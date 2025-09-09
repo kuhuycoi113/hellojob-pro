@@ -91,7 +91,7 @@ const emptyCandidate: EnrichedCandidateProfile = {
     skills: ['Vận hành máy CNC', 'AutoCAD', 'SolidWorks', 'Làm việc nhóm', 'Giải quyết vấn đề'],
     certifications: ['Chứng chỉ JLPT N3', 'Chứng chỉ An toàn lao động'],
     documents: {
-        vietnam: ['CCCD', 'Giấy khai sinh'],
+        vietnam: ['Xác nhận cư trú', 'Xác nhận dân sự', 'Căn cước mặt trước', 'Căn cước mặt sau', 'Hộ chiếu mặt trước', 'Hộ chiếu mặt sau', 'Giấy khám sức khỏe', 'Bằng học vấn', 'Xác nhận tình trạng hôn nhân', 'Giấy tờ khác'],
         japan: ['Thẻ ngoại kiều', 'MyNumber'],
         other: [],
     },
