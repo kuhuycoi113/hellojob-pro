@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight } from "lucide-react";
+import { industriesByJobType } from "@/lib/industry-data";
+import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera } from "lucide-react";
 
 const japanJobTypes = [
     'Thực tập sinh 3 năm',
@@ -58,6 +59,8 @@ const experienceYears = [
     '4,5 - 5 năm',
     'Trên 5 năm'
 ];
+const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
+const interviewFormats = ["Phỏng vấn trực tiếp", "Phỏng vấn Online", "Phỏng vấn trực tiếp và Online"];
 
 export const FilterSidebar = () => {
     return (
@@ -67,7 +70,7 @@ export const FilterSidebar = () => {
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Accordion type="multiple" defaultValue={['salary', 'jobType', 'location', 'requirements', 'specialConditions']} className="w-full">
+                    <Accordion type="multiple" defaultValue={['salary', 'jobType', 'location', 'requirements', 'specialConditions', 'industry']} className="w-full">
                         
                         <AccordionItem value="salary">
                             <AccordionTrigger className="text-base font-semibold">
@@ -96,6 +99,16 @@ export const FilterSidebar = () => {
                             </AccordionContent>
                         </AccordionItem>
 
+                        <AccordionItem value="industry">
+                            <AccordionTrigger className="text-base font-semibold">
+                                <span className="flex items-center gap-2"><Building className="h-5 w-5"/>Ngành nghề</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-2 pt-4">
+                               <Select><SelectTrigger><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả ngành nghề</SelectItem>{allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name}</SelectItem>)}</SelectContent></Select>
+                            </AccordionContent>
+                        </AccordionItem>
+
+
                          <AccordionItem value="location">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><MapPin className="h-5 w-5"/>Địa điểm</span>
@@ -103,11 +116,11 @@ export const FilterSidebar = () => {
                             <AccordionContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
                                     <Label>Nơi làm việc (Nhật Bản)</Label>
-                                    <Select><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent><SelectItem value="all">Tất cả Nhật Bản</SelectItem>{Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (<SelectGroup key={region}><SelectLabel>{region}</SelectLabel>{(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectGroup>))}</SelectContent></Select>
+                                    <Select><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Nhật Bản</SelectItem>{Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (<SelectGroup key={region}><SelectLabel>{region}</SelectLabel>{(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectGroup>))}</SelectContent></Select>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Nơi phỏng vấn (Việt Nam)</Label>
-                                    <Select><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent><SelectItem value="all">Tất cả Việt Nam</SelectItem>{locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent></Select>
+                                    <Select><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Việt Nam</SelectItem>{locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent></Select>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
@@ -127,6 +140,14 @@ export const FilterSidebar = () => {
                                             </div>
                                         ))}
                                     </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><Label htmlFor="age-from">Tuổi từ</Label><Input id="age-from" type="number" placeholder="18" /></div>
+                                    <div><Label htmlFor="age-to">đến</Label><Input id="age-to" type="number" placeholder="40" /></div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><Label htmlFor="height-from">Chiều cao từ (cm)</Label><Input id="height-from" type="number" placeholder="150" /></div>
+                                    <div><Label htmlFor="weight-from">Cân nặng từ (kg)</Label><Input id="weight-from" type="number" placeholder="45" /></div>
                                 </div>
                                 <div>
                                     <Label className="font-semibold">Trình độ tiếng Nhật</Label>
@@ -160,6 +181,10 @@ export const FilterSidebar = () => {
                                     </Select>
                                 </div>
                                 <div>
+                                    <Label>Hình thức phỏng vấn</Label>
+                                    <Select><SelectTrigger className="mt-2"><SelectValue placeholder="Chọn hình thức"/></SelectTrigger><SelectContent>{interviewFormats.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent></Select>
+                                </div>
+                                <div>
                                     <Label className="font-semibold">Yêu cầu khác</Label>
                                     <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2">
                                         <div className="flex items-center space-x-2">
@@ -169,6 +194,10 @@ export const FilterSidebar = () => {
                                          <div className="flex items-center space-x-2">
                                             <Checkbox id="cond-hepatitis" />
                                             <Label htmlFor="cond-hepatitis" className="font-normal cursor-pointer text-sm flex items-center gap-1.5"><Dna className="h-4 w-4 text-red-500"/>Không VGB</Label>
+                                        </div>
+                                         <div className="flex items-center space-x-2">
+                                            <Checkbox id="cond-vision" />
+                                            <Label htmlFor="cond-vision" className="font-normal cursor-pointer text-sm flex items-center gap-1.5"><Camera className="h-4 w-4 text-blue-500"/>Không cận thị</Label>
                                         </div>
                                     </div>
                                 </div>
@@ -195,5 +224,3 @@ export const FilterSidebar = () => {
         </div>
     );
 };
-
-    
