@@ -20,7 +20,6 @@ import {
 export const mainNavLinks = [
   { href: '/', label: 'Trang chủ', icon: Home, mobile: true },
   { href: '/roadmap', label: 'Lộ trình' },
-  { href: '/career-orientation', label: 'Hướng nghiệp' },
   {
     href: '/ai-profile',
     label: 'Hồ sơ AI',
@@ -33,7 +32,6 @@ export const mainNavLinks = [
 
 export const quickAccessLinks = [
   { href: '/roadmap', label: 'Lộ trình', icon: Compass },
-  { href: '/career-orientation', label: 'Hướng nghiệp', icon: Compass },
   { href: '/about', label: 'Giới thiệu', icon: Info },
   { href: '/post-job', label: 'Đăng tuyển dụng', icon: PlusCircle },
   { href: '/dashboard', label: 'Dữ liệu & Báo cáo', icon: FileText },
