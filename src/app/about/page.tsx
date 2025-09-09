@@ -16,25 +16,25 @@ const teamMembers = [
   {
     name: 'Nguyễn Quốc Việt',
     role: 'Founder & CEO',
-    avatar: '/img/viet.jpg',
+    avatar: 'https://placehold.co/200x200.png',
     dataAiHint: 'male ceo portrait',
   },
   {
     name: 'Phùng Thị Tuyết Nhung',
     role: 'Founder & COO',
-    avatar: '/img/nhung.jpg',
+    avatar: 'https://placehold.co/200x200.png',
     dataAiHint: 'female coo portrait',
   },
   {
     name: 'Trương Quỳnh Phương',
     role: 'Co-Founder - Thành viên HĐQT',
-    avatar: '/img/phuong.jpg',
+    avatar: 'https://placehold.co/200x200.png',
     dataAiHint: 'female board member portrait',
   },
    {
     name: 'Nguyễn Ngọc Hà',
     role: 'Co-Founder - Thành viên HĐQT',
-    avatar: '/img/ha.jpg',
+    avatar: 'https://placehold.co/200x200.png',
     dataAiHint: 'female board member portrait',
   },
   {
@@ -97,7 +97,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="relative aspect-[4/3] max-h-[450px]">
               <Image
-                src="/img/hellojob.jpg"
+                src="https://placehold.co/600x450.png"
                 alt="Đội ngũ HelloJob"
                 fill
                 className="object-contain rounded-lg shadow-xl"
