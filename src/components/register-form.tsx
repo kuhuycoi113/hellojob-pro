@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const TOTAL_STEPS = 4;
@@ -228,11 +228,17 @@ export function RegisterForm() {
         )}
       </CardContent>
       <CardFooter className="flex justify-between mt-6">
-        {step > 1 ? (
-          <Button variant="outline" onClick={handleBack}>
-            <ChevronLeft /> Quay lại
-          </Button>
-        ) : <div />}
+        <div>
+          {step > 1 ? (
+            <Button variant="outline" onClick={handleBack}>
+              <ChevronLeft /> Quay lại
+            </Button>
+          ) : (
+            <Button variant="ghost" onClick={() => router.push('/')}>
+              <X className="mr-2 h-4 w-4" /> Hủy
+            </Button>
+          )}
+        </div>
         {step < TOTAL_STEPS ? (
           <Button onClick={handleNext} className="bg-accent-blue text-white hover:bg-accent-green/90">
             Tiếp theo <ChevronRight />
@@ -246,5 +252,3 @@ export function RegisterForm() {
     </Card>
   );
 }
-
-    
