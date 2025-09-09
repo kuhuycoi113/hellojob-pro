@@ -301,7 +301,7 @@ export default function PartnerPostJobPage() {
     "Trình độ tương đương 9.0", "Trình độ tương đương 8.0", "Trình độ tương đương 7.0", "Trình độ tương đương 6.0", "Trình độ tương đương 5.0", "Trình độ tương đương 4.0"
   ];
   const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Thạc sĩ", "Tốt nghiệp Tiến sĩ", "Tốt nghiệp Senmon", "Tốt nghiệp Tanki-dai"];
-  const experienceYears = ["trên 0,5 năm", "trên 1 năm", "trên 1,5 năm", "trên 2 năm", "trên 2,5 năm", "trên 3 năm", "trên 3,5 năm", "trên 4 năm", "trên 4,5 năm", "Nhận cả kinh nghiệm ngành khác"];
+  const experienceYears = ["Trên 0,5 năm", "Trên 1 năm", "Trên 1,5 năm", "Trên 2 năm", "Trên 2,5 năm", "Trên 3 năm", "Trên 3,5 năm", "Trên 4 năm", "Trên 4,5 năm", "Trên 5 năm"];
   const ginouExpiryOptions = ["trên 4,5 năm", "trên 4 năm", "trên 3,5 năm", "trên 3 năm", "trên 2,5 năm", "trên 2 năm", "trên 1,5 năm", "trên 1 năm", "trên 0,5 năm"];
   const workShifts = [
     'Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)',

@@ -44,7 +44,7 @@ const specialConditions = [
 ];
 const languageLevels = ['N1', 'N2', 'N3', 'N4', 'N5', 'Không yêu cầu'];
 const educationLevels = ["Tốt nghiệp THPT", "Trung cấp", "Cao đẳng", "Đại học", "Senmon", "Không yêu cầu"];
-const experienceYears = ["Không yêu cầu", "Dưới 1 năm", "1-2 năm", "3-5 năm", "Trên 5 năm"];
+const experienceYears = ["Không yêu cầu", "Trên 0,5 năm", "Trên 1 năm", "Trên 1,5 năm", "Trên 2 năm", "Trên 2,5 năm", "Trên 3 năm", "Trên 3,5 năm", "Trên 4 năm", "Trên 4,5 năm", "Trên 5 năm"];
 
 export const FilterSidebar = () => {
     return (
