@@ -83,7 +83,7 @@ export function Header() {
       }
   }
 
-  const LoggedInMenu = () => (
+  const MainMenu = () => (
      <DropdownMenu>
         <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
@@ -92,22 +92,35 @@ export function Header() {
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-[360px]" align="end" forceMount>
-            <DropdownMenuItem asChild>
-            <Link href="/candidate-profile" className="block hover:bg-accent rounded-md p-2 cursor-pointer">
-                <div className="flex items-center gap-3">
-                <Avatar className="h-12 w-12">
-                    <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
-                    <AvatarFallback>A</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col space-y-1">
-                    <p className="text-base font-medium leading-none">Lê Ngọc Hân</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                    Ứng viên Thực tập sinh
-                    </p>
+            {isLoggedIn ? (
+                <DropdownMenuItem asChild>
+                    <Link href="/candidate-profile" className="block hover:bg-accent rounded-md p-2 cursor-pointer">
+                        <div className="flex items-center gap-3">
+                        <Avatar className="h-12 w-12">
+                            <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
+                            <AvatarFallback>A</AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col space-y-1">
+                            <p className="text-base font-medium leading-none">Lê Ngọc Hân</p>
+                            <p className="text-xs leading-none text-muted-foreground">
+                            Ứng viên Thực tập sinh
+                            </p>
+                        </div>
+                        </div>
+                    </Link>
+                </DropdownMenuItem>
+            ) : (
+                <div className="p-2">
+                    <div className="grid grid-cols-2 gap-2">
+                         <Button asChild className="w-full" size="sm" variant="outline">
+                            <Link href="/register"><UserPlus /> Đăng ký</Link>
+                        </Button>
+                         <Button asChild className="w-full" size="sm">
+                            <Link href="/candidate-profile"><LogIn/> Đăng nhập</Link>
+                        </Button>
+                    </div>
                 </div>
-                </div>
-            </Link>
-            </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
             <div className="grid grid-cols-4 gap-2 p-2">
@@ -135,36 +148,6 @@ export function Header() {
     </DropdownMenu>
   );
 
-  const LoggedOutMenu = () => (
-      <div className="flex items-center gap-2">
-          <Button asChild variant="ghost">
-              <Link href="/register"><UserPlus /> Đăng ký</Link>
-          </Button>
-           <Button asChild>
-              <Link href="/candidate-profile"><LogIn/> Đăng nhập</Link>
-          </Button>
-           <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                 <Button variant="ghost" size="icon" className="rounded-full">
-                  <LayoutGrid className="h-5 w-5" />
-                  <span className="sr-only">Open Menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-64" align="end" forceMount>
-                 <DropdownMenuRadioGroup value={role} onValueChange={(value) => setRole(value as 'candidate' | 'guest')}>
-                    <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                        <DropdownMenuRadioItem value="candidate">Ứng viên đã đăng nhập</DropdownMenuRadioItem>
-                    </DropdownMenuItem>
-                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                        <DropdownMenuRadioItem value="guest">Khách</DropdownMenuRadioItem>
-                    </DropdownMenuItem>
-                 </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-      </div>
-  )
-
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -185,7 +168,9 @@ export function Header() {
         <div className="hidden md:flex items-center gap-2">
             <Dialog>
               <DialogTrigger asChild>
-                <Button>Tạo hồ sơ</Button>
+                <Button variant="default" asChild>
+                  <Link href="/ai-profile">Tạo hồ sơ</Link>
+                </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-xl">
                 <DialogHeader>
@@ -197,18 +182,18 @@ export function Header() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                   <DialogClose asChild>
                     <Link href="/ai-profile">
-                      <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                        <Sparkles className="h-8 w-8 text-primary mx-auto mb-2" />
-                        <h3 className="font-bold text-lg mb-1">Tạo hồ sơ bằng AI</h3>
+                      <Card className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                        <Sparkles className="h-6 w-6 text-primary mx-auto mb-2" />
+                        <h3 className="font-bold text-base mb-1">Tạo hồ sơ bằng AI</h3>
                         <p className="text-muted-foreground text-xs">Tải lên CV hoặc mô tả mong muốn, AI sẽ tự động điền thông tin.</p>
                       </Card>
                     </Link>
                   </DialogClose>
                   <DialogClose asChild>
                     <Link href="/register">
-                      <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                        <Pencil className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                        <h3 className="font-bold text-lg mb-1">Nhập liệu thủ công</h3>
+                      <Card className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                        <Pencil className="h-6 w-6 text-blue-500 mx-auto mb-2" />
+                        <h3 className="font-bold text-base mb-1">Nhập liệu thủ công</h3>
                         <p className="text-muted-foreground text-xs">Tự điền thông tin chi tiết vào biểu mẫu có sẵn của chúng tôi.</p>
                       </Card>
                     </Link>
@@ -220,17 +205,19 @@ export function Header() {
             <Button asChild variant="outline">
               <Link href="/jobs">Trang việc làm</Link>
             </Button>
-             {isClient && (isLoggedIn ? (
+             {isClient && (
                 <>
-                    <Link href="/candidate-profile">
-                        <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
-                            <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
-                            <AvatarFallback>A</AvatarFallback>
-                        </Avatar>
-                    </Link>
-                    <LoggedInMenu />
+                    {isLoggedIn && (
+                         <Link href="/candidate-profile">
+                            <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+                                <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
+                                <AvatarFallback>A</AvatarFallback>
+                            </Avatar>
+                        </Link>
+                    )}
+                    <MainMenu />
                 </>
-             ) : <LoggedOutMenu />)}
+             )}
         </div>
         <div className="md:hidden">
             <Button variant="default" size="icon" onClick={() => openChat()}>
