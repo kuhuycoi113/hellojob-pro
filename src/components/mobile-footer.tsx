@@ -89,14 +89,9 @@ export function MobileFooter() {
   const LoggedOutContent = () => (
      <div className="p-4 space-y-4">
         <p className="text-muted-foreground text-center">Đăng nhập để trải nghiệm đầy đủ tính năng của HelloJob.</p>
-        <div className="grid grid-cols-2 gap-4">
-           <Button asChild className="w-full" size="lg" variant="outline" onClick={() => setIsOpen(false)}>
-                <Link href="/register"><UserPlus/> Đăng ký</Link>
-            </Button>
-            <Button asChild className="w-full" size="lg" onClick={() => setIsOpen(false)}>
-                <Link href="/candidate-profile"><LogIn/> Đăng nhập</Link>
-            </Button>
-        </div>
+        <Button asChild className="w-full" size="lg" onClick={() => setIsOpen(false)}>
+          <Link href="/candidate-profile"><LogIn className="mr-2"/>Đăng nhập / Đăng ký</Link>
+        </Button>
      </div>
   );
 

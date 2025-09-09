@@ -84,67 +84,85 @@ export function Header() {
   }
 
   const MainMenu = () => (
-     <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-            <LayoutGrid className="h-5 w-5" />
-            <span className="sr-only">Open Menu</span>
-            </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[360px]" align="end" forceMount>
-            {isLoggedIn ? (
-                <DropdownMenuItem asChild>
-                    <Link href="/candidate-profile" className="block hover:bg-accent rounded-md p-2 cursor-pointer">
-                        <div className="flex items-center gap-3">
-                        <Avatar className="h-12 w-12">
-                            <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
-                            <AvatarFallback>A</AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col space-y-1">
-                            <p className="text-base font-medium leading-none">Lê Ngọc Hân</p>
-                            <p className="text-xs leading-none text-muted-foreground">
-                            Ứng viên Thực tập sinh
-                            </p>
-                        </div>
-                        </div>
-                    </Link>
-                </DropdownMenuItem>
-            ) : (
-                <div className="p-2">
-                    <div className="grid grid-cols-2 gap-2">
-                         <Button asChild className="w-full" size="sm" variant="outline">
-                            <Link href="/register"><UserPlus /> Đăng ký</Link>
-                        </Button>
-                         <Button asChild className="w-full" size="sm">
-                            <Link href="/candidate-profile"><LogIn/> Đăng nhập</Link>
-                        </Button>
-                    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <LayoutGrid className="h-5 w-5" />
+          <span className="sr-only">Open Menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-[360px]" align="end" forceMount>
+        {isLoggedIn ? (
+          <DropdownMenuItem asChild>
+            <Link
+              href="/candidate-profile"
+              className="block hover:bg-accent rounded-md p-2 cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage
+                    src="https://placehold.co/100x100.png"
+                    alt="User"
+                    data-ai-hint="user avatar"
+                  />
+                  <AvatarFallback>A</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-base font-medium leading-none">
+                    Lê Ngọc Hân
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    Ứng viên Thực tập sinh
+                  </p>
                 </div>
-            )}
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-            <div className="grid grid-cols-4 gap-2 p-2">
-                {quickAccessLinks.map((link) => (
-                    <DropdownMenuItem asChild key={link.href}>
-                    <Link href={link.href} className="flex flex-col items-center justify-start p-2 h-20 cursor-pointer rounded-md hover:bg-accent">
-                        <div className="h-8 flex items-center justify-center"><link.icon/></div>
-                        <span className="text-xs text-center leading-tight">{link.label}</span>
-                    </Link>
-                    </DropdownMenuItem>
-                ))}
-            </div>
-            </DropdownMenuGroup>
-             <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup value={role} onValueChange={(value) => setRole(value as 'candidate' | 'guest')}>
-                <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  <DropdownMenuRadioItem value="candidate">Ứng viên đã đăng nhập</DropdownMenuRadioItem>
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  <DropdownMenuRadioItem value="guest">Khách</DropdownMenuRadioItem>
-                </DropdownMenuItem>
-              </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
+              </div>
+            </Link>
+          </DropdownMenuItem>
+        ) : (
+          <div className="p-2">
+            <Button asChild className="w-full" size="sm">
+              <Link href="/candidate-profile">
+                <LogIn className="mr-2 h-4 w-4" /> Đăng nhập / Đăng ký
+              </Link>
+            </Button>
+          </div>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <div className="grid grid-cols-4 gap-2 p-2">
+            {quickAccessLinks.map((link) => (
+              <DropdownMenuItem asChild key={link.href}>
+                <Link
+                  href={link.href}
+                  className="flex flex-col items-center justify-start p-2 h-20 cursor-pointer rounded-md hover:bg-accent"
+                >
+                  <div className="h-8 flex items-center justify-center">
+                    <link.icon />
+                  </div>
+                  <span className="text-xs text-center leading-tight">
+                    {link.label}
+                  </span>
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </div>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuRadioGroup
+          value={role}
+          onValueChange={(value) => setRole(value as 'candidate' | 'guest')}
+        >
+          <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuRadioItem value="candidate">
+              Ứng viên đã đăng nhập
+            </DropdownMenuRadioItem>
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuRadioItem value="guest">Khách</DropdownMenuRadioItem>
+          </DropdownMenuItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 
@@ -207,13 +225,19 @@ export function Header() {
             </Button>
              {isClient && (
                 <>
-                    {isLoggedIn && (
+                    {isLoggedIn ? (
                          <Link href="/candidate-profile">
                             <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
                                 <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
                                 <AvatarFallback>A</AvatarFallback>
                             </Avatar>
                         </Link>
+                    ): (
+                       <Button asChild>
+                          <Link href="/candidate-profile">
+                            <LogIn className="mr-2 h-4 w-4" /> Đăng nhập / Đăng ký
+                          </Link>
+                        </Button>
                     )}
                     <MainMenu />
                 </>
