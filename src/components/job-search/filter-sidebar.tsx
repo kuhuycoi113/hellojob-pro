@@ -10,17 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { industriesByJobType } from "@/lib/industry-data";
-import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera } from "lucide-react";
+import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler } from "lucide-react";
 
 const japanJobTypes = [
-    'Thực tập sinh 3 năm',
-    'Thực tập sinh 1 năm',
-    'Thực tập sinh 3 Go',
-    'Đặc định đầu Việt',
-    'Đặc định đầu Nhật',
-    'Đặc định đi mới',
-    'Kỹ sư, tri thức đầu Việt',
-    'Kỹ sư, tri thức đầu Nhật'
+    'Thực tập sinh kỹ năng',
+    'Kỹ năng đặc định',
+    'Kỹ sư, tri thức'
 ];
 
 const locations = {
@@ -44,7 +39,7 @@ const specialConditions = [
     'Hỗ trợ Ginou 2', 'Hỗ trợ chỗ ở', 'Cặp đôi', 'Lương tốt', 'Tăng ca', 'Có thưởng', 'Nợ phí', 'Bay nhanh', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Không yêu cầu kinh nghiệm', 'Việc nhẹ', 'Việc nặng', 'Nghỉ T7, CN', 'Nhận visa katsudo'
 ];
 const languageLevels = ['N1', 'N2', 'N3', 'N4', 'N5', 'Không yêu cầu'];
-const educationLevels = ["Tốt nghiệp THPT", "Trung cấp", "Cao đẳng", "Đại học", "Senmon", "Không yêu cầu"];
+const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon", "Không yêu cầu"];
 const experienceYears = [
     'Không yêu cầu',
     'Dưới 0,5 năm',
@@ -90,7 +85,7 @@ export const FilterSidebar = () => {
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-2 pt-4">
-                                {japanJobTypes.map(item => (
+                                {Object.keys(industriesByJobType).filter(k => k !== 'Default').map(item => (
                                     <div key={item} className="flex items-center space-x-2">
                                         <Checkbox id={`type-${item}`} />
                                         <Label htmlFor={`type-${item}`} className="font-normal cursor-pointer">{item}</Label>
@@ -224,3 +219,5 @@ export const FilterSidebar = () => {
         </div>
     );
 };
+
+    

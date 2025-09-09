@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, ChevronRight, Eye, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { industriesByJobType } from '@/lib/industry-data';
 
 const TOTAL_STEPS = 4;
 
@@ -46,6 +47,8 @@ const locations = {
     }
 };
 
+const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
+const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
 
 export function RegisterForm() {
   const [step, setStep] = useState(1);
@@ -145,10 +148,7 @@ export function RegisterForm() {
                   <SelectValue placeholder="Chọn trình độ" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="THPT">Tốt nghiệp THPT</SelectItem>
-                  <SelectItem value="Trung cấp">Trung cấp</SelectItem>
-                  <SelectItem value="Cao đẳng">Cao đẳng</SelectItem>
-                  <SelectItem value="Đại học">Đại học</SelectItem>
+                  {educationLevels.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -177,10 +177,10 @@ export function RegisterForm() {
             <div>
               <Label className="font-bold text-lg">Lĩnh vực quan tâm</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3">
-                {['Cơ khí', 'Điện tử', 'Dệt may', 'Chế biến thực phẩm', 'IT', 'Logistics'].map((interest) => (
-                  <div key={interest} className="flex items-center space-x-3 p-3 bg-secondary rounded-lg">
-                    <Checkbox id={`interest-${interest}`} onCheckedChange={() => handleCheckboxChange('interests', interest)} checked={formData.interests.includes(interest)}/>
-                    <Label htmlFor={`interest-${interest}`} className="cursor-pointer">{interest}</Label>
+                {allIndustries.slice(0,6).map((interest) => (
+                  <div key={interest.slug} className="flex items-center space-x-3 p-3 bg-secondary rounded-lg">
+                    <Checkbox id={`interest-${interest.slug}`} onCheckedChange={() => handleCheckboxChange('interests', interest.name)} checked={formData.interests.includes(interest.name)}/>
+                    <Label htmlFor={`interest-${interest.slug}`} className="cursor-pointer">{interest.name}</Label>
                   </div>
                 ))}
               </div>
@@ -252,3 +252,5 @@ export function RegisterForm() {
     </Card>
   );
 }
+
+    
