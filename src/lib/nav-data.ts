@@ -22,7 +22,7 @@ export const mainNavLinks = [
   { href: '/roadmap', label: 'Lộ trình' },
   {
     href: '/ai-profile',
-    label: 'Hồ sơ AI',
+    label: 'Tạo hồ sơ AI',
     icon: Sparkles,
     mobile: true,
   },
