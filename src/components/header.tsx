@@ -361,6 +361,12 @@ export function Header() {
                            <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
                        </Button>
                     )}
+                    <Button asChild variant="ghost">
+                        <Link href="/jobs">
+                            <Briefcase className="mr-2 h-4 w-4" />
+                            Trang việc làm
+                        </Link>
+                    </Button>
                     <MainMenu />
                 </>
              )}
