@@ -177,7 +177,7 @@ export function Header() {
                 key={link.href} 
                 href={link.href}
                 label={link.label}
-                icon={(link.href === '/ai-profile' && role === 'guest') ? Sparkles : undefined}
+                icon={link.icon}
                 onClick={link.href === '/' ? handleHomeClick : undefined} 
             />
           ))}
