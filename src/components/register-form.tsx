@@ -29,6 +29,11 @@ type FormData = {
   jobType: string;
 };
 
+const locations = [
+    "An Giang", "Bắc Ninh", "Cao Bằng", "Cà Mau", "Cần Thơ", "Đà Nẵng", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Đắk Lắk", "Gia Lai", "Hà Nội", "Hà Tĩnh", "Hải Phòng", "Hưng Yên", "Thừa Thiên Huế", "Khánh Hòa", "Lai Châu", "Lào Cai", "Lạng Sơn", "Lâm Đồng", "Nghệ An", "Ninh Bình", "Phú Thọ", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sơn La", "Tây Ninh", "Thanh Hóa", "Thành phố Hồ Chí Minh", "Thái Nguyên", "Tuyên Quang", "Vĩnh Long"
+];
+
+
 export function RegisterForm() {
   const [step, setStep] = useState(1);
   const router = useRouter();
@@ -135,8 +140,15 @@ export function RegisterForm() {
               </Select>
             </div>
              <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="district">Quận/Huyện đang ở</Label>
-              <Input id="district" placeholder="Quận 1, TP.HCM" value={formData.district} onChange={(e) => handleChange('district', e.target.value)} />
+              <Label htmlFor="district">Quê quán/Tỉnh thành</Label>
+               <Select onValueChange={(value) => handleChange('district', value)} value={formData.district}>
+                <SelectTrigger id="district">
+                  <SelectValue placeholder="Chọn quê quán" />
+                </SelectTrigger>
+                <SelectContent>
+                    {locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         )}
