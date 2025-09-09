@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -940,8 +941,12 @@ export default function CandidateProfilePage() {
                   </p>
                 </div>
                  <div className="md:ml-auto mt-4 md:mt-0 flex items-center gap-2">
-                     <Button variant="outline"><FileDown/> Tải hồ sơ</Button>
-                     <Button variant="outline"><Send/> Gửi hồ sơ</Button>
+                     <Button variant="outline" size="icon" className="sm:hidden"><FileDown/></Button>
+                     <Button variant="outline" className="hidden sm:inline-flex"><FileDown/> Tải hồ sơ</Button>
+                     
+                     <Button variant="outline" size="icon" className="sm:hidden"><Send/></Button>
+                     <Button variant="outline" className="hidden sm:inline-flex"><Send/> Gửi hồ sơ</Button>
+
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="icon" disabled={isTranslating}>
@@ -966,7 +971,16 @@ export default function CandidateProfilePage() {
                         description="Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn."
                         candidate={originalCandidate!} // Always edit the original version
                      >
-                        <Button variant="outline"><Edit /> Sửa hồ sơ</Button>
+                        <Button variant="outline" size="icon" className="sm:hidden"><Edit /></Button>
+                     </EditDialog>
+                     <EditDialog
+                        title="Hoàn thiện hồ sơ"
+                        onSave={handleSave}
+                        renderContent={MainEditDialogContent}
+                        description="Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn."
+                        candidate={originalCandidate!} // Always edit the original version
+                     >
+                         <Button variant="outline" className="hidden sm:inline-flex"><Edit /> Sửa hồ sơ</Button>
                      </EditDialog>
                  </div>
               </div>
