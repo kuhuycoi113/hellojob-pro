@@ -67,8 +67,8 @@ const hiddenFieldsByVisa: { [key: string]: (keyof JobData)[] } = {
   'Đặc định đầu Việt': ['educationRequirement', 'companyArrivalTime', 'ginouExpiryRequirement'],
   'Đặc định đầu Nhật': ['educationRequirement', 'financialAbility'],
   'Đặc định đi mới': ['educationRequirement', 'companyArrivalTime', 'ginouExpiryRequirement'],
-  'Kỹ sư, tri thức đầu Việt': ['companyArrivalTime', 'ginouExpiryRequirement'],
-  'Kỹ sư, tri thức đầu Nhật': ['financialAbility'],
+  'Kỹ sư, tri thức đầu Việt': ['companyArrivalTime', 'ginouExpiryRequirement', 'annualIncome', 'annualBonus'],
+  'Kỹ sư, tri thức đầu Nhật': ['financialAbility', 'annualIncome', 'annualBonus'],
 };
 
 const visaDetailsByVisaType: { [key: string]: string[] } = {
@@ -370,6 +370,12 @@ export default function PartnerPostJobPage() {
     if (jobData.visaType?.includes('Kỹ sư, tri thức')) return '1,600,000 - 30,000,000 yên/năm';
     return 'VD: 300 vạn yên';
   })();
+  
+  const annualBonusPlaceholder = (() => {
+    if (jobData.visaType?.includes('Kỹ năng đặc định')) return '250,000 - 1,666,666 yên/năm';
+    if (jobData.visaType?.includes('Kỹ sư, tri thức')) return '266,666 - 5,000,000 yên/năm';
+    return 'VD: 2 lần/năm, tổng 2 tháng lương';
+  })();
 
 
   const basicSalaryPlaceholder = (() => {
@@ -597,7 +603,7 @@ export default function PartnerPostJobPage() {
                     {visibleFields.has('annualBonus') && (
                         <div className="space-y-2">
                             <Label htmlFor="annual-bonus">Thưởng (năm)</Label>
-                            <Input id="annual-bonus" placeholder="VD: 2 lần/năm" value={jobData.annualBonus} onChange={(e) => handleInputChange('annualBonus', e.target.value)} />
+                            <Input id="annual-bonus" placeholder={annualBonusPlaceholder} value={jobData.annualBonus} onChange={(e) => handleInputChange('annualBonus', e.target.value)} />
                         </div>
                     )}
                     {visibleFields.has('netFee') && (
