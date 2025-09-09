@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { BookOpen, Search, ChevronsUpDown, Check, GraduationCap, Briefcase, TrendingUp, BookCopy, ArrowRight, MapPin } from 'lucide-react';
+import { BookOpen, Search, ChevronsUpDown, Check, GraduationCap, Briefcase, TrendingUp, BookCopy, ArrowRight, MapPin, MapIcon } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
@@ -101,7 +101,7 @@ const MainContent = () => (
             <Card className="text-center shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2">
               <CardHeader>
                 <div className="mx-auto bg-green-100 rounded-full p-4 w-fit">
-                  <MapPin className="h-10 w-10 text-green-600" />
+                  <MapIcon className="h-10 w-10 text-green-600" />
                 </div>
                 <CardTitle className="font-headline mt-4">Lộ trình rõ ràng</CardTitle>
               </CardHeader>
@@ -212,7 +212,7 @@ const MainContent = () => (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredCourses.map(course => (
               <Card key={course.id} className="flex flex-col overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
-                <CardHeader>
+                <CardHeader className="p-0">
                    <Link href={`/learn/${course.id}`} className="block">
                       <Image
                         src={course.image}
