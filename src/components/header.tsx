@@ -174,7 +174,7 @@ export function Header() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-            <Button asChild variant="outline">
+            <Button asChild>
               <Link href="/ai-profile">Tạo hồ sơ</Link>
             </Button>
             <Button asChild variant="outline">
