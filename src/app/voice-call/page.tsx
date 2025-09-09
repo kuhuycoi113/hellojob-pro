@@ -1,17 +1,16 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Mic, MicOff, PhoneOff, User, Volume2, AlertTriangle } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, User, Volume2, AlertTriangle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-
-export default function VoiceCallPage() {
+function VoiceCallComponent() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -115,4 +114,18 @@ export default function VoiceCallPage() {
       </div>
     </div>
   );
+}
+
+
+export default function VoiceCallPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex h-screen w-full flex-col bg-slate-900 text-white items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin"/>
+                <p className="mt-4">Đang tải cuộc gọi...</p>
+            </div>
+        }>
+            <VoiceCallComponent />
+        </Suspense>
+    )
 }
