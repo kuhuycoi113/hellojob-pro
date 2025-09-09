@@ -118,17 +118,17 @@ export function Header() {
           </DialogDescription>
       </DialogHeader>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-        <Card onClick={() => router.push('/ai-profile')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+        <Card onClick={() => setProfileCreationStep(4)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
             <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Thực tập sinh</h3>
             <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
         </Card>
-        <Card onClick={() => router.push('/ai-profile')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+        <Card onClick={() => setProfileCreationStep(5)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
             <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
             <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
         </Card>
-        <Card onClick={() => router.push('/ai-profile')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+        <Card onClick={() => setProfileCreationStep(6)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
             <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
             <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
@@ -138,7 +138,7 @@ export function Header() {
     </>
   );
 
-  const SecondStepDialog = () => (
+  const DetailedCreateStepDialog = () => (
      <>
         <DialogHeader>
           <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
@@ -170,6 +170,25 @@ export function Header() {
       </>
   );
   
+    const VisaDetailStepDialog = ({ title, options, backStep }: { title: string, options: string[], backStep: number }) => (
+    <>
+      <DialogHeader>
+        <DialogTitle className="text-2xl font-headline text-center">{title}</DialogTitle>
+        <DialogDescription className="text-center">
+          Chọn loại hình chi tiết để tiếp tục.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+        {options.map(option => (
+          <Card key={option} onClick={() => router.push('/ai-profile')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+            <h3 className="font-bold text-base">{option}</h3>
+          </Card>
+        ))}
+      </div>
+      <Button variant="link" onClick={() => setProfileCreationStep(backStep)} className="mt-4 mx-auto block">Quay lại</Button>
+    </>
+  );
+
   const renderDialogContent = () => {
     switch (profileCreationStep) {
       case 1:
@@ -177,7 +196,13 @@ export function Header() {
       case 2:
         return <QuickCreateStepDialog />;
       case 3:
-        return <SecondStepDialog />;
+        return <DetailedCreateStepDialog />;
+      case 4:
+         return <VisaDetailStepDialog title="Chọn loại Thực tập sinh" options={['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go']} backStep={2} />;
+      case 5:
+         return <VisaDetailStepDialog title="Chọn loại Kỹ năng đặc định" options={['Đặc định đầu Nhật', 'Đặc định đầu Việt', 'Đặc định đi mới']} backStep={2} />;
+      case 6:
+         return <VisaDetailStepDialog title="Chọn loại Kỹ sư, tri thức" options={['Kỹ sư đầu Nhật', 'Kỹ sư đầu Việt']} backStep={2} />;
       default:
         return <FirstStepDialog />;
     }
@@ -219,7 +244,13 @@ export function Header() {
             </Link>
           </DropdownMenuItem>
         ) : (
-          null
+           <DropdownMenuItem asChild>
+            <div className="p-2">
+                <Button asChild className="w-full" size="lg">
+                    <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
+                </Button>
+            </div>
+           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
@@ -273,7 +304,7 @@ export function Header() {
                 key={link.href} 
                 href={link.href}
                 label={link.label}
-                icon={link.icon}
+                icon={link.href === '/ai-profile' ? Sparkles : undefined}
                 onClick={link.href === '/' ? handleHomeClick : undefined} 
             />
           ))}
