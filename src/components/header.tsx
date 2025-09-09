@@ -363,7 +363,6 @@ export function Header() {
                     )}
                     <Button asChild variant="ghost">
                         <Link href="/jobs">
-                            <Briefcase className="mr-2 h-4 w-4" />
                             Trang việc làm
                         </Link>
                     </Button>
