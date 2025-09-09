@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn } from 'lucide-react';
+import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useState, useEffect } from 'react';
@@ -25,6 +25,15 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import Image from 'next/image';
 import { useChat } from '@/contexts/ChatContext';
@@ -168,15 +177,41 @@ export function Header() {
                 key={link.href} 
                 href={link.href}
                 label={link.label}
-                icon={link.href === '/ai-profile' ? link.icon : undefined}
                 onClick={link.href === '/' ? handleHomeClick : undefined} 
             />
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-            <Button asChild>
-              <Link href="/ai-profile">Tạo hồ sơ</Link>
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>Tạo hồ sơ</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
+                  <DialogDescription className="text-center">
+                    Bắt đầu hành trình của bạn với HelloJob bằng cách dễ nhất cho bạn.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                  <Link href="/ai-profile">
+                    <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                      <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
+                      <h3 className="font-bold text-xl mb-2">Tạo hồ sơ bằng AI</h3>
+                      <p className="text-muted-foreground text-sm">Tải lên CV hoặc mô tả mong muốn, AI sẽ tự động điền thông tin.</p>
+                    </Card>
+                  </Link>
+                  <Link href="/register">
+                    <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                      <Pencil className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+                      <h3 className="font-bold text-xl mb-2">Nhập liệu thủ công</h3>
+                      <p className="text-muted-foreground text-sm">Tự điền thông tin chi tiết vào biểu mẫu có sẵn của chúng tôi.</p>
+                    </Card>
+                  </Link>
+                </div>
+              </DialogContent>
+            </Dialog>
+
             <Button asChild variant="outline">
               <Link href="/jobs">Trang việc làm</Link>
             </Button>
