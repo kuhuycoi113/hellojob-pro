@@ -175,6 +175,9 @@ export function Header() {
         </nav>
         <div className="hidden md:flex items-center gap-2">
             <Button asChild variant="outline">
+              <Link href="/ai-profile">Tạo hồ sơ</Link>
+            </Button>
+            <Button asChild variant="outline">
               <Link href="/jobs">Trang việc làm</Link>
             </Button>
              {isClient && (isLoggedIn ? (
