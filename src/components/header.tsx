@@ -2,11 +2,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks } from 'lucide-react';
+import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
   Accordion,
@@ -48,10 +48,12 @@ export const Logo = ({ className }: { className?: string }) => (
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { openChat } = useChat();
   const { role, setRole } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [profileCreationStep, setProfileCreationStep] = useState(1);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -98,12 +100,41 @@ export function Header() {
             <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
             <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
         </Card>
-        <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+        <Card onClick={() => setProfileCreationStep(3)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
             <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
             <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
         </Card>
       </div>
+    </>
+  );
+
+  const QuickCreateStepDialog = () => (
+    <>
+      <DialogHeader>
+          <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
+          <DialogDescription className="text-center">
+            Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
+          </DialogDescription>
+      </DialogHeader>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+        <Card onClick={() => router.push('/ai-profile')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+            <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+            <h3 className="font-bold text-base mb-1">Thực tập sinh</h3>
+            <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
+        </Card>
+        <Card onClick={() => router.push('/ai-profile')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+            <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+            <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
+            <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
+        </Card>
+        <Card onClick={() => router.push('/ai-profile')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+            <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
+            <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
+            <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
+        </Card>
+      </div>
+      <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
     </>
   );
 
@@ -135,9 +166,22 @@ export function Header() {
             </Link>
           </DialogClose>
         </div>
-         <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
+        <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
       </>
   );
+  
+  const renderDialogContent = () => {
+    switch (profileCreationStep) {
+      case 1:
+        return <FirstStepDialog />;
+      case 2:
+        return <QuickCreateStepDialog />;
+      case 3:
+        return <SecondStepDialog />;
+      default:
+        return <FirstStepDialog />;
+    }
+  }
 
   const MainMenu = () => (
     <DropdownMenu>
@@ -175,11 +219,7 @@ export function Header() {
             </Link>
           </DropdownMenuItem>
         ) : (
-          <div className="p-2">
-             <Button asChild className="w-full" size="sm">
-              <Link href="/candidate-profile"><LogIn className="mr-2 h-4 w-4"/>Đăng nhập / Đăng ký</Link>
-            </Button>
-          </div>
+          null
         )}
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
@@ -239,18 +279,21 @@ export function Header() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-            <Dialog onOpenChange={(open) => !open && setProfileCreationStep(1)}>
+            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
               <DialogTrigger asChild>
                 <Button variant="default">Tạo hồ sơ</Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-xl">
-                 {profileCreationStep === 1 ? <FirstStepDialog /> : <SecondStepDialog />}
+                 {renderDialogContent()}
               </DialogContent>
             </Dialog>
+            
+            {isClient && role === 'guest' && (
+              <Button asChild variant="outline">
+                <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
+              </Button>
+            )}
 
-            <Button asChild variant="outline">
-              <Link href="/jobs">Trang việc làm</Link>
-            </Button>
              {isClient && (
                 <>
                     {isLoggedIn ? (
