@@ -283,7 +283,7 @@ export function Header() {
               <DialogTrigger asChild>
                 <Button variant="default">Tạo hồ sơ</Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-xl">
+              <DialogContent className="sm:max-w-2xl">
                  {renderDialogContent()}
               </DialogContent>
             </Dialog>
