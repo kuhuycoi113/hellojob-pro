@@ -901,7 +901,7 @@ export default function PartnerPostJobPage() {
       </Card>
     </div>
   </div>
-    
+}
 
 
     
