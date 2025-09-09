@@ -117,12 +117,30 @@ const conditionsByVisaType: { [key: string]: string[] } = {
 };
 
 const otherSkills = [
-    "Cần bằng gia công kim loại", "Cần bằng hàn", "Cần bằng tiện, mài", "Cần bằng cắt",
-    "Cần bằng vận hành máy", "Cần lái được xe nâng", "Cần bằng cầu", "Cần làm được giàn giáo",
-    "Cần bằng thi công nội thất", "Cần lái được máy xúc, máy đào", "Cần bằng lái xe AT", "Cần bằng lái xe MT",
-    "Cần bằng lái xe buýt cỡ trung", "Cần bằng lái xe buýt cỡ lớn", "Cần bằng lái xe tải cỡ nhỏ", "Cần bằng lái xe tải cỡ trung",
-    "Cần bằng lái xe tải cỡ lớn", "Cần bằng vận hành máy NC", "Cần bằng vận hành máy CNC", "Dùng được thước đo",
-    "Đọc được bản vẽ kỹ thuật", "Thiết kế BIM xây dựng", "Quản lý thi công xây dựng", "Quản lý khối lượng xây dựng"
+    "Có bằng gia công kim loại",
+    "Có bằng hàn",
+    "Có bằng tiện, mài",
+    "Có bằng cắt",
+    "Có bằng vận hành máy",
+    "Lái được xe nâng",
+    "Có bằng cầu",
+    "Làm được giàn giáo",
+    "Có bằng thi công nội thất",
+    "Lái được máy xúc, máy đào",
+    "Có bằng lái xe AT",
+    "Có bằng lái xe MT",
+    "Có bằng lái xe buýt cỡ trung",
+    "Có bằng lái xe buýt cỡ lớn",
+    "Có bằng lái xe tải cỡ nhỏ",
+    "Có bằng lái xe tải cỡ trung",
+    "Có bằng lái xe tải cỡ lớn",
+    "Có bằng vận hành máy NC",
+    "Có bằng vận hành máy CNC",
+    "Dùng được thước đo",
+    "Đọc được bản vẽ kỹ thuật",
+    "Thiết kế BIM xây dựng",
+    "Quản lý thi công xây dựng",
+    "Quản lý khối lượng xây dựng"
 ];
 
 const locations = {
@@ -301,7 +319,7 @@ export default function PartnerPostJobPage() {
     "Trình độ tương đương 9.0", "Trình độ tương đương 8.0", "Trình độ tương đương 7.0", "Trình độ tương đương 6.0", "Trình độ tương đương 5.0", "Trình độ tương đương 4.0"
   ];
   const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Thạc sĩ", "Tốt nghiệp Tiến sĩ", "Tốt nghiệp Senmon", "Tốt nghiệp Tanki-dai"];
-  const experienceYears = ["Trên 0,5 năm", "Trên 1 năm", "Trên 1,5 năm", "Trên 2 năm", "Trên 2,5 năm", "Trên 3 năm", "Trên 3,5 năm", "Trên 4 năm", "Trên 4,5 năm"];
+  const experienceYears = ["Không yêu cầu", "Trên 0,5 năm", "Trên 1 năm", "Trên 1,5 năm", "Trên 2 năm", "Trên 2,5 năm", "Trên 3 năm", "Trên 3,5 năm", "Trên 4 năm", "Trên 4,5 năm"];
   const workShifts = [
     'Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)',
     'Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)',
