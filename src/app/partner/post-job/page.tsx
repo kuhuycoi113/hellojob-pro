@@ -63,7 +63,7 @@ type JobData = {
 const hiddenFieldsByVisa: { [key: string]: (keyof JobData)[] } = {
   'Thực tập sinh 3 năm': ['languageRequirement', 'languageProficiency', 'companyArrivalTime', 'ginouExpiryRequirement', 'hourlySalary', 'annualIncome', 'annualBonus'],
   'Thực tập sinh 1 năm': ['languageRequirement', 'languageProficiency', 'companyArrivalTime', 'ginouExpiryRequirement', 'hourlySalary', 'annualIncome', 'annualBonus'],
-  'Thực tập sinh 3 Go': ['educationRequirement', 'ginouExpiryRequirement'],
+  'Thực tập sinh 3 Go': ['educationRequirement', 'ginouExpiryRequirement', 'annualIncome', 'annualBonus'],
   'Đặc định đầu Việt': ['educationRequirement', 'companyArrivalTime', 'ginouExpiryRequirement'],
   'Đặc định đầu Nhật': ['educationRequirement', 'financialAbility'],
   'Đặc định đi mới': ['educationRequirement', 'companyArrivalTime', 'ginouExpiryRequirement'],
@@ -365,6 +365,13 @@ export default function PartnerPostJobPage() {
   const currentVisaCategory = jobData.visaDetail ? getVisaCategory(jobData.visaDetail) : null;
   const availableConditions = currentVisaCategory ? conditionsByVisaType[currentVisaCategory] : [];
 
+  const annualIncomePlaceholder = (() => {
+    if (jobData.visaType?.includes('Kỹ năng đặc định')) return '1,500,000 - 10,000,000 yên/năm';
+    if (jobData.visaType?.includes('Kỹ sư, tri thức')) return '1,600,000 - 30,000,000 yên/năm';
+    return 'VD: 300 vạn yên';
+  })();
+
+
   const basicSalaryPlaceholder = (() => {
     const visaDetail = jobData.visaDetail;
     if (visaDetail?.includes('Thực tập sinh')) return "120,000 - 500,000 yên/tháng";
@@ -584,7 +591,7 @@ export default function PartnerPostJobPage() {
                     {visibleFields.has('annualIncome') && (
                         <div className="space-y-2">
                             <Label htmlFor="annual-income">Thu nhập (năm)</Label>
-                            <Input id="annual-income" placeholder="VD: 300 vạn yên" value={jobData.annualIncome} onChange={(e) => handleInputChange('annualIncome', e.target.value)} />
+                            <Input id="annual-income" placeholder={annualIncomePlaceholder} value={jobData.annualIncome} onChange={(e) => handleInputChange('annualIncome', e.target.value)} />
                         </div>
                     )}
                     {visibleFields.has('annualBonus') && (
