@@ -52,17 +52,17 @@ const matchJobsToProfileFlow = ai.defineFlow(
             const breakdown: { [key: string]: number } = {};
             let score = 0;
 
-            // 1. Visa Matching (Hard Filter)
+            // 1. Visa Matching (Hard Filter & High Score)
             if (profile.aspirations?.desiredVisaType && job.visaType &&
-                !job.visaType.includes(profile.aspirations.desiredVisaType)) {
+                !job.visaType.toLowerCase().includes(profile.aspirations.desiredVisaType.toLowerCase())) {
                 continue; // Skip if visa types don't match at all
+            } else if (profile.aspirations?.desiredVisaType && job.visaType) {
+                 score += WEIGHTS.VISA_TYPE; // Add high score for matching visa type
+                 breakdown['visaType'] = WEIGHTS.VISA_TYPE;
             }
+            
             if (profile.aspirations?.desiredVisaDetail && job.visaDetail &&
-                job.visaDetail !== profile.aspirations.desiredVisaDetail) {
-                // Lower score significantly if detail doesn't match, but still might be considerable
-                score -= WEIGHTS.VISA_DETAIL;
-                breakdown['visaDetail'] = -WEIGHTS.VISA_DETAIL;
-            } else if (profile.aspirations?.desiredVisaDetail && job.visaDetail && job.visaDetail === profile.aspirations.desiredVisaDetail) {
+                job.visaDetail.toLowerCase() === profile.aspirations.desiredVisaDetail.toLowerCase()) {
                 score += WEIGHTS.VISA_DETAIL;
                 breakdown['visaDetail'] = WEIGHTS.VISA_DETAIL;
             }
