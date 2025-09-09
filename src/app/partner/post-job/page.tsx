@@ -117,29 +117,13 @@ const conditionsByVisaType: { [key: string]: string[] } = {
 };
 
 const otherSkills = [
-    "Có bằng gia công kim loại",
-    "Có bằng hàn",
-    "Có bằng tiện, mài",
-    "Có bằng cắt",
-    "Có bằng vận hành máy",
-    "Lái được xe nâng",
-    "Có bằng cầu",
-    "Làm được giàn giáo",
-    "Có bằng thi công nội thất",
-    "Lái được máy xúc, máy đào",
-    "Có bằng lái xe AT",
-    "Có bằng lái xe MT",
-    "Có bằng lái xe buýt cỡ trung",
-    "Có bằng lái xe buýt cỡ lớn",
-    "Có bằng lái xe tải cỡ nhỏ",
-    "Có bằng lái xe tải cỡ trung",
-    "Có bằng lái xe tải cỡ lớn",
-    "Có bằng vận hành máy NC",
-    "Có bằng vận hành máy CNC",
-    "Dùng được thước đo",
-    "Đọc được bản vẽ kỹ thuật",
-    "Thiết kế BIM xây dựng",
-    "Quản lý thi công xây dựng",
+    "Có bằng gia công kim loại", "Có bằng hàn", "Có bằng tiện, mài", "Có bằng cắt",
+    "Có bằng vận hành máy", "Lái được xe nâng", "Có bằng cầu", "Làm được giàn giáo",
+    "Có bằng thi công nội thất", "Lái được máy xúc, máy đào", "Có bằng lái xe AT",
+    "Có bằng lái xe MT", "Có bằng lái xe buýt cỡ trung", "Có bằng lái xe buýt cỡ lớn",
+    "Có bằng lái xe tải cỡ nhỏ", "Có bằng lái xe tải cỡ trung", "Có bằng lái xe tải cỡ lớn",
+    "Có bằng vận hành máy NC", "Có bằng vận hành máy CNC", "Dùng được thước đo",
+    "Đọc được bản vẽ kỹ thuật", "Thiết kế BIM xây dựng", "Quản lý thi công xây dựng",
     "Quản lý khối lượng xây dựng"
 ];
 
