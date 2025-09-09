@@ -32,6 +32,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose
 } from "@/components/ui/dialog";
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
@@ -194,20 +195,24 @@ export function Header() {
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                  <Link href="/ai-profile">
-                    <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                      <Sparkles className="h-10 w-10 text-primary mx-auto mb-3" />
-                      <h3 className="font-bold text-lg mb-1">Tạo hồ sơ bằng AI</h3>
-                      <p className="text-muted-foreground text-xs">Tải lên CV hoặc mô tả mong muốn, AI sẽ tự động điền thông tin.</p>
-                    </Card>
-                  </Link>
-                  <Link href="/register">
-                    <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                      <Pencil className="h-10 w-10 text-blue-500 mx-auto mb-3" />
-                      <h3 className="font-bold text-lg mb-1">Nhập liệu thủ công</h3>
-                      <p className="text-muted-foreground text-xs">Tự điền thông tin chi tiết vào biểu mẫu có sẵn của chúng tôi.</p>
-                    </Card>
-                  </Link>
+                  <DialogClose asChild>
+                    <Link href="/ai-profile">
+                      <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                        <Sparkles className="h-8 w-8 text-primary mx-auto mb-2" />
+                        <h3 className="font-bold text-lg mb-1">Tạo hồ sơ bằng AI</h3>
+                        <p className="text-muted-foreground text-xs">Tải lên CV hoặc mô tả mong muốn, AI sẽ tự động điền thông tin.</p>
+                      </Card>
+                    </Link>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Link href="/register">
+                      <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                        <Pencil className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+                        <h3 className="font-bold text-lg mb-1">Nhập liệu thủ công</h3>
+                        <p className="text-muted-foreground text-xs">Tự điền thông tin chi tiết vào biểu mẫu có sẵn của chúng tôi.</p>
+                      </Card>
+                    </Link>
+                  </DialogClose>
                 </div>
               </DialogContent>
             </Dialog>
