@@ -179,6 +179,7 @@ export function Header() {
                 key={link.href} 
                 href={link.href}
                 label={link.label}
+                icon={link.icon && link.href === '/ai-profile' ? Sparkles : undefined}
                 onClick={link.href === '/' ? handleHomeClick : undefined} 
             />
           ))}
