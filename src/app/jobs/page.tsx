@@ -266,10 +266,7 @@ const LoggedOutView = () => {
                 </CardHeader>
                 <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild size="lg">
-                        <Link href="/candidate-profile"><LogIn className="mr-2"/>Đăng nhập</Link>
-                    </Button>
-                    <Button asChild variant="outline" size="lg">
-                        <Link href="/register"><UserPlus className="mr-2"/>Tạo tài khoản mới</Link>
+                        <Link href="/candidate-profile"><LogIn className="mr-2"/>Đăng ký / Đăng nhập</Link>
                     </Button>
                 </CardContent>
             </Card>
