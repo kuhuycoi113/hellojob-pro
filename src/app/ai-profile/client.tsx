@@ -320,8 +320,8 @@ export default function AiProfileClientPage() {
                                     </Card>
                                     <Card className="text-center p-4 cursor-pointer hover:shadow-md transition-all duration-300 hover:-translate-y-1" onClick={() => router.push('/register')}>
                                         <Pencil className="h-8 w-8 text-primary mx-auto"/>
-                                        <h4 className="font-bold text-sm mt-2">Nhập liệu thủ công dễ dàng</h4>
-                                        <p className="text-xs text-muted-foreground">Tự điền vào biểu mẫu chi tiết.</p>
+                                        <h4 className="font-bold text-sm mt-2">Nhập liệu thủ công</h4>
+                                        <p className="text-xs text-muted-foreground">Tự điền vào biểu mẫu chi tiết của chúng tôi.</p>
                                     </Card>
                                 </div>
                             </div>
