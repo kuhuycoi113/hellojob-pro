@@ -120,10 +120,8 @@ export function Header() {
           </DropdownMenuItem>
         ) : (
           <div className="p-2">
-            <Button asChild className="w-full" size="sm">
-              <Link href="/candidate-profile">
-                <LogIn className="mr-2 h-4 w-4" /> Đăng nhập / Đăng ký
-              </Link>
+             <Button asChild className="w-full" size="sm">
+              <Link href="/candidate-profile"><LogIn className="mr-2 h-4 w-4"/>Đăng nhập / Đăng ký</Link>
             </Button>
           </div>
         )}
@@ -179,7 +177,7 @@ export function Header() {
                 key={link.href} 
                 href={link.href}
                 label={link.label}
-                icon={link.icon && link.href === '/ai-profile' ? Sparkles : undefined}
+                icon={(link.href === '/ai-profile' && role === 'guest') ? Sparkles : undefined}
                 onClick={link.href === '/' ? handleHomeClick : undefined} 
             />
           ))}
@@ -187,9 +185,7 @@ export function Header() {
         <div className="hidden md:flex items-center gap-2">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="default" asChild>
-                  <Link href="/ai-profile">Tạo hồ sơ</Link>
-                </Button>
+                <Button variant="default">Tạo hồ sơ</Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-xl">
                 <DialogHeader>
