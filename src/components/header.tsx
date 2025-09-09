@@ -233,11 +233,7 @@ export function Header() {
                             </Avatar>
                         </Link>
                     ): (
-                       <Button asChild>
-                          <Link href="/candidate-profile">
-                            <LogIn className="mr-2 h-4 w-4" /> Đăng nhập / Đăng ký
-                          </Link>
-                        </Button>
+                       null
                     )}
                     <MainMenu />
                 </>
