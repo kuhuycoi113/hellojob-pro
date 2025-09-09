@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil } from 'lucide-react';
+import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useState, useEffect } from 'react';
@@ -51,6 +51,7 @@ export function Header() {
   const { openChat } = useChat();
   const { role, setRole } = useAuth();
   const [isClient, setIsClient] = useState(false);
+  const [profileCreationStep, setProfileCreationStep] = useState(1);
 
   useEffect(() => {
     setIsClient(true);
@@ -82,6 +83,61 @@ export function Header() {
         window.location.reload();
       }
   }
+  
+  const FirstStepDialog = () => (
+    <>
+      <DialogHeader>
+          <DialogTitle className="text-2xl font-headline text-center">Chọn mục tiêu của bạn</DialogTitle>
+          <DialogDescription className="text-center">
+            Bạn muốn tạo hồ sơ để làm gì?
+          </DialogDescription>
+      </DialogHeader>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+        <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+            <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
+            <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
+            <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
+        </Card>
+        <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+            <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
+            <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
+            <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
+        </Card>
+      </div>
+    </>
+  );
+
+  const SecondStepDialog = () => (
+     <>
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
+          <DialogDescription className="text-center">
+            Bắt đầu hành trình của bạn với HelloJob bằng cách dễ nhất cho bạn.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+          <DialogClose asChild>
+            <Link href="/ai-profile">
+              <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                <Sparkles className="h-8 w-8 text-primary mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Tạo hồ sơ bằng AI</h3>
+                <p className="text-muted-foreground text-xs">Tải lên CV hoặc mô tả mong muốn, AI sẽ tự động điền thông tin.</p>
+              </Card>
+            </Link>
+          </DialogClose>
+          <DialogClose asChild>
+            <Link href="/register">
+              <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                <Pencil className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Nhập liệu thủ công</h3>
+                <p className="text-muted-foreground text-xs">Tự điền thông tin chi tiết vào biểu mẫu có sẵn của chúng tôi.</p>
+              </Card>
+            </Link>
+          </DialogClose>
+        </div>
+         <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
+      </>
+  );
 
   const MainMenu = () => (
     <DropdownMenu>
@@ -183,37 +239,12 @@ export function Header() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-            <Dialog>
+            <Dialog onOpenChange={(open) => !open && setProfileCreationStep(1)}>
               <DialogTrigger asChild>
                 <Button variant="default">Tạo hồ sơ</Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-xl">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
-                  <DialogDescription className="text-center">
-                    Bắt đầu hành trình của bạn với HelloJob bằng cách dễ nhất cho bạn.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                  <DialogClose asChild>
-                    <Link href="/ai-profile">
-                      <Card className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                        <Sparkles className="h-6 w-6 text-primary mx-auto mb-2" />
-                        <h3 className="font-bold text-base mb-1">Tạo hồ sơ bằng AI</h3>
-                        <p className="text-muted-foreground text-xs">Tải lên CV hoặc mô tả mong muốn, AI sẽ tự động điền thông tin.</p>
-                      </Card>
-                    </Link>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <Link href="/register">
-                      <Card className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                        <Pencil className="h-6 w-6 text-blue-500 mx-auto mb-2" />
-                        <h3 className="font-bold text-base mb-1">Nhập liệu thủ công</h3>
-                        <p className="text-muted-foreground text-xs">Tự điền thông tin chi tiết vào biểu mẫu có sẵn của chúng tôi.</p>
-                      </Card>
-                    </Link>
-                  </DialogClose>
-                </div>
+                 {profileCreationStep === 1 ? <FirstStepDialog /> : <SecondStepDialog />}
               </DialogContent>
             </Dialog>
 
