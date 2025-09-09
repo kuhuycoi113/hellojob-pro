@@ -27,7 +27,6 @@ export const mainNavLinks = [
     icon: Sparkles,
     mobile: true,
   },
-  { href: '/learn', label: 'E-Learning' },
   { href: '/handbook', label: 'Cẩm nang', icon: LifeBuoy, mobile: true },
   { href: '/about', label: 'Giới thiệu' },
 ];
@@ -35,7 +34,6 @@ export const mainNavLinks = [
 export const quickAccessLinks = [
   { href: '/roadmap', label: 'Lộ trình', icon: Compass },
   { href: '/career-orientation', label: 'Hướng nghiệp', icon: Compass },
-  { href: '/learn', label: 'E-Learning', icon: BookOpen },
   { href: '/about', label: 'Giới thiệu', icon: Info },
   { href: '/post-job', label: 'Đăng tuyển dụng', icon: PlusCircle },
   { href: '/dashboard', label: 'Dữ liệu & Báo cáo', icon: FileText },
