@@ -177,7 +177,17 @@ export function Header() {
             <Button asChild variant="outline">
               <Link href="/jobs">Trang việc làm</Link>
             </Button>
-            {isClient && (isLoggedIn ? <LoggedInMenu /> : <LoggedOutMenu />)}
+             {isClient && (isLoggedIn ? (
+                <>
+                    <Link href="/candidate-profile">
+                        <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+                            <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
+                            <AvatarFallback>A</AvatarFallback>
+                        </Avatar>
+                    </Link>
+                    <LoggedInMenu />
+                </>
+             ) : <LoggedOutMenu />)}
         </div>
         <div className="md:hidden">
             <Button variant="default" size="icon" onClick={() => openChat()}>
