@@ -186,26 +186,26 @@ export function Header() {
               <DialogTrigger asChild>
                 <Button>Tạo hồ sơ</Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-2xl">
+              <DialogContent className="sm:max-w-xl">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
                   <DialogDescription className="text-center">
                     Bắt đầu hành trình của bạn với HelloJob bằng cách dễ nhất cho bạn.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                   <Link href="/ai-profile">
-                    <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                      <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
-                      <h3 className="font-bold text-xl mb-2">Tạo hồ sơ bằng AI</h3>
-                      <p className="text-muted-foreground text-sm">Tải lên CV hoặc mô tả mong muốn, AI sẽ tự động điền thông tin.</p>
+                    <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                      <Sparkles className="h-10 w-10 text-primary mx-auto mb-3" />
+                      <h3 className="font-bold text-lg mb-1">Tạo hồ sơ bằng AI</h3>
+                      <p className="text-muted-foreground text-xs">Tải lên CV hoặc mô tả mong muốn, AI sẽ tự động điền thông tin.</p>
                     </Card>
                   </Link>
                   <Link href="/register">
-                    <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                      <Pencil className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-                      <h3 className="font-bold text-xl mb-2">Nhập liệu thủ công</h3>
-                      <p className="text-muted-foreground text-sm">Tự điền thông tin chi tiết vào biểu mẫu có sẵn của chúng tôi.</p>
+                    <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                      <Pencil className="h-10 w-10 text-blue-500 mx-auto mb-3" />
+                      <h3 className="font-bold text-lg mb-1">Nhập liệu thủ công</h3>
+                      <p className="text-muted-foreground text-xs">Tự điền thông tin chi tiết vào biểu mẫu có sẵn của chúng tôi.</p>
                     </Card>
                   </Link>
                 </div>
