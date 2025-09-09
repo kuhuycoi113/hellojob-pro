@@ -1,0 +1,1171 @@
+
+
+'use client';
+
+import { useState, useEffect, use } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send } from 'lucide-react';
+import Image from 'next/image';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose,
+} from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from "@/components/ui/checkbox";
+import type { CandidateProfile } from '@/ai/schemas';
+import Link from 'next/link';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
+import { translateProfile } from '@/ai/flows/translate-profile-flow';
+import { type TranslateProfileInput } from '@/ai/schemas/translate-profile-schema';
+import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
+
+
+type MediaItem = {
+  src: string;
+  thumbnail?: string; 
+  alt: string;
+  "data-ai-hint": string;
+};
+
+type EnrichedCandidateProfile = CandidateProfile & { 
+  avatarUrl?: string;
+  videos: MediaItem[];
+  images: MediaItem[];
+};
+
+
+const emptyCandidate: EnrichedCandidateProfile = {
+    name: 'Lê Thị An',
+    headline: 'Kỹ sư Cơ khí với 2 năm kinh nghiệm',
+    location: 'TP. Hồ Chí Minh, Việt Nam',
+    about: 'Là một kỹ sư cơ khí năng động và ham học hỏi với 2 năm kinh nghiệm trong lĩnh vực thiết kế và vận hành máy móc công nghiệp. Có khả năng sử dụng thành thạo AutoCAD, SolidWorks và có kiến thức nền tảng về hệ thống CNC. Mong muốn tìm kiếm một cơ hội làm việc tại Nhật Bản để phát triển kỹ năng chuyên môn và đóng góp vào sự thành công của công ty.',
+    education: [
+        { school: 'Đại học Bách Khoa TP.HCM', degree: 'Kỹ sư Cơ khí', gradYear: 2022 },
+        { school: 'Trung tâm tiếng Nhật Sakura', degree: 'Chứng chỉ N3', gradYear: 2023 }
+    ],
+    experience: [
+        { company: 'Công ty TNHH Cơ khí Chính xác ABC', role: 'Kỹ sư Vận hành', period: '08/2022 - Hiện tại', description: 'Chịu trách nhiệm vận hành và bảo trì dây chuyền máy phay CNC. Lập trình và tối ưu hóa các chương trình gia công. Đảm bảo chất lượng sản phẩm đầu ra.' },
+    ],
+    personalInfo: {
+      birthYear: 2000,
+      gender: 'Nữ',
+      phone: '*********',
+      language: 'Tiếng Nhật N3, Tiếng Anh giao tiếp',
+      dateOfBirth: '2000-05-15',
+      height: '160',
+      weight: '50',
+      tattooStatus: 'Không có',
+      hepatitisBStatus: 'Không viêm gan B',
+    },
+    aspirations: {
+        desiredLocation: 'Osaka',
+        desiredSalary: '220000',
+        desiredNetSalary: '180000',
+        desiredVisaType: 'Kỹ năng đặc định',
+        desiredVisaDetail: 'Đặc định đầu Nhật',
+        financialAbility: 'Không yêu cầu',
+        interviewLocation: 'Thành phố Hồ Chí Minh',
+        specialAspirations: 'Mong muốn có nhiều cơ hội làm thêm giờ và được hỗ trợ đào tạo chuyên sâu về kỹ năng quản lý.',
+    },
+    notes: 'Đã có kinh nghiệm phỏng vấn với công ty Nhật 2 lần, mong muốn tìm đơn hàng bay nhanh trong vòng 3 tháng tới. Có thể đóng phí ngay.',
+    interests: ['Cơ khí', 'Tự động hóa', 'Sản xuất'],
+    skills: ['Vận hành máy CNC', 'AutoCAD', 'SolidWorks', 'Làm việc nhóm', 'Giải quyết vấn đề'],
+    certifications: ['Chứng chỉ JLPT N3', 'Chứng chỉ An toàn lao động'],
+    desiredIndustry: 'Cơ khí, Chế tạo máy',
+    avatarUrl: 'https://placehold.co/128x128.png',
+    videos: [
+        { src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://placehold.co/400x600.png', alt: 'Giới thiệu bản thân', "data-ai-hint": 'self introduction video' },
+        { src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://placehold.co/400x600.png', alt: 'Tay nghề 1', "data-ai-hint": 'skill demonstration' },
+        { src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://placehold.co/400x600.png', alt: 'Tay nghề 2', "data-ai-hint": 'welding skill' },
+    ],
+    images: [
+      { src: 'https://placehold.co/400x600.png', alt: 'Ảnh trước', "data-ai-hint": 'front view portrait' },
+      { src: 'https://placehold.co/400x600.png', alt: 'Ảnh trái', "data-ai-hint": 'left side portrait' },
+      { src: 'https://placehold.co/400x600.png', alt: 'Ảnh phải', "data-ai-hint": 'right side portrait' },
+      { src: 'https://placehold.co/400x600.png', alt: 'Toàn thân trước', "data-ai-hint": 'full body front' },
+      { src: 'https://placehold.co/400x600.png', alt: 'Toàn thân trái', "data-ai-hint": 'full body left' },
+      { src: 'https://placehold.co/400x600.png', alt: 'Toàn thân phải', "data-ai-hint": 'full body right' },
+    ],
+};
+
+
+const commonSkills = ['Vận hành máy CNC', 'AutoCAD', 'Kiểm tra chất lượng', 'Làm việc nhóm', 'Giải quyết vấn đề', 'Tiếng Anh giao tiếp'];
+const commonInterests = ['Cơ khí', 'Điện tử', 'IT', 'Logistics', 'Dệt may', 'Chế biến thực phẩm'];
+
+const EditDialog = ({
+  children,
+  title,
+  onSave,
+  renderContent,
+  description,
+  candidate
+}: {
+  children: React.ReactNode;
+  title: string;
+  onSave: (updatedCandidate: EnrichedCandidateProfile) => void;
+  renderContent: (
+    tempData: EnrichedCandidateProfile,
+    handleTempChange: (
+      section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations',
+      ...args: any[]
+    ) => void
+  ) => React.ReactNode;
+  description?: string;
+  candidate: EnrichedCandidateProfile;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile>(candidate);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTempCandidate(JSON.parse(JSON.stringify(candidate)));
+    }
+  }, [isOpen, candidate]);
+
+  const handleSave = () => {
+    onSave(tempCandidate);
+    setIsOpen(false);
+  };
+
+  const handleTempChange = (
+    section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations',
+    ...args: any[]
+  ) => {
+    setTempCandidate(prev => {
+      const newCandidate = { ...prev! };
+
+      if (section === 'personalInfo' || section === 'aspirations') {
+        const [field, value] = args;
+        // @ts-ignore
+        newCandidate[section] = { ...newCandidate[section], [field]: value };
+      } else if (['experience', 'education'].includes(section)) {
+        const [index, field, value] = args;
+        // @ts-ignore
+        newCandidate[section][index][field] = value;
+      } else if (section === 'certifications') {
+         const [index, value] = args;
+         newCandidate.certifications[index] = value;
+      } else if (['skills', 'interests'].includes(section)) {
+          const [value, isAdding] = args;
+          // @ts-ignore
+          const currentValues = newCandidate[section];
+          // @ts-ignore
+          newCandidate[section] = isAdding
+              ? [...currentValues, value]
+              : currentValues.filter((item: string) => item !== value);
+      }
+      else {
+        const [field, value] = args;
+        // @ts-ignore
+        newCandidate[field] = value;
+      }
+
+      return newCandidate;
+    });
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle className="font-headline text-2xl">{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
+        <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
+          {renderContent(tempCandidate, handleTempChange)}
+        </div>
+        <DialogFooter>
+           <DialogClose asChild>
+                <Button variant="outline">Hủy</Button>
+            </DialogClose>
+          <Button type="submit" onClick={handleSave} className="bg-primary text-white">
+            Lưu thay đổi
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+
+const ZaloIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 262 263" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <path d="M131 0C58.649 0 0 58.649 0 131C0 203.351 58.649 262 131 262C203.351 262 262 203.351 262 131C262 58.649 203.351 0 131 0ZM197.838 170.368L173.962 194.244C171.139 197.067 167.247 197.68 163.639 196.223L126.541 182.903C125.129 182.413 123.824 181.711 122.625 180.892L74.832 144.37C71.748 142.029 70.832 137.989 72.585 134.577L84.975 111.758C86.728 108.347 90.722 106.889 94.276 108.347L131.374 121.612C132.786 122.102 134.091 122.748 135.29 123.623L183.083 160.145C186.167 162.486 187.083 166.526 185.33 169.937L197.838 170.368Z" fill="#0068FF"/>
+    </svg>
+)
+
+const locations = {
+    "Việt Nam": [
+        "An Giang", "Bắc Ninh", "Cao Bằng", "Cà Mau", "Cần Thơ", "Đà Nẵng", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Đắk Lắk", "Gia Lai", "Hà Nội", "Hà Tĩnh", "Hải Phòng", "Hưng Yên", "Thừa Thiên Huế", "Khánh Hòa", "Lai Châu", "Lào Cai", "Lạng Sơn", "Lâm Đồng", "Nghệ An", "Ninh Bình", "Phú Thọ", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sơn La", "Tây Ninh", "Thanh Hóa", "Thành phố Hồ Chí Minh", "Thái Nguyên", "Tuyên Quang", "Vĩnh Long"
+    ],
+    "Nhật Bản": {
+        "Hokkaido": ["Hokkaido"],
+        "Tohoku": ["Aomori", "Iwate", "Miyagi", "Akita", "Yamagata", "Fukushima"],
+        "Kanto": ["Ibaraki", "Tochigi", "Gunma", "Saitama", "Chiba", "Tokyo", "Kanagawa"],
+        "Chubu": ["Niigata", "Toyama", "Ishikawa", "Fukui", "Yamanashi", "Nagano", "Gifu", "Shizuoka", "Aichi"],
+        "Kansai": ["Mie", "Shiga", "Kyoto", "Osaka", "Hyogo", "Nara", "Wakayama"],
+        "Chugoku": ["Tottori", "Shimane", "Okayama", "Hiroshima", "Yamaguchi"],
+        "Shikoku": ["Tokushima", "Kagawa", "Ehime", "Kochi"],
+        "Kyushu": ["Fukuoka", "Saga", "Nagasaki", "Kumamoto", "Oita", "Miyazaki", "Kagoshima"],
+        "Okinawa": ["Okinawa"]
+    }
+};
+
+const formatYen = (value?: string) => {
+    if (!value) return 'Chưa cập nhật';
+    const numericValue = parseInt(value.replace(/[^0-9]/g, ''), 10);
+    if (isNaN(numericValue)) return value;
+    return `${numericValue.toLocaleString('en-US')} yên`;
+};
+
+const visaDetailsByVisaType: { [key: string]: string[] } = {
+    'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
+    'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
+    'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
+};
+const visaTypes = Object.keys(visaDetailsByVisaType);
+
+
+export default function CandidateProfilePage() {
+  const [candidate, setCandidate] = useState<EnrichedCandidateProfile | null>(null);
+  const [originalCandidate, setOriginalCandidate] = useState<EnrichedCandidateProfile | null>(null);
+  const [newSkill, setNewSkill] = useState('');
+  const [newInterest, setNewInterest] = useState('');
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [currentLang, setCurrentLang] = useState('vi');
+
+
+  useEffect(() => {
+    const storedProfile = localStorage.getItem('generatedCandidateProfile');
+    let profileToLoad: EnrichedCandidateProfile;
+
+    const defaultImages: MediaItem[] = [
+      { src: 'https://placehold.co/400x600.png', alt: 'Ảnh trước', "data-ai-hint": 'front view portrait' },
+      { src: 'https://placehold.co/400x600.png', alt: 'Ảnh trái', "data-ai-hint": 'left side portrait' },
+      { src: 'https://placehold.co/400x600.png', alt: 'Ảnh phải', "data-ai-hint": 'right side portrait' },
+      { src: 'https://placehold.co/400x600.png', alt: 'Toàn thân trước', "data-ai-hint": 'full body front' },
+      { src: 'https://placehold.co/400x600.png', alt: 'Toàn thân trái', "data-ai-hint": 'full body left' },
+      { src: 'https://placehold.co/400x600.png', alt: 'Toàn thân phải', "data-ai-hint": 'full body right' },
+    ];
+    
+    const defaultVideos: MediaItem[] = [
+        { src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://placehold.co/400x600.png', alt: 'Giới thiệu bản thân', "data-ai-hint": 'self introduction video' },
+        { src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://placehold.co/400x600.png', alt: 'Tay nghề 1', "data-ai-hint": 'skill demonstration' },
+        { src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://placehold.co/400x600.png', alt: 'Tay nghề 2', "data-ai-hint": 'welding skill' },
+    ];
+
+    if (storedProfile) {
+      try {
+        const parsedProfile = JSON.parse(storedProfile);
+        profileToLoad = {
+          ...emptyCandidate,
+          ...parsedProfile,
+          personalInfo: { ...emptyCandidate.personalInfo, ...parsedProfile.personalInfo },
+          aspirations: { ...emptyCandidate.aspirations, ...parsedProfile.aspirations },
+          avatarUrl: parsedProfile.avatarUrl || 'https://placehold.co/128x128.png',
+          videos: (parsedProfile.videos && parsedProfile.videos.length > 0) ? parsedProfile.videos : defaultVideos,
+          images: (parsedProfile.images && parsedProfile.images.length > 0) ? parsedProfile.images : defaultImages,
+        };
+      } catch (error) {
+        console.error("Failed to parse candidate profile from localStorage", error);
+        profileToLoad = { ...emptyCandidate, videos: defaultVideos, images: defaultImages };
+      }
+    } else {
+        profileToLoad = { ...emptyCandidate, 
+            videos: defaultVideos,
+            images: defaultImages
+        };
+    }
+    setCandidate(profileToLoad);
+    setOriginalCandidate(JSON.parse(JSON.stringify(profileToLoad))); // Deep copy
+  }, []);
+
+  const handleSave = (updatedCandidate: EnrichedCandidateProfile) => {
+    setCandidate(updatedCandidate);
+    setOriginalCandidate(JSON.parse(JSON.stringify(updatedCandidate))); // Update original state on save
+    setCurrentLang('vi'); // Revert to Vietnamese on save
+  };
+
+  useEffect(() => {
+    if (candidate) {
+      localStorage.setItem('generatedCandidateProfile', JSON.stringify(candidate));
+    }
+  }, [candidate]);
+
+
+  if (!candidate) {
+      return (
+        <div className="bg-secondary">
+            <div className="container mx-auto px-4 md:px-6 py-12">
+                <div className="max-w-5xl mx-auto">
+                    <Card className="shadow-2xl overflow-hidden">
+                        <CardHeader className="p-0">
+                            <Skeleton className="h-32 bg-gray-300" />
+                            <div className="p-6 flex flex-col md:flex-row items-center md:items-end -mt-16">
+                                <Skeleton className="h-32 w-32 rounded-full border-4 border-background bg-gray-400" />
+                                <div className="md:ml-6 mt-4 md:mt-0 text-center md:text-left space-y-2">
+                                    <Skeleton className="h-8 w-64" />
+                                    <Skeleton className="h-6 w-80" />
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <Skeleton className="h-96 w-full" />
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </div>
+      );
+  }
+
+  const handleLanguageChange = async (lang: string) => {
+    if (lang === currentLang || !originalCandidate) return;
+
+    setCurrentLang(lang);
+
+    if (lang === 'vi') {
+        setCandidate(originalCandidate);
+        return;
+    }
+
+    setIsTranslating(true);
+    try {
+        const input: TranslateProfileInput = {
+            profile: originalCandidate,
+            targetLanguage: lang === 'ja' ? 'Japanese' : 'English',
+        };
+        const translatedProfile = await translateProfile(input);
+        
+        setCandidate(prev => {
+            if (!prev) return null;
+             // A more robust way to merge, handling potentially missing keys in translatedProfile
+            const mergedProfile = { ...originalCandidate }; // Start with a fresh copy of original
+
+            // Iterate over keys of the translated profile and merge them
+            for (const key in translatedProfile) {
+                const aKey = key as keyof Partial<CandidateProfile>;
+                if (translatedProfile[aKey] !== undefined) {
+                    // @ts-ignore
+                    mergedProfile[aKey] = translatedProfile[aKey];
+                }
+            }
+
+            return {
+                ...mergedProfile,
+                education: originalCandidate.education.map((edu, index) => ({
+                    ...edu,
+                    ...(translatedProfile.education?.[index] || {}),
+                })),
+                experience: originalCandidate.experience.map((exp, index) => ({
+                    ...exp,
+                    ...(translatedProfile.experience?.[index] || {}),
+                })),
+            };
+        });
+
+    } catch (error) {
+        console.error("Translation failed:", error);
+        // Optionally, show a toast message to the user
+    } finally {
+        setIsTranslating(false);
+    }
+  };
+  
+  const handleMediaChange = (type: 'avatar' | 'image', e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const newUrl = reader.result as string;
+        setCandidate(prev => {
+          if (!prev) return null;
+          const newCandidate = JSON.parse(JSON.stringify(prev));
+          if (type === 'avatar') {
+             newCandidate.avatarUrl = newUrl;
+          } else if (type === 'image' && index !== undefined) {
+             newCandidate.images[index].src = newUrl;
+          }
+          return newCandidate;
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAddItem = (section: 'experience' | 'education' | 'certifications') => {
+      setCandidate(prev => {
+          if (!prev) return null;
+          const newCandidate = JSON.parse(JSON.stringify(prev));
+          if (section === 'experience') {
+              newCandidate.experience.push({ company: '', role: '', period: '', description: '' });
+          } else if (section === 'education') {
+              newCandidate.education.push({ school: '', degree: '', gradYear: new Date().getFullYear() });
+          } else if (section === 'certifications') {
+              newCandidate.certifications.push('');
+          }
+          return newCandidate;
+      });
+  };
+
+  const handleRemoveItem = (
+      section: 'experience' | 'education' | 'certifications' | 'skills' | 'interests',
+      indexOrValue: number | string
+  ) => {
+      setCandidate(prev => {
+          if (!prev) return null;
+          const newCandidate = JSON.parse(JSON.stringify(prev));
+          if (section === 'skills' || section === 'interests') {
+              // @ts-ignore
+              newCandidate[section] = newCandidate[section].filter(item => item !== indexOrValue);
+          } else {
+              // @ts-ignore
+              newCandidate[section].splice(indexOrValue, 1);
+          }
+          return newCandidate;
+      });
+  };
+
+  const handleAddNewChip = (field: 'skills' | 'interests') => {
+    if (!candidate) return;
+    const valueToAdd = field === 'skills' ? newSkill.trim() : newInterest.trim();
+    if (valueToAdd && !candidate[field].includes(valueToAdd)) {
+      setCandidate(prev => ({
+        ...prev!,
+        [field]: [...prev![field], valueToAdd],
+      }));
+      if (field === 'skills') {
+        setNewSkill('');
+      } else {
+        setNewInterest('');
+      }
+    }
+  };
+
+
+  const renderAboutEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
+    <Textarea
+      value={tempCandidate.about}
+      onChange={e => handleTempChange('about', null, e.target.value)}
+      rows={6}
+    />
+  );
+
+  const renderNotesEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
+    <Textarea
+      value={tempCandidate.notes}
+      onChange={e => handleTempChange('notes', null, e.target.value)}
+      rows={4}
+      placeholder="Ghi chú về nguyện vọng, khả năng tài chính, thời gian có thể đi..."
+    />
+  );
+
+  const renderExperienceEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
+    <div className="space-y-6">
+      {tempCandidate.experience.map((exp, index) => (
+        <div key={index} className="p-4 border rounded-lg space-y-2 relative">
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="font-bold">Kinh nghiệm #{index + 1}</h4>
+            <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('experience', index)}>
+              <Trash2 className="h-4 w-4 text-destructive"/>
+            </Button>
+          </div>
+          <Label>Vai trò</Label>
+          <Input value={exp.role} onChange={e => handleTempChange('experience', index, 'role', e.target.value)} />
+          <Label>Công ty</Label>
+          <Input value={exp.company} onChange={e => handleTempChange('experience', index, 'company', e.target.value)} />
+          <Label>Thời gian</Label>
+          <Input value={exp.period} onChange={e => handleTempChange('experience', index, 'period', e.target.value)} />
+          <Label>Mô tả</Label>
+          <Textarea value={exp.description} onChange={e => handleTempChange('experience', index, 'description', e.target.value)} />
+        </div>
+      ))}
+      <Button variant="outline" className="w-full" onClick={() => handleAddItem('experience')}>
+        <PlusCircle className="mr-2"/> Thêm kinh nghiệm
+      </Button>
+    </div>
+  );
+
+  const renderEducationEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
+    <div className="space-y-6">
+      {tempCandidate.education.map((edu, index) => (
+        <div key={index} className="p-4 border rounded-lg space-y-2 relative">
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="font-bold">Học vấn #{index + 1}</h4>
+            <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('education', index)}>
+              <Trash2 className="h-4 w-4 text-destructive"/>
+            </Button>
+          </div>
+          <Label>Trường</Label>
+          <Input value={edu.school} onChange={e => handleTempChange('education', index, 'school', e.target.value)} />
+          <Label>Chuyên ngành</Label>
+          <Input value={edu.degree} onChange={e => handleTempChange('education', index, 'degree', e.target.value)} />
+          <Label>Năm tốt nghiệp</Label>
+          <Input type="number" value={edu.gradYear} onChange={e => handleTempChange('education', index, 'gradYear', parseInt(e.target.value))} />
+        </div>
+      ))}
+      <Button variant="outline" className="w-full" onClick={() => handleAddItem('education')}>
+        <PlusCircle className="mr-2"/> Thêm học vấn
+      </Button>
+    </div>
+  );
+
+  const renderSkillsInterestsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <Label className="font-bold">Kỹ năng</Label>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {tempCandidate.skills.map((skill) => (
+            <Badge key={skill} variant="secondary" className="pr-1">
+              {skill}
+              <button onClick={() => handleRemoveItem('skills', skill)} className="ml-2 rounded-full hover:bg-destructive/80 p-0.5">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          {commonSkills.filter(s => !tempCandidate.skills.includes(s)).map((skill) => (
+            <div key={skill} className="flex items-center space-x-2">
+              <Checkbox id={`skill-${skill}`} onCheckedChange={(checked) => handleTempChange('skills', skill, checked)} checked={tempCandidate.skills.includes(skill)}/>
+              <Label htmlFor={`skill-${skill}`} className="text-sm font-normal cursor-pointer">{skill}</Label>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2 mt-2">
+          <Input value={newSkill} onChange={e => setNewSkill(e.target.value)} placeholder="Thêm kỹ năng khác..." />
+          <Button onClick={() => handleAddNewChip('skills')}>Thêm</Button>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label className="font-bold">Lĩnh vực quan tâm</Label>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {tempCandidate.interests.map((interest) => (
+            <Badge key={interest} className="bg-accent-blue text-white pr-1">
+              {interest}
+              <button onClick={() => handleRemoveItem('interests', interest)} className="ml-2 rounded-full hover:bg-destructive/80 p-0.5">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          {commonInterests.filter(i => !tempCandidate.interests.includes(i)).map((interest) => (
+            <div key={interest} className="flex items-center space-x-2">
+              <Checkbox id={`interest-${interest}`} onCheckedChange={(checked) => handleTempChange('interests', interest, checked)} checked={tempCandidate.interests.includes(interest)}/>
+              <Label htmlFor={`interest-${interest}`} className="text-sm font-normal cursor-pointer">{interest}</Label>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2 mt-2">
+          <Input value={newInterest} onChange={e => setNewInterest(e.target.value)} placeholder="Thêm lĩnh vực khác..." />
+          <Button onClick={() => handleAddNewChip('interests')}>Thêm</Button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCertificationsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
+    <div className="space-y-6">
+      {tempCandidate.certifications.map((cert, index) => (
+        <div key={index} className="p-4 border rounded-lg space-y-2 relative">
+          <div className="flex justify-between items-center mb-2">
+            <Label htmlFor={`cert-${index}`}>Chứng chỉ #{index + 1}</Label>
+            <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('certifications', index)}>
+              <Trash2 className="h-4 w-4 text-destructive"/>
+            </Button>
+          </div>
+          <Input id={`cert-${index}`} value={cert} onChange={(e) => handleTempChange('certifications', index, e.target.value)} />
+        </div>
+      ))}
+      <Button variant="outline" className="w-full" onClick={() => handleAddItem('certifications')}>
+        <PlusCircle className="mr-2"/> Thêm chứng chỉ
+      </Button>
+    </div>
+  );
+
+  const renderAspirationsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2 md:col-span-2">
+          <Label>Ngành nghề mong muốn</Label>
+          <Input value={tempCandidate.desiredIndustry} onChange={e => handleTempChange('desiredIndustry', null, e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Loại visa mong muốn</Label>
+          <Select value={tempCandidate.aspirations?.desiredVisaType || ''} onValueChange={value => { handleTempChange('aspirations', 'desiredVisaType', value); handleTempChange('aspirations', 'desiredVisaDetail', ''); }}>
+            <SelectTrigger><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
+            <SelectContent>
+              {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+         <div className="space-y-2">
+          <Label>Chi tiết visa</Label>
+          <Select value={tempCandidate.aspirations?.desiredVisaDetail || ''} onValueChange={value => handleTempChange('aspirations', 'desiredVisaDetail', value)} disabled={!tempCandidate.aspirations?.desiredVisaType}>
+            <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
+            <SelectContent>
+                {(visaDetailsByVisaType[tempCandidate.aspirations?.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+            <Label>Địa điểm mong muốn</Label>
+            <Select value={tempCandidate.aspirations?.desiredLocation || ''} onValueChange={value => handleTempChange('aspirations', 'desiredLocation', value)}>
+                <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
+                <SelectContent>
+                <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
+                    <SelectGroup key={region}>
+                    <SelectLabel>{region}</SelectLabel>
+                    {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectGroup>
+                ))}
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Lương cơ bản mong muốn/tháng</Label>
+          <Input value={tempCandidate.aspirations?.desiredSalary} onChange={e => handleTempChange('aspirations', 'desiredSalary', e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Thực lĩnh mong muốn</Label>
+          <Input value={tempCandidate.aspirations?.desiredNetSalary} onChange={e => handleTempChange('aspirations', 'desiredNetSalary', e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Khả năng tài chính</Label>
+          <Input value={tempCandidate.aspirations?.financialAbility} onChange={e => handleTempChange('aspirations', 'financialAbility', e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Tìm việc, phỏng vấn, tuyển tại</Label>
+          <Select value={tempCandidate.aspirations?.interviewLocation || ''} onValueChange={value => handleTempChange('aspirations', 'interviewLocation', value)}>
+            <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Việt Nam</SelectLabel>
+                {locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>Nhật Bản</SelectLabel>
+                {Object.values(locations['Nhật Bản']).flat().map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+         <div className="md:col-span-2 space-y-2">
+          <Label>Nguyện vọng đặc biệt</Label>
+          <Textarea value={tempCandidate.aspirations?.specialAspirations} onChange={e => handleTempChange('aspirations', 'specialAspirations', e.target.value)} />
+        </div>
+    </div>
+  );
+
+  const renderLevel1Edit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Họ và tên</Label>
+          <Input value={tempCandidate.name} onChange={e => handleTempChange('name', null, e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Số điện thoại</Label>
+          <Input value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Ngày sinh</Label>
+          <Input type="date" value={tempCandidate.personalInfo.dateOfBirth?.split('T')[0]} onChange={e => handleTempChange('personalInfo', 'dateOfBirth', e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Chiều cao (cm)</Label>
+          <Input placeholder="150 - 205" value={tempCandidate.personalInfo.height} onChange={e => handleTempChange('personalInfo', 'height', e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Cân nặng (kg)</Label>
+          <Input placeholder="40 - 105" value={tempCandidate.personalInfo.weight} onChange={e => handleTempChange('personalInfo', 'weight', e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Hình xăm</Label>
+          <Select value={tempCandidate.personalInfo.tattooStatus || ''} onValueChange={value => handleTempChange('personalInfo', 'tattooStatus', value)}>
+            <SelectTrigger><SelectValue placeholder="Chọn tình trạng hình xăm" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Không có">Không có</SelectItem>
+              <SelectItem value="Có xăm nhỏ (kín)">Có xăm nhỏ (kín)</SelectItem>
+              <SelectItem value="Có xăm to (lộ)">Có xăm to (lộ)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Viêm gan B</Label>
+          <Select value={tempCandidate.personalInfo.hepatitisBStatus || ''} onValueChange={value => handleTempChange('personalInfo', 'hepatitisBStatus', value)}>
+            <SelectTrigger><SelectValue placeholder="Chọn tình trạng viêm gan B" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Không viêm gan B">Không viêm gan B</SelectItem>
+              <SelectItem value="Viêm gan B thể tĩnh">Viêm gan B thể tĩnh</SelectItem>
+              <SelectItem value="Viêm gan B thể động">Viêm gan B thể động</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </div>
+  );
+
+  const MainEditDialogContent = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
+    return (
+        <div className="space-y-4">
+            <div className="text-center">
+                <Image src="https://placehold.co/100x100.png" alt="AI Assistant" width={80} height={80} data-ai-hint="friendly robot mascot" className="mx-auto" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                 <EditDialog
+                    title="Chỉnh sửa Thông tin Cá nhân"
+                    onSave={handleSave}
+                    renderContent={renderLevel1Edit}
+                    candidate={candidate!}
+                >
+                    <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-orange">
+                        <h4 className="font-bold text-accent-orange">Cá nhân</h4>
+                        <User className="h-12 w-12 text-gray-300 mx-auto my-2" />
+                        <p className="text-sm text-muted-foreground">(Thông tin cơ bản)</p>
+                    </Card>
+                </EditDialog>
+
+                 <EditDialog
+                    title="Chỉnh sửa Kinh nghiệm & Học vấn"
+                    onSave={handleSave}
+                    renderContent={(temp, handleChange) => (
+                        <div className="max-h-[60vh] overflow-y-auto pr-4 space-y-4">
+                            <h3 className="font-bold text-lg">Kinh nghiệm</h3>
+                            {renderExperienceEdit(temp, handleChange)}
+                            <h3 className="font-bold text-lg mt-4">Học vấn</h3>
+                            {renderEducationEdit(temp, handleChange)}
+                        </div>
+                    )}
+                    candidate={candidate!}
+                >
+                    <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-green">
+                        <h4 className="font-bold text-accent-green">Sự nghiệp</h4>
+                        <Briefcase className="h-12 w-12 text-gray-300 mx-auto my-2" />
+                        <p className="text-sm text-muted-foreground">(Kinh nghiệm, học vấn)</p>
+                    </Card>
+                </EditDialog>
+                
+                 <EditDialog
+                    title="Chỉnh sửa Nguyện vọng"
+                    onSave={handleSave}
+                    renderContent={renderAspirationsEdit}
+                    candidate={candidate!}
+                >
+                    <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-blue">
+                        <h4 className="font-bold text-accent-blue">Nguyện vọng</h4>
+                         <Target className="h-12 w-12 text-gray-300 mx-auto my-2" />
+                        <p className="text-sm text-muted-foreground">(Lương, địa điểm...)</p>
+                    </Card>
+                </EditDialog>
+            </div>
+            <p className="text-center mt-4 text-muted-foreground">Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-green-500 font-semibold">Cập nhật thông tin</span>.</p>
+        </div>
+      )
+  };
+  
+  const MediaCarousel = ({ items, title }: { items: MediaItem[], title: string }) => (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="font-headline text-xl flex items-center"><Video className="mr-3 text-primary"/> {title}</CardTitle>
+          <Button variant="ghost" size="icon"><PlusCircle className="h-5 w-5"/></Button>
+      </CardHeader>
+      <CardContent>
+        <Carousel className="w-full" opts={{align: "start", loop: true}}>
+            <CarouselContent className="-ml-2 md:-ml-4">
+                {items.slice(0, 6).map((item, index) => (
+                    <CarouselItem key={index} className="pl-2 md:pl-4 basis-[30%] md:basis-1/3 lg:basis-1/4">
+                       <div className="relative group overflow-hidden rounded-lg aspect-[9/16] cursor-pointer">
+                            <Image src={item.thumbnail || item.src} alt={item.alt} fill className="object-cover transition-transform duration-300 group-hover:scale-105" data-ai-hint={item['data-ai-hint']} />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <PlayCircle className="h-12 w-12 text-white/80 drop-shadow-lg" />
+                            </div>
+                            <div className="absolute bottom-2 left-2 text-white text-xs font-semibold drop-shadow-md p-1 bg-black/40 rounded">
+                                {item.alt}
+                            </div>
+                        </div>
+                    </CarouselItem>
+                ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+        </Carousel>
+      </CardContent>
+    </Card>
+  );
+
+  const BodyPhotosCarousel = ({items, onImageChange}: {items: MediaItem[], onImageChange: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void}) => (
+    <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="font-headline text-xl flex items-center"><ImageIcon className="mr-3 text-primary"/> Ảnh hình thể</CardTitle>
+             <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="ghost" size="icon"><PlusCircle className="h-5 w-5"/></Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Cập nhật ảnh hình thể</DialogTitle>
+                        <DialogDescription>Tải lên các ảnh theo yêu cầu để hoàn thiện hồ sơ.</DialogDescription>
+                    </DialogHeader>
+                    {/* Add management UI here if needed */}
+                </DialogContent>
+             </Dialog>
+        </CardHeader>
+        <CardContent>
+            <Carousel className="w-full" opts={{align: "start"}}>
+                <CarouselContent className="-ml-2 md:-ml-4">
+                    {items.map((item, index) => (
+                        <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/3 md:basis-1/4 lg:basis-1/5">
+                           <div className="space-y-2">
+                                <div className="relative group aspect-[3/4] rounded-lg overflow-hidden border">
+                                     <Image src={item.src} alt={item.alt} fill className="object-cover" data-ai-hint={item['data-ai-hint']} />
+                                     <Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                        <Camera className="h-8 w-8 text-white"/>
+                                     </Label>
+                                     <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => onImageChange(e, index)} />
+                                </div>
+                                <p className="text-center text-sm font-semibold text-muted-foreground">{item.alt}</p>
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden md:flex" />
+                <CarouselNext className="hidden md:flex" />
+            </Carousel>
+        </CardContent>
+    </Card>
+  )
+
+
+  return (
+    <div className="bg-secondary">
+      <div className="container mx-auto px-4 md:px-6 py-12">
+        <div className="max-w-5xl mx-auto">
+          <Card className="shadow-2xl overflow-hidden">
+             <CardHeader className="p-0">
+               <div className="bg-gradient-to-tr from-primary to-accent h-32" />
+                 <div className="p-6 flex flex-col md:flex-row items-center md:items-end -mt-16">
+                 <div className="relative group">
+                     <Avatar className="h-32 w-32 border-4 border-background bg-background shadow-lg">
+                      <AvatarImage src={candidate.avatarUrl} alt={candidate.name} data-ai-hint="professional headshot" className="object-cover" />
+                      <AvatarFallback>{candidate.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <Label htmlFor="avatar-upload" className="absolute bottom-1 right-1 cursor-pointer bg-black/50 text-white p-2 rounded-full group-hover:bg-black/70 transition-colors">
+                        <Camera className="h-5 w-5" />
+                        <span className="sr-only">Change avatar</span>
+                    </Label>
+                    <Input id="avatar-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('avatar', e)}/>
+                 </div>
+                <div className="md:ml-6 mt-4 md:mt-0 text-center md:text-left">
+                  <h1 className="text-3xl font-headline font-bold">{candidate.name}</h1>
+                  <p className="text-muted-foreground">{candidate.headline}</p>
+                  <p className="text-sm text-muted-foreground flex items-center justify-center md:justify-start gap-2 mt-1">
+                    <MapPin className="h-4 w-4" /> {candidate.location}
+                  </p>
+                </div>
+                 <div className="md:ml-auto mt-4 md:mt-0 flex items-center gap-2">
+                     <Button variant="outline"><FileDown/> Tải hồ sơ</Button>
+                     <Button variant="outline"><Send/> Gửi hồ sơ</Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="icon" disabled={isTranslating}>
+                           {isTranslating ? <Loader2 className="h-5 w-5 animate-spin" /> :
+                            currentLang === 'vi' ? <VnFlagIcon className="w-6 h-6 rounded-full object-cover"/> :
+                            currentLang === 'ja' ? <JpFlagIcon className="w-6 h-6 rounded-full object-cover"/> :
+                            <EnFlagIcon className="w-6 h-6 rounded-full object-cover"/>
+                           }
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onSelect={() => handleLanguageChange('vi')}><VnFlagIcon className="w-5 h-5 mr-2"/>Tiếng Việt</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleLanguageChange('ja')}><JpFlagIcon className="w-5 h-5 mr-2"/>日本語</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleLanguageChange('en')}><EnFlagIcon className="w-5 h-5 mr-2"/>English</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                     <EditDialog
+                        title="Hoàn thiện hồ sơ"
+                        onSave={handleSave}
+                        renderContent={MainEditDialogContent}
+                        description="Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn."
+                        candidate={originalCandidate!} // Always edit the original version
+                     >
+                        <Button variant="outline"><Edit /> Sửa hồ sơ</Button>
+                     </EditDialog>
+                 </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left Column */}
+              <div className="lg:col-span-2 space-y-8">
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-headline text-xl flex items-center"><User className="mr-3 text-primary"/> Giới thiệu bản thân</CardTitle>
+                     <EditDialog
+                        title="Chỉnh sửa Giới thiệu bản thân"
+                        onSave={handleSave}
+                        renderContent={renderAboutEdit}
+                        candidate={originalCandidate!}
+                        description="Viết một đoạn giới thiệu ngắn về bản thân, kỹ năng và mục tiêu nghề nghiệp của bạn."
+                    >
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                    </EditDialog>
+                  </CardHeader>
+                  <CardContent>
+                    {candidate.about ? (
+                      <p className="text-muted-foreground whitespace-pre-line">{candidate.about}</p>
+                    ) : (
+                      <div className="text-muted-foreground">
+                        <span>Chưa có thông tin. </span>
+                        <EditDialog title="Chỉnh sửa Giới thiệu bản thân" onSave={handleSave} renderContent={renderAboutEdit} candidate={originalCandidate!}>
+                            <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                        </EditDialog>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {candidate.videos.length > 0 && <MediaCarousel items={candidate.videos} title="Video" />}
+                
+                {candidate.images.length > 0 && <BodyPhotosCarousel items={candidate.images} onImageChange={(e, index) => handleMediaChange('image', e, index)} />}
+
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-headline text-xl flex items-center"><Briefcase className="mr-3 text-primary"/> Kinh nghiệm làm việc</CardTitle>
+                     <EditDialog
+                        title="Chỉnh sửa Kinh nghiệm làm việc"
+                        onSave={handleSave}
+                        renderContent={renderExperienceEdit}
+                        candidate={originalCandidate!}
+                    >
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                     </EditDialog>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {candidate.experience.length > 0 ? candidate.experience.map((exp, index) => (
+                        <div key={index} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:rounded-full before:bg-primary">
+                            <h4 className="font-bold">{exp.role}</h4>
+                            <p className="font-semibold text-sm text-primary">{exp.company}</p>
+                            <p className="text-xs text-muted-foreground mb-1">{exp.period}</p>
+                            <p className="text-sm text-muted-foreground">{exp.description}</p>
+                        </div>
+                    )) : (
+                        <div className="text-muted-foreground">
+                           <span>Chưa có thông tin. </span>
+                            <EditDialog title="Chỉnh sửa Kinh nghiệm làm việc" onSave={handleSave} renderContent={renderExperienceEdit} candidate={originalCandidate!}>
+                               <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                            </EditDialog>
+                        </div>
+                    )}
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-headline text-xl flex items-center"><GraduationCap className="mr-3 text-primary"/> Học vấn</CardTitle>
+                     <EditDialog
+                        title="Chỉnh sửa Học vấn"
+                        onSave={handleSave}
+                        renderContent={renderEducationEdit}
+                        candidate={originalCandidate!}
+                    >
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                    </EditDialog>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                     {candidate.education.length > 0 ? candidate.education.map((edu, index) => (
+                        <div key={index} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:rounded-full before:bg-primary">
+                            <p className="font-semibold flex items-center gap-2"><School className="h-4 w-4"/> {edu.school}</p>
+                            <p className="text-muted-foreground ml-6">Chuyên ngành: {edu.degree}</p>
+                            <p className="text-muted-foreground ml-6">Tốt nghiệp năm: {edu.gradYear}</p>
+                        </div>
+                     )) : (
+                        <div className="text-muted-foreground">
+                            <span>Chưa có thông tin. </span>
+                            <EditDialog title="Chỉnh sửa Học vấn" onSave={handleSave} renderContent={renderEducationEdit} candidate={originalCandidate!}>
+                                <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                            </EditDialog>
+                        </div>
+                     )}
+                  </CardContent>
+                </Card>
+                 <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-headline text-xl flex items-center"><FilePen className="mr-3 text-primary"/> Ghi chú</CardTitle>
+                     <EditDialog
+                        title="Chỉnh sửa Ghi chú"
+                        onSave={handleSave}
+                        renderContent={renderNotesEdit}
+                        candidate={originalCandidate!}
+                        description="Thêm bất kỳ ghi chú hoặc thông tin bổ sung nào về nguyện vọng, hoàn cảnh của bạn."
+                    >
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                    </EditDialog>
+                  </CardHeader>
+                  <CardContent>
+                    {candidate.notes ? (
+                      <p className="text-muted-foreground whitespace-pre-line">{candidate.notes}</p>
+                    ) : (
+                      <div className="text-muted-foreground">
+                        <span>Chưa có ghi chú. </span>
+                        <EditDialog title="Chỉnh sửa Ghi chú" onSave={handleSave} renderContent={renderNotesEdit} candidate={originalCandidate!}>
+                            <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                        </EditDialog>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right Column */}
+              <div className="lg:col-span-1 space-y-6">
+                 <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-headline text-xl flex items-center"><UserCog className="mr-3 text-primary"/> Thông tin cá nhân</CardTitle>
+                    <EditDialog
+                        title="Chỉnh sửa Thông tin cá nhân"
+                        onSave={handleSave}
+                        renderContent={renderLevel1Edit}
+                        candidate={originalCandidate!}
+                    >
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                    </EditDialog>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-sm">
+                    <p><strong>Ngày sinh:</strong> {candidate.personalInfo.dateOfBirth}</p>
+                    <p><strong>Giới tính:</strong> {candidate.personalInfo.gender}</p>
+                    <p><strong>Chiều cao:</strong> {candidate.personalInfo.height} cm</p>
+                    <p><strong>Cân nặng:</strong> {candidate.personalInfo.weight} kg</p>
+                    <p><strong>Hình xăm:</strong> {candidate.personalInfo.tattooStatus}</p>
+                    <p><strong>Viêm gan B:</strong> {candidate.personalInfo.hepatitisBStatus}</p>
+                    <p><strong>Ngôn ngữ:</strong> {candidate.personalInfo.language}</p>
+                  </CardContent>
+                </Card>
+
+                 <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-headline text-xl flex items-center"><Target className="mr-3 text-primary"/> Nguyện vọng</CardTitle>
+                     <EditDialog
+                        title="Chỉnh sửa Nguyện vọng"
+                        onSave={handleSave}
+                        renderContent={renderAspirationsEdit}
+                        candidate={originalCandidate!}
+                    >
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                    </EditDialog>
+                  </CardHeader>
+                   <CardContent className="space-y-3 text-sm">
+                        <p><strong>Ngành nghề:</strong> {candidate.desiredIndustry}</p>
+                        <p><strong>Loại Visa:</strong> {candidate.aspirations?.desiredVisaType}</p>
+                        <p><strong>Chi tiết Visa:</strong> {candidate.aspirations?.desiredVisaDetail}</p>
+                        <p><strong>Địa điểm:</strong> {candidate.aspirations?.desiredLocation}</p>
+                        <p><strong>Lương cơ bản:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p>
+                        <p><strong>Thực lĩnh:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p>
+                        <p><strong>Khả năng tài chính:</strong> {candidate.aspirations?.financialAbility}</p>
+                        <p><strong>Nơi phỏng vấn:</strong> {candidate.aspirations?.interviewLocation}</p>
+                        <p><strong>Yêu cầu khác:</strong> {candidate.aspirations?.specialAspirations}</p>
+                  </CardContent>
+                </Card>
+
+                 <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-headline text-xl flex items-center"><Star className="mr-3 text-primary"/> Kỹ năng & Lĩnh vực</CardTitle>
+                    <EditDialog
+                        title="Chỉnh sửa Kỹ năng & Lĩnh vực"
+                        description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn."
+                        onSave={handleSave}
+                        renderContent={renderSkillsInterestsEdit}
+                        candidate={originalCandidate!}
+                    >
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                    </EditDialog>
+                  </CardHeader>
+                  <CardContent>
+                     <h4 className="font-semibold mb-2 text-sm">Kỹ năng</h4>
+                     <div className="flex flex-wrap gap-2 mb-4">
+                        {candidate.skills.length > 0 ? candidate.skills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>) : 
+                        <div className="text-muted-foreground text-sm">
+                            <span>Chưa có kỹ năng. </span>
+                            <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={originalCandidate!}>
+                               <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                            </EditDialog>
+                        </div>}
+                     </div>
+                     <h4 className="font-semibold mb-2 text-sm">Lĩnh vực quan tâm</h4>
+                     <div className="flex flex-wrap gap-2">
+                        {candidate.interests.length > 0 ? candidate.interests.map(interest => <Badge key={interest} className="bg-accent-blue text-white">{interest}</Badge>) : 
+                        <div className="text-muted-foreground text-sm">
+                            <span>Chưa có lĩnh vực quan tâm. </span>
+                             <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={originalCandidate!}>
+                                <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                            </EditDialog>
+                        </div>}
+                     </div>
+                  </CardContent>
+                </Card>
+
+                 <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-headline text-xl flex items-center"><Award className="mr-3 text-primary"/> Chứng chỉ & Giải thưởng</CardTitle>
+                     <EditDialog
+                        title="Chỉnh sửa Chứng chỉ & Giải thưởng"
+                        onSave={handleSave}
+                        renderContent={renderCertificationsEdit}
+                        candidate={originalCandidate!}
+                    >
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                    </EditDialog>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                     {candidate.certifications.length > 0 ? candidate.certifications.map((cert, index) => (
+                         <p key={index} className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-muted-foreground"/>{cert}</p>
+                     )) : 
+                     <div className="text-muted-foreground text-sm">
+                        <span>Chưa có chứng chỉ. </span>
+                        <EditDialog title="Chỉnh sửa Chứng chỉ & Giải thưởng" onSave={handleSave} renderContent={renderCertificationsEdit} candidate={originalCandidate!}>
+                            <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                        </EditDialog>
+                    </div>}
+                  </CardContent>
+                </Card>
+
+                 <Button className="w-full bg-accent-green hover:bg-accent-green/90 text-white"><FileDown/> Tải CV (.pdf)</Button>
+                 <div className="text-center pt-4">
+                    <Button variant="link" className="text-muted-foreground text-sm" onClick={() => { /* Handle logout */ }}>
+                        <LogOut className="mr-2 h-4 w-4"/>
+                        Đăng xuất
+                    </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
