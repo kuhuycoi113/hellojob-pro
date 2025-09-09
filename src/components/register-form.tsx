@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, ChevronRight, Eye } from 'lucide-react';
@@ -29,9 +29,22 @@ type FormData = {
   jobType: string;
 };
 
-const locations = [
-    "An Giang", "Bắc Ninh", "Cao Bằng", "Cà Mau", "Cần Thơ", "Đà Nẵng", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Đắk Lắk", "Gia Lai", "Hà Nội", "Hà Tĩnh", "Hải Phòng", "Hưng Yên", "Thừa Thiên Huế", "Khánh Hòa", "Lai Châu", "Lào Cai", "Lạng Sơn", "Lâm Đồng", "Nghệ An", "Ninh Bình", "Phú Thọ", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sơn La", "Tây Ninh", "Thanh Hóa", "Thành phố Hồ Chí Minh", "Thái Nguyên", "Tuyên Quang", "Vĩnh Long"
-];
+const locations = {
+    "Việt Nam": [
+        "An Giang", "Bắc Ninh", "Cao Bằng", "Cà Mau", "Cần Thơ", "Đà Nẵng", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Đắk Lắk", "Gia Lai", "Hà Nội", "Hà Tĩnh", "Hải Phòng", "Hưng Yên", "Thừa Thiên Huế", "Khánh Hòa", "Lai Châu", "Lào Cai", "Lạng Sơn", "Lâm Đồng", "Nghệ An", "Ninh Bình", "Phú Thọ", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sơn La", "Tây Ninh", "Thanh Hóa", "Thành phố Hồ Chí Minh", "Thái Nguyên", "Tuyên Quang", "Vĩnh Long"
+    ],
+    "Nhật Bản": {
+        "Hokkaido": ["Hokkaido"],
+        "Tohoku": ["Aomori", "Iwate", "Miyagi", "Akita", "Yamagata", "Fukushima"],
+        "Kanto": ["Ibaraki", "Tochigi", "Gunma", "Saitama", "Chiba", "Tokyo", "Kanagawa"],
+        "Chubu": ["Niigata", "Toyama", "Ishikawa", "Fukui", "Yamanashi", "Nagano", "Gifu", "Shizuoka", "Aichi"],
+        "Kansai": ["Mie", "Shiga", "Kyoto", "Osaka", "Hyogo", "Nara", "Wakayama"],
+        "Chugoku": ["Tottori", "Shimane", "Okayama", "Hiroshima", "Yamaguchi"],
+        "Shikoku": ["Tokushima", "Kagawa", "Ehime", "Kochi"],
+        "Kyushu": ["Fukuoka", "Saga", "Nagasaki", "Kumamoto", "Oita", "Miyazaki", "Kagoshima"],
+        "Okinawa": ["Okinawa"]
+    }
+};
 
 
 export function RegisterForm() {
@@ -140,13 +153,20 @@ export function RegisterForm() {
               </Select>
             </div>
              <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="district">Quê quán/Tỉnh thành</Label>
+              <Label htmlFor="district">Nơi ở hiện tại</Label>
                <Select onValueChange={(value) => handleChange('district', value)} value={formData.district}>
                 <SelectTrigger id="district">
-                  <SelectValue placeholder="Chọn quê quán" />
+                  <SelectValue placeholder="Chọn nơi ở hiện tại" />
                 </SelectTrigger>
                 <SelectContent>
-                    {locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
+                    <SelectGroup>
+                        <SelectLabel>Việt Nam</SelectLabel>
+                        {locations["Việt Nam"].map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
+                    </SelectGroup>
+                    <SelectGroup>
+                        <SelectLabel>Nhật Bản</SelectLabel>
+                        {Object.values(locations["Nhật Bản"]).flat().map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
+                    </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
