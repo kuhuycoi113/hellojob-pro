@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -117,14 +118,7 @@ const conditionsByVisaType: { [key: string]: string[] } = {
 };
 
 const otherSkills = [
-    "Có bằng gia công kim loại", "Có bằng hàn", "Có bằng tiện, mài", "Có bằng cắt",
-    "Có bằng vận hành máy", "Lái được xe nâng", "Có bằng cầu", "Làm được giàn giáo",
-    "Có bằng thi công nội thất", "Lái được máy xúc, máy đào", "Có bằng lái xe AT",
-    "Có bằng lái xe MT", "Có bằng lái xe buýt cỡ trung", "Có bằng lái xe buýt cỡ lớn",
-    "Có bằng lái xe tải cỡ nhỏ", "Có bằng lái xe tải cỡ trung", "Có bằng lái xe tải cỡ lớn",
-    "Có bằng vận hành máy NC", "Có bằng vận hành máy CNC", "Dùng được thước đo",
-    "Đọc được bản vẽ kỹ thuật", "Thiết kế BIM xây dựng", "Quản lý thi công xây dựng",
-    "Quản lý khối lượng xây dựng"
+    "Có bằng lái xe AT", "Có bằng lái xe MT", "Có bằng lái xe tải cỡ nhỏ", "Có bằng lái xe tải cỡ trung", "Có bằng lái xe tải cỡ lớn", "Có bằng lái xe buýt cỡ trung", "Có bằng lái xe buýt cỡ lớn", "Lái được máy xúc, máy đào", "Lái được xe nâng", "Có bằng cầu", "Vận hành máy CNC", "Có bằng tiện, mài", "Có bằng hàn", "Có bằng cắt", "Có bằng gia công kim loại", "Làm được giàn giáo", "Thi công nội thất", "Quản lý thi công xây dựng", "Quản lý khối lượng xây dựng", "Thiết kế BIM xây dựng", "Đọc được bản vẽ kỹ thuật"
 ];
 
 const locations = {
@@ -305,17 +299,17 @@ export default function PartnerPostJobPage() {
   const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Thạc sĩ", "Tốt nghiệp Tiến sĩ", "Tốt nghiệp Senmon", "Tốt nghiệp Tanki-dai"];
   const experienceYears = ["Không yêu cầu", "Trên 0,5 năm", "Trên 1 năm", "Trên 1,5 năm", "Trên 2 năm", "Trên 2,5 năm", "Trên 3 năm", "Trên 3,5 năm", "Trên 4 năm", "Trên 4,5 năm"];
   const workShifts = [
-    'Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)',
-    'Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)',
-    'Ca đêm (thường 24:00-08:00)',
-    'Ca luân phiên (chia ca sáng, chiều và đêm; luân phiên tuần tháng)',
-    'Ca 2-2-3 (làm 2 ngày, nghỉ 2 ngày, làm 3 ngày và lặp lại)',
-    'Ca 4-3-3 (làm 4 ngày, nghỉ 3 ngày và tiếp tục 3 ngày nghỉ)',
-    'Nghỉ thứ 7, Chủ Nhật',
-    'Nghỉ định kỳ trong tuần',
-    'Khác'
+    "Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)",
+    "Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)",
+    "Ca đêm (thường 24:00-08:00)",
+    "Ca luân phiên (chia ca sáng, chiều và đêm; luân phiên tuần tháng)",
+    "Ca 2-2-3 (làm 2 ngày, nghỉ 2 ngày, làm 3 ngày và lặp lại)",
+    "Ca 4-3-3 (làm 4 ngày, nghỉ 3 ngày và tiếp tục 3 ngày nghỉ)",
+    "Nghỉ thứ 7, Chủ Nhật",
+    "Nghỉ định kỳ trong tuần",
+    "Khác"
   ];
-  const visionRequirements = ["Yêu cầu thị lực rất tốt", "Yêu cầu thị lực tốt", "Không yêu cầu thị lực", "Không nhận cận thị", "Không nhận viễn thị", "Không nhận loạn thị", "Không nhận mù màu"];
+  const visionRequirements = ["20/10", "15/10", "10/10", "9/10", "8/10", "7/10", "6/10", "5/10", "4/10", "3/10", "2/10", "1/10", "Cận thị", "Viễn thị", "Loạn thị", "Mù màu"];
   const interviewFormats = ["Phỏng vấn trực tiếp", "Phỏng vấn Online", "Phỏng vấn trực tiếp và Online"];
   const interviewRoundsOptions = ["1 vòng", "2 vòng", "3 vòng", "4 vòng", "5 vòng"];
 
