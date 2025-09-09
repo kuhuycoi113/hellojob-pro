@@ -1,6 +1,5 @@
 
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -299,18 +298,18 @@ export default function PartnerPostJobPage() {
   ];
   const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Thạc sĩ", "Tốt nghiệp Tiến sĩ", "Tốt nghiệp Senmon", "Tốt nghiệp Tanki-dai"];
   const experienceYears = [
-    "Không yêu cầu",
-    "Dưới 0,5 năm",
-    "0,5 - 1 năm",
-    "1 - 1,5 năm",
-    "1,5 - 2 năm",
-    "2 - 2,5 năm",
-    "2,5 - 3 năm",
-    "3 - 3,5 năm",
-    "3,5 - 4 năm",
-    "4 - 4,5 năm",
-    "4,5 - 5 năm",
-    "Trên 5 năm"
+    'Không yêu cầu',
+    'Dưới 0,5 năm',
+    '0,5 - 1 năm',
+    '1 - 1,5 năm',
+    '1,5 - 2 năm',
+    '2 - 2,5 năm',
+    '2,5 - 3 năm',
+    '3 - 3,5 năm',
+    '3,5 - 4 năm',
+    '4 - 4,5 năm',
+    '4,5 - 5 năm',
+    'Trên 5 năm'
 ];
   const workShifts = [
     "Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)",
@@ -372,6 +371,15 @@ export default function PartnerPostJobPage() {
     if (visaDetail?.includes('Đặc định')) return "150,000 - 1,500,000 yên/tháng";
     if (visaDetail?.includes('Kỹ sư, tri thức')) return "160,000 - 10,000,000 yên/tháng";
     return "Nhập mức lương cơ bản";
+  })();
+
+  const hourlySalaryPlaceholder = (() => {
+    const visaDetail = jobData.visaDetail;
+    if (!visaDetail) return "VD: 1000 yên/giờ";
+    if (visaDetail.includes('Thực tập sinh')) return "700 - 1800 yên/giờ";
+    if (visaDetail.includes('Đặc định')) return "750 - 5000 yên/giờ";
+    if (visaDetail.includes('Kỹ sư, tri thức')) return "800 - 15000 yên/giờ";
+    return "VD: 1000 yên/giờ";
   })();
 
   const netSalaryPlaceholder = (() => {
@@ -570,7 +578,7 @@ export default function PartnerPostJobPage() {
                     {visibleFields.has('hourlySalary') && (
                         <div className="space-y-2">
                             <Label htmlFor="hourly-salary">Lương cơ bản (giờ)</Label>
-                            <Input id="hourly-salary" placeholder="VD: 1000 yên/giờ" value={jobData.hourlySalary} onChange={(e) => handleInputChange('hourlySalary', e.target.value)} />
+                            <Input id="hourly-salary" placeholder={hourlySalaryPlaceholder} value={jobData.hourlySalary} onChange={(e) => handleInputChange('hourlySalary', e.target.value)} />
                         </div>
                     )}
                     {visibleFields.has('annualIncome') && (
