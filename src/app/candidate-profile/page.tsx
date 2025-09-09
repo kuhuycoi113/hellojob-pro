@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -90,6 +90,11 @@ const emptyCandidate: EnrichedCandidateProfile = {
     interests: ['Cơ khí', 'Tự động hóa', 'Sản xuất'],
     skills: ['Vận hành máy CNC', 'AutoCAD', 'SolidWorks', 'Làm việc nhóm', 'Giải quyết vấn đề'],
     certifications: ['Chứng chỉ JLPT N3', 'Chứng chỉ An toàn lao động'],
+    documents: {
+        vietnam: ['CCCD', 'Giấy khai sinh'],
+        japan: ['Thẻ ngoại kiều', 'MyNumber'],
+        other: [],
+    },
     desiredIndustry: 'Cơ khí, Chế tạo máy',
     avatarUrl: 'https://placehold.co/128x128.png',
     videos: [
@@ -125,7 +130,7 @@ const EditDialog = ({
   renderContent: (
     tempData: EnrichedCandidateProfile,
     handleTempChange: (
-      section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations',
+      section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
       ...args: any[]
     ) => void
   ) => React.ReactNode;
@@ -147,7 +152,7 @@ const EditDialog = ({
   };
 
   const handleTempChange = (
-    section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations',
+    section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
     ...args: any[]
   ) => {
     setTempCandidate(prev => {
@@ -157,6 +162,10 @@ const EditDialog = ({
         const [field, value] = args;
         // @ts-ignore
         newCandidate[section] = { ...newCandidate[section], [field]: value };
+      } else if (section === 'documents') {
+          const [docType, index, value] = args;
+          // @ts-ignore
+          newCandidate.documents[docType][index] = value;
       } else if (['experience', 'education'].includes(section)) {
         const [index, field, value] = args;
         // @ts-ignore
@@ -282,6 +291,7 @@ export default function CandidateProfilePage() {
           ...parsedProfile,
           personalInfo: { ...emptyCandidate.personalInfo, ...parsedProfile.personalInfo },
           aspirations: { ...emptyCandidate.aspirations, ...parsedProfile.aspirations },
+          documents: { ...emptyCandidate.documents, ...parsedProfile.documents },
           avatarUrl: parsedProfile.avatarUrl || 'https://placehold.co/128x128.png',
           videos: (parsedProfile.videos && parsedProfile.videos.length > 0) ? parsedProfile.videos : defaultVideos,
           images: (parsedProfile.images && parsedProfile.images.length > 0) ? parsedProfile.images : defaultImages,
@@ -413,7 +423,7 @@ export default function CandidateProfilePage() {
     }
   };
 
-  const handleAddItem = (section: 'experience' | 'education' | 'certifications') => {
+  const handleAddItem = (section: 'experience' | 'education' | 'certifications' | 'documents', docType?: 'vietnam' | 'japan' | 'other') => {
       setCandidate(prev => {
           if (!prev) return null;
           const newCandidate = JSON.parse(JSON.stringify(prev));
@@ -423,14 +433,20 @@ export default function CandidateProfilePage() {
               newCandidate.education.push({ school: '', degree: '', gradYear: new Date().getFullYear() });
           } else if (section === 'certifications') {
               newCandidate.certifications.push('');
+          } else if (section === 'documents' && docType) {
+              if (!newCandidate.documents) {
+                  newCandidate.documents = { vietnam: [], japan: [], other: [] };
+              }
+              newCandidate.documents[docType].push('');
           }
           return newCandidate;
       });
   };
 
   const handleRemoveItem = (
-      section: 'experience' | 'education' | 'certifications' | 'skills' | 'interests',
-      indexOrValue: number | string
+      section: 'experience' | 'education' | 'certifications' | 'skills' | 'interests' | 'documents',
+      indexOrValue: number | string,
+      docType?: 'vietnam' | 'japan' | 'other'
   ) => {
       setCandidate(prev => {
           if (!prev) return null;
@@ -438,7 +454,10 @@ export default function CandidateProfilePage() {
           if (section === 'skills' || section === 'interests') {
               // @ts-ignore
               newCandidate[section] = newCandidate[section].filter(item => item !== indexOrValue);
-          } else {
+          } else if (section === 'documents' && docType && typeof indexOrValue === 'number') {
+             // @ts-ignore
+             newCandidate.documents[docType].splice(indexOrValue, 1);
+          } else if (typeof indexOrValue === 'number') {
               // @ts-ignore
               newCandidate[section].splice(indexOrValue, 1);
           }
@@ -601,6 +620,41 @@ export default function CandidateProfilePage() {
       <Button variant="outline" className="w-full" onClick={() => handleAddItem('certifications')}>
         <PlusCircle className="mr-2"/> Thêm chứng chỉ
       </Button>
+    </div>
+  );
+
+  const renderDocumentsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
+    <div className="space-y-6">
+        <div>
+            <h4 className="font-bold mb-2">Giấy tờ Việt Nam</h4>
+            {(tempCandidate.documents?.vietnam || []).map((doc, index) => (
+                 <div key={index} className="flex items-center gap-2 mb-2">
+                    <Input value={doc} onChange={(e) => handleTempChange('documents', 'vietnam', index, e.target.value)} />
+                    <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'vietnam')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                 </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'vietnam')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+        </div>
+         <div>
+            <h4 className="font-bold mb-2">Giấy tờ Nhật Bản</h4>
+            {(tempCandidate.documents?.japan || []).map((doc, index) => (
+                 <div key={index} className="flex items-center gap-2 mb-2">
+                    <Input value={doc} onChange={(e) => handleTempChange('documents', 'japan', index, e.target.value)} />
+                    <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'japan')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                 </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'japan')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+        </div>
+         <div>
+            <h4 className="font-bold mb-2">Giấy tờ nước ngoài / Du học</h4>
+            {(tempCandidate.documents?.other || []).map((doc, index) => (
+                 <div key={index} className="flex items-center gap-2 mb-2">
+                    <Input value={doc} onChange={(e) => handleTempChange('documents', 'other', index, e.target.value)} />
+                    <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'other')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                 </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'other')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+        </div>
     </div>
   );
 
@@ -1127,6 +1181,40 @@ export default function CandidateProfilePage() {
                      </div>
                   </CardContent>
                 </Card>
+                
+                 <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-headline text-xl flex items-center"><FileArchive className="mr-3 text-primary"/> Hồ sơ/Giấy tờ</CardTitle>
+                     <EditDialog
+                        title="Chỉnh sửa Hồ sơ/Giấy tờ"
+                        onSave={handleSave}
+                        renderContent={renderDocumentsEdit}
+                        candidate={originalCandidate!}
+                    >
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                    </EditDialog>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                        <h4 className="font-semibold mb-2 text-sm">Giấy tờ Việt Nam</h4>
+                        {candidate.documents?.vietnam?.length > 0 ? (
+                             <div className="flex flex-wrap gap-2">{candidate.documents.vietnam.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
+                        ) : (<p className="text-sm text-muted-foreground">Chưa có</p>)}
+                    </div>
+                     <div>
+                        <h4 className="font-semibold mb-2 text-sm">Giấy tờ Nhật Bản</h4>
+                        {candidate.documents?.japan?.length > 0 ? (
+                             <div className="flex flex-wrap gap-2">{candidate.documents.japan.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
+                        ) : (<p className="text-sm text-muted-foreground">Chưa có</p>)}
+                    </div>
+                     <div>
+                        <h4 className="font-semibold mb-2 text-sm">Giấy tờ nước ngoài/Du học</h4>
+                        {candidate.documents?.other?.length > 0 ? (
+                             <div className="flex flex-wrap gap-2">{candidate.documents.other.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
+                        ) : (<p className="text-sm text-muted-foreground">Chưa có</p>)}
+                    </div>
+                  </CardContent>
+                </Card>
 
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
@@ -1168,5 +1256,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-
-    

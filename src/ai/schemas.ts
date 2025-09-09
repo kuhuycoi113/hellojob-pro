@@ -31,6 +31,11 @@ export const CandidateProfileSchema = z.object({
   interests: z.array(z.string()).describe('A list of professional interests or industries.'),
   skills: z.array(z.string()).describe('A list of key skills.'),
   certifications: z.array(z.string()).describe('A list of certifications or awards.'),
+  documents: z.object({
+      vietnam: z.array(z.string()).optional().describe('List of Vietnamese documents.'),
+      japan: z.array(z.string()).optional().describe('List of Japanese documents.'),
+      other: z.array(z.string()).optional().describe('List of other/foreign documents.'),
+  }).optional().describe('A collection of the candidate\'s legal documents.'),
   desiredIndustry: z.string().describe('The desired industry for future roles.'),
   aspirations: z.object({
     desiredLocation: z.string().optional().describe('The desired work location (e.g., "Osaka").'),
