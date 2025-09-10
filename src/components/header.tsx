@@ -151,21 +151,21 @@ export function Header() {
           </DialogDescription>
       </DialogHeader>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-        <Card onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
+        <Button onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
             <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
             <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
-        </Card>
-        <Card onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
+        </Button>
+        <Button onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
             <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
             <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
-        </Card>
-        <Card onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
+        </Button>
+        <Button onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
             <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
             <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
-        </Card>
+        </Button>
       </div>
       <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
     </>
@@ -234,10 +234,10 @@ export function Header() {
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
             {options.map(option => (
-                <Card key={option.label} onClick={() => { setSelectedVisaDetail(option.label); setProfileCreationStep(5); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+                <Button key={option.label} onClick={() => { setSelectedVisaDetail(option.label); setProfileCreationStep(5); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
                     <h3 className="font-bold text-base mb-1">{option.label}</h3>
                     <p className="text-muted-foreground text-xs">{option.description}</p>
-                </Card>
+                </Button>
             ))}
         </div>
         <Button variant="link" onClick={() => setProfileCreationStep(2)} className="mt-4 mx-auto block">Quay lại</Button>
@@ -259,9 +259,9 @@ export function Header() {
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                 {industries.map(industry => (
-                    <Card key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(6);}} className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                    <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(6);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
                         <p className="font-semibold text-sm">{industry.name}</p>
-                    </Card>
+                    </Button>
                 ))}
             </div>
             <Button variant="link" onClick={() => setProfileCreationStep(4)} className="mt-4 mx-auto block">Quay lại</Button>
@@ -288,7 +288,7 @@ export function Header() {
                         onClick={() => setSelectedRegion(region)} 
                         className={cn(
                             "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center",
-                            selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : "hover:border-primary hover:bg-secondary"
+                            selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
                         )}
                     >
                         <p className="font-semibold text-sm">{region}</p>
@@ -297,7 +297,7 @@ export function Header() {
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
-                <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleQuickCreateRedirect}>Lưu và xem việc phù hợp</Button>
+                <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và xem việc phù hợp</Button>
             </div>
         </>
     )
@@ -453,4 +453,3 @@ export function Header() {
     </>
   );
 }
-
