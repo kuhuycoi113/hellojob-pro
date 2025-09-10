@@ -22,6 +22,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { CommentSection } from '@/components/handbook/comment-section';
 
 
 const ShareDialogContent = () => (
@@ -240,6 +241,11 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
 
               <MainContent />
             </article>
+
+            {/* Comments Section */}
+            <section className="mt-16 pt-8 border-t">
+              <CommentSection />
+            </section>
 
             {/* Hot Jobs Section */}
             <section className="mt-16 pt-8 border-t">
