@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { jobData } from '@/lib/mock-data';
+import { JobCard } from '@/components/job-card';
 
 export const metadata: Metadata = {
   title: 'Lộ trình chi tiết: Chương trình Kỹ sư, Tri thức tại Nhật Bản',
@@ -70,6 +72,8 @@ const roadmapSteps = [
 
 
 export default function EngineerRoadmapPage() {
+  const featuredJobs = jobData.filter(job => job.visaType?.includes('Kỹ sư')).slice(0, 4);
+
   return (
     <div className="bg-secondary">
       {/* Hero Section */}
@@ -183,6 +187,28 @@ export default function EngineerRoadmapPage() {
             </div>
         </div>
       </section>
+
+      {/* Featured Jobs Section */}
+       <section className="py-20 md:py-24 bg-secondary">
+        <div className="container mx-auto px-4 md:px-6">
+            <div className="text-center mb-12">
+                <h2 className="text-3xl font-headline font-bold text-primary">Việc làm Kỹ sư, tri thức nổi bật</h2>
+                <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
+                    Khám phá các cơ hội việc làm chất lượng cao dành riêng cho các kỹ sư và chuyên gia.
+                </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                 {featuredJobs.map(job => (
+                    <JobCard key={job.id} job={job} />
+                 ))}
+            </div>
+            <div className="text-center mt-12">
+                <Button asChild size="lg">
+                    <Link href="/jobs">Xem tất cả việc làm Kỹ sư <ChevronRight /></Link>
+                </Button>
+            </div>
+        </div>
+       </section>
 
        {/* CTA Section */}
       <section className="bg-accent text-white py-20 md:py-28">
