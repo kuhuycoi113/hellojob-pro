@@ -56,6 +56,7 @@ export function Header() {
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
+  const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
 
 
   useEffect(() => {
@@ -229,19 +230,75 @@ export function Header() {
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                 {industries.map(industry => (
-                    <DialogClose key={industry.slug} asChild>
-                        <Link href="/ai-profile">
-                            <Card className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                                <p className="font-semibold text-sm">{industry.name}</p>
-                            </Card>
-                        </Link>
-                    </DialogClose>
+                    <Card key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(6);}} className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                        <p className="font-semibold text-sm">{industry.name}</p>
+                    </Card>
                 ))}
             </div>
             <Button variant="link" onClick={() => setProfileCreationStep(4)} className="mt-4 mx-auto block">Quay lại</Button>
         </>
     );
-};
+  };
+
+  const JobDetailStepDialog = () => {
+    if (!selectedIndustry) return null;
+    
+    return (
+        <>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn công việc chi tiết</DialogTitle>
+                <DialogDescription className="text-center">
+                   Chọn công việc cụ thể bạn muốn làm trong ngành {selectedIndustry.name}.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                {selectedIndustry.keywords.map(keyword => (
+                     <DialogClose key={keyword} asChild>
+                        <Link href="/ai-profile">
+                            <Card className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                                <p className="font-semibold text-sm capitalize">{keyword}</p>
+                            </Card>
+                        </Link>
+                    </DialogClose>
+                ))}
+            </div>
+             <div className="flex justify-center items-center mt-4 gap-4">
+                <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
+                <DialogClose asChild>
+                    <Button variant="secondary" onClick={() => router.push('/ai-profile')}>Bỏ qua</Button>
+                </DialogClose>
+            </div>
+        </>
+    );
+  };
+
+  const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
+
+  const RegionStepDialog = () => {
+    return (
+         <>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn khu vực làm việc</DialogTitle>
+                <DialogDescription className="text-center">
+                    Lựa chọn khu vực bạn muốn làm việc tại Nhật Bản.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                 {japanRegions.map(region => (
+                    <Card key={region} onClick={() => setProfileCreationStep(7)} className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                        <p className="font-semibold text-sm">{region}</p>
+                    </Card>
+                ))}
+            </div>
+            <div className="flex justify-center items-center mt-4 gap-4">
+                <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
+                 <DialogClose asChild>
+                     <Button variant="secondary" onClick={() => router.push('/ai-profile')}>Bỏ qua</Button>
+                 </DialogClose>
+            </div>
+        </>
+    )
+  }
 
 
   const renderDialogContent = () => {
@@ -251,6 +308,8 @@ export function Header() {
       case 3: return <DetailedCreateStepDialog />;
       case 4: return <VisaDetailStepDialog />;
       case 5: return <IndustryStepDialog />;
+      case 6: return <RegionStepDialog />;
+      case 7: return <JobDetailStepDialog />;
       default: return <FirstStepDialog />;
     }
   }
