@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat } from 'lucide-react';
+import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useState, useEffect } from 'react';
@@ -40,6 +40,7 @@ import Image from 'next/image';
 import { useChat } from '@/contexts/ChatContext';
 import { mainNavLinks, quickAccessLinks } from '@/lib/nav-data';
 import { useAuth } from '@/contexts/AuthContext';
+import { Industry, industriesByJobType } from '@/lib/industry-data';
 
 
 export const Logo = ({ className }: { className?: string }) => (
@@ -54,6 +55,8 @@ export function Header() {
   const [isClient, setIsClient] = useState(false);
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
+
 
   useEffect(() => {
     setIsClient(true);
@@ -118,17 +121,17 @@ export function Header() {
           </DialogDescription>
       </DialogHeader>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-        <Card onClick={() => setProfileCreationStep(4)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+        <Card onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
             <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-            <h3 className="font-bold text-base mb-1">Thực tập sinh</h3>
+            <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
             <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
         </Card>
-        <Card onClick={() => setProfileCreationStep(5)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+        <Card onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
             <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
             <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
         </Card>
-        <Card onClick={() => setProfileCreationStep(6)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+        <Card onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
             <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
             <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
@@ -170,69 +173,85 @@ export function Header() {
       </>
   );
   
-    const VisaDetailStepDialog = ({ title, options, backStep }: { title: string, options: {label: string, description: string}[], backStep: number }) => (
-    <>
-      <DialogHeader>
-        <DialogTitle className="text-2xl font-headline text-center">{title}</DialogTitle>
-        <DialogDescription className="text-center">
-          Chọn loại hình chi tiết để tiếp tục.
-        </DialogDescription>
-      </DialogHeader>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-        {options.map(option => (
-          <DialogClose key={option.label} asChild>
-            <Link href="/ai-profile">
-                <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+  const visaDetailsOptions: { [key: string]: { label: string, description: string }[] } = {
+    'Thực tập sinh kỹ năng': [
+      { label: 'Thực tập sinh 3 năm', description: 'Chương trình phổ thông nhất' },
+      { label: 'Thực tập sinh 1 năm', description: 'Chương trình ngắn hạn' },
+      { label: 'Thực tập sinh 3 Go', description: 'Dành cho người có kinh nghiệm' },
+    ],
+    'Kỹ năng đặc định': [
+      { label: 'Đặc định đầu Nhật', description: 'Dành cho người đang ở Nhật' },
+      { label: 'Đặc định đầu Việt', description: 'Dành cho người ở Việt Nam' },
+      { label: 'Đặc định đi mới', description: 'Lần đầu đăng ký' },
+    ],
+    'Kỹ sư, tri thức': [
+      { label: 'Kỹ sư đầu Nhật', description: 'Dành cho kỹ sư đang ở Nhật' },
+      { label: 'Kỹ sư đầu Việt', description: 'Dành cho kỹ sư ở Việt Nam' },
+    ],
+  };
+
+  const VisaDetailStepDialog = () => {
+    if (!selectedVisaType) return null;
+    const options = visaDetailsOptions[selectedVisaType];
+    
+    return (
+        <>
+        <DialogHeader>
+            <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisaType}</DialogTitle>
+            <DialogDescription className="text-center">
+            Chọn loại hình chi tiết để tiếp tục.
+            </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+            {options.map(option => (
+                <Card key={option.label} onClick={() => setProfileCreationStep(5)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
                     <h3 className="font-bold text-base mb-1">{option.label}</h3>
                     <p className="text-muted-foreground text-xs">{option.description}</p>
                 </Card>
-            </Link>
-          </DialogClose>
-        ))}
-      </div>
-      <Button variant="link" onClick={() => setProfileCreationStep(backStep)} className="mt-4 mx-auto block">Quay lại</Button>
-    </>
-  );
+            ))}
+        </div>
+        <Button variant="link" onClick={() => setProfileCreationStep(2)} className="mt-4 mx-auto block">Quay lại</Button>
+        </>
+    )
+  };
+
+  const IndustryStepDialog = () => {
+    if (!selectedVisaType) return null;
+    const industries = industriesByJobType[selectedVisaType as keyof typeof industriesByJobType] || [];
+    
+    return (
+        <>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
+                <DialogDescription className="text-center">
+                    Lựa chọn ngành nghề bạn quan tâm nhất để chúng tôi gợi ý việc làm chính xác hơn.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                {industries.map(industry => (
+                    <DialogClose key={industry.slug} asChild>
+                        <Link href="/ai-profile">
+                            <Card className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                                <p className="font-semibold text-sm">{industry.name}</p>
+                            </Card>
+                        </Link>
+                    </DialogClose>
+                ))}
+            </div>
+            <Button variant="link" onClick={() => setProfileCreationStep(4)} className="mt-4 mx-auto block">Quay lại</Button>
+        </>
+    );
+};
+
 
   const renderDialogContent = () => {
     switch (profileCreationStep) {
-      case 1:
-        return <FirstStepDialog />;
-      case 2:
-        return <QuickCreateStepDialog />;
-      case 3:
-        return <DetailedCreateStepDialog />;
-      case 4:
-         return <VisaDetailStepDialog 
-                    title="Chọn loại Thực tập sinh" 
-                    options={[
-                        { label: 'Thực tập sinh 3 năm', description: 'Chương trình phổ thông nhất' },
-                        { label: 'Thực tập sinh 1 năm', description: 'Chương trình ngắn hạn' },
-                        { label: 'Thực tập sinh 3 Go', description: 'Dành cho người có kinh nghiệm' },
-                    ]} 
-                    backStep={2} 
-                />;
-      case 5:
-         return <VisaDetailStepDialog 
-                    title="Chọn loại Kỹ năng đặc định" 
-                    options={[
-                        { label: 'Đặc định đầu Nhật', description: 'Dành cho người đang ở Nhật' },
-                        { label: 'Đặc định đầu Việt', description: 'Dành cho người ở Việt Nam' },
-                        { label: 'Đặc định đi mới', description: 'Lần đầu đăng ký' },
-                    ]} 
-                    backStep={2} 
-                />;
-      case 6:
-         return <VisaDetailStepDialog 
-                    title="Chọn loại Kỹ sư, tri thức" 
-                    options={[
-                        { label: 'Kỹ sư đầu Nhật', description: 'Dành cho kỹ sư đang ở Nhật' },
-                        { label: 'Kỹ sư đầu Việt', description: 'Dành cho kỹ sư ở Việt Nam' },
-                    ]} 
-                    backStep={2} 
-                />;
-      default:
-        return <FirstStepDialog />;
+      case 1: return <FirstStepDialog />;
+      case 2: return <QuickCreateStepDialog />;
+      case 3: return <DetailedCreateStepDialog />;
+      case 4: return <VisaDetailStepDialog />;
+      case 5: return <IndustryStepDialog />;
+      default: return <FirstStepDialog />;
     }
   }
 
