@@ -93,7 +93,7 @@ export function Header() {
   const FirstStepDialog = () => (
     <>
       <DialogHeader>
-          <DialogTitle className="text-2xl font-headline text-center">Chọn mục tiêu của bạn</DialogTitle>
+          <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
           <DialogDescription className="text-center">
             Bạn muốn tạo hồ sơ để làm gì?
           </DialogDescription>
@@ -240,38 +240,6 @@ export function Header() {
     );
   };
 
-  const JobDetailStepDialog = () => {
-    if (!selectedIndustry) return null;
-    
-    return (
-        <>
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn công việc chi tiết</DialogTitle>
-                <DialogDescription className="text-center">
-                   Chọn công việc cụ thể bạn muốn làm trong ngành {selectedIndustry.name}.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
-                {selectedIndustry.keywords.map(keyword => (
-                     <DialogClose key={keyword} asChild>
-                        <Link href="/ai-profile">
-                            <Card className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                                <p className="font-semibold text-sm capitalize">{keyword}</p>
-                            </Card>
-                        </Link>
-                    </DialogClose>
-                ))}
-            </div>
-             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
-                <DialogClose asChild>
-                    <Button variant="secondary" onClick={() => router.push('/ai-profile')}>Bỏ qua</Button>
-                </DialogClose>
-            </div>
-        </>
-    );
-  };
-
   const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
 
   const RegionStepDialog = () => {
@@ -285,9 +253,13 @@ export function Header() {
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                  {japanRegions.map(region => (
-                    <Card key={region} onClick={() => setProfileCreationStep(7)} className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                        <p className="font-semibold text-sm">{region}</p>
-                    </Card>
+                    <DialogClose key={region} asChild>
+                        <Link href="/ai-profile">
+                            <Card className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                                <p className="font-semibold text-sm">{region}</p>
+                            </Card>
+                         </Link>
+                    </DialogClose>
                 ))}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
@@ -309,7 +281,6 @@ export function Header() {
       case 4: return <VisaDetailStepDialog />;
       case 5: return <IndustryStepDialog />;
       case 6: return <RegionStepDialog />;
-      case 7: return <JobDetailStepDialog />;
       default: return <FirstStepDialog />;
     }
   }
