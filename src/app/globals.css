@@ -22,7 +22,7 @@ body {
     --muted: 210 29% 90%;
     --muted-foreground: 215 28% 45%;
     --accent: 199 89% 42%; /* #0D8DC8 - Xanh Đậm */
-    --accent-foreground: 0 0% 98%;
+    --accent-foreground: 196 84% 56%; /* Updated to primary color */
     --accent-orange: 45 89% 56%; /* #F2B92A - Cam */
     --accent-blue: 196 84% 56%; /* #19A6DF - Xanh Nhạt */
     --accent-green: 74 46% 54%; /* #AFC536 - Xanh Lá */
@@ -54,7 +54,7 @@ body {
     --muted: 217 33% 17%;
     --muted-foreground: 215 28% 45%;
     --accent: 199 89% 42%;
-    --accent-foreground: 0 0% 98%;
+    --accent-foreground: 196 84% 56%; /* Updated to primary color */
     --accent-orange: 45 89% 56%;
     --accent-blue: 196 84% 56%;
     --accent-green: 74 46% 54%;
