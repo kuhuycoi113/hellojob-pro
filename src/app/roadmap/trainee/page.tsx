@@ -196,7 +196,7 @@ export default function TraineeRoadmapPage() {
                  <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
                     <Link href="/ai-profile">Tạo hồ sơ bằng AI <Sparkles/></Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 hover:text-white">
+                <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
                     <Link href="/jobs">Tìm việc làm TTS <Briefcase/></Link>
                 </Button>
             </div>
