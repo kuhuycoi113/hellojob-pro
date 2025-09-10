@@ -55,6 +55,7 @@ export function Header() {
   const [isClient, setIsClient] = useState(false);
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
@@ -69,10 +70,16 @@ export function Header() {
   const isLoggedIn = role === 'candidate';
 
   const handleCreateProfileRedirect = () => {
-    // Logic for redirection or saving data will be here
-    setIsDialogOpen(false);
-    // For now, just redirecting to ai-profile
-    router.push('/ai-profile');
+    if (isLoggedIn) {
+        // Logic for logged in user: save preferences and redirect
+        console.log("Saving preferences for logged in user:", { selectedVisaType, selectedVisaDetail, selectedIndustry, selectedRegion });
+        setIsDialogOpen(false);
+        router.push('/jobs');
+    } else {
+        // Guest user: close current dialog and open login dialog
+        setIsDialogOpen(false);
+        setIsLoginDialogOpen(true);
+    }
   };
 
   const NavLink = ({ href, label, className, icon: Icon, onClick }: { href: string; label: string, className?: string, icon?: React.ElementType, onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => (
@@ -249,32 +256,6 @@ export function Header() {
     );
   };
   
-  const JobDetailStepDialog = () => {
-      if (!selectedIndustry) return null;
-      const jobs = selectedIndustry.keywords;
-      return (
-         <>
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn công việc chi tiết</DialogTitle>
-                <DialogDescription className="text-center">
-                    Chọn công việc cụ thể bạn muốn làm trong ngành {selectedIndustry.name}.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
-                 {jobs.map(job => (
-                    <Card key={job} onClick={() => {setSelectedJob(job); setProfileCreationStep(7);}} className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                        <p className="font-semibold text-sm">{job}</p>
-                    </Card>
-                ))}
-            </div>
-            <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
-                 <Button variant="secondary" onClick={() => handleCreateProfileRedirect()}>Bỏ qua</Button>
-            </div>
-        </>
-      )
-  }
-
   const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
 
   const RegionStepDialog = () => {
@@ -302,7 +283,7 @@ export function Header() {
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
-                 <Button variant="secondary" onClick={() => handleCreateProfileRedirect()} className="bg-accent-orange hover:bg-accent-orange/90 text-white">Lưu và xem việc phù hợp</Button>
+                <Button onClick={handleCreateProfileRedirect} variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white">Lưu và xem việc phù hợp</Button>
             </div>
         </>
     )
@@ -317,7 +298,6 @@ export function Header() {
       case 4: return <VisaDetailStepDialog />;
       case 5: return <IndustryStepDialog />;
       case 6: return <RegionStepDialog />;
-      // case 7: return <RegionStepDialog />;
       default: return <FirstStepDialog />;
     }
   }
@@ -407,6 +387,7 @@ export function Header() {
 
 
   return (
+    <>
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2">
@@ -432,30 +413,22 @@ export function Header() {
                            <Button asChild>
                                <Link href="/candidate-profile">Quản lý hồ sơ</Link>
                            </Button>
-                             <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-                                <DialogTrigger asChild>
-                                    <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-2xl">
-                                    {renderDialogContent()}
-                                </DialogContent>
-                            </Dialog>
                         </>
                     ): (
                         <>
                            <Button asChild>
                                <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
                            </Button>
-                           <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-                              <DialogTrigger asChild>
-                                <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-2xl">
-                                 {renderDialogContent()}
-                              </DialogContent>
-                            </Dialog>
                         </>
                     )}
+                     <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-2xl">
+                            {renderDialogContent()}
+                        </DialogContent>
+                    </Dialog>
                      <Button asChild variant="ghost">
                         <Link href="/jobs">
                            Trang việc làm
@@ -473,5 +446,34 @@ export function Header() {
         </div>
       </div>
     </header>
+    <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Lưu lại nguyện vọng của bạn</DialogTitle>
+                <DialogDescription className="text-center">
+                Đăng nhập hoặc tạo tài khoản miễn phí để lưu lại lựa chọn và nhận gợi ý việc làm phù hợp nhất.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">Đăng nhập với Facebook</Button>
+                <Button className="w-full bg-red-600 hover:bg-red-700">Đăng nhập với Google</Button>
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">Hoặc</span>
+                    </div>
+                </div>
+                 <Button asChild variant="secondary" className="w-full">
+                     <Link href="/candidate-profile">Đăng ký bằng Email / SĐT</Link>
+                 </Button>
+                 <p className="text-center text-sm text-muted-foreground">
+                    Đã có tài khoản? <Link href="/candidate-profile" className="font-semibold text-primary hover:underline">Đăng nhập</Link>
+                 </p>
+            </div>
+        </DialogContent>
+    </Dialog>
+    </>
   );
 }
