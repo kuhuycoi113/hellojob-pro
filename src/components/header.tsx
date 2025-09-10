@@ -98,7 +98,7 @@ export function Header() {
         <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
             <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
-            <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc phù hợp ngay lập tức.</p>
+            <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
         </Card>
         <Card onClick={() => setProfileCreationStep(3)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
             <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
@@ -274,7 +274,7 @@ export function Header() {
         ) : (
            <DropdownMenuItem asChild>
             <div className="p-2">
-                <Button asChild className="w-full" size="lg" onClick={() => router.push('/candidate-profile')}>
+                <Button asChild className="w-full" size="lg">
                     <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
                 </Button>
             </div>
@@ -345,7 +345,7 @@ export function Header() {
                         <>
                             <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                                 <DialogTrigger asChild>
-                                    <Button variant="default">Tạo hồ sơ</Button>
+                                    <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-2xl">
                                     {renderDialogContent()}
@@ -360,12 +360,12 @@ export function Header() {
                         </>
                     ): (
                         <>
-                            <Button asChild variant="default">
+                           <Button asChild>
                                <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
                            </Button>
                            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                               <DialogTrigger asChild>
-                                <Button variant="outline">Tạo hồ sơ</Button>
+                                <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
                               </DialogTrigger>
                               <DialogContent className="sm:max-w-2xl">
                                  {renderDialogContent()}
@@ -392,4 +392,3 @@ export function Header() {
     </header>
   );
 }
-
