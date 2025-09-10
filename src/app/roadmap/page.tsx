@@ -5,6 +5,7 @@ import React from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Lộ trình sự nghiệp (SWR) tại Nhật Bản',
@@ -15,18 +16,21 @@ const programTypes = [
   {
     icon: HardHat,
     title: 'Thực tập sinh kỹ năng',
+    slug: 'trainee',
     description: 'Đây là hình thức phổ biến nhất với thời hạn 3-5 năm, dành cho bất kỳ ai có thể làm việc <i><b>lao động phổ thông</b></i>, tuổi từ 18-40 không yêu cầu bằng cấp, không cần thi tuyển tay nghề và có thể <i><b>nâng cấp lên</b></i> visa Kỹ năng đặc định sau khi hoàn thành.',
     color: 'orange'
   },
   {
     icon: UserCheck,
     title: 'Kỹ năng đặc định (Tokutei)',
+    slug: 'tokutei',
     description: 'Dành cho lao động có tay nghề, cho phép làm việc lâu hơn tại Nhật và hưởng <i><b>lương cao hơn</b></i>. Người đi mới hoặc chuyển trái ngành cần <i><b>thi chứng chỉ</b></i> tiếng Nhật và kỳ thi kỹ năng tay nghề, sau giai đoạn 1 có thể nâng cấp lên giai đoạn 2 để <i><b>định cư</b></i> tại Nhật.',
      color: 'dark-blue'
   },
   {
     icon: Briefcase,
     title: 'Kỹ sư, tri thức',
+    slug: 'engineer',
     description: 'Dành cho người có trình độ chuyên môn cao (<i><b>Cao đẳng, Đại học</b></i>), làm việc đúng chuyên ngành và là con đường chính thống để phát triển <i><b>sự nghiệp lâu dài</b></i>, mở ra cơ hội xin visa vĩnh trú và bảo lãnh gia đình sang Nhật sinh sống, định cư.',
     color: 'green'
   }
@@ -133,17 +137,19 @@ export default function RoadmapPage() {
           {programTypes.map((program) => {
             const colors = colorClasses[program.color] || colorClasses['light-blue'];
             return (
-              <Card key={program.title} className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardHeader>
-                   <div className={cn("mx-auto rounded-full p-4 w-fit", colors.bg)}>
-                      <program.icon className="h-10 w-10 text-white" />
-                  </div>
-                  <CardTitle className={cn("font-headline mt-4 text-xl", colors.text)}>{program.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm" dangerouslySetInnerHTML={{ __html: program.description }}></p>
-                </CardContent>
-              </Card>
+              <Link href={`/roadmap/${program.slug}`} key={program.slug} className="block group">
+                <Card className="text-center shadow-lg h-full group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300">
+                  <CardHeader>
+                    <div className={cn("mx-auto rounded-full p-4 w-fit", colors.bg)}>
+                        <program.icon className="h-10 w-10 text-white" />
+                    </div>
+                    <CardTitle className={cn("font-headline mt-4 text-xl", colors.text)}>{program.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm" dangerouslySetInnerHTML={{ __html: program.description }}></p>
+                  </CardContent>
+                </Card>
+              </Link>
             )
           })}
         </div>
