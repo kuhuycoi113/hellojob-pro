@@ -14,7 +14,7 @@ import { Briefcase, Send, Upload, FileText, Star } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { industriesByJobType } from '@/lib/industry-data';
+import { industriesByJobType, type Industry } from "@/lib/industry-data";
 
 // Represents all possible fields
 type JobData = {
@@ -193,12 +193,16 @@ export default function PartnerPostJobPage() {
   });
 
   const [visibleFields, setVisibleFields] = useState<Set<keyof JobData>>(new Set(Object.keys(jobData) as (keyof JobData)[]));
+  const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
 
   const handleInputChange = (field: keyof JobData, value: string | string[]) => {
     const newData = { ...jobData, [field]: value };
 
     if (field === 'visaType') {
         newData.visaDetail = ''; // Reset dependent dropdown
+        newData.industry = ''; // Reset industry as well
+        const industries = industriesByJobType[value as string] || [];
+        setAvailableIndustries(industries);
     }
 
     if (field === 'visaDetail') {
@@ -246,7 +250,7 @@ export default function PartnerPostJobPage() {
         title: "Kỹ sư Vận hành Dây chuyền Tự động",
         visaType: "Kỹ sư, tri thức",
         visaDetail: "Kỹ sư, tri thức đầu Việt",
-        industry: "Điện tử",
+        industry: "Điện, điện tử",
         workLocation: "Khu công nghệ cao Hòa Lạc, Hà Nội",
         gender: "Cả nam và nữ",
         quantity: "5",
@@ -264,7 +268,7 @@ export default function PartnerPostJobPage() {
       const hidden = hiddenFieldsByVisa[mockData.visaDetail!] || [];
       const allFields = Object.keys(jobData) as (keyof JobData)[];
       setVisibleFields(new Set(allFields.filter(f => !hidden.includes(f))));
-
+      setAvailableIndustries(industriesByJobType[mockData.visaType!] || []);
       setJobData(prev => ({...prev, ...mockData}));
       
       setActiveTab('manual');
@@ -421,9 +425,6 @@ export default function PartnerPostJobPage() {
       }
   })();
 
-  const allIndustries = Object.values(industriesByJobType).flat().filter((v,i,a)=>a.findIndex(t=>(t.name === v.name))===i);
-
-
   return <div className="container mx-auto px-4 md:px-6 py-8">
     <div className="max-w-4xl mx-auto">
       <Card className="shadow-xl">
@@ -489,10 +490,10 @@ export default function PartnerPostJobPage() {
 
                     <div className="space-y-2">
                       <Label htmlFor="job-industry">Ngành nghề</Label>
-                       <Select value={jobData.industry} onValueChange={(value) => handleInputChange('industry', value)} required>
+                       <Select value={jobData.industry} onValueChange={(value) => handleInputChange('industry', value)} required disabled={!jobData.visaType}>
                         <SelectTrigger id="job-industry"><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
                         <SelectContent>
-                          {allIndustries.map(industry => (
+                          {availableIndustries.map(industry => (
                             <SelectItem key={industry.slug} value={industry.name}>{industry.name}</SelectItem>
                           ))}
                         </SelectContent>
@@ -916,5 +917,3 @@ export default function PartnerPostJobPage() {
   </div>
 }
 
-
-    
