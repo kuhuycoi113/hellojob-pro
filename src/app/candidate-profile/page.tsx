@@ -38,6 +38,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGr
 import { translateProfile } from '@/ai/flows/translate-profile-flow';
 import { type TranslateProfileInput } from '@/ai/schemas/translate-profile-schema';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
+import { industriesByJobType } from '@/lib/industry-data';
 
 
 type MediaItem = {
@@ -117,6 +118,8 @@ const emptyCandidate: EnrichedCandidateProfile = {
 const commonSkills = ['Vận hành máy CNC', 'AutoCAD', 'Kiểm tra chất lượng', 'Làm việc nhóm', 'Giải quyết vấn đề', 'Tiếng Anh giao tiếp'];
 const commonInterests = ['Cơ khí', 'Điện tử', 'IT', 'Logistics', 'Dệt may', 'Chế biến thực phẩm'];
 
+const allIndustries = Object.values(industriesByJobType).flat().filter((v,i,a)=>a.findIndex(t=>(t.name === v.name))===i);
+
 const EditDialog = ({
   children,
   title,
@@ -153,7 +156,7 @@ const EditDialog = ({
   };
 
   const handleTempChange = (
-    section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents' | 'desiredIndustry',
+    section: keyof EnrichedCandidateProfile,
     ...args: any[]
   ) => {
     setTempCandidate(prev => {
@@ -666,7 +669,12 @@ export default function CandidateProfilePage() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2 md:col-span-2">
           <Label>Ngành nghề mong muốn</Label>
-          <Input value={tempCandidate.desiredIndustry} onChange={e => handleTempChange('desiredIndustry', e.target.value)} />
+          <Select value={tempCandidate.desiredIndustry} onValueChange={value => handleTempChange('desiredIndustry', value)}>
+            <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
+            <SelectContent>
+              {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <Label>Loại visa mong muốn</Label>
@@ -1273,3 +1281,5 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+    
