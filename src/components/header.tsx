@@ -41,6 +41,7 @@ import { useChat } from '@/contexts/ChatContext';
 import { mainNavLinks, quickAccessLinks } from '@/lib/nav-data';
 import { useAuth } from '@/contexts/AuthContext';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
+import { AuthDialog } from './auth-dialog';
 
 
 export const Logo = ({ className }: { className?: string }) => (
@@ -294,7 +295,7 @@ export function Header() {
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
-                <Button onClick={handleCreateProfileRedirect} variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white">Lưu và xem việc phù hợp</Button>
+                <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và xem việc phù hợp</Button>
             </div>
         </>
     )
@@ -419,9 +420,7 @@ export function Header() {
                             </Avatar>
                         </Link>
                     ): (
-                         <Button asChild>
-                           <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
-                         </Button>
+                         <Button onClick={() => setIsLoginDialogOpen(true)}>Đăng nhập / Đăng ký</Button>
                     )}
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
@@ -448,34 +447,7 @@ export function Header() {
         </div>
       </div>
     </header>
-    <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Lưu lại nguyện vọng của bạn</DialogTitle>
-                <DialogDescription className="text-center">
-                Đăng nhập hoặc tạo tài khoản miễn phí để lưu lại lựa chọn và nhận gợi ý việc làm phù hợp nhất.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="py-4 space-y-4">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">Đăng nhập với Facebook</Button>
-                <Button className="w-full bg-red-600 hover:bg-red-700">Đăng nhập với Google</Button>
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">Hoặc</span>
-                    </div>
-                </div>
-                 <Button asChild variant="secondary" className="w-full">
-                     <Link href="/candidate-profile">Đăng ký bằng Email / SĐT</Link>
-                 </Button>
-                 <p className="text-center text-sm text-muted-foreground">
-                    Đã có tài khoản? <Link href="/candidate-profile" className="font-semibold text-primary hover:underline">Đăng nhập</Link>
-                 </p>
-            </div>
-        </DialogContent>
-    </Dialog>
+    <AuthDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />
     </>
   );
 }
