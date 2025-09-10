@@ -22,6 +22,7 @@ import Image from 'next/image';
 import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
 import { type CandidateProfile } from '@/ai/schemas';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AuthDialog } from '@/components/auth-dialog';
 
 
 const aspirations = [
@@ -252,7 +253,10 @@ const LoggedInView = () => {
 }
 
 const LoggedOutView = () => {
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+
     return (
+        <>
         <div className="flex items-center justify-center text-center py-20">
             <Card className="max-w-2xl p-8 shadow-2xl">
                 <CardHeader>
@@ -265,12 +269,14 @@ const LoggedOutView = () => {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button asChild size="lg">
-                        <Link href="/candidate-profile"><LogIn className="mr-2"/>Đăng ký / Đăng nhập</Link>
+                    <Button onClick={() => setIsAuthDialogOpen(true)} size="lg">
+                        <LogIn className="mr-2"/>Đăng ký / Đăng nhập
                     </Button>
                 </CardContent>
             </Card>
         </div>
+        <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+        </>
     )
 }
 
@@ -286,4 +292,3 @@ export default function JobsDashboardPage() {
     </div>
   );
 }
-
