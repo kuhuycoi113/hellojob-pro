@@ -348,15 +348,7 @@ export function Header() {
               </div>
             </Link>
           </DropdownMenuItem>
-        ) : (
-           <DropdownMenuItem asChild>
-            <div className="p-2">
-                <Button asChild className="w-full" size="lg">
-                    <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
-                </Button>
-            </div>
-           </DropdownMenuItem>
-        )}
+        ) : null }
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <div className="grid grid-cols-4 gap-2 p-2">
@@ -488,4 +480,3 @@ export function Header() {
   );
 }
 
-    
