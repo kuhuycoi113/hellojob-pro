@@ -1,11 +1,12 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { HardHat, School, Star, Plane, UserCheck, ShieldCheck, TrendingUp, Briefcase, MapIcon, Compass, Building } from 'lucide-react';
+import { HardHat, School, Star, Plane, UserCheck, ShieldCheck, TrendingUp, Briefcase, MapIcon, Compass, Building, ChevronRight } from 'lucide-react';
 import React from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
   title: 'Lộ trình sự nghiệp (SWR) tại Nhật Bản',
@@ -138,16 +139,19 @@ export default function RoadmapPage() {
             const colors = colorClasses[program.color] || colorClasses['light-blue'];
             return (
               <Link href={`/roadmap/${program.slug}`} key={program.slug} className="block group">
-                <Card className="text-center shadow-lg h-full group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300">
+                <Card className="text-center shadow-lg h-full group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 flex flex-col">
                   <CardHeader>
                     <div className={cn("mx-auto rounded-full p-4 w-fit", colors.bg)}>
                         <program.icon className="h-10 w-10 text-white" />
                     </div>
                     <CardTitle className={cn("font-headline mt-4 text-xl", colors.text)}>{program.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-grow">
                     <p className="text-muted-foreground text-sm" dangerouslySetInnerHTML={{ __html: program.description }}></p>
                   </CardContent>
+                  <div className="p-4 mt-auto">
+                    <Button variant="link" className={cn("font-semibold", colors.text)}>Xem lộ trình <ChevronRight className="ml-1 h-4 w-4"/></Button>
+                  </div>
                 </Card>
               </Link>
             )
