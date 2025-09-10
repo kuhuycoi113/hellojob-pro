@@ -269,7 +269,7 @@ export function Header() {
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
-                 <Button variant="secondary" onClick={() => setProfileCreationStep(7)}>Bỏ qua</Button>
+                 <Button variant="secondary" onClick={() => handleCreateProfileRedirect()}>Bỏ qua</Button>
             </div>
         </>
       )
@@ -302,7 +302,7 @@ export function Header() {
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
-                 <Button variant="secondary" onClick={() => handleCreateProfileRedirect()}>Lưu và xem việc phù hợp</Button>
+                 <Button variant="secondary" onClick={() => handleCreateProfileRedirect()} className="bg-accent-orange hover:bg-accent-orange/90 text-white">Lưu và xem việc phù hợp</Button>
             </div>
         </>
     )
