@@ -89,6 +89,7 @@ export function Header() {
     if (selectedVisaDetail) query.set('visaDetail', selectedVisaDetail);
     if (selectedIndustry) query.set('industry', selectedIndustry.name);
     if (selectedJob) query.set('job', selectedJob);
+    if (selectedRegion) query.set('region', selectedRegion);
     
     setIsDialogOpen(false);
     router.push(`/ai-profile?${query.toString()}`);
@@ -281,21 +282,22 @@ export function Header() {
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                  {japanRegions.map(region => (
-                    <Card 
+                    <Button 
                         key={region} 
+                        variant="outline"
                         onClick={() => setSelectedRegion(region)} 
                         className={cn(
-                            "text-center p-3 hover:shadow-lg transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center",
-                            selectedRegion === region ? "ring-2 ring-primary border-primary" : "hover:border-primary"
+                            "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center",
+                            selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : "hover:border-primary hover:bg-secondary"
                         )}
                     >
                         <p className="font-semibold text-sm">{region}</p>
-                    </Card>
+                    </Button>
                 ))}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
-                <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và xem việc phù hợp</Button>
+                <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleQuickCreateRedirect}>Lưu và xem việc phù hợp</Button>
             </div>
         </>
     )
