@@ -192,10 +192,10 @@ export default function EngineerRoadmapPage() {
                 Đây là con đường dành cho bạn. Hãy bắt đầu bằng cách tạo một hồ sơ chuyên nghiệp để các nhà tuyển dụng hàng đầu có thể tìm thấy bạn.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                 <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 hover:text-white">
+                 <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
                     <Link href="/ai-profile">Tạo hồ sơ bằng AI <Sparkles/></Link>
                 </Button>
-                <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
+                <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 hover:text-white">
                     <Link href="/jobs">Tìm việc làm Kỹ sư <Briefcase/></Link>
                 </Button>
             </div>
