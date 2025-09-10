@@ -153,7 +153,7 @@ const EditDialog = ({
   };
 
   const handleTempChange = (
-    section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
+    section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents' | 'desiredIndustry',
     ...args: any[]
   ) => {
     setTempCandidate(prev => {
@@ -186,11 +186,10 @@ const EditDialog = ({
           newCandidate[section] = isAdding
               ? [...currentValues, value]
               : currentValues.filter((item: string) => item !== value);
-      }
-      else {
-        const [field, value] = args;
+      } else {
+        const [value] = args;
         // @ts-ignore
-        newCandidate[field] = value;
+        newCandidate[section] = value;
       }
 
       return newCandidate;
@@ -490,7 +489,7 @@ export default function CandidateProfilePage() {
   const renderAboutEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
     <Textarea
       value={tempCandidate.about}
-      onChange={e => handleTempChange('about', null, e.target.value)}
+      onChange={e => handleTempChange('about', e.target.value)}
       rows={6}
     />
   );
@@ -498,7 +497,7 @@ export default function CandidateProfilePage() {
   const renderNotesEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
     <Textarea
       value={tempCandidate.notes}
-      onChange={e => handleTempChange('notes', null, e.target.value)}
+      onChange={e => handleTempChange('notes', e.target.value)}
       rows={4}
       placeholder="Ghi chú về nguyện vọng, khả năng tài chính, thời gian có thể đi..."
     />
@@ -667,7 +666,7 @@ export default function CandidateProfilePage() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2 md:col-span-2">
           <Label>Ngành nghề mong muốn</Label>
-          <Input value={tempCandidate.desiredIndustry} onChange={e => handleTempChange('desiredIndustry', null, e.target.value)} />
+          <Input value={tempCandidate.desiredIndustry} onChange={e => handleTempChange('desiredIndustry', e.target.value)} />
         </div>
         <div className="space-y-2">
           <Label>Loại visa mong muốn</Label>
@@ -742,7 +741,7 @@ export default function CandidateProfilePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Họ và tên</Label>
-          <Input value={tempCandidate.name} onChange={e => handleTempChange('name', null, e.target.value)} />
+          <Input value={tempCandidate.name} onChange={e => handleTempChange('name', e.target.value)} />
         </div>
         <div className="space-y-2">
           <Label>Số điện thoại</Label>
