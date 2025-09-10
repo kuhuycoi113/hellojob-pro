@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileSignature, School, Plane, UserCheck, CheckCircle, TrendingUp, User, Briefcase, Calendar, Map, DollarSign, ChevronRight } from 'lucide-react';
+import { FileSignature, School, Plane, UserCheck, CheckCircle, TrendingUp, User, Briefcase, Calendar, Map, DollarSign, ChevronRight, Sparkles } from 'lucide-react';
 import React from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -205,4 +205,3 @@ export default function TraineeRoadmapPage() {
     </div>
   );
 }
-
