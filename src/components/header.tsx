@@ -66,7 +66,7 @@ export function Header() {
     <Link
       href={href}
       className={cn(
-        'transition-colors hover:text-primary py-2 block font-medium flex items-center gap-2',
+        'transition-colors hover:text-primary py-2 font-medium flex items-center gap-2',
         (pathname === href || (pathname.startsWith(href) && href !== '/')) ? 'text-primary font-bold' : 'text-foreground/80',
         className
       )}
@@ -338,28 +338,40 @@ export function Header() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-              <DialogTrigger asChild>
-                <Button variant="default">Tạo hồ sơ</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-2xl">
-                 {renderDialogContent()}
-              </DialogContent>
-            </Dialog>
             
              {isClient && (
                 <>
                     {isLoggedIn ? (
-                         <Link href="/candidate-profile">
-                            <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
-                                <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
-                                <AvatarFallback>A</AvatarFallback>
-                            </Avatar>
-                        </Link>
+                        <>
+                            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                                <DialogTrigger asChild>
+                                    <Button variant="default">Tạo hồ sơ</Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-2xl">
+                                    {renderDialogContent()}
+                                </DialogContent>
+                            </Dialog>
+                            <Link href="/candidate-profile">
+                                <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+                                    <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
+                                    <AvatarFallback>A</AvatarFallback>
+                                </Avatar>
+                            </Link>
+                        </>
                     ): (
-                       <Button asChild variant="outline">
-                           <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
-                       </Button>
+                        <>
+                            <Button asChild variant="default">
+                               <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
+                           </Button>
+                           <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                              <DialogTrigger asChild>
+                                <Button variant="outline">Tạo hồ sơ</Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-2xl">
+                                 {renderDialogContent()}
+                              </DialogContent>
+                            </Dialog>
+                        </>
                     )}
                     <Button asChild variant="ghost">
                         <Link href="/jobs">
@@ -380,3 +392,4 @@ export function Header() {
     </header>
   );
 }
+
