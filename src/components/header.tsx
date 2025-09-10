@@ -56,7 +56,7 @@ export function Header() {
   const [isClient, setIsClient] = useState(false);
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
@@ -79,7 +79,7 @@ export function Header() {
     } else {
         // Guest user: close current dialog and open login dialog
         setIsDialogOpen(false);
-        setIsLoginDialogOpen(true);
+        setIsAuthDialogOpen(true);
     }
   };
   
@@ -151,17 +151,26 @@ export function Header() {
           </DialogDescription>
       </DialogHeader>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-        <Button onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
+        <Button 
+            onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(4); }} 
+            variant="outline" 
+            className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
             <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
         </Button>
-        <Button onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
+        <Button 
+            onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(4); }} 
+            variant="outline" 
+            className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
             <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
         </Button>
-        <Button onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
+        <Button 
+            onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(4); }} 
+            variant="outline" 
+            className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
             <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
@@ -422,7 +431,7 @@ export function Header() {
                             </Avatar>
                         </Link>
                     ): (
-                         <Button onClick={() => setIsLoginDialogOpen(true)}>Đăng nhập / Đăng ký</Button>
+                         <Button onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập / Đăng ký</Button>
                     )}
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
@@ -449,7 +458,8 @@ export function Header() {
         </div>
       </div>
     </header>
-    <AuthDialog isOpen={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />
+    <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
     </>
   );
 }
+
