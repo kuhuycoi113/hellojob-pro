@@ -162,8 +162,9 @@ export default function RoadmapPage() {
           <div className="space-y-12 md:space-y-4">
             {roadmapSteps.map((step, index) => {
               const colors = colorClasses[step.color] || colorClasses['light-blue'];
+              const isEven = index % 2 === 0;
               return (
-              <div key={index} className="relative flex flex-col md:flex-row items-center group md:h-80">
+              <div key={index} className={`relative flex flex-col md:flex-row items-center group md:h-80 ${isEven ? '' : 'md:flex-row-reverse'}`}>
                 {/* Timeline circle for desktop */}
                 <div className="hidden md:block absolute left-1/2 -translate-x-1/2 z-10">
                    <div className={cn(
@@ -174,36 +175,30 @@ export default function RoadmapPage() {
                     </div>
                 </div>
                 
-                {/* Mobile Icon */}
-                 <div className="md:hidden flex items-center gap-4 mb-4 w-full">
-                    <div className={cn("w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0", colors.bg)}>
-                        <step.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <h2 className={cn("font-headline text-2xl", colors.text)}>{step.title}</h2>
+                {/* Content Side */}
+                <div className={`w-full md:w-1/2 flex ${isEven ? 'md:justify-end' : 'md:justify-start'}`}>
+                   <div className="w-full md:max-w-sm">
+                     <Card className={cn("shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4", colors.border)}>
+                        <CardHeader>
+                        <CardTitle className={cn("font-headline text-2xl", colors.text)}>
+                            {step.title}
+                        </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                        <p className="text-muted-foreground mb-4">{step.description}</p>
+                        <div className={`font-bold text-lg`}>
+                            <span className="text-accent-green">{step.salary}</span>
+                        </div>
+                        </CardContent>
+                    </Card>
+                   </div>
+                </div>
+                
+                {/* Image Side */}
+                <div className={`w-full md:w-1/2 flex mt-4 md:mt-0 ${isEven ? 'md:justify-start md:pl-16' : 'md:justify-end md:pr-16'}`}>
+                    <Image src={step.image} alt={step.title} width={400} height={225} className="rounded-lg shadow-xl object-cover w-full md:w-auto md:max-w-sm aspect-video" data-ai-hint={step.dataAiHint} />
                 </div>
 
-
-                {/* Content: Right side (for even index on desktop) or all on mobile */}
-                <div className={`w-full md:w-1/2 ${index % 2 !== 0 ? 'md:pl-16' : 'md:pr-16 md:text-right'} ${index % 2 !== 0 ? 'md:order-2' : ''}`}>
-                   <Card className={cn("shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4", colors.border)}>
-                     <CardHeader className="hidden md:block">
-                      <CardTitle className={cn("font-headline text-2xl", colors.text)}>
-                          {step.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                      <p className="text-muted-foreground mb-4">{step.description}</p>
-                       <div className={`font-bold text-lg ${index % 2 !== 0 ? 'md:text-left' : 'md:text-right'}`}>
-                         <span className="text-accent-green">{step.salary}</span>
-                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Image: Left side (for even index on desktop) */}
-                <div className={`hidden md:flex w-1/2 h-full items-center ${index % 2 !== 0 ? 'md:pr-16 md:order-1' : 'md:pl-16'}`}>
-                   <Image src={step.image} alt={step.title} width={500} height={300} className="rounded-lg shadow-xl object-contain w-full h-56" data-ai-hint={step.dataAiHint} />
-                </div>
               </div>
             )})}
           </div>
