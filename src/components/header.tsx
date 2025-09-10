@@ -243,7 +243,7 @@ export function Header() {
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
             {options.map(option => (
-                <Button key={option.label} onClick={() => { setSelectedVisaDetail(option.label); setProfileCreationStep(5); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+                <Button key={option.label} onClick={() => { setSelectedVisaDetail(option.label); setProfileCreationStep(5); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                     <h3 className="font-bold text-base mb-1">{option.label}</h3>
                     <p className="text-muted-foreground text-xs">{option.description}</p>
                 </Button>
@@ -268,7 +268,7 @@ export function Header() {
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                 {industries.map(industry => (
-                    <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(6);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                    <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(6);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                         <p className="font-semibold text-sm">{industry.name}</p>
                     </Button>
                 ))}
@@ -296,7 +296,7 @@ export function Header() {
                         variant="outline"
                         onClick={() => setSelectedRegion(region)} 
                         className={cn(
-                            "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center",
+                            "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary",
                             selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
                         )}
                     >
@@ -462,4 +462,3 @@ export function Header() {
     </>
   );
 }
-
