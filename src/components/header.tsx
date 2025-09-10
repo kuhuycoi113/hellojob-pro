@@ -56,7 +56,10 @@ export function Header() {
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
+  const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
+  const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -65,6 +68,12 @@ export function Header() {
 
   const isLoggedIn = role === 'candidate';
 
+  const handleCreateProfileRedirect = () => {
+    // Logic for redirection or saving data will be here
+    setIsDialogOpen(false);
+    // For now, just redirecting to ai-profile
+    router.push('/ai-profile');
+  };
 
   const NavLink = ({ href, label, className, icon: Icon, onClick }: { href: string; label: string, className?: string, icon?: React.ElementType, onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => (
     <Link
@@ -122,17 +131,17 @@ export function Header() {
           </DialogDescription>
       </DialogHeader>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-        <Card onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+        <Card onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
             <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
             <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
         </Card>
-        <Card onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+        <Card onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
             <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
             <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
         </Card>
-        <Card onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+        <Card onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(4); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[170px]">
             <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
             <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
@@ -205,7 +214,7 @@ export function Header() {
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
             {options.map(option => (
-                <Card key={option.label} onClick={() => setProfileCreationStep(5)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
+                <Card key={option.label} onClick={() => { setSelectedVisaDetail(option.label); setProfileCreationStep(5); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px]">
                     <h3 className="font-bold text-base mb-1">{option.label}</h3>
                     <p className="text-muted-foreground text-xs">{option.description}</p>
                 </Card>
@@ -239,6 +248,32 @@ export function Header() {
         </>
     );
   };
+  
+  const JobDetailStepDialog = () => {
+      if (!selectedIndustry) return null;
+      const jobs = selectedIndustry.keywords;
+      return (
+         <>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn công việc chi tiết</DialogTitle>
+                <DialogDescription className="text-center">
+                    Chọn công việc cụ thể bạn muốn làm trong ngành {selectedIndustry.name}.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                 {jobs.map(job => (
+                    <Card key={job} onClick={() => {setSelectedJob(job); setProfileCreationStep(7);}} className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                        <p className="font-semibold text-sm">{job}</p>
+                    </Card>
+                ))}
+            </div>
+            <div className="flex justify-center items-center mt-4 gap-4">
+                <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
+                 <Button variant="secondary" onClick={() => setProfileCreationStep(7)}>Bỏ qua</Button>
+            </div>
+        </>
+      )
+  }
 
   const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
 
@@ -253,20 +288,21 @@ export function Header() {
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                  {japanRegions.map(region => (
-                    <DialogClose key={region} asChild>
-                        <Link href="/ai-profile">
-                            <Card className="text-center p-3 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                                <p className="font-semibold text-sm">{region}</p>
-                            </Card>
-                         </Link>
-                    </DialogClose>
+                    <Card 
+                        key={region} 
+                        onClick={() => setSelectedRegion(region)} 
+                        className={cn(
+                            "text-center p-3 hover:shadow-lg transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center",
+                            selectedRegion === region ? "ring-2 ring-primary border-primary" : "hover:border-primary"
+                        )}
+                    >
+                        <p className="font-semibold text-sm">{region}</p>
+                    </Card>
                 ))}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
-                 <DialogClose asChild>
-                     <Button variant="secondary" onClick={() => router.push('/ai-profile')}>Bỏ qua</Button>
-                 </DialogClose>
+                 <Button variant="secondary" onClick={() => handleCreateProfileRedirect()}>Lưu và xem việc phù hợp</Button>
             </div>
         </>
     )
@@ -281,6 +317,7 @@ export function Header() {
       case 4: return <VisaDetailStepDialog />;
       case 5: return <IndustryStepDialog />;
       case 6: return <RegionStepDialog />;
+      // case 7: return <RegionStepDialog />;
       default: return <FirstStepDialog />;
     }
   }
@@ -392,7 +429,10 @@ export function Header() {
                 <>
                     {isLoggedIn ? (
                         <>
-                            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                           <Button asChild>
+                               <Link href="/candidate-profile">Quản lý hồ sơ</Link>
+                           </Button>
+                             <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                                 <DialogTrigger asChild>
                                     <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
                                 </DialogTrigger>
@@ -400,12 +440,6 @@ export function Header() {
                                     {renderDialogContent()}
                                 </DialogContent>
                             </Dialog>
-                            <Link href="/candidate-profile">
-                                <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
-                                    <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
-                                    <AvatarFallback>A</AvatarFallback>
-                                </Avatar>
-                            </Link>
                         </>
                     ): (
                         <>
@@ -422,9 +456,9 @@ export function Header() {
                             </Dialog>
                         </>
                     )}
-                    <Button asChild variant="ghost">
+                     <Button asChild variant="ghost">
                         <Link href="/jobs">
-                            Trang việc làm
+                           Trang việc làm
                         </Link>
                     </Button>
                     <MainMenu />
