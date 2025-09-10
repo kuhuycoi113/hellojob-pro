@@ -36,7 +36,7 @@ import { cn } from '@/lib/utils';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { translateProfile } from '@/ai/flows/translate-profile-flow';
-import { type TranslateProfileInput } from '@/ai/schemas/translate-profile-schema';
+import type { TranslateProfileInput } from '@/ai/schemas/translate-profile-schema';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -333,6 +333,40 @@ export default function CandidateProfilePage() {
   }, [profileByLang.vi]);
 
 
+  const handleLanguageChange = async (lang: Language) => {
+    if (lang === currentLang) return;
+    
+    // Switch immediately if data is already available
+    if (profileByLang[lang]) {
+        setCurrentLang(lang);
+        return;
+    }
+    
+    // If no Vietnamese profile exists to translate from, do nothing.
+    if (!profileByLang.vi) return;
+
+    setIsTranslating(true);
+    try {
+        const input: TranslateProfileInput = {
+            profile: profileByLang.vi,
+            targetLanguage: lang === 'ja' ? 'Japanese' : 'English',
+        };
+        const translatedProfile = await translateProfile(input);
+        
+        setProfileByLang(prev => ({
+            ...prev,
+            [lang]: translatedProfile,
+        }));
+        setCurrentLang(lang); // Switch to the new language after successful translation
+
+    } catch (error) {
+        console.error("Translation failed:", error);
+        // Optionally, show a toast message to the user about the failure
+    } finally {
+        setIsTranslating(false);
+    }
+  };
+
   const candidate = profileByLang.vi ? { ...profileByLang.vi, ...profileByLang[currentLang] } : null;
 
   if (!candidate) {
@@ -360,37 +394,6 @@ export default function CandidateProfilePage() {
         </div>
       );
   }
-
-  const handleLanguageChange = async (lang: Language) => {
-    if (lang === currentLang) return;
-    setCurrentLang(lang);
-
-    if (lang === 'vi' || profileByLang[lang]) {
-        return; // Already have the data, just switch
-    }
-
-    if (!profileByLang.vi) return;
-
-    setIsTranslating(true);
-    try {
-        const input: TranslateProfileInput = {
-            profile: profileByLang.vi,
-            targetLanguage: lang === 'ja' ? 'Japanese' : 'English',
-        };
-        const translatedProfile = await translateProfile(input);
-        
-        setProfileByLang(prev => ({
-            ...prev,
-            [lang]: translatedProfile,
-        }));
-
-    } catch (error) {
-        console.error("Translation failed:", error);
-        setCurrentLang('vi'); // Revert on error
-    } finally {
-        setIsTranslating(false);
-    }
-  };
   
   const handleMediaChange = (type: 'avatar' | 'image', e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
     const file = e.target.files?.[0];
