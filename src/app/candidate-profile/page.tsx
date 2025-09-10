@@ -54,6 +54,13 @@ type EnrichedCandidateProfile = CandidateProfile & {
   images: MediaItem[];
 };
 
+type Language = 'vi' | 'ja' | 'en';
+
+type ProfilesByLang = {
+    vi: EnrichedCandidateProfile | null;
+    ja: Partial<EnrichedCandidateProfile> | null;
+    en: Partial<EnrichedCandidateProfile> | null;
+}
 
 const emptyCandidate: EnrichedCandidateProfile = {
     name: 'Lê Thị An',
@@ -263,13 +270,11 @@ const visaTypes = Object.keys(visaDetailsByVisaType);
 
 
 export default function CandidateProfilePage() {
-  const [candidate, setCandidate] = useState<EnrichedCandidateProfile | null>(null);
-  const [originalCandidate, setOriginalCandidate] = useState<EnrichedCandidateProfile | null>(null);
+  const [profileByLang, setProfileByLang] = useState<ProfilesByLang>({ vi: null, ja: null, en: null });
   const [newSkill, setNewSkill] = useState('');
   const [newInterest, setNewInterest] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
-  const [currentLang, setCurrentLang] = useState('vi');
-
+  const [currentLang, setCurrentLang] = useState<Language>('vi');
 
   useEffect(() => {
     const storedProfile = localStorage.getItem('generatedCandidateProfile');
@@ -313,22 +318,22 @@ export default function CandidateProfilePage() {
             images: defaultImages
         };
     }
-    setCandidate(profileToLoad);
-    setOriginalCandidate(JSON.parse(JSON.stringify(profileToLoad))); // Deep copy
+    setProfileByLang({ vi: profileToLoad, ja: null, en: null });
   }, []);
 
   const handleSave = (updatedCandidate: EnrichedCandidateProfile) => {
-    setCandidate(updatedCandidate);
-    setOriginalCandidate(JSON.parse(JSON.stringify(updatedCandidate))); // Update original state on save
+    setProfileByLang({ vi: updatedCandidate, ja: null, en: null });
     setCurrentLang('vi'); // Revert to Vietnamese on save
   };
 
   useEffect(() => {
-    if (candidate) {
-      localStorage.setItem('generatedCandidateProfile', JSON.stringify(candidate));
+    if (profileByLang.vi) {
+      localStorage.setItem('generatedCandidateProfile', JSON.stringify(profileByLang.vi));
     }
-  }, [candidate]);
+  }, [profileByLang.vi]);
 
+
+  const candidate = profileByLang.vi ? { ...profileByLang.vi, ...profileByLang[currentLang] } : null;
 
   if (!candidate) {
       return (
@@ -356,54 +361,32 @@ export default function CandidateProfilePage() {
       );
   }
 
-  const handleLanguageChange = async (lang: string) => {
-    if (lang === currentLang || !originalCandidate) return;
-
+  const handleLanguageChange = async (lang: Language) => {
+    if (lang === currentLang) return;
     setCurrentLang(lang);
 
-    if (lang === 'vi') {
-        setCandidate(originalCandidate);
-        return;
+    if (lang === 'vi' || profileByLang[lang]) {
+        return; // Already have the data, just switch
     }
+
+    if (!profileByLang.vi) return;
 
     setIsTranslating(true);
     try {
         const input: TranslateProfileInput = {
-            profile: originalCandidate,
+            profile: profileByLang.vi,
             targetLanguage: lang === 'ja' ? 'Japanese' : 'English',
         };
         const translatedProfile = await translateProfile(input);
         
-        setCandidate(prev => {
-            if (!prev) return null;
-             // A more robust way to merge, handling potentially missing keys in translatedProfile
-            const mergedProfile = { ...originalCandidate }; // Start with a fresh copy of original
-
-            // Iterate over keys of the translated profile and merge them
-            for (const key in translatedProfile) {
-                const aKey = key as keyof Partial<CandidateProfile>;
-                if (translatedProfile[aKey] !== undefined) {
-                    // @ts-ignore
-                    mergedProfile[aKey] = translatedProfile[aKey];
-                }
-            }
-
-            return {
-                ...mergedProfile,
-                education: originalCandidate.education.map((edu, index) => ({
-                    ...edu,
-                    ...(translatedProfile.education?.[index] || {}),
-                })),
-                experience: originalCandidate.experience.map((exp, index) => ({
-                    ...exp,
-                    ...(translatedProfile.experience?.[index] || {}),
-                })),
-            };
-        });
+        setProfileByLang(prev => ({
+            ...prev,
+            [lang]: translatedProfile,
+        }));
 
     } catch (error) {
         console.error("Translation failed:", error);
-        // Optionally, show a toast message to the user
+        setCurrentLang('vi'); // Revert on error
     } finally {
         setIsTranslating(false);
     }
@@ -411,43 +394,40 @@ export default function CandidateProfilePage() {
   
   const handleMediaChange = (type: 'avatar' | 'image', e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (file && profileByLang.vi) {
       const reader = new FileReader();
       reader.onload = () => {
         const newUrl = reader.result as string;
-        setCandidate(prev => {
-          if (!prev) return null;
-          const newCandidate = JSON.parse(JSON.stringify(prev));
-          if (type === 'avatar') {
-             newCandidate.avatarUrl = newUrl;
-          } else if (type === 'image' && index !== undefined) {
-             newCandidate.images[index].src = newUrl;
-          }
-          return newCandidate;
-        });
+        const newProfile = JSON.parse(JSON.stringify(profileByLang.vi));
+        if (type === 'avatar') {
+            newProfile.avatarUrl = newUrl;
+        } else if (type === 'image' && index !== undefined) {
+            newProfile.images[index].src = newUrl;
+        }
+        setProfileByLang({ vi: newProfile, ja: null, en: null });
+        setCurrentLang('vi');
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleAddItem = (section: 'experience' | 'education' | 'certifications' | 'documents', docType?: 'vietnam' | 'japan' | 'other') => {
-      setCandidate(prev => {
-          if (!prev) return null;
-          const newCandidate = JSON.parse(JSON.stringify(prev));
-          if (section === 'experience') {
-              newCandidate.experience.push({ company: '', role: '', period: '', description: '' });
-          } else if (section === 'education') {
-              newCandidate.education.push({ school: '', degree: '', gradYear: new Date().getFullYear() });
-          } else if (section === 'certifications') {
-              newCandidate.certifications.push('');
-          } else if (section === 'documents' && docType) {
-              if (!newCandidate.documents) {
-                  newCandidate.documents = { vietnam: [], japan: [], other: [] };
-              }
-              newCandidate.documents[docType].push('');
+      if (!profileByLang.vi) return;
+      const newProfile = JSON.parse(JSON.stringify(profileByLang.vi));
+      if (section === 'experience') {
+          newProfile.experience.push({ company: '', role: '', period: '', description: '' });
+      } else if (section === 'education') {
+          newProfile.education.push({ school: '', degree: '', gradYear: new Date().getFullYear() });
+      } else if (section === 'certifications') {
+          newProfile.certifications.push('');
+      } else if (section === 'documents' && docType) {
+          if (!newProfile.documents) {
+              newProfile.documents = { vietnam: [], japan: [], other: [] };
           }
-          return newCandidate;
-      });
+          newProfile.documents[docType].push('');
+      }
+      setProfileByLang({ vi: newProfile, ja: null, en: null });
+      setCurrentLang('vi');
   };
 
   const handleRemoveItem = (
@@ -455,31 +435,32 @@ export default function CandidateProfilePage() {
       indexOrValue: number | string,
       docType?: 'vietnam' | 'japan' | 'other'
   ) => {
-      setCandidate(prev => {
-          if (!prev) return null;
-          const newCandidate = JSON.parse(JSON.stringify(prev));
-          if (section === 'skills' || section === 'interests') {
-              // @ts-ignore
-              newCandidate[section] = newCandidate[section].filter(item => item !== indexOrValue);
-          } else if (section === 'documents' && docType && typeof indexOrValue === 'number') {
-             // @ts-ignore
-             newCandidate.documents[docType].splice(indexOrValue, 1);
-          } else if (typeof indexOrValue === 'number') {
-              // @ts-ignore
-              newCandidate[section].splice(indexOrValue, 1);
-          }
-          return newCandidate;
-      });
+      if (!profileByLang.vi) return;
+      const newProfile = JSON.parse(JSON.stringify(profileByLang.vi));
+      if (section === 'skills' || section === 'interests') {
+          // @ts-ignore
+          newProfile[section] = newProfile[section].filter(item => item !== indexOrValue);
+      } else if (section === 'documents' && docType && typeof indexOrValue === 'number') {
+         // @ts-ignore
+         newProfile.documents[docType].splice(indexOrValue, 1);
+      } else if (typeof indexOrValue === 'number') {
+          // @ts-ignore
+          newProfile[section].splice(indexOrValue, 1);
+      }
+      setProfileByLang({ vi: newProfile, ja: null, en: null });
+      setCurrentLang('vi');
   };
 
   const handleAddNewChip = (field: 'skills' | 'interests') => {
-    if (!candidate) return;
+    if (!profileByLang.vi) return;
     const valueToAdd = field === 'skills' ? newSkill.trim() : newInterest.trim();
-    if (valueToAdd && !candidate[field].includes(valueToAdd)) {
-      setCandidate(prev => ({
-        ...prev!,
-        [field]: [...prev![field], valueToAdd],
-      }));
+    if (valueToAdd && !profileByLang.vi[field].includes(valueToAdd)) {
+        const newProfile = {
+            ...profileByLang.vi,
+            [field]: [...profileByLang.vi[field], valueToAdd],
+        };
+      setProfileByLang({ vi: newProfile, ja: null, en: null });
+      setCurrentLang('vi');
       if (field === 'skills') {
         setNewSkill('');
       } else {
@@ -804,7 +785,7 @@ export default function CandidateProfilePage() {
                     title="Chỉnh sửa Thông tin Cá nhân"
                     onSave={handleSave}
                     renderContent={renderLevel1Edit}
-                    candidate={candidate!}
+                    candidate={profileByLang.vi!}
                 >
                     <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-orange">
                         <h4 className="font-bold text-accent-orange">Cá nhân</h4>
@@ -824,7 +805,7 @@ export default function CandidateProfilePage() {
                             {renderEducationEdit(temp, handleChange)}
                         </div>
                     )}
-                    candidate={candidate!}
+                    candidate={profileByLang.vi!}
                 >
                     <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-green">
                         <h4 className="font-bold text-accent-green">Sự nghiệp</h4>
@@ -837,7 +818,7 @@ export default function CandidateProfilePage() {
                     title="Chỉnh sửa Nguyện vọng"
                     onSave={handleSave}
                     renderContent={renderAspirationsEdit}
-                    candidate={candidate!}
+                    candidate={profileByLang.vi!}
                 >
                     <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-blue">
                         <h4 className="font-bold text-accent-blue">Nguyện vọng</h4>
@@ -936,7 +917,7 @@ export default function CandidateProfilePage() {
                  <div className="relative group">
                      <Avatar className="h-32 w-32 border-4 border-background bg-background shadow-lg">
                       <AvatarImage src={candidate.avatarUrl} alt={candidate.name} data-ai-hint="professional headshot" className="object-cover" />
-                      <AvatarFallback>{candidate.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{candidate.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <Label htmlFor="avatar-upload" className="absolute bottom-1 right-1 cursor-pointer bg-black/50 text-white p-2 rounded-full group-hover:bg-black/70 transition-colors">
                         <Camera className="h-5 w-5" />
@@ -980,7 +961,7 @@ export default function CandidateProfilePage() {
                         onSave={handleSave}
                         renderContent={MainEditDialogContent}
                         description="Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn."
-                        candidate={originalCandidate!} // Always edit the original version
+                        candidate={profileByLang.vi!} 
                      >
                         <Button variant="outline" size="icon" className="sm:hidden"><Edit /></Button>
                      </EditDialog>
@@ -989,7 +970,7 @@ export default function CandidateProfilePage() {
                         onSave={handleSave}
                         renderContent={MainEditDialogContent}
                         description="Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn."
-                        candidate={originalCandidate!} // Always edit the original version
+                        candidate={profileByLang.vi!}
                      >
                          <Button variant="outline" className="hidden sm:inline-flex"><Edit /> Sửa hồ sơ</Button>
                      </EditDialog>
@@ -1007,7 +988,7 @@ export default function CandidateProfilePage() {
                         title="Chỉnh sửa Giới thiệu bản thân"
                         onSave={handleSave}
                         renderContent={renderAboutEdit}
-                        candidate={originalCandidate!}
+                        candidate={profileByLang.vi!}
                         description="Viết một đoạn giới thiệu ngắn về bản thân, kỹ năng và mục tiêu nghề nghiệp của bạn."
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
@@ -1019,7 +1000,7 @@ export default function CandidateProfilePage() {
                     ) : (
                       <div className="text-muted-foreground">
                         <span>Chưa có thông tin. </span>
-                        <EditDialog title="Chỉnh sửa Giới thiệu bản thân" onSave={handleSave} renderContent={renderAboutEdit} candidate={originalCandidate!}>
+                        <EditDialog title="Chỉnh sửa Giới thiệu bản thân" onSave={handleSave} renderContent={renderAboutEdit} candidate={profileByLang.vi!}>
                             <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
                         </EditDialog>
                       </div>
@@ -1039,7 +1020,7 @@ export default function CandidateProfilePage() {
                         title="Chỉnh sửa Kinh nghiệm làm việc"
                         onSave={handleSave}
                         renderContent={renderExperienceEdit}
-                        candidate={originalCandidate!}
+                        candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
                      </EditDialog>
@@ -1055,7 +1036,7 @@ export default function CandidateProfilePage() {
                     )) : (
                         <div className="text-muted-foreground">
                            <span>Chưa có thông tin. </span>
-                            <EditDialog title="Chỉnh sửa Kinh nghiệm làm việc" onSave={handleSave} renderContent={renderExperienceEdit} candidate={originalCandidate!}>
+                            <EditDialog title="Chỉnh sửa Kinh nghiệm làm việc" onSave={handleSave} renderContent={renderExperienceEdit} candidate={profileByLang.vi!}>
                                <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
                             </EditDialog>
                         </div>
@@ -1070,7 +1051,7 @@ export default function CandidateProfilePage() {
                         title="Chỉnh sửa Học vấn"
                         onSave={handleSave}
                         renderContent={renderEducationEdit}
-                        candidate={originalCandidate!}
+                        candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
                     </EditDialog>
@@ -1085,7 +1066,7 @@ export default function CandidateProfilePage() {
                      )) : (
                         <div className="text-muted-foreground">
                             <span>Chưa có thông tin. </span>
-                            <EditDialog title="Chỉnh sửa Học vấn" onSave={handleSave} renderContent={renderEducationEdit} candidate={originalCandidate!}>
+                            <EditDialog title="Chỉnh sửa Học vấn" onSave={handleSave} renderContent={renderEducationEdit} candidate={profileByLang.vi!}>
                                 <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
                             </EditDialog>
                         </div>
@@ -1099,7 +1080,7 @@ export default function CandidateProfilePage() {
                         title="Chỉnh sửa Ghi chú"
                         onSave={handleSave}
                         renderContent={renderNotesEdit}
-                        candidate={originalCandidate!}
+                        candidate={profileByLang.vi!}
                         description="Thêm bất kỳ ghi chú hoặc thông tin bổ sung nào về nguyện vọng, hoàn cảnh của bạn."
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
@@ -1111,7 +1092,7 @@ export default function CandidateProfilePage() {
                     ) : (
                       <div className="text-muted-foreground">
                         <span>Chưa có ghi chú. </span>
-                        <EditDialog title="Chỉnh sửa Ghi chú" onSave={handleSave} renderContent={renderNotesEdit} candidate={originalCandidate!}>
+                        <EditDialog title="Chỉnh sửa Ghi chú" onSave={handleSave} renderContent={renderNotesEdit} candidate={profileByLang.vi!}>
                             <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
                         </EditDialog>
                       </div>
@@ -1129,7 +1110,7 @@ export default function CandidateProfilePage() {
                         title="Chỉnh sửa Thông tin cá nhân"
                         onSave={handleSave}
                         renderContent={renderLevel1Edit}
-                        candidate={originalCandidate!}
+                        candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
                     </EditDialog>
@@ -1152,7 +1133,7 @@ export default function CandidateProfilePage() {
                         title="Chỉnh sửa Nguyện vọng"
                         onSave={handleSave}
                         renderContent={renderAspirationsEdit}
-                        candidate={originalCandidate!}
+                        candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
                     </EditDialog>
@@ -1178,7 +1159,7 @@ export default function CandidateProfilePage() {
                         description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn."
                         onSave={handleSave}
                         renderContent={renderSkillsInterestsEdit}
-                        candidate={originalCandidate!}
+                        candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
                     </EditDialog>
@@ -1189,7 +1170,7 @@ export default function CandidateProfilePage() {
                         {candidate.skills.length > 0 ? candidate.skills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>) : 
                         <div className="text-muted-foreground text-sm">
                             <span>Chưa có kỹ năng. </span>
-                            <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={originalCandidate!}>
+                            <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={profileByLang.vi!}>
                                <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
                             </EditDialog>
                         </div>}
@@ -1199,7 +1180,7 @@ export default function CandidateProfilePage() {
                         {candidate.interests.length > 0 ? candidate.interests.map(interest => <Badge key={interest} className="bg-accent-blue text-white">{interest}</Badge>) : 
                         <div className="text-muted-foreground text-sm">
                             <span>Chưa có lĩnh vực quan tâm. </span>
-                             <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={originalCandidate!}>
+                             <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={profileByLang.vi!}>
                                 <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
                             </EditDialog>
                         </div>}
@@ -1214,7 +1195,7 @@ export default function CandidateProfilePage() {
                         title="Chỉnh sửa Hồ sơ/Giấy tờ"
                         onSave={handleSave}
                         renderContent={renderDocumentsEdit}
-                        candidate={originalCandidate!}
+                        candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
                     </EditDialog>
@@ -1248,7 +1229,7 @@ export default function CandidateProfilePage() {
                         title="Chỉnh sửa Chứng chỉ & Giải thưởng"
                         onSave={handleSave}
                         renderContent={renderCertificationsEdit}
-                        candidate={originalCandidate!}
+                        candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
                     </EditDialog>
@@ -1259,7 +1240,7 @@ export default function CandidateProfilePage() {
                      )) : 
                      <div className="text-muted-foreground text-sm">
                         <span>Chưa có chứng chỉ. </span>
-                        <EditDialog title="Chỉnh sửa Chứng chỉ & Giải thưởng" onSave={handleSave} renderContent={renderCertificationsEdit} candidate={originalCandidate!}>
+                        <EditDialog title="Chỉnh sửa Chứng chỉ & Giải thưởng" onSave={handleSave} renderContent={renderCertificationsEdit} candidate={profileByLang.vi!}>
                             <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
                         </EditDialog>
                     </div>}
@@ -1281,5 +1262,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-
-    
