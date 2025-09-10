@@ -81,6 +81,17 @@ export function Header() {
         setIsLoginDialogOpen(true);
     }
   };
+  
+    const handleQuickCreateRedirect = () => {
+    const query = new URLSearchParams();
+    if (selectedVisaType) query.set('visaType', selectedVisaType);
+    if (selectedVisaDetail) query.set('visaDetail', selectedVisaDetail);
+    if (selectedIndustry) query.set('industry', selectedIndustry.name);
+    if (selectedJob) query.set('job', selectedJob);
+    
+    setIsDialogOpen(false);
+    router.push(`/ai-profile?${query.toString()}`);
+  };
 
   const NavLink = ({ href, label, className, icon: Icon, onClick }: { href: string; label: string, className?: string, icon?: React.ElementType, onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => (
     <Link
@@ -409,17 +420,16 @@ export function Header() {
              {isClient && (
                 <>
                     {isLoggedIn ? (
-                        <>
-                           <Button asChild>
-                               <Link href="/candidate-profile">Quản lý hồ sơ</Link>
-                           </Button>
-                        </>
+                        <Link href="/candidate-profile" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                            <Avatar className="h-10 w-10 cursor-pointer">
+                                <AvatarImage src="https://placehold.co/100x100.png" alt="User Avatar" data-ai-hint="user avatar" />
+                                <AvatarFallback>A</AvatarFallback>
+                            </Avatar>
+                        </Link>
                     ): (
-                        <>
-                           <Button asChild>
-                               <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
-                           </Button>
-                        </>
+                         <Button asChild>
+                           <Link href="/candidate-profile">Đăng nhập / Đăng ký</Link>
+                         </Button>
                     )}
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
@@ -477,3 +487,5 @@ export function Header() {
     </>
   );
 }
+
+    
