@@ -163,6 +163,10 @@ const EditDialog = ({
         const [field, value] = args;
         // @ts-ignore
         newCandidate[section] = { ...newCandidate[section], [field]: value };
+         // Logic to reset visa detail when visa type changes
+        if (section === 'aspirations' && field === 'desiredVisaType') {
+            newCandidate.aspirations!.desiredVisaDetail = '';
+        }
       } else if (section === 'documents') {
           const [docType, index, value] = args;
           // @ts-ignore
@@ -667,7 +671,7 @@ export default function CandidateProfilePage() {
         </div>
         <div className="space-y-2">
           <Label>Loại visa mong muốn</Label>
-          <Select value={tempCandidate.aspirations?.desiredVisaType || ''} onValueChange={value => { handleTempChange('aspirations', 'desiredVisaType', value); handleTempChange('aspirations', 'desiredVisaDetail', ''); }}>
+          <Select value={tempCandidate.aspirations?.desiredVisaType || ''} onValueChange={value => handleTempChange('aspirations', 'desiredVisaType', value)}>
             <SelectTrigger><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
             <SelectContent>
               {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
