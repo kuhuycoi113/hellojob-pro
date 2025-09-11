@@ -5,7 +5,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2 } from 'lucide-react';
+import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { jobData, type Job } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
@@ -51,8 +51,14 @@ const EmptyProfileView = () => (
         <p className="text-muted-foreground mt-1">
             Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.
         </p>
-        <div className="mt-6">
-            <Button asChild>
+        <div className="mt-6 flex flex-wrap gap-4">
+             <Button asChild className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                <Link href="/ai-profile">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Tạo hồ sơ nhanh
+                </Link>
+            </Button>
+            <Button asChild variant="outline">
                 <Link href="/candidate-profile">
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Xem trang hồ sơ và khởi tạo
