@@ -119,7 +119,6 @@ const EmptyProfileView = () => {
     // Screen: THSN002
     const QuickCreateStepDialog = () => (
         <>
-            {/* Screen: THSN002 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
                 <DialogDescription className="text-center">

@@ -217,6 +217,7 @@ export function Header() {
     const options = visaDetailsOptions[selectedVisaType];
     
     let screenIdComment = '';
+    // Screen: THSN003-1, THSN003-2, THSN003-3
     if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN003-1';
     if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN003-2';
     if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN003-3';
@@ -248,6 +249,7 @@ export function Header() {
     const industries = industriesByJobType[selectedVisaType as keyof typeof industriesByJobType] || [];
     
     let screenIdComment = '';
+    // Screen: THSN004-1, THSN004-2, THSN004-3
     if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN004-1';
     if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN004-2';
     if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN004-3';
@@ -276,6 +278,7 @@ export function Header() {
   const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
 
   const RegionStepDialog = () => {
+    // Screen: THSN005
     return (
          <>
             {/* Screen: THSN005 */}
