@@ -88,6 +88,7 @@ export function Header() {
         router.push('/jobs?highlight=suggested');
     } else {
         sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
+        setIsDialogOpen(false); // Close the current dialog
         setIsConfirmLoginOpen(true);
     }
   };
@@ -217,14 +218,13 @@ export function Header() {
     const options = visaDetailsOptions[selectedVisaType];
     
     let screenIdComment = '';
-    // Screen: THSN003-1, THSN003-2, THSN003-3
     if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN003-1';
-    if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN003-2';
-    if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN003-3';
+    else if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN003-2';
+    else if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN003-3';
     
     return (
         <>
-        {/* {screenIdComment} */}
+        <span className="hidden">{screenIdComment}</span>
         <DialogHeader>
             <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisaType}</DialogTitle>
             <DialogDescription className="text-center">
@@ -249,14 +249,13 @@ export function Header() {
     const industries = industriesByJobType[selectedVisaType as keyof typeof industriesByJobType] || [];
     
     let screenIdComment = '';
-    // Screen: THSN004-1, THSN004-2, THSN004-3
     if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN004-1';
-    if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN004-2';
-    if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN004-3';
+    else if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN004-2';
+    else if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN004-3';
 
     return (
         <>
-            {/* {screenIdComment} */}
+            <span className="hidden">{screenIdComment}</span>
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
                 <DialogDescription className="text-center">
@@ -484,9 +483,6 @@ export function Header() {
     </AlertDialog>
     <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={(open) => {
         setIsAuthDialogOpen(open);
-        // If auth dialog is closed without logging in, we might need to decide if we close the parent.
-        // For now, let's not close the parent dialog automatically when auth dialog closes.
-        // The successful login logic will handle closing the parent dialog.
     }} />
     </>
   );

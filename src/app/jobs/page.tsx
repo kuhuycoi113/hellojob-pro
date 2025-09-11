@@ -95,6 +95,7 @@ const EmptyProfileView = () => {
     // Screen: THSN001
     const FirstStepDialog = () => (
         <>
+        {/* Screen: THSN001 */}
         <DialogHeader>
             <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
             <DialogDescription className="text-center">
@@ -119,6 +120,7 @@ const EmptyProfileView = () => {
     // Screen: THSN002
     const QuickCreateStepDialog = () => (
         <>
+            {/* Screen: THSN002 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
                 <DialogDescription className="text-center">
@@ -177,14 +179,13 @@ const EmptyProfileView = () => {
         const options = visaDetailsOptions[selectedVisaType];
         
         let screenIdComment = '';
-        // Screen: THSN003-1, THSN003-2, THSN003-3
         if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN003-1';
-        if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN003-2';
-        if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN003-3';
+        else if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN003-2';
+        else if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN003-3';
         
         return (
             <>
-            {/* {screenIdComment} */}
+            <span className="hidden">{screenIdComment}</span>
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisaType}</DialogTitle>
                 <DialogDescription className="text-center">
@@ -209,14 +210,13 @@ const EmptyProfileView = () => {
         const industries = industriesByJobType[selectedVisaType as keyof typeof industriesByJobType] || [];
         
         let screenIdComment = '';
-        // Screen: THSN004-1, THSN004-2, THSN004-3
         if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN004-1';
-        if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN004-2';
-        if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN004-3';
+        else if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN004-2';
+        else if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN004-3';
 
         return (
             <>
-                {/* {screenIdComment} */}
+                <span className="hidden">{screenIdComment}</span>
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
                     <DialogDescription className="text-center">
