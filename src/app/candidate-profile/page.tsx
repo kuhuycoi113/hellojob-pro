@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -72,6 +73,10 @@ const translations = {
         tattoo: "Hình xăm",
         hepatitisB: "Viêm gan B",
         language: "Ngôn ngữ",
+        documentsSection: "Hồ sơ/Giấy tờ",
+        vietnamDocs: "Giấy tờ Việt Nam",
+        japanDocs: "Giấy tờ Nhật Bản",
+        otherDocs: "Giấy tờ nước ngoài/Du học",
     },
     ja: {
         personalInfo: "個人情報",
@@ -82,6 +87,10 @@ const translations = {
         tattoo: "刺青",
         hepatitisB: "B型肝炎",
         language: "言語",
+        documentsSection: "書類・証明書",
+        vietnamDocs: "ベトナムの書類",
+        japanDocs: "日本の書類",
+        otherDocs: "外国の書類・留学",
     },
     en: {
         personalInfo: "Personal Information",
@@ -92,6 +101,10 @@ const translations = {
         tattoo: "Tattoo Status",
         hepatitisB: "Hepatitis B",
         language: "Language",
+        documentsSection: "Documents & Paperwork",
+        vietnamDocs: "Vietnamese Documents",
+        japanDocs: "Japanese Documents",
+        otherDocs: "Overseas/Study Abroad Docs",
     }
 }
 
@@ -430,7 +443,7 @@ export default function CandidateProfilePage() {
                     else
                         output[key] = mergeDeep(target[key], source[key]);
                 } else if (Array.isArray(source[key])) {
-                     if (key === 'skills' || key === 'interests' || key === 'certifications') {
+                     if (key === 'skills' || key === 'interests' || key === 'certifications' || key === 'documents') {
                         Object.assign(output, { [key]: source[key] });
                     } else if (key === 'education' || key === 'experience') {
                         const targetArray = target[key] || [];
@@ -1118,31 +1131,39 @@ export default function CandidateProfilePage() {
                 </DialogHeader>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
                     <Card className="hover:bg-secondary cursor-pointer">
-                        <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-                            <FileCode className="h-10 w-10 text-blue-500 mb-2"/>
-                            <p className="font-semibold">Dạng HTML</p>
-                            <p className="text-xs text-muted-foreground">Tải xuống như giao diện Web.</p>
+                        <CardContent className="p-4 flex items-center gap-4">
+                            <FileCode className="h-10 w-10 text-blue-500 shrink-0"/>
+                            <div>
+                                <p className="font-semibold">Dạng HTML</p>
+                                <p className="text-xs text-muted-foreground">Tải xuống như giao diện Web.</p>
+                            </div>
                         </CardContent>
                     </Card>
                     <Card className="hover:bg-secondary cursor-pointer">
-                         <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-                            <FileText className="h-10 w-10 text-red-500 mb-2"/>
-                            <p className="font-semibold">Dạng PDF</p>
-                            <p className="text-xs text-muted-foreground">Lý tưởng để gửi qua email hoặc in ấn.</p>
+                         <CardContent className="p-4 flex items-center gap-4">
+                            <FileText className="h-10 w-10 text-red-500 shrink-0"/>
+                            <div>
+                                <p className="font-semibold">Dạng PDF</p>
+                                <p className="text-xs text-muted-foreground">Lý tưởng để gửi qua email hoặc in ấn.</p>
+                            </div>
                         </CardContent>
                     </Card>
                      <Card className="hover:bg-secondary cursor-pointer">
-                         <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-                            <FileType className="h-10 w-10 text-sky-600 mb-2"/>
-                            <p className="font-semibold">Dạng Docx</p>
-                            <p className="text-xs text-muted-foreground">Dễ dàng chỉnh sửa bằng Microsoft Word.</p>
+                         <CardContent className="p-4 flex items-center gap-4">
+                            <FileType className="h-10 w-10 text-sky-600 shrink-0"/>
+                            <div>
+                                <p className="font-semibold">Dạng Docx</p>
+                                <p className="text-xs text-muted-foreground">Dễ dàng chỉnh sửa bằng Microsoft Word.</p>
+                            </div>
                         </CardContent>
                     </Card>
                      <Card className="hover:bg-secondary cursor-pointer">
-                         <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-                            <Sheet className="h-10 w-10 text-green-600 mb-2"/>
-                            <p className="font-semibold">Dạng Excel</p>
-                            <p className="text-xs text-muted-foreground">Phù hợp để quản lý và phân tích dữ liệu.</p>
+                         <CardContent className="p-4 flex items-center gap-4">
+                            <Sheet className="h-10 w-10 text-green-600 shrink-0"/>
+                            <div>
+                                <p className="font-semibold">Dạng Excel</p>
+                                <p className="text-xs text-muted-foreground">Phù hợp để quản lý và phân tích dữ liệu.</p>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
@@ -1445,7 +1466,7 @@ export default function CandidateProfilePage() {
                 
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><FileArchive className="mr-3 text-primary"/> Hồ sơ/Giấy tờ</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center"><FileArchive className="mr-3 text-primary"/> {t.documentsSection}</CardTitle>
                      <EditDialog
                         title="Chỉnh sửa Hồ sơ/Giấy tờ"
                         onSave={handleSave}
@@ -1457,19 +1478,19 @@ export default function CandidateProfilePage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                        <h4 className="font-semibold mb-2 text-sm">Giấy tờ Việt Nam</h4>
+                        <h4 className="font-semibold mb-2 text-sm">{t.vietnamDocs}</h4>
                         {candidate.documents?.vietnam?.length > 0 ? (
                              <div className="flex flex-wrap gap-2">{candidate.documents.vietnam.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
                         ) : (<p className="text-sm text-muted-foreground">Chưa có</p>)}
                     </div>
                      <div>
-                        <h4 className="font-semibold mb-2 text-sm">Giấy tờ Nhật Bản</h4>
+                        <h4 className="font-semibold mb-2 text-sm">{t.japanDocs}</h4>
                         {candidate.documents?.japan?.length > 0 ? (
                              <div className="flex flex-wrap gap-2">{candidate.documents.japan.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
                         ) : (<p className="text-sm text-muted-foreground">Chưa có</p>)}
                     </div>
                      <div>
-                        <h4 className="font-semibold mb-2 text-sm">Giấy tờ nước ngoài/Du học</h4>
+                        <h4 className="font-semibold mb-2 text-sm">{t.otherDocs}</h4>
                         {candidate.documents?.other?.length > 0 ? (
                              <div className="flex flex-wrap gap-2">{candidate.documents.other.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
                         ) : (<p className="text-sm text-muted-foreground">Chưa có</p>)}
@@ -1518,5 +1539,7 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+    
 
     
