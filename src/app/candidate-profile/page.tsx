@@ -1074,7 +1074,7 @@ export default function CandidateProfilePage() {
                         <FileJson className="mr-4 h-6 w-6 text-blue-500 flex-shrink-0"/>
                         <div>
                             <p className="font-semibold text-base">Dạng HTML</p>
-                            <p className="text-xs text-muted-foreground">Tải xuống dưới dạng tệp HTML, giữ nguyên giao diện như trên web.</p>
+                            <p className="text-xs text-muted-foreground">Tải xuống như giao diện Web.</p>
                         </div>
                     </Button>
                      <Button className="w-full justify-start h-auto p-4 text-left" variant="outline">
