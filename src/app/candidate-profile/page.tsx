@@ -881,14 +881,15 @@ export default function CandidateProfilePage() {
             <Label>Địa điểm mong muốn</Label>
             <Select value={tempCandidate.aspirations?.desiredLocation || ''} onValueChange={value => handleTempChange('aspirations', 'desiredLocation', value)}>
                 <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
-                <SelectContent>
-                <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
-                    <SelectGroup key={region}>
-                    <SelectLabel>{region}</SelectLabel>
-                    {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                    </SelectGroup>
-                ))}
+                <SelectContent className="max-h-[300px]">
+                    <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                    {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
+                        <SelectGroup key={region}>
+                            <SelectLabel>{region}</SelectLabel>
+                            <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                            {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                        </SelectGroup>
+                    ))}
                 </SelectContent>
             </Select>
         </div>
@@ -1635,4 +1636,3 @@ export default function CandidateProfilePage() {
   );
 }
 
-    
