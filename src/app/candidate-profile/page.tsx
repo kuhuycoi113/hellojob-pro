@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -39,6 +39,7 @@ import { translateProfile } from '@/ai/flows/translate-profile-flow';
 import type { TranslateProfileInput } from '@/ai/schemas/translate-profile-schema';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
 import { industriesByJobType } from '@/lib/industry-data';
+import { useToast } from '@/hooks/use-toast';
 
 
 type MediaItem = {
@@ -270,6 +271,7 @@ const visaTypes = Object.keys(visaDetailsByVisaType);
 
 
 export default function CandidateProfilePage() {
+  const { toast } = useToast();
   const [profileByLang, setProfileByLang] = useState<ProfilesByLang>({ vi: null, ja: null, en: null });
   const [newSkill, setNewSkill] = useState('');
   const [newInterest, setNewInterest] = useState('');
@@ -368,32 +370,34 @@ export default function CandidateProfilePage() {
   };
 
   const getDisplayedProfile = (): EnrichedCandidateProfile | null => {
-    if (!profileByLang.vi) return null;
-    if (currentLang === 'vi' || !profileByLang[currentLang]) {
-      return profileByLang.vi;
-    }
-  
-    // Deep merge the translated profile over the Vietnamese base profile
-    const translated = profileByLang[currentLang]!;
-    const mergedProfile = JSON.parse(JSON.stringify(profileByLang.vi)); // Deep copy
+    const { vi, ja, en } = profileByLang;
+    if (!vi) return null;
 
-    // A recursive function to merge translated fields
-    const merge = (target: any, source: any) => {
-        for (const key in source) {
-            if (source.hasOwnProperty(key)) {
-                if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
-                    if (!target[key]) target[key] = {};
-                    merge(target[key], source[key]);
-                } else if (source[key] !== undefined && source[key] !== null) { // Only overwrite if translated value exists
-                    target[key] = source[key];
-                }
-            }
-        }
-    };
+    if (currentLang === 'vi' || !profileByLang[currentLang]) {
+        return vi;
+    }
+
+    const translated = profileByLang[currentLang]!;
     
+    // Create a deep copy of the base 'vi' profile
+    const mergedProfile = JSON.parse(JSON.stringify(vi));
+
+    // Recursively merge translated fields into the base profile
+    const merge = (target: any, source: any) => {
+        Object.keys(source).forEach(key => {
+            const sourceValue = source[key];
+            if (sourceValue !== null && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
+                if (!target[key]) target[key] = {};
+                merge(target[key], sourceValue);
+            } else if (sourceValue !== undefined) { // Check for undefined to not overwrite with it
+                target[key] = sourceValue;
+            }
+        });
+    };
+
     merge(mergedProfile, translated);
-    return mergedProfile;
-  };
+    return mergedProfile as EnrichedCandidateProfile;
+};
   
   const candidate = getDisplayedProfile();
 
@@ -937,6 +941,63 @@ export default function CandidateProfilePage() {
     </Card>
   )
 
+  const SendProfileDialog = () => {
+    const handleSend = (lang: string) => {
+        toast({
+            title: "Đã gửi hồ sơ!",
+            description: `Hồ sơ của bạn đã được gửi bằng ${lang}.`,
+            className: "bg-green-500 text-white"
+        });
+    };
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline" className="hidden sm:inline-flex"><Send/> Gửi hồ sơ</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-2xl">Bạn muốn gửi hồ sơ theo ngôn ngữ nào?</DialogTitle>
+                    <DialogDescription>
+                        Chọn một ngôn ngữ để gửi hồ sơ này cho nhà tuyển dụng.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <VnFlagIcon className="w-8 h-6 rounded-sm"/>
+                            <span className="font-semibold">Tiếng Việt</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
+                            <Button size="sm" onClick={() => handleSend('Tiếng Việt')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
+                        </div>
+                    </div>
+                     <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <JpFlagIcon className="w-8 h-6 rounded-sm"/>
+                            <span className="font-semibold">Tiếng Nhật</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                             <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
+                            <Button size="sm" onClick={() => handleSend('Tiếng Nhật')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
+                        </div>
+                    </div>
+                     <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <EnFlagIcon className="w-8 h-6 rounded-sm"/>
+                            <span className="font-semibold">Tiếng Anh</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
+                            <Button size="sm" onClick={() => handleSend('Tiếng Anh')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
+                        </div>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+  };
+
 
   return (
     <div className="bg-secondary">
@@ -968,8 +1029,13 @@ export default function CandidateProfilePage() {
                      <Button variant="outline" size="icon" className="sm:hidden"><FileDown/></Button>
                      <Button variant="outline" className="hidden sm:inline-flex"><FileDown/> Tải hồ sơ</Button>
                      
-                     <Button variant="outline" size="icon" className="sm:hidden"><Send/></Button>
-                     <Button variant="outline" className="hidden sm:inline-flex"><Send/> Gửi hồ sơ</Button>
+                     <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="icon" className="sm:hidden"><Send/></Button>
+                        </DialogTrigger>
+                        <DialogContent><SendProfileDialog /></DialogContent>
+                     </Dialog>
+                     <SendProfileDialog />
 
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
