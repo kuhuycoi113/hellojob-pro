@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -85,7 +86,6 @@ export function Header() {
     sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
 
     if (isLoggedIn) {
-        // Apply preferences to existing user profile if needed
         console.log("Applying preferences for logged in user:", preferences);
         setIsDialogOpen(false);
         router.push('/jobs?highlight=suggested');

@@ -336,15 +336,14 @@ const LoggedInView = () => {
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
-    const [visibleJobsCount, setVisibleJobsCount] = useState(8); // Show 8 jobs initially
+    const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const searchParams = useSearchParams();
     const [isHighlighted, setIsHighlighted] = useState(false);
-    const router = useRouter();
     
     // Initialize accordion state directly from searchParams
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(
-        searchParams.get('highlight') === 'suggested' ? 'item-1' : undefined
+        () => searchParams.get('highlight') === 'suggested' ? 'item-1' : undefined
     );
 
     useEffect(() => {
