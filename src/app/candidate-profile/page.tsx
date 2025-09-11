@@ -77,6 +77,16 @@ const translations = {
         vietnamDocs: "Giấy tờ Việt Nam",
         japanDocs: "Giấy tờ Nhật Bản",
         otherDocs: "Giấy tờ nước ngoài/Du học",
+        aspirations: "Nguyện vọng",
+        desiredIndustry: "Ngành nghề",
+        desiredVisaType: "Loại Visa",
+        desiredVisaDetail: "Chi tiết Visa",
+        desiredLocation: "Địa điểm",
+        desiredSalary: "Lương cơ bản",
+        desiredNetSalary: "Thực lĩnh",
+        financialAbility: "Khả năng tài chính",
+        interviewLocation: "Nơi phỏng vấn",
+        specialAspirations: "Yêu cầu khác",
     },
     ja: {
         personalInfo: "個人情報",
@@ -91,6 +101,16 @@ const translations = {
         vietnamDocs: "ベトナムの書類",
         japanDocs: "日本の書類",
         otherDocs: "外国の書類・留学",
+        aspirations: "希望条件",
+        desiredIndustry: "希望職種",
+        desiredVisaType: "希望ビザ",
+        desiredVisaDetail: "ビザ詳細",
+        desiredLocation: "希望勤務地",
+        desiredSalary: "希望基本給",
+        desiredNetSalary: "希望手取り",
+        financialAbility: "経済的能力",
+        interviewLocation: "面接地",
+        specialAspirations: "その他の希望",
     },
     en: {
         personalInfo: "Personal Information",
@@ -105,6 +125,16 @@ const translations = {
         vietnamDocs: "Vietnamese Documents",
         japanDocs: "Japanese Documents",
         otherDocs: "Overseas/Study Abroad Docs",
+        aspirations: "Aspirations",
+        desiredIndustry: "Desired Industry",
+        desiredVisaType: "Desired Visa Type",
+        desiredVisaDetail: "Visa Detail",
+        desiredLocation: "Desired Location",
+        desiredSalary: "Desired Basic Salary",
+        desiredNetSalary: "Desired Net Salary",
+        financialAbility: "Financial Ability",
+        interviewLocation: "Interview Location",
+        specialAspirations: "Other Aspirations",
     }
 }
 
@@ -1404,7 +1434,7 @@ export default function CandidateProfilePage() {
 
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><Target className="mr-3 text-primary"/> Nguyện vọng</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center"><Target className="mr-3 text-primary"/> {t.aspirations}</CardTitle>
                      <EditDialog
                         title="Chỉnh sửa Nguyện vọng"
                         onSave={handleSave}
@@ -1415,15 +1445,15 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                    <CardContent className="space-y-3 text-sm">
-                        <p><strong>Ngành nghề:</strong> {candidate.desiredIndustry}</p>
-                        <p><strong>Loại Visa:</strong> {candidate.aspirations?.desiredVisaType}</p>
-                        <p><strong>Chi tiết Visa:</strong> {candidate.aspirations?.desiredVisaDetail}</p>
-                        <p><strong>Địa điểm:</strong> {candidate.aspirations?.desiredLocation}</p>
-                        <p><strong>Lương cơ bản:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p>
-                        <p><strong>Thực lĩnh:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p>
-                        <p><strong>Khả năng tài chính:</strong> {candidate.aspirations?.financialAbility}</p>
-                        <p><strong>Nơi phỏng vấn:</strong> {candidate.aspirations?.interviewLocation}</p>
-                        <p><strong>Yêu cầu khác:</strong> {candidate.aspirations?.specialAspirations}</p>
+                        <p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry}</p>
+                        <p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.desiredVisaType}</p>
+                        <p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.desiredVisaDetail}</p>
+                        <p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation}</p>
+                        <p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p>
+                        <p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p>
+                        <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility}</p>
+                        <p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation}</p>
+                        <p><strong>{t.specialAspirations}:</strong> {candidate.aspirations?.specialAspirations}</p>
                   </CardContent>
                 </Card>
 
