@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -277,6 +277,8 @@ export default function CandidateProfilePage() {
   const [newInterest, setNewInterest] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [currentLang, setCurrentLang] = useState<Language>('vi');
+  const [isSendOptionsOpen, setIsSendOptionsOpen] = useState(false);
+  const [languageToSend, setLanguageToSend] = useState('');
 
   useEffect(() => {
     const storedProfile = localStorage.getItem('generatedCandidateProfile');
@@ -363,7 +365,11 @@ export default function CandidateProfilePage() {
 
     } catch (error) {
         console.error("Translation failed:", error);
-        // Optionally, show a toast message to the user about the failure
+        toast({
+            variant: "destructive",
+            title: "Dịch thất bại",
+            description: "Đã có lỗi xảy ra khi dịch hồ sơ. Vui lòng thử lại."
+        });
     } finally {
         setIsTranslating(false);
     }
@@ -373,30 +379,36 @@ export default function CandidateProfilePage() {
     const { vi, ja, en } = profileByLang;
     if (!vi) return null;
 
-    if (currentLang === 'vi' || !profileByLang[currentLang]) {
-        return vi;
+    const baseProfile = vi;
+    const translatedProfile = profileByLang[currentLang];
+    
+    if (currentLang === 'vi' || !translatedProfile) {
+        return baseProfile;
     }
 
-    const translated = profileByLang[currentLang]!;
-    
-    // Create a deep copy of the base 'vi' profile
-    const mergedProfile = JSON.parse(JSON.stringify(vi));
-
-    // Recursively merge translated fields into the base profile
-    const merge = (target: any, source: any) => {
-        Object.keys(source).forEach(key => {
-            const sourceValue = source[key];
-            if (sourceValue !== null && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
-                if (!target[key]) target[key] = {};
-                merge(target[key], sourceValue);
-            } else if (sourceValue !== undefined) { // Check for undefined to not overwrite with it
-                target[key] = sourceValue;
-            }
-        });
+    // Deep merge translated fields into the base profile
+    const mergeDeep = (target: any, source: any): any => {
+        const output = { ...target };
+        if (isObject(target) && isObject(source)) {
+            Object.keys(source).forEach(key => {
+                if (isObject(source[key])) {
+                    if (!(key in target))
+                        Object.assign(output, { [key]: source[key] });
+                    else
+                        output[key] = mergeDeep(target[key], source[key]);
+                } else {
+                    Object.assign(output, { [key]: source[key] });
+                }
+            });
+        }
+        return output;
     };
 
-    merge(mergedProfile, translated);
-    return mergedProfile as EnrichedCandidateProfile;
+    const isObject = (item: any) => {
+        return (item && typeof item === 'object' && !Array.isArray(item));
+    };
+
+    return mergeDeep(baseProfile, translatedProfile) as EnrichedCandidateProfile;
 };
   
   const candidate = getDisplayedProfile();
@@ -941,14 +953,63 @@ export default function CandidateProfilePage() {
     </Card>
   )
 
-  const SendProfileDialog = () => {
-    const handleSend = (lang: string) => {
+  const SendOptionsDialog = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+    
+    const handleSendToConsultant = () => {
         toast({
             title: "Đã gửi hồ sơ!",
-            description: `Hồ sơ của bạn đã được gửi bằng ${lang}.`,
+            description: `Hồ sơ ${languageToSend} của bạn đã được gửi tới các tư vấn viên phù hợp.`,
             className: "bg-green-500 text-white"
         });
+        onOpenChange(false);
     };
+
+    const handleGetShareLink = () => {
+        const link = `${window.location.origin}/candidate-profile/public/${candidate?.name.toLowerCase().replace(/\s/g, '-')}`;
+        navigator.clipboard.writeText(link);
+        toast({
+            title: "Đã sao chép đường dẫn!",
+            description: "Bạn có thể gửi đường dẫn này cho người khác.",
+        });
+        onOpenChange(false);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-2xl">Gửi hồ sơ</DialogTitle>
+                    <DialogDescription>
+                        Chọn cách bạn muốn chia sẻ hồ sơ này.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <Button onClick={handleSendToConsultant} className="w-full justify-start h-auto p-4" variant="outline">
+                        <UserCog className="mr-4 h-6 w-6 text-primary"/>
+                        <div>
+                            <p className="font-semibold text-base">Gửi cho tư vấn viên</p>
+                            <p className="text-xs text-muted-foreground text-left">Hồ sơ của bạn sẽ được gửi đến các tư vấn viên phù hợp trong hệ thống.</p>
+                        </div>
+                    </Button>
+                    <Button onClick={handleGetShareLink} className="w-full justify-start h-auto p-4" variant="outline">
+                        <Link2 className="mr-4 h-6 w-6 text-green-500"/>
+                        <div>
+                            <p className="font-semibold text-base">Lấy đường dẫn chia sẻ</p>
+                            <p className="text-xs text-muted-foreground text-left">Tạo một đường dẫn công khai để gửi hồ sơ cho bất kỳ ai.</p>
+                        </div>
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+};
+  
+  const SendProfileDialog = () => {
+    const handleSendClick = (lang: string) => {
+        setLanguageToSend(lang);
+        setIsSendOptionsOpen(true);
+    };
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -969,7 +1030,7 @@ export default function CandidateProfilePage() {
                         </div>
                         <div className="flex items-center gap-2">
                             <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
-                            <Button size="sm" onClick={() => handleSend('Tiếng Việt')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
+                            <Button size="sm" onClick={() => handleSendClick('Tiếng Việt')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
                         </div>
                     </div>
                      <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
@@ -979,7 +1040,7 @@ export default function CandidateProfilePage() {
                         </div>
                         <div className="flex items-center gap-2">
                              <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
-                            <Button size="sm" onClick={() => handleSend('Tiếng Nhật')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
+                            <Button size="sm" onClick={() => handleSendClick('Tiếng Nhật')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
                         </div>
                     </div>
                      <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
@@ -989,7 +1050,7 @@ export default function CandidateProfilePage() {
                         </div>
                         <div className="flex items-center gap-2">
                             <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
-                            <Button size="sm" onClick={() => handleSend('Tiếng Anh')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
+                            <Button size="sm" onClick={() => handleSendClick('Tiếng Anh')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
                         </div>
                     </div>
                 </div>
@@ -1357,6 +1418,7 @@ export default function CandidateProfilePage() {
           </Card>
         </div>
       </div>
+      <SendOptionsDialog open={isSendOptionsOpen} onOpenChange={setIsSendOptionsOpen} />
     </div>
   );
 }
