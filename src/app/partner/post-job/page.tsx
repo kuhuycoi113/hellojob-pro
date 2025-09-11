@@ -179,44 +179,47 @@ export default function PartnerPostJobPage() {
   const [visibleFields, setVisibleFields] = useState<Set<keyof JobData>>(new Set(Object.keys(jobData) as (keyof JobData)[]));
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
 
+  useEffect(() => {
+    // Collect all industries initially
+    const allIndustries = Object.values(industriesByJobType).flat();
+    const uniqueIndustries = Array.from(new Map(allIndustries.map(item => [item['slug'], item])).values());
+    setAvailableIndustries(uniqueIndustries);
+  }, []);
+
   const handleInputChange = (field: keyof JobData, value: string | string[]) => {
-    const newData = { ...jobData, [field]: value };
+    setJobData(prevData => {
+        const newData = { ...prevData, [field]: value };
 
-    if (field === 'visaType') {
-        newData.visaDetail = ''; // Reset dependent dropdown
-        newData.industry = ''; // Reset industry as well
-        const industries = industriesByJobType[value as string] || [];
-        setAvailableIndustries(industries);
-    }
+        if (field === 'visaType') {
+            newData.visaDetail = '';
+            newData.industry = '';
+            const industries = industriesByJobType[value as string] || [];
+            setAvailableIndustries(industries);
+        }
 
-    if (field === 'visaDetail') {
-      const hidden = hiddenFieldsByVisa[value as string] || [];
-      const allFields = Object.keys(jobData) as (keyof JobData)[];
-      const newVisibleFields = new Set(allFields.filter(f => !hidden.includes(f)));
-      setVisibleFields(newVisibleFields);
-      // Reset special conditions when visa type changes
-      newData.specialConditions = [];
-    }
+        if (field === 'visaDetail') {
+            const hidden = hiddenFieldsByVisa[value as string] || [];
+            const allFields = Object.keys(jobData) as (keyof JobData)[];
+            const newVisibleFields = new Set(allFields.filter(f => !hidden.includes(f)));
+            setVisibleFields(newVisibleFields);
+            newData.specialConditions = [];
+        }
 
-    // Reset proficiency when language changes, or hide it if not required
-    if (field === 'languageRequirement') {
-      newData.languageProficiency = '';
-      if (value === 'Không yêu cầu tiếng') {
-          setVisibleFields(prev => {
-              const newSet = new Set(prev);
-              newSet.delete('languageProficiency');
-              return newSet;
-          });
-      } else {
-           setVisibleFields(prev => {
-              const newSet = new Set(prev);
-              newSet.add('languageProficiency');
-              return newSet;
-          });
-      }
-    }
-
-    setJobData(newData);
+        if (field === 'languageRequirement') {
+            newData.languageProficiency = '';
+            setVisibleFields(prevVisible => {
+                const newSet = new Set(prevVisible);
+                if (value === 'Không yêu cầu tiếng') {
+                    newSet.delete('languageProficiency');
+                } else {
+                    newSet.add('languageProficiency');
+                }
+                return newSet;
+            });
+        }
+        
+        return newData;
+    });
   };
 
   const handleCheckboxChange = (field: keyof JobData, value: string) => {
@@ -650,7 +653,7 @@ export default function PartnerPostJobPage() {
                            <Select value={jobData.experienceRequirement} onValueChange={(value) => handleInputChange('experienceRequirement', value)}>
                             <SelectTrigger id="experience-requirement"><SelectValue placeholder="Chọn ngành nghề yêu cầu kinh nghiệm" /></SelectTrigger>
                             <SelectContent>
-                              {allIndustries.map(industry => (
+                              {availableIndustries.map(industry => (
                                 <SelectItem key={industry.slug} value={industry.name}>{industry.name}</SelectItem>
                               ))}
                             </SelectContent>
