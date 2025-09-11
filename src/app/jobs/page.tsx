@@ -53,11 +53,13 @@ const LoggedInView = () => {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const searchParams = useSearchParams();
     const [isHighlighted, setIsHighlighted] = useState(false);
+    const [defaultAccordion, setDefaultAccordion] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         const highlight = searchParams.get('highlight');
         if (highlight === 'suggested') {
             setIsHighlighted(true);
+            setDefaultAccordion("item-1"); // Keep it open
             const timer = setTimeout(() => setIsHighlighted(false), 2500); // Highlight for 2.5 seconds
             return () => clearTimeout(timer);
         }
@@ -106,7 +108,7 @@ const LoggedInView = () => {
         </div>
          {/* Main Content */}
         <div className="w-full mb-8">
-            <Accordion type="single" collapsible className="w-full" defaultValue={isHighlighted ? "item-1" : undefined}>
+            <Accordion type="single" collapsible className="w-full" defaultValue={defaultAccordion}>
                 <AccordionItem value="item-1" className={cn(
                     "transition-all duration-1000 ease-out",
                     isHighlighted ? "ring-2 ring-offset-2 ring-yellow-400 shadow-2xl rounded-lg" : ""
