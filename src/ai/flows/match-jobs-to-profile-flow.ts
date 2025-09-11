@@ -21,6 +21,9 @@ const MatchResultSchema = z.object({
 
 type MatchResult = z.infer<typeof MatchResultSchema>;
 
+// Make most fields optional for the matching logic, as a quick-profile won't have all data.
+const PartialCandidateProfileSchema = CandidateProfileSchema.deepPartial();
+
 export async function matchJobsToProfile(profile: CandidateProfile): Promise<MatchResult[]> {
     return matchJobsToProfileFlow(profile);
 }
@@ -42,7 +45,7 @@ const WEIGHTS = {
 const matchJobsToProfileFlow = ai.defineFlow(
     {
         name: 'matchJobsToProfileFlow',
-        inputSchema: CandidateProfileSchema,
+        inputSchema: PartialCandidateProfileSchema,
         outputSchema: z.array(MatchResultSchema),
     },
     async (profile) => {
@@ -97,7 +100,7 @@ const matchJobsToProfileFlow = ai.defineFlow(
             // 5. Experience Matching
             if (profile.experience && profile.experience.length > 0) {
                 profile.experience.forEach(exp => {
-                    if (job.industry.toLowerCase().includes(exp.company.toLowerCase()) || job.title.toLowerCase().includes(exp.role.toLowerCase())) {
+                    if (exp.company && exp.role && (job.industry.toLowerCase().includes(exp.company.toLowerCase()) || job.title.toLowerCase().includes(exp.role.toLowerCase()))) {
                         score += WEIGHTS.EXPERIENCE_INDUSTRY;
                         breakdown['experience'] = (breakdown['experience'] || 0) + WEIGHTS.EXPERIENCE_INDUSTRY;
                     }
@@ -105,7 +108,7 @@ const matchJobsToProfileFlow = ai.defineFlow(
             }
 
             // 6. Language Matching
-            if (profile.personalInfo.language && job.languageRequirement && job.languageRequirement !== "Không yêu cầu") {
+            if (profile.personalInfo?.language && job.languageRequirement && job.languageRequirement !== "Không yêu cầu") {
                  const profileLangLevel = parseInt(profile.personalInfo.language.match(/N(\d)/)?.[1] || '0', 10);
                  const jobLangLevel = parseInt(job.languageRequirement.match(/N(\d)/)?.[1] || '0', 10);
                  if(profileLangLevel > 0 && jobLangLevel > 0 && profileLangLevel <= jobLangLevel){
@@ -115,7 +118,7 @@ const matchJobsToProfileFlow = ai.defineFlow(
             }
 
             // 7. Gender Matching
-            if(job.gender && job.gender !== 'Cả nam và nữ' && profile.personalInfo.gender && profile.personalInfo.gender !== job.gender){
+            if(job.gender && job.gender !== 'Cả nam và nữ' && profile.personalInfo?.gender && profile.personalInfo.gender !== job.gender){
                  // Hard negative score if gender doesn't match
                  score -= 1000;
             } else {
@@ -124,7 +127,7 @@ const matchJobsToProfileFlow = ai.defineFlow(
             }
 
             // 8. Age Matching
-            if (job.ageRequirement) {
+            if (job.ageRequirement && profile.personalInfo?.birthYear) {
                 const [minAge, maxAge] = job.ageRequirement.split('-').map(Number);
                 const profileAge = new Date().getFullYear() - profile.personalInfo.birthYear;
                 if (profileAge >= minAge && profileAge <= maxAge) {
