@@ -45,7 +45,26 @@ const viewers = [
   { name: 'F', src: 'https://placehold.co/40x40.png?text=F' },
 ];
 
+const EmptyProfileView = () => (
+    <div className="text-center md:text-left mb-8">
+        <h1 className="text-3xl font-bold font-headline">Bắt đầu hành trình tìm việc của bạn</h1>
+        <p className="text-muted-foreground mt-1">
+            Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.
+        </p>
+        <div className="mt-6">
+            <Button asChild>
+                <Link href="/candidate-profile">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Tạo hồ sơ ngay
+                </Link>
+            </Button>
+        </div>
+    </div>
+);
+
+
 const LoggedInView = () => {
+    const { role } = useAuth();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
@@ -70,6 +89,11 @@ const LoggedInView = () => {
 
 
     useEffect(() => {
+        if (role === 'candidate-empty-profile') {
+            setIsLoadingSuggestions(false);
+            return;
+        }
+
         const fetchSuggestedJobs = async () => {
             setIsLoadingSuggestions(true);
             try {
@@ -93,7 +117,7 @@ const LoggedInView = () => {
         };
 
         fetchSuggestedJobs();
-    }, []);
+    }, [role]);
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
@@ -102,6 +126,10 @@ const LoggedInView = () => {
             setIsLoadingMore(false);
         }, 500); // Simulate network delay
     };
+
+    if (role === 'candidate-empty-profile') {
+        return <EmptyProfileView />;
+    }
 
     return (
         <>
@@ -309,7 +337,7 @@ const LoggedOutView = () => {
 
 function JobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
   
     return (
       <div className="bg-secondary min-h-screen">
