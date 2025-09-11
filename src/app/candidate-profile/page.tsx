@@ -397,6 +397,7 @@ export default function CandidateProfilePage() {
   useEffect(() => {
     const storedProfile = localStorage.getItem('generatedCandidateProfile');
     let profileToLoad: EnrichedCandidateProfile;
+    let isNew = true;
 
     const defaultImages: MediaItem[] = [
       { src: 'https://placehold.co/400x600.png', alt: 'Ảnh trước', "data-ai-hint": 'front view portrait' },
@@ -426,20 +427,21 @@ export default function CandidateProfilePage() {
           videos: (parsedProfile.videos && parsedProfile.videos.length > 0) ? parsedProfile.videos : defaultVideos,
           images: (parsedProfile.images && parsedProfile.images.length > 0) ? parsedProfile.images : defaultImages,
         };
-        setIsNewProfile(false);
+        isNew = false;
       } catch (error) {
         console.error("Failed to parse candidate profile from localStorage", error);
         profileToLoad = { ...emptyCandidate, videos: defaultVideos, images: defaultImages };
-        setIsNewProfile(true);
+        isNew = true;
       }
     } else {
         profileToLoad = { ...emptyCandidate, 
             videos: defaultVideos,
             images: defaultImages
         };
-        setIsNewProfile(true);
+        isNew = true;
     }
     setProfileByLang({ vi: profileToLoad, ja: null, en: null });
+    setIsNewProfile(isNew);
   }, []);
 
   const handleSave = (updatedCandidate: EnrichedCandidateProfile) => {
@@ -1012,7 +1014,7 @@ export default function CandidateProfilePage() {
       )
   };
   
-  const MediaCarousel = ({ items, title }: { items: MediaItem[], title: string }) => (
+    const MediaCarousel = ({ items, title }: { items: MediaItem[], title: string }) => (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="font-headline text-xl flex items-center"><Video className="mr-3 text-primary"/> {title}</CardTitle>
@@ -1612,8 +1614,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-
-    
-
-    
-
