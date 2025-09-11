@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2 } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -1058,6 +1058,50 @@ export default function CandidateProfilePage() {
         </Dialog>
     );
   };
+  
+    const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
+        <Dialog>
+            <DialogTrigger asChild>{children}</DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-2xl">Tải hồ sơ xuống</DialogTitle>
+                    <DialogDescription>
+                        Chọn định dạng bạn muốn tải xuống.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <Button className="w-full justify-start h-auto p-4" variant="outline">
+                        <FileJson className="mr-4 h-6 w-6 text-blue-500"/>
+                        <div>
+                            <p className="font-semibold text-base">Dạng HTML</p>
+                            <p className="text-xs text-muted-foreground text-left">Tải xuống dưới dạng tệp HTML, giữ nguyên giao diện như trên web.</p>
+                        </div>
+                    </Button>
+                     <Button className="w-full justify-start h-auto p-4" variant="outline">
+                        <FileType className="mr-4 h-6 w-6 text-red-500"/>
+                        <div>
+                            <p className="font-semibold text-base">Dạng PDF</p>
+                            <p className="text-xs text-muted-foreground text-left">Lý tưởng để gửi qua email hoặc in ấn.</p>
+                        </div>
+                    </Button>
+                     <Button className="w-full justify-start h-auto p-4" variant="outline">
+                        <FileJson className="mr-4 h-6 w-6 text-sky-600"/>
+                        <div>
+                            <p className="font-semibold text-base">Dạng Docx</p>
+                            <p className="text-xs text-muted-foreground text-left">Dễ dàng chỉnh sửa và tùy biến bằng Microsoft Word.</p>
+                        </div>
+                    </Button>
+                     <Button className="w-full justify-start h-auto p-4" variant="outline">
+                        <FileSpreadsheet className="mr-4 h-6 w-6 text-green-600"/>
+                        <div>
+                            <p className="font-semibold text-base">Dạng Excel</p>
+                            <p className="text-xs text-muted-foreground text-left">Phù hợp để quản lý dữ liệu và phân tích.</p>
+                        </div>
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    )
 
 
   return (
@@ -1087,8 +1131,13 @@ export default function CandidateProfilePage() {
                   </p>
                 </div>
                  <div className="md:ml-auto mt-4 md:mt-0 flex items-center gap-2">
-                     <Button variant="outline" size="icon" className="sm:hidden"><FileDown/></Button>
-                     <Button variant="outline" className="hidden sm:inline-flex"><FileDown/> Tải hồ sơ</Button>
+                    <DownloadProfileDialog>
+                        <Button variant="outline" size="icon" className="sm:hidden"><FileDown/></Button>
+                    </DownloadProfileDialog>
+                    <DownloadProfileDialog>
+                         <Button variant="outline" className="hidden sm:inline-flex"><FileDown/> Tải hồ sơ</Button>
+                    </DownloadProfileDialog>
+
                      
                      <Dialog>
                         <DialogTrigger asChild>
