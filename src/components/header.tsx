@@ -244,11 +244,11 @@ export function Header() {
     ],
   };
 
+  // Screen: THSN003-1, THSN003-2, THSN003-3
   const VisaDetailStepDialog = () => {
     if (!selectedVisaType) return null;
     const options = visaDetailsOptions[selectedVisaType];
     
-    // Screen: THSN003-1, THSN003-2, THSN003-3
     return (
         <>
         <DialogHeader>
@@ -270,11 +270,11 @@ export function Header() {
     )
   };
 
+  // Screen: THSN004-1, THSN004-2
   const IndustryStepDialog = () => {
     if (!selectedVisaType) return null;
     const industries = industriesByJobType[selectedVisaType as keyof typeof industriesByJobType] || [];
     
-    // Screen: THSN004-1
     return (
         <>
             <DialogHeader>

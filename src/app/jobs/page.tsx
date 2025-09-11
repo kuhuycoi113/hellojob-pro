@@ -191,6 +191,17 @@ const LoggedInView = () => {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const searchParams = useSearchParams();
     const [isHighlighted, setIsHighlighted] = useState(false);
+    const router = useRouter();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [profileCreationStep, setProfileCreationStep] = useState(1);
+    const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
+    const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
+    const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
+    const [selectedJob, setSelectedJob] = useState<string | null>(null);
+    const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+    const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+    const { isLoggedIn } = useAuth();
     
     // Initialize accordion state directly from searchParams
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(
