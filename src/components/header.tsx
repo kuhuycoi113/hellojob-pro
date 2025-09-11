@@ -92,6 +92,12 @@ export function Header() {
         setIsConfirmLoginOpen(true);
     }
   };
+
+  const handleConfirmLogin = () => {
+    setIsConfirmLoginOpen(false);
+    // Don't close the main dialog, just open the auth one on top.
+    setIsAuthDialogOpen(true);
+  };
   
     const handleQuickCreateRedirect = () => {
     const query = new URLSearchParams();
@@ -478,13 +484,7 @@ export function Header() {
             </AlertDialogHeader>
             <AlertDialogFooter>
             <AlertDialogCancel>Từ chối</AlertDialogCancel>
-            <AlertDialogAction
-                onClick={() => {
-                    setIsConfirmLoginOpen(false);
-                    setIsDialogOpen(false);
-                    setIsAuthDialogOpen(true);
-                }}
-                >
+            <AlertDialogAction onClick={handleConfirmLogin}>
                 Đồng ý
             </AlertDialogAction>
             </AlertDialogFooter>
