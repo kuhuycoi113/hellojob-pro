@@ -367,7 +367,36 @@ export default function CandidateProfilePage() {
     }
   };
 
-  const candidate = profileByLang.vi ? { ...profileByLang.vi, ...profileByLang[currentLang] } : null;
+  const getDisplayedProfile = (): EnrichedCandidateProfile | null => {
+    if (!profileByLang.vi) return null;
+    if (currentLang === 'vi' || !profileByLang[currentLang]) {
+      return profileByLang.vi;
+    }
+  
+    // Deep merge the translated profile over the Vietnamese base profile
+    const translated = profileByLang[currentLang]!;
+    const mergedProfile = JSON.parse(JSON.stringify(profileByLang.vi)); // Deep copy
+
+    // A recursive function to merge translated fields
+    const merge = (target: any, source: any) => {
+        for (const key in source) {
+            if (source.hasOwnProperty(key)) {
+                if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
+                    if (!target[key]) target[key] = {};
+                    merge(target[key], source[key]);
+                } else if (source[key] !== undefined && source[key] !== null) { // Only overwrite if translated value exists
+                    target[key] = source[key];
+                }
+            }
+        }
+    };
+    
+    merge(mergedProfile, translated);
+    return mergedProfile;
+  };
+  
+  const candidate = getDisplayedProfile();
+
 
   if (!candidate) {
       return (
