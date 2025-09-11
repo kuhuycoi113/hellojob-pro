@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
@@ -65,45 +66,48 @@ const EmptyProfileView = () => {
     };
 
     const renderDialogContent = () => {
-        if (profileCreationStep === 2) {
-            return (
-                <>
-                  <DialogHeader>
-                      <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
-                      <DialogDescription className="text-center">
-                        Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
-                      </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                    <Button 
-                        onClick={() => handleVisaTypeSelection('Thực tập sinh kỹ năng')}
-                        variant="outline" 
-                        className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-                        <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
-                        <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
-                    </Button>
-                    <Button 
-                        onClick={() => handleVisaTypeSelection('Kỹ năng đặc định')}
-                        variant="outline" 
-                        className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                        <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
-                        <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
-                    </Button>
-                    <Button 
-                        onClick={() => handleVisaTypeSelection('Kỹ sư, tri thức')}
-                        variant="outline" 
-                        className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                        <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
-                        <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
-                    </Button>
-                  </div>
-                </>
-            )
+        // Screen: THSN002
+        const QuickCreateStepDialog = () => (
+            <>
+              <DialogHeader>
+                  <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
+                  <DialogDescription className="text-center">
+                    Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
+                  </DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                <Button 
+                    onClick={() => handleVisaTypeSelection('Thực tập sinh kỹ năng')}
+                    variant="outline" 
+                    className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                    <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
+                    <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
+                </Button>
+                <Button 
+                    onClick={() => handleVisaTypeSelection('Kỹ năng đặc định')}
+                    variant="outline" 
+                    className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                    <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
+                    <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
+                </Button>
+                <Button 
+                    onClick={() => handleVisaTypeSelection('Kỹ sư, tri thức')}
+                    variant="outline" 
+                    className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                    <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
+                    <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
+                </Button>
+              </div>
+            </>
+        )
+
+        switch (profileCreationStep) {
+            case 2: return <QuickCreateStepDialog />;
+            default: return null;
         }
-        return null;
     }
 
     return (
@@ -429,5 +433,3 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
-
-    
