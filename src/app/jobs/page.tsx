@@ -55,7 +55,7 @@ const EmptyProfileView = () => (
             <Button asChild>
                 <Link href="/candidate-profile">
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Tạo hồ sơ ngay
+                    Xem trang hồ sơ và khởi tạo
                 </Link>
             </Button>
         </div>
