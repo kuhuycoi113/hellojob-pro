@@ -47,7 +47,7 @@ const viewers = [
 
 const EmptyProfileView = () => (
     <div className="text-center md:text-left mb-8">
-        <h1 className="text-3xl font-bold font-headline">Bắt đầu hành trình tìm việc của bạn</h1>
+        <h1 className="text-3xl font-bold font-headline">Tạo hồ sơ để được hiển thị việc làm phù hợp</h1>
         <p className="text-muted-foreground mt-1">
             Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.
         </p>
