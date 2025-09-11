@@ -159,7 +159,7 @@ export function Header() {
       </div>
     </>
   );
-
+  // Screen: THSN002
   const QuickCreateStepDialog = () => (
     <>
       <DialogHeader>
@@ -247,7 +247,7 @@ export function Header() {
     ],
   };
 
-  // Screen: THSN003-1, THSN003-2
+  // Screen: THSN003-1, THSN003-2, THSN003-3
   const VisaDetailStepDialog = () => {
     if (!selectedVisaType) return null;
     const options = visaDetailsOptions[selectedVisaType];
