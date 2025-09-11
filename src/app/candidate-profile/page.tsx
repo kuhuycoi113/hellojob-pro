@@ -87,6 +87,18 @@ const translations = {
         financialAbility: "Khả năng tài chính",
         interviewLocation: "Nơi phỏng vấn",
         specialAspirations: "Yêu cầu khác",
+        about: "Giới thiệu bản thân",
+        workExperience: "Kinh nghiệm làm việc",
+        education: "Học vấn",
+        skillsAndInterests: "Kỹ năng & Lĩnh vực",
+        skills: "Kỹ năng",
+        interests: "Lĩnh vực quan tâm",
+        certifications: "Chứng chỉ & Giải thưởng",
+        notes: "Ghi chú",
+        videos: "Video",
+        bodyPhotos: "Ảnh hình thể",
+        noInfo: "Chưa có thông tin.",
+        clickToUpdate: "Nhấn vào đây để cập nhật",
     },
     ja: {
         personalInfo: "個人情報",
@@ -111,6 +123,18 @@ const translations = {
         financialAbility: "経済的能力",
         interviewLocation: "面接地",
         specialAspirations: "その他の希望",
+        about: "自己紹介",
+        workExperience: "職務経歴",
+        education: "学歴",
+        skillsAndInterests: "スキル・興味分野",
+        skills: "スキル",
+        interests: "興味分野",
+        certifications: "資格・受賞歴",
+        notes: "備考",
+        videos: "ビデオ",
+        bodyPhotos: "体型写真",
+        noInfo: "情報がありません。",
+        clickToUpdate: "ここをクリックして更新",
     },
     en: {
         personalInfo: "Personal Information",
@@ -135,6 +159,18 @@ const translations = {
         financialAbility: "Financial Ability",
         interviewLocation: "Interview Location",
         specialAspirations: "Other Aspirations",
+        about: "About Me",
+        workExperience: "Work Experience",
+        education: "Education",
+        skillsAndInterests: "Skills & Interests",
+        skills: "Skills",
+        interests: "Interests",
+        certifications: "Certifications & Awards",
+        notes: "Notes",
+        videos: "Videos",
+        bodyPhotos: "Body Photos",
+        noInfo: "No information yet.",
+        clickToUpdate: "Click here to update",
     }
 }
 
@@ -1004,7 +1040,7 @@ export default function CandidateProfilePage() {
   const BodyPhotosCarousel = ({items, onImageChange}: {items: MediaItem[], onImageChange: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void}) => (
     <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="font-headline text-xl flex items-center"><ImageIcon className="mr-3 text-primary"/> Ảnh hình thể</CardTitle>
+            <CardTitle className="font-headline text-xl flex items-center"><ImageIcon className="mr-3 text-primary"/> {t.bodyPhotos}</CardTitle>
              <Dialog>
                 <DialogTrigger asChild>
                     <Button variant="ghost" size="icon"><PlusCircle className="h-5 w-5"/></Button>
@@ -1289,7 +1325,7 @@ export default function CandidateProfilePage() {
                 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><User className="mr-3 text-primary"/> Giới thiệu bản thân</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center"><User className="mr-3 text-primary"/>{t.about}</CardTitle>
                      <EditDialog
                         title="Chỉnh sửa Giới thiệu bản thân"
                         onSave={handleSave}
@@ -1305,23 +1341,23 @@ export default function CandidateProfilePage() {
                       <p className="text-muted-foreground whitespace-pre-line">{candidate.about}</p>
                     ) : (
                       <div className="text-muted-foreground">
-                        <span>Chưa có thông tin. </span>
+                        <span>{t.noInfo}</span>
                         <EditDialog title="Chỉnh sửa Giới thiệu bản thân" onSave={handleSave} renderContent={renderAboutEdit} candidate={profileByLang.vi!}>
-                            <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                            <button className="text-primary hover:underline">{t.clickToUpdate}</button>
                         </EditDialog>
                       </div>
                     )}
                   </CardContent>
                 </Card>
 
-                {candidate.videos.length > 0 && <MediaCarousel items={candidate.videos} title="Video" />}
+                {candidate.videos.length > 0 && <MediaCarousel items={candidate.videos} title={t.videos} />}
                 
                 {candidate.images.length > 0 && <BodyPhotosCarousel items={candidate.images} onImageChange={(e, index) => handleMediaChange('image', e, index)} />}
 
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><Briefcase className="mr-3 text-primary"/> Kinh nghiệm làm việc</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center"><Briefcase className="mr-3 text-primary"/>{t.workExperience}</CardTitle>
                      <EditDialog
                         title="Chỉnh sửa Kinh nghiệm làm việc"
                         onSave={handleSave}
@@ -1341,9 +1377,9 @@ export default function CandidateProfilePage() {
                         </div>
                     )) : (
                         <div className="text-muted-foreground">
-                           <span>Chưa có thông tin. </span>
+                           <span>{t.noInfo}</span>
                             <EditDialog title="Chỉnh sửa Kinh nghiệm làm việc" onSave={handleSave} renderContent={renderExperienceEdit} candidate={profileByLang.vi!}>
-                               <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                               <button className="text-primary hover:underline">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>
                     )}
@@ -1352,7 +1388,7 @@ export default function CandidateProfilePage() {
                 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><GraduationCap className="mr-3 text-primary"/> Học vấn</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center"><GraduationCap className="mr-3 text-primary"/>{t.education}</CardTitle>
                      <EditDialog
                         title="Chỉnh sửa Học vấn"
                         onSave={handleSave}
@@ -1371,9 +1407,9 @@ export default function CandidateProfilePage() {
                         </div>
                      )) : (
                         <div className="text-muted-foreground">
-                            <span>Chưa có thông tin. </span>
+                            <span>{t.noInfo}</span>
                             <EditDialog title="Chỉnh sửa Học vấn" onSave={handleSave} renderContent={renderEducationEdit} candidate={profileByLang.vi!}>
-                                <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                                <button className="text-primary hover:underline">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>
                      )}
@@ -1381,7 +1417,7 @@ export default function CandidateProfilePage() {
                 </Card>
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><FilePen className="mr-3 text-primary"/> Ghi chú</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center"><FilePen className="mr-3 text-primary"/>{t.notes}</CardTitle>
                      <EditDialog
                         title="Chỉnh sửa Ghi chú"
                         onSave={handleSave}
@@ -1397,9 +1433,9 @@ export default function CandidateProfilePage() {
                       <p className="text-muted-foreground whitespace-pre-line">{candidate.notes}</p>
                     ) : (
                       <div className="text-muted-foreground">
-                        <span>Chưa có ghi chú. </span>
+                        <span>{t.noInfo}</span>
                         <EditDialog title="Chỉnh sửa Ghi chú" onSave={handleSave} renderContent={renderNotesEdit} candidate={profileByLang.vi!}>
-                            <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                            <button className="text-primary hover:underline">{t.clickToUpdate}</button>
                         </EditDialog>
                       </div>
                     )}
@@ -1459,7 +1495,7 @@ export default function CandidateProfilePage() {
 
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><Star className="mr-3 text-primary"/> Kỹ năng & Lĩnh vực</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center"><Star className="mr-3 text-primary"/> {t.skillsAndInterests}</CardTitle>
                     <EditDialog
                         title="Chỉnh sửa Kỹ năng & Lĩnh vực"
                         description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn."
@@ -1471,23 +1507,23 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                   <CardContent>
-                     <h4 className="font-semibold mb-2 text-sm">Kỹ năng</h4>
+                     <h4 className="font-semibold mb-2 text-sm">{t.skills}</h4>
                      <div className="flex flex-wrap gap-2 mb-4">
                         {candidate.skills.length > 0 ? candidate.skills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>) : 
                         <div className="text-muted-foreground text-sm">
-                            <span>Chưa có kỹ năng. </span>
+                            <span>{t.noInfo}</span>
                             <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={profileByLang.vi!}>
-                               <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                               <button className="text-primary hover:underline">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>}
                      </div>
-                     <h4 className="font-semibold mb-2 text-sm">Lĩnh vực quan tâm</h4>
+                     <h4 className="font-semibold mb-2 text-sm">{t.interests}</h4>
                      <div className="flex flex-wrap gap-2">
                         {candidate.interests.length > 0 ? candidate.interests.map(interest => <Badge key={interest} className="bg-accent-blue text-white">{interest}</Badge>) : 
                         <div className="text-muted-foreground text-sm">
-                            <span>Chưa có lĩnh vực quan tâm. </span>
+                            <span>{t.noInfo}</span>
                              <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={profileByLang.vi!}>
-                                <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                                <button className="text-primary hover:underline">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>}
                      </div>
@@ -1511,26 +1547,26 @@ export default function CandidateProfilePage() {
                         <h4 className="font-semibold mb-2 text-sm">{t.vietnamDocs}</h4>
                         {candidate.documents?.vietnam?.length > 0 ? (
                              <div className="flex flex-wrap gap-2">{candidate.documents.vietnam.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
-                        ) : (<p className="text-sm text-muted-foreground">Chưa có</p>)}
+                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
                     </div>
                      <div>
                         <h4 className="font-semibold mb-2 text-sm">{t.japanDocs}</h4>
                         {candidate.documents?.japan?.length > 0 ? (
                              <div className="flex flex-wrap gap-2">{candidate.documents.japan.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
-                        ) : (<p className="text-sm text-muted-foreground">Chưa có</p>)}
+                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
                     </div>
                      <div>
                         <h4 className="font-semibold mb-2 text-sm">{t.otherDocs}</h4>
                         {candidate.documents?.other?.length > 0 ? (
                              <div className="flex flex-wrap gap-2">{candidate.documents.other.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
-                        ) : (<p className="text-sm text-muted-foreground">Chưa có</p>)}
+                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
                     </div>
                   </CardContent>
                 </Card>
 
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><Award className="mr-3 text-primary"/> Chứng chỉ & Giải thưởng</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center"><Award className="mr-3 text-primary"/> {t.certifications}</CardTitle>
                      <EditDialog
                         title="Chỉnh sửa Chứng chỉ & Giải thưởng"
                         onSave={handleSave}
@@ -1545,9 +1581,9 @@ export default function CandidateProfilePage() {
                          <p key={index} className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-muted-foreground"/>{cert}</p>
                      )) : 
                      <div className="text-muted-foreground text-sm">
-                        <span>Chưa có chứng chỉ. </span>
+                        <span>{t.noInfo}</span>
                         <EditDialog title="Chỉnh sửa Chứng chỉ & Giải thưởng" onSave={handleSave} renderContent={renderCertificationsEdit} candidate={profileByLang.vi!}>
-                            <button className="text-primary hover:underline">Nhấn vào đây để cập nhật</button>
+                            <button className="text-primary hover:underline">{t.clickToUpdate}</button>
                         </EditDialog>
                     </div>}
                   </CardContent>
