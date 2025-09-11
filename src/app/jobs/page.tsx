@@ -67,11 +67,31 @@ const EmptyProfileView = () => {
     };
 
     const handleCreateProfileRedirect = () => {
-        const preferences = { selectedVisaType, selectedVisaDetail, selectedIndustry, selectedRegion };
+        const preferences = { 
+            desiredVisaType: selectedVisaType, 
+            desiredVisaDetail: selectedVisaDetail, 
+            desiredIndustry: selectedIndustry?.name,
+            desiredLocation: selectedRegion 
+        };
         sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
 
         if (isLoggedIn) {
             console.log("Applying preferences for logged in user:", preferences);
+            // Directly update localStorage profile
+            const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
+            let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
+            profile = {
+                ...profile,
+                desiredIndustry: preferences.desiredIndustry,
+                aspirations: {
+                    ...profile.aspirations,
+                    desiredVisaType: preferences.desiredVisaType,
+                    desiredVisaDetail: preferences.desiredVisaDetail,
+                    desiredLocation: preferences.desiredLocation,
+                }
+            };
+            localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+
             setIsDialogOpen(false);
             router.push('/jobs?highlight=suggested');
         } else {

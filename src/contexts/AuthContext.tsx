@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
@@ -34,6 +35,33 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (role === 'candidate-empty-profile') {
       localStorage.removeItem('generatedCandidateProfile');
     }
+
+    // When logging in (switching from guest to a candidate role)
+    if (role.startsWith('candidate')) {
+        const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
+        if (preferencesRaw) {
+            try {
+                const preferences = JSON.parse(preferencesRaw);
+                const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
+                let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
+
+                // Merge preferences into the profile
+                profile = {
+                    ...profile,
+                    desiredIndustry: preferences.desiredIndustry || profile.desiredIndustry,
+                    aspirations: {
+                        ...profile.aspirations,
+                        ...preferences,
+                    }
+                };
+                localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+                sessionStorage.removeItem('onboardingPreferences');
+            } catch(e) {
+                console.error("Failed to apply onboarding preferences:", e);
+            }
+        }
+    }
+
   }, [role]);
 
   const value = {
