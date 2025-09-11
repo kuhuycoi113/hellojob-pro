@@ -83,7 +83,6 @@ const EmptyProfileView = () => {
     };
 
     const handleVisaTypeSelection = (visaType: string) => {
-        setSelectedVisaType(visaType);
         const query = new URLSearchParams();
         query.set('visaType', visaType);
         router.push(`/ai-profile?${query.toString()}`);
@@ -152,7 +151,7 @@ const EmptyProfileView = () => {
                            {renderDialogContent()}
                         </DialogContent>
                     </Dialog>
-                    <Button asChild>
+                    <Button asChild variant="default">
                         <Link href="/candidate-profile">
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Xem trang hồ sơ và khởi tạo

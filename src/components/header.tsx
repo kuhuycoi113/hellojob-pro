@@ -310,6 +310,7 @@ export function Header() {
   const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
 
   const RegionStepDialog = () => {
+    // Screen: THSN005
     return (
          <>
             <DialogHeader>
