@@ -62,7 +62,8 @@ const EmptyProfileView = () => {
     const { isLoggedIn } = useAuth();
 
     const handleQuickCreateClick = () => {
-        setProfileCreationStep(1); // Start at the first step
+        // Luồng THSN-L02 bắt đầu từ THSN001
+        setProfileCreationStep(1); 
         setIsDialogOpen(true);
     };
 
@@ -118,6 +119,7 @@ const EmptyProfileView = () => {
     // Screen: THSN002
     const QuickCreateStepDialog = () => (
         <>
+            {/* Screen: THSN002 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
                 <DialogDescription className="text-center">
@@ -240,6 +242,7 @@ const EmptyProfileView = () => {
         // Screen: THSN005
         return (
              <>
+                {/* Screen: THSN005 */}
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-headline text-center">Chọn khu vực làm việc</DialogTitle>
                     <DialogDescription className="text-center">
