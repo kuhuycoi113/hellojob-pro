@@ -34,6 +34,16 @@ import {
   DialogTrigger,
   DialogClose
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import Image from 'next/image';
@@ -57,6 +67,7 @@ export function Header() {
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
   const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
@@ -77,9 +88,8 @@ export function Header() {
         setIsDialogOpen(false);
         router.push('/jobs');
     } else {
-        // Guest user: close current dialog and open login dialog
-        setIsDialogOpen(false);
-        setIsAuthDialogOpen(true);
+        // Guest user: open confirmation dialog
+        setIsConfirmLoginOpen(true);
     }
   };
   
@@ -458,6 +468,28 @@ export function Header() {
         </div>
       </div>
     </header>
+     <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
+            <AlertDialogDescription>
+                Bạn cần có tài khoản để lưu các lựa chọn và xem việc làm phù hợp. Đi đến trang đăng ký/đăng nhập?
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel>Từ chối</AlertDialogCancel>
+            <AlertDialogAction
+                onClick={() => {
+                    setIsConfirmLoginOpen(false);
+                    setIsDialogOpen(false);
+                    setIsAuthDialogOpen(true);
+                }}
+                >
+                Đồng ý
+            </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
     <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
     </>
   );
