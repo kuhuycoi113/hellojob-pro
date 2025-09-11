@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { industriesByJobType, type Industry } from "@/lib/industry-data";
+import { locations } from '@/lib/location-data';
 
 // Represents all possible fields
 type JobData = {
@@ -45,7 +46,7 @@ type JobData = {
   yearsOfExperience: string;
   companyArrivalTime: string;
   ginouExpiryRequirement: string;
-  otherSkillRequirement: string[];
+  otherSkillRequirement: [],
   workShift: string;
   visionRequirement: string;
   interviewFormat: string;
@@ -120,23 +121,6 @@ const conditionsByVisaType: { [key: string]: string[] } = {
 const otherSkills = [
     "Có bằng lái xe AT", "Có bằng lái xe MT", "Có bằng lái xe tải cỡ nhỏ", "Có bằng lái xe tải cỡ trung", "Có bằng lái xe tải cỡ lớn", "Có bằng lái xe buýt cỡ trung", "Có bằng lái xe buýt cỡ lớn", "Lái được máy xúc, máy đào", "Lái được xe nâng", "Có bằng cầu", "Vận hành máy CNC", "Có bằng tiện, mài", "Có bằng hàn", "Có bằng cắt", "Có bằng gia công kim loại", "Làm được giàn giáo", "Thi công nội thất", "Quản lý thi công xây dựng", "Quản lý khối lượng xây dựng", "Thiết kế BIM xây dựng", "Đọc được bản vẽ kỹ thuật"
 ];
-
-const locations = {
-    "Việt Nam": [
-        "An Giang", "Bắc Ninh", "Cao Bằng", "Cà Mau", "Cần Thơ", "Đà Nẵng", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Đắk Lắk", "Gia Lai", "Hà Nội", "Hà Tĩnh", "Hải Phòng", "Hưng Yên", "Thừa Thiên Huế", "Khánh Hòa", "Lai Châu", "Lào Cai", "Lạng Sơn", "Lâm Đồng", "Nghệ An", "Ninh Bình", "Phú Thọ", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sơn La", "Tây Ninh", "Thanh Hóa", "Thành phố Hồ Chí Minh", "Thái Nguyên", "Tuyên Quang", "Vĩnh Long"
-    ],
-    "Nhật Bản": {
-        "Hokkaido": ["Hokkaido"],
-        "Tohoku": ["Aomori", "Iwate", "Miyagi", "Akita", "Yamagata", "Fukushima"],
-        "Kanto": ["Ibaraki", "Tochigi", "Gunma", "Saitama", "Chiba", "Tokyo", "Kanagawa"],
-        "Chubu": ["Niigata", "Toyama", "Ishikawa", "Fukui", "Yamanashi", "Nagano", "Gifu", "Shizuoka", "Aichi"],
-        "Kansai": ["Mie", "Shiga", "Kyoto", "Osaka", "Hyogo", "Nara", "Wakayama"],
-        "Chugoku": ["Tottori", "Shimane", "Okayama", "Hiroshima", "Yamaguchi"],
-        "Shikoku": ["Tokushima", "Kagawa", "Ehime", "Kochi"],
-        "Kyushu": ["Fukuoka", "Saga", "Nagasaki", "Kumamoto", "Oita", "Miyazaki", "Kagoshima"],
-        "Okinawa": ["Okinawa"]
-    }
-};
 
 const getVisaCategory = (visaDetail: string): keyof typeof conditionsByVisaType | null => {
   if (visaDetail.includes('Thực tập sinh')) return 'Thực tập sinh kỹ năng';
@@ -916,4 +900,3 @@ export default function PartnerPostJobPage() {
     </div>
   </div>
 }
-

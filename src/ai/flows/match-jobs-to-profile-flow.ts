@@ -7,10 +7,11 @@
  * - matchJobsToProfile - The main function to handle the job matching process.
  */
 
-import { CandidateProfile, CandidateProfileSchema } from '@/ai/schemas';
+import { CandidateProfile } from '@/ai/schemas';
 import { Job, jobData } from '@/lib/mock-data';
 import { z } from 'zod';
 import { ai } from '@/ai/genkit';
+import { locations } from '@/lib/location-data';
 
 
 const MatchResultSchema = z.object({
@@ -22,9 +23,10 @@ const MatchResultSchema = z.object({
 type MatchResult = z.infer<typeof MatchResultSchema>;
 
 // Make most fields optional for the matching logic, as a quick-profile won't have all data.
-const PartialCandidateProfileSchema = CandidateProfileSchema.deepPartial();
+const PartialCandidateProfileSchema = z.custom<Partial<CandidateProfile>>();
 
-export async function matchJobsToProfile(profile: CandidateProfile): Promise<MatchResult[]> {
+
+export async function matchJobsToProfile(profile: Partial<CandidateProfile>): Promise<MatchResult[]> {
     return matchJobsToProfileFlow(profile);
 }
 
@@ -51,6 +53,14 @@ const matchJobsToProfileFlow = ai.defineFlow(
     async (profile) => {
         const matchedJobs: MatchResult[] = [];
 
+        // Helper function to check if a job's location is within the desired region
+        const isLocationInRegion = (jobLocation: string, desiredRegion: string): boolean => {
+            if (!desiredRegion) return false;
+            const regionPrefectures = locations['Nhật Bản'][desiredRegion as keyof typeof locations['Nhật Bản']];
+            if (!regionPrefectures) return false;
+            return regionPrefectures.some(prefecture => jobLocation.toLowerCase().includes(prefecture.toLowerCase()));
+        };
+        
         for (const job of jobData) {
             const breakdown: { [key: string]: number } = {};
             let score = 0;
@@ -76,11 +86,22 @@ const matchJobsToProfileFlow = ai.defineFlow(
                 breakdown['industry'] = WEIGHTS.INDUSTRY;
             }
 
-            // 3. Location Matching
-            if (profile.aspirations?.desiredLocation && job.workLocation && job.workLocation.toLowerCase().includes(profile.aspirations.desiredLocation.toLowerCase())) {
-                score += WEIGHTS.LOCATION;
-                breakdown['location'] = WEIGHTS.LOCATION;
+            // 3. Location Matching (Updated Logic)
+            if (profile.aspirations?.desiredLocation && job.workLocation) {
+                const desiredLocLower = profile.aspirations.desiredLocation.toLowerCase();
+                const jobLocLower = job.workLocation.toLowerCase();
+                // Check for exact prefecture match first
+                if (jobLocLower.includes(desiredLocLower)) {
+                    score += WEIGHTS.LOCATION;
+                    breakdown['location'] = WEIGHTS.LOCATION;
+                } 
+                // Then check if job's prefecture is in the desired region
+                else if (isLocationInRegion(job.workLocation, profile.aspirations.desiredLocation)) {
+                    score += WEIGHTS.LOCATION; // Same weight for being in the region
+                    breakdown['location'] = WEIGHTS.LOCATION;
+                }
             }
+
 
             // 4. Skills Matching
             let skillMatches = 0;
