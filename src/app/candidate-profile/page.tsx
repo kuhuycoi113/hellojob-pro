@@ -397,24 +397,30 @@ export default function CandidateProfilePage() {
 
 
   useEffect(() => {
+    // This logic determines which profile state to show based on the user's role.
+    // This is the core of the user state management you requested.
     let isNew = false;
     let profileToLoad: EnrichedCandidateProfile;
 
     const storedProfile = localStorage.getItem('generatedCandidateProfile');
+    // State 1: A brand new user who has just registered.
     const isCandidateWithEmptyProfile = role === 'candidate-empty-profile';
     
-    // If the role is candidate-empty-profile, we ignore localStorage and force a new profile state.
     if (isCandidateWithEmptyProfile) {
+        // If the role is explicitly 'candidate-empty-profile', always force a new, blank profile state.
+        // This ignores any potentially lingering data in localStorage.
         isNew = true;
     } else if (storedProfile) {
+        // State 2: A returning user with a saved profile.
         try {
             const parsedProfile = JSON.parse(storedProfile);
             // A simple check to see if the stored profile has meaningful data.
             isNew = !parsedProfile.name && !parsedProfile.headline && !parsedProfile.about;
         } catch {
-            isNew = true;
+            isNew = true; // If parsing fails, treat it as a new profile.
         }
     } else {
+        // State 3: A guest or a user without any saved profile data.
         isNew = true;
     }
     
@@ -434,8 +440,8 @@ export default function CandidateProfilePage() {
     ];
 
     if (isNew) {
-        // If it's a new profile, we load an empty structure but with default media.
-        const newEmptyProfile = JSON.parse(JSON.stringify(emptyCandidate)); // Deep copy
+        // If it's a new profile, we load an empty structure but with default media placeholders.
+        const newEmptyProfile = JSON.parse(JSON.stringify(emptyCandidate)); // Deep copy to avoid mutation
         Object.keys(newEmptyProfile).forEach(key => {
             if (typeof newEmptyProfile[key] === 'string') newEmptyProfile[key] = '';
             if (Array.isArray(newEmptyProfile[key])) newEmptyProfile[key] = [];
@@ -445,11 +451,12 @@ export default function CandidateProfilePage() {
         });
          profileToLoad = {
              ...newEmptyProfile,
-             name: 'Ứng viên mới', // A default name to indicate new profile
+             name: 'Ứng viên mới', // A default name to indicate it's a new profile
              videos: defaultVideos,
              images: defaultImages
          };
     } else {
+      // If not a new profile, load the data from localStorage.
       try {
         const parsedProfile = JSON.parse(storedProfile!);
         profileToLoad = {
@@ -479,7 +486,7 @@ export default function CandidateProfilePage() {
   };
 
   useEffect(() => {
-    // Only save to localStorage if the role is not guest and not an empty-profile candidate
+    // Only save to localStorage if the role is a candidate with a filled profile.
     if (profileByLang.vi && role === 'candidate') {
       localStorage.setItem('generatedCandidateProfile', JSON.stringify(profileByLang.vi));
     }
@@ -1643,3 +1650,5 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+    
