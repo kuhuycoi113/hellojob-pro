@@ -62,18 +62,21 @@ const EmptyProfileView = () => {
     const { isLoggedIn } = useAuth();
 
     const handleQuickCreateClick = () => {
-        // Luồng THSN-L02 bắt đầu từ THSN001
         setProfileCreationStep(1); 
         setIsDialogOpen(true);
     };
 
     const handleCreateProfileRedirect = () => {
+        const preferences = { selectedVisaType, selectedVisaDetail, selectedIndustry, selectedRegion };
+        sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
+
         if (isLoggedIn) {
-            console.log("Saving preferences for logged in user:", { selectedVisaType, selectedVisaDetail, selectedIndustry, selectedRegion });
+            console.log("Applying preferences for logged in user:", preferences);
             setIsDialogOpen(false);
             router.push('/jobs?highlight=suggested');
         } else {
             sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
+            setIsDialogOpen(false); // Close the current dialog
             setIsConfirmLoginOpen(true);
         }
     };
@@ -92,7 +95,6 @@ const EmptyProfileView = () => {
         }
     };
     
-    // Screen: THSN001
     const FirstStepDialog = () => (
         <>
         {/* Screen: THSN001 */}
@@ -117,7 +119,6 @@ const EmptyProfileView = () => {
         </>
     );
 
-    // Screen: THSN002
     const QuickCreateStepDialog = () => (
         <>
             {/* Screen: THSN002 */}
@@ -238,7 +239,6 @@ const EmptyProfileView = () => {
     const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
 
     const RegionStepDialog = () => {
-        // Screen: THSN005
         return (
              <>
                 {/* Screen: THSN005 */}

@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import Link from 'next/link';
@@ -82,8 +81,12 @@ export function Header() {
 
 
   const handleCreateProfileRedirect = () => {
+    const preferences = { selectedVisaType, selectedVisaDetail, selectedIndustry, selectedRegion };
+    sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
+
     if (isLoggedIn) {
-        console.log("Saving preferences for logged in user:", { selectedVisaType, selectedVisaDetail, selectedIndustry, selectedRegion });
+        // Apply preferences to existing user profile if needed
+        console.log("Applying preferences for logged in user:", preferences);
         setIsDialogOpen(false);
         router.push('/jobs?highlight=suggested');
     } else {
@@ -131,7 +134,6 @@ export function Header() {
       }
   }
   
-  // Screen: THSN001
   const FirstStepDialog = () => (
     <>
       {/* Screen: THSN001 */}
@@ -156,7 +158,6 @@ export function Header() {
     </>
   );
 
-  // Screen: THSN002
   const QuickCreateStepDialog = () => (
     <>
       {/* Screen: THSN002 */}
@@ -277,7 +278,6 @@ export function Header() {
   const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
 
   const RegionStepDialog = () => {
-    // Screen: THSN005
     return (
          <>
             {/* Screen: THSN005 */}
