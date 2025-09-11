@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -7,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -396,6 +395,19 @@ export default function CandidateProfilePage() {
                         Object.assign(output, { [key]: source[key] });
                     else
                         output[key] = mergeDeep(target[key], source[key]);
+                } else if (Array.isArray(source[key])) {
+                     if (key === 'skills' || key === 'interests' || key === 'certifications') {
+                        Object.assign(output, { [key]: source[key] });
+                    } else if (key === 'education' || key === 'experience') {
+                        const targetArray = target[key] || [];
+                        const sourceArray = source[key] || [];
+                        output[key] = targetArray.map((item: any, index: number) => {
+                            if (sourceArray[index]) {
+                                return mergeDeep(item, sourceArray[index]);
+                            }
+                            return item;
+                        });
+                    }
                 } else if (source[key] !== undefined && source[key] !== null) { // Only overwrite if source has a value
                     Object.assign(output, { [key]: source[key] });
                 }
@@ -1069,35 +1081,35 @@ export default function CandidateProfilePage() {
                         Chọn định dạng bạn muốn tải xuống.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 py-4 max-h-[80vh] overflow-y-auto">
-                    <Button className="w-full justify-start h-auto p-4 text-left" variant="outline">
-                        <FileJson className="mr-4 h-6 w-6 text-blue-500 flex-shrink-0"/>
-                        <div>
-                            <p className="font-semibold text-base">Dạng HTML</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+                    <Card className="hover:bg-secondary cursor-pointer">
+                        <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                            <FileCode className="h-10 w-10 text-blue-500 mb-2"/>
+                            <p className="font-semibold">Dạng HTML</p>
                             <p className="text-xs text-muted-foreground">Tải xuống như giao diện Web.</p>
-                        </div>
-                    </Button>
-                     <Button className="w-full justify-start h-auto p-4 text-left" variant="outline">
-                        <FileType className="mr-4 h-6 w-6 text-red-500 flex-shrink-0"/>
-                        <div>
-                            <p className="font-semibold text-base">Dạng PDF</p>
+                        </CardContent>
+                    </Card>
+                    <Card className="hover:bg-secondary cursor-pointer">
+                         <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                            <FileText className="h-10 w-10 text-red-500 mb-2"/>
+                            <p className="font-semibold">Dạng PDF</p>
                             <p className="text-xs text-muted-foreground">Lý tưởng để gửi qua email hoặc in ấn.</p>
-                        </div>
-                    </Button>
-                     <Button className="w-full justify-start h-auto p-4 text-left" variant="outline">
-                        <FileJson className="mr-4 h-6 w-6 text-sky-600 flex-shrink-0"/>
-                        <div>
-                            <p className="font-semibold text-base">Dạng Docx</p>
-                            <p className="text-xs text-muted-foreground">Dễ dàng chỉnh sửa và tùy biến bằng Microsoft Word.</p>
-                        </div>
-                    </Button>
-                     <Button className="w-full justify-start h-auto p-4 text-left" variant="outline">
-                        <FileSpreadsheet className="mr-4 h-6 w-6 text-green-600 flex-shrink-0"/>
-                        <div>
-                            <p className="font-semibold text-base">Dạng Excel</p>
-                            <p className="text-xs text-muted-foreground">Phù hợp để quản lý dữ liệu và phân tích.</p>
-                        </div>
-                    </Button>
+                        </CardContent>
+                    </Card>
+                     <Card className="hover:bg-secondary cursor-pointer">
+                         <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                            <FileType className="h-10 w-10 text-sky-600 mb-2"/>
+                            <p className="font-semibold">Dạng Docx</p>
+                            <p className="text-xs text-muted-foreground">Dễ dàng chỉnh sửa bằng Microsoft Word.</p>
+                        </CardContent>
+                    </Card>
+                     <Card className="hover:bg-secondary cursor-pointer">
+                         <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                            <Sheet className="h-10 w-10 text-green-600 mb-2"/>
+                            <p className="font-semibold">Dạng Excel</p>
+                            <p className="text-xs text-muted-foreground">Phù hợp để quản lý và phân tích dữ liệu.</p>
+                        </CardContent>
+                    </Card>
                 </div>
             </DialogContent>
         </Dialog>
@@ -1471,3 +1483,5 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+    
