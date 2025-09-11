@@ -46,6 +46,23 @@ const viewers = [
   { name: 'F', src: 'https://placehold.co/40x40.png?text=F' },
 ];
 
+const visaDetailsOptions: { [key: string]: { label: string, description: string }[] } = {
+    'Thực tập sinh kỹ năng': [
+      { label: 'Thực tập sinh 3 năm', description: 'Chương trình phổ thông nhất' },
+      { label: 'Thực tập sinh 1 năm', description: 'Chương trình ngắn hạn' },
+      { label: 'Thực tập sinh 3 Go', description: 'Dành cho người có kinh nghiệm' },
+    ],
+    'Kỹ năng đặc định': [
+      { label: 'Đặc định đầu Nhật', description: 'Dành cho người đang ở Nhật' },
+      { label: 'Đặc định đầu Việt', description: 'Dành cho người ở Việt Nam' },
+      { label: 'Đặc định đi mới', description: 'Lần đầu đăng ký' },
+    ],
+    'Kỹ sư, tri thức': [
+      { label: 'Kỹ sư đầu Nhật', description: 'Dành cho kỹ sư đang ở Nhật' },
+      { label: 'Kỹ sư đầu Việt', description: 'Dành cho kỹ sư ở Việt Nam' },
+    ],
+  };
+
 const EmptyProfileView = () => {
     const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -65,49 +82,47 @@ const EmptyProfileView = () => {
         setIsDialogOpen(false);
     };
 
-    const renderDialogContent = () => {
-        // Screen: THSN002
-        const QuickCreateStepDialog = () => (
-            <>
-              <DialogHeader>
-                  <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
-                  <DialogDescription className="text-center">
-                    Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
-                  </DialogDescription>
-              </DialogHeader>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                <Button 
-                    onClick={() => handleVisaTypeSelection('Thực tập sinh kỹ năng')}
-                    variant="outline" 
-                    className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
-                    <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
-                </Button>
-                <Button 
-                    onClick={() => handleVisaTypeSelection('Kỹ năng đặc định')}
-                    variant="outline" 
-                    className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
-                    <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
-                </Button>
-                <Button 
-                    onClick={() => handleVisaTypeSelection('Kỹ sư, tri thức')}
-                    variant="outline" 
-                    className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
-                    <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
-                </Button>
-              </div>
-            </>
-        )
+    // Screen: THSN002
+    const QuickCreateStepDialog = () => (
+        <>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
+                <DialogDescription className="text-center">
+                Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+            <Button 
+                onClick={() => handleVisaTypeSelection('Thực tập sinh kỹ năng')}
+                variant="outline" 
+                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
+                <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
+            </Button>
+            <Button 
+                onClick={() => handleVisaTypeSelection('Kỹ năng đặc định')}
+                variant="outline" 
+                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
+                <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
+            </Button>
+            <Button 
+                onClick={() => handleVisaTypeSelection('Kỹ sư, tri thức')}
+                variant="outline" 
+                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
+                <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
+            </Button>
+            </div>
+        </>
+    )
 
-        switch (profileCreationStep) {
-            case 2: return <QuickCreateStepDialog />;
-            default: return null;
-        }
+    const renderDialogContent = () => {
+        // We only have one step in this context
+        return <QuickCreateStepDialog />;
     }
 
     return (
@@ -118,10 +133,17 @@ const EmptyProfileView = () => {
                     Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-4">
-                    <Button onClick={handleQuickCreateClick} className="bg-accent-orange hover:bg-accent-orange/90 text-white">
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        Tạo hồ sơ nhanh
-                    </Button>
+                    <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                                <Sparkles className="mr-2 h-4 w-4" />
+                                Tạo hồ sơ nhanh
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-2xl">
+                           {renderDialogContent()}
+                        </DialogContent>
+                    </Dialog>
                     <Button asChild>
                         <Link href="/candidate-profile">
                             <PlusCircle className="mr-2 h-4 w-4" />
@@ -130,11 +152,6 @@ const EmptyProfileView = () => {
                     </Button>
                 </div>
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-                <DialogContent className="sm:max-w-2xl">
-                    {renderDialogContent()}
-                </DialogContent>
-            </Dialog>
         </>
     )
 };
