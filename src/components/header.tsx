@@ -367,12 +367,17 @@ export function Header() {
                   <AvatarFallback>A</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-base font-medium leading-none">
-                    Lê Ngọc Hân
-                  </p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    Ứng viên Thực tập sinh
-                  </p>
+                  {role === 'candidate-empty-profile' ? (
+                     <>
+                        <p className="text-base font-medium leading-none">Hoàn thiện hồ sơ</p>
+                        <p className="text-xs leading-none text-muted-foreground">Nhà tuyển dụng đang chờ bạn!</p>
+                     </>
+                  ) : (
+                    <>
+                      <p className="text-base font-medium leading-none">Lê Ngọc Hân</p>
+                      <p className="text-xs leading-none text-muted-foreground">Ứng viên Thực tập sinh</p>
+                    </>
+                  )}
                 </div>
               </div>
             </Link>
