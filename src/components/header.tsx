@@ -247,7 +247,7 @@ export function Header() {
     ],
   };
 
-  // Screen: THSN003-1
+  // Screen: THSN003-1, THSN003-2
   const VisaDetailStepDialog = () => {
     if (!selectedVisaType) return null;
     const options = visaDetailsOptions[selectedVisaType];
