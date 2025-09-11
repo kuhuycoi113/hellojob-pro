@@ -58,7 +58,7 @@ const EmptyProfileView = () => (
                     Tạo hồ sơ nhanh
                 </Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild>
                 <Link href="/candidate-profile">
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Xem trang hồ sơ và khởi tạo
