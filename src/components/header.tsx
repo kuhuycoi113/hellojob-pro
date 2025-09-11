@@ -244,13 +244,19 @@ export function Header() {
     ],
   };
 
-  // Screen: THSN003-1, THSN003-2, THSN003-3
   const VisaDetailStepDialog = () => {
     if (!selectedVisaType) return null;
     const options = visaDetailsOptions[selectedVisaType];
     
+    let screenIdComment = '';
+    // Screen: THSN003-1, THSN003-2, THSN003-3
+    if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN003-1';
+    if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN003-2';
+    if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN003-3';
+    
     return (
         <>
+        {/* {screenIdComment} */}
         <DialogHeader>
             <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisaType}</DialogTitle>
             <DialogDescription className="text-center">
@@ -270,13 +276,19 @@ export function Header() {
     )
   };
 
-  // Screen: THSN004-1, THSN004-2
   const IndustryStepDialog = () => {
     if (!selectedVisaType) return null;
     const industries = industriesByJobType[selectedVisaType as keyof typeof industriesByJobType] || [];
     
+    let screenIdComment = '';
+    // Screen: THSN004-1, THSN004-2, THSN004-3
+    if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN004-1';
+    if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN004-2';
+    if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN004-3';
+
     return (
         <>
+            {/* {screenIdComment} */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
                 <DialogDescription className="text-center">
