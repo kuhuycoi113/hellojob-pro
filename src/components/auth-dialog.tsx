@@ -16,6 +16,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 interface AuthDialogProps {
   isOpen: boolean;
@@ -43,6 +44,7 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
   const [authType, setAuthType] = useState<'login' | 'register'>('register');
   const { setRole } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +55,15 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
         description: "Chào mừng bạn đã quay trở lại.",
         className: 'bg-green-500 text-white'
     })
+
+    // Check for a redirect path and navigate
+    const redirectPath = sessionStorage.getItem('postLoginRedirect');
+    if (redirectPath) {
+        sessionStorage.removeItem('postLoginRedirect');
+        router.push(redirectPath);
+    } else {
+        router.push('/candidate-profile'); // Default redirect
+    }
   }
 
   return (
@@ -141,4 +152,3 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
     </Dialog>
   );
 }
-

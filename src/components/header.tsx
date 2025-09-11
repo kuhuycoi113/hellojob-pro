@@ -88,14 +88,15 @@ export function Header() {
         setIsDialogOpen(false);
         router.push('/jobs');
     } else {
-        // Guest user: open confirmation dialog
+        // Guest user: set a flag and open confirmation dialog
+        sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
         setIsConfirmLoginOpen(true);
     }
   };
 
   const handleConfirmLogin = () => {
     setIsConfirmLoginOpen(false);
-    // Don't close the main dialog, just open the auth one on top.
+    // The main dialog should stay open, so we just trigger the auth dialog
     setIsAuthDialogOpen(true);
   };
   
@@ -490,7 +491,13 @@ export function Header() {
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>
-    <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+    <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={(open) => {
+        setIsAuthDialogOpen(open);
+        // If auth dialog is closed, also close the parent create profile dialog
+        if (!open) {
+            setIsDialogOpen(false);
+        }
+    }} />
     </>
   );
 }

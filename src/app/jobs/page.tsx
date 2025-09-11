@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2 } from 'lucide-react';
@@ -23,6 +23,8 @@ import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
 import { type CandidateProfile } from '@/ai/schemas';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AuthDialog } from '@/components/auth-dialog';
+import { useSearchParams } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 
 const aspirations = [
@@ -49,6 +51,17 @@ const LoggedInView = () => {
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
     const [visibleJobsCount, setVisibleJobsCount] = useState(8); // Show 8 jobs initially
     const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const searchParams = useSearchParams();
+    const [isHighlighted, setIsHighlighted] = useState(false);
+
+    useEffect(() => {
+        const highlight = searchParams.get('highlight');
+        if (highlight === 'suggested') {
+            setIsHighlighted(true);
+            const timer = setTimeout(() => setIsHighlighted(false), 2500); // Highlight for 2.5 seconds
+            return () => clearTimeout(timer);
+        }
+    }, [searchParams]);
 
 
     useEffect(() => {
@@ -93,8 +106,11 @@ const LoggedInView = () => {
         </div>
          {/* Main Content */}
         <div className="w-full mb-8">
-            <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
-                <AccordionItem value="item-1">
+            <Accordion type="single" collapsible className="w-full" defaultValue={isHighlighted ? "item-1" : undefined}>
+                <AccordionItem value="item-1" className={cn(
+                    "transition-all duration-1000 ease-out",
+                    isHighlighted ? "ring-2 ring-offset-2 ring-yellow-400 shadow-2xl rounded-lg" : ""
+                )}>
                     <AccordionTrigger className="bg-background px-6 rounded-t-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
                             <Star className="h-5 w-5 text-yellow-500" />
@@ -280,15 +296,24 @@ const LoggedOutView = () => {
     )
 }
 
-export default function JobsDashboardPage() {
-  const { role } = useAuth();
-  const isLoggedIn = role === 'candidate';
-
-  return (
-    <div className="bg-secondary min-h-screen">
-      <div className="container mx-auto px-2 md:px-4 py-8">
-        {isLoggedIn ? <LoggedInView /> : <LoggedOutView />}
+function JobsDashboardPageContent() {
+    const { role } = useAuth();
+    const isLoggedIn = role === 'candidate';
+  
+    return (
+      <div className="bg-secondary min-h-screen">
+        <div className="container mx-auto px-2 md:px-4 py-8">
+          {isLoggedIn ? <LoggedInView /> : <LoggedOutView />}
+        </div>
       </div>
-    </div>
-  );
+    );
+}
+
+
+export default function JobsDashboardPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <JobsDashboardPageContent />
+        </Suspense>
+    )
 }
