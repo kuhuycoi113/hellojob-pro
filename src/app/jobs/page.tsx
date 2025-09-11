@@ -1,11 +1,10 @@
 
-
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles } from 'lucide-react';
+import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { jobData, type Job } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
@@ -23,8 +22,9 @@ import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
 import { type CandidateProfile } from '@/ai/schemas';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AuthDialog } from '@/components/auth-dialog';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 
 const aspirations = [
@@ -45,28 +45,95 @@ const viewers = [
   { name: 'F', src: 'https://placehold.co/40x40.png?text=F' },
 ];
 
-const EmptyProfileView = () => (
-    <div className="text-center md:text-left mb-8">
-        <h1 className="text-3xl font-bold font-headline">Tạo hồ sơ để được hiển thị việc làm phù hợp</h1>
-        <p className="text-muted-foreground mt-1">
-            Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-4">
-             <Button asChild className="bg-accent-orange hover:bg-accent-orange/90 text-white">
-                <Link href="/ai-profile">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Tạo hồ sơ nhanh
-                </Link>
-            </Button>
-            <Button asChild>
-                <Link href="/candidate-profile">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Xem trang hồ sơ và khởi tạo
-                </Link>
-            </Button>
-        </div>
-    </div>
-);
+const EmptyProfileView = () => {
+    const router = useRouter();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [profileCreationStep, setProfileCreationStep] = useState(1);
+    const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
+
+    const handleQuickCreateClick = () => {
+        setProfileCreationStep(2); // Start at the "Quick Create" step
+        setIsDialogOpen(true);
+    };
+
+    const handleVisaTypeSelection = (visaType: string) => {
+        setSelectedVisaType(visaType);
+        const query = new URLSearchParams();
+        query.set('visaType', visaType);
+        router.push(`/ai-profile?${query.toString()}`);
+        setIsDialogOpen(false);
+    };
+
+    const renderDialogContent = () => {
+        if (profileCreationStep === 2) {
+            return (
+                <>
+                  <DialogHeader>
+                      <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
+                      <DialogDescription className="text-center">
+                        Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
+                      </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                    <Button 
+                        onClick={() => handleVisaTypeSelection('Thực tập sinh kỹ năng')}
+                        variant="outline" 
+                        className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+                        <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
+                        <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
+                    </Button>
+                    <Button 
+                        onClick={() => handleVisaTypeSelection('Kỹ năng đặc định')}
+                        variant="outline" 
+                        className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+                        <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
+                        <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
+                    </Button>
+                    <Button 
+                        onClick={() => handleVisaTypeSelection('Kỹ sư, tri thức')}
+                        variant="outline" 
+                        className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                        <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
+                        <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
+                    </Button>
+                  </div>
+                </>
+            )
+        }
+        return null;
+    }
+
+    return (
+        <>
+            <div className="text-center md:text-left mb-8">
+                <h1 className="text-3xl font-bold font-headline">Tạo hồ sơ để được hiển thị việc làm phù hợp</h1>
+                <p className="text-muted-foreground mt-1">
+                    Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-4">
+                    <Button onClick={handleQuickCreateClick} className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Tạo hồ sơ nhanh
+                    </Button>
+                    <Button asChild>
+                        <Link href="/candidate-profile">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Xem trang hồ sơ và khởi tạo
+                        </Link>
+                    </Button>
+                </div>
+            </div>
+            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                <DialogContent className="sm:max-w-2xl">
+                    {renderDialogContent()}
+                </DialogContent>
+            </Dialog>
+        </>
+    )
+};
 
 
 const LoggedInView = () => {
@@ -362,3 +429,5 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
