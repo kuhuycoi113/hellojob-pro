@@ -291,6 +291,7 @@ const EditDialog = ({
          // Logic to reset visa detail when visa type changes
         if (section === 'aspirations' && field === 'desiredVisaType') {
             newCandidate.aspirations!.desiredVisaDetail = '';
+            newCandidate.desiredIndustry = ''; // Also reset industry
         }
       } else if (section === 'documents') {
           const [docType, index, value] = args;
@@ -848,85 +849,91 @@ export default function CandidateProfilePage() {
     </div>
   );
 
-  const renderAspirationsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2 md:col-span-2">
-          <Label>Ngành nghề mong muốn</Label>
-          <Select value={tempCandidate.desiredIndustry} onValueChange={value => handleTempChange('desiredIndustry', value)}>
-            <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
-            <SelectContent>
-              {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label>Loại visa mong muốn</Label>
-          <Select value={tempCandidate.aspirations?.desiredVisaType || ''} onValueChange={value => handleTempChange('aspirations', 'desiredVisaType', value)}>
-            <SelectTrigger><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
-            <SelectContent>
-              {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-         <div className="space-y-2">
-          <Label>Chi tiết visa</Label>
-          <Select value={tempCandidate.aspirations?.desiredVisaDetail || ''} onValueChange={value => handleTempChange('aspirations', 'desiredVisaDetail', value)} disabled={!tempCandidate.aspirations?.desiredVisaType}>
-            <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
-            <SelectContent>
-                {(visaDetailsByVisaType[tempCandidate.aspirations?.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-            <Label>Địa điểm mong muốn</Label>
-            <Select value={tempCandidate.aspirations?.desiredLocation || ''} onValueChange={value => handleTempChange('aspirations', 'desiredLocation', value)}>
-                <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
-                <SelectContent className="max-h-[300px]">
-                    <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                    {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
-                        <SelectGroup key={region}>
-                            <SelectLabel>{region}</SelectLabel>
-                            <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
-                            {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                        </SelectGroup>
-                    ))}
+  const renderAspirationsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
+    const availableIndustries = tempCandidate.aspirations?.desiredVisaType 
+      ? industriesByJobType[tempCandidate.aspirations.desiredVisaType as keyof typeof industriesByJobType] || []
+      : allIndustries;
+      
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Loại visa mong muốn</Label>
+              <Select value={tempCandidate.aspirations?.desiredVisaType || ''} onValueChange={value => handleTempChange('aspirations', 'desiredVisaType', value)}>
+                <SelectTrigger><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
+                <SelectContent>
+                  {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
                 </SelectContent>
-            </Select>
+              </Select>
+            </div>
+             <div className="space-y-2">
+              <Label>Chi tiết visa</Label>
+              <Select value={tempCandidate.aspirations?.desiredVisaDetail || ''} onValueChange={value => handleTempChange('aspirations', 'desiredVisaDetail', value)} disabled={!tempCandidate.aspirations?.desiredVisaType}>
+                <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
+                <SelectContent>
+                    {(visaDetailsByVisaType[tempCandidate.aspirations?.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>Ngành nghề mong muốn</Label>
+              <Select value={tempCandidate.desiredIndustry} onValueChange={value => handleTempChange('desiredIndustry', value)} disabled={!tempCandidate.aspirations?.desiredVisaType}>
+                <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
+                <SelectContent>
+                  {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+                <Label>Địa điểm mong muốn</Label>
+                <Select value={tempCandidate.aspirations?.desiredLocation || ''} onValueChange={value => handleTempChange('aspirations', 'desiredLocation', value)}>
+                    <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                        <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                        {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
+                            <SelectGroup key={region}>
+                                <SelectLabel>{region}</SelectLabel>
+                                <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                            </SelectGroup>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Lương cơ bản mong muốn/tháng</Label>
+              <Input value={tempCandidate.aspirations?.desiredSalary} onChange={e => handleTempChange('aspirations', 'desiredSalary', e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Thực lĩnh mong muốn</Label>
+              <Input value={tempCandidate.aspirations?.desiredNetSalary} onChange={e => handleTempChange('aspirations', 'desiredNetSalary', e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Khả năng tài chính</Label>
+              <Input value={tempCandidate.aspirations?.financialAbility} onChange={e => handleTempChange('aspirations', 'financialAbility', e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Tìm việc, phỏng vấn, tuyển tại</Label>
+              <Select value={tempCandidate.aspirations?.interviewLocation || ''} onValueChange={value => handleTempChange('aspirations', 'interviewLocation', value)}>
+                <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Việt Nam</SelectLabel>
+                    {locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel>Nhật Bản</SelectLabel>
+                    {Object.values(locations['Nhật Bản']).flat().map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+             <div className="md:col-span-2 space-y-2">
+              <Label>Nguyện vọng đặc biệt</Label>
+              <Textarea value={tempCandidate.aspirations?.specialAspirations} onChange={e => handleTempChange('aspirations', 'specialAspirations', e.target.value)} />
+            </div>
         </div>
-        <div className="space-y-2">
-          <Label>Lương cơ bản mong muốn/tháng</Label>
-          <Input value={tempCandidate.aspirations?.desiredSalary} onChange={e => handleTempChange('aspirations', 'desiredSalary', e.target.value)} />
-        </div>
-        <div className="space-y-2">
-          <Label>Thực lĩnh mong muốn</Label>
-          <Input value={tempCandidate.aspirations?.desiredNetSalary} onChange={e => handleTempChange('aspirations', 'desiredNetSalary', e.target.value)} />
-        </div>
-        <div className="space-y-2">
-          <Label>Khả năng tài chính</Label>
-          <Input value={tempCandidate.aspirations?.financialAbility} onChange={e => handleTempChange('aspirations', 'financialAbility', e.target.value)} />
-        </div>
-        <div className="space-y-2">
-          <Label>Tìm việc, phỏng vấn, tuyển tại</Label>
-          <Select value={tempCandidate.aspirations?.interviewLocation || ''} onValueChange={value => handleTempChange('aspirations', 'interviewLocation', value)}>
-            <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Việt Nam</SelectLabel>
-                {locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>Nhật Bản</SelectLabel>
-                {Object.values(locations['Nhật Bản']).flat().map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-         <div className="md:col-span-2 space-y-2">
-          <Label>Nguyện vọng đặc biệt</Label>
-          <Textarea value={tempCandidate.aspirations?.specialAspirations} onChange={e => handleTempChange('aspirations', 'specialAspirations', e.target.value)} />
-        </div>
-    </div>
-  );
+      );
+  }
 
   const renderLevel1Edit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
     <div className="space-y-4">
@@ -1635,4 +1642,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-
