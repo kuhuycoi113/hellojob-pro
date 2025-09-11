@@ -79,7 +79,7 @@ export function Header() {
     setIsClient(true);
   }, []);
 
-  const isLoggedIn = role === 'candidate';
+  const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
 
   const handleCreateProfileRedirect = () => {
     if (isLoggedIn) {
@@ -401,16 +401,21 @@ export function Header() {
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
           value={role}
-          onValueChange={(value) => setRole(value as 'candidate' | 'guest')}
+          onValueChange={(value) => setRole(value as 'candidate' | 'candidate-empty-profile' | 'guest')}
         >
           <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
             <DropdownMenuRadioItem value="candidate">
-              Ứng viên đã đăng nhập
+              Đã đăng nhập (Có Profile)
             </DropdownMenuRadioItem>
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <DropdownMenuRadioItem value="guest">Khách</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="candidate-empty-profile">
+              Đã đăng nhập (Profile trắng)
+            </DropdownMenuRadioItem>
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuRadioItem value="guest">Khách (Chưa đăng nhập)</DropdownMenuRadioItem>
           </DropdownMenuItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>

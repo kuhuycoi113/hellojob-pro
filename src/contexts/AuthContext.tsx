@@ -1,8 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
-type Role = 'candidate' | 'guest';
+export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
 
 interface AuthContextType {
   role: Role;
@@ -24,8 +24,15 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  // Default to candidate role for demonstration purposes
   const [role, setRole] = useState<Role>('candidate');
+
+  useEffect(() => {
+    // When simulating 'candidate-empty-profile', we want to clear the stored profile
+    // to ensure the profile page starts fresh.
+    if (role === 'candidate-empty-profile') {
+      localStorage.removeItem('generatedCandidateProfile');
+    }
+  }, [role]);
 
   const value = {
     role,

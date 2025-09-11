@@ -40,6 +40,7 @@ import type { TranslateProfileInput } from '@/ai/schemas/translate-profile-schem
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
 import { industriesByJobType } from '@/lib/industry-data';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 
 type MediaItem = {
@@ -384,6 +385,7 @@ const visaTypes = Object.keys(visaDetailsByVisaType);
 
 export default function CandidateProfilePage() {
   const { toast } = useToast();
+  const { role } = useAuth();
   const [profileByLang, setProfileByLang] = useState<ProfilesByLang>({ vi: null, ja: null, en: null });
   const [newSkill, setNewSkill] = useState('');
   const [newInterest, setNewInterest] = useState('');
@@ -395,10 +397,27 @@ export default function CandidateProfilePage() {
 
 
   useEffect(() => {
-    const storedProfile = localStorage.getItem('generatedCandidateProfile');
+    let isNew = false;
     let profileToLoad: EnrichedCandidateProfile;
-    let isNew = true;
 
+    const storedProfile = localStorage.getItem('generatedCandidateProfile');
+    const isCandidateWithEmptyProfile = role === 'candidate-empty-profile';
+    
+    // If the role is candidate-empty-profile, we ignore localStorage and force a new profile state.
+    if (isCandidateWithEmptyProfile) {
+        isNew = true;
+    } else if (storedProfile) {
+        try {
+            const parsedProfile = JSON.parse(storedProfile);
+            // A simple check to see if the stored profile has meaningful data.
+            isNew = !parsedProfile.name && !parsedProfile.headline && !parsedProfile.about;
+        } catch {
+            isNew = true;
+        }
+    } else {
+        isNew = true;
+    }
+    
     const defaultImages: MediaItem[] = [
       { src: 'https://placehold.co/400x600.png', alt: 'Ảnh trước', "data-ai-hint": 'front view portrait' },
       { src: 'https://placehold.co/400x600.png', alt: 'Ảnh trái', "data-ai-hint": 'left side portrait' },
@@ -414,9 +433,25 @@ export default function CandidateProfilePage() {
         { src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://placehold.co/400x600.png', alt: 'Tay nghề 2', "data-ai-hint": 'welding skill' },
     ];
 
-    if (storedProfile) {
+    if (isNew) {
+        // If it's a new profile, we load an empty structure but with default media.
+        const newEmptyProfile = JSON.parse(JSON.stringify(emptyCandidate)); // Deep copy
+        Object.keys(newEmptyProfile).forEach(key => {
+            if (typeof newEmptyProfile[key] === 'string') newEmptyProfile[key] = '';
+            if (Array.isArray(newEmptyProfile[key])) newEmptyProfile[key] = [];
+            if (key === 'personalInfo' || key === 'aspirations' || key === 'documents') {
+                Object.keys(newEmptyProfile[key]).forEach(subKey => newEmptyProfile[key][subKey] = '');
+            }
+        });
+         profileToLoad = {
+             ...newEmptyProfile,
+             name: 'Ứng viên mới', // A default name to indicate new profile
+             videos: defaultVideos,
+             images: defaultImages
+         };
+    } else {
       try {
-        const parsedProfile = JSON.parse(storedProfile);
+        const parsedProfile = JSON.parse(storedProfile!);
         profileToLoad = {
           ...emptyCandidate,
           ...parsedProfile,
@@ -427,22 +462,15 @@ export default function CandidateProfilePage() {
           videos: (parsedProfile.videos && parsedProfile.videos.length > 0) ? parsedProfile.videos : defaultVideos,
           images: (parsedProfile.images && parsedProfile.images.length > 0) ? parsedProfile.images : defaultImages,
         };
-        isNew = false;
       } catch (error) {
         console.error("Failed to parse candidate profile from localStorage", error);
         profileToLoad = { ...emptyCandidate, videos: defaultVideos, images: defaultImages };
-        isNew = true;
+        isNew = true; // Mark as new if parsing fails
       }
-    } else {
-        profileToLoad = { ...emptyCandidate, 
-            videos: defaultVideos,
-            images: defaultImages
-        };
-        isNew = true;
     }
     setProfileByLang({ vi: profileToLoad, ja: null, en: null });
     setIsNewProfile(isNew);
-  }, []);
+  }, [role]);
 
   const handleSave = (updatedCandidate: EnrichedCandidateProfile) => {
     setProfileByLang({ vi: updatedCandidate, ja: null, en: null });
@@ -451,10 +479,11 @@ export default function CandidateProfilePage() {
   };
 
   useEffect(() => {
-    if (profileByLang.vi) {
+    // Only save to localStorage if the role is not guest and not an empty-profile candidate
+    if (profileByLang.vi && role === 'candidate') {
       localStorage.setItem('generatedCandidateProfile', JSON.stringify(profileByLang.vi));
     }
-  }, [profileByLang.vi]);
+  }, [profileByLang.vi, role]);
 
 
   const handleLanguageChange = async (lang: Language) => {
