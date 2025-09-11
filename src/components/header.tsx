@@ -86,7 +86,7 @@ export function Header() {
         // Logic for logged in user: save preferences and redirect
         console.log("Saving preferences for logged in user:", { selectedVisaType, selectedVisaDetail, selectedIndustry, selectedRegion });
         setIsDialogOpen(false);
-        router.push('/jobs');
+        router.push('/jobs?highlight=suggested');
     } else {
         // Guest user: set a flag and open confirmation dialog
         sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
@@ -493,10 +493,9 @@ export function Header() {
     </AlertDialog>
     <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={(open) => {
         setIsAuthDialogOpen(open);
-        // If auth dialog is closed, also close the parent create profile dialog
-        if (!open) {
-            setIsDialogOpen(false);
-        }
+        // If auth dialog is closed without logging in, we might need to decide if we close the parent.
+        // For now, let's not close the parent dialog automatically when auth dialog closes.
+        // The successful login logic will handle closing the parent dialog.
     }} />
     </>
   );
