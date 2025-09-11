@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -62,7 +63,7 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { openChat } = useChat();
-  const { role, setRole } = useAuth();
+  const { role, setRole, isLoggedIn } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -79,16 +80,13 @@ export function Header() {
     setIsClient(true);
   }, []);
 
-  const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
 
   const handleCreateProfileRedirect = () => {
     if (isLoggedIn) {
-        // Logic for logged in user: save preferences and redirect
         console.log("Saving preferences for logged in user:", { selectedVisaType, selectedVisaDetail, selectedIndustry, selectedRegion });
         setIsDialogOpen(false);
         router.push('/jobs?highlight=suggested');
     } else {
-        // Guest user: set a flag and open confirmation dialog
         sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
         setIsConfirmLoginOpen(true);
     }
@@ -96,7 +94,6 @@ export function Header() {
 
   const handleConfirmLogin = () => {
     setIsConfirmLoginOpen(false);
-    // The main dialog should stay open, so we just trigger the auth dialog
     setIsAuthDialogOpen(true);
   };
   
@@ -247,11 +244,11 @@ export function Header() {
     ],
   };
 
-  // Screen: THSN003-1, THSN003-2, THSN003-3
   const VisaDetailStepDialog = () => {
     if (!selectedVisaType) return null;
     const options = visaDetailsOptions[selectedVisaType];
     
+    // Screen: THSN003-1, THSN003-2, THSN003-3
     return (
         <>
         <DialogHeader>
@@ -277,6 +274,7 @@ export function Header() {
     if (!selectedVisaType) return null;
     const industries = industriesByJobType[selectedVisaType as keyof typeof industriesByJobType] || [];
     
+    // Screen: THSN004-1
     return (
         <>
             <DialogHeader>

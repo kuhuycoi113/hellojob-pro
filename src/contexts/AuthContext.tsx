@@ -6,6 +6,7 @@ export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
 
 interface AuthContextType {
   role: Role;
+  isLoggedIn: boolean;
   setRole: (role: Role) => void;
 }
 
@@ -24,7 +25,8 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [role, setRole] = useState<Role>('candidate');
+  const [role, setRole] = useState<Role>('guest');
+  const isLoggedIn = role !== 'guest';
 
   useEffect(() => {
     // When simulating 'candidate-empty-profile', we want to clear the stored profile
@@ -36,6 +38,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const value = {
     role,
+    isLoggedIn,
     setRole,
   };
 

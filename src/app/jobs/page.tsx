@@ -2,10 +2,10 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { jobData, type Job } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +25,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AuthDialog } from '@/components/auth-dialog';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import { Industry, industriesByJobType } from '@/lib/industry-data';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 
 
 const aspirations = [
@@ -46,32 +48,38 @@ const viewers = [
   { name: 'F', src: 'https://placehold.co/40x40.png?text=F' },
 ];
 
-const visaDetailsOptions: { [key: string]: { label: string, description: string }[] } = {
-    'Thực tập sinh kỹ năng': [
-      { label: 'Thực tập sinh 3 năm', description: 'Chương trình phổ thông nhất' },
-      { label: 'Thực tập sinh 1 năm', description: 'Chương trình ngắn hạn' },
-      { label: 'Thực tập sinh 3 Go', description: 'Dành cho người có kinh nghiệm' },
-    ],
-    'Kỹ năng đặc định': [
-      { label: 'Đặc định đầu Nhật', description: 'Dành cho người đang ở Nhật' },
-      { label: 'Đặc định đầu Việt', description: 'Dành cho người ở Việt Nam' },
-      { label: 'Đặc định đi mới', description: 'Lần đầu đăng ký' },
-    ],
-    'Kỹ sư, tri thức': [
-      { label: 'Kỹ sư đầu Nhật', description: 'Dành cho kỹ sư đang ở Nhật' },
-      { label: 'Kỹ sư đầu Việt', description: 'Dành cho kỹ sư ở Việt Nam' },
-    ],
-  };
-
 const EmptyProfileView = () => {
     const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [profileCreationStep, setProfileCreationStep] = useState(1);
     const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
+    const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
+    const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
+    const [selectedJob, setSelectedJob] = useState<string | null>(null);
+    const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+    const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+    const { isLoggedIn } = useAuth();
 
     const handleQuickCreateClick = () => {
         setProfileCreationStep(2); // Start at the "Quick Create" step
         setIsDialogOpen(true);
+    };
+
+    const handleCreateProfileRedirect = () => {
+        if (isLoggedIn) {
+            console.log("Saving preferences for logged in user:", { selectedVisaType, selectedVisaDetail, selectedIndustry, selectedRegion });
+            setIsDialogOpen(false);
+            router.push('/jobs?highlight=suggested');
+        } else {
+            sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
+            setIsConfirmLoginOpen(true);
+        }
+    };
+    
+    const handleConfirmLogin = () => {
+        setIsConfirmLoginOpen(false);
+        setIsAuthDialogOpen(true);
     };
 
     const handleVisaTypeSelection = (visaType: string) => {
@@ -81,7 +89,7 @@ const EmptyProfileView = () => {
         router.push(`/ai-profile?${query.toString()}`);
         setIsDialogOpen(false);
     };
-
+    
     // Screen: THSN002
     const QuickCreateStepDialog = () => (
         <>
@@ -135,7 +143,7 @@ const EmptyProfileView = () => {
                 <div className="mt-6 flex flex-wrap gap-4">
                      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
@@ -152,6 +160,23 @@ const EmptyProfileView = () => {
                     </Button>
                 </div>
             </div>
+             <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+             <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Bạn cần có tài khoản để lưu các lựa chọn và xem việc làm phù hợp. Đi đến trang đăng ký/đăng nhập?
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Từ chối</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmLogin}>
+                        Đồng ý
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     )
 };
