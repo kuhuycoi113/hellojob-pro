@@ -391,6 +391,8 @@ export default function CandidateProfilePage() {
   const [currentLang, setCurrentLang] = useState<Language>('vi');
   const [isSendOptionsOpen, setIsSendOptionsOpen] = useState(false);
   const [languageToSend, setLanguageToSend] = useState('');
+  const [isNewProfile, setIsNewProfile] = useState(false);
+
 
   useEffect(() => {
     const storedProfile = localStorage.getItem('generatedCandidateProfile');
@@ -424,15 +426,18 @@ export default function CandidateProfilePage() {
           videos: (parsedProfile.videos && parsedProfile.videos.length > 0) ? parsedProfile.videos : defaultVideos,
           images: (parsedProfile.images && parsedProfile.images.length > 0) ? parsedProfile.images : defaultImages,
         };
+        setIsNewProfile(false);
       } catch (error) {
         console.error("Failed to parse candidate profile from localStorage", error);
         profileToLoad = { ...emptyCandidate, videos: defaultVideos, images: defaultImages };
+        setIsNewProfile(true);
       }
     } else {
         profileToLoad = { ...emptyCandidate, 
             videos: defaultVideos,
             images: defaultImages
         };
+        setIsNewProfile(true);
     }
     setProfileByLang({ vi: profileToLoad, ja: null, en: null });
   }, []);
@@ -440,6 +445,7 @@ export default function CandidateProfilePage() {
   const handleSave = (updatedCandidate: EnrichedCandidateProfile) => {
     setProfileByLang({ vi: updatedCandidate, ja: null, en: null });
     setCurrentLang('vi'); // Revert to Vietnamese on save
+    setIsNewProfile(false); // After saving, it's no longer a "new" profile
   };
 
   useEffect(() => {
@@ -1237,6 +1243,7 @@ export default function CandidateProfilePage() {
         </Dialog>
     )
 
+  const editButtonText = isNewProfile ? 'Tạo hồ sơ' : 'Sửa hồ sơ';
 
   return (
     <div className="bg-secondary">
@@ -1314,7 +1321,7 @@ export default function CandidateProfilePage() {
                         description="Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn."
                         candidate={profileByLang.vi!}
                      >
-                         <Button variant="outline" className="hidden sm:inline-flex"><Edit /> Sửa hồ sơ</Button>
+                         <Button variant="outline" className="hidden sm:inline-flex"><Edit /> {editButtonText}</Button>
                      </EditDialog>
                  </div>
               </div>
@@ -1609,3 +1616,4 @@ export default function CandidateProfilePage() {
     
 
     
+
