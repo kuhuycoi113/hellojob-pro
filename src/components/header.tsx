@@ -136,6 +136,7 @@ export function Header() {
       }
   }
   
+  // Screen: THSN001
   const FirstStepDialog = () => (
     <>
       <DialogHeader>
