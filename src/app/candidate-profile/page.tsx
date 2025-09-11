@@ -396,7 +396,7 @@ export default function CandidateProfilePage() {
                         Object.assign(output, { [key]: source[key] });
                     else
                         output[key] = mergeDeep(target[key], source[key]);
-                } else {
+                } else if (source[key] !== undefined && source[key] !== null) { // Only overwrite if source has a value
                     Object.assign(output, { [key]: source[key] });
                 }
             });
@@ -1070,32 +1070,32 @@ export default function CandidateProfilePage() {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4 max-h-[80vh] overflow-y-auto">
-                    <Button className="w-full justify-start h-auto p-4" variant="outline">
-                        <FileJson className="mr-4 h-6 w-6 text-blue-500"/>
+                    <Button className="w-full justify-start h-auto p-4 text-left" variant="outline">
+                        <FileJson className="mr-4 h-6 w-6 text-blue-500 flex-shrink-0"/>
                         <div>
                             <p className="font-semibold text-base">Dạng HTML</p>
-                            <p className="text-xs text-muted-foreground text-left">Tải xuống dưới dạng tệp HTML, giữ nguyên giao diện như trên web.</p>
+                            <p className="text-xs text-muted-foreground">Tải xuống dưới dạng tệp HTML, giữ nguyên giao diện như trên web.</p>
                         </div>
                     </Button>
-                     <Button className="w-full justify-start h-auto p-4" variant="outline">
-                        <FileType className="mr-4 h-6 w-6 text-red-500"/>
+                     <Button className="w-full justify-start h-auto p-4 text-left" variant="outline">
+                        <FileType className="mr-4 h-6 w-6 text-red-500 flex-shrink-0"/>
                         <div>
                             <p className="font-semibold text-base">Dạng PDF</p>
-                            <p className="text-xs text-muted-foreground text-left">Lý tưởng để gửi qua email hoặc in ấn.</p>
+                            <p className="text-xs text-muted-foreground">Lý tưởng để gửi qua email hoặc in ấn.</p>
                         </div>
                     </Button>
-                     <Button className="w-full justify-start h-auto p-4" variant="outline">
-                        <FileJson className="mr-4 h-6 w-6 text-sky-600"/>
+                     <Button className="w-full justify-start h-auto p-4 text-left" variant="outline">
+                        <FileJson className="mr-4 h-6 w-6 text-sky-600 flex-shrink-0"/>
                         <div>
                             <p className="font-semibold text-base">Dạng Docx</p>
-                            <p className="text-xs text-muted-foreground text-left">Dễ dàng chỉnh sửa và tùy biến bằng Microsoft Word.</p>
+                            <p className="text-xs text-muted-foreground">Dễ dàng chỉnh sửa và tùy biến bằng Microsoft Word.</p>
                         </div>
                     </Button>
-                     <Button className="w-full justify-start h-auto p-4" variant="outline">
-                        <FileSpreadsheet className="mr-4 h-6 w-6 text-green-600"/>
+                     <Button className="w-full justify-start h-auto p-4 text-left" variant="outline">
+                        <FileSpreadsheet className="mr-4 h-6 w-6 text-green-600 flex-shrink-0"/>
                         <div>
                             <p className="font-semibold text-base">Dạng Excel</p>
-                            <p className="text-xs text-muted-foreground text-left">Phù hợp để quản lý dữ liệu và phân tích.</p>
+                            <p className="text-xs text-muted-foreground">Phù hợp để quản lý dữ liệu và phân tích.</p>
                         </div>
                     </Button>
                 </div>
