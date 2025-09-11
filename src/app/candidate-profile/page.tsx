@@ -1062,7 +1062,7 @@ export default function CandidateProfilePage() {
     const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
         <Dialog>
             <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle className="font-headline text-2xl">Tải hồ sơ xuống</DialogTitle>
                     <DialogDescription>
