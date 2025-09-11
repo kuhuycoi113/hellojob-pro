@@ -53,7 +53,8 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
     toast({
         title: "Đăng nhập thành công!",
         description: "Chào mừng bạn đã quay trở lại.",
-        className: 'bg-green-500 text-white'
+        className: 'bg-green-500 text-white',
+        duration: 2000,
     })
 
     // Check for a redirect path and navigate
