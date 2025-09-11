@@ -62,6 +62,40 @@ type ProfilesByLang = {
     en: Partial<EnrichedCandidateProfile> | null;
 }
 
+const translations = {
+    vi: {
+        personalInfo: "Thông tin cá nhân",
+        dateOfBirth: "Ngày sinh",
+        gender: "Giới tính",
+        height: "Chiều cao",
+        weight: "Cân nặng",
+        tattoo: "Hình xăm",
+        hepatitisB: "Viêm gan B",
+        language: "Ngôn ngữ",
+    },
+    ja: {
+        personalInfo: "個人情報",
+        dateOfBirth: "生年月日",
+        gender: "性別",
+        height: "身長",
+        weight: "体重",
+        tattoo: "刺青",
+        hepatitisB: "B型肝炎",
+        language: "言語",
+    },
+    en: {
+        personalInfo: "Personal Information",
+        dateOfBirth: "Date of Birth",
+        gender: "Gender",
+        height: "Height",
+        weight: "Weight",
+        tattoo: "Tattoo Status",
+        hepatitisB: "Hepatitis B",
+        language: "Language",
+    }
+}
+
+
 const emptyCandidate: EnrichedCandidateProfile = {
     name: 'Lê Thị An',
     headline: 'Kỹ sư Cơ khí với 2 năm kinh nghiệm',
@@ -424,6 +458,7 @@ export default function CandidateProfilePage() {
 };
   
   const candidate = getDisplayedProfile();
+  const t = translations[currentLang];
 
 
   if (!candidate) {
@@ -1325,7 +1360,7 @@ export default function CandidateProfilePage() {
               <div className="lg:col-span-1 space-y-6">
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><UserCog className="mr-3 text-primary"/> Thông tin cá nhân</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center"><UserCog className="mr-3 text-primary"/> {t.personalInfo}</CardTitle>
                     <EditDialog
                         title="Chỉnh sửa Thông tin cá nhân"
                         onSave={handleSave}
@@ -1336,13 +1371,13 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
-                    <p><strong>Ngày sinh:</strong> {candidate.personalInfo.dateOfBirth}</p>
-                    <p><strong>Giới tính:</strong> {candidate.personalInfo.gender}</p>
-                    <p><strong>Chiều cao:</strong> {candidate.personalInfo.height} cm</p>
-                    <p><strong>Cân nặng:</strong> {candidate.personalInfo.weight} kg</p>
-                    <p><strong>Hình xăm:</strong> {candidate.personalInfo.tattooStatus}</p>
-                    <p><strong>Viêm gan B:</strong> {candidate.personalInfo.hepatitisBStatus}</p>
-                    <p><strong>Ngôn ngữ:</strong> {candidate.personalInfo.language}</p>
+                    <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth}</p>
+                    <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender}</p>
+                    <p><strong>{t.height}:</strong> {candidate.personalInfo.height} cm</p>
+                    <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight} kg</p>
+                    <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus}</p>
+                    <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus}</p>
+                    <p><strong>{t.language}:</strong> {candidate.personalInfo.language}</p>
                   </CardContent>
                 </Card>
 
