@@ -97,17 +97,14 @@ export function Header() {
     setIsAuthDialogOpen(true);
   };
   
-    const handleQuickCreateRedirect = () => {
-    const query = new URLSearchParams();
-    if (selectedVisaType) query.set('visaType', selectedVisaType);
-    if (selectedVisaDetail) query.set('visaDetail', selectedVisaDetail);
-    if (selectedIndustry) query.set('industry', selectedIndustry.name);
-    if (selectedJob) query.set('job', selectedJob);
-    if (selectedRegion) query.set('region', selectedRegion);
-    
-    setIsDialogOpen(false);
-    router.push(`/ai-profile?${query.toString()}`);
-  };
+    const handleCreateDetailedProfile = (method: 'ai' | 'manual') => {
+        setIsDialogOpen(false);
+        if (method === 'ai') {
+            router.push('/ai-profile');
+        } else {
+            router.push('/register');
+        }
+    };
 
   const NavLink = ({ href, label, className, icon: Icon, onClick }: { href: string; label: string, className?: string, icon?: React.ElementType, onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => (
     <Link
@@ -148,7 +145,7 @@ export function Header() {
             <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
             <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
         </Card>
-        <Card onClick={() => setProfileCreationStep(3)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+        <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
             <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
             <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
@@ -156,6 +153,7 @@ export function Header() {
       </div>
     </>
   );
+
   // Screen: THSN002
   const QuickCreateStepDialog = () => (
     <>
@@ -167,7 +165,7 @@ export function Header() {
       </DialogHeader>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
         <Button 
-            onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(4); }} 
+            onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(3); }} 
             variant="outline" 
             className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
@@ -175,7 +173,7 @@ export function Header() {
             <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
         </Button>
         <Button 
-            onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(4); }} 
+            onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(3); }} 
             variant="outline" 
             className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
@@ -183,7 +181,7 @@ export function Header() {
             <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
         </Button>
         <Button 
-            onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(4); }} 
+            onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(3); }} 
             variant="outline" 
             className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
@@ -195,38 +193,6 @@ export function Header() {
     </>
   );
 
-  const DetailedCreateStepDialog = () => (
-     <>
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
-          <DialogDescription className="text-center">
-            Bắt đầu hành trình của bạn với HelloJob bằng cách dễ nhất cho bạn.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-          <DialogClose asChild>
-            <Link href="/ai-profile">
-              <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                <Sparkles className="h-8 w-8 text-primary mx-auto mb-2" />
-                <h3 className="font-bold text-base mb-1">Tạo hồ sơ bằng AI</h3>
-                <p className="text-muted-foreground text-xs">Tải lên CV hoặc mô tả mong muốn, AI sẽ tự động điền thông tin.</p>
-              </Card>
-            </Link>
-          </DialogClose>
-          <DialogClose asChild>
-            <Link href="/register">
-              <Card className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                <Pencil className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                <h3 className="font-bold text-base mb-1">Nhập liệu thủ công</h3>
-                <p className="text-muted-foreground text-xs">Tự điền thông tin chi tiết vào biểu mẫu có sẵn của chúng tôi.</p>
-              </Card>
-            </Link>
-          </DialogClose>
-        </div>
-        <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
-      </>
-  );
-  
   const visaDetailsOptions: { [key: string]: { label: string, description: string }[] } = {
     'Thực tập sinh kỹ năng': [
       { label: 'Thực tập sinh 3 năm', description: 'Chương trình phổ thông nhất' },
@@ -265,7 +231,7 @@ export function Header() {
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
             {options.map(option => (
-                <Button key={option.label} onClick={() => { setSelectedVisaDetail(option.label); setProfileCreationStep(5); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                <Button key={option.label} onClick={() => { setSelectedVisaDetail(option.label); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                     <h3 className="font-bold text-base mb-1">{option.label}</h3>
                     <p className="text-muted-foreground text-xs">{option.description}</p>
                 </Button>
@@ -297,12 +263,12 @@ export function Header() {
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                 {industries.map(industry => (
-                    <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(6);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                    <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                         <p className="font-semibold text-sm">{industry.name}</p>
                     </Button>
                 ))}
             </div>
-            <Button variant="link" onClick={() => setProfileCreationStep(4)} className="mt-4 mx-auto block">Quay lại</Button>
+            <Button variant="link" onClick={() => setProfileCreationStep(3)} className="mt-4 mx-auto block">Quay lại</Button>
         </>
     );
   };
@@ -335,7 +301,7 @@ export function Header() {
                 ))}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setProfileCreationStep(5)}>Quay lại</Button>
+                <Button variant="link" onClick={() => setProfileCreationStep(4)}>Quay lại</Button>
                 <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và xem việc phù hợp</Button>
             </div>
         </>
@@ -347,10 +313,9 @@ export function Header() {
     switch (profileCreationStep) {
       case 1: return <FirstStepDialog />;
       case 2: return <QuickCreateStepDialog />;
-      case 3: return <DetailedCreateStepDialog />;
-      case 4: return <VisaDetailStepDialog />;
-      case 5: return <IndustryStepDialog />;
-      case 6: return <RegionStepDialog />;
+      case 3: return <VisaDetailStepDialog />;
+      case 4: return <IndustryStepDialog />;
+      case 5: return <RegionStepDialog />;
       default: return <FirstStepDialog />;
     }
   }

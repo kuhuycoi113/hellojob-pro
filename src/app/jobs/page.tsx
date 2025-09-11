@@ -62,7 +62,7 @@ const EmptyProfileView = () => {
     const { isLoggedIn } = useAuth();
 
     const handleQuickCreateClick = () => {
-        setProfileCreationStep(2); // Start at the "Quick Create" step
+        setProfileCreationStep(1); // Start at the first step
         setIsDialogOpen(true);
     };
 
@@ -82,13 +82,39 @@ const EmptyProfileView = () => {
         setIsAuthDialogOpen(true);
     };
 
-    const handleVisaTypeSelection = (visaType: string) => {
-        const query = new URLSearchParams();
-        query.set('visaType', visaType);
-        router.push(`/ai-profile?${query.toString()}`);
+    const handleCreateDetailedProfile = (method: 'ai' | 'manual') => {
         setIsDialogOpen(false);
+        if (method === 'ai') {
+            router.push('/ai-profile');
+        } else {
+            router.push('/register');
+        }
     };
     
+    // Screen: THSN001
+    const FirstStepDialog = () => (
+        <>
+        <DialogHeader>
+            <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
+            <DialogDescription className="text-center">
+                Bạn muốn tạo hồ sơ để làm gì?
+            </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+            <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
+                <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
+            </Card>
+            <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
+                <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
+            </Card>
+        </div>
+        </>
+    );
+
     // Screen: THSN002
     const QuickCreateStepDialog = () => (
         <>
@@ -100,7 +126,7 @@ const EmptyProfileView = () => {
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
             <Button 
-                onClick={() => handleVisaTypeSelection('Thực tập sinh kỹ năng')}
+                onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(3); }} 
                 variant="outline" 
                 className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                 <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
@@ -108,7 +134,7 @@ const EmptyProfileView = () => {
                 <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
             </Button>
             <Button 
-                onClick={() => handleVisaTypeSelection('Kỹ năng đặc định')}
+                onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(3); }}
                 variant="outline" 
                 className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                 <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
@@ -116,7 +142,7 @@ const EmptyProfileView = () => {
                 <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
             </Button>
             <Button 
-                onClick={() => handleVisaTypeSelection('Kỹ sư, tri thức')}
+                onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(3); }}
                 variant="outline" 
                 className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                 <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
@@ -124,12 +150,134 @@ const EmptyProfileView = () => {
                 <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
             </Button>
             </div>
+            <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
         </>
-    )
+    );
+
+    const visaDetailsOptions: { [key: string]: { label: string, description: string }[] } = {
+        'Thực tập sinh kỹ năng': [
+          { label: 'Thực tập sinh 3 năm', description: 'Chương trình phổ thông nhất' },
+          { label: 'Thực tập sinh 1 năm', description: 'Chương trình ngắn hạn' },
+          { label: 'Thực tập sinh 3 Go', description: 'Dành cho người có kinh nghiệm' },
+        ],
+        'Kỹ năng đặc định': [
+          { label: 'Đặc định đầu Nhật', description: 'Dành cho người đang ở Nhật' },
+          { label: 'Đặc định đầu Việt', description: 'Dành cho người ở Việt Nam' },
+          { label: 'Đặc định đi mới', description: 'Lần đầu đăng ký' },
+        ],
+        'Kỹ sư, tri thức': [
+          { label: 'Kỹ sư đầu Nhật', description: 'Dành cho kỹ sư đang ở Nhật' },
+          { label: 'Kỹ sư đầu Việt', description: 'Dành cho kỹ sư ở Việt Nam' },
+        ],
+    };
+    
+    const VisaDetailStepDialog = () => {
+        if (!selectedVisaType) return null;
+        const options = visaDetailsOptions[selectedVisaType];
+        
+        let screenIdComment = '';
+        // Screen: THSN003-1, THSN003-2, THSN003-3
+        if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN003-1';
+        if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN003-2';
+        if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN003-3';
+        
+        return (
+            <>
+            {/* {screenIdComment} */}
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisaType}</DialogTitle>
+                <DialogDescription className="text-center">
+                Chọn loại hình chi tiết để tiếp tục.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                {options.map(option => (
+                    <Button key={option.label} onClick={() => { setSelectedVisaDetail(option.label); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <h3 className="font-bold text-base mb-1">{option.label}</h3>
+                        <p className="text-muted-foreground text-xs">{option.description}</p>
+                    </Button>
+                ))}
+            </div>
+            <Button variant="link" onClick={() => setProfileCreationStep(2)} className="mt-4 mx-auto block">Quay lại</Button>
+            </>
+        )
+    };
+
+    const IndustryStepDialog = () => {
+        if (!selectedVisaType) return null;
+        const industries = industriesByJobType[selectedVisaType as keyof typeof industriesByJobType] || [];
+        
+        let screenIdComment = '';
+        // Screen: THSN004-1, THSN004-2, THSN004-3
+        if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN004-1';
+        if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN004-2';
+        if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN004-3';
+
+        return (
+            <>
+                {/* {screenIdComment} */}
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
+                    <DialogDescription className="text-center">
+                        Lựa chọn ngành nghề bạn quan tâm nhất để chúng tôi gợi ý việc làm chính xác hơn.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                    {industries.map(industry => (
+                        <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                            <p className="font-semibold text-sm">{industry.name}</p>
+                        </Button>
+                    ))}
+                </div>
+                <Button variant="link" onClick={() => setProfileCreationStep(3)} className="mt-4 mx-auto block">Quay lại</Button>
+            </>
+        );
+    };
+
+    const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
+
+    const RegionStepDialog = () => {
+        // Screen: THSN005
+        return (
+             <>
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-headline text-center">Chọn khu vực làm việc</DialogTitle>
+                    <DialogDescription className="text-center">
+                        Lựa chọn khu vực bạn muốn làm việc tại Nhật Bản.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                     {japanRegions.map(region => (
+                        <Button 
+                            key={region} 
+                            variant="outline"
+                            onClick={() => setSelectedRegion(region)} 
+                            className={cn(
+                                "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary",
+                                selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
+                            )}
+                        >
+                            <p className="font-semibold text-sm">{region}</p>
+                        </Button>
+                    ))}
+                </div>
+                <div className="flex justify-center items-center mt-4 gap-4">
+                    <Button variant="link" onClick={() => setProfileCreationStep(4)}>Quay lại</Button>
+                    <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và xem việc phù hợp</Button>
+                </div>
+            </>
+        )
+    }
 
     const renderDialogContent = () => {
-        // We only have one step in this context
-        return <QuickCreateStepDialog />;
+        switch(profileCreationStep) {
+            case 1: return <FirstStepDialog />;
+            case 2: return <QuickCreateStepDialog />;
+            case 3: return <VisaDetailStepDialog />;
+            case 4: return <IndustryStepDialog />;
+            case 5: return <RegionStepDialog />;
+            default: return <FirstStepDialog />;
+        }
     }
 
     return (
@@ -140,9 +288,9 @@ const EmptyProfileView = () => {
                     Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-4">
-                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                     <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
-                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleQuickCreateClick}>
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
@@ -191,16 +339,6 @@ const LoggedInView = () => {
     const searchParams = useSearchParams();
     const [isHighlighted, setIsHighlighted] = useState(false);
     const router = useRouter();
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [profileCreationStep, setProfileCreationStep] = useState(1);
-    const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
-    const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
-    const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
-    const [selectedJob, setSelectedJob] = useState<string | null>(null);
-    const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-    const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
-    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-    const { isLoggedIn } = useAuth();
     
     // Initialize accordion state directly from searchParams
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(
