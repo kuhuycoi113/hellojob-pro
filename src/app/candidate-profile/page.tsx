@@ -1069,7 +1069,7 @@ export default function CandidateProfilePage() {
                         Chọn định dạng bạn muốn tải xuống.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 py-4">
+                <div className="space-y-4 py-4 max-h-[80vh] overflow-y-auto">
                     <Button className="w-full justify-start h-auto p-4" variant="outline">
                         <FileJson className="mr-4 h-6 w-6 text-blue-500"/>
                         <div>
