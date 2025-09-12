@@ -83,7 +83,7 @@ const translations = {
         desiredIndustry: "Ngành nghề",
         desiredJobDetail: "Công việc chi tiết",
         desiredVisaType: "Loại Visa",
-        desiredVisaDetail: "Chi tiết Visa",
+        desiredVisaDetail: "Chi tiết loại hình visa mong muốn",
         desiredLocation: "Địa điểm",
         desiredSalary: "Lương cơ bản",
         desiredNetSalary: "Thực lĩnh",
@@ -871,7 +871,7 @@ export default function CandidateProfilePage() {
               </Select>
             </div>
              <div className="space-y-2">
-              <Label>Chi tiết visa</Label>
+              <Label>Chi tiết loại hình visa mong muốn</Label>
               <Select value={tempCandidate.aspirations?.desiredVisaDetail || ''} onValueChange={value => handleTempChange('aspirations', 'desiredVisaDetail', value)} disabled={!tempCandidate.aspirations?.desiredVisaType}>
                 <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                 <SelectContent>
