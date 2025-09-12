@@ -65,5 +65,3 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
     ],
     'Default': defaultIndustries,
 };
-
-    
