@@ -44,6 +44,7 @@ const TranslatableCandidateProfileSchema = CandidateProfileSchema.partial().pick
         desiredLocation: z.string().optional(),
         desiredVisaType: z.string().optional(),
         desiredVisaDetail: z.string().optional(),
+        desiredJobDetail: z.string().optional(),
         specialAspirations: z.string().optional(),
     }).optional(),
 });
@@ -90,3 +91,5 @@ const translateProfileFlow = ai.defineFlow(
     return output;
   }
 );
+
+    

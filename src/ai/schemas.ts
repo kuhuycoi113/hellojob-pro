@@ -43,6 +43,7 @@ export const CandidateProfileSchema = z.object({
     desiredNetSalary: z.string().optional().describe('The desired net salary (e.g., "160,000 yên").'),
     desiredVisaType: z.string().optional().describe('The desired visa type (e.g., "Kỹ năng đặc định").'),
     desiredVisaDetail: z.string().optional().describe('The detailed desired visa type (e.g., "Đặc định đầu Nhật").'),
+    desiredJobDetail: z.string().optional().describe('A more specific job role or task the candidate wants (e.g., "Vận hành máy CNC", "Làm cơm hộp").'),
     financialAbility: z.string().optional().describe('Financial ability (e.g., "90 triệu").'),
     interviewLocation: z.string().optional().describe('The location for job interviews (e.g., "Hà Nội").'),
     specialAspirations: z.string().optional().describe('Special requests or aspirations (e.g., "Tăng ca, hỗ trợ...").'),
@@ -51,3 +52,5 @@ export const CandidateProfileSchema = z.object({
 });
 
 export type CandidateProfile = z.infer<typeof CandidateProfileSchema>;
+
+    

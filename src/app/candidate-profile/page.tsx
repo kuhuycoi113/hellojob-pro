@@ -81,6 +81,7 @@ const translations = {
         otherDocs: "Giấy tờ nước ngoài/Du học",
         aspirations: "Nguyện vọng",
         desiredIndustry: "Ngành nghề",
+        desiredJobDetail: "Công việc chi tiết",
         desiredVisaType: "Loại Visa",
         desiredVisaDetail: "Chi tiết Visa",
         desiredLocation: "Địa điểm",
@@ -117,6 +118,7 @@ const translations = {
         otherDocs: "外国の書類・留学",
         aspirations: "希望条件",
         desiredIndustry: "希望職種",
+        desiredJobDetail: "具体的な仕事内容",
         desiredVisaType: "希望ビザ",
         desiredVisaDetail: "ビザ詳細",
         desiredLocation: "希望勤務地",
@@ -153,6 +155,7 @@ const translations = {
         otherDocs: "Overseas/Study Abroad Docs",
         aspirations: "Aspirations",
         desiredIndustry: "Desired Industry",
+        desiredJobDetail: "Detailed Job",
         desiredVisaType: "Desired Visa Type",
         desiredVisaDetail: "Visa Detail",
         desiredLocation: "Desired Location",
@@ -206,6 +209,7 @@ const emptyCandidate: EnrichedCandidateProfile = {
         desiredNetSalary: '180000',
         desiredVisaType: 'Thực tập sinh kỹ năng',
         desiredVisaDetail: 'Thực tập sinh 3 năm',
+        desiredJobDetail: 'Vận hành máy CNC',
         financialAbility: 'Không yêu cầu',
         interviewLocation: 'Thành phố Hồ Chí Minh',
         specialAspirations: 'Mong muốn có nhiều cơ hội làm thêm giờ và được hỗ trợ đào tạo chuyên sâu về kỹ năng quản lý.',
@@ -885,6 +889,10 @@ export default function CandidateProfilePage() {
               </Select>
             </div>
             <div className="space-y-2">
+              <Label>Công việc chi tiết mong muốn</Label>
+              <Input value={tempCandidate.aspirations?.desiredJobDetail || ''} onChange={e => handleTempChange('aspirations', 'desiredJobDetail', e.target.value)} />
+            </div>
+            <div className="space-y-2">
                 <Label>Địa điểm mong muốn</Label>
                 <Select value={tempCandidate.aspirations?.desiredLocation || ''} onValueChange={value => handleTempChange('aspirations', 'desiredLocation', value)}>
                     <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
@@ -1520,6 +1528,7 @@ export default function CandidateProfilePage() {
                   </CardHeader>
                    <CardContent className="space-y-3 text-sm">
                         <p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry}</p>
+                        <p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail}</p>
                         <p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.desiredVisaType}</p>
                         <p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.desiredVisaDetail}</p>
                         <p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation}</p>
@@ -1643,3 +1652,5 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+    
