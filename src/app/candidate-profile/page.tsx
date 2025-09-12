@@ -35,6 +35,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { translateProfile } from '@/ai/flows/translate-profile-flow';
 import type { TranslateProfileInput } from '@/ai/schemas/translate-profile-schema';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
@@ -1046,61 +1047,67 @@ export default function CandidateProfilePage() {
             </div>
             <div />
             
-            <div className="space-y-2">
-              <Label htmlFor="desired-salary">Lương cơ bản mong muốn/tháng</Label>
-              <div className="flex items-center gap-2">
-                  <Input
-                      id="desired-salary"
-                      type="number"
-                      value={tempCandidate.aspirations?.desiredSalary}
-                      onChange={(e) => handleSalaryChange(e, 'desiredSalary', 'JPY')}
-                      placeholder={getPlaceholder('basic', 'JPY')}
-                      className="flex-grow"
-                  />
-              </div>
-               {tempCandidate.aspirations?.desiredSalary && (
-                  <p className="text-xs text-muted-foreground">
-                      {getConvertedSalaryDisplay('desiredSalary', 'JPY')}
-                  </p>
-              )}
+            <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="desired-salary">Lương cơ bản mong muốn/tháng</Label>
+                <div className="flex items-center gap-2">
+                    <Input
+                        id="desired-salary"
+                        type="number"
+                        value={getDisplayValue('desiredSalary', basicSalaryCurrency)}
+                        onChange={(e) => handleSalaryChange(e, 'desiredSalary', basicSalaryCurrency)}
+                        placeholder={getPlaceholder('basic', basicSalaryCurrency)}
+                        className="flex-grow"
+                    />
+                    <Select value={basicSalaryCurrency} onValueChange={(value) => setBasicSalaryCurrency(value as 'JPY' | 'VND')}>
+                        <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
+                        <SelectContent><SelectItem value="JPY">Yên</SelectItem><SelectItem value="VND">VNĐ</SelectItem></SelectContent>
+                    </Select>
+                </div>
+                {tempCandidate.aspirations?.desiredSalary && (
+                    <p className="text-xs text-muted-foreground">{getConvertedSalaryDisplay('desiredSalary', basicSalaryCurrency)}</p>
+                )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="desired-net-salary">Thực lĩnh mong muốn/tháng</Label>
                 <div className="flex items-center gap-2">
                     <Input
                         id="desired-net-salary"
                         type="number"
-                        value={tempCandidate.aspirations?.desiredNetSalary}
-                        onChange={(e) => handleSalaryChange(e, 'desiredNetSalary', 'JPY')}
-                        placeholder={getPlaceholder('net', 'JPY')}
+                        value={getDisplayValue('desiredNetSalary', netSalaryCurrency)}
+                        onChange={(e) => handleSalaryChange(e, 'desiredNetSalary', netSalaryCurrency)}
+                        placeholder={getPlaceholder('net', netSalaryCurrency)}
                         className="flex-grow"
                     />
+                     <Select value={netSalaryCurrency} onValueChange={(value) => setNetSalaryCurrency(value as 'JPY' | 'VND')}>
+                        <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
+                        <SelectContent><SelectItem value="JPY">Yên</SelectItem><SelectItem value="VND">VNĐ</SelectItem></SelectContent>
+                    </Select>
                 </div>
                  {tempCandidate.aspirations?.desiredNetSalary && (
-                    <p className="text-xs text-muted-foreground">
-                       {getConvertedSalaryDisplay('desiredNetSalary', 'JPY')}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{getConvertedSalaryDisplay('desiredNetSalary', netSalaryCurrency)}</p>
                 )}
             </div>
             
             {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(tempCandidate.aspirations?.desiredVisaDetail || '') && (
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="financial-ability">Khả năng tài chính</Label>
                     <div className="flex items-center gap-2">
                         <Input
                             id="financial-ability"
                             type="number"
-                            value={tempCandidate.aspirations?.financialAbility}
-                            onChange={(e) => handleSalaryChange(e, 'financialAbility', 'JPY')}
-                            placeholder={getPlaceholder('financial', 'JPY')}
+                            value={getDisplayValue('financialAbility', financialAbilityCurrency)}
+                            onChange={(e) => handleSalaryChange(e, 'financialAbility', financialAbilityCurrency)}
+                            placeholder={getPlaceholder('financial', financialAbilityCurrency)}
                             className="flex-grow"
                         />
+                         <Select value={financialAbilityCurrency} onValueChange={(value) => setFinancialAbilityCurrency(value as 'JPY' | 'VND')}>
+                            <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
+                            <SelectContent><SelectItem value="JPY">USD</SelectItem><SelectItem value="VND">VNĐ</SelectItem></SelectContent>
+                        </Select>
                     </div>
                      {tempCandidate.aspirations?.financialAbility && (
-                        <p className="text-xs text-muted-foreground">
-                            {getConvertedSalaryDisplay('financialAbility', 'JPY')}
-                        </p>
+                        <p className="text-xs text-muted-foreground">{getConvertedSalaryDisplay('financialAbility', financialAbilityCurrency)}</p>
                     )}
                 </div>
             )}
@@ -1131,7 +1138,11 @@ export default function CandidateProfilePage() {
       );
   }
 
-  const renderLevel1Edit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
+  const renderLevel1Edit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
+    const height = parseInt(tempCandidate.personalInfo?.height || '160', 10);
+    const weight = parseInt(tempCandidate.personalInfo?.weight || '50', 10);
+
+    return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -1147,12 +1158,30 @@ export default function CandidateProfilePage() {
           <Input type="date" value={tempCandidate.personalInfo.dateOfBirth?.split('T')[0]} onChange={e => handleTempChange('personalInfo', 'dateOfBirth', e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label>Chiều cao (cm)</Label>
-          <Input placeholder="150 - 205" value={tempCandidate.personalInfo.height} onChange={e => handleTempChange('personalInfo', 'height', e.target.value)} />
+          <div className="flex justify-between items-center">
+            <Label>Chiều cao (cm)</Label>
+            <span className="text-sm font-semibold text-primary">{height} cm</span>
+          </div>
+          <Slider
+            value={[height]}
+            onValueChange={([value]) => handleTempChange('personalInfo', 'height', String(value))}
+            min={140}
+            max={205}
+            step={1}
+          />
         </div>
         <div className="space-y-2">
-          <Label>Cân nặng (kg)</Label>
-          <Input placeholder="40 - 105" value={tempCandidate.personalInfo.weight} onChange={e => handleTempChange('personalInfo', 'weight', e.target.value)} />
+            <div className="flex justify-between items-center">
+                <Label>Cân nặng (kg)</Label>
+                <span className="text-sm font-semibold text-primary">{weight} kg</span>
+            </div>
+             <Slider
+                value={[weight]}
+                onValueChange={([value]) => handleTempChange('personalInfo', 'weight', String(value))}
+                min={40}
+                max={120}
+                step={1}
+            />
         </div>
         <div className="space-y-2">
           <Label>Hình xăm</Label>
@@ -1179,6 +1208,7 @@ export default function CandidateProfilePage() {
       </div>
     </div>
   );
+};
 
   const MainEditDialogContent = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
     return (
@@ -1843,6 +1873,7 @@ export default function CandidateProfilePage() {
     
 
     
+
 
 
 
