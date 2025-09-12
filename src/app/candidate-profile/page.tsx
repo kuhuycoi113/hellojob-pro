@@ -867,6 +867,7 @@ export default function CandidateProfilePage() {
   const renderAspirationsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
     const [basicSalaryCurrency, setBasicSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
     const [netSalaryCurrency, setNetSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
+    const [financialAbilityCurrency, setFinancialAbilityCurrency] = useState<'JPY' | 'VND'>('JPY');
     const JPY_VND_RATE = 180;
   
     const availableIndustries = tempCandidate.aspirations?.desiredVisaType
@@ -885,8 +886,27 @@ export default function CandidateProfilePage() {
     const salaryProps = tempCandidate.aspirations?.desiredVisaType
         ? salaryRanges[tempCandidate.aspirations.desiredVisaType]
         : { min: 100000, max: 10000000 };
+    
+    const financialAbilityRanges: { [key: string]: { min: number; max: number } } = {
+        'Thực tập sinh 3 năm': { min: 0, max: 4000 },
+        'Thực tập sinh 1 năm': { min: 0, max: 2000 },
+        'Thực tập sinh 3 Go': { min: 0, max: 2000 },
+        'Đặc định đầu Việt': { min: 0, max: 2000 },
+        'Đặc định đi mới': { min: 0, max: 2000 },
+        'Kỹ sư, tri thức đầu Việt': { min: 0, max: 2000 },
+        'Kỹ năng đặc định đầu Nhật': { min: 0, max: 0 },
+        'Kỹ sư, tri thức đầu Nhật': { min: 0, max: 0 },
+    };
 
-    const getPlaceholder = (currency: 'JPY' | 'VND', field: 'basic' | 'net') => {
+    const getPlaceholder = (currency: 'JPY' | 'VND', field: 'basic' | 'net' | 'financial') => {
+        if(field === 'financial') {
+            const range = financialAbilityRanges[tempCandidate.aspirations?.desiredVisaDetail || ''] || {min: 0, max: 4000};
+            if(currency === 'VND') {
+                 return `${(range.min * JPY_VND_RATE * 100).toLocaleString('de-DE')} - ${(range.max * JPY_VND_RATE * 100).toLocaleString('de-DE')} VNĐ`;
+            }
+            return `${range.min}$ - ${range.max}$`;
+        }
+
         const { min, max } = salaryProps;
         let effectiveMin = field === 'basic' ? min : Math.floor(min * 0.8);
         let effectiveMax = field === 'basic' ? max : Math.floor(max * 0.85);
@@ -897,37 +917,39 @@ export default function CandidateProfilePage() {
         return `${effectiveMin.toLocaleString('ja-JP')} - ${effectiveMax.toLocaleString('ja-JP')} yên`;
     };
 
-    const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'desiredSalary' | 'desiredNetSalary', currency: 'JPY' | 'VND') => {
+    const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND') => {
         const rawValue = e.target.value;
         const numericValue = parseInt(rawValue.replace(/[.,]/g, ''), 10);
-
         if (isNaN(numericValue)) {
             handleTempChange('aspirations', field, '');
             return;
         }
-    
-        let jpyValue = currency === 'VND' ? Math.round(numericValue / JPY_VND_RATE) : numericValue;
-    
-        const { max } = salaryProps;
-        let effectiveMax = field === 'desiredSalary' ? max : Math.floor(max * 0.85);
-        if (jpyValue > effectiveMax) {
-            jpyValue = effectiveMax;
-        }
-    
-        handleTempChange('aspirations', field, String(jpyValue));
+
+        handleTempChange('aspirations', field, String(numericValue));
     };
 
-    const getConvertedSalaryDisplay = (jpyValueStr: string | undefined, fromCurrency: 'JPY' | 'VND') => {
+    const getDisplayValue = (rawValue: string | undefined, currency: 'JPY' | 'VND') => {
+        if (rawValue === undefined || rawValue === null || rawValue === '') return '';
+        const numericValue = parseInt(rawValue.replace(/[.,]/g, ''), 10);
+        if(isNaN(numericValue)) return '';
+        
+        if(currency === 'VND') {
+            return numericValue.toLocaleString('de-DE');
+        }
+        return numericValue.toLocaleString('ja-JP');
+    }
+
+    const getConvertedSalaryDisplay = (jpyValueStr: string | undefined, fromCurrency: 'JPY' | 'VND', field: 'salary' | 'financial') => {
         if (!jpyValueStr) return '';
-        const jpyValue = parseInt(jpyValueStr, 10);
-        if (isNaN(jpyValue)) return '';
+        let numericValue = parseInt(jpyValueStr, 10);
+        if (isNaN(numericValue)) return '';
+
+        let rate = field === 'salary' ? JPY_VND_RATE : JPY_VND_RATE * 100; // Assuming financial is in USD converted to JPY
 
         if (fromCurrency === 'JPY') {
-            const vndValue = jpyValue * JPY_VND_RATE;
-            return `≈ ${vndValue.toLocaleString('de-DE')} VNĐ`;
+            return `≈ ${Math.round(numericValue * rate).toLocaleString('de-DE')} VNĐ`;
         } else {
-            const newJpyValue = Math.round(jpyValue / JPY_VND_RATE);
-            return `≈ ${newJpyValue.toLocaleString('ja-JP')} yên`;
+            return `≈ ${Math.round(numericValue / rate).toLocaleString('ja-JP')} ${field === 'salary' ? 'yên' : '$'}`;
         }
     }
 
@@ -1012,23 +1034,14 @@ export default function CandidateProfilePage() {
                         id="desired-salary"
                         type="number"
                         value={tempCandidate.aspirations?.desiredSalary || ''}
-                        onChange={(e) => handleSalaryChange(e, 'desiredSalary', basicSalaryCurrency)}
-                        placeholder={getPlaceholder(basicSalaryCurrency, 'basic')}
+                        onChange={(e) => handleSalaryChange(e, 'desiredSalary', 'JPY')}
+                        placeholder={getPlaceholder('JPY', 'basic')}
                         className="flex-grow"
                     />
-                    {showCurrencyToggle && (
-                        <Select value={basicSalaryCurrency} onValueChange={(value) => setBasicSalaryCurrency(value as 'JPY' | 'VND')}>
-                            <SelectTrigger className="w-[80px] flex-shrink-0"><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="JPY">JPY</SelectItem>
-                                <SelectItem value="VND">VND</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    )}
                 </div>
                  {tempCandidate.aspirations?.desiredSalary && (
                     <p className="text-xs text-muted-foreground">
-                        {getConvertedSalaryDisplay(tempCandidate.aspirations.desiredSalary, basicSalaryCurrency)}
+                        {getConvertedSalaryDisplay(tempCandidate.aspirations.desiredSalary, 'JPY', 'salary')}
                     </p>
                 )}
             </div>
@@ -1041,31 +1054,44 @@ export default function CandidateProfilePage() {
                         id="desired-net-salary"
                         type="number"
                         value={tempCandidate.aspirations?.desiredNetSalary || ''}
-                        onChange={(e) => handleSalaryChange(e, 'desiredNetSalary', netSalaryCurrency)}
-                        placeholder={getPlaceholder(netSalaryCurrency, 'net')}
+                        onChange={(e) => handleSalaryChange(e, 'desiredNetSalary', 'JPY')}
+                        placeholder={getPlaceholder('JPY', 'net')}
                         className="flex-grow"
                     />
-                     {showCurrencyToggle && (
-                        <Select value={netSalaryCurrency} onValueChange={(value) => setNetSalaryCurrency(value as 'JPY' | 'VND')}>
-                            <SelectTrigger className="w-[80px] flex-shrink-0"><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="JPY">JPY</SelectItem>
-                                <SelectItem value="VND">VND</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    )}
                 </div>
                  {tempCandidate.aspirations?.desiredNetSalary && (
                     <p className="text-xs text-muted-foreground">
-                       {getConvertedSalaryDisplay(tempCandidate.aspirations.desiredNetSalary, netSalaryCurrency)}
+                       {getConvertedSalaryDisplay(tempCandidate.aspirations.desiredNetSalary, 'JPY', 'salary')}
                     </p>
                 )}
             </div>
             
             <div className="space-y-2">
-              <Label>Khả năng tài chính</Label>
-              <Input value={tempCandidate.aspirations?.financialAbility} onChange={e => handleTempChange('aspirations', 'financialAbility', e.target.value)} />
+                <Label htmlFor="financial-ability">Khả năng tài chính</Label>
+                <div className="flex items-center gap-2">
+                    <Input
+                        id="financial-ability"
+                        type="number"
+                        value={tempCandidate.aspirations?.financialAbility}
+                        onChange={(e) => handleSalaryChange(e, 'financialAbility', 'VND')}
+                        placeholder={getPlaceholder('VND', 'financial')}
+                        className="flex-grow"
+                    />
+                     <Select value={financialAbilityCurrency} onValueChange={(value) => setFinancialAbilityCurrency(value as 'JPY' | 'VND')}>
+                        <SelectTrigger className="w-[80px] flex-shrink-0"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="VND">VNĐ</SelectItem>
+                            <SelectItem value="JPY">$</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                 {tempCandidate.aspirations?.financialAbility && (
+                    <p className="text-xs text-muted-foreground">
+                        {getConvertedSalaryDisplay(tempCandidate.aspirations.financialAbility, financialAbilityCurrency, 'financial')}
+                    </p>
+                )}
             </div>
+
             <div className="space-y-2">
               <Label>Tìm việc, phỏng vấn, tuyển tại</Label>
               <Select value={tempCandidate.aspirations?.interviewLocation || ''} onValueChange={value => handleTempChange('aspirations', 'interviewLocation', value)}>
@@ -1802,3 +1828,4 @@ export default function CandidateProfilePage() {
     
 
     
+
