@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -894,23 +893,26 @@ export default function CandidateProfilePage() {
 
     const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value.replace(/,/g, '');
-        const numericValue = parseInt(rawValue, 10) || 0;
+        const numericValue = parseInt(rawValue, 10);
         
-        let jpyValue;
-        if (salaryCurrency === 'VND') {
-            jpyValue = Math.round(numericValue / JPY_VND_RATE);
-        } else {
-            jpyValue = numericValue;
+        if (isNaN(numericValue)) {
+            handleTempChange('aspirations', 'desiredSalary', '');
+            return;
         }
 
-        if (jpyValue > salaryProps.max) return;
+        let jpyValue = salaryCurrency === 'VND' ? Math.round(numericValue / JPY_VND_RATE) : numericValue;
+
+        // Ensure the JPY value does not exceed the max for the visa type
+        if (salaryProps.max && jpyValue > salaryProps.max) {
+           jpyValue = salaryProps.max;
+        }
 
         handleTempChange('aspirations', 'desiredSalary', String(jpyValue));
     };
 
     const getDisplaySalary = () => {
-        const jpyValue = parseInt(tempCandidate.aspirations?.desiredSalary || '0', 10);
-        if (isNaN(jpyValue) || jpyValue === 0) return '';
+        const jpyValue = parseInt(tempCandidate.aspirations?.desiredSalary || '', 10);
+        if (isNaN(jpyValue)) return '';
         
         if (salaryCurrency === 'VND') {
             return (jpyValue * JPY_VND_RATE).toLocaleString('en-US');
@@ -1750,3 +1752,5 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+    
