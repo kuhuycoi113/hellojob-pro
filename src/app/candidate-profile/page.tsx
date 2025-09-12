@@ -361,9 +361,13 @@ const ZaloIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 )
 
-const formatYen = (value?: string) => {
-    if (!value) return 'Chưa cập nhật';
-    const numericValue = parseInt(value.replace(/[^0-9]/g, ''), 10);
+const formatYen = (value?: string | number) => {
+    if (value === null || value === undefined || value === '') return 'Chưa cập nhật';
+    
+    const numericValue = typeof value === 'string' 
+        ? parseInt(value.replace(/[^0-9]/g, ''), 10)
+        : value;
+        
     if (isNaN(numericValue)) return value;
     return `${numericValue.toLocaleString('en-US')} yên`;
 };
@@ -877,6 +881,16 @@ export default function CandidateProfilePage() {
     const salaryProps = tempCandidate.aspirations?.desiredVisaType 
       ? salaryRanges[tempCandidate.aspirations.desiredVisaType]
       : { min: 100000, max: 10000000, placeholder: 'Nhập mức lương mong muốn' };
+
+    const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const rawValue = e.target.value;
+        const numericValue = parseInt(rawValue.replace(/,/g, ''), 10) || 0;
+        
+        if (numericValue > salaryProps.max) return;
+
+        const formattedValue = isNaN(numericValue) ? '' : numericValue.toLocaleString('en-US');
+        handleTempChange('aspirations', 'desiredSalary', formattedValue);
+    };
       
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -950,11 +964,9 @@ export default function CandidateProfilePage() {
             <div className="space-y-2">
               <Label>Lương cơ bản mong muốn/tháng</Label>
               <Input 
-                type="number"
-                value={tempCandidate.aspirations?.desiredSalary} 
-                onChange={e => handleTempChange('aspirations', 'desiredSalary', e.target.value)}
-                min={salaryProps.min}
-                max={salaryProps.max}
+                type="text"
+                value={formatYen(tempCandidate.aspirations?.desiredSalary).replace(' yên', '')} 
+                onChange={handleSalaryChange}
                 placeholder={salaryProps.placeholder}
               />
             </div>
