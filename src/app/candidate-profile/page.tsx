@@ -894,14 +894,8 @@ export default function CandidateProfilePage() {
     };
     
     const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const rawValue = e.target.value.replace(/,/g, '');
-        if (!/^\d*$/.test(rawValue)) return;
-
-        let numericValue = parseInt(rawValue, 10);
-        if (isNaN(numericValue)) {
-            handleTempChange('aspirations', 'desiredSalary', '');
-            return;
-        }
+        const rawValue = e.target.value;
+        const numericValue = parseInt(rawValue.replace(/,/g, ''), 10) || 0;
 
         let jpyValue;
         if (salaryCurrency === 'VND') {
@@ -910,6 +904,7 @@ export default function CandidateProfilePage() {
             jpyValue = numericValue;
         }
         
+        // Clamp the value to the max limit
         if (jpyValue > salaryProps.max) {
             jpyValue = salaryProps.max;
         }
@@ -919,7 +914,7 @@ export default function CandidateProfilePage() {
 
     const getDisplaySalary = () => {
         const jpyValueStr = tempCandidate.aspirations?.desiredSalary;
-        if (!jpyValueStr || jpyValueStr === '') return '';
+        if (!jpyValueStr) return '';
         
         const jpyValue = parseInt(jpyValueStr, 10);
         if (isNaN(jpyValue)) return '';
@@ -999,10 +994,11 @@ export default function CandidateProfilePage() {
                     </SelectContent>
                 </Select>
             </div>
-             <div className="space-y-2">
-                <Label>Lương cơ bản mong muốn/tháng</Label>
+            <div className="space-y-2">
+                <Label htmlFor="desired-salary">Lương cơ bản mong muốn/tháng</Label>
                 <div className="flex items-center gap-2">
-                    <Input 
+                    <Input
+                        id="desired-salary"
                         type="text"
                         value={getDisplaySalary()}
                         onChange={handleSalaryChange}
@@ -1010,7 +1006,7 @@ export default function CandidateProfilePage() {
                         className="flex-grow"
                     />
                     {showCurrencyToggle && (
-                         <Select value={salaryCurrency} onValueChange={(value) => setSalaryCurrency(value as 'JPY' | 'VND')}>
+                        <Select value={salaryCurrency} onValueChange={(value) => setSalaryCurrency(value as 'JPY' | 'VND')}>
                             <SelectTrigger className="w-[80px] flex-shrink-0">
                                 <SelectValue />
                             </SelectTrigger>
