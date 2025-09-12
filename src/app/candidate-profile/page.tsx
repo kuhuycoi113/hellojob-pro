@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -865,6 +865,9 @@ export default function CandidateProfilePage() {
   );
 
   const renderAspirationsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
+    const [salaryCurrency, setSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
+    const JPY_VND_RATE = 180;
+  
     const availableIndustries = tempCandidate.aspirations?.desiredVisaType
       ? industriesByJobType[tempCandidate.aspirations.desiredVisaType as keyof typeof industriesByJobType] || allIndustries
       : allIndustries;
@@ -872,26 +875,55 @@ export default function CandidateProfilePage() {
     const selectedIndustryData = availableIndustries.find(ind => ind.name === tempCandidate.desiredIndustry);
     const availableJobDetails = selectedIndustryData ? selectedIndustryData.keywords : [];
 
-    const salaryRanges: {[key: string]: {min: number, max: number, placeholder: string}} = {
-      'Thực tập sinh kỹ năng': { min: 120000, max: 500000, placeholder: '120,000 - 500,000 yên' },
-      'Kỹ năng đặc định': { min: 150000, max: 1500000, placeholder: '150,000 - 1,500,000 yên' },
-      'Kỹ sư, tri thức': { min: 160000, max: 10000000, placeholder: '160,000 - 10,000,000 yên' },
+    const salaryRanges: {[key: string]: {min: number, max: number}} = {
+      'Thực tập sinh kỹ năng': { min: 120000, max: 500000 },
+      'Kỹ năng đặc định': { min: 150000, max: 1500000 },
+      'Kỹ sư, tri thức': { min: 160000, max: 10000000 },
     };
     
     const salaryProps = tempCandidate.aspirations?.desiredVisaType 
       ? salaryRanges[tempCandidate.aspirations.desiredVisaType]
-      : { min: 100000, max: 10000000, placeholder: 'Nhập mức lương mong muốn' };
+      : { min: 100000, max: 10000000 };
+
+    const getPlaceholder = (currency: 'JPY' | 'VND') => {
+        if (currency === 'JPY') {
+            return `${salaryProps.min.toLocaleString('en-US')} - ${salaryProps.max.toLocaleString('en-US')} yên`;
+        }
+        return `${(salaryProps.min * JPY_VND_RATE).toLocaleString('en-US')} - ${(salaryProps.max * JPY_VND_RATE).toLocaleString('en-US')} VNĐ`;
+    };
 
     const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const rawValue = e.target.value;
-        const numericValue = parseInt(rawValue.replace(/,/g, ''), 10) || 0;
+        const rawValue = e.target.value.replace(/,/g, '');
+        const numericValue = parseInt(rawValue, 10) || 0;
         
-        if (numericValue > salaryProps.max) return;
+        let jpyValue;
+        if (salaryCurrency === 'VND') {
+            jpyValue = Math.round(numericValue / JPY_VND_RATE);
+        } else {
+            jpyValue = numericValue;
+        }
 
-        const formattedValue = isNaN(numericValue) ? '' : numericValue.toLocaleString('en-US');
-        handleTempChange('aspirations', 'desiredSalary', formattedValue);
+        if (jpyValue > salaryProps.max) return;
+
+        handleTempChange('aspirations', 'desiredSalary', String(jpyValue));
     };
-      
+
+    const getDisplaySalary = () => {
+        const jpyValue = parseInt(tempCandidate.aspirations?.desiredSalary || '0', 10);
+        if (isNaN(jpyValue) || jpyValue === 0) return '';
+        
+        if (salaryCurrency === 'VND') {
+            return (jpyValue * JPY_VND_RATE).toLocaleString('en-US');
+        }
+        return jpyValue.toLocaleString('en-US');
+    }
+
+    const toggleCurrency = () => {
+        setSalaryCurrency(prev => prev === 'JPY' ? 'VND' : 'JPY');
+    }
+
+    const showCurrencyToggle = ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đi mới', 'Kỹ sư, tri thức đầu Việt'].includes(tempCandidate.aspirations?.desiredVisaDetail || '');
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -963,12 +995,20 @@ export default function CandidateProfilePage() {
             </div>
             <div className="space-y-2">
               <Label>Lương cơ bản mong muốn/tháng</Label>
-              <Input 
-                type="text"
-                value={formatYen(tempCandidate.aspirations?.desiredSalary).replace(' yên', '')} 
-                onChange={handleSalaryChange}
-                placeholder={salaryProps.placeholder}
-              />
+              <div className="flex items-center gap-2">
+                <Input 
+                  type="text"
+                  value={getDisplaySalary()}
+                  onChange={handleSalaryChange}
+                  placeholder={getPlaceholder(salaryCurrency)}
+                />
+                {showCurrencyToggle && (
+                    <Button variant="outline" size="icon" onClick={toggleCurrency} className="flex-shrink-0">
+                        <ArrowRightLeft className="h-4 w-4"/>
+                    </Button>
+                )}
+                <span className="font-bold">{salaryCurrency}</span>
+              </div>
             </div>
             <div className="space-y-2">
               <Label>Thực lĩnh mong muốn</Label>
