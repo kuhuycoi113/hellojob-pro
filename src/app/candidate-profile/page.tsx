@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -895,22 +894,35 @@ export default function CandidateProfilePage() {
 
     const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value.replace(/,/g, '');
-        if (rawValue === '' || /^\d+$/.test(rawValue)) {
-            let numericValue = parseInt(rawValue, 10);
-            if (isNaN(numericValue)) numericValue = 0;
+        if (!/^\d*$/.test(rawValue)) return; // Allow only numbers
 
-            let jpyValue = salaryCurrency === 'VND' ? Math.round(numericValue / JPY_VND_RATE) : numericValue;
-            
-            // Do not cap the value while typing, only format it.
-            // Capping will be handled on blur or save if necessary.
-            
-            handleTempChange('aspirations', 'desiredSalary', String(jpyValue || ''));
+        const numericValue = parseInt(rawValue, 10);
+        if (isNaN(numericValue)) {
+            handleTempChange('aspirations', 'desiredSalary', '');
+            return;
         }
+
+        let jpyValue;
+        if (salaryCurrency === 'VND') {
+            const maxVnd = salaryProps.max * JPY_VND_RATE;
+            if (numericValue > maxVnd) {
+                jpyValue = salaryProps.max;
+            } else {
+                jpyValue = Math.round(numericValue / JPY_VND_RATE);
+            }
+        } else { // JPY
+            if (numericValue > salaryProps.max) {
+                jpyValue = salaryProps.max;
+            } else {
+                jpyValue = numericValue;
+            }
+        }
+        handleTempChange('aspirations', 'desiredSalary', String(jpyValue));
     };
 
     const getDisplaySalary = () => {
         const jpyValueStr = tempCandidate.aspirations?.desiredSalary;
-        if (!jpyValueStr) return '';
+        if (!jpyValueStr || jpyValueStr === '') return '';
         
         const jpyValue = parseInt(jpyValueStr, 10);
         if (isNaN(jpyValue)) return '';
@@ -1752,3 +1764,4 @@ export default function CandidateProfilePage() {
   );
 }
 
+    
