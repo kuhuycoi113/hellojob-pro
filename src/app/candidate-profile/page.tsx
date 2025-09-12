@@ -437,6 +437,7 @@ export default function CandidateProfilePage() {
          profileToLoad = {
              ...newEmptyProfile,
              name: 'Ứng viên mới', // A default name to indicate it's a new profile
+             avatarUrl: undefined, // ensure avatarUrl is not an empty string
              videos: defaultVideos,
              images: defaultImages
          };
@@ -1285,7 +1286,7 @@ export default function CandidateProfilePage() {
                  <div className="p-6 flex flex-col md:flex-row items-center md:items-end -mt-16">
                  <div className="relative group">
                      <Avatar className="h-32 w-32 border-4 border-background bg-background shadow-lg">
-                      <AvatarImage src={candidate.avatarUrl} alt={candidate.name} data-ai-hint="professional headshot" className="object-cover" />
+                      <AvatarImage src={candidate.avatarUrl || undefined} alt={candidate.name} data-ai-hint="professional headshot" className="object-cover" />
                       <AvatarFallback>{candidate.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <Label htmlFor="avatar-upload" className="absolute bottom-1 right-1 cursor-pointer bg-black/50 text-white p-2 rounded-full group-hover:bg-black/70 transition-colors">

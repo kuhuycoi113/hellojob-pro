@@ -43,7 +43,7 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
     return (
         <div className="flex items-start gap-2 justify-start">
             <Avatar className="h-8 w-8">
-                <AvatarImage src={displayUser.avatarUrl} alt={displayUser.name} />
+                <AvatarImage src={displayUser.avatarUrl || undefined} alt={displayUser.name} />
                 <AvatarFallback>{displayUser.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
@@ -68,7 +68,7 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
         <>
             {/* CHATAVATAR2 */}
             <Avatar className="h-8 w-8 flex-shrink-0">
-            <AvatarImage src={displayUser.avatarUrl} alt={displayUser.name} />
+            <AvatarImage src={displayUser.avatarUrl || undefined} alt={displayUser.name} />
             <AvatarFallback>{displayUser.name.charAt(0)}</AvatarFallback>
             </Avatar>
         </>
