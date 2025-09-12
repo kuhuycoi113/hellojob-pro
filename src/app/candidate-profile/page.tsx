@@ -295,8 +295,8 @@ const EditDialog = ({
          // Logic to reset visa detail when visa type changes
         if (section === 'aspirations' && field === 'desiredVisaType') {
             newCandidate.aspirations!.desiredVisaDetail = '';
-            newCandidate.desiredIndustry = ''; // Also reset industry
-            newCandidate.aspirations!.desiredJobDetail = ''; // Also reset job detail
+            // Do not reset industry, but do reset job detail
+            newCandidate.aspirations!.desiredJobDetail = ''; 
         }
         if (section === 'aspirations' && field === 'desiredIndustry') {
             newCandidate.aspirations!.desiredJobDetail = ''; // Also reset job detail
@@ -439,7 +439,9 @@ export default function CandidateProfilePage() {
             if (typeof newEmptyProfile[key] === 'string') newEmptyProfile[key] = '';
             if (Array.isArray(newEmptyProfile[key])) newEmptyProfile[key] = [];
             if (key === 'personalInfo' || key === 'aspirations' || key === 'documents') {
-                Object.keys(newEmptyProfile[key]).forEach(subKey => newEmptyProfile[key][subKey] = '');
+                if (newEmptyProfile[key]) {
+                    Object.keys(newEmptyProfile[key]).forEach(subKey => newEmptyProfile[key][subKey] = '');
+                }
             }
         });
          profileToLoad = {
@@ -859,11 +861,11 @@ export default function CandidateProfilePage() {
   );
 
   const renderAspirationsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
-    const availableIndustries = tempCandidate.aspirations?.desiredVisaType 
-      ? industriesByJobType[tempCandidate.aspirations.desiredVisaType as keyof typeof industriesByJobType] || []
+    const availableIndustries = tempCandidate.aspirations?.desiredVisaType
+      ? industriesByJobType[tempCandidate.aspirations.desiredVisaType as keyof typeof industriesByJobType] || allIndustries
       : allIndustries;
       
-    const selectedIndustryData = allIndustries.find(ind => ind.name === tempCandidate.desiredIndustry);
+    const selectedIndustryData = availableIndustries.find(ind => ind.name === tempCandidate.desiredIndustry);
     const availableJobDetails = selectedIndustryData ? selectedIndustryData.keywords : [];
       
     return (
@@ -888,7 +890,10 @@ export default function CandidateProfilePage() {
             </div>
             <div className="space-y-2">
               <Label>Ngành nghề mong muốn</Label>
-              <Select value={tempCandidate.desiredIndustry} onValueChange={value => handleTempChange('aspirations', 'desiredIndustry', value)} disabled={!tempCandidate.aspirations?.desiredVisaType}>
+              <Select value={tempCandidate.desiredIndustry} onValueChange={value => {
+                handleTempChange('desiredIndustry', value);
+                handleTempChange('aspirations', 'desiredJobDetail', ''); // Reset job detail when industry changes
+              }} disabled={!tempCandidate.aspirations?.desiredVisaType}>
                 <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
                 <SelectContent>
                   {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
