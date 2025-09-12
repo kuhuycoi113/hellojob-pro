@@ -1160,8 +1160,8 @@ export default function CandidateProfilePage() {
           <Input value={tempCandidate.name} onChange={e => handleTempChange('name', e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label>Số điện thoại</Label>
-          <Input value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value)} />
+          <Label>Số điện thoại Việt Nam</Label>
+          <Input type="tel" pattern="(0[35789])([0-9]{8})" title="Vui lòng nhập số điện thoại di động hợp lệ của Việt Nam." value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value)} />
         </div>
         <div className="space-y-2">
           <Label>Ngày sinh</Label>
@@ -1801,7 +1801,9 @@ export default function CandidateProfilePage() {
                         <p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation}</p>
                         <p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p>
                         <p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p>
-                        <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility}</p>
+                        {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(candidate.aspirations?.desiredVisaDetail || '') && (
+                            <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility}</p>
+                        )}
                         <p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation}</p>
                         <p><strong>{t.specialAspirations}:</strong> {candidate.aspirations?.specialAspirations}</p>
                   </CardContent>
@@ -1923,6 +1925,7 @@ export default function CandidateProfilePage() {
     
 
     
+
 
 
 
