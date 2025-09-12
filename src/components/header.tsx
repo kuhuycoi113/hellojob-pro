@@ -171,7 +171,7 @@ export function Header() {
             <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
             <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
         </Card>
-        <Card onClick={() => setIsCreateDetailOpen(true)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+        <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
             <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
             <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
@@ -519,6 +519,9 @@ export function Header() {
                     <h3 className="font-bold text-base mb-1">Thủ công</h3>
                     <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
                 </Card>
+            </div>
+             <div className="mt-4 text-center">
+                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
             </div>
         </DialogContent>
     </Dialog>
