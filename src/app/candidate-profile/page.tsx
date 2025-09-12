@@ -149,7 +149,7 @@ const translations = {
         hepatitisB: "Hepatitis B",
         language: "Language",
         documentsSection: "Documents & Paperwork",
-        vietnamDocs: "Vietnamese Documents",
+        vietnameseDocs: "Vietnamese Documents",
         japanDocs: "Japanese Documents",
         otherDocs: "Overseas/Study Abroad Docs",
         aspirations: "Aspirations",
@@ -894,9 +894,10 @@ export default function CandidateProfilePage() {
 
     const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value.replace(/,/g, '');
-        if (!/^\d*$/.test(rawValue)) return; // Allow only numbers
+        if (!/^\d*$/.test(rawValue)) return;
 
         const numericValue = parseInt(rawValue, 10);
+
         if (isNaN(numericValue)) {
             handleTempChange('aspirations', 'desiredSalary', '');
             return;
@@ -904,21 +905,20 @@ export default function CandidateProfilePage() {
 
         let jpyValue;
         if (salaryCurrency === 'VND') {
+            jpyValue = Math.round(numericValue / JPY_VND_RATE);
             const maxVnd = salaryProps.max * JPY_VND_RATE;
-            if (numericValue > maxVnd) {
+             if (numericValue > maxVnd) {
                 jpyValue = salaryProps.max;
-            } else {
-                jpyValue = Math.round(numericValue / JPY_VND_RATE);
             }
         } else { // JPY
+            jpyValue = numericValue;
             if (numericValue > salaryProps.max) {
                 jpyValue = salaryProps.max;
-            } else {
-                jpyValue = numericValue;
             }
         }
         handleTempChange('aspirations', 'desiredSalary', String(jpyValue));
     };
+
 
     const getDisplaySalary = () => {
         const jpyValueStr = tempCandidate.aspirations?.desiredSalary;
@@ -1763,5 +1763,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-
-    
