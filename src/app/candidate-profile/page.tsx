@@ -898,7 +898,10 @@ export default function CandidateProfilePage() {
         if (!/^\d*$/.test(rawValue)) return;
 
         let numericValue = parseInt(rawValue, 10);
-        if (isNaN(numericValue)) numericValue = 0;
+        if (isNaN(numericValue)) {
+            handleTempChange('aspirations', 'desiredSalary', '');
+            return;
+        }
 
         let jpyValue;
         if (salaryCurrency === 'VND') {
@@ -907,17 +910,16 @@ export default function CandidateProfilePage() {
             jpyValue = numericValue;
         }
         
-        // Clamp the JPY value
         if (jpyValue > salaryProps.max) {
             jpyValue = salaryProps.max;
         }
 
-        handleTempChange('aspirations', 'desiredSalary', String(jpyValue || ''));
+        handleTempChange('aspirations', 'desiredSalary', String(jpyValue));
     };
 
     const getDisplaySalary = () => {
         const jpyValueStr = tempCandidate.aspirations?.desiredSalary;
-        if (!jpyValueStr) return '';
+        if (!jpyValueStr || jpyValueStr === '') return '';
         
         const jpyValue = parseInt(jpyValueStr, 10);
         if (isNaN(jpyValue)) return '';
@@ -925,10 +927,6 @@ export default function CandidateProfilePage() {
         const displayValue = salaryCurrency === 'VND' ? jpyValue * JPY_VND_RATE : jpyValue;
         return displayValue.toLocaleString('en-US');
     };
-
-    const toggleCurrency = () => {
-        setSalaryCurrency(prev => prev === 'JPY' ? 'VND' : 'JPY');
-    }
 
     const showCurrencyToggle = ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đi mới', 'Kỹ sư, tri thức đầu Việt'].includes(tempCandidate.aspirations?.desiredVisaDetail || '');
 
@@ -1001,22 +999,28 @@ export default function CandidateProfilePage() {
                     </SelectContent>
                 </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Lương cơ bản mong muốn/tháng</Label>
-              <div className="flex items-center gap-2">
-                <Input 
-                  type="text"
-                  value={getDisplaySalary()}
-                  onChange={handleSalaryChange}
-                  placeholder={getPlaceholder(salaryCurrency)}
-                />
-                {showCurrencyToggle && (
-                    <Button variant="outline" size="icon" onClick={toggleCurrency} className="flex-shrink-0">
-                        <ArrowRightLeft className="h-4 w-4"/>
-                    </Button>
-                )}
-                <span className="font-bold">{salaryCurrency}</span>
-              </div>
+             <div className="space-y-2">
+                <Label>Lương cơ bản mong muốn/tháng</Label>
+                <div className="flex items-center gap-2">
+                    <Input 
+                        type="text"
+                        value={getDisplaySalary()}
+                        onChange={handleSalaryChange}
+                        placeholder={getPlaceholder(salaryCurrency)}
+                        className="flex-grow"
+                    />
+                    {showCurrencyToggle && (
+                         <Select value={salaryCurrency} onValueChange={(value) => setSalaryCurrency(value as 'JPY' | 'VND')}>
+                            <SelectTrigger className="w-[80px] flex-shrink-0">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="JPY">JPY</SelectItem>
+                                <SelectItem value="VND">VND</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
+                </div>
             </div>
             <div className="space-y-2">
               <Label>Thực lĩnh mong muốn</Label>
