@@ -78,8 +78,7 @@ const EmptyProfileView = () => {
             desiredIndustry: selectedIndustry?.name,
             desiredLocation: selectedRegion 
         };
-        sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
-
+        
         if (isLoggedIn) {
             console.log("Applying preferences for logged in user:", preferences);
             // Directly update localStorage profile
@@ -100,6 +99,7 @@ const EmptyProfileView = () => {
             setIsDialogOpen(false);
             router.push('/jobs?highlight=suggested');
         } else {
+            sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
             sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
             setIsDialogOpen(false); // Close the current dialog
             setIsConfirmLoginOpen(true);
@@ -112,8 +112,8 @@ const EmptyProfileView = () => {
     };
     
     const handleCreateDetailedProfile = (method: 'ai' | 'manual') => {
-        setIsCreateDetailOpen(false); // Close the selection dialog
-        setIsDialogOpen(false); // Close the main dialog
+        setIsCreateDetailOpen(false);
+        setIsDialogOpen(false);
         if (method === 'ai') {
             router.push('/ai-profile');
         } else {
@@ -318,7 +318,7 @@ const EmptyProfileView = () => {
                 <div className="mt-6 flex flex-wrap gap-4">
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
-                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleQuickCreateClick}>
+                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
@@ -327,11 +327,11 @@ const EmptyProfileView = () => {
                            {renderDialogContent()}
                         </DialogContent>
                     </Dialog>
-                    <Button asChild variant="default">
-                        <Link href="/candidate-profile">
+                    <Button asChild variant="default" onClick={() => setIsCreateDetailOpen(true)}>
+                        <div className="cursor-pointer inline-flex items-center justify-center gap-2">
                             <PlusCircle className="mr-2 h-4 w-4" />
-                            Xem trang hồ sơ và khởi tạo
-                        </Link>
+                            Tạo hồ sơ chi tiết
+                        </div>
                     </Button>
                 </div>
             </div>

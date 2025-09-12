@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -48,7 +49,7 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setRole('candidate');
+    setRole('candidate-empty-profile'); // Default to empty profile, context will fill it
     onOpenChange(false);
     toast({
         title: "Đăng nhập thành công!",

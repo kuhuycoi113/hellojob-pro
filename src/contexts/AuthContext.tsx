@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
@@ -30,36 +31,41 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const isLoggedIn = role !== 'guest';
 
   useEffect(() => {
-    // When simulating 'candidate-empty-profile', we want to clear the stored profile
-    // to ensure the profile page starts fresh.
-    if (role === 'candidate-empty-profile') {
-      localStorage.removeItem('generatedCandidateProfile');
-    }
+    const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
+    
+    // When role changes to 'candidate-empty-profile' (which is the default on login)
+    // we check if there are preferences to apply from the guest session.
+    if (role === 'candidate-empty-profile' && preferencesRaw) {
+        try {
+            const preferences = JSON.parse(preferencesRaw);
+            const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
+            let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
 
-    // When logging in (switching from guest to a candidate role)
-    if (role.startsWith('candidate')) {
-        const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
-        if (preferencesRaw) {
-            try {
-                const preferences = JSON.parse(preferencesRaw);
-                const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
-                let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
+            // Merge preferences into the profile
+            profile = {
+                ...profile,
+                desiredIndustry: preferences.desiredIndustry || profile.desiredIndustry,
+                aspirations: {
+                    ...profile.aspirations,
+                    ...preferences,
+                }
+            };
+            localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+            sessionStorage.removeItem('onboardingPreferences');
+            
+            // After applying preferences, the profile is no longer 'empty' in spirit,
+            // so we transition the role to 'candidate'.
+            setRole('candidate');
 
-                // Merge preferences into the profile
-                profile = {
-                    ...profile,
-                    desiredIndustry: preferences.desiredIndustry || profile.desiredIndustry,
-                    aspirations: {
-                        ...profile.aspirations,
-                        ...preferences,
-                    }
-                };
-                localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
-                sessionStorage.removeItem('onboardingPreferences');
-            } catch(e) {
-                console.error("Failed to apply onboarding preferences:", e);
-            }
+        } catch(e) {
+            console.error("Failed to apply onboarding preferences:", e);
+            // If applying preferences fails, we still remove the temp data
+            sessionStorage.removeItem('onboardingPreferences');
         }
+    } else if (role === 'candidate-empty-profile' && !preferencesRaw) {
+        // If the role is set to empty but there are no preferences, it means a fresh start.
+        // Clear any potentially lingering profile data.
+        localStorage.removeItem('generatedCandidateProfile');
     }
 
   }, [role]);

@@ -89,7 +89,6 @@ export function Header() {
         desiredIndustry: selectedIndustry?.name,
         desiredLocation: selectedRegion 
     };
-    sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
 
     if (isLoggedIn) {
         console.log("Applying preferences for logged in user:", preferences);
@@ -111,6 +110,7 @@ export function Header() {
         setIsDialogOpen(false);
         router.push('/jobs?highlight=suggested');
     } else {
+        sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
         sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
         setIsDialogOpen(false); // Close the current dialog
         setIsConfirmLoginOpen(true);
