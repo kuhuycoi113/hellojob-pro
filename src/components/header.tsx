@@ -503,18 +503,25 @@ export function Header() {
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>
-     <AlertDialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</AlertDialogTitle>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-                <AlertDialogCancel>Hủy</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleCreateDetailedProfile('manual')}>Thủ công</AlertDialogAction>
-                <AlertDialogAction onClick={() => handleCreateDetailedProfile('ai')}>Dùng AI</AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
+     <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
+        <DialogContent className="sm:max-w-xl">
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                    <Sparkles className="h-8 w-8 text-primary mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Dùng AI</h3>
+                    <p className="text-muted-foreground text-xs">Tải lên CV, AI sẽ tự động điền thông tin.</p>
+                </Card>
+                <Card onClick={() => handleCreateDetailedProfile('manual')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                    <Pencil className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Thủ công</h3>
+                    <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
+                </Card>
+            </div>
+        </DialogContent>
+    </Dialog>
     <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={(open) => {
         setIsAuthDialogOpen(open);
     }} />
