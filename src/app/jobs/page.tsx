@@ -28,6 +28,9 @@ import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { locations } from '@/lib/location-data';
 
 
 const aspirations = [
@@ -360,7 +363,11 @@ const LoggedInView = () => {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const searchParams = useSearchParams();
     const [isHighlighted, setIsHighlighted] = useState(false);
-    
+    const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
+    const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
+    const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
+    const [forceUpdate, setForceUpdate] = useState(0); // State to trigger re-fetch
+
     // Initialize accordion state directly from searchParams
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(
         () => searchParams.get('highlight') === 'suggested' ? 'item-1' : undefined
@@ -375,37 +382,33 @@ const LoggedInView = () => {
         }
     }, [searchParams]);
 
+    const fetchSuggestedJobs = useCallback(async () => {
+        setIsLoadingSuggestions(true);
+        try {
+            const storedProfile = localStorage.getItem('generatedCandidateProfile');
+            if (storedProfile) {
+                const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+                const matchResults = await matchJobsToProfile(profile);
+                const jobs = matchResults.map(result => result.job);
+                setSuggestedJobs(jobs);
+            } else {
+                setSuggestedJobs(jobData.slice(0, 20)); // Fallback
+            }
+        } catch (error) {
+            console.error("Failed to fetch suggested jobs:", error);
+            setSuggestedJobs(jobData.slice(0, 20)); // Fallback on error
+        } finally {
+            setIsLoadingSuggestions(false);
+        }
+    }, []);
 
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
             setIsLoadingSuggestions(false);
             return;
         }
-
-        const fetchSuggestedJobs = async () => {
-            setIsLoadingSuggestions(true);
-            try {
-                const storedProfile = localStorage.getItem('generatedCandidateProfile');
-                if (storedProfile) {
-                    const profile: CandidateProfile = JSON.parse(storedProfile);
-                    const matchResults = await matchJobsToProfile(profile);
-                    // Extract job object from each match result
-                    const jobs = matchResults.map(result => result.job);
-                    setSuggestedJobs(jobs);
-                } else {
-                    // Fallback to some default jobs if no profile is found
-                    setSuggestedJobs(jobData.slice(0, 20));
-                }
-            } catch (error) {
-                console.error("Failed to fetch suggested jobs:", error);
-                setSuggestedJobs(jobData.slice(0, 20)); // Fallback on error
-            } finally {
-                setIsLoadingSuggestions(false);
-            }
-        };
-
         fetchSuggestedJobs();
-    }, [role]);
+    }, [role, fetchSuggestedJobs, forceUpdate]);
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
@@ -415,9 +418,40 @@ const LoggedInView = () => {
         }, 500); // Simulate network delay
     };
 
+    const openEditAspirationsDialog = () => {
+        const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
+        if (storedProfileRaw) {
+            const profile = JSON.parse(storedProfileRaw);
+            setTempAspirations(profile.aspirations || {});
+            setTempDesiredIndustry(profile.desiredIndustry || '');
+        }
+        setIsAspirationsDialogOpen(true);
+    };
+
+    const handleSaveAspirations = () => {
+        const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
+        let profile = storedProfileRaw ? JSON.parse(storedProfileRaw) : {};
+        profile = {
+            ...profile,
+            aspirations: tempAspirations,
+            desiredIndustry: tempDesiredIndustry,
+        };
+        localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+        setIsAspirationsDialogOpen(false);
+        setForceUpdate(prev => prev + 1); // Trigger a re-fetch
+    };
+
     if (role === 'candidate-empty-profile') {
         return <EmptyProfileView />;
     }
+    
+    const visaDetailsOptions: { [key: string]: string[] } = {
+        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
+        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
+        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư đầu Nhật'],
+    };
+    const visaTypes = Object.keys(visaDetailsOptions);
+    const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     return (
         <>
@@ -438,11 +472,14 @@ const LoggedInView = () => {
                     "transition-all duration-1000 ease-out",
                     isHighlighted ? "ring-2 ring-offset-2 ring-yellow-400 shadow-2xl rounded-lg" : ""
                 )}>
-                    <AccordionTrigger className="bg-background px-6 rounded-t-lg font-semibold text-base hover:no-underline">
-                        <div className="flex items-center gap-3">
+                    <AccordionTrigger className="bg-background px-6 rounded-t-lg font-semibold text-base hover:no-underline [&>svg]:ml-auto">
+                        <div className="flex items-center gap-3 w-full">
                             <Star className="h-5 w-5 text-yellow-500" />
                             <span>Gợi ý cho bạn</span>
                             <Badge>{isLoadingSuggestions ? '...' : suggestedJobs.length}</Badge>
+                            <Button variant="ghost" size="icon" className="ml-auto h-7 w-7" onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}>
+                                <Pencil className="h-4 w-4"/>
+                            </Button>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
@@ -591,6 +628,81 @@ const LoggedInView = () => {
             </div>
         </div>
         <ProfileViewersDialog isOpen={isViewersDialogOpen} onClose={() => setIsViewersDialogOpen(false)} />
+        <Dialog open={isAspirationsDialogOpen} onOpenChange={setIsAspirationsDialogOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Sửa điều kiện gợi ý</DialogTitle>
+                    <DialogDescription>
+                        Thay đổi các nguyện vọng để nhận được gợi ý việc làm phù hợp hơn.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div className="space-y-2">
+                        <Label>Loại visa mong muốn</Label>
+                        <Select
+                            value={tempAspirations.desiredVisaType || ''}
+                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }))}
+                        >
+                            <SelectTrigger><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
+                            <SelectContent>
+                                {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Chi tiết visa</Label>
+                        <Select
+                            value={tempAspirations.desiredVisaDetail || ''}
+                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaDetail: value }))}
+                            disabled={!tempAspirations.desiredVisaType}
+                        >
+                            <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
+                            <SelectContent>
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.label} value={vd.label}>{vd.label}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Ngành nghề mong muốn</Label>
+                        <Select
+                            value={tempDesiredIndustry}
+                            onValueChange={value => setTempDesiredIndustry(value)}
+                            disabled={!tempAspirations.desiredVisaType}
+                        >
+                            <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
+                            <SelectContent>
+                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Địa điểm mong muốn</Label>
+                        <Select
+                            value={tempAspirations.desiredLocation || ''}
+                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredLocation: value }))}
+                        >
+                            <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
+                            <SelectContent className="max-h-[300px]">
+                                <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                                {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
+                                    <SelectGroup key={region}>
+                                        <SelectLabel>{region}</SelectLabel>
+                                        <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                        {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                    </SelectGroup>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                <DialogClose asChild>
+                    <div className="flex justify-end gap-2">
+                        <Button variant="outline">Hủy</Button>
+                        <Button onClick={handleSaveAspirations}>Lưu và tìm lại</Button>
+                    </div>
+                </DialogClose>
+            </DialogContent>
+        </Dialog>
     </>
     )
 }
