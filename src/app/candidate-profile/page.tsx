@@ -224,7 +224,7 @@ const emptyCandidate: EnrichedCandidateProfile = {
         other: ['Thẻ ID', 'Bằng ngoại ngữ', 'Sổ tiết kiệm', 'Xác nhận công việc người bảo lãnh 1', 'Xác nhận công việc người bảo lãnh 2', 'Thẻ ID người bảo lãnh 1', 'Thẻ ID người bảo lãnh 2', 'Giấy tờ khác'],
     },
     desiredIndustry: 'Cơ khí, Chế tạo máy',
-    avatarUrl: 'https://placehold.co/128x128.png',
+    avatarUrl: undefined,
     videos: [
         { src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://placehold.co/400x600.png', alt: 'Giới thiệu bản thân', "data-ai-hint": 'self introduction video' },
         { src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://placehold.co/400x600.png', alt: 'Tay nghề 1', "data-ai-hint": 'skill demonstration' },
@@ -455,7 +455,7 @@ export default function CandidateProfilePage() {
           personalInfo: { ...emptyCandidate.personalInfo, ...parsedProfile.personalInfo },
           aspirations: { ...emptyCandidate.aspirations, ...parsedProfile.aspirations },
           documents: { ...emptyCandidate.documents, ...parsedProfile.documents },
-          avatarUrl: parsedProfile.avatarUrl || 'https://placehold.co/128x128.png',
+          avatarUrl: parsedProfile.avatarUrl || undefined,
           videos: (parsedProfile.videos && parsedProfile.videos.length > 0) ? parsedProfile.videos : defaultVideos,
           images: (parsedProfile.images && parsedProfile.images.length > 0) ? parsedProfile.images : defaultImages,
         };
@@ -879,7 +879,7 @@ export default function CandidateProfilePage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2">
               <Label>Ngành nghề mong muốn</Label>
               <Select value={tempCandidate.desiredIndustry} onValueChange={value => handleTempChange('desiredIndustry', value)} disabled={!tempCandidate.aspirations?.desiredVisaType}>
                 <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
@@ -1527,10 +1527,10 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                    <CardContent className="space-y-3 text-sm">
-                        <p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry}</p>
-                        <p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail}</p>
                         <p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.desiredVisaType}</p>
                         <p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.desiredVisaDetail}</p>
+                        <p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry}</p>
+                        <p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail}</p>
                         <p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation}</p>
                         <p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p>
                         <p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p>
@@ -1653,4 +1653,3 @@ export default function CandidateProfilePage() {
   );
 }
 
-    
