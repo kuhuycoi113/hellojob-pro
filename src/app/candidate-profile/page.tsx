@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -890,25 +889,24 @@ export default function CandidateProfilePage() {
         if (currency === 'JPY') {
             return `${min.toLocaleString('en-US')} - ${max.toLocaleString('en-US')} yên`;
         }
-        return `${(min * JPY_VND_RATE).toLocaleString('en-US')} - ${(max * JPY_VND_RATE).toLocaleString('en-US')} VNĐ`;
+        return `${(min * JPY_VND_RATE).toLocaleString('de-DE')} - ${(max * JPY_VND_RATE).toLocaleString('de-DE')} VNĐ`;
     };
     
     const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value;
-        const numericValue = parseInt(rawValue.replace(/,/g, ''), 10) || 0;
-
+        const numericValue = parseInt(rawValue.replace(/[,.]/g, ''), 10) || 0;
+    
         let jpyValue;
         if (salaryCurrency === 'VND') {
             jpyValue = Math.round(numericValue / JPY_VND_RATE);
-        } else { // JPY
+        } else {
             jpyValue = numericValue;
         }
-        
-        // Clamp the value to the max limit
+    
         if (jpyValue > salaryProps.max) {
             jpyValue = salaryProps.max;
         }
-
+    
         handleTempChange('aspirations', 'desiredSalary', String(jpyValue));
     };
 
@@ -920,7 +918,9 @@ export default function CandidateProfilePage() {
         if (isNaN(jpyValue)) return '';
 
         const displayValue = salaryCurrency === 'VND' ? jpyValue * JPY_VND_RATE : jpyValue;
-        return displayValue.toLocaleString('en-US');
+        
+        const locale = salaryCurrency === 'VND' ? 'de-DE' : 'en-US';
+        return displayValue.toLocaleString(locale);
     };
 
     const showCurrencyToggle = ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đi mới', 'Kỹ sư, tri thức đầu Việt'].includes(tempCandidate.aspirations?.desiredVisaDetail || '');
@@ -1758,3 +1758,5 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+    
