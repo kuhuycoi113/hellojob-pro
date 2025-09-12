@@ -296,6 +296,10 @@ const EditDialog = ({
         if (section === 'aspirations' && field === 'desiredVisaType') {
             newCandidate.aspirations!.desiredVisaDetail = '';
             newCandidate.desiredIndustry = ''; // Also reset industry
+            newCandidate.aspirations!.desiredJobDetail = ''; // Also reset job detail
+        }
+        if (section === 'aspirations' && field === 'desiredIndustry') {
+            newCandidate.aspirations!.desiredJobDetail = ''; // Also reset job detail
         }
       } else if (section === 'documents') {
           const [docType, index, value] = args;
@@ -859,6 +863,9 @@ export default function CandidateProfilePage() {
       ? industriesByJobType[tempCandidate.aspirations.desiredVisaType as keyof typeof industriesByJobType] || []
       : allIndustries;
       
+    const selectedIndustryData = allIndustries.find(ind => ind.name === tempCandidate.desiredIndustry);
+    const availableJobDetails = selectedIndustryData ? selectedIndustryData.keywords : [];
+      
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -881,7 +888,7 @@ export default function CandidateProfilePage() {
             </div>
             <div className="space-y-2">
               <Label>Ngành nghề mong muốn</Label>
-              <Select value={tempCandidate.desiredIndustry} onValueChange={value => handleTempChange('desiredIndustry', value)} disabled={!tempCandidate.aspirations?.desiredVisaType}>
+              <Select value={tempCandidate.desiredIndustry} onValueChange={value => handleTempChange('aspirations', 'desiredIndustry', value)} disabled={!tempCandidate.aspirations?.desiredVisaType}>
                 <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
                 <SelectContent>
                   {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
@@ -889,8 +896,25 @@ export default function CandidateProfilePage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Công việc chi tiết mong muốn</Label>
-              <Input value={tempCandidate.aspirations?.desiredJobDetail || ''} onChange={e => handleTempChange('aspirations', 'desiredJobDetail', e.target.value)} />
+                <Label>Công việc chi tiết mong muốn</Label>
+                <Select
+                    value={tempCandidate.aspirations?.desiredJobDetail || ''}
+                    onValueChange={value => handleTempChange('aspirations', 'desiredJobDetail', value)}
+                    disabled={!tempCandidate.desiredIndustry || availableJobDetails.length === 0}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Chọn công việc chi tiết" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {availableJobDetails.length > 0 ? (
+                            availableJobDetails.map(job => (
+                                <SelectItem key={job} value={job}>{job}</SelectItem>
+                            ))
+                        ) : (
+                            <SelectItem value="none" disabled>Không có lựa chọn</SelectItem>
+                        )}
+                    </SelectContent>
+                </Select>
             </div>
             <div className="space-y-2">
                 <Label>Địa điểm mong muốn</Label>
@@ -1652,4 +1676,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-
