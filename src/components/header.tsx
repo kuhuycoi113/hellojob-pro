@@ -74,6 +74,7 @@ export function Header() {
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
 
 
   useEffect(() => {
@@ -122,6 +123,7 @@ export function Header() {
   };
   
     const handleCreateDetailedProfile = (method: 'ai' | 'manual') => {
+        setIsCreateDetailOpen(false);
         setIsDialogOpen(false);
         if (method === 'ai') {
             router.push('/ai-profile');
@@ -169,7 +171,7 @@ export function Header() {
             <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
             <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
         </Card>
-        <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+        <Card onClick={() => setIsCreateDetailOpen(true)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
             <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
             <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
@@ -498,6 +500,18 @@ export function Header() {
             <AlertDialogAction onClick={handleConfirmLogin}>
                 Đồng ý
             </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+     <AlertDialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleCreateDetailedProfile('manual')}>Thủ công</AlertDialogAction>
+                <AlertDialogAction onClick={() => handleCreateDetailedProfile('ai')}>Dùng AI</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

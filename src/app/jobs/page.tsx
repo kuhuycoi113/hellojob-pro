@@ -63,6 +63,8 @@ const EmptyProfileView = () => {
     const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
     const { isLoggedIn } = useAuth();
+    const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
+
 
     const handleQuickCreateClick = () => {
         setProfileCreationStep(1); 
@@ -110,7 +112,8 @@ const EmptyProfileView = () => {
     };
 
     const handleCreateDetailedProfile = (method: 'ai' | 'manual') => {
-        setIsDialogOpen(false);
+        setIsCreateDetailOpen(false); // Close the selection dialog
+        setIsDialogOpen(false); // Close the main dialog
         if (method === 'ai') {
             router.push('/ai-profile');
         } else {
@@ -133,7 +136,7 @@ const EmptyProfileView = () => {
                 <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
                 <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
             </Card>
-            <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+             <Card onClick={() => setIsCreateDetailOpen(true)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
                 <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
                 <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
                 <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
@@ -349,6 +352,18 @@ const EmptyProfileView = () => {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <AlertDialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</AlertDialogTitle>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleCreateDetailedProfile('manual')}>Thủ công</AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleCreateDetailedProfile('ai')}>Dùng AI</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     )
 };
@@ -480,7 +495,7 @@ const LoggedInView = () => {
                                 <Badge>{isLoadingSuggestions ? '...' : suggestedJobs.length}</Badge>
                             </div>
                         </AccordionTrigger>
-                        <Button variant="ghost" size="icon" className="ml-auto h-7 w-7 flex-shrink-0" onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}>
+                         <Button variant="ghost" size="icon" className="ml-auto h-7 w-7 flex-shrink-0" onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}>
                             <Pencil className="h-4 w-4"/>
                         </Button>
                     </div>
