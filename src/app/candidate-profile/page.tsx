@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon, Ruler } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -1197,6 +1197,17 @@ export default function CandidateProfilePage() {
           </Popover>
         </div>
         <div className="space-y-2">
+          <Label>Giới tính</Label>
+          <Select value={tempCandidate.personalInfo.gender || ''} onValueChange={value => handleTempChange('personalInfo', 'gender', value)}>
+            <SelectTrigger><SelectValue placeholder="Chọn giới tính" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Nam">Nam</SelectItem>
+              <SelectItem value="Nữ">Nữ</SelectItem>
+              <SelectItem value="Khác">Khác</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
           <div className="flex justify-between items-center">
             <Label>Chiều cao (cm)</Label>
             <span className="text-sm font-semibold text-primary">{height} cm</span>
@@ -1912,6 +1923,7 @@ export default function CandidateProfilePage() {
     
 
     
+
 
 
 
