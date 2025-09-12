@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -874,51 +875,49 @@ export default function CandidateProfilePage() {
     const selectedIndustryData = availableIndustries.find(ind => ind.name === tempCandidate.desiredIndustry);
     const availableJobDetails = selectedIndustryData ? selectedIndustryData.keywords : [];
 
-    const salaryRanges: {[key: string]: {min: number, max: number}} = {
-      'Thực tập sinh kỹ năng': { min: 120000, max: 500000 },
-      'Kỹ năng đặc định': { min: 150000, max: 1500000 },
-      'Kỹ sư, tri thức': { min: 160000, max: 10000000 },
+    const salaryRanges: { [key: string]: { min: number; max: number } } = {
+        'Thực tập sinh kỹ năng': { min: 120000, max: 500000 },
+        'Kỹ năng đặc định': { min: 150000, max: 1500000 },
+        'Kỹ sư, tri thức': { min: 160000, max: 10000000 },
     };
-    
-    const salaryProps = tempCandidate.aspirations?.desiredVisaType 
-      ? salaryRanges[tempCandidate.aspirations.desiredVisaType]
-      : { min: 100000, max: 10000000 };
+
+    const salaryProps = tempCandidate.aspirations?.desiredVisaType
+        ? salaryRanges[tempCandidate.aspirations.desiredVisaType]
+        : { min: 100000, max: 10000000 };
 
     const getPlaceholder = (currency: 'JPY' | 'VND') => {
+        const { min, max } = salaryProps;
         if (currency === 'JPY') {
-            return `${salaryProps.min.toLocaleString('en-US')} - ${salaryProps.max.toLocaleString('en-US')} yên`;
+            return `${min.toLocaleString('en-US')} - ${max.toLocaleString('en-US')} yên`;
         }
-        return `${(salaryProps.min * JPY_VND_RATE).toLocaleString('en-US')} - ${(salaryProps.max * JPY_VND_RATE).toLocaleString('en-US')} VNĐ`;
+        return `${(min * JPY_VND_RATE).toLocaleString('en-US')} - ${(max * JPY_VND_RATE).toLocaleString('en-US')} VNĐ`;
     };
 
     const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value.replace(/,/g, '');
-        const numericValue = parseInt(rawValue, 10);
-        
-        if (isNaN(numericValue)) {
-            handleTempChange('aspirations', 'desiredSalary', '');
-            return;
+        if (rawValue === '' || /^\d+$/.test(rawValue)) {
+            let numericValue = parseInt(rawValue, 10);
+            if (isNaN(numericValue)) numericValue = 0;
+
+            let jpyValue = salaryCurrency === 'VND' ? Math.round(numericValue / JPY_VND_RATE) : numericValue;
+            
+            // Do not cap the value while typing, only format it.
+            // Capping will be handled on blur or save if necessary.
+            
+            handleTempChange('aspirations', 'desiredSalary', String(jpyValue || ''));
         }
-
-        let jpyValue = salaryCurrency === 'VND' ? Math.round(numericValue / JPY_VND_RATE) : numericValue;
-
-        // Ensure the JPY value does not exceed the max for the visa type
-        if (salaryProps.max && jpyValue > salaryProps.max) {
-           jpyValue = salaryProps.max;
-        }
-
-        handleTempChange('aspirations', 'desiredSalary', String(jpyValue));
     };
 
     const getDisplaySalary = () => {
-        const jpyValue = parseInt(tempCandidate.aspirations?.desiredSalary || '', 10);
-        if (isNaN(jpyValue)) return '';
+        const jpyValueStr = tempCandidate.aspirations?.desiredSalary;
+        if (!jpyValueStr) return '';
         
-        if (salaryCurrency === 'VND') {
-            return (jpyValue * JPY_VND_RATE).toLocaleString('en-US');
-        }
-        return jpyValue.toLocaleString('en-US');
-    }
+        const jpyValue = parseInt(jpyValueStr, 10);
+        if (isNaN(jpyValue)) return '';
+
+        const displayValue = salaryCurrency === 'VND' ? jpyValue * JPY_VND_RATE : jpyValue;
+        return displayValue.toLocaleString('en-US');
+    };
 
     const toggleCurrency = () => {
         setSalaryCurrency(prev => prev === 'JPY' ? 'VND' : 'JPY');
@@ -1753,4 +1752,3 @@ export default function CandidateProfilePage() {
   );
 }
 
-    
