@@ -867,6 +867,16 @@ export default function CandidateProfilePage() {
       
     const selectedIndustryData = availableIndustries.find(ind => ind.name === tempCandidate.desiredIndustry);
     const availableJobDetails = selectedIndustryData ? selectedIndustryData.keywords : [];
+
+    const salaryRanges: {[key: string]: {min: number, max: number, placeholder: string}} = {
+      'Thực tập sinh kỹ năng': { min: 120000, max: 500000, placeholder: '120,000 - 500,000 yên' },
+      'Kỹ năng đặc định': { min: 150000, max: 1500000, placeholder: '150,000 - 1,500,000 yên' },
+      'Kỹ sư, tri thức': { min: 160000, max: 10000000, placeholder: '160,000 - 10,000,000 yên' },
+    };
+    
+    const salaryProps = tempCandidate.aspirations?.desiredVisaType 
+      ? salaryRanges[tempCandidate.aspirations.desiredVisaType]
+      : { min: 100000, max: 10000000, placeholder: 'Nhập mức lương mong muốn' };
       
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -939,7 +949,14 @@ export default function CandidateProfilePage() {
             </div>
             <div className="space-y-2">
               <Label>Lương cơ bản mong muốn/tháng</Label>
-              <Input value={tempCandidate.aspirations?.desiredSalary} onChange={e => handleTempChange('aspirations', 'desiredSalary', e.target.value)} />
+              <Input 
+                type="number"
+                value={tempCandidate.aspirations?.desiredSalary} 
+                onChange={e => handleTempChange('aspirations', 'desiredSalary', e.target.value)}
+                min={salaryProps.min}
+                max={salaryProps.max}
+                placeholder={salaryProps.placeholder}
+              />
             </div>
             <div className="space-y-2">
               <Label>Thực lĩnh mong muốn</Label>
