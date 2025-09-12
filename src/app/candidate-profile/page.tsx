@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -25,6 +25,14 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { vi } from 'date-fns/locale';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from '@/components/ui/textarea';
@@ -283,7 +291,7 @@ const EditDialog = ({
   };
 
   const handleTempChange = (
-    section: keyof EnrichedCandidateProfile,
+    section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
     ...args: any[]
   ) => {
     setTempCandidate(prev => {
@@ -869,8 +877,9 @@ export default function CandidateProfilePage() {
     
     const [basicSalaryCurrency, setBasicSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
     const [netSalaryCurrency, setNetSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
-    const [financialAbilityCurrency, setFinancialAbilityCurrency] = useState<'JPY' | 'VND'>('JPY');
-    const JPY_VND_RATE = 180;
+    const [financialAbilityCurrency, setFinancialAbilityCurrency] = useState<'JPY' | 'VND'>('USD');
+    const JPY_VND_RATE = 165;
+    const USD_VND_RATE = 25000;
   
     const availableIndustries = tempCandidate.aspirations?.desiredVisaType
       ? industriesByJobType[tempCandidate.aspirations.desiredVisaType as keyof typeof industriesByJobType] || allIndustries
@@ -879,58 +888,41 @@ export default function CandidateProfilePage() {
     const selectedIndustryData = availableIndustries.find(ind => ind.name === tempCandidate.desiredIndustry);
     const availableJobDetails = selectedIndustryData ? selectedIndustryData.keywords : [];
 
-    const salaryRanges: { [key: string]: { min: number; max: number } } = {
-        'Thực tập sinh kỹ năng': { min: 120000, max: 500000 },
-        'Kỹ năng đặc định': { min: 150000, max: 1500000 },
-        'Kỹ sư, tri thức': { min: 160000, max: 10000000 },
-    };
-
-    const salaryProps = tempCandidate.aspirations?.desiredVisaType
-        ? salaryRanges[tempCandidate.aspirations.desiredVisaType]
-        : { min: 100000, max: 10000000 };
-    
-    const financialAbilityRanges: { [key: string]: { min: number; max: number } } = {
-        'Thực tập sinh 3 năm': { min: 0, max: 4000 },
-        'Thực tập sinh 1 năm': { min: 0, max: 2000 },
-        'Thực tập sinh 3 Go': { min: 0, max: 2000 },
-        'Đặc định đầu Việt': { min: 0, max: 2000 },
-        'Đặc định đi mới': { min: 0, max: 2000 },
-        'Kỹ sư, tri thức đầu Việt': { min: 0, max: 2000 },
-        'Kỹ năng đặc định đầu Nhật': { min: 0, max: 0 },
-        'Kỹ sư, tri thức đầu Nhật': { min: 0, max: 0 },
-    };
-
-    const getPlaceholder = (field: 'basic' | 'net' | 'financial', currency: 'JPY' | 'VND') => {
+    const getPlaceholder = (field: 'basic' | 'net' | 'financial', currency: 'JPY' | 'VND' | 'USD') => {
       let range;
-      let jpyRate = 1;
+      let rate = 1;
       let currencySymbol = 'yên';
       let locale = 'ja-JP';
 
-      if (currency === 'VND') {
-        jpyRate = JPY_VND_RATE;
-        currencySymbol = 'VNĐ';
-        locale = 'de-DE';
-      }
-
       if (field === 'financial') {
-        range = financialAbilityRanges[tempCandidate.aspirations?.desiredVisaDetail || ''] || { min: 0, max: 4000 };
-        currencySymbol = currency === 'JPY' ? '$' : 'VNĐ';
-        jpyRate = currency === 'JPY' ? 1 : 25000; // Assuming 1 USD = 25000 VND
+        range = {min: 0, max: 4000};
+        rate = currency === 'USD' ? 1 : USD_VND_RATE;
+        currencySymbol = currency === 'USD' ? '$' : 'VNĐ';
+        locale = currency === 'USD' ? 'en-US' : 'vi-VN';
       } else {
-        const { min, max } = salaryProps;
+        const salaryRanges: { [key: string]: { min: number; max: number } } = {
+          'Thực tập sinh kỹ năng': { min: 120000, max: 500000 },
+          'Kỹ năng đặc định': { min: 150000, max: 1500000 },
+          'Kỹ sư, tri thức': { min: 160000, max: 10000000 },
+          'Default': { min: 100000, max: 10000000 }
+        };
+        const { min, max } = salaryRanges[tempCandidate.aspirations?.desiredVisaType || 'Default'];
         range = {
             min: field === 'basic' ? min : Math.floor(min * 0.8),
             max: field === 'basic' ? max : Math.floor(max * 0.85),
         };
+        rate = currency === 'JPY' ? 1 : JPY_VND_RATE;
+        currencySymbol = currency === 'JPY' ? 'yên' : 'VNĐ';
+        locale = currency === 'JPY' ? 'ja-JP' : 'vi-VN';
       }
       
-      const minDisplay = (range.min * jpyRate).toLocaleString(locale).replace(/,/g, '.');
-      const maxDisplay = (range.max * jpyRate).toLocaleString(locale).replace(/,/g, '.');
+      const minDisplay = (range.min * rate).toLocaleString(locale);
+      const maxDisplay = (range.max * rate).toLocaleString(locale);
 
       return `${minDisplay} - ${maxDisplay} ${currencySymbol}`;
     };
 
-    const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND') => {
+    const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND' | 'USD') => {
         const rawValue = e.target.value;
         const numericValue = parseInt(rawValue.replace(/[,.]/g, ''), 10);
 
@@ -939,37 +931,55 @@ export default function CandidateProfilePage() {
             return;
         }
 
-        let valueInYen = currency === 'VND' ? Math.round(numericValue / JPY_VND_RATE) : numericValue;
-        
-        const { max } = salaryProps;
-        if (field !== 'financialAbility' && valueInYen > max) {
-            valueInYen = max;
+        let valueInYen;
+        if (field === 'financialAbility') {
+            valueInYen = currency === 'VND' ? Math.round(numericValue / USD_VND_RATE) : numericValue;
+        } else {
+            valueInYen = currency === 'VND' ? Math.round(numericValue / JPY_VND_RATE) : numericValue;
         }
-
+        
         handleTempChange('aspirations', field, String(valueInYen));
     };
 
-    const getDisplayValue = (field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND') => {
+    const getDisplayValue = (field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND' | 'USD') => {
         const rawValue = tempCandidate.aspirations?.[field];
         if (!rawValue || isNaN(parseInt(rawValue, 10))) return '';
         
         const numericValue = parseInt(rawValue, 10);
-        const displayValue = currency === 'VND' ? Math.round(numericValue * JPY_VND_RATE) : numericValue;
+        let displayValue;
+        let locale;
+
+        if (field === 'financialAbility') {
+             displayValue = currency === 'VND' ? Math.round(numericValue * USD_VND_RATE) : numericValue;
+             locale = currency === 'VND' ? 'vi-VN' : 'en-US';
+        } else {
+            displayValue = currency === 'VND' ? Math.round(numericValue * JPY_VND_RATE) : numericValue;
+            locale = currency === 'VND' ? 'vi-VN' : 'ja-JP';
+        }
         
-        return displayValue.toLocaleString(currency === 'VND' ? 'de-DE' : 'ja-JP').replace(/\./g, ',');
+        return displayValue.toLocaleString(locale);
     }
     
-    const getConvertedSalaryDisplay = (field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND') => {
+    const getConvertedSalaryDisplay = (field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND' | 'USD') => {
         const rawValue = tempCandidate.aspirations?.[field];
         if (!rawValue) return '';
         let numericValue = parseInt(rawValue, 10);
         if (isNaN(numericValue)) return '';
 
-        let rate = JPY_VND_RATE;
-        const targetCurrency = currency === 'JPY' ? 'VND' : 'JPY';
-        const locale = targetCurrency === 'VND' ? 'de-DE' : 'ja-JP';
-        const currencySymbol = targetCurrency === 'VND' ? 'VNĐ' : 'yên';
+        let rate, targetCurrency, locale, currencySymbol;
 
+        if (field === 'financialAbility') {
+            rate = USD_VND_RATE;
+            targetCurrency = currency === 'USD' ? 'VND' : 'USD';
+            locale = targetCurrency === 'VND' ? 'vi-VN' : 'en-US';
+            currencySymbol = targetCurrency === 'VND' ? 'VNĐ' : '$';
+        } else {
+            rate = JPY_VND_RATE;
+            targetCurrency = currency === 'JPY' ? 'VND' : 'JPY';
+            locale = targetCurrency === 'VND' ? 'vi-VN' : 'ja-JP';
+            currencySymbol = targetCurrency === 'VND' ? 'VNĐ' : 'yên';
+        }
+        
         const convertedValue = targetCurrency === 'VND' ? Math.round(numericValue * rate) : Math.round(numericValue / rate);
         
         return `≈ ${convertedValue.toLocaleString(locale)} ${currencySymbol}`;
@@ -1052,7 +1062,7 @@ export default function CandidateProfilePage() {
                 <div className="flex items-center gap-2">
                     <Input
                         id="desired-salary"
-                        type="number"
+                        type="text"
                         value={getDisplayValue('desiredSalary', basicSalaryCurrency)}
                         onChange={(e) => handleSalaryChange(e, 'desiredSalary', basicSalaryCurrency)}
                         placeholder={getPlaceholder('basic', basicSalaryCurrency)}
@@ -1073,7 +1083,7 @@ export default function CandidateProfilePage() {
                 <div className="flex items-center gap-2">
                     <Input
                         id="desired-net-salary"
-                        type="number"
+                        type="text"
                         value={getDisplayValue('desiredNetSalary', netSalaryCurrency)}
                         onChange={(e) => handleSalaryChange(e, 'desiredNetSalary', netSalaryCurrency)}
                         placeholder={getPlaceholder('net', netSalaryCurrency)}
@@ -1095,15 +1105,15 @@ export default function CandidateProfilePage() {
                     <div className="flex items-center gap-2">
                         <Input
                             id="financial-ability"
-                            type="number"
+                            type="text"
                             value={getDisplayValue('financialAbility', financialAbilityCurrency)}
                             onChange={(e) => handleSalaryChange(e, 'financialAbility', financialAbilityCurrency)}
                             placeholder={getPlaceholder('financial', financialAbilityCurrency)}
                             className="flex-grow"
                         />
-                         <Select value={financialAbilityCurrency} onValueChange={(value) => setFinancialAbilityCurrency(value as 'JPY' | 'VND')}>
+                         <Select value={financialAbilityCurrency} onValueChange={(value) => setFinancialAbilityCurrency(value as 'USD' | 'VND')}>
                             <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
-                            <SelectContent><SelectItem value="JPY">USD</SelectItem><SelectItem value="VND">VNĐ</SelectItem></SelectContent>
+                            <SelectContent><SelectItem value="USD">USD</SelectItem><SelectItem value="VND">VNĐ</SelectItem></SelectContent>
                         </Select>
                     </div>
                      {tempCandidate.aspirations?.financialAbility && (
@@ -1155,7 +1165,36 @@ export default function CandidateProfilePage() {
         </div>
         <div className="space-y-2">
           <Label>Ngày sinh</Label>
-          <Input type="date" value={tempCandidate.personalInfo.dateOfBirth?.split('T')[0]} onChange={e => handleTempChange('personalInfo', 'dateOfBirth', e.target.value)} />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {tempCandidate.personalInfo.dateOfBirth ? (
+                  format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
+                ) : (
+                  <span>Chọn ngày sinh</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                locale={vi}
+                selected={tempCandidate.personalInfo.dateOfBirth ? new Date(tempCandidate.personalInfo.dateOfBirth) : undefined}
+                onSelect={(date) => handleTempChange('personalInfo', 'dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '')}
+                initialFocus
+                captionLayout="dropdown-buttons"
+                fromYear={1950}
+                toYear={new Date().getFullYear() - 16}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="space-y-2">
           <div className="flex justify-between items-center">
@@ -1721,7 +1760,7 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
-                    <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth}</p>
+                    <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : 'Chưa cập nhật'}</p>
                     <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender}</p>
                     <p><strong>{t.height}:</strong> {candidate.personalInfo.height} cm</p>
                     <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight} kg</p>
@@ -1873,6 +1912,7 @@ export default function CandidateProfilePage() {
     
 
     
+
 
 
 
