@@ -66,45 +66,40 @@ const EmptyProfileView = () => {
     const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
 
 
-    const handleQuickCreateClick = () => {
-        setProfileCreationStep(1); 
-        setIsDialogOpen(true);
-    };
-
     const handleCreateProfileRedirect = () => {
-        const preferences = { 
-            desiredVisaType: selectedVisaType, 
-            desiredVisaDetail: selectedVisaDetail, 
-            desiredIndustry: selectedIndustry?.name,
-            desiredLocation: selectedRegion 
+        const preferences = {
+          desiredVisaType: selectedVisaType || undefined,
+          desiredVisaDetail: selectedVisaDetail || undefined,
+          desiredIndustry: selectedIndustry?.name || undefined,
+          desiredLocation: selectedRegion || undefined,
         };
-        
+    
         if (isLoggedIn) {
-            console.log("Applying preferences for logged in user:", preferences);
-            // Directly update localStorage profile
-            const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
-            let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
-            profile = {
-                ...profile,
-                desiredIndustry: preferences.desiredIndustry,
-                aspirations: {
-                    ...profile.aspirations,
-                    desiredVisaType: preferences.desiredVisaType,
-                    desiredVisaDetail: preferences.desiredVisaDetail,
-                    desiredLocation: preferences.desiredLocation,
-                }
-            };
-            localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+          console.log("Applying preferences for logged in user:", preferences);
+          const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
+          let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
+          
+          const updatedAspirations = { ...profile.aspirations };
+          if (preferences.desiredVisaType) updatedAspirations.desiredVisaType = preferences.desiredVisaType;
+          if (preferences.desiredVisaDetail) updatedAspirations.desiredVisaDetail = preferences.desiredVisaDetail;
+          if (preferences.desiredLocation) updatedAspirations.desiredLocation = preferences.desiredLocation;
 
-            setIsDialogOpen(false);
-            router.push('/jobs?highlight=suggested');
+          profile = {
+            ...profile,
+            aspirations: updatedAspirations,
+          };
+          if (preferences.desiredIndustry) profile.desiredIndustry = preferences.desiredIndustry;
+    
+          localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+          setIsDialogOpen(false);
+          router.push('/jobs?highlight=suggested');
         } else {
-            sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
-            sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
-            setIsDialogOpen(false); // Close the current dialog
-            setIsConfirmLoginOpen(true);
+          sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
+          sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
+          setIsDialogOpen(false);
+          setIsConfirmLoginOpen(true);
         }
-    };
+      };
     
     const handleConfirmLogin = () => {
         setIsConfirmLoginOpen(false);
@@ -327,12 +322,34 @@ const EmptyProfileView = () => {
                            {renderDialogContent()}
                         </DialogContent>
                     </Dialog>
-                    <Button asChild variant="default" onClick={() => setIsCreateDetailOpen(true)}>
-                        <div className="cursor-pointer inline-flex items-center justify-center gap-2">
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Tạo hồ sơ chi tiết
-                        </div>
-                    </Button>
+                    <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="default">
+                                <PlusCircle className="mr-2 h-4 w-4" />
+                                Tạo hồ sơ chi tiết
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-xl">
+                            <DialogHeader>
+                                <DialogTitle className="text-2xl font-headline text-center">Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</DialogTitle>
+                            </DialogHeader>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                                <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                                    <Sparkles className="h-8 w-8 text-primary mx-auto mb-2" />
+                                    <h3 className="font-bold text-base mb-1">Dùng AI</h3>
+                                    <p className="text-muted-foreground text-xs">Tải lên CV, AI sẽ tự động điền thông tin.</p>
+                                </Card>
+                                <Card onClick={() => handleCreateDetailedProfile('manual')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                                    <Pencil className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                                    <h3 className="font-bold text-base mb-1">Thủ công</h3>
+                                    <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
+                                </Card>
+                            </div>
+                             <div className="mt-4 text-center">
+                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
              <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
@@ -352,28 +369,6 @@ const EmptyProfileView = () => {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
-                 <DialogContent className="sm:max-w-xl">
-                    <DialogHeader>
-                        <DialogTitle className="text-2xl font-headline text-center">Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                        <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                            <Sparkles className="h-8 w-8 text-primary mx-auto mb-2" />
-                            <h3 className="font-bold text-base mb-1">Dùng AI</h3>
-                            <p className="text-muted-foreground text-xs">Tải lên CV, AI sẽ tự động điền thông tin.</p>
-                        </Card>
-                        <Card onClick={() => handleCreateDetailedProfile('manual')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                            <Pencil className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                            <h3 className="font-bold text-base mb-1">Thủ công</h3>
-                            <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
-                        </Card>
-                    </div>
-                    <div className="mt-4 text-center">
-                        <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
         </>
     )
 };
@@ -685,7 +680,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.label} value={vd.label}>{vd.label}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>

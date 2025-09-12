@@ -83,37 +83,37 @@ export function Header() {
 
 
   const handleCreateProfileRedirect = () => {
-    const preferences = { 
-        desiredVisaType: selectedVisaType, 
-        desiredVisaDetail: selectedVisaDetail, 
-        desiredIndustry: selectedIndustry?.name,
-        desiredLocation: selectedRegion 
+    const preferences = {
+      desiredVisaType: selectedVisaType || undefined,
+      desiredVisaDetail: selectedVisaDetail || undefined,
+      desiredIndustry: selectedIndustry?.name || undefined,
+      desiredLocation: selectedRegion || undefined,
     };
 
     if (isLoggedIn) {
-        console.log("Applying preferences for logged in user:", preferences);
-        // Directly update localStorage profile
-        const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
-        let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
-        profile = {
-            ...profile,
-            desiredIndustry: preferences.desiredIndustry,
-            aspirations: {
-                ...profile.aspirations,
-                desiredVisaType: preferences.desiredVisaType,
-                desiredVisaDetail: preferences.desiredVisaDetail,
-                desiredLocation: preferences.desiredLocation,
-            }
-        };
-        localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+      console.log("Applying preferences for logged in user:", preferences);
+      const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
+      let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
+      
+      const updatedAspirations = { ...profile.aspirations };
+      if (preferences.desiredVisaType) updatedAspirations.desiredVisaType = preferences.desiredVisaType;
+      if (preferences.desiredVisaDetail) updatedAspirations.desiredVisaDetail = preferences.desiredVisaDetail;
+      if (preferences.desiredLocation) updatedAspirations.desiredLocation = preferences.desiredLocation;
 
-        setIsDialogOpen(false);
-        router.push('/jobs?highlight=suggested');
+      profile = {
+        ...profile,
+        aspirations: updatedAspirations,
+      };
+      if (preferences.desiredIndustry) profile.desiredIndustry = preferences.desiredIndustry;
+
+      localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+      setIsDialogOpen(false);
+      router.push('/jobs?highlight=suggested');
     } else {
-        sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
-        sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
-        setIsDialogOpen(false); // Close the current dialog
-        setIsConfirmLoginOpen(true);
+      sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
+      sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
+      setIsDialogOpen(false);
+      setIsConfirmLoginOpen(true);
     }
   };
 
