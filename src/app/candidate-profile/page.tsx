@@ -865,6 +865,7 @@ export default function CandidateProfilePage() {
   );
 
   const renderAspirationsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
+    
     const [basicSalaryCurrency, setBasicSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
     const [netSalaryCurrency, setNetSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
     const [financialAbilityCurrency, setFinancialAbilityCurrency] = useState<'JPY' | 'VND'>('JPY');
@@ -954,7 +955,7 @@ export default function CandidateProfilePage() {
         const numericValue = parseInt(rawValue, 10);
         const displayValue = currency === 'VND' ? Math.round(numericValue * JPY_VND_RATE) : numericValue;
         
-        return displayValue.toLocaleString(currency === 'VND' ? 'de-DE' : 'ja-JP');
+        return displayValue.toLocaleString(currency === 'VND' ? 'de-DE' : 'ja-JP').replace(/\./g, ',');
     }
     
     const getConvertedSalaryDisplay = (field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND') => {
@@ -1046,22 +1047,22 @@ export default function CandidateProfilePage() {
             <div />
             
             <div className="space-y-2">
-                <Label htmlFor="desired-salary">Lương cơ bản mong muốn/tháng</Label>
-                <div className="flex items-center gap-2">
-                    <Input
-                        id="desired-salary"
-                        type="number"
-                        value={tempCandidate.aspirations?.desiredSalary}
-                        onChange={(e) => handleSalaryChange(e, 'desiredSalary', 'JPY')}
-                        placeholder={getPlaceholder('basic', 'JPY')}
-                        className="flex-grow"
-                    />
-                </div>
-                 {tempCandidate.aspirations?.desiredSalary && (
-                    <p className="text-xs text-muted-foreground">
-                        {getConvertedSalaryDisplay('desiredSalary', 'JPY')}
-                    </p>
-                )}
+              <Label htmlFor="desired-salary">Lương cơ bản mong muốn/tháng</Label>
+              <div className="flex items-center gap-2">
+                  <Input
+                      id="desired-salary"
+                      type="number"
+                      value={tempCandidate.aspirations?.desiredSalary}
+                      onChange={(e) => handleSalaryChange(e, 'desiredSalary', 'JPY')}
+                      placeholder={getPlaceholder('basic', 'JPY')}
+                      className="flex-grow"
+                  />
+              </div>
+               {tempCandidate.aspirations?.desiredSalary && (
+                  <p className="text-xs text-muted-foreground">
+                      {getConvertedSalaryDisplay('desiredSalary', 'JPY')}
+                  </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -1083,24 +1084,26 @@ export default function CandidateProfilePage() {
                 )}
             </div>
             
-            <div className="space-y-2">
-                <Label htmlFor="financial-ability">Khả năng tài chính</Label>
-                <div className="flex items-center gap-2">
-                    <Input
-                        id="financial-ability"
-                        type="number"
-                        value={tempCandidate.aspirations?.financialAbility}
-                        onChange={(e) => handleSalaryChange(e, 'financialAbility', 'JPY')}
-                        placeholder={getPlaceholder('financial', 'JPY')}
-                        className="flex-grow"
-                    />
+            {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(tempCandidate.aspirations?.desiredVisaDetail || '') && (
+                <div className="space-y-2">
+                    <Label htmlFor="financial-ability">Khả năng tài chính</Label>
+                    <div className="flex items-center gap-2">
+                        <Input
+                            id="financial-ability"
+                            type="number"
+                            value={tempCandidate.aspirations?.financialAbility}
+                            onChange={(e) => handleSalaryChange(e, 'financialAbility', 'JPY')}
+                            placeholder={getPlaceholder('financial', 'JPY')}
+                            className="flex-grow"
+                        />
+                    </div>
+                     {tempCandidate.aspirations?.financialAbility && (
+                        <p className="text-xs text-muted-foreground">
+                            {getConvertedSalaryDisplay('financialAbility', 'JPY')}
+                        </p>
+                    )}
                 </div>
-                 {tempCandidate.aspirations?.financialAbility && (
-                    <p className="text-xs text-muted-foreground">
-                        {getConvertedSalaryDisplay('financialAbility', 'JPY')}
-                    </p>
-                )}
-            </div>
+            )}
 
             {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(tempCandidate.aspirations?.desiredVisaDetail || '') && (
               <div className="space-y-2">
@@ -1840,6 +1843,7 @@ export default function CandidateProfilePage() {
     
 
     
+
 
 
 
