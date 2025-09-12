@@ -472,16 +472,18 @@ const LoggedInView = () => {
                     "transition-all duration-1000 ease-out",
                     isHighlighted ? "ring-2 ring-offset-2 ring-yellow-400 shadow-2xl rounded-lg" : ""
                 )}>
-                    <AccordionTrigger className="bg-background px-6 rounded-t-lg font-semibold text-base hover:no-underline [&>svg]:ml-auto">
-                        <div className="flex items-center gap-3 w-full">
-                            <Star className="h-5 w-5 text-yellow-500" />
-                            <span>Gợi ý cho bạn</span>
-                            <Badge>{isLoadingSuggestions ? '...' : suggestedJobs.length}</Badge>
-                            <Button variant="ghost" size="icon" className="ml-auto h-7 w-7" onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}>
-                                <Pencil className="h-4 w-4"/>
-                            </Button>
-                        </div>
-                    </AccordionTrigger>
+                    <div className="flex items-center bg-background px-6 rounded-t-lg hover:no-underline">
+                        <AccordionTrigger className="flex-grow py-4 font-semibold text-base">
+                            <div className="flex items-center gap-3">
+                                <Star className="h-5 w-5 text-yellow-500" />
+                                <span>Gợi ý cho bạn</span>
+                                <Badge>{isLoadingSuggestions ? '...' : suggestedJobs.length}</Badge>
+                            </div>
+                        </AccordionTrigger>
+                        <Button variant="ghost" size="icon" className="ml-auto h-7 w-7 flex-shrink-0" onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}>
+                            <Pencil className="h-4 w-4"/>
+                        </Button>
+                    </div>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                        {isLoadingSuggestions ? (
                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
