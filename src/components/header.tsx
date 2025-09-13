@@ -454,7 +454,7 @@ export function Header() {
                 <>
                     {isLoggedIn ? (
                         <Link href="/candidate-profile" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                            <Avatar className="h-10 w-10 cursor-pointer">
+                            <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
                                 <AvatarImage src={"https://placehold.co/100x100.png" || undefined} alt="User Avatar" data-ai-hint="user avatar" />
                                 <AvatarFallback>A</AvatarFallback>
                             </Avatar>
