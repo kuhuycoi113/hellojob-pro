@@ -705,7 +705,7 @@ const LoggedInView = () => {
         </div>
         <ProfileViewersDialog isOpen={isViewersDialogOpen} onClose={() => setIsViewersDialogOpen(false)} />
         <Dialog open={isAspirationsDialogOpen} onOpenChange={setIsAspirationsDialogOpen}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Sửa điều kiện gợi ý</DialogTitle>
                     <DialogDescription>
