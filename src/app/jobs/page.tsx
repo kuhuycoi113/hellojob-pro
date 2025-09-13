@@ -25,7 +25,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AuthDialog } from '@/components/auth-dialog';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogClose, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
@@ -386,7 +386,7 @@ const LoggedInView = () => {
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
-    const [suggestionPrinciple, setSuggestionPrinciple] = useState('accurate');
+    const [suggestionPrinciple, setSuggestionPrinciple] = useState('salary');
     const [forceUpdate, setForceUpdate] = useState(0); 
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
@@ -803,7 +803,6 @@ const LoggedInView = () => {
                                 onClick={() => setSuggestionPrinciple('salary')}
                                 className="justify-start text-left h-auto py-2"
                             >
-                                <TrendingUp className="mr-2 text-green-500 flex-shrink-0" /> 
                                 <div>
                                     <p className="font-semibold">Lương tốt</p>
                                     <p className="text-xs opacity-80 font-normal">Ưu tiên việc có lương cao</p>
@@ -814,7 +813,6 @@ const LoggedInView = () => {
                                 onClick={() => setSuggestionPrinciple('fee')}
                                 className="justify-start text-left h-auto py-2"
                             >
-                                <ThumbsUp className="mr-2 text-blue-500 flex-shrink-0" />
                                  <div>
                                     <p className="font-semibold">{feeButtonText}</p>
                                     <p className="text-xs opacity-80 font-normal">Ưu tiên phí thấp / uy tín</p>
@@ -825,7 +823,6 @@ const LoggedInView = () => {
                                 onClick={() => setSuggestionPrinciple('company')}
                                 className="justify-start text-left h-auto py-2"
                             >
-                                <ShieldCheck className="mr-2 text-orange-500 flex-shrink-0" />
                                  <div>
                                     <p className="font-semibold">{companyButtonText}</p>
                                     <p className="text-xs opacity-80 font-normal">Ưu tiên công ty uy tín</p>
