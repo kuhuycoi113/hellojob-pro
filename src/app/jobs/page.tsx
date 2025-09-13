@@ -832,6 +832,9 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
                    if (userVisaDetail === "Kỹ sư, tri thức đầu Nhật") {
                        setFeeButtonText("Shokai uy tín");
                    }
+                   if (userVisaDetail === "Đặc định đầu Nhật") {
+                       setFeeButtonText("Shien uy tín");
+                   }
                 }
             }
         } catch (e) {
@@ -939,3 +942,5 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
