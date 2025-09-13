@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense, useCallback } from 'react';
+import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil, X, ThumbsUp, TrendingUp, ShieldCheck } from 'lucide-react';
@@ -802,7 +802,7 @@ function JobsDashboardPageContent() {
         <div className="container mx-auto px-2 md:px-4 py-8">
           {isLoggedIn ? <LoggedInView /> : <LoggedOutView />}
         </div>
-        <FloatingPrioritySelector />
+        {isLoggedIn && <FloatingPrioritySelector />}
       </div>
     );
 }
