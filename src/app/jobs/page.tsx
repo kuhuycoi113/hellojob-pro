@@ -388,7 +388,7 @@ const LoggedInView = () => {
 
     // Always keep the 'Gợi ý' accordion open and highlighted
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
-    const [isHighlighted, setIsHighlighted] = useState(true);
+    const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(true);
 
     const fetchSuggestedJobs = useCallback(async () => {
         setIsLoadingSuggestions(true);
@@ -478,7 +478,7 @@ const LoggedInView = () => {
             >
                 <AccordionItem value="item-1" className={cn(
                     "transition-all duration-1000 ease-out",
-                    isHighlighted ? "ring-2 ring-offset-2 ring-yellow-400 shadow-2xl rounded-lg" : ""
+                    isSuggestionHighlighted ? "ring-2 ring-offset-2 ring-yellow-400 shadow-2xl rounded-lg" : ""
                 )}>
                     <div className="flex items-center bg-background px-6 rounded-t-lg hover:no-underline">
                         <AccordionTrigger className="flex-grow py-4 font-semibold text-base">
@@ -488,7 +488,13 @@ const LoggedInView = () => {
                                 <Badge>{isLoadingSuggestions ? '...' : suggestedJobs.length}</Badge>
                             </div>
                         </AccordionTrigger>
-                         <Button variant="ghost" size="sm" className="ml-auto flex-shrink-0" onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}>
+                         <Button
+                            id="highlight-target-button"
+                            variant="default"
+                            size="sm"
+                            className="ml-auto flex-shrink-0 bg-primary text-primary-foreground transition-all duration-300"
+                            onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}
+                        >
                             Sửa gợi ý
                             <Pencil className="h-4 w-4 ml-2"/>
                         </Button>
@@ -669,7 +675,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.label} value={vd.label}>{vd.label}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -748,75 +754,66 @@ const LoggedOutView = () => {
     )
 }
 
-const FloatingPrioritySelector = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 2000); // Show after 2 seconds
-
-    const closeTimer = setTimeout(() => {
+const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+  
+    const handleClose = () => {
       setIsClosing(true);
-      const highlightButton = document.getElementById('highlight-target-button');
-      if (highlightButton) {
-        highlightButton.classList.add('animate-pulse', 'ring-2', 'ring-yellow-400');
-        setTimeout(() => {
-            highlightButton.classList.remove('animate-pulse', 'ring-2', 'ring-yellow-400');
-        }, 1500)
-      }
-    }, 7000); // Start closing after 7 seconds (2 to show + 5 to display)
-
-    const hideTimer = setTimeout(() => {
-        setIsVisible(false);
-    }, 7500); // Completely hide after animation
-
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(closeTimer);
-      clearTimeout(hideTimer);
+      onHighlight(); 
     };
-  }, []);
-
-  if (!isVisible) {
-    return null;
-  }
-
-  return (
-    <div
-        ref={cardRef}
+  
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 2000); // Show after 2 seconds
+  
+      const closeTimer = setTimeout(() => {
+        handleClose();
+      }, 7000); // Start closing after 7 seconds (2 to show + 5 to display)
+  
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(closeTimer);
+      };
+    }, []);
+  
+    if (!isVisible) {
+      return null;
+    }
+  
+    return (
+      <div
         className={cn(
-            "fixed bottom-24 left-4 z-50 transition-all duration-500",
-            isClosing ? "opacity-0 scale-50 -translate-y-1/2 translate-x-[20vw]" : "opacity-100 scale-100",
-            "animate-in slide-in-from-bottom"
+          "fixed bottom-24 left-4 z-50 transition-all duration-500",
+          isClosing 
+            ? "opacity-0 scale-50 translate-x-[70vw] -translate-y-[80vh]" 
+            : "opacity-100 scale-100",
+          "animate-in slide-in-from-bottom"
         )}
-    >
+      >
         <Card className="shadow-2xl w-full max-w-sm">
             <CardHeader className="pb-3">
                 <CardTitle className="text-base font-bold flex items-center justify-between">
                     <span>Bạn có muốn ưu tiên tìm việc theo?</span>
                     <Button
-                        ref={buttonRef}
                         variant="ghost"
                         size="icon"
                         className="h-6 w-6"
-                        onClick={() => setIsClosing(true)}
+                        onClick={handleClose}
                     >
                         <X className="h-4 w-4" />
                     </Button>
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
-                <Button variant="outline" className="justify-start" onClick={() => setIsClosing(true)}>
+                <Button variant="outline" className="justify-start" onClick={handleClose}>
                     <TrendingUp className="mr-2 text-green-500" /> Lương tốt
                 </Button>
-                <Button variant="outline" className="justify-start" onClick={() => setIsClosing(true)}>
+                <Button variant="outline" className="justify-start" onClick={handleClose}>
                     <ThumbsUp className="mr-2 text-blue-500" /> Phí thấp
                 </Button>
-                <Button variant="outline" className="justify-start" onClick={() => setIsClosing(true)}>
+                <Button variant="outline" className="justify-start" onClick={handleClose}>
                     <ShieldCheck className="mr-2 text-orange-500" /> Công ty uy tín
                 </Button>
             </CardContent>
@@ -829,13 +826,24 @@ const FloatingPrioritySelector = () => {
 function JobsDashboardPageContent() {
     const { role } = useAuth();
     const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
+    const [isHighlighting, setIsHighlighting] = useState(false);
+
+    const handleHighlight = () => {
+        const button = document.getElementById('highlight-target-button');
+        if (button) {
+            setIsHighlighting(true);
+            setTimeout(() => {
+                setIsHighlighting(false);
+            }, 1500); // Duration of the highlight effect
+        }
+    };
   
     return (
       <div className="bg-secondary min-h-screen">
         <div className="container mx-auto px-2 md:px-4 py-8">
           {isLoggedIn ? <LoggedInView /> : <LoggedOutView />}
         </div>
-        {role === 'candidate' && <FloatingPrioritySelector />}
+        {role === 'candidate' && <FloatingPrioritySelector onHighlight={handleHighlight} />}
       </div>
     );
 }
