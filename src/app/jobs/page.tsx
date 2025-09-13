@@ -286,7 +286,7 @@ const EmptyProfileView = () => {
                 </div>
                 <div className="flex justify-center items-center mt-4 gap-4">
                     <Button variant="link" onClick={() => setProfileCreationStep(4)}>Quay lại</Button>
-                    <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và xem việc phù hợp</Button>
+                    <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và xem việc làm phù hợp</Button>
                 </div>
             </>
         )
@@ -388,7 +388,7 @@ const LoggedInView = () => {
 
     // Always keep the 'Gợi ý' accordion open and highlighted
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
-    const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(true);
+    const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
 
     const fetchSuggestedJobs = useCallback(async () => {
         setIsLoadingSuggestions(true);
@@ -492,7 +492,10 @@ const LoggedInView = () => {
                             id="highlight-target-button"
                             variant="default"
                             size="sm"
-                            className="ml-auto flex-shrink-0 bg-primary text-primary-foreground transition-all duration-300"
+                            className={cn(
+                                "ml-auto flex-shrink-0 transition-all duration-300",
+                                isSuggestionHighlighted && "animate-pulse bg-primary/20"
+                            )}
                             onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}
                         >
                             Sửa gợi ý
@@ -770,12 +773,13 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
   
       const closeTimer = setTimeout(() => {
         handleClose();
-      }, 7000); // Start closing after 7 seconds (2 to show + 5 to display)
+      }, 5000); // Start closing after 5 seconds (2 to show + 3 to display)
   
       return () => {
         clearTimeout(timer);
         clearTimeout(closeTimer);
       };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
   
     if (!isVisible) {
@@ -785,9 +789,9 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
     return (
       <div
         className={cn(
-          "fixed bottom-24 left-4 z-50 transition-all duration-500",
+          "fixed bottom-24 left-4 z-50 transition-all duration-1000",
           isClosing 
-            ? "opacity-0 scale-50 translate-x-[70vw] -translate-y-[80vh]" 
+            ? "opacity-0 scale-0 translate-x-[70vw] -translate-y-[80vh]" 
             : "opacity-100 scale-100",
           "animate-in slide-in-from-bottom"
         )}
