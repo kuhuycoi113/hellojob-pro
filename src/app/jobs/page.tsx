@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -385,11 +386,14 @@ const LoggedInView = () => {
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
-    const [suggestionPrinciple, setSuggestionPrinciple] = useState('related');
+    const [suggestionPrinciple, setSuggestionPrinciple] = useState('accurate');
     const [forceUpdate, setForceUpdate] = useState(0); 
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
+
+    const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
+    const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
 
     useEffect(() => {
         if (searchParams.get('highlight') === 'suggested') {
@@ -397,7 +401,6 @@ const LoggedInView = () => {
             setIsSuggestionHighlighted(true);
             const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
 
-            // Clean up the URL
             const nextUrl = new URL(window.location.href);
             nextUrl.searchParams.delete('highlight');
             router.replace(nextUrl.toString(), { scroll: false });
@@ -415,6 +418,30 @@ const LoggedInView = () => {
             const storedProfile = localStorage.getItem('generatedCandidateProfile');
             if (storedProfile) {
                 const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+                 const userVisaDetail = profile.aspirations?.desiredVisaDetail;
+                
+                const vietnamVisaDetails = ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Đặc định đi mới', 'Kỹ sư, tri thức đầu Việt'];
+                const japanVisaDetails = ['Đặc định đầu Nhật', 'Kỹ sư, tri thức đầu Nhật'];
+
+                if (vietnamVisaDetails.includes(userVisaDetail || '')) {
+                   setCompanyButtonText('Công ty phái cử uy tín');
+                } else if (japanVisaDetails.includes(userVisaDetail || '')) {
+                   setCompanyButtonText('Công ty tiếp nhận uy tín');
+                } else {
+                    setCompanyButtonText('Công ty uy tín');
+                }
+
+                if (userVisaDetail === 'Thực tập sinh 3 Go') {
+                    setFeeButtonText('Nghiệp đoàn uy tín');
+                    setCompanyButtonText('Công ty tiếp nhận uy tín');
+                } else if (userVisaDetail === "Kỹ sư, tri thức đầu Nhật") {
+                   setFeeButtonText("Shokai uy tín");
+                } else if (userVisaDetail === "Đặc định đầu Nhật") {
+                   setFeeButtonText("Shien uy tín");
+                } else {
+                    setFeeButtonText('Phí thấp');
+                }
+
                 const matchResults = await matchJobsToProfile(profile);
                 const jobs = matchResults.map(result => result.job);
                 setSuggestedJobs(jobs);
@@ -464,6 +491,7 @@ const LoggedInView = () => {
             desiredIndustry: tempDesiredIndustry,
         };
         localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+        localStorage.setItem('suggestionPrinciple', suggestionPrinciple);
         console.log("Suggestion principle saved:", suggestionPrinciple);
         setIsAspirationsDialogOpen(false);
         setForceUpdate(prev => prev + 1); // Trigger a re-fetch
@@ -673,7 +701,7 @@ const LoggedInView = () => {
                         Thay đổi các nguyện vọng để nhận được gợi ý việc làm phù hợp hơn.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
+                <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
                     <div className="space-y-2">
                         <Label>Loại visa mong muốn</Label>
                         <Select
@@ -735,30 +763,51 @@ const LoggedInView = () => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="space-y-2">
-                        <Label>Nguyên tắc gợi ý</Label>
-                        <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2 pt-2">
+                        <Label className="font-semibold">Ưu tiên tìm việc</Label>
+                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <Button 
-                                variant={suggestionPrinciple === 'accurate' ? 'default' : 'outline'}
-                                onClick={() => setSuggestionPrinciple('accurate')}
+                                variant={suggestionPrinciple === 'salary' ? 'default' : 'outline'}
+                                onClick={() => setSuggestionPrinciple('salary')}
+                                className="justify-start text-left h-auto py-2"
                             >
-                                Chính xác 100%
+                                <TrendingUp className="mr-2 text-green-500 flex-shrink-0" /> 
+                                <div>
+                                    <p className="font-semibold">Lương tốt</p>
+                                    <p className="text-xs opacity-80 font-normal">Ưu tiên việc có lương cao</p>
+                                </div>
                             </Button>
                             <Button 
-                                variant={suggestionPrinciple === 'related' ? 'default' : 'outline'}
-                                onClick={() => setSuggestionPrinciple('related')}
+                                variant={suggestionPrinciple === 'fee' ? 'default' : 'outline'}
+                                onClick={() => setSuggestionPrinciple('fee')}
+                                className="justify-start text-left h-auto py-2"
                             >
-                                Thêm cả việc liên quan
+                                <ThumbsUp className="mr-2 text-blue-500 flex-shrink-0" />
+                                 <div>
+                                    <p className="font-semibold">{feeButtonText}</p>
+                                    <p className="text-xs opacity-80 font-normal">Ưu tiên phí thấp / uy tín</p>
+                                </div>
+                            </Button>
+                            <Button 
+                                variant={suggestionPrinciple === 'company' ? 'default' : 'outline'}
+                                onClick={() => setSuggestionPrinciple('company')}
+                                className="justify-start text-left h-auto py-2"
+                            >
+                                <ShieldCheck className="mr-2 text-orange-500 flex-shrink-0" />
+                                 <div>
+                                    <p className="font-semibold">{companyButtonText}</p>
+                                    <p className="text-xs opacity-80 font-normal">Ưu tiên công ty uy tín</p>
+                                </div>
                             </Button>
                         </div>
                     </div>
                 </div>
-                <DialogClose asChild>
-                    <div className="flex justify-end gap-2">
+                <DialogFooter>
+                    <DialogClose asChild>
                         <Button variant="outline">Hủy</Button>
-                        <Button onClick={handleSaveAspirations}>Lưu và tìm lại</Button>
-                    </div>
-                </DialogClose>
+                    </DialogClose>
+                    <Button onClick={handleSaveAspirations}>Lưu và tìm lại</Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     </>
@@ -796,8 +845,8 @@ const LoggedOutView = () => {
 const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
-    const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
+    const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [transformStyle, setTransformStyle] = useState({});
     const cardRef = useRef<HTMLDivElement>(null);
   
@@ -830,11 +879,9 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
                    if (userVisaDetail === 'Thực tập sinh 3 Go') {
                         setFeeButtonText('Nghiệp đoàn uy tín');
                         setCompanyButtonText('Công ty tiếp nhận uy tín');
-                   }
-                   if (userVisaDetail === "Kỹ sư, tri thức đầu Nhật") {
+                   } else if (userVisaDetail === "Kỹ sư, tri thức đầu Nhật") {
                        setFeeButtonText("Shokai uy tín");
-                   }
-                   if (userVisaDetail === "Đặc định đầu Nhật") {
+                   } else if (userVisaDetail === "Đặc định đầu Nhật") {
                        setFeeButtonText("Shien uy tín");
                    }
                 }
@@ -872,16 +919,18 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
         setIsClosing(true);
         setTimeout(() => {
             onHighlight();
-        }, 700); // Delay highlight to sync with animation
+            setIsVisible(false); // Hide the component after animation
+        }, 700); // This duration must match the CSS transition duration
     };
   
     useEffect(() => {
+        let closeTimer: NodeJS.Timeout;
         if(isVisible && !isClosing) {
-            const closeTimer = setTimeout(() => {
+            closeTimer = setTimeout(() => {
                 handleClose();
-            }, 3000); // Start closing after 3 seconds visible (2s wait + 3s visible)
-             return () => clearTimeout(closeTimer);
+            }, 3000); 
         }
+        return () => clearTimeout(closeTimer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isVisible, isClosing]);
   
@@ -898,32 +947,34 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
           !isClosing && "animate-in slide-in-from-bottom"
         )}
       >
-        <Card className="shadow-2xl w-full max-w-sm">
-            <CardHeader className="pb-3">
-                <CardTitle className="text-base font-bold flex items-center justify-between">
-                    <span>Bạn có muốn ưu tiên tìm việc theo?</span>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={handleClose}
-                    >
-                        <X className="h-4 w-4" />
+        { !isClosing && (
+            <Card className="shadow-2xl w-full max-w-sm">
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-bold flex items-center justify-between">
+                        <span>Bạn có muốn ưu tiên tìm việc theo?</span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={handleClose}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2">
+                    <Button variant="outline" className="justify-start" onClick={handleClose}>
+                        <TrendingUp className="mr-2 text-green-500" /> Lương tốt
                     </Button>
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-                <Button variant="outline" className="justify-start" onClick={handleClose}>
-                    <TrendingUp className="mr-2 text-green-500" /> Lương tốt
-                </Button>
-                <Button variant="outline" className="justify-start" onClick={handleClose}>
-                    <ThumbsUp className="mr-2 text-blue-500" /> {feeButtonText}
-                </Button>
-                <Button variant="outline" className="justify-start" onClick={handleClose}>
-                    <ShieldCheck className="mr-2 text-orange-500" /> {companyButtonText}
-                </Button>
-            </CardContent>
-        </Card>
+                    <Button variant="outline" className="justify-start" onClick={handleClose}>
+                        <ThumbsUp className="mr-2 text-blue-500" /> {feeButtonText}
+                    </Button>
+                    <Button variant="outline" className="justify-start" onClick={handleClose}>
+                        <ShieldCheck className="mr-2 text-orange-500" /> {companyButtonText}
+                    </Button>
+                </CardContent>
+            </Card>
+        )}
     </div>
   );
 };
@@ -933,9 +984,11 @@ function JobsDashboardPageContent() {
     const { role } = useAuth();
     const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
+    const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
     const handleHighlight = () => {
         setIsHighlighting(true);
+        setShowFloatingSelector(false); // Hide the selector after it has animated
         setTimeout(() => {
             setIsHighlighting(false);
         }, 1500); // Duration of the highlight effect
@@ -946,7 +999,7 @@ function JobsDashboardPageContent() {
         <div className="container mx-auto px-2 md:px-4 py-8">
           {isLoggedIn ? <LoggedInView /> : <LoggedOutView />}
         </div>
-        {role === 'candidate' && <FloatingPrioritySelector onHighlight={handleHighlight} />}
+        {role === 'candidate' && showFloatingSelector && <FloatingPrioritySelector onHighlight={handleHighlight} />}
       </div>
     );
 }
