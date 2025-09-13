@@ -798,6 +798,8 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
     const [isClosing, setIsClosing] = useState(false);
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
+    const [transformStyle, setTransformStyle] = useState({});
+    const cardRef = useRef<HTMLDivElement>(null);
   
     useEffect(() => {
         const vietnamVisaDetails = [
@@ -851,21 +853,37 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
     }, []);
 
     const handleClose = () => {
-      setIsClosing(true);
-      setTimeout(() => {
-          onHighlight();
-      }, 500); // Delay highlight to sync with animation
+        const targetButton = document.getElementById('highlight-target-button');
+        const cardElement = cardRef.current;
+
+        if (targetButton && cardElement) {
+            const targetRect = targetButton.getBoundingClientRect();
+            const cardRect = cardElement.getBoundingClientRect();
+            
+            const translateX = targetRect.left - cardRect.left + (targetRect.width / 2) - (cardRect.width / 2);
+            const translateY = targetRect.top - cardRect.top + (targetRect.height / 2) - (cardRect.height / 2);
+
+            setTransformStyle({
+                transform: `translate(${translateX}px, ${translateY}px) scale(0.1)`,
+                opacity: 0,
+            });
+        }
+        
+        setIsClosing(true);
+        setTimeout(() => {
+            onHighlight();
+        }, 500); // Delay highlight to sync with animation
     };
   
     useEffect(() => {
-        if(isVisible) {
+        if(isVisible && !isClosing) {
             const closeTimer = setTimeout(() => {
                 handleClose();
             }, 3000); // Start closing after 3 seconds visible (2s wait + 3s visible)
              return () => clearTimeout(closeTimer);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isVisible]);
+    }, [isVisible, isClosing]);
   
     if (!isVisible) {
       return null;
@@ -873,12 +891,11 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
   
     return (
       <div
+        ref={cardRef}
+        style={isClosing ? transformStyle : {}}
         className={cn(
-          "fixed bottom-24 left-4 z-50 transition-all",
-          isClosing 
-            ? "opacity-0 scale-0 translate-x-[70vw] -translate-y-[80vh] duration-1000" 
-            : "opacity-100 scale-100 duration-500",
-          "animate-in slide-in-from-bottom"
+          "fixed bottom-24 left-4 z-50 transition-all duration-500",
+          !isClosing && "animate-in slide-in-from-bottom"
         )}
       >
         <Card className="shadow-2xl w-full max-w-sm">
@@ -942,5 +959,3 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
-
-    
