@@ -384,6 +384,7 @@ const LoggedInView = () => {
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
+    const [suggestionPrinciple, setSuggestionPrinciple] = useState('accurate');
     const [forceUpdate, setForceUpdate] = useState(0); // State to trigger re-fetch
 
     // Always keep the 'Gợi ý' accordion open and highlighted
@@ -445,6 +446,7 @@ const LoggedInView = () => {
             desiredIndustry: tempDesiredIndustry,
         };
         localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+        console.log("Suggestion principle saved:", suggestionPrinciple);
         setIsAspirationsDialogOpen(false);
         setForceUpdate(prev => prev + 1); // Trigger a re-fetch
     };
@@ -456,7 +458,7 @@ const LoggedInView = () => {
     const visaDetailsOptions: { [key: string]: string[] } = {
         'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
         'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư đầu Nhật'],
+        'Kỹ sư, tri thức': ['Kỹ sư đầu Việt', 'Kỹ sư đầu Nhật'],
     };
     const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
@@ -494,7 +496,7 @@ const LoggedInView = () => {
                             size="sm"
                             className={cn(
                                 "ml-auto flex-shrink-0 transition-all duration-300",
-                                isSuggestionHighlighted && "animate-pulse bg-primary/20"
+                                isSuggestionHighlighted && "animate-pulse"
                             )}
                             onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}
                         >
@@ -690,7 +692,7 @@ const LoggedInView = () => {
                             disabled={!tempAspirations.desiredVisaType}
                         >
                              <SelectTrigger>
-                                {tempDesiredIndustry ? tempDesiredIndustry : <span className="text-muted-foreground">Chọn ngành nghề</span>}
+                                <SelectValue placeholder="Chọn ngành nghề" />
                             </SelectTrigger>
                             <SelectContent>
                                 {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
@@ -713,6 +715,18 @@ const LoggedInView = () => {
                                         {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                                     </SelectGroup>
                                 ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Nguyên tắc gợi ý</Label>
+                        <Select value={suggestionPrinciple} onValueChange={setSuggestionPrinciple}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Chọn nguyên tắc gợi ý" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="accurate">Chính xác 100%</SelectItem>
+                                <SelectItem value="related">Thêm cả việc liên quan</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -773,7 +787,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
   
       const closeTimer = setTimeout(() => {
         handleClose();
-      }, 5000); // Start closing after 5 seconds (2 to show + 3 to display)
+      }, 5000); // Start closing after 3 seconds of being visible
   
       return () => {
         clearTimeout(timer);
