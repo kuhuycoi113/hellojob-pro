@@ -831,7 +831,7 @@ const LoggedInView = () => {
                         </div>
                     </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="flex-row justify-end space-x-2">
                     <DialogClose asChild>
                         <Button variant="outline">Hủy</Button>
                     </DialogClose>
