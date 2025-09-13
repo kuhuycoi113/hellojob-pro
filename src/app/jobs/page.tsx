@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -499,7 +498,7 @@ const LoggedInView = () => {
             >
                 <AccordionItem value="item-1" className={cn(
                     "border-b transition-all duration-500 ease-in-out",
-                    isSuggestionHighlighted ? "ring-2 ring-primary ring-offset-2 shadow-2xl rounded-lg bg-primary/5" : ""
+                    isSuggestionHighlighted ? "ring-2 ring-accent-orange ring-offset-2 shadow-2xl rounded-lg bg-accent-orange/10" : ""
                 )}>
                     <div className="flex items-center bg-background px-6 rounded-t-lg hover:no-underline">
                         <AccordionTrigger className="flex-grow py-4 font-semibold text-base">
