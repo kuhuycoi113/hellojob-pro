@@ -282,6 +282,7 @@ const MainContent = () => (
   
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('all');
+  const [selectedVisaGroup, setSelectedVisaGroup] = useState<string | null>('all');
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
   const [selectedLocation, setSelectedLocation] = useState('');
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
@@ -301,16 +302,15 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
     setSelectedIndustry(null);
     setIndustrySearch('');
 
+    let visaTypeKey: keyof typeof industriesByJobType | null = null;
     if (value === 'all') {
       const allUniqueIndustries = Object.values(industriesByJobType)
         .flat()
         .filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
       setAvailableIndustries(allUniqueIndustries);
+      setSelectedVisaGroup('all');
       return;
-    }
-
-    let visaTypeKey: keyof typeof industriesByJobType = 'Default';
-    if (value.includes('Thực tập sinh')) {
+    } else if (value.includes('Thực tập sinh')) {
       visaTypeKey = 'Thực tập sinh kỹ năng';
     } else if (value.includes('Đặc định')) {
       visaTypeKey = 'Kỹ năng đặc định';
@@ -318,7 +318,8 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
       visaTypeKey = 'Kỹ sư, tri thức';
     }
     
-    setAvailableIndustries(industriesByJobType[visaTypeKey] || []);
+    setSelectedVisaGroup(visaTypeKey);
+    setAvailableIndustries(visaTypeKey ? industriesByJobType[visaTypeKey] : []);
   };
   
   const handleIndustrySelect = (industry: Industry | null) => {
@@ -326,6 +327,14 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
     setIndustrySearch('');
     setIsIndustryPopoverOpen(false);
   }
+
+  const filteredIndustries = industrySearch
+    ? availableIndustries.filter(industry =>
+        industry.name.toLowerCase().includes(industrySearch.toLowerCase()) ||
+        industry.keywords.some(k => k.toLowerCase().includes(industrySearch.toLowerCase()))
+      )
+    : availableIndustries;
+
 
   return (
     <section className="w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white pt-20 md:pt-28 pb-10">
@@ -366,6 +375,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                               role="combobox"
                               aria-expanded={isIndustryPopoverOpen}
                               className="w-full justify-between h-10 font-normal text-muted-foreground"
+                              disabled={!selectedVisaGroup}
                             >
                               {selectedIndustry?.name || "Tất cả ngành nghề"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -380,14 +390,15 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                               />
                               <CommandList>
                                 <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
-                                <CommandItem
-                                  onSelect={() => handleIndustrySelect(null)}
-                                >
-                                  <Check className={cn("mr-2 h-4 w-4", !selectedIndustry ? "opacity-100" : "opacity-0")}/>
-                                  Tất cả ngành nghề
-                                </CommandItem>
-                                {availableIndustries.map((industry) => (
-                                    <React.Fragment key={industry.slug}>
+                                <CommandGroup>
+                                    <CommandItem
+                                    onSelect={() => handleIndustrySelect(null)}
+                                    >
+                                    <Check className={cn("mr-2 h-4 w-4", !selectedIndustry ? "opacity-100" : "opacity-0")}/>
+                                    Tất cả ngành nghề
+                                    </CommandItem>
+                                    {filteredIndustries.map((industry) => (
+                                        <React.Fragment key={industry.slug}>
                                         <CommandItem
                                             onSelect={() => handleIndustrySelect(industry)}
                                             className="font-semibold"
@@ -404,8 +415,9 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                                                 {keyword}
                                             </CommandItem>
                                         ))}
-                                    </React.Fragment>
-                                ))}
+                                        </React.Fragment>
+                                    ))}
+                                </CommandGroup>
                               </CommandList>
                             </Command>
                           </PopoverContent>
@@ -456,3 +468,4 @@ export default function HomeClient() {
     </div>
   );
 }
+
