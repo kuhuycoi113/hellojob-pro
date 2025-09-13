@@ -5,7 +5,7 @@
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil, X, ThumbsUp, TrendingUp, ShieldCheck } from 'lucide-react';
+import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil, X, ThumbsUp, TrendingUp, ShieldCheck, ChevronDown } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { jobData, type Job } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
@@ -458,7 +458,7 @@ const LoggedInView = () => {
     const visaDetailsOptions: { [key: string]: string[] } = {
         'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
         'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-        'Kỹ sư, tri thức': ['Kỹ sư đầu Việt', 'Kỹ sư đầu Nhật'],
+        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
     };
     const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
@@ -479,8 +479,8 @@ const LoggedInView = () => {
                 onValueChange={setOpenAccordion}
             >
                 <AccordionItem value="item-1" className={cn(
-                    "transition-all duration-1000 ease-out",
-                    isSuggestionHighlighted ? "ring-2 ring-offset-2 ring-yellow-400 shadow-2xl rounded-lg" : ""
+                    "border-b transition-all duration-500 ease-in-out",
+                    isSuggestionHighlighted ? "ring-2 ring-primary ring-offset-2 shadow-2xl rounded-lg bg-primary/5" : ""
                 )}>
                     <div className="flex items-center bg-background px-6 rounded-t-lg hover:no-underline">
                         <AccordionTrigger className="flex-grow py-4 font-semibold text-base">
@@ -494,10 +494,7 @@ const LoggedInView = () => {
                             id="highlight-target-button"
                             variant="default"
                             size="sm"
-                            className={cn(
-                                "ml-auto flex-shrink-0 transition-all duration-300",
-                                isSuggestionHighlighted && "animate-pulse"
-                            )}
+                            className="ml-auto flex-shrink-0"
                             onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}
                         >
                             Sửa gợi ý
@@ -781,27 +778,56 @@ const LoggedOutView = () => {
 const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
-  
-    const handleClose = () => {
-      setIsClosing(true);
-      onHighlight(); 
-    };
+    const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
   
     useEffect(() => {
+        // Define the visa types that indicate the user is in Vietnam
+        const vietnamVisaDetails = [
+            'Thực tập sinh 3 năm',
+            'Thực tập sinh 1 năm',
+            'Đặc định đầu Việt',
+            'Đặc định đi mới',
+            'Kỹ sư, tri thức đầu Việt'
+        ];
+
+        try {
+            const storedProfile = localStorage.getItem('generatedCandidateProfile');
+            if (storedProfile) {
+                const profile = JSON.parse(storedProfile);
+                const userVisaDetail = profile.aspirations?.desiredVisaDetail;
+                if (userVisaDetail && vietnamVisaDetails.includes(userVisaDetail)) {
+                    setCompanyButtonText('Công ty phái cử uy tín');
+                }
+            }
+        } catch (e) {
+            console.error("Could not parse user profile from localStorage", e);
+        }
+        
       const timer = setTimeout(() => {
         setIsVisible(true);
       }, 2000); // Show after 2 seconds
   
-      const closeTimer = setTimeout(() => {
-        handleClose();
-      }, 5000); // Start closing after 2s + 3s visible
-  
       return () => {
         clearTimeout(timer);
-        clearTimeout(closeTimer);
       };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handleClose = () => {
+      setIsClosing(true);
+      setTimeout(() => {
+          onHighlight();
+      }, 500); // Delay highlight to sync with animation
+    };
+  
+    useEffect(() => {
+        if(isVisible) {
+            const closeTimer = setTimeout(() => {
+                handleClose();
+            }, 3000); // Start closing after 3 seconds visible (2s wait + 3s visible)
+             return () => clearTimeout(closeTimer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isVisible]);
   
     if (!isVisible) {
       return null;
@@ -839,7 +865,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
                     <ThumbsUp className="mr-2 text-blue-500" /> Phí thấp
                 </Button>
                 <Button variant="outline" className="justify-start" onClick={handleClose}>
-                    <ShieldCheck className="mr-2 text-orange-500" /> Công ty uy tín
+                    <ShieldCheck className="mr-2 text-orange-500" /> {companyButtonText}
                 </Button>
             </CardContent>
         </Card>
@@ -854,13 +880,10 @@ function JobsDashboardPageContent() {
     const [isHighlighting, setIsHighlighting] = useState(false);
 
     const handleHighlight = () => {
-        const button = document.getElementById('highlight-target-button');
-        if (button) {
-            setIsHighlighting(true);
-            setTimeout(() => {
-                setIsHighlighting(false);
-            }, 1500); // Duration of the highlight effect
-        }
+        setIsHighlighting(true);
+        setTimeout(() => {
+            setIsHighlighting(false);
+        }, 1500); // Duration of the highlight effect
     };
   
     return (
