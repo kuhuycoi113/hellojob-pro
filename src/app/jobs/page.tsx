@@ -5,7 +5,7 @@
 import { useState, useEffect, Suspense, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil } from 'lucide-react';
+import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil, X, ThumbsUp, TrendingUp, ShieldCheck } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { jobData, type Job } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
@@ -668,7 +668,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd.label}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -745,6 +745,54 @@ const LoggedOutView = () => {
     )
 }
 
+const FloatingPrioritySelector = () => {
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsVisible(true);
+        }, 3000); // Show after 3 seconds
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    const handleSelect = () => {
+        // Logic to apply filter will be added later
+        setIsVisible(false);
+    }
+
+    if (!isVisible) {
+        return null;
+    }
+
+    return (
+        <div className="fixed bottom-24 left-4 z-50 animate-in slide-in-from-bottom duration-500">
+            <Card className="shadow-2xl w-full max-w-sm">
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-bold flex items-center justify-between">
+                       <span>Bạn có muốn ưu tiên tìm việc theo?</span>
+                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsVisible(false)}>
+                           <X className="h-4 w-4"/>
+                       </Button>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2">
+                   <Button variant="outline" className="justify-start" onClick={handleSelect}>
+                       <TrendingUp className="mr-2 text-green-500"/> Lương tốt
+                   </Button>
+                   <Button variant="outline" className="justify-start" onClick={handleSelect}>
+                        <ThumbsUp className="mr-2 text-blue-500"/> Phí thấp
+                   </Button>
+                   <Button variant="outline" className="justify-start" onClick={handleSelect}>
+                        <ShieldCheck className="mr-2 text-orange-500"/> Công ty uy tín
+                   </Button>
+                </CardContent>
+            </Card>
+        </div>
+    );
+};
+
+
 function JobsDashboardPageContent() {
     const { role } = useAuth();
     const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
@@ -754,6 +802,7 @@ function JobsDashboardPageContent() {
         <div className="container mx-auto px-2 md:px-4 py-8">
           {isLoggedIn ? <LoggedInView /> : <LoggedOutView />}
         </div>
+        <FloatingPrioritySelector />
       </div>
     );
 }
