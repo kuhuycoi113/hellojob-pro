@@ -303,7 +303,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                         <Select onValueChange={setSelectedJobType} value={selectedJobType}>
                             <SelectTrigger id="search-type">
-                            <SelectValue placeholder="Chọn chi tiết loại hình visa" />
+                            <SelectValue placeholder="Tất cả loại hình" />
                             </SelectTrigger>
                             <SelectContent>
                             <SelectItem value="all">Tất cả loại hình</SelectItem>
