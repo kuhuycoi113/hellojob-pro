@@ -376,6 +376,8 @@ const EmptyProfileView = () => {
 
 const LoggedInView = () => {
     const { role } = useAuth();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
@@ -385,11 +387,28 @@ const LoggedInView = () => {
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
     const [suggestionPrinciple, setSuggestionPrinciple] = useState('related');
-    const [forceUpdate, setForceUpdate] = useState(0); // State to trigger re-fetch
+    const [forceUpdate, setForceUpdate] = useState(0); 
 
-    // Always keep the 'Gợi ý' accordion open and highlighted
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
+
+    useEffect(() => {
+        if (searchParams.get('highlight') === 'suggested') {
+            setOpenAccordion('item-1');
+            setIsSuggestionHighlighted(true);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+
+            // Clean up the URL
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('highlight');
+            router.replace(nextUrl.toString(), { scroll: false });
+            
+            return () => clearTimeout(timer);
+        } else {
+             setOpenAccordion('item-1');
+        }
+    }, [searchParams, router]);
+
 
     const fetchSuggestedJobs = useCallback(async () => {
         setIsLoadingSuggestions(true);
