@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -668,7 +669,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd.label}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -679,7 +680,9 @@ const LoggedInView = () => {
                             onValueChange={value => setTempDesiredIndustry(value)}
                             disabled={!tempAspirations.desiredVisaType}
                         >
-                            <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
+                            <SelectTrigger>
+                                {tempDesiredIndustry ? tempDesiredIndustry : <span className="text-muted-foreground">Chọn ngành nghề</span>}
+                            </SelectTrigger>
                             <SelectContent>
                                 {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
                             </SelectContent>
@@ -746,50 +749,80 @@ const LoggedOutView = () => {
 }
 
 const FloatingPrioritySelector = () => {
-    const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsVisible(true);
-        }, 3000); // Show after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 2000); // Show after 2 seconds
 
-        return () => clearTimeout(timer);
-    }, []);
+    const closeTimer = setTimeout(() => {
+      setIsClosing(true);
+      const highlightButton = document.getElementById('highlight-target-button');
+      if (highlightButton) {
+        highlightButton.classList.add('animate-pulse', 'ring-2', 'ring-yellow-400');
+        setTimeout(() => {
+            highlightButton.classList.remove('animate-pulse', 'ring-2', 'ring-yellow-400');
+        }, 1500)
+      }
+    }, 7000); // Start closing after 7 seconds (2 to show + 5 to display)
 
-    const handleSelect = () => {
-        // Logic to apply filter will be added later
+    const hideTimer = setTimeout(() => {
         setIsVisible(false);
-    }
+    }, 7500); // Completely hide after animation
 
-    if (!isVisible) {
-        return null;
-    }
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(closeTimer);
+      clearTimeout(hideTimer);
+    };
+  }, []);
 
-    return (
-        <div className="fixed bottom-24 left-4 z-50 animate-in slide-in-from-bottom duration-500">
-            <Card className="shadow-2xl w-full max-w-sm">
-                <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-bold flex items-center justify-between">
-                       <span>Bạn có muốn ưu tiên tìm việc theo?</span>
-                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsVisible(false)}>
-                           <X className="h-4 w-4"/>
-                       </Button>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-2">
-                   <Button variant="outline" className="justify-start" onClick={handleSelect}>
-                       <TrendingUp className="mr-2 text-green-500"/> Lương tốt
-                   </Button>
-                   <Button variant="outline" className="justify-start" onClick={handleSelect}>
-                        <ThumbsUp className="mr-2 text-blue-500"/> Phí thấp
-                   </Button>
-                   <Button variant="outline" className="justify-start" onClick={handleSelect}>
-                        <ShieldCheck className="mr-2 text-orange-500"/> Công ty uy tín
-                   </Button>
-                </CardContent>
-            </Card>
-        </div>
-    );
+  if (!isVisible) {
+    return null;
+  }
+
+  return (
+    <div
+        ref={cardRef}
+        className={cn(
+            "fixed bottom-24 left-4 z-50 transition-all duration-500",
+            isClosing ? "opacity-0 scale-50 -translate-y-1/2 translate-x-[20vw]" : "opacity-100 scale-100",
+            "animate-in slide-in-from-bottom"
+        )}
+    >
+        <Card className="shadow-2xl w-full max-w-sm">
+            <CardHeader className="pb-3">
+                <CardTitle className="text-base font-bold flex items-center justify-between">
+                    <span>Bạn có muốn ưu tiên tìm việc theo?</span>
+                    <Button
+                        ref={buttonRef}
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => setIsClosing(true)}
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2">
+                <Button variant="outline" className="justify-start" onClick={() => setIsClosing(true)}>
+                    <TrendingUp className="mr-2 text-green-500" /> Lương tốt
+                </Button>
+                <Button variant="outline" className="justify-start" onClick={() => setIsClosing(true)}>
+                    <ThumbsUp className="mr-2 text-blue-500" /> Phí thấp
+                </Button>
+                <Button variant="outline" className="justify-start" onClick={() => setIsClosing(true)}>
+                    <ShieldCheck className="mr-2 text-orange-500" /> Công ty uy tín
+                </Button>
+            </CardContent>
+        </Card>
+    </div>
+  );
 };
 
 
