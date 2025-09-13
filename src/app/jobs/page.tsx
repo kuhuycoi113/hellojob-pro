@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -488,8 +487,9 @@ const LoggedInView = () => {
                                 <Badge>{isLoadingSuggestions ? '...' : suggestedJobs.length}</Badge>
                             </div>
                         </AccordionTrigger>
-                         <Button variant="ghost" size="icon" className="ml-auto h-7 w-7 flex-shrink-0" onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}>
-                            <Pencil className="h-4 w-4"/>
+                         <Button variant="ghost" size="sm" className="ml-auto flex-shrink-0" onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}>
+                            Sửa gợi ý
+                            <Pencil className="h-4 w-4 ml-2"/>
                         </Button>
                     </div>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
@@ -815,3 +815,5 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
