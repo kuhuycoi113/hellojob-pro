@@ -829,6 +829,9 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
                         setFeeButtonText('Nghiệp đoàn uy tín');
                         setCompanyButtonText('Công ty tiếp nhận uy tín');
                    }
+                   if (userVisaDetail === "Kỹ sư, tri thức đầu Nhật") {
+                       setFeeButtonText("Shokai uy tín");
+                   }
                 }
             }
         } catch (e) {
