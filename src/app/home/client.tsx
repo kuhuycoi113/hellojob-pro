@@ -281,7 +281,6 @@ const MainContent = () => (
   
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   
   return (
@@ -301,10 +300,10 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                 <CardContent className="p-4 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <div className="md:col-span-5 space-y-2">
-                        <Label htmlFor="search-type" className="text-foreground">Loại hình, kỹ năng</Label>
+                        <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                         <Select onValueChange={setSelectedJobType} value={selectedJobType}>
                             <SelectTrigger id="search-type">
-                            <SelectValue placeholder="Chọn loại hình" />
+                            <SelectValue placeholder="Chọn chi tiết loại hình visa" />
                             </SelectTrigger>
                             <SelectContent>
                             <SelectItem value="all">Tất cả loại hình</SelectItem>
