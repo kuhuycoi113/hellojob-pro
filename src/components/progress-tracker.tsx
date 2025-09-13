@@ -20,7 +20,7 @@ const steps = [
 
 export const ProgressTracker = () => {
   // Let's assume the user is at step 3 for demonstration
-  const currentStep = 3;
+  const currentStep = 0;
 
   return (
     <Card className="shadow-xl">
