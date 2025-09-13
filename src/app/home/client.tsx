@@ -290,17 +290,18 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const finalSearchTerm = selectedIndustry || searchQuery;
 
   useEffect(() => {
+    const jobTypeToUpdate = selectedJobType === 'all' ? '' : selectedJobType;
     let industries: Industry[] = [];
-    if (!selectedJobType) {
+    if (!jobTypeToUpdate) {
         // Collect all industries from all types and remove duplicates
         const allIndustries = Object.values(industriesByJobType).flat();
         const uniqueIndustries = Array.from(new Map(allIndustries.map(item => [item['slug'], item])).values());
         industries = uniqueIndustries;
     } else {
         let jobTypeKey: keyof typeof industriesByJobType | 'Default' = 'Default';
-        if (selectedJobType.includes('Thực tập sinh')) jobTypeKey = 'Thực tập sinh kỹ năng';
-        else if (selectedJobType.includes('Đặc định')) jobTypeKey = 'Kỹ năng đặc định';
-        else if (selectedJobType.includes('Kỹ sư, tri thức')) jobTypeKey = 'Kỹ sư, tri thức';
+        if (jobTypeToUpdate.includes('Thực tập sinh')) jobTypeKey = 'Thực tập sinh kỹ năng';
+        else if (jobTypeToUpdate.includes('Đặc định')) jobTypeKey = 'Kỹ năng đặc định';
+        else if (jobTypeToUpdate.includes('Kỹ sư, tri thức')) jobTypeKey = 'Kỹ sư, tri thức';
         
         industries = industriesByJobType[jobTypeKey] || [];
     }
@@ -334,7 +335,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             <SelectValue placeholder="Chọn loại hình" />
                             </SelectTrigger>
                             <SelectContent>
-                            <SelectItem value="">Tất cả loại hình</SelectItem>
+                            <SelectItem value="all">Tất cả loại hình</SelectItem>
                             {japanJobTypes.map(type => (
                                 <SelectItem key={type} value={type}>{type}</SelectItem>
                             ))}
