@@ -384,7 +384,7 @@ const LoggedInView = () => {
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
-    const [suggestionPrinciple, setSuggestionPrinciple] = useState('accurate');
+    const [suggestionPrinciple, setSuggestionPrinciple] = useState('related');
     const [forceUpdate, setForceUpdate] = useState(0); // State to trigger re-fetch
 
     // Always keep the 'Gợi ý' accordion open and highlighted
@@ -692,7 +692,9 @@ const LoggedInView = () => {
                             disabled={!tempAspirations.desiredVisaType}
                         >
                              <SelectTrigger>
-                                <SelectValue placeholder="Chọn ngành nghề" />
+                                <SelectValue placeholder="Chọn ngành nghề" >
+                                    {tempDesiredIndustry || "Chọn ngành nghề"}
+                                </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                                 {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
@@ -720,15 +722,20 @@ const LoggedInView = () => {
                     </div>
                     <div className="space-y-2">
                         <Label>Nguyên tắc gợi ý</Label>
-                        <Select value={suggestionPrinciple} onValueChange={setSuggestionPrinciple}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Chọn nguyên tắc gợi ý" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="accurate">Chính xác 100%</SelectItem>
-                                <SelectItem value="related">Thêm cả việc liên quan</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <div className="grid grid-cols-2 gap-2">
+                            <Button 
+                                variant={suggestionPrinciple === 'accurate' ? 'default' : 'outline'}
+                                onClick={() => setSuggestionPrinciple('accurate')}
+                            >
+                                Chính xác 100%
+                            </Button>
+                            <Button 
+                                variant={suggestionPrinciple === 'related' ? 'default' : 'outline'}
+                                onClick={() => setSuggestionPrinciple('related')}
+                            >
+                                Thêm cả việc liên quan
+                            </Button>
+                        </div>
                     </div>
                 </div>
                 <DialogClose asChild>
@@ -787,7 +794,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
   
       const closeTimer = setTimeout(() => {
         handleClose();
-      }, 5000); // Start closing after 3 seconds of being visible
+      }, 5000); // Start closing after 2s + 3s visible
   
       return () => {
         clearTimeout(timer);
@@ -803,10 +810,10 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
     return (
       <div
         className={cn(
-          "fixed bottom-24 left-4 z-50 transition-all duration-1000",
+          "fixed bottom-24 left-4 z-50 transition-all",
           isClosing 
-            ? "opacity-0 scale-0 translate-x-[70vw] -translate-y-[80vh]" 
-            : "opacity-100 scale-100",
+            ? "opacity-0 scale-0 translate-x-[70vw] -translate-y-[80vh] duration-1000" 
+            : "opacity-100 scale-100 duration-500",
           "animate-in slide-in-from-bottom"
         )}
       >
