@@ -675,7 +675,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.label} value={vd.label}>{vd.label}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -686,7 +686,7 @@ const LoggedInView = () => {
                             onValueChange={value => setTempDesiredIndustry(value)}
                             disabled={!tempAspirations.desiredVisaType}
                         >
-                            <SelectTrigger>
+                             <SelectTrigger>
                                 {tempDesiredIndustry ? tempDesiredIndustry : <span className="text-muted-foreground">Chọn ngành nghề</span>}
                             </SelectTrigger>
                             <SelectContent>
