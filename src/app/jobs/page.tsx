@@ -802,7 +802,7 @@ function JobsDashboardPageContent() {
         <div className="container mx-auto px-2 md:px-4 py-8">
           {isLoggedIn ? <LoggedInView /> : <LoggedOutView />}
         </div>
-        {isLoggedIn && <FloatingPrioritySelector />}
+        {role === 'candidate' && <FloatingPrioritySelector />}
       </div>
     );
 }
@@ -815,5 +815,3 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
-
-    
