@@ -1,6 +1,7 @@
 
 'use client';
 
+import * as React from 'react';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -391,10 +392,10 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                                             onSelect={() => handleIndustrySelect(industry)}
                                             className="font-semibold"
                                         >
-                                            <Check className={cn("mr-2 h-4 w-4", selectedIndustry?.slug === industry.slug ? "opacity-100" : "opacity-0")} />
+                                            <Check className={cn("mr-2 h-4 w-4", selectedIndustry?.slug === industry.slug && !industrySearch ? "opacity-100" : "opacity-0")} />
                                             {industry.name}
                                         </CommandItem>
-                                        {industrySearch && industry.keywords.map(keyword => (
+                                        {industrySearch && industry.keywords.filter(k => k.toLowerCase().includes(industrySearch.toLowerCase())).map(keyword => (
                                             <CommandItem
                                                 key={`${industry.slug}-${keyword}`}
                                                 onSelect={() => handleIndustrySelect(industry)}
@@ -455,4 +456,3 @@ export default function HomeClient() {
     </div>
   );
 }
-
