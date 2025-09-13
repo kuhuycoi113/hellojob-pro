@@ -394,6 +394,7 @@ const LoggedInView = () => {
 
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
+    const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
 
     useEffect(() => {
         if (searchParams.get('highlight') === 'suggested') {
@@ -479,6 +480,14 @@ const LoggedInView = () => {
             setTempAspirations(profile.aspirations || {});
             setTempDesiredIndustry(profile.desiredIndustry || '');
         }
+        const storedPrinciple = localStorage.getItem('suggestionPrinciple');
+        if (storedPrinciple === 'salary' || storedPrinciple === 'fee' || storedPrinciple === 'company') {
+            setSuggestionPrinciple(storedPrinciple);
+        }
+         const storedType = localStorage.getItem('suggestionType');
+        if(storedType === 'accurate' || storedType === 'related') {
+            setSuggestionType(storedType);
+        }
         setIsAspirationsDialogOpen(true);
     };
 
@@ -492,7 +501,9 @@ const LoggedInView = () => {
         };
         localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
         localStorage.setItem('suggestionPrinciple', suggestionPrinciple);
+        localStorage.setItem('suggestionType', suggestionType);
         console.log("Suggestion principle saved:", suggestionPrinciple);
+        console.log("Suggestion type saved:", suggestionType);
         setIsAspirationsDialogOpen(false);
         setForceUpdate(prev => prev + 1); // Trigger a re-fetch
     };
@@ -703,38 +714,38 @@ const LoggedInView = () => {
                 </DialogHeader>
                 <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
                     <div className="space-y-2">
-                        <Label>Loại visa mong muốn</Label>
+                        <Label htmlFor="visa-type-modal">Loại visa mong muốn</Label>
                         <Select
                             value={tempAspirations.desiredVisaType || ''}
                             onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }))}
                         >
-                            <SelectTrigger><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
+                            <SelectTrigger id="visa-type-modal"><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
                             <SelectContent>
                                 {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label>Chi tiết visa</Label>
+                        <Label htmlFor="visa-detail-modal">Chi tiết visa</Label>
                         <Select
                             value={tempAspirations.desiredVisaDetail || ''}
                             onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaDetail: value }))}
                             disabled={!tempAspirations.desiredVisaType}
                         >
-                            <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
+                            <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
                                 {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label>Ngành nghề mong muốn</Label>
+                        <Label htmlFor="industry-modal">Ngành nghề mong muốn</Label>
                         <Select
                             value={tempDesiredIndustry}
                             onValueChange={value => setTempDesiredIndustry(value)}
                             disabled={!tempAspirations.desiredVisaType}
                         >
-                             <SelectTrigger>
+                             <SelectTrigger id="industry-modal">
                                 <SelectValue placeholder="Chọn ngành nghề" >
                                     {tempDesiredIndustry || "Chọn ngành nghề"}
                                 </SelectValue>
@@ -745,12 +756,12 @@ const LoggedInView = () => {
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label>Địa điểm mong muốn</Label>
+                        <Label htmlFor="location-modal">Địa điểm mong muốn</Label>
                         <Select
                             value={tempAspirations.desiredLocation || ''}
                             onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredLocation: value }))}
                         >
-                            <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
+                            <SelectTrigger id="location-modal"><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
                             <SelectContent className="max-h-[300px]">
                                 <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
                                 {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
@@ -763,6 +774,27 @@ const LoggedInView = () => {
                             </SelectContent>
                         </Select>
                     </div>
+
+                    <div className="space-y-2 pt-2">
+                        <Label className="font-semibold">Nguyên tắc gợi ý</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                             <Button 
+                                variant={suggestionType === 'accurate' ? 'default' : 'outline'}
+                                onClick={() => setSuggestionType('accurate')}
+                                className="justify-center text-left h-auto py-2"
+                            >
+                                Chính xác 100%
+                            </Button>
+                             <Button 
+                                variant={suggestionType === 'related' ? 'default' : 'outline'}
+                                onClick={() => setSuggestionType('related')}
+                                className="justify-center text-left h-auto py-2"
+                            >
+                               Thêm cả việc liên quan
+                            </Button>
+                        </div>
+                    </div>
+                    
                     <div className="space-y-2 pt-2">
                         <Label className="font-semibold">Ưu tiên tìm việc</Label>
                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
