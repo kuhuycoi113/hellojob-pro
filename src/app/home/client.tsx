@@ -281,11 +281,13 @@ const MainContent = () => (
   
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('all');
-  const [selectedIndustry, setSelectedIndustry] = useState('all');
+  const [selectedIndustry, setSelectedIndustry] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
+  const [isIndustryPopoverOpen, setIsIndustryPopoverOpen] = useState(false);
 
   useEffect(() => {
+    // Initially, load all unique industries
     const allUniqueIndustries = Object.values(industriesByJobType)
       .flat()
       .filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
@@ -294,7 +296,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
 
   const handleJobTypeChange = (value: string) => {
     setSelectedJobType(value);
-    setSelectedIndustry('all'); // Reset industry when job type changes
+    setSelectedIndustry(''); // Reset industry when job type changes
 
     if (value === 'all') {
       const allUniqueIndustries = Object.values(industriesByJobType)
@@ -334,7 +336,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
-                        <Select onValueChange={handleJobTypeChange} value={selectedJobType}>
+                        <Select onValueChange={handleJobTypeChange} defaultValue={selectedJobType}>
                             <SelectTrigger id="search-type">
                             <SelectValue placeholder="Tất cả loại hình" />
                             </SelectTrigger>
@@ -348,17 +350,66 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                     </div>
                      <div className="md:col-span-4 space-y-2">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                        <Select onValueChange={setSelectedIndustry} value={selectedIndustry} disabled={availableIndustries.length === 0}>
-                            <SelectTrigger id="search-industry">
-                            <SelectValue placeholder="Tất cả ngành nghề" />
-                            </SelectTrigger>
-                            <SelectContent>
-                            <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                            {availableIndustries.map(industry => (
-                                <SelectItem key={industry.slug} value={industry.slug}>{industry.name}</SelectItem>
-                            ))}
-                            </SelectContent>
-                        </Select>
+                        <Popover open={isIndustryPopoverOpen} onOpenChange={setIsIndustryPopoverOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={isIndustryPopoverOpen}
+                              className="w-full justify-between h-10 font-normal text-muted-foreground"
+                            >
+                              {selectedIndustry
+                                ? availableIndustries.find((industry) => industry.slug === selectedIndustry)?.name
+                                : "Tất cả ngành nghề"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                              <CommandInput placeholder="Tìm ngành nghề..." />
+                              <CommandList>
+                                <CommandEmpty>Không tìm thấy ngành nghề.</CommandEmpty>
+                                <CommandGroup>
+                                  <CommandItem
+                                      key="all-industries"
+                                      value="all-industries"
+                                      onSelect={() => {
+                                        setSelectedIndustry("");
+                                        setIsIndustryPopoverOpen(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          selectedIndustry === "" ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      Tất cả ngành nghề
+                                    </CommandItem>
+                                  {availableIndustries.map((industry) => (
+                                    <CommandItem
+                                      key={industry.slug}
+                                      value={industry.name}
+                                      onSelect={(currentValue) => {
+                                        const slug = availableIndustries.find(ind => ind.name.toLowerCase() === currentValue)?.slug;
+                                        setSelectedIndustry(slug === selectedIndustry ? "" : slug || "");
+                                        setIsIndustryPopoverOpen(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          selectedIndustry === industry.slug ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {industry.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                     </div>
                     <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
