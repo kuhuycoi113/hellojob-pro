@@ -872,7 +872,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
         setIsClosing(true);
         setTimeout(() => {
             onHighlight();
-        }, 500); // Delay highlight to sync with animation
+        }, 700); // Delay highlight to sync with animation
     };
   
     useEffect(() => {
@@ -894,7 +894,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
         ref={cardRef}
         style={isClosing ? transformStyle : {}}
         className={cn(
-          "fixed bottom-24 left-4 z-50 transition-all duration-500",
+          "fixed bottom-24 left-4 z-50 transition-all duration-700",
           !isClosing && "animate-in slide-in-from-bottom"
         )}
       >
