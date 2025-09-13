@@ -301,7 +301,8 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
         if (selectedJobType.includes('Thực tập sinh')) jobTypeKey = 'Thực tập sinh kỹ năng';
         else if (selectedJobType.includes('Đặc định')) jobTypeKey = 'Kỹ năng đặc định';
         else if (selectedJobType.includes('Kỹ sư, tri thức')) jobTypeKey = 'Kỹ sư, tri thức';
-        industries = industriesByJobType[jobTypeKey];
+        
+        industries = industriesByJobType[jobTypeKey] || [];
     }
     
     setAvailableIndustries(industries);
@@ -333,6 +334,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             <SelectValue placeholder="Chọn loại hình" />
                             </SelectTrigger>
                             <SelectContent>
+                            <SelectItem value="">Tất cả loại hình</SelectItem>
                             {japanJobTypes.map(type => (
                                 <SelectItem key={type} value={type}>{type}</SelectItem>
                             ))}
@@ -348,6 +350,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                                     role="combobox"
                                     aria-expanded={comboboxOpen}
                                     className="w-full justify-between h-10 font-normal text-sm"
+                                    disabled={availableIndustries.length === 0}
                                 >
                                     <span className="truncate">{selectedIndustry || "Tất cả ngành nghề"}</span>
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -428,5 +431,3 @@ export default function HomeClient() {
     </div>
   );
 }
-
-    
