@@ -779,9 +779,9 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
     const [isVisible, setIsVisible] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
+    const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
   
     useEffect(() => {
-        // Define the visa types that indicate the user is in Vietnam
         const vietnamVisaDetails = [
             'Thực tập sinh 3 năm',
             'Thực tập sinh 1 năm',
@@ -789,14 +789,28 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
             'Đặc định đi mới',
             'Kỹ sư, tri thức đầu Việt'
         ];
+        
+        const japanVisaDetails = [
+            'Đặc định đầu Nhật',
+            'Kỹ sư, tri thức đầu Nhật'
+        ];
 
         try {
             const storedProfile = localStorage.getItem('generatedCandidateProfile');
             if (storedProfile) {
                 const profile = JSON.parse(storedProfile);
                 const userVisaDetail = profile.aspirations?.desiredVisaDetail;
-                if (userVisaDetail && vietnamVisaDetails.includes(userVisaDetail)) {
-                    setCompanyButtonText('Công ty phái cử uy tín');
+                if (userVisaDetail) {
+                   if (vietnamVisaDetails.includes(userVisaDetail)) {
+                       setCompanyButtonText('Công ty phái cử uy tín');
+                   } else if (japanVisaDetails.includes(userVisaDetail)) {
+                       setCompanyButtonText('Công ty tiếp nhận uy tín');
+                   }
+
+                   if (userVisaDetail === 'Thực tập sinh 3 Go') {
+                        setFeeButtonText('Nghiệp đoàn uy tín');
+                        setCompanyButtonText('Công ty tiếp nhận uy tín');
+                   }
                 }
             }
         } catch (e) {
@@ -862,7 +876,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
                     <TrendingUp className="mr-2 text-green-500" /> Lương tốt
                 </Button>
                 <Button variant="outline" className="justify-start" onClick={handleClose}>
-                    <ThumbsUp className="mr-2 text-blue-500" /> Phí thấp
+                    <ThumbsUp className="mr-2 text-blue-500" /> {feeButtonText}
                 </Button>
                 <Button variant="outline" className="justify-start" onClick={handleClose}>
                     <ShieldCheck className="mr-2 text-orange-500" /> {companyButtonText}
