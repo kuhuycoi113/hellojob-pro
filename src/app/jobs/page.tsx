@@ -381,26 +381,14 @@ const LoggedInView = () => {
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const searchParams = useSearchParams();
-    const [isHighlighted, setIsHighlighted] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
     const [forceUpdate, setForceUpdate] = useState(0); // State to trigger re-fetch
 
-    // Initialize accordion state directly from searchParams
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>(
-        () => searchParams.get('highlight') === 'suggested' ? 'item-1' : undefined
-    );
-
-    useEffect(() => {
-        const highlight = searchParams.get('highlight');
-        if (highlight === 'suggested') {
-            setIsHighlighted(true);
-            const timer = setTimeout(() => setIsHighlighted(false), 2500); // Highlight for 2.5 seconds
-            return () => clearTimeout(timer);
-        }
-    }, [searchParams]);
+    // Always keep the 'Gợi ý' accordion open and highlighted
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
+    const [isHighlighted, setIsHighlighted] = useState(true);
 
     const fetchSuggestedJobs = useCallback(async () => {
         setIsLoadingSuggestions(true);
