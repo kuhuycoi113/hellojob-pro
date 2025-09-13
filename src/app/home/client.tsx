@@ -285,6 +285,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
   const [isIndustryPopoverOpen, setIsIndustryPopoverOpen] = useState(false);
+  const [industrySearch, setIndustrySearch] = useState('');
 
   useEffect(() => {
     // Initially, load all unique industries
@@ -296,7 +297,8 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
 
   const handleJobTypeChange = (value: string) => {
     setSelectedJobType(value);
-    setSelectedIndustry(null); 
+    setSelectedIndustry(null);
+    setIndustrySearch('');
 
     if (value === 'all') {
       const allUniqueIndustries = Object.values(industriesByJobType)
@@ -320,6 +322,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   
   const handleIndustrySelect = (industry: Industry | null) => {
     setSelectedIndustry(industry);
+    setIndustrySearch('');
     setIsIndustryPopoverOpen(false);
   }
 
@@ -369,7 +372,11 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                           </PopoverTrigger>
                           <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                             <Command>
-                              <CommandInput placeholder="Tìm ngành nghề hoặc công việc..." />
+                              <CommandInput 
+                                placeholder="Tìm ngành nghề hoặc công việc..." 
+                                value={industrySearch}
+                                onValueChange={setIndustrySearch}
+                              />
                               <CommandList>
                                 <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
                                 <CommandItem
@@ -379,24 +386,24 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                                   Tất cả ngành nghề
                                 </CommandItem>
                                 {availableIndustries.map((industry) => (
-                                  <CommandGroup key={industry.slug} heading={industry.name}>
-                                    <CommandItem
-                                      onSelect={() => handleIndustrySelect(industry)}
-                                      className="font-semibold"
-                                    >
-                                      <Check className={cn("mr-2 h-4 w-4", selectedIndustry?.slug === industry.slug ? "opacity-100" : "opacity-0")} />
-                                      {industry.name}
-                                    </CommandItem>
-                                    {industry.keywords.map(keyword => (
-                                      <CommandItem
-                                        key={`${industry.slug}-${keyword}`}
-                                        onSelect={() => handleIndustrySelect(industry)}
-                                        className="pl-8"
-                                      >
-                                          {keyword}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
+                                    <React.Fragment key={industry.slug}>
+                                        <CommandItem
+                                            onSelect={() => handleIndustrySelect(industry)}
+                                            className="font-semibold"
+                                        >
+                                            <Check className={cn("mr-2 h-4 w-4", selectedIndustry?.slug === industry.slug ? "opacity-100" : "opacity-0")} />
+                                            {industry.name}
+                                        </CommandItem>
+                                        {industrySearch && industry.keywords.map(keyword => (
+                                            <CommandItem
+                                                key={`${industry.slug}-${keyword}`}
+                                                onSelect={() => handleIndustrySelect(industry)}
+                                                className="pl-8"
+                                            >
+                                                {keyword}
+                                            </CommandItem>
+                                        ))}
+                                    </React.Fragment>
                                 ))}
                               </CommandList>
                             </Command>
@@ -448,3 +455,4 @@ export default function HomeClient() {
     </div>
   );
 }
+
