@@ -332,16 +332,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div>
-                                    <Label className="font-semibold">Viêm gan B</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="no">Không nhận viêm gan B</SelectItem>
-                                            <SelectItem value="static">Nhận viêm gan B (thể tĩnh)</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
