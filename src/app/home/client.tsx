@@ -286,26 +286,9 @@ const MainContent = () => (
   
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('all');
-  const [selectedIndustry, setSelectedIndustry] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const [test6Value, setTest6Value] = useState("");
-  const [openTest6Popover, setOpenTest6Popover] = useState(false);
-
-  const test6Suggestions = ['A', 'B', 'C'];
-
-  const filteredTest6Suggestions = React.useMemo(() => {
-    if (!test6Value) {
-        return test6Suggestions;
-    }
-    const lowercasedValue = test6Value.toLowerCase();
-    return test6Suggestions.filter(item => item.toLowerCase().includes(lowercasedValue));
-  }, [test6Value, test6Suggestions]);
-  
-
-  const handleSelectTest6Suggestion = (suggestion: string) => {
-    setTest6Value(suggestion);
-    setOpenTest6Popover(false);
-  }
+  const [openIndustryPopover, setOpenIndustryPopover] = useState(false);
+  const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
 
   return (
     <section className="w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white pt-20 md:pt-28 pb-10">
@@ -339,15 +322,52 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                     </div>
                      <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                        <Select onValueChange={setSelectedIndustry}>
-                            <SelectTrigger id="search-industry">
-                                <SelectValue placeholder="Tất cả ngành nghề" />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-60">
-                                <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                                {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name.vi}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
+                        <Popover open={openIndustryPopover} onOpenChange={setOpenIndustryPopover}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={openIndustryPopover}
+                                className="w-full justify-between h-10 font-normal"
+                                >
+                                {selectedIndustry
+                                    ? selectedIndustry.name.vi
+                                    : "Tất cả ngành nghề"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                <Command>
+                                <CommandInput placeholder="Tìm ngành nghề..." />
+                                <CommandList>
+                                    <CommandEmpty>Không tìm thấy ngành nghề.</CommandEmpty>
+                                    <CommandGroup>
+                                    {allIndustries.map((industry) => (
+                                        <CommandItem
+                                        key={industry.slug}
+                                        value={industry.name.vi}
+                                        onSelect={(currentValue) => {
+                                            const foundIndustry = allIndustries.find(
+                                                (ind) => ind.name.vi.toLowerCase() === currentValue.toLowerCase()
+                                            );
+                                            setSelectedIndustry(foundIndustry || null);
+                                            setOpenIndustryPopover(false);
+                                        }}
+                                        >
+                                        <Check
+                                            className={cn(
+                                            "mr-2 h-4 w-4",
+                                            selectedIndustry?.slug === industry.slug ? "opacity-100" : "opacity-0"
+                                            )}
+                                        />
+                                        {industry.name.vi}
+                                        </CommandItem>
+                                    ))}
+                                    </CommandGroup>
+                                </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                     <div className="md:col-span-4 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
