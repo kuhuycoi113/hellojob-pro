@@ -537,14 +537,8 @@ const LoggedInView = () => {
         });
     };
 
-    const formatNumber = (value: string | number) => {
-        const num = Number(String(value).replace(/,/g, ''));
-        if (isNaN(num)) return '';
-        return num.toLocaleString();
-    };
-    
     const handleSalaryInputChange = (value: string, currency: 'vnd' | 'jpy') => {
-        const num = parseInt(value.replace(/,/g, ''), 10);
+        const num = parseInt(value.replace(/[.,]/g, ''), 10);
         if (isNaN(num)) {
             setTempSalary('');
             return;
@@ -556,23 +550,22 @@ const LoggedInView = () => {
             setTempSalary(String(num));
         }
     };
-
+    
     const getDisplayValue = (currency: 'vnd' | 'jpy') => {
         const num = Number(tempSalary);
         if (isNaN(num) || num === 0) return '';
-        if (currency === 'vnd') {
-            return formatNumber(Math.round(num * JPY_VND_RATE));
-        }
-        return formatNumber(num);
+        const locale = currency === 'vnd' ? 'vi-VN' : 'ja-JP';
+        const valueToFormat = currency === 'vnd' ? Math.round(num * JPY_VND_RATE) : num;
+        return valueToFormat.toLocaleString(locale);
     };
-
+    
     const getConvertedValue = (currency: 'vnd' | 'jpy') => {
         const num = Number(tempSalary);
         if (isNaN(num) || num === 0) return '';
         if (currency === 'vnd') {
-            return `≈ ${formatNumber(num)} JPY`;
+            return `≈ ${num.toLocaleString('ja-JP')} JPY`;
         }
-        return `≈ ${formatNumber(Math.round(num * JPY_VND_RATE))} VNĐ`;
+        return `≈ ${Math.round(num * JPY_VND_RATE).toLocaleString('vi-VN')} VNĐ`;
     };
 
     if (role === 'candidate-empty-profile') {
@@ -956,7 +949,7 @@ const LoggedInView = () => {
                             <Label htmlFor="salary-vnd">Lương tối thiểu (VNĐ)</Label>
                             <Input 
                                 id="salary-vnd" 
-                                placeholder="33,000,000"
+                                placeholder="33.000.000"
                                 value={getDisplayValue('vnd')}
                                 onChange={(e) => handleSalaryInputChange(e.target.value, 'vnd')}
                             />
@@ -1172,6 +1165,7 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
