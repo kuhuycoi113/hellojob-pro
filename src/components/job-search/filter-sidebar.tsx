@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { industriesByJobType } from "@/lib/industry-data";
+import { industriesByJobType, type Industry } from "@/lib/industry-data";
 import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages } from "lucide-react";
 import { locations } from "@/lib/location-data";
 import { type SearchFilters } from './search-results';
@@ -60,6 +60,9 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
     const [visaDetail, setVisaDetail] = useState(initialFilters?.visaDetail || '');
     const [industry, setIndustry] = useState(initialFilters?.industry || '');
     const [workLocation, setWorkLocation] = useState(initialFilters?.location || '');
+    const [jobDetail, setJobDetail] = useState('');
+    const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
+
 
     useEffect(() => {
         setJobType(initialFilters?.visa || '');
@@ -67,6 +70,16 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
         setIndustry(initialFilters?.industry || '');
         setWorkLocation(initialFilters?.location || '');
     }, [initialFilters]);
+    
+     useEffect(() => {
+        if (industry) {
+            const selectedIndustryData = allIndustries.find(ind => ind.name === industry);
+            setAvailableJobDetails(selectedIndustryData?.keywords || []);
+        } else {
+            setAvailableJobDetails([]);
+        }
+        setJobDetail(''); // Reset job detail when industry changes
+    }, [industry]);
 
     const handleApplyFilters = () => {
         if (onApply) {
@@ -130,10 +143,28 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
 
                         <AccordionItem value="industry">
                             <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><Building className="h-5 w-5"/>Ngành nghề</span>
+                                <span className="flex items-center gap-2"><Building className="h-5 w-5"/>Ngành nghề & Công việc</span>
                             </AccordionTrigger>
-                            <AccordionContent className="space-y-2 pt-4">
-                               <Select value={industry} onValueChange={setIndustry}><SelectTrigger><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả ngành nghề</SelectItem>{allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}</SelectContent></Select>
+                            <AccordionContent className="space-y-4 pt-4">
+                                <div className="space-y-2">
+                                    <Label>Ngành nghề</Label>
+                                    <Select value={industry} onValueChange={setIndustry}>
+                                        <SelectTrigger><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
+                                        <SelectContent className="max-h-60">
+                                            <SelectItem value="all">Tất cả ngành nghề</SelectItem>
+                                            {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Chi tiết công việc</Label>
+                                     <Select value={jobDetail} onValueChange={setJobDetail} disabled={!industry || availableJobDetails.length === 0}>
+                                        <SelectTrigger><SelectValue placeholder="Chọn công việc chi tiết"/></SelectTrigger>
+                                        <SelectContent className="max-h-60">
+                                            {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
 

@@ -21,9 +21,10 @@ export type SearchFilters = {
 type SearchResultsProps = {
     jobs: Job[];
     initialFilters: SearchFilters;
+    onBack?: () => void;
 }
 
-export const SearchResults = ({ jobs, initialFilters }: SearchResultsProps) => {
+export const SearchResults = ({ jobs, initialFilters, onBack }: SearchResultsProps) => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(24);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
@@ -62,6 +63,11 @@ export const SearchResults = ({ jobs, initialFilters }: SearchResultsProps) => {
     return (
      <div className="w-full bg-secondary">
         <div className="container mx-auto px-4 md:px-6 py-6">
+             {onBack && (
+                <Button onClick={onBack} variant="link" className="mb-4 pl-0">
+                    <ChevronLeft className="mr-2 h-4 w-4" /> Quay lại trang chủ
+                </Button>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8">
                 <div className="hidden md:block">
                   <FilterSidebar initialFilters={initialFilters} />

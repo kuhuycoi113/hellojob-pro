@@ -267,10 +267,11 @@ const MainContent = () => (
 
   type SearchModuleProps = {
       onSearch: (filters: SearchFilters) => void;
-      showHero: boolean;
+      onBack?: () => void;
+      isSearching: boolean;
   }
   
-const SearchModule = ({ onSearch, showHero }: SearchModuleProps) => {
+const SearchModule = ({ onSearch, onBack, isSearching }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('');
   const [selectedVisaDetail, setSelectedVisaDetail] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -280,10 +281,10 @@ const SearchModule = ({ onSearch, showHero }: SearchModuleProps) => {
 
   useEffect(() => {
     // When the hero is hidden (after a search), collapse the search bar by default on mobile.
-    if (!showHero) {
+    if (isSearching) {
       setIsSearchExpanded(false);
     }
-  }, [showHero]);
+  }, [isSearching]);
 
   const handleVisaTypeChange = (value: string) => {
     setSelectedJobType(value);
@@ -326,9 +327,9 @@ const SearchModule = ({ onSearch, showHero }: SearchModuleProps) => {
   return (
     <section className={cn(
         "w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white transition-all duration-500",
-        showHero ? "pt-20 md:pt-28 pb-10" : "pt-8 pb-8 md:pt-12 md:pb-12"
+        !isSearching ? "pt-20 md:pt-28 pb-10" : "pt-8 pb-8 md:pt-12 md:pb-12"
     )}>
-        {showHero && (
+        {!isSearching && (
             <div className="container mx-auto px-4 md:px-6">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4">
@@ -342,11 +343,11 @@ const SearchModule = ({ onSearch, showHero }: SearchModuleProps) => {
         )}
         <div className={cn(
             "container mx-auto px-4 md:px-6 relative z-10",
-            showHero && "mt-[-6rem] md:mt-4"
+            !isSearching && "mt-[-6rem] md:mt-4"
         )}>
             <Card className="max-w-6xl mx-auto shadow-2xl">
                  {/* Mobile Collapsed View */}
-                {!showHero && (
+                {isSearching && (
                     <div className="md:hidden p-2">
                         <Button 
                             variant="ghost" 
@@ -365,7 +366,7 @@ const SearchModule = ({ onSearch, showHero }: SearchModuleProps) => {
                 {/* Full Search View (Desktop always, Mobile when expanded) */}
                 <div className={cn(
                     "p-4 md:p-6",
-                    !showHero && !isSearchExpanded ? "hidden md:block" : "block"
+                    isSearching && !isSearchExpanded ? "hidden md:block" : "block"
                 )}>
                     <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                         <div className="space-y-2 flex-1">
@@ -482,10 +483,10 @@ export default function HomeClient() {
 
   return (
     <div className="flex flex-col items-center min-h-screen">
-        <SearchModule onSearch={handleSearch} showHero={!isSearching} />
+        <SearchModule onSearch={handleSearch} isSearching={isSearching} />
       
       <div className="w-full flex-grow">
-        {isSearching ? <SearchResults jobs={filteredJobs} initialFilters={searchFilters} /> : <MainContent />}
+        {isSearching ? <SearchResults jobs={filteredJobs} initialFilters={searchFilters} onBack={handleBackToHome} /> : <MainContent />}
       </div>
     </div>
   );
