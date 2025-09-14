@@ -286,6 +286,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
   const [openIndustryPopover, setOpenIndustryPopover] = useState(false);
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
+  const [test4Value, setTest4Value] = useState('');
   
 
   useEffect(() => {
@@ -337,7 +338,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     
                     <div className="md:col-span-3 space-y-2">
-                        <Label htmlFor="test3-input" className="text-foreground">Ngành nghề</Label>
+                        <Label htmlFor="industry-input" className="text-foreground">Ngành nghề</Label>
                         <Popover open={openIndustryPopover} onOpenChange={setOpenIndustryPopover}>
                             <PopoverTrigger asChild>
                                 <Button
@@ -345,7 +346,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                                     role="combobox"
                                     aria-expanded={openIndustryPopover}
                                     className="w-full justify-between h-10"
-                                    id="test3-input"
+                                    id="industry-input"
                                 >
                                     {selectedIndustry
                                         ? selectedIndustry.name
@@ -356,7 +357,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             <PopoverContent className="w-[300px] p-0">
                                 <Command
                                     filter={(value, search) => {
-                                        const industry = availableIndustries.find(ind => ind.name.toLowerCase() === value);
+                                        const industry = availableIndustries.find(ind => ind.name.toLowerCase() === value.toLowerCase());
                                         if (!industry) return 0;
                                         const nameMatch = industry.name.toLowerCase().includes(search.toLowerCase());
                                         const keywordMatch = industry.keywords.some(k => k.toLowerCase().includes(search.toLowerCase()));
@@ -393,7 +394,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                         </Popover>
                     </div>
                     
-                    <div className="md:col-span-3 space-y-2">
+                    <div className="md:col-span-2 space-y-2">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                         <Select onValueChange={handleJobTypeChange} defaultValue="all">
                             <SelectTrigger id="search-type">
@@ -407,8 +408,13 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
+
+                    <div className="md:col-span-2 space-y-2">
+                        <Label htmlFor="test4-input" className="text-foreground">Test 4</Label>
+                        <Input id="test4-input" placeholder="Gõ để tìm kiếm..." value={test4Value} onChange={(e) => setTest4Value(e.target.value)} />
+                    </div>
                     
-                    <div className="md:col-span-4 space-y-2">
+                    <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                         <Select onValueChange={setSelectedLocation}>
                             <SelectTrigger id="search-location">
@@ -453,3 +459,4 @@ export default function HomeClient() {
     </div>
   );
 }
+
