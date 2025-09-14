@@ -188,7 +188,14 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         "Thực tập sinh 3 Go", 
         "Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"
     ].includes(filters.visaDetail || '');
+    const availableWageTypesCount = 1 + (showHourlyWage ? 1 : 0) + (showYearlyWage ? 1 : 0);
 
+    const monthlySalaryContent = (
+        <div className="space-y-2">
+            <Label htmlFor="basic-salary-month">Lương cơ bản (JPY/tháng)</Label>
+            <Input id="basic-salary-month" type="number" placeholder="VD: 200000" />
+        </div>
+    );
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -299,40 +306,43 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương & Phúc lợi</span>
                             </AccordionTrigger>
-                            <AccordionContent className="pt-4 space-y-4">
-                               <Tabs defaultValue="monthly" className="w-full">
-                                    <TabsList className={cn("grid w-full", showHourlyWage && showYearlyWage ? "grid-cols-3" : (showHourlyWage || showYearlyWage ? "grid-cols-2" : "grid-cols-1"))}>
-                                        <TabsTrigger value="monthly">Tháng</TabsTrigger>
-                                        {showHourlyWage && <TabsTrigger value="hourly">Giờ</TabsTrigger>}
-                                        {showYearlyWage && <TabsTrigger value="yearly">Năm</TabsTrigger>}
-                                    </TabsList>
-                                    <TabsContent value="monthly" className="pt-4 space-y-4">
-                                         <div className="space-y-2">
-                                            <Label htmlFor="basic-salary-month">Lương cơ bản (JPY/tháng)</Label>
-                                            <Input id="basic-salary-month" type="number" placeholder="VD: 200000" />
-                                        </div>
-                                    </TabsContent>
-                                    {showHourlyWage && (
-                                        <TabsContent value="hourly" className="pt-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="hourly-salary">Lương theo giờ (JPY)</Label>
-                                                <Input id="hourly-salary" type="number" placeholder="VD: 1000" />
-                                            </div>
+                             <AccordionContent className="pt-4 space-y-4">
+                                {availableWageTypesCount > 1 ? (
+                                    <Tabs defaultValue="monthly" className="w-full">
+                                        <TabsList className={cn("grid w-full", showHourlyWage && showYearlyWage ? "grid-cols-3" : "grid-cols-2")}>
+                                            <TabsTrigger value="monthly">Tháng</TabsTrigger>
+                                            {showHourlyWage && <TabsTrigger value="hourly">Giờ</TabsTrigger>}
+                                            {showYearlyWage && <TabsTrigger value="yearly">Năm</TabsTrigger>}
+                                        </TabsList>
+                                        <TabsContent value="monthly" className="pt-4 space-y-4">
+                                            {monthlySalaryContent}
                                         </TabsContent>
-                                    )}
-                                     {showYearlyWage && (
-                                        <TabsContent value="yearly" className="space-y-4 pt-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="annual-income">Thu nhập năm (Vạn JPY)</Label>
-                                                <Input id="annual-income" type="number" placeholder="VD: 300" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="annual-bonus">Thưởng năm (Vạn JPY)</Label>
-                                                <Input id="annual-bonus" type="text" placeholder="VD: 20" />
-                                            </div>
-                                        </TabsContent>
-                                    )}
-                                </Tabs>
+                                        {showHourlyWage && (
+                                            <TabsContent value="hourly" className="pt-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="hourly-salary">Lương theo giờ (JPY)</Label>
+                                                    <Input id="hourly-salary" type="number" placeholder="VD: 1000" />
+                                                </div>
+                                            </TabsContent>
+                                        )}
+                                        {showYearlyWage && (
+                                            <TabsContent value="yearly" className="space-y-4 pt-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="annual-income">Thu nhập năm (Vạn JPY)</Label>
+                                                    <Input id="annual-income" type="number" placeholder="VD: 300" />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="annual-bonus">Thưởng năm (Vạn JPY)</Label>
+                                                    <Input id="annual-bonus" type="text" placeholder="VD: 20" />
+                                                </div>
+                                            </TabsContent>
+                                        )}
+                                    </Tabs>
+                                ) : (
+                                    <div className="pt-4 space-y-4">
+                                        {monthlySalaryContent}
+                                    </div>
+                                )}
                             </AccordionContent>
                         </AccordionItem>
                         
@@ -524,10 +534,4 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
             </Card>
         </div>
     );
- 
-
-    
-
-
-
-    
+}
