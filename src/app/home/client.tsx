@@ -287,6 +287,8 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [openIndustryPopover, setOpenIndustryPopover] = useState(false);
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
   const [test4Value, setTest4Value] = useState('');
+  const [openTest4Popover, setOpenTest4Popover] = useState(false);
+  const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
   
 
   useEffect(() => {
@@ -409,12 +411,52 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                         </Select>
                     </div>
 
-                    <div className="md:col-span-2 space-y-2">
+                     <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="test4-input" className="text-foreground">Test 4</Label>
-                        <Input id="test4-input" placeholder="Gõ để tìm kiếm..." value={test4Value} onChange={(e) => setTest4Value(e.target.value)} />
+                        <Popover open={openTest4Popover} onOpenChange={setOpenTest4Popover}>
+                            <PopoverTrigger asChild>
+                                <Input
+                                    id="test4-input"
+                                    placeholder="Gõ để tìm kiếm..."
+                                    value={test4Value}
+                                    onChange={(e) => setTest4Value(e.target.value)}
+                                    onFocus={() => setOpenTest4Popover(true)}
+                                />
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[300px] p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
+                                <Command
+                                    filter={(value, search) => {
+                                        if (!search) return 1;
+                                        const industry = allIndustries.find(ind => ind.name.toLowerCase() === value.toLowerCase());
+                                        if (!industry) return 0;
+                                        const nameMatch = industry.name.toLowerCase().includes(search.toLowerCase());
+                                        const keywordMatch = industry.keywords.some(k => k.toLowerCase().includes(search.toLowerCase()));
+                                        return (nameMatch || keywordMatch) ? 1 : 0;
+                                    }}
+                                >
+                                    <CommandList>
+                                        <CommandEmpty>Không tìm thấy.</CommandEmpty>
+                                        <CommandGroup heading={test4Value ? "Kết quả" : "Gợi ý ngành nghề"}>
+                                            {allIndustries.map((industry) => (
+                                                <CommandItem
+                                                    key={`test4-${industry.slug}`}
+                                                    value={industry.name}
+                                                    onSelect={(currentValue) => {
+                                                        setTest4Value(currentValue);
+                                                        setOpenTest4Popover(false);
+                                                    }}
+                                                >
+                                                    {industry.name}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                     
-                    <div className="md:col-span-3 space-y-2">
+                    <div className="md:col-span-2 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                         <Select onValueChange={setSelectedLocation}>
                             <SelectTrigger id="search-location">
@@ -459,4 +501,3 @@ export default function HomeClient() {
     </div>
   );
 }
-
