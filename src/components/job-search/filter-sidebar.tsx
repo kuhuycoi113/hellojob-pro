@@ -110,16 +110,13 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
 
     useEffect(() => {
-        const industries = filters.visa ? (industriesByJobType[filters.visa as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
+        const industries = allIndustries;
         const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
         setAvailableIndustries(uniqueIndustries);
 
-        if (filters.industry) {
-            const selectedIndustryData = allIndustries.find(ind => ind.name === filters.industry);
-            setAvailableJobDetails(selectedIndustryData?.keywords || []);
-        } else {
-            setAvailableJobDetails([]);
-        }
+        const allJobDetails = allIndustries.flatMap(ind => ind.keywords);
+        setAvailableJobDetails([...new Set(allJobDetails)]);
+
     }, [filters.visa, filters.industry]);
 
 
@@ -151,7 +148,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
-                                <div>
+                                <div className="hidden">
                                     <Label>Loại visa</Label>
                                     <Select value={filters.visa} onValueChange={handleJobTypeChange}>
                                         <SelectTrigger className={cn(filters.visa && filters.visa !== 'all' && 'text-primary')}>
@@ -204,8 +201,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Chi tiết công việc</Label>
-                                     <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry || availableJobDetails.length === 0}>
-                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Phải chọn Ngành nghề trước"/></SelectTrigger>
+                                     <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
+                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn công việc chi tiết"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
                                         </SelectContent>
@@ -477,13 +474,3 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         </div>
     );
  
-
-
-
-
-    
-
-
-
-    
-
