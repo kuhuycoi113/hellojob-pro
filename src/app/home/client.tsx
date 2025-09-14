@@ -345,12 +345,15 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                                     className="h-10"
                                     value={searchValue}
                                     onChange={(e) => setSearchValue(e.target.value)}
-                                    onClick={() => setOpenPopover(true)}
                                 />
                             </PopoverTrigger>
                             <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
                                 <Command>
-                                    <CommandInput placeholder="Gõ để tìm kiếm..." />
+                                    <CommandInput 
+                                        placeholder="Gõ để tìm ngành nghề hoặc công việc..." 
+                                        value={searchValue}
+                                        onValueChange={setSearchValue}
+                                    />
                                     <CommandList>
                                         <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
                                         <CommandGroup>
