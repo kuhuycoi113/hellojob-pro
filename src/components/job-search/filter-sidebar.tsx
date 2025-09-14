@@ -216,7 +216,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             </AccordionContent>
                         </AccordionItem>
 
-                         <AccordionItem value="basic-salary">
+                        <AccordionItem value="basic-salary">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương cơ bản (JPY/tháng)</span>
                             </AccordionTrigger>
@@ -269,7 +269,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="height-from">Chiều cao từ (cm)</Label>
-                                    <Input id="height-from" type="number" placeholder="150" />
+                                    <Input id="height-from" type="number" placeholder="135-210" min="135" max="210" />
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="weight-from">Cân nặng từ (kg)</Label>
