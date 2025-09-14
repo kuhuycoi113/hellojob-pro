@@ -362,7 +362,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                         <div className="space-y-2 flex-1">
                             <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                             <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail}>
-                                <SelectTrigger id="search-type" className={cn(filters.visaDetail && 'text-primary')}>
+                                <SelectTrigger id="search-type">
                                 <SelectValue placeholder="Tất cả loại hình" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -381,7 +381,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                         <div className="space-y-2 flex-1">
                             <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
                             <Select onValueChange={(value) => onFilterChange({ industry: value })} value={filters.industry}>
-                                <SelectTrigger id="search-industry" className={cn(filters.industry && 'text-primary')}>
+                                <SelectTrigger id="search-industry">
                                     <SelectValue placeholder="Tất cả ngành nghề" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -397,7 +397,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                         <div className="space-y-2 flex-1">
                             <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                             <Select onValueChange={(value) => onFilterChange({ location: value })} value={filters.location}>
-                                <SelectTrigger id="search-location" className={cn(filters.location && 'text-primary')}>
+                                <SelectTrigger id="search-location">
                                 <SelectValue placeholder="Tất cả địa điểm" />
                                 </SelectTrigger>
                                 <SelectContent className="max-h-[300px]">
