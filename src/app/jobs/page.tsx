@@ -32,6 +32,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { locations } from '@/lib/location-data';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 const aspirations = [
@@ -385,6 +386,7 @@ const LoggedInView = () => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
+    const [isSalaryDialogOpen, setIsSalaryDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
     const [suggestionPrinciple, setSuggestionPrinciple] = useState<'salary' | 'fee' | 'company' | null>(null);
@@ -805,19 +807,40 @@ const LoggedInView = () => {
                     <div className="space-y-2 pt-2">
                         <Label className="font-semibold">Ưu tiên tìm việc</Label>
                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <Button 
-                                variant={suggestionPrinciple === 'salary' ? 'default' : 'outline'}
-                                onClick={() => setSuggestionPrinciple('salary')}
-                                className={cn(
-                                    "justify-start text-left h-auto py-2",
-                                    suggestionPrinciple === 'salary' && "bg-accent-green hover:bg-accent-green/90"
-                                )}
-                            >
-                                <div>
-                                    <p className="font-semibold">Lương tốt</p>
-                                    <p className="text-xs opacity-80 font-normal">Ưu tiên việc có lương cao</p>
-                                </div>
-                            </Button>
+                            <Dialog open={isSalaryDialogOpen} onOpenChange={setIsSalaryDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        variant={suggestionPrinciple === 'salary' ? 'default' : 'outline'}
+                                        onClick={() => setSuggestionPrinciple('salary')}
+                                        className={cn(
+                                            "justify-start text-left h-auto py-2",
+                                            suggestionPrinciple === 'salary' && "bg-accent-green hover:bg-accent-green/90"
+                                        )}
+                                    >
+                                        <div>
+                                            <p className="font-semibold">Lương tốt</p>
+                                            <p className="text-xs opacity-80 font-normal">Ưu tiên việc có lương cao</p>
+                                        </div>
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                     <DialogHeader>
+                                        <DialogTitle>Mức lương mong muốn tối thiểu/tháng</DialogTitle>
+                                    </DialogHeader>
+                                    <Tabs defaultValue="vnd" className="w-full">
+                                        <TabsList className="grid w-full grid-cols-2">
+                                            <TabsTrigger value="vnd">VND</TabsTrigger>
+                                            <TabsTrigger value="jpy">JPY</TabsTrigger>
+                                        </TabsList>
+                                        <TabsContent value="vnd">
+                                            {/* VND Input Content Here */}
+                                        </TabsContent>
+                                        <TabsContent value="jpy">
+                                            {/* JPY Input Content Here */}
+                                        </TabsContent>
+                                    </Tabs>
+                                </DialogContent>
+                            </Dialog>
                             <Button 
                                 variant={suggestionPrinciple === 'fee' ? 'default' : 'outline'}
                                 onClick={() => setSuggestionPrinciple('fee')}
@@ -1068,6 +1091,7 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
