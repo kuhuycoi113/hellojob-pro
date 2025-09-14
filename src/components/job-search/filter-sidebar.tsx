@@ -22,6 +22,12 @@ const japanJobTypes = [
     'Kỹ sư, tri thức'
 ];
 
+const visaDetailsByVisaType: { [key: string]: string[] } = {
+    'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
+    'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
+    'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
+};
+
 const specialConditions = [
     'Hỗ trợ Ginou 2', 'Hỗ trợ chỗ ở', 'Cặp đôi', 'Lương tốt', 'Tăng ca', 'Có thưởng', 'Nợ phí', 'Bay nhanh', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Không yêu cầu kinh nghiệm', 'Việc nhẹ', 'Việc nặng', 'Nghỉ T7, CN', 'Nhận visa katsudo'
 ];
@@ -51,6 +57,7 @@ interface FilterSidebarProps {
 
 export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) => {
     const [jobType, setJobType] = useState(initialFilters?.visa || '');
+    const [visaDetail, setVisaDetail] = useState('');
     const [industry, setIndustry] = useState(initialFilters?.industry || '');
     const [workLocation, setWorkLocation] = useState(initialFilters?.location || '');
 
@@ -63,11 +70,16 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
     const handleApplyFilters = () => {
         if (onApply) {
             onApply({
-                visa: jobType,
+                visa: visaDetail || jobType,
                 industry,
                 location: workLocation
             });
         }
+    }
+
+    const handleJobTypeChange = (value: string) => {
+        setJobType(value);
+        setVisaDetail(''); // Reset visa detail when job type changes
     }
 
     return (
@@ -82,18 +94,35 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                             <AccordionTrigger className="text-base font-semibold">
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
                             </AccordionTrigger>
-                            <AccordionContent className="space-y-2 pt-4">
-                                <Select value={jobType} onValueChange={setJobType}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Tất cả loại hình"/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">Tất cả loại hình</SelectItem>
-                                        {japanJobTypes.map(type => (
-                                            <SelectItem key={type} value={type}>{type}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                            <AccordionContent className="space-y-4 pt-4">
+                                <div>
+                                    <Label>Loại visa</Label>
+                                    <Select value={jobType} onValueChange={handleJobTypeChange}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Tất cả loại hình"/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Tất cả loại hình</SelectItem>
+                                            {japanJobTypes.map(type => (
+                                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                 <div>
+                                    <Label>Chi tiết loại hình visa</Label>
+                                    <Select value={visaDetail} onValueChange={setVisaDetail} disabled={!jobType || jobType === 'all'}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Tất cả chi tiết"/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all-details">Tất cả chi tiết</SelectItem>
+                                            {(visaDetailsByVisaType[jobType] || []).map(detail => (
+                                                <SelectItem key={detail} value={detail}>{detail}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
