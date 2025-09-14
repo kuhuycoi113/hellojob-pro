@@ -25,9 +25,15 @@ type MatchResult = z.infer<typeof MatchResultSchema>;
 // Make most fields optional for the matching logic, as a quick-profile won't have all data.
 const PartialCandidateProfileSchema = z.custom<Partial<CandidateProfile>>();
 
+const MatchInputSchema = z.object({
+    profile: PartialCandidateProfileSchema,
+    suggestionType: z.enum(['accurate', 'related']).optional().default('related'),
+});
+type MatchInput = z.infer<typeof MatchInputSchema>;
 
-export async function matchJobsToProfile(profile: Partial<CandidateProfile>): Promise<MatchResult[]> {
-    return matchJobsToProfileFlow(profile);
+
+export async function matchJobsToProfile(profile: Partial<CandidateProfile>, suggestionType?: 'accurate' | 'related'): Promise<MatchResult[]> {
+    return matchJobsToProfileFlow({ profile, suggestionType });
 }
 
 // Weight constants for scoring
@@ -47,11 +53,12 @@ const WEIGHTS = {
 const matchJobsToProfileFlow = ai.defineFlow(
     {
         name: 'matchJobsToProfileFlow',
-        inputSchema: PartialCandidateProfileSchema,
+        inputSchema: MatchInputSchema,
         outputSchema: z.array(MatchResultSchema),
     },
-    async (profile) => {
+    async ({ profile, suggestionType }) => {
         const matchedJobs: MatchResult[] = [];
+        const isAccurateMode = suggestionType === 'accurate';
 
         // Helper function to check if a job's location is within the desired region
         const isLocationInRegion = (jobLocation: string, desiredRegion: string): boolean => {
@@ -64,6 +71,14 @@ const matchJobsToProfileFlow = ai.defineFlow(
         for (const job of jobData) {
             const breakdown: { [key: string]: number } = {};
             let score = 0;
+            
+            // ACCURATE MODE: Hard filters
+            if (isAccurateMode) {
+                if (profile.aspirations?.desiredVisaType && profile.aspirations.desiredVisaType !== job.visaType) continue;
+                if (profile.aspirations?.desiredVisaDetail && profile.aspirations.desiredVisaDetail !== job.visaDetail) continue;
+                if (profile.desiredIndustry && profile.desiredIndustry !== job.industry) continue;
+                if (profile.aspirations?.desiredLocation && profile.aspirations.desiredLocation !== job.workLocation && !isLocationInRegion(job.workLocation, profile.aspirations.desiredLocation)) continue;
+            }
 
             // 1. Visa Matching (Hard Filter & High Score)
             if (profile.aspirations?.desiredVisaType && job.visaType &&

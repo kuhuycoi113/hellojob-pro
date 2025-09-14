@@ -429,6 +429,8 @@ const LoggedInView = () => {
         setIsLoadingSuggestions(true);
         try {
             const storedProfile = localStorage.getItem('generatedCandidateProfile');
+            const storedSuggestionType = (localStorage.getItem('suggestionType') as 'accurate' | 'related') || 'related';
+
             if (storedProfile) {
                 const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
                  const userVisaDetail = profile.aspirations?.desiredVisaDetail;
@@ -455,7 +457,7 @@ const LoggedInView = () => {
                     setFeeButtonText('Phí thấp');
                 }
 
-                const matchResults = await matchJobsToProfile(profile);
+                const matchResults = await matchJobsToProfile(profile, storedSuggestionType);
                 const jobs = matchResults.map(result => result.job);
                 setSuggestedJobs(jobs);
             } else {
