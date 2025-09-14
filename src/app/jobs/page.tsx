@@ -31,6 +31,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { locations } from '@/lib/location-data';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 
 const aspirations = [
@@ -797,7 +798,7 @@ const LoggedInView = () => {
                     
                     <div className="space-y-2 pt-2">
                         <Label className="font-semibold">Ưu tiên tìm việc</Label>
-                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <Button 
                                 variant={suggestionPrinciple === 'salary' ? 'default' : 'outline'}
                                 onClick={() => setSuggestionPrinciple('salary')}
@@ -830,10 +831,17 @@ const LoggedInView = () => {
                             </Button>
                         </div>
                     </div>
-                    <div className="space-y-2 pt-2">
-                        <Label className="font-semibold">Thêm điều kiện mở rộng</Label>
-                        {/* Content for this section will be added in a future prompt */}
-                    </div>
+                    <Collapsible className="space-y-2 pt-2">
+                        <CollapsibleTrigger asChild>
+                            <Button variant="ghost" className="justify-start p-0 h-auto font-semibold hover:no-underline">
+                                Thêm điều kiện mở rộng
+                                <ChevronDown className="h-4 w-4 ml-2"/>
+                            </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                           {/* Content for this section will be added in a future prompt */}
+                        </CollapsibleContent>
+                    </Collapsible>
                 </div>
                 <DialogFooter className="flex-row justify-end space-x-2">
                     <DialogClose asChild>
@@ -984,7 +992,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
             <Card className="shadow-2xl w-full max-w-sm">
                 <CardHeader className="pb-3">
                     <CardTitle className="text-base font-bold flex items-center justify-between">
-                        <span>Bạn có muốn ưu tiên tìm việc theo?</span>
+                        <span>Ưu tiên tìm việc theo?</span>
                         <Button
                             variant="ghost"
                             size="icon"
@@ -997,13 +1005,13 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2">
                     <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        <TrendingUp className="mr-2 text-green-500" /> Lương tốt
+                        Lương tốt
                     </Button>
                     <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        <ThumbsUp className="mr-2 text-blue-500" /> {feeButtonText}
+                        {feeButtonText}
                     </Button>
                     <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        <ShieldCheck className="mr-2 text-orange-500" /> {companyButtonText}
+                        {companyButtonText}
                     </Button>
                 </CardContent>
             </Card>
