@@ -322,52 +322,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                     </div>
                      <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                        <Popover open={openIndustryPopover} onOpenChange={setOpenIndustryPopover}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={openIndustryPopover}
-                                className="w-full justify-between h-10 font-normal"
-                                >
-                                {selectedIndustry
-                                    ? selectedIndustry.name.vi
-                                    : "Tất cả ngành nghề"}
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                                <Command>
-                                <CommandInput placeholder="Tìm ngành nghề..." />
-                                <CommandList>
-                                    <CommandEmpty>Không tìm thấy ngành nghề.</CommandEmpty>
-                                    <CommandGroup>
-                                    {allIndustries.map((industry) => (
-                                        <CommandItem
-                                        key={industry.slug}
-                                        value={industry.name.vi}
-                                        onSelect={(currentValue) => {
-                                            const foundIndustry = allIndustries.find(
-                                                (ind) => ind.name.vi.toLowerCase() === currentValue.toLowerCase()
-                                            );
-                                            setSelectedIndustry(foundIndustry || null);
-                                            setOpenIndustryPopover(false);
-                                        }}
-                                        >
-                                        <Check
-                                            className={cn(
-                                            "mr-2 h-4 w-4",
-                                            selectedIndustry?.slug === industry.slug ? "opacity-100" : "opacity-0"
-                                            )}
-                                        />
-                                        {industry.name.vi}
-                                        </CommandItem>
-                                    ))}
-                                    </CommandGroup>
-                                </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                        <Input id="search-industry" placeholder="VD: Cơ khí, Thực phẩm" />
                     </div>
                     <div className="md:col-span-4 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
