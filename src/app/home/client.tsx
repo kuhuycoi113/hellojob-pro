@@ -92,7 +92,7 @@ const locations = {
     }
 };
 
-const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name.vi === v.name.vi)) === i);
+const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
 const MainContent = () => (
     <>
@@ -320,7 +320,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                     <div className="md:col-span-3 space-y-2">
+                    <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
                         <Input id="search-industry" placeholder="VD: Cơ khí, Thực phẩm" />
                     </div>
