@@ -935,7 +935,7 @@ const LoggedInView = () => {
                 </DialogHeader>
                 <Tabs defaultValue="jpy" className="w-full pt-4">
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="jpy">JPY</TabsTrigger>
+                        <TabsTrigger value="jpy" className="data-[state=active]:bg-accent-yellow">JPY</TabsTrigger>
                         <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VND</TabsTrigger>
                     </TabsList>
                     <TabsContent value="jpy" className="pt-4">
@@ -975,16 +975,16 @@ const LoggedInView = () => {
                 <DialogHeader>
                     <DialogTitle>Mức phí mong muốn</DialogTitle>
                 </DialogHeader>
-                <Tabs defaultValue="jpy" className="w-full pt-4">
+                <Tabs defaultValue="usd" className="w-full pt-4">
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="jpy">JPY</TabsTrigger>
+                        <TabsTrigger value="usd" className="data-[state=active]:bg-accent-yellow">USD</TabsTrigger>
                         <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VND</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="jpy" className="pt-4">
+                    <TabsContent value="usd" className="pt-4">
                         <div className="space-y-2">
-                            <Label htmlFor="fee-jpy">Phí (JPY)</Label>
+                            <Label htmlFor="fee-usd">Phí (USD)</Label>
                             <Input 
-                                id="fee-jpy" 
+                                id="fee-usd" 
                                 placeholder="Nhập mức phí mong muốn"
                                 value={''}
                                 onChange={(e) => {}}
@@ -1211,6 +1211,7 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
