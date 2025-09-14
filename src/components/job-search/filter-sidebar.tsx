@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -160,19 +161,39 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
                          <AccordionItem value="location">
                             <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><MapPin className="h-5 w-5"/>Địa điểm</span>
+                                <span className="flex items-center gap-2"><MapPin className="h-5 w-5"/>Địa điểm làm việc</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
-                                    <Label>Nơi làm việc (Nhật Bản)</Label>
                                     <Select value={filters.location} onValueChange={(value) => onFilterChange({ location: value })}><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Nhật Bản</SelectItem>{Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (<SelectGroup key={region}><SelectLabel>{region}</SelectLabel><SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>{(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectGroup>))}</SelectContent></Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Nơi phỏng vấn (Việt Nam)</Label>
-                                    <Select><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Việt Nam</SelectItem>{locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent></Select>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
+                        
+                         <AccordionItem value="interviewLocation">
+                            <AccordionTrigger className="text-base font-semibold">
+                                <span className="flex items-center gap-2"><MapPin className="h-5 w-5"/>Phỏng vấn, tuyển tại</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-4 pt-4">
+                                <div className="space-y-2">
+                                    <Select value={filters.interviewLocation} onValueChange={(value) => onFilterChange({ interviewLocation: value })}>
+                                        <SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger>
+                                        <SelectContent className="max-h-60">
+                                            <SelectItem value="all">Tất cả địa điểm</SelectItem>
+                                            <SelectGroup>
+                                                 <SelectLabel>Việt Nam</SelectLabel>
+                                                 {locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}
+                                            </SelectGroup>
+                                             <SelectGroup>
+                                                <SelectLabel>Nhật Bản</SelectLabel>
+                                                 {Object.values(locations["Nhật Bản"]).flat().map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                             </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+
                         <AccordionItem value="salary">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Mức lương (JPY/tháng)</span>

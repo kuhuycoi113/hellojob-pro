@@ -17,6 +17,7 @@ export type SearchFilters = {
     visaDetail: string;
     industry: string;
     location: string;
+    interviewLocation: string; // Added this line
     jobDetail?: string; // Add jobDetail
 }
 

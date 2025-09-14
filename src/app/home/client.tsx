@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { BookOpen, Search, ChevronsUpDown, Check, GraduationCap, Briefcase, TrendingUp, BookCopy, ArrowRight, MapPin, MapIcon, SlidersHorizontal, ChevronLeft } from 'lucide-react';
@@ -429,7 +429,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
 export default function HomeClient() {
   const [isSearching, setIsSearching] = useState(false);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', visaDetail: '', industry: '', location: '' });
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', visaDetail: '', industry: '', location: '', interviewLocation: '' });
 
   const handleSearch = (filters: SearchFilters) => {
     applyFilters(filters);
@@ -447,7 +447,7 @@ export default function HomeClient() {
   }, [searchFilters, isSearching]);
 
   const applyFilters = useCallback((currentFilters: SearchFilters) => {
-     const { visa, visaDetail, industry, location, jobDetail } = currentFilters;
+     const { visa, visaDetail, industry, location, jobDetail, interviewLocation } = currentFilters;
     const results = jobData.filter(job => {
         
         let visaMatch = true;
@@ -474,7 +474,9 @@ export default function HomeClient() {
             }
         }
         
-        return visaMatch && industryMatch && locationMatch && jobDetailMatch;
+        const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
+        
+        return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch;
     });
 
     setFilteredJobs(results);
@@ -485,7 +487,7 @@ export default function HomeClient() {
         e.preventDefault();
         if (isSearching) {
             setIsSearching(false);
-            setSearchFilters({ visa: '', visaDetail: '', industry: '', location: '' });
+            setSearchFilters({ visa: '', visaDetail: '', industry: '', location: '', interviewLocation: '' });
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
              window.location.reload();
