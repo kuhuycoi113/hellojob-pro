@@ -696,7 +696,13 @@ const LoggedInView = () => {
                        ) : (
                            <div className="text-center py-8 text-muted-foreground">
                              <p>Không tìm thấy công việc nào phù hợp với hồ sơ của bạn.</p>
-                             <p className="text-sm mt-2">Hãy thử cập nhật <Link href="/candidate-profile" className="text-primary underline">hồ sơ và nguyện vọng</Link> của bạn.</p>
+                             <p className="text-sm mt-2">
+                                Hãy thử cập nhật{' '}
+                                <button onClick={openEditAspirationsDialog} className="text-primary underline">
+                                    hồ sơ và nguyện vọng
+                                </button>{' '}
+                                của bạn.
+                             </p>
                            </div>
                        )}
                     </AccordionContent>
