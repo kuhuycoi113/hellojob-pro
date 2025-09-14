@@ -305,8 +305,8 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
         <div className="container mx-auto px-4 md:px-6 mt-[-6rem] md:mt-4 relative z-10">
             <Card className="max-w-6xl mx-auto shadow-2xl">
                 <CardContent className="p-4 md:p-6">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                    <div className="md:col-span-3 space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div className="col-span-1 space-y-2">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                         <Select onValueChange={setSelectedJobType} defaultValue="all">
                             <SelectTrigger id="search-type">
@@ -320,11 +320,11 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="md:col-span-3 space-y-2">
+                    <div className="col-span-1 space-y-2">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
                         <Input id="search-industry" placeholder="VD: Cơ khí, Thực phẩm" />
                     </div>
-                    <div className="md:col-span-4 space-y-2">
+                    <div className="col-span-1 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                         <Select onValueChange={setSelectedLocation}>
                             <SelectTrigger id="search-location">
@@ -340,7 +340,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="md:col-span-2">
+                    <div className="col-span-1">
                         <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={onSearch}>
                             <Search className="mr-2 h-5 w-5" /> Tìm kiếm
                         </Button>
