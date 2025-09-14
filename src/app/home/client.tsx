@@ -288,6 +288,8 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
   const [isIndustryPopoverOpen, setIsIndustryPopoverOpen] = useState(false);
   const [industrySearch, setIndustrySearch] = useState('');
+  const [selectedTest, setSelectedTest] = useState('');
+
 
   useEffect(() => {
     // Initially, load all unique industries
@@ -301,6 +303,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
     setSelectedJobType(value);
     setSelectedIndustry(null);
     setIndustrySearch('');
+    setSelectedTest(''); // Reset test filter as well
 
     let visaTypeKey: keyof typeof industriesByJobType | null = null;
     if (value === 'all') {
@@ -368,12 +371,14 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                     </div>
                     <div className="md:col-span-2 space-y-2">
                         <Label htmlFor="search-test" className="text-foreground">Test</Label>
-                        <Select>
+                        <Select onValueChange={setSelectedTest} value={selectedTest} disabled={!selectedVisaGroup}>
                             <SelectTrigger id="search-test">
                                 <SelectValue placeholder="Test" />
                             </SelectTrigger>
                             <SelectContent>
-                                {/* Dữ liệu sẽ được thêm ở đây */}
+                                {availableIndustries.map(industry => (
+                                    <SelectItem key={industry.slug} value={industry.slug}>{industry.name}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
