@@ -1,4 +1,5 @@
 
+
 export const locations = {
     "Việt Nam": [
         "Hà Nội", "Thành phố Hồ Chí Minh", "Đà Nẵng", "Phỏng vấn Online"
@@ -13,5 +14,8 @@ export const locations = {
         "Shikoku": ["Tokushima", "Kagawa", "Ehime", "Kochi"],
         "Kyushu": ["Fukuoka", "Saga", "Nagasaki", "Kumamoto", "Oita", "Miyazaki", "Kagoshima"],
         "Okinawa": ["Okinawa"]
-    }
+    },
+    "Phỏng vấn tại Nhật Bản": [
+        'Phỏng vấn tại Công ty', 'Phỏng vấn Online'
+    ]
 };

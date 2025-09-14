@@ -1134,7 +1134,7 @@ export default function CandidateProfilePage() {
                     </SelectGroup>
                     <SelectGroup>
                       <SelectLabel>Nhật Bản</SelectLabel>
-                      {Object.values(locations['Nhật Bản']).flat().map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                      {locations['Phỏng vấn tại Nhật Bản'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -1925,6 +1925,7 @@ export default function CandidateProfilePage() {
     
 
     
+
 
 
 

@@ -850,7 +850,7 @@ const LoggedInView = () => {
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
+                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -1034,7 +1034,7 @@ const LoggedInView = () => {
                             <Label htmlFor="fee-vnd">Phí (VNĐ)</Label>
                             <Input 
                                 id="fee-vnd" 
-                                placeholder="70.000.000 VNĐ"
+                                placeholder="70,000,000 VNĐ"
                                 value={getDisplayValue(tempFee, 'vnd')}
                                 onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'fee')}
                             />

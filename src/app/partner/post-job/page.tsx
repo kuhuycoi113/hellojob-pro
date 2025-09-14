@@ -519,7 +519,7 @@ export default function PartnerPostJobPage() {
                                   </SelectGroup>
                                   <SelectGroup>
                                       <SelectLabel>Nhật Bản</SelectLabel>
-                                      {Object.values(locations["Nhật Bản"]).flat().map(prefecture => <SelectItem key={prefecture} value={prefecture}>{prefecture}</SelectItem>)}
+                                      {locations["Phỏng vấn tại Nhật Bản"].map(prefecture => <SelectItem key={prefecture} value={prefecture}>{prefecture}</SelectItem>)}
                                   </SelectGroup>
                               </SelectContent>
                           </Select>
