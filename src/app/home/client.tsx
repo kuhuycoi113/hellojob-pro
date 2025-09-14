@@ -276,6 +276,7 @@ const MainContent = () => (
 const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchModuleProps) => {
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
 
   useEffect(() => {
     // When the hero is hidden (after a search), collapse the search bar by default on mobile.
@@ -288,7 +289,15 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
     const industries = filters.visa ? (industriesByJobType[filters.visa as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
     const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
     setAvailableIndustries(uniqueIndustries);
-  }, [filters.visa]);
+    
+    if (filters.industry) {
+      const selectedIndustryData = allIndustries.find(ind => ind.name === filters.industry);
+      setAvailableJobDetails(selectedIndustryData?.keywords || []);
+    } else {
+      setAvailableJobDetails([]);
+    }
+
+  }, [filters.visa, filters.industry]);
 
   
   const handleVisaDetailChange = (value: string) => {
@@ -358,64 +367,80 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                     "p-4 md:p-6",
                     !showHero && !isSearchExpanded ? "hidden md:block" : "block"
                 )}>
-                    <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
-                        <div className="space-y-2 flex-1">
-                            <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
-                            <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail}>
-                                <SelectTrigger id="search-type">
-                                <SelectValue placeholder="Tất cả loại hình" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                <SelectItem value="all-details">Tất cả loại hình</SelectItem>
-                                {japanJobTypes.map(type => (
-                                    <SelectGroup key={type}>
-                                        <SelectLabel>{type}</SelectLabel>
-                                        {(visaDetailsByVisaType[type] || []).map(detail => (
-                                            <SelectItem key={detail} value={detail}>{detail}</SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2 flex-1">
-                            <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                            <Select onValueChange={(value) => onFilterChange({ industry: value })} value={filters.industry}>
-                                <SelectTrigger id="search-industry">
-                                    <SelectValue placeholder="Tất cả ngành nghề" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                                    {availableIndustries.map((industry) => (
-                                        <SelectItem key={industry.slug} value={industry.name}>
-                                            {industry.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2 flex-1">
-                            <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
-                            <Select onValueChange={(value) => onFilterChange({ location: value })} value={filters.location}>
-                                <SelectTrigger id="search-location">
-                                <SelectValue placeholder="Tất cả địa điểm" />
-                                </SelectTrigger>
-                                <SelectContent className="max-h-[300px]">
-                                    <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                                    {Object.entries(locations["Nhật Bản"]).map(([region, prefectures]) => (
-                                        <SelectGroup key={region}>
-                                            <SelectLabel>{region}</SelectLabel>
-                                            {region !== 'Hokkaido' && region !== 'Okinawa' && (
-                                              <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
-                                            )}
-                                            {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4 items-end">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="space-y-2 flex-1">
+                                <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
+                                <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail}>
+                                    <SelectTrigger id="search-type">
+                                    <SelectValue placeholder="Tất cả loại hình" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                    <SelectItem value="all-details">Tất cả loại hình</SelectItem>
+                                    {japanJobTypes.map(type => (
+                                        <SelectGroup key={type}>
+                                            <SelectLabel>{type}</SelectLabel>
+                                            {(visaDetailsByVisaType[type] || []).map(detail => (
+                                                <SelectItem key={detail} value={detail}>{detail}</SelectItem>
+                                            ))}
                                         </SelectGroup>
                                     ))}
-                                </SelectContent>
-                            </Select>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2 flex-1">
+                                <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
+                                <Select onValueChange={(value) => onFilterChange({ industry: value, jobDetail: '' })} value={filters.industry}>
+                                    <SelectTrigger id="search-industry">
+                                        <SelectValue placeholder="Tất cả ngành nghề" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Tất cả ngành nghề</SelectItem>
+                                        {availableIndustries.map((industry) => (
+                                            <SelectItem key={industry.slug} value={industry.name}>
+                                                {industry.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2 flex-1">
+                                <Label htmlFor="search-job-detail" className="text-foreground">Chi tiết công việc</Label>
+                                <Select onValueChange={(value) => onFilterChange({ jobDetail: value })} value={filters.jobDetail} disabled={!filters.industry || availableJobDetails.length === 0}>
+                                    <SelectTrigger id="search-job-detail">
+                                        <SelectValue placeholder="Tất cả công việc" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all-details">Tất cả công việc</SelectItem>
+                                        {availableJobDetails.map((detail) => (
+                                            <SelectItem key={detail} value={detail}>{detail}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2 flex-1">
+                                <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
+                                <Select onValueChange={(value) => onFilterChange({ location: value })} value={filters.location}>
+                                    <SelectTrigger id="search-location">
+                                    <SelectValue placeholder="Tất cả địa điểm" />
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-[300px]">
+                                        <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                                        {Object.entries(locations["Nhật Bản"]).map(([region, prefectures]) => (
+                                            <SelectGroup key={region}>
+                                                <SelectLabel>{region}</SelectLabel>
+                                                {region !== 'Hokkaido' && region !== 'Okinawa' && (
+                                                  <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                                )}
+                                                {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                            </SelectGroup>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                         <div>
-                            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
+                            <Button size="lg" className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
                                 <Search className="mr-2 h-5 w-5" /> Tìm kiếm
                             </Button>
                         </div>
@@ -431,7 +456,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
 export default function HomeClient() {
   const [isSearching, setIsSearching] = useState(false);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', visaDetail: '', industry: '', location: '', interviewLocation: '' });
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', visaDetail: '', industry: '', location: '', interviewLocation: '', jobDetail: '' });
 
   const handleSearch = (filters: SearchFilters) => {
     applyFilters(filters);
@@ -461,7 +486,7 @@ export default function HomeClient() {
 
         const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
         
-        const jobDetailMatch = !jobDetail || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
+        const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
         
         let locationMatch = false;
         if (!location || location === 'all') {
@@ -489,7 +514,7 @@ export default function HomeClient() {
         e.preventDefault();
         if (isSearching) {
             setIsSearching(false);
-            setSearchFilters({ visa: '', visaDetail: '', industry: '', location: '', interviewLocation: '' });
+            setSearchFilters({ visa: '', visaDetail: '', industry: '', location: '', interviewLocation: '', jobDetail: '' });
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
              window.location.reload();
