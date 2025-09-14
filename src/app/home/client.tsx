@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -319,7 +320,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
             <Card className="max-w-6xl mx-auto shadow-2xl">
                 <CardContent className="p-4 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                    <div className="md:col-span-3 space-y-2">
+                    <div className="md:col-span-2 space-y-2">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                         <Select onValueChange={setSelectedJobType} defaultValue="all">
                             <SelectTrigger id="search-type">
@@ -332,6 +333,10 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             ))}
                             </SelectContent>
                         </Select>
+                    </div>
+                     <div className="md:col-span-2 space-y-2">
+                        <Label htmlFor="search-test7" className="text-foreground">Test 7</Label>
+                        <Input id="search-test7" placeholder="Gõ tìm kiếm" className="h-10"/>
                     </div>
                     <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-test6" className="text-foreground">Test 6</Label>
@@ -390,7 +395,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="md:col-span-3">
+                    <div className="md:col-span-2">
                         <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={onSearch}>
                             <Search className="mr-2 h-5 w-5" /> Tìm kiếm
                         </Button>
