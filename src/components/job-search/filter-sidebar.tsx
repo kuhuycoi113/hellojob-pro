@@ -165,7 +165,21 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
-                                    <Select value={filters.location} onValueChange={(value) => onFilterChange({ location: value })}><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Nhật Bản</SelectItem>{Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (<SelectGroup key={region}><SelectLabel>{region}</SelectLabel><SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>{(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectGroup>))}</SelectContent></Select>
+                                    <Select value={filters.location} onValueChange={(value) => onFilterChange({ location: value })}>
+                                        <SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger>
+                                        <SelectContent className="max-h-60">
+                                            <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                                            {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
+                                                <SelectGroup key={region}>
+                                                    <SelectLabel>{region}</SelectLabel>
+                                                    {region !== 'Hokkaido' && region !== 'Okinawa' && (
+                                                        <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                                    )}
+                                                    {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                                </SelectGroup>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>

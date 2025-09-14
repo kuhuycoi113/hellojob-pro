@@ -362,7 +362,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                         <div className="space-y-2 flex-1">
                             <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                             <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail}>
-                                <SelectTrigger id="search-type">
+                                <SelectTrigger id="search-type" className={cn(filters.visaDetail && 'text-primary')}>
                                 <SelectValue placeholder="Tất cả loại hình" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -381,7 +381,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                         <div className="space-y-2 flex-1">
                             <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
                             <Select onValueChange={(value) => onFilterChange({ industry: value })} value={filters.industry}>
-                                <SelectTrigger id="search-industry">
+                                <SelectTrigger id="search-industry" className={cn(filters.industry && 'text-primary')}>
                                     <SelectValue placeholder="Tất cả ngành nghề" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -397,7 +397,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                         <div className="space-y-2 flex-1">
                             <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                             <Select onValueChange={(value) => onFilterChange({ location: value })} value={filters.location}>
-                                <SelectTrigger id="search-location">
+                                <SelectTrigger id="search-location" className={cn(filters.location && 'text-primary')}>
                                 <SelectValue placeholder="Tất cả địa điểm" />
                                 </SelectTrigger>
                                 <SelectContent className="max-h-[300px]">
@@ -405,7 +405,9 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                                     {Object.entries(locations["Nhật Bản"]).map(([region, prefectures]) => (
                                         <SelectGroup key={region}>
                                             <SelectLabel>{region}</SelectLabel>
-                                            <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                            {region !== 'Hokkaido' && region !== 'Okinawa' && (
+                                              <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                            )}
                                             {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                                         </SelectGroup>
                                     ))}
