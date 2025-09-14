@@ -304,6 +304,15 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     </Select>
                                 </div>
                                 <div>
+                                    <Label className="font-semibold">Yêu cầu kinh nghiệm</Label>
+                                    <Select>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
+                                        <SelectContent className="max-h-60">
+                                            {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
                                     <Label className="font-semibold">Kinh nghiệm</Label>
                                      <Select>
                                         <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn số năm kinh nghiệm" /></SelectTrigger>
@@ -354,4 +363,4 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
             </Card>
         </div>
     );
-};
+ 
