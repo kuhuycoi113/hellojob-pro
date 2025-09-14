@@ -349,7 +349,10 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    
+                    <div className="md:col-span-3 space-y-2">
+                      <Label htmlFor="search-test6" className="text-foreground">Test 6</Label>
+                      <Input id="search-test6" placeholder="Gõ tìm kiếm" className="h-10" />
+                    </div>
                     <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                         <Select onValueChange={setSelectedLocation}>
