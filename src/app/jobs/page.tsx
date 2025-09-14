@@ -930,7 +930,7 @@ const LoggedInView = () => {
                 <Tabs defaultValue="jpy" className="w-full pt-4">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="jpy">JPY</TabsTrigger>
-                        <TabsTrigger value="vnd">VND</TabsTrigger>
+                        <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VND</TabsTrigger>
                     </TabsList>
                     <TabsContent value="jpy" className="pt-4">
                         <div className="space-y-2">
@@ -1165,6 +1165,7 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
