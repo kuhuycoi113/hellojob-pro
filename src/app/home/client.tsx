@@ -16,7 +16,6 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  PopoverAnchor,
 } from "@/components/ui/popover"
 import {
   Command,
@@ -288,7 +287,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('all');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [openIndustryPopover, setOpenIndustryPopover] = useState(false);
-  const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
+  const [industryValue, setIndustryValue] = useState("");
 
   return (
     <section className="w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white pt-20 md:pt-28 pb-10">
@@ -322,7 +321,49 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                        <Input id="search-industry" placeholder="VD: Cơ khí, Thực phẩm" />
+                         <Popover open={openIndustryPopover} onOpenChange={setOpenIndustryPopover}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={openIndustryPopover}
+                                className="w-full justify-between h-10 font-normal"
+                                >
+                                {industryValue
+                                    ? allIndustries.find((industry) => industry.name.toLowerCase() === industryValue)?.name
+                                    : "Tất cả ngành nghề"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0">
+                                <Command>
+                                <CommandInput placeholder="Tìm ngành nghề..." />
+                                <CommandList>
+                                    <CommandEmpty>Không tìm thấy ngành nghề.</CommandEmpty>
+                                    <CommandGroup>
+                                    {allIndustries.map((industry) => (
+                                        <CommandItem
+                                        key={industry.slug}
+                                        value={industry.name}
+                                        onSelect={(currentValue) => {
+                                            setIndustryValue(currentValue === industryValue ? "" : currentValue)
+                                            setOpenIndustryPopover(false)
+                                        }}
+                                        >
+                                        <Check
+                                            className={cn(
+                                            "mr-2 h-4 w-4",
+                                            industryValue === industry.name.toLowerCase() ? "opacity-100" : "opacity-0"
+                                            )}
+                                        />
+                                        {industry.name}
+                                        </CommandItem>
+                                    ))}
+                                    </CommandGroup>
+                                </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
@@ -341,7 +382,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                         </Select>
                     </div>
                     <div>
-                        <Button size="lg" className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white text-lg" onClick={onSearch}>
+                        <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={onSearch}>
                             <Search className="mr-2 h-5 w-5" /> Tìm kiếm
                         </Button>
                     </div>
