@@ -132,8 +132,55 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
             newFilters.industry = '';
             newFilters.jobDetail = '';
         }
+        
+        const vietnamVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Đặc định đầu Việt", "Đặc định đi mới", "Kỹ sư, tri thức đầu Việt"];
+        const japanVisas = ["Thực tập sinh 3 Go", "Đặc định đầu Nhật", "Kỹ sư, tri thức đầu Nhật"];
+
+        if (vietnamVisas.includes(value) && !locations['Việt Nam'].includes(filters.interviewLocation || '')) {
+            newFilters.interviewLocation = ''; 
+        } else if (japanVisas.includes(value) && !locations['Phỏng vấn tại Nhật Bản'].includes(filters.interviewLocation || '')) {
+             newFilters.interviewLocation = '';
+        }
+
         onFilterChange(newFilters);
     };
+
+    const renderInterviewLocations = () => {
+        const vietnamVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Đặc định đầu Việt", "Đặc định đi mới", "Kỹ sư, tri thức đầu Việt"];
+        const japanVisas = ["Thực tập sinh 3 Go", "Đặc định đầu Nhật", "Kỹ sư, tri thức đầu Nhật"];
+        
+        if (vietnamVisas.includes(filters.visaDetail)) {
+            return (
+                <SelectGroup>
+                    <SelectLabel>Việt Nam</SelectLabel>
+                    {locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}
+                </SelectGroup>
+            );
+        }
+
+        if (japanVisas.includes(filters.visaDetail)) {
+            return (
+                 <SelectGroup>
+                    <SelectLabel>Nhật Bản</SelectLabel>
+                    {locations['Phỏng vấn tại Nhật Bản'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                </SelectGroup>
+            );
+        }
+
+        // Default case: show all
+        return (
+            <>
+                <SelectGroup>
+                        <SelectLabel>Việt Nam</SelectLabel>
+                        {locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}
+                </SelectGroup>
+                    <SelectGroup>
+                    <SelectLabel>Nhật Bản</SelectLabel>
+                        {locations['Phỏng vấn tại Nhật Bản'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectGroup>
+            </>
+        )
+    }
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -233,14 +280,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         <SelectTrigger className={cn(filters.interviewLocation && filters.interviewLocation !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả địa điểm</SelectItem>
-                                            <SelectGroup>
-                                                 <SelectLabel>Việt Nam</SelectLabel>
-                                                 {locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}
-                                            </SelectGroup>
-                                             <SelectGroup>
-                                                <SelectLabel>Nhật Bản</SelectLabel>
-                                                 {locations['Phỏng vấn tại Nhật Bản'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                                             </SelectGroup>
+                                            {renderInterviewLocations()}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -460,4 +500,5 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         </div>
     );
  
+
 
