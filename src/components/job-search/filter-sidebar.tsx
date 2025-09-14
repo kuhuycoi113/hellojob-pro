@@ -189,12 +189,71 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         "Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"
     ].includes(filters.visaDetail || '');
     const availableWageTypesCount = 1 + (showHourlyWage ? 1 : 0) + (showYearlyWage ? 1 : 0);
+    const JPY_VND_RATE = 165;
+    const showVndTab = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Đặc định đi mới"].includes(filters.visaDetail || '');
+
+    const handleSalaryInputChange = (value: string, currency: 'vnd' | 'jpy') => {
+        let num = parseInt(value.replace(/[.,]/g, ''), 10);
+        if (isNaN(num)) num = 0;
+        
+        const salaryInJPY = currency === 'vnd' ? Math.round(num / JPY_VND_RATE) : num;
+        // Assuming you have a way to store the salary filter value, e.g., in `onFilterChange`
+        // onFilterChange({ basicSalary: String(salaryInJPY) });
+    };
+
+    const getDisplayValue = (value: string | undefined, currency: 'vnd' | 'jpy') => {
+        if (!value) return '';
+        const num = Number(value);
+        if (isNaN(num)) return '';
+
+        let rate = currency === 'vnd' ? JPY_VND_RATE : 1;
+        let locale = currency === 'vnd' ? 'vi-VN' : 'ja-JP';
+
+        const valueToFormat = Math.round(num * rate);
+        return valueToFormat.toLocaleString(locale);
+    };
+
+    const getConvertedValue = (value: string | undefined, currency: 'vnd' | 'jpy') => {
+        if (!value) return '';
+        const num = Number(value);
+        if (isNaN(num)) return '';
+
+        if (currency === 'vnd') {
+            const converted = Math.round(num / JPY_VND_RATE);
+            return `≈ ${converted.toLocaleString('ja-JP')} JPY`;
+        } else { // jpy
+            const converted = Math.round(num * JPY_VND_RATE);
+            return `≈ ${converted.toLocaleString('vi-VN')} VNĐ`;
+        }
+    };
+
 
     const monthlySalaryContent = (
-        <div className="space-y-2">
-            <Label htmlFor="basic-salary-month">Lương cơ bản (JPY/tháng)</Label>
-            <Input id="basic-salary-month" type="number" placeholder="VD: 200000" />
-        </div>
+        <>
+            {showVndTab ? (
+                <Tabs defaultValue="jpy" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="jpy">JPY</TabsTrigger>
+                        <TabsTrigger value="vnd">VNĐ</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="jpy" className="pt-4 space-y-2">
+                        <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
+                        <Input id="basic-salary-jpy" type="text" placeholder="VD: 200,000" />
+                        <p className="text-xs text-muted-foreground">≈ 33,000,000 VNĐ</p>
+                    </TabsContent>
+                    <TabsContent value="vnd" className="pt-4 space-y-2">
+                         <Label htmlFor="basic-salary-vnd">Lương cơ bản (VNĐ/tháng)</Label>
+                        <Input id="basic-salary-vnd" type="text" placeholder="VD: 33,000,000" />
+                        <p className="text-xs text-muted-foreground">≈ 200,000 JPY</p>
+                    </TabsContent>
+                </Tabs>
+            ) : (
+                <div className="space-y-2">
+                    <Label htmlFor="basic-salary-month">Lương cơ bản (JPY/tháng)</Label>
+                    <Input id="basic-salary-month" type="number" placeholder="VD: 200000" />
+                </div>
+            )}
+        </>
     );
 
     return (
