@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { industriesByJobType, type Industry } from "@/lib/industry-data";
-import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages } from "lucide-react";
+import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks } from "lucide-react";
 import { locations } from "@/lib/location-data";
 import { type SearchFilters } from './search-results';
 import { cn } from '@/lib/utils';
@@ -56,6 +56,37 @@ const experienceYears = [
 ];
 const visionRequirements = ["Không yêu cầu", "Yêu cầu thị lực tốt", "Không mù màu", "20/20", "10/10", "8/10"];
 const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
+
+const interviewRoundsOptions = ["1 vòng", "2 vòng", "3 vòng", "4 vòng", "5 vòng"];
+const workShifts = [
+    "Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)",
+    "Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)",
+    "Ca đêm (thường 24:00-08:00)",
+    "Ca luân phiên (chia ca sáng, chiều và đêm; luân phiên tuần tháng)",
+    "Ca 2-2-3 (làm 2 ngày, nghỉ 2 ngày, làm 3 ngày và lặp lại)",
+    "Ca 4-3-3 (làm 4 ngày, nghỉ 3 ngày và tiếp tục 3 ngày nghỉ)",
+    "Nghỉ thứ 7, Chủ Nhật",
+    "Nghỉ định kỳ trong tuần",
+    "Khác"
+];
+const ginouExpiryOptions = [
+    "Trên 4,5 năm", "Trên 4 năm", "Trên 3,5 năm", "Trên 3 năm", "Trên 2,5 năm", "Trên 2 năm", "Trên 1,5 năm", "Trên 1 năm", "Trên 0,5 năm"
+];
+const otherSkills = [
+    "Có bằng lái xe AT", "Có bằng lái xe MT", "Lái được máy xúc, máy đào", "Lái được xe nâng", "Có bằng cầu", "Vận hành máy CNC", "Có bằng hàn",
+];
+const getFutureMonths = () => {
+    const months = [];
+    const today = new Date();
+    for (let i = 1; i <= 12; i++) {
+        const futureDate = new Date(today.getFullYear(), today.getMonth() + i, 1);
+        const month = futureDate.getMonth() + 1;
+        const year = futureDate.getFullYear();
+        months.push(`Tháng ${month}/${year}`);
+    }
+    return months;
+};
+
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
@@ -166,7 +197,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 <div className="space-y-2">
                                     <Label>Chi tiết công việc</Label>
                                      <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry || availableJobDetails.length === 0}>
-                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn công việc chi tiết"/></SelectTrigger>
+                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Phải chọn Ngành nghề trước"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
                                         </SelectContent>
@@ -225,32 +256,38 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             </AccordionContent>
                         </AccordionItem>
 
-                        <AccordionItem value="basic-salary">
+                        <AccordionItem value="salary">
                             <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương cơ bản (JPY/tháng)</span>
+                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương & Phúc lợi</span>
                             </AccordionTrigger>
                             <AccordionContent className="pt-4 space-y-4">
                                 <div>
-                                    <Slider defaultValue={[160000, 300000]} max={500000} step={10000} />
+                                    <Label>Lương cơ bản (JPY/tháng)</Label>
+                                    <Slider defaultValue={[160000]} max={500000} step={10000} className="mt-2"/>
                                     <div className="flex justify-between text-xs text-muted-foreground mt-2">
                                         <span>16万</span>
                                         <span>50万</span>
                                     </div>
                                 </div>
-                            </AccordionContent>
-                        </AccordionItem>
-
-                        <AccordionItem value="net-salary">
-                            <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Thực lĩnh (JPY/tháng)</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="pt-4 space-y-4">
                                 <div>
-                                    <Slider defaultValue={[140000, 250000]} max={450000} step={10000} />
+                                    <Label>Thực lĩnh (JPY/tháng)</Label>
+                                    <Slider defaultValue={[140000]} max={450000} step={10000} className="mt-2"/>
                                     <div className="flex justify-between text-xs text-muted-foreground mt-2">
                                         <span>14万</span>
                                         <span>45万</span>
                                     </div>
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label htmlFor="hourly-salary">Lương cơ bản (giờ)</Label>
+                                    <Input id="hourly-salary" type="number" placeholder="VD: 1000" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="annual-income">Thu nhập (năm)</Label>
+                                    <Input id="annual-income" type="text" placeholder="VD: 300 vạn" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="annual-bonus">Thưởng (năm)</Label>
+                                    <Input id="annual-bonus" type="text" placeholder="VD: 2 tháng lương" />
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
@@ -358,6 +395,57 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                <div>
+                                    <Label className="font-semibold pt-2">Yêu cầu năng lực khác</Label>
+                                    <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-2">
+                                      {otherSkills.map(skill => (
+                                        <div key={skill} className="flex items-center space-x-2">
+                                            <Checkbox id={`skill-${skill}`} />
+                                            <Label htmlFor={`skill-${skill}`} className="font-normal text-sm cursor-pointer">{skill}</Label>
+                                        </div>
+                                      ))}
+                                    </div>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                        
+                        <AccordionItem value="process">
+                            <AccordionTrigger className="text-base font-semibold">
+                                <span className="flex items-center gap-2"><ListChecks className="h-5 w-5"/>Quy trình tuyển dụng</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-4 pt-4">
+                                <div className="space-y-2">
+                                    <Label>Số vòng phỏng vấn</Label>
+                                    <Select><SelectTrigger><SelectValue placeholder="Chọn số vòng" /></SelectTrigger>
+                                        <SelectContent>
+                                            {interviewRoundsOptions.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Yêu cầu hạn Ginou còn</Label>
+                                    <Select><SelectTrigger><SelectValue placeholder="Chọn thời gian" /></SelectTrigger>
+                                        <SelectContent>
+                                            {ginouExpiryOptions.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Yêu cầu thời điểm về công ty</Label>
+                                    <Select><SelectTrigger><SelectValue placeholder="Chọn thời điểm" /></SelectTrigger>
+                                        <SelectContent>
+                                            {getFutureMonths().map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Ca làm việc</Label>
+                                    <Select><SelectTrigger><SelectValue placeholder="Chọn ca làm việc" /></SelectTrigger>
+                                        <SelectContent>
+                                            {workShifts.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
@@ -387,3 +475,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
     
 
+
+
+    
