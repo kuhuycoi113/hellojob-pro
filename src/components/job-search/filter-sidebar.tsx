@@ -54,6 +54,8 @@ const experienceYears = [
     '4,5 - 5 năm',
     'Trên 5 năm'
 ];
+const visionRequirements = ["Không yêu cầu", "Yêu cầu thị lực tốt", "Không mù màu", "20/20", "10/10", "8/10"];
+
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
 interface FilterSidebarProps {
@@ -265,6 +267,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     <div><Label htmlFor="age-from">Tuổi từ</Label><Input id="age-from" type="number" placeholder="18" /></div>
                                     <div><Label htmlFor="age-to">đến</Label><Input id="age-to" type="number" placeholder="40" /></div>
                                 </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><Label htmlFor="height-from">Chiều cao từ (cm)</Label><Input id="height-from" type="number" placeholder="150" /></div>
+                                    <div><Label htmlFor="weight-from">Cân nặng từ (kg)</Label><Input id="weight-from" type="number" placeholder="45" /></div>
+                                </div>
                                 
                                 <div>
                                     <Label className="font-semibold">Trình độ tiếng Nhật</Label>
@@ -299,6 +305,36 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn số năm kinh nghiệm" /></SelectTrigger>
                                         <SelectContent>
                                             {experienceYears.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <Label className="font-semibold">Yêu cầu thị lực</Label>
+                                    <Select>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu thị lực" /></SelectTrigger>
+                                        <SelectContent>
+                                            {visionRequirements.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <Label className="font-semibold">Yêu cầu hình xăm</Label>
+                                    <Select>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none">Không nhận hình xăm</SelectItem>
+                                            <SelectItem value="small">Nhận xăm nhỏ (kín)</SelectItem>
+                                            <SelectItem value="all">Nhận cả xăm to (lộ)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <Label className="font-semibold">Viêm gan B</Label>
+                                    <Select>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="no">Không nhận viêm gan B</SelectItem>
+                                            <SelectItem value="static">Nhận viêm gan B (thể tĩnh)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
