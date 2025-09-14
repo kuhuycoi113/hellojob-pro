@@ -397,7 +397,7 @@ const LoggedInView = () => {
     const { toast } = useToast();
     const [tempSalary, setTempSalary] = useState('');
     const [tempFee, setTempFee] = useState('');
-    const JPY_VND_RATE = 165;
+    const JPY_VND_RATE = 180;
     const USD_VND_RATE = 25000;
 
 
