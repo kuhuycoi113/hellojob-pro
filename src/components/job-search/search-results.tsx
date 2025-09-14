@@ -113,7 +113,7 @@ export const SearchResults = ({ jobs, initialFilters }: SearchResultsProps) => {
                     ) : (
                         <div className="text-center py-16 bg-background rounded-lg">
                             <p className="text-lg font-semibold text-muted-foreground">Không tìm thấy công việc nào phù hợp.</p>
-                            <p className="text-sm text-muted-foreground mt-2">Hãy thử thay đổi bộ lọc hoặc quay lại trang chủ.</p>
+                            <p className="text-sm text-muted-foreground mt-2">Hãy thử thay đổi bộ lọc hoặc tìm kiếm lại.</p>
                         </div>
                     )}
                     {isLoadingMore && (

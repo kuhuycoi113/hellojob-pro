@@ -267,9 +267,10 @@ const MainContent = () => (
 
   type SearchModuleProps = {
       onSearch: (filters: SearchFilters) => void;
+      showHero: boolean;
   }
   
-const SearchModule = ({ onSearch }: SearchModuleProps) => {
+const SearchModule = ({ onSearch, showHero }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('');
   const [selectedVisaDetail, setSelectedVisaDetail] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -305,18 +306,26 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   }
 
   return (
-    <section className="w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white pt-20 md:pt-28 pb-10">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4">
-              Tìm việc làm tại Nhật Bản
-            </h1>
-            <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80">
-             Chúng tôi không chỉ cung cấp việc làm, mà còn đào tạo tư duy và xây dựng lộ trình phát triển sự nghiệp (SWR) rõ ràng, giúp bạn từ lao động phổ thông trở thành chuyên gia lành nghề.
-            </p>
-          </div>
-        </div>
-        <div className="container mx-auto px-4 md:px-6 mt-[-6rem] md:mt-4 relative z-10">
+    <section className={cn(
+        "w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white transition-all duration-500",
+        showHero ? "pt-20 md:pt-28 pb-10" : "pt-8 pb-8 md:pt-12 md:pb-12"
+    )}>
+        {showHero && (
+            <div className="container mx-auto px-4 md:px-6">
+              <div className="max-w-4xl mx-auto text-center">
+                <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4">
+                  Tìm việc làm tại Nhật Bản
+                </h1>
+                <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80">
+                 Chúng tôi không chỉ cung cấp việc làm, mà còn đào tạo tư duy và xây dựng lộ trình phát triển sự nghiệp (SWR) rõ ràng, giúp bạn từ lao động phổ thông trở thành chuyên gia lành nghề.
+                </p>
+              </div>
+            </div>
+        )}
+        <div className={cn(
+            "container mx-auto px-4 md:px-6 relative z-10",
+            showHero && "mt-[-6rem] md:mt-4"
+        )}>
             <Card className="max-w-6xl mx-auto shadow-2xl">
                 <CardContent className="p-4 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
@@ -357,7 +366,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                     </div>
                     <div className="space-y-2 flex-1">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
-                        <Select onValueChange={setSelectedLocation}>
+                        <Select onValueChange={setSelectedLocation} value={selectedLocation}>
                             <SelectTrigger id="search-location">
                             <SelectValue placeholder="Tất cả địa điểm" />
                             </SelectTrigger>
@@ -425,10 +434,14 @@ export default function HomeClient() {
     setFilteredJobs(results);
     setIsSearching(true);
   };
+  
+    const handleBackToHome = () => {
+        setIsSearching(false);
+    }
 
   return (
     <div className="flex flex-col items-center min-h-screen">
-        <SearchModule onSearch={handleSearch} />
+        <SearchModule onSearch={handleSearch} showHero={!isSearching} />
       
       <div className="w-full flex-grow">
         {isSearching ? <SearchResults jobs={filteredJobs} initialFilters={searchFilters} /> : <MainContent />}
