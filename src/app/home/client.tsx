@@ -285,6 +285,16 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
     setAvailableIndustries(uniqueIndustries);
   };
   
+  const handleVisaDetailChange = (value: string) => {
+    const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].includes(value));
+    if (parentType) {
+        if(selectedJobType !== parentType) {
+            handleVisaTypeChange(parentType);
+        }
+    }
+    setSelectedVisaDetail(value);
+  }
+  
   const handleSearchClick = () => {
     onSearch({
         visa: selectedJobType,
@@ -312,14 +322,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                     <div className="space-y-2 flex-1">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
-                        <Select onValueChange={(value) => {
-                            // Find the parent visa type and set both states
-                            const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].includes(value));
-                            if (parentType) {
-                                handleVisaTypeChange(parentType);
-                            }
-                            setSelectedVisaDetail(value);
-                        }} value={selectedVisaDetail}>
+                        <Select onValueChange={handleVisaDetailChange} value={selectedVisaDetail}>
                             <SelectTrigger id="search-type">
                             <SelectValue placeholder="Tất cả loại hình" />
                             </SelectTrigger>
@@ -407,13 +410,11 @@ export default function HomeClient() {
         if (!location || location === 'all') {
             locationMatch = true;
         } else {
-            // Is the selected location a region?
             const isRegion = Object.keys(locations['Nhật Bản']).includes(location);
             if (isRegion) {
                 const regionPrefectures = locations['Nhật Bản'][location as keyof typeof locations['Nhật Bản']];
                 locationMatch = regionPrefectures.some(prefecture => job.workLocation.toLowerCase().includes(prefecture.toLowerCase()));
             } else {
-                // It's a prefecture
                 locationMatch = job.workLocation && job.workLocation.toLowerCase().includes(location.toLowerCase());
             }
         }
@@ -427,12 +428,10 @@ export default function HomeClient() {
 
   return (
     <div className="flex flex-col items-center min-h-screen">
-      <div className="w-full">
-        {!isSearching && <SearchModule onSearch={handleSearch} />}
-      </div>
+        <SearchModule onSearch={handleSearch} />
       
       <div className="w-full flex-grow">
-        {isSearching ? <SearchResults jobs={filteredJobs} initialFilters={searchFilters} onBack={() => setIsSearching(false)} /> : <MainContent />}
+        {isSearching ? <SearchResults jobs={filteredJobs} initialFilters={searchFilters} /> : <MainContent />}
       </div>
     </div>
   );

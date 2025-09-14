@@ -21,26 +21,9 @@ export type SearchFilters = {
 type SearchResultsProps = {
     jobs: Job[];
     initialFilters: SearchFilters;
-    onBack: () => void;
 }
 
-const CompactSearchForm = ({ onBack, searchTerm }: { onBack: () => void, searchTerm: string }) => (
-     <div className="bg-primary p-2 md:hidden sticky top-16 z-40 shadow-lg">
-        <Button 
-            variant="outline" 
-            className="w-full justify-start text-left h-auto py-2 px-3 bg-background text-foreground hover:bg-background/90"
-            onClick={onBack}
-        >
-            <ChevronLeft className="mr-2 text-muted-foreground"/>
-            <div className="flex-grow overflow-hidden">
-                <p className="font-bold text-base truncate">{searchTerm || 'Tất cả việc làm'}</p>
-                <p className="text-sm text-muted-foreground truncate">Chỉnh sửa tìm kiếm của bạn</p>
-            </div>
-        </Button>
-    </div>
-);
-
-export const SearchResults = ({ jobs, initialFilters, onBack }: SearchResultsProps) => {
+export const SearchResults = ({ jobs, initialFilters }: SearchResultsProps) => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(24);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
@@ -78,7 +61,6 @@ export const SearchResults = ({ jobs, initialFilters, onBack }: SearchResultsPro
 
     return (
      <div className="w-full bg-secondary">
-        <CompactSearchForm onBack={onBack} searchTerm={getSearchTerm()} />
         <div className="container mx-auto px-4 md:px-6 py-6">
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8">
                 <div className="hidden md:block">
