@@ -269,7 +269,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="height-from">Chiều cao từ (cm)</Label>
-                                    <Input id="height-from" type="number" placeholder="135-210" min="135" max="210" />
+                                    <Input id="height-from" type="number" placeholder="150" min="135" max="210" />
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="weight-from">Cân nặng từ (kg)</Label>
