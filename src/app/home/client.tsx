@@ -287,13 +287,8 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
   const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
   
-  // State for "Ngành nghề" (Test 3)
-  const [industrySearchValue, setIndustrySearchValue] = useState("");
-  const [openIndustryPopover, setOpenIndustryPopover] = useState(false);
-
-  // State for "Test 4"
-  const [test4SearchValue, setTest4SearchValue] = useState("");
-  const [openTest4Popover, setOpenTest4Popover] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [openPopover, setOpenPopover] = useState(false);
   
 
   useEffect(() => {
@@ -323,27 +318,6 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
     }
     
     setAvailableIndustries(visaTypeKey ? industriesByJobType[visaTypeKey] : []);
-    setIndustrySearchValue(""); // Reset search value when job type changes
-  };
-
-  const getFilteredIndustries = (searchValue: string) => {
-    if (!searchValue) return availableIndustries;
-    const lowercasedValue = searchValue.toLowerCase();
-    return availableIndustries.filter(industry => 
-      industry.name.toLowerCase().includes(lowercasedValue) || 
-      industry.keywords.some(keyword => keyword.toLowerCase().includes(lowercasedValue))
-    );
-  };
-      
-  const getFilteredTest4 = (searchValue: string) => {
-    const lowercasedValue = searchValue.toLowerCase();
-    if (!searchValue) return allIndustries;
-    
-    const filtered = allIndustries.filter(industry => 
-      industry.name.toLowerCase().includes(lowercasedValue) || 
-      industry.keywords.some(keyword => keyword.toLowerCase().includes(lowercasedValue))
-    );
-    return filtered;
   };
 
   return (
@@ -362,54 +336,12 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
             <Card className="max-w-6xl mx-auto shadow-2xl">
                 <CardContent className="p-4 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                    
-                    <div className="md:col-span-3 space-y-2">
-                        <Label htmlFor="industry-input" className="text-foreground">Ngành nghề</Label>
-                        <Popover open={openIndustryPopover} onOpenChange={setOpenIndustryPopover}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    aria-expanded={openIndustryPopover}
-                                    className="w-full justify-between h-10"
-                                    id="industry-input"
-                                >
-                                    {industrySearchValue || "Gõ để tìm ngành..."}
-                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[300px] p-0">
-                                <Command>
-                                    <CommandInput placeholder="Tìm ngành hoặc công việc..." />
-                                    <CommandList>
-                                        <CommandEmpty>Không tìm thấy.</CommandEmpty>
-                                        <CommandGroup>
-                                            {getFilteredIndustries(industrySearchValue).map((industry) => (
-                                                <CommandItem
-                                                    key={industry.slug}
-                                                    value={industry.name}
-                                                    onSelect={(currentValue) => {
-                                                        setIndustrySearchValue(currentValue === industrySearchValue ? "" : currentValue);
-                                                        setOpenIndustryPopover(false);
-                                                    }}
-                                                >
-                                                    <Check
-                                                        className={cn(
-                                                            "mr-2 h-4 w-4",
-                                                            industrySearchValue === industry.name ? "opacity-100" : "opacity-0"
-                                                        )}
-                                                    />
-                                                    {industry.name}
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                    <div className="md:col-span-5 space-y-2">
+                        <Label htmlFor="search-keyword" className="text-foreground">Ngành nghề, công việc hoặc từ khóa</Label>
+                        <Input id="search-keyword" placeholder="VD: Vận hành máy CNC, Chế biến thực phẩm..." className="h-10"/>
                     </div>
                     
-                    <div className="md:col-span-2 space-y-2">
+                    <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                         <Select onValueChange={handleJobTypeChange} defaultValue="all">
                             <SelectTrigger id="search-type">
@@ -422,45 +354,6 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             ))}
                             </SelectContent>
                         </Select>
-                    </div>
-
-                    <div className="md:col-span-3 space-y-2">
-                      <Label htmlFor="test4-input" className="text-foreground">Test 4</Label>
-                      <Popover open={openTest4Popover} onOpenChange={setOpenTest4Popover}>
-                        <PopoverAnchor>
-                           <Input
-                              id="test4-input"
-                              placeholder="Gõ để tìm kiếm..."
-                              value={test4SearchValue}
-                              onChange={(e) => setTest4SearchValue(e.target.value)}
-                              onFocus={() => setOpenTest4Popover(true)}
-                              className="h-10"
-                           />
-                        </PopoverAnchor>
-                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
-                            <Command>
-                                <CommandList>
-                                    {(openTest4Popover && getFilteredTest4(test4SearchValue).length > 0) ? (
-                                        <CommandGroup heading={test4SearchValue ? "Kết quả" : "Gợi ý ngành nghề"}>
-                                            {getFilteredTest4(test4SearchValue).map((industry) => (
-                                                <CommandItem
-                                                    key={`test4-${industry.slug}`}
-                                                    onSelect={() => {
-                                                        setTest4SearchValue(industry.name);
-                                                        setOpenTest4Popover(false);
-                                                    }}
-                                                >
-                                                    {industry.name}
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    ) : (
-                                      test4SearchValue && <CommandEmpty>Không tìm thấy.</CommandEmpty>
-                                    )}
-                                </CommandList>
-                            </Command>
-                        </PopoverContent>
-                      </Popover>
                     </div>
                     
                     <div className="md:col-span-2 space-y-2">
@@ -508,3 +401,5 @@ export default function HomeClient() {
     </div>
   );
 }
+
+    
