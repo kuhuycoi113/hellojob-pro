@@ -148,20 +148,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
-                                <div className="hidden">
-                                    <Label>Loại visa</Label>
-                                    <Select value={filters.visa} onValueChange={handleJobTypeChange}>
-                                        <SelectTrigger className={cn(filters.visa && filters.visa !== 'all' && 'text-primary')}>
-                                            <SelectValue placeholder="Tất cả loại hình"/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">Tất cả loại hình</SelectItem>
-                                            {japanJobTypes.map(type => (
-                                                <SelectItem key={type} value={type}>{type}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
                                  <div>
                                     <Label>Chi tiết loại hình visa</Label>
                                     <Select value={filters.visaDetail} onValueChange={handleVisaDetailChange}>
@@ -474,3 +460,4 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         </div>
     );
  
+
