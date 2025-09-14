@@ -183,6 +183,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     }
 
     const showHourlyWage = ["Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới"].includes(filters.visaDetail || '');
+    const showYearlyWage = [
+        "Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới", 
+        "Thực tập sinh 3 Go", 
+        "Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"
+    ].includes(filters.visaDetail || '');
+
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -295,12 +301,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             </AccordionTrigger>
                             <AccordionContent className="pt-4 space-y-4">
                                <Tabs defaultValue="monthly" className="w-full">
-                                    <TabsList className={cn("grid w-full", showHourlyWage ? "grid-cols-3" : "grid-cols-2")}>
+                                    <TabsList className={cn("grid w-full", showHourlyWage && showYearlyWage ? "grid-cols-3" : (showHourlyWage || showYearlyWage ? "grid-cols-2" : "grid-cols-1"))}>
                                         <TabsTrigger value="monthly">Tháng</TabsTrigger>
                                         {showHourlyWage && <TabsTrigger value="hourly">Giờ</TabsTrigger>}
-                                        <TabsTrigger value="yearly">Năm</TabsTrigger>
+                                        {showYearlyWage && <TabsTrigger value="yearly">Năm</TabsTrigger>}
                                     </TabsList>
-                                    <TabsContent value="monthly" className="space-y-4 pt-4">
+                                    <TabsContent value="monthly" className="pt-4 space-y-4">
                                          <div className="space-y-2">
                                             <Label htmlFor="basic-salary-month">Lương cơ bản (JPY/tháng)</Label>
                                             <Input id="basic-salary-month" type="number" placeholder="VD: 200000" />
@@ -314,16 +320,18 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                             </div>
                                         </TabsContent>
                                     )}
-                                     <TabsContent value="yearly" className="space-y-4 pt-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="annual-income">Thu nhập năm (Vạn JPY)</Label>
-                                            <Input id="annual-income" type="number" placeholder="VD: 300" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="annual-bonus">Thưởng năm (Vạn JPY)</Label>
-                                            <Input id="annual-bonus" type="text" placeholder="VD: 20" />
-                                        </div>
-                                    </TabsContent>
+                                     {showYearlyWage && (
+                                        <TabsContent value="yearly" className="space-y-4 pt-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="annual-income">Thu nhập năm (Vạn JPY)</Label>
+                                                <Input id="annual-income" type="number" placeholder="VD: 300" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="annual-bonus">Thưởng năm (Vạn JPY)</Label>
+                                                <Input id="annual-bonus" type="text" placeholder="VD: 20" />
+                                            </div>
+                                        </TabsContent>
+                                    )}
                                 </Tabs>
                             </AccordionContent>
                         </AccordionItem>
