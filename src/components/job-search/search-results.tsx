@@ -11,8 +11,15 @@ import { Job, jobData } from "@/lib/mock-data";
 import { JobCard } from "../job-card";
 import { ChevronLeft, ListFilter, Loader2 } from "lucide-react";
 
+export type SearchFilters = {
+    visa: string;
+    industry: string;
+    location: string;
+}
+
 type SearchResultsProps = {
     jobs: Job[];
+    initialFilters: SearchFilters;
     onBack: () => void;
 }
 
@@ -32,7 +39,7 @@ const CompactSearchForm = ({ onBack, searchTerm }: { onBack: () => void, searchT
     </div>
 );
 
-export const SearchResults = ({ jobs, onBack }: SearchResultsProps) => {
+export const SearchResults = ({ jobs, initialFilters, onBack }: SearchResultsProps) => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(24);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
@@ -58,13 +65,23 @@ export const SearchResults = ({ jobs, onBack }: SearchResultsProps) => {
         if (node) observer.current.observe(node);
     }, [isLoadingMore, loadMoreJobs, visibleJobsCount, jobs.length]);
       
+    const getSearchTerm = () => {
+        const { industry, location } = initialFilters;
+        if (industry && industry !== 'all' && location && location !== 'all') {
+            return `${industry} tại ${location}`;
+        }
+        if (industry && industry !== 'all') return industry;
+        if (location && location !== 'all') return location;
+        return 'Tất cả việc làm';
+    }
+
     return (
      <div className="w-full bg-secondary">
-        <CompactSearchForm onBack={onBack} searchTerm="Kết quả tìm kiếm" />
+        <CompactSearchForm onBack={onBack} searchTerm={getSearchTerm()} />
         <div className="container mx-auto px-4 md:px-6 py-6">
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8">
                 <div className="hidden md:block">
-                  <FilterSidebar />
+                  <FilterSidebar initialFilters={initialFilters} />
                 </div>
 
                 <div className="md:col-span-3 lg:col-span-3">
@@ -85,7 +102,7 @@ export const SearchResults = ({ jobs, onBack }: SearchResultsProps) => {
                               </SheetDescription>
                             </SheetHeader>
                             <div className="py-4 h-[calc(100vh-8rem)] overflow-y-auto">
-                              <FilterSidebar />
+                              <FilterSidebar initialFilters={initialFilters} />
                             </div>
                           </SheetContent>
                         </Sheet>

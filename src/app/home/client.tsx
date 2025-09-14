@@ -28,7 +28,7 @@ import {
 import { cn } from '@/lib/utils';
 import { industriesByJobType, type Industry } from "@/lib/industry-data";
 import { FilterSidebar } from '@/components/job-search/filter-sidebar';
-import { SearchResults } from '@/components/job-search/search-results';
+import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
 import { Job, jobData } from '@/lib/mock-data';
 import { locations } from '@/lib/location-data';
 
@@ -265,7 +265,7 @@ const MainContent = () => (
   );
 
   type SearchModuleProps = {
-      onSearch: (filters: { visa: string; industry: string; location: string }) => void;
+      onSearch: (filters: SearchFilters) => void;
   }
   
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
@@ -387,8 +387,10 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
 export default function HomeClient() {
   const [isSearching, setIsSearching] = useState(false);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>(jobData);
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', industry: '', location: '' });
 
-  const handleSearch = (filters: { visa: string; industry: string; location: string }) => {
+  const handleSearch = (filters: SearchFilters) => {
+    setSearchFilters(filters);
     const { visa, industry, location } = filters;
     const results = jobData.filter(job => {
         const visaMatch = !visa || visa === 'all' || (job.visaDetail && job.visaDetail.includes(visa));
@@ -423,7 +425,7 @@ export default function HomeClient() {
       </div>
       
       <div className="w-full flex-grow">
-        {isSearching ? <SearchResults jobs={filteredJobs} onBack={() => setIsSearching(false)} /> : <MainContent />}
+        {isSearching ? <SearchResults jobs={filteredJobs} initialFilters={searchFilters} onBack={() => setIsSearching(false)} /> : <MainContent />}
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 
+
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { industriesByJobType } from "@/lib/industry-data";
 import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler } from "lucide-react";
 import { locations } from "@/lib/location-data";
+import { type SearchFilters } from './search-results';
 
 const japanJobTypes = [
     'Thực tập sinh kỹ năng',
@@ -41,7 +44,32 @@ const experienceYears = [
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 const interviewFormats = ["Phỏng vấn trực tiếp", "Phỏng vấn Online", "Phỏng vấn trực tiếp và Online"];
 
-export const FilterSidebar = () => {
+interface FilterSidebarProps {
+    initialFilters?: SearchFilters;
+    onApply?: (filters: any) => void;
+}
+
+export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) => {
+    const [jobType, setJobType] = useState(initialFilters?.visa || '');
+    const [industry, setIndustry] = useState(initialFilters?.industry || '');
+    const [workLocation, setWorkLocation] = useState(initialFilters?.location || '');
+
+    useEffect(() => {
+        setJobType(initialFilters?.visa || '');
+        setIndustry(initialFilters?.industry || '');
+        setWorkLocation(initialFilters?.location || '');
+    }, [initialFilters]);
+
+    const handleApplyFilters = () => {
+        if (onApply) {
+            onApply({
+                visa: jobType,
+                industry,
+                location: workLocation
+            });
+        }
+    }
+
     return (
         <div className="md:col-span-1 lg:col-span-1">
             <Card>
@@ -49,8 +77,51 @@ export const FilterSidebar = () => {
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Accordion type="multiple" defaultValue={['salary', 'jobType', 'location', 'requirements', 'specialConditions', 'industry']} className="w-full">
-                        
+                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry']} className="w-full">
+                         <AccordionItem value="jobType">
+                            <AccordionTrigger className="text-base font-semibold">
+                                 <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-2 pt-4">
+                                <Select value={jobType} onValueChange={setJobType}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Tất cả loại hình"/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Tất cả loại hình</SelectItem>
+                                        {japanJobTypes.map(type => (
+                                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </AccordionContent>
+                        </AccordionItem>
+
+                        <AccordionItem value="industry">
+                            <AccordionTrigger className="text-base font-semibold">
+                                <span className="flex items-center gap-2"><Building className="h-5 w-5"/>Ngành nghề</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-2 pt-4">
+                               <Select value={industry} onValueChange={setIndustry}><SelectTrigger><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả ngành nghề</SelectItem>{allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name}</SelectItem>)}</SelectContent></Select>
+                            </AccordionContent>
+                        </AccordionItem>
+
+
+                         <AccordionItem value="location">
+                            <AccordionTrigger className="text-base font-semibold">
+                                <span className="flex items-center gap-2"><MapPin className="h-5 w-5"/>Địa điểm</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-4 pt-4">
+                                <div className="space-y-2">
+                                    <Label>Nơi làm việc (Nhật Bản)</Label>
+                                    <Select value={workLocation} onValueChange={setWorkLocation}><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Nhật Bản</SelectItem>{Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (<SelectGroup key={region}><SelectLabel>{region}</SelectLabel><SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>{(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectGroup>))}</SelectContent></Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Nơi phỏng vấn (Việt Nam)</Label>
+                                    <Select><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Việt Nam</SelectItem>{locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent></Select>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
                         <AccordionItem value="salary">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Mức lương (JPY/tháng)</span>
@@ -63,47 +134,6 @@ export const FilterSidebar = () => {
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
-                        
-                        <AccordionItem value="jobType">
-                            <AccordionTrigger className="text-base font-semibold">
-                                 <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-2 pt-4">
-                                {Object.keys(industriesByJobType).filter(k => k !== 'Default').map(item => (
-                                    <div key={item} className="flex items-center space-x-2">
-                                        <Checkbox id={`type-${item}`} />
-                                        <Label htmlFor={`type-${item}`} className="font-normal cursor-pointer">{item}</Label>
-                                    </div>
-                                ))}
-                            </AccordionContent>
-                        </AccordionItem>
-
-                        <AccordionItem value="industry">
-                            <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><Building className="h-5 w-5"/>Ngành nghề</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-2 pt-4">
-                               <Select><SelectTrigger><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả ngành nghề</SelectItem>{allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name}</SelectItem>)}</SelectContent></Select>
-                            </AccordionContent>
-                        </AccordionItem>
-
-
-                         <AccordionItem value="location">
-                            <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><MapPin className="h-5 w-5"/>Địa điểm</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-4 pt-4">
-                                <div className="space-y-2">
-                                    <Label>Nơi làm việc (Nhật Bản)</Label>
-                                    <Select><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Nhật Bản</SelectItem>{Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (<SelectGroup key={region}><SelectLabel>{region}</SelectLabel>{(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectGroup>))}</SelectContent></Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Nơi phỏng vấn (Việt Nam)</Label>
-                                    <Select><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Việt Nam</SelectItem>{locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent></Select>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-
                          <AccordionItem value="requirements">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><UserSearch className="h-5 w-5"/>Yêu cầu ứng viên</span>
@@ -197,7 +227,7 @@ export const FilterSidebar = () => {
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
-                     <Button className="w-full bg-primary text-white mt-6">Áp dụng bộ lọc</Button>
+                     <Button className="w-full bg-primary text-white mt-6" onClick={handleApplyFilters}>Áp dụng bộ lọc</Button>
                 </CardContent>
             </Card>
         </div>
