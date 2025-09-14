@@ -276,7 +276,24 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     <Label htmlFor="weight-from">Cân nặng từ (kg)</Label>
                                     <Input id="weight-from" type="number" placeholder="45" />
                                 </div>
-                                
+                                 <div className="space-y-2">
+                                    <Label className="font-semibold">Yêu cầu thị lực</Label>
+                                    <Select>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu thị lực" /></SelectTrigger>
+                                        <SelectContent>
+                                            {visionRequirements.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="font-semibold">Yêu cầu hình xăm</Label>
+                                    <Select>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
+                                        <SelectContent>
+                                            {tattooRequirements.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                                 <div>
                                     <Label className="font-semibold">Trình độ tiếng Nhật</Label>
                                     <Select>
@@ -304,10 +321,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div>
+                                 <div>
                                     <Label className="font-semibold">Yêu cầu kinh nghiệm</Label>
                                     <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn chi tiết công việc" /></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
                                         </SelectContent>
@@ -323,24 +340,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     </Select>
                                 </div>
                                 <div>
-                                    <Label className="font-semibold">Yêu cầu thị lực</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu thị lực" /></SelectTrigger>
-                                        <SelectContent>
-                                            {visionRequirements.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div>
-                                    <Label className="font-semibold">Yêu cầu hình xăm</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
-                                        <SelectContent>
-                                            {tattooRequirements.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                 <div>
                                     <Label className="font-semibold">Tay thuận</Label>
                                     <Select>
                                         <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn tay thuận" /></SelectTrigger>
