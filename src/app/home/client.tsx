@@ -338,29 +338,28 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                     <div className="md:col-span-5 space-y-2">
                         <Label htmlFor="search-keyword" className="text-foreground">Ngành nghề, công việc hoặc từ khóa</Label>
                          <Popover open={openPopover} onOpenChange={setOpenPopover}>
-                            <PopoverTrigger asChild>
+                             <PopoverAnchor asChild>
                                  <Input 
                                     id="search-keyword" 
                                     placeholder="VD: Vận hành máy CNC, Chế biến thực phẩm..." 
                                     className="h-10"
                                     value={searchValue}
-                                    onChange={(e) => setSearchValue(e.target.value)}
+                                    onChange={(e) => {
+                                        setSearchValue(e.target.value);
+                                        if (!openPopover) setOpenPopover(true);
+                                    }}
+                                    onClick={() => setOpenPopover(true)}
                                 />
-                            </PopoverTrigger>
+                            </PopoverAnchor>
                             <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
                                 <Command>
-                                    <CommandInput 
-                                        placeholder="Gõ để tìm ngành nghề hoặc công việc..." 
-                                        value={searchValue}
-                                        onValueChange={setSearchValue}
-                                    />
                                     <CommandList>
                                         <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
                                         <CommandGroup>
                                             {filteredSuggestions.map((suggestion) => (
                                                 <CommandItem
                                                     key={suggestion}
-                                                    onSelect={() => handleSelectSuggestion(suggestion)}
+                                                    onMouseDown={() => handleSelectSuggestion(suggestion)}
                                                 >
                                                     {suggestion}
                                                 </CommandItem>
