@@ -289,7 +289,6 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [industryValue, setIndustryValue] = useState("");
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
-  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const handleVisaTypeChange = (value: string) => {
     setSelectedJobType(value);
@@ -301,25 +300,19 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
     }
     
     let visaCategory: keyof typeof industriesByJobType | undefined;
-    for (const category in industriesByJobType) {
-        if (industriesByJobType[category as keyof typeof industriesByJobType].some(ind => value.includes(ind.name))) {
-            visaCategory = category as keyof typeof industriesByJobType;
-            break;
-        }
-    }
-
-    if (!visaCategory) {
-        // Find category from visa type detail
-        if (value.includes('Thực tập sinh')) {
-            visaCategory = 'Thực tập sinh kỹ năng';
-        } else if (value.includes('Đặc định')) {
-            visaCategory = 'Kỹ năng đặc định';
-        } else if (value.includes('Kỹ sư, tri thức')) {
-            visaCategory = 'Kỹ sư, tri thức';
-        }
+    
+    // Find category from visa type detail
+    if (value.includes('Thực tập sinh')) {
+        visaCategory = 'Thực tập sinh kỹ năng';
+    } else if (value.includes('Đặc định')) {
+        visaCategory = 'Kỹ năng đặc định';
+    } else if (value.includes('Kỹ sư, tri thức')) {
+        visaCategory = 'Kỹ sư, tri thức';
     }
     
-    setAvailableIndustries(visaCategory ? industriesByJobType[visaCategory] : allIndustries);
+    const newIndustries = visaCategory ? industriesByJobType[visaCategory] : allIndustries;
+    const uniqueIndustries = Array.from(new Map(newIndustries.map(item => [item.name, item])).values());
+    setAvailableIndustries(uniqueIndustries);
   };
   
   const handleSearchClick = () => {
@@ -362,38 +355,19 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                     </div>
                     <div className="space-y-2 flex-1">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" role="combobox" aria-expanded={popoverOpen} className="w-full justify-between h-10 font-normal">
-                                    {industryValue ? availableIndustries.find((industry) => industry.name === industryValue)?.name : "Tất cả ngành nghề"}
-                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                                <Command>
-                                    <CommandInput placeholder="Tìm ngành nghề..." />
-                                    <CommandList>
-                                        <CommandEmpty>Không tìm thấy ngành nghề.</CommandEmpty>
-                                        <CommandGroup>
-                                            <CommandItem value="all" onSelect={() => {setIndustryValue(""); setPopoverOpen(false);}}>Tất cả ngành nghề</CommandItem>
-                                            {availableIndustries.map((industry) => (
-                                                <CommandItem
-                                                    key={industry.slug}
-                                                    value={industry.name}
-                                                    onSelect={(currentValue) => {
-                                                        setIndustryValue(currentValue === industryValue ? "" : industry.name);
-                                                        setPopoverOpen(false);
-                                                    }}
-                                                >
-                                                    <Check className={cn("mr-2 h-4 w-4", industryValue === industry.name ? "opacity-100" : "opacity-0")} />
-                                                    {industry.name}
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                         <Select onValueChange={setIndustryValue} value={industryValue}>
+                            <SelectTrigger id="search-industry">
+                                <SelectValue placeholder="Tất cả ngành nghề" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Tất cả ngành nghề</SelectItem>
+                                {availableIndustries.map((industry) => (
+                                    <SelectItem key={industry.slug} value={industry.name}>
+                                        {industry.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="space-y-2 flex-1">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
@@ -412,7 +386,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                         </Select>
                     </div>
                     <div>
-                        <Button size="lg" className="w-auto bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
+                        <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
                             <Search className="mr-2 h-5 w-5" /> Tìm kiếm
                         </Button>
                     </div>
