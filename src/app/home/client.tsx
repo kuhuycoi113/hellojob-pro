@@ -334,10 +334,6 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                     <div className="md:col-span-2 space-y-2">
-                        <Label htmlFor="search-test7" className="text-foreground">Test 7</Label>
-                        <Input id="search-test7" placeholder="Gõ tìm kiếm" className="h-10"/>
-                    </div>
                     <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-test6" className="text-foreground">Test 6</Label>
                         <Popover open={openTest6Popover} onOpenChange={setOpenTest6Popover}>
