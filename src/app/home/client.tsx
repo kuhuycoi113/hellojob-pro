@@ -366,7 +366,18 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                     <div className="md:col-span-4 space-y-2">
+                    <div className="md:col-span-2 space-y-2">
+                        <Label htmlFor="search-test" className="text-foreground">Test</Label>
+                        <Select>
+                            <SelectTrigger id="search-test">
+                                <SelectValue placeholder="Test" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {/* Dữ liệu sẽ được thêm ở đây */}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                     <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
                         <Popover open={isIndustryPopoverOpen} onOpenChange={setIsIndustryPopoverOpen}>
                           <PopoverTrigger asChild>
@@ -423,7 +434,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                           </PopoverContent>
                         </Popover>
                     </div>
-                    <div className="md:col-span-3 space-y-2">
+                    <div className="md:col-span-2 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                         <Select onValueChange={setSelectedLocation}>
                             <SelectTrigger id="search-location">
@@ -468,4 +479,3 @@ export default function HomeClient() {
     </div>
   );
 }
-
