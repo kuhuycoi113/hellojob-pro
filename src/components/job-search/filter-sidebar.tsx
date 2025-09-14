@@ -55,6 +55,7 @@ const experienceYears = [
     'Trên 5 năm'
 ];
 const visionRequirements = ["Không yêu cầu", "Yêu cầu thị lực tốt", "Không mù màu", "20/20", "10/10", "8/10"];
+const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
@@ -335,9 +336,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     <Select>
                                         <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="none">Không nhận hình xăm</SelectItem>
-                                            <SelectItem value="small">Nhận xăm nhỏ (kín)</SelectItem>
-                                            <SelectItem value="all">Nhận cả xăm to (lộ)</SelectItem>
+                                            {tattooRequirements.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -375,4 +374,5 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         </div>
     );
  
+
 

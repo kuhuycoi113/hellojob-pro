@@ -404,21 +404,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="space-y-2 flex-1">
-                                <Label htmlFor="search-job-detail" className="text-foreground">Chi tiết công việc</Label>
-                                <Select onValueChange={(value) => onFilterChange({ jobDetail: value })} value={filters.jobDetail} disabled={!filters.industry || availableJobDetails.length === 0}>
-                                    <SelectTrigger id="search-job-detail">
-                                        <SelectValue placeholder="Tất cả công việc" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all-details">Tất cả công việc</SelectItem>
-                                        {availableJobDetails.map((detail) => (
-                                            <SelectItem key={detail} value={detail}>{detail}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2 flex-1">
+                             <div className="space-y-2 flex-1">
                                 <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                                 <Select onValueChange={(value) => onFilterChange({ location: value })} value={filters.location}>
                                     <SelectTrigger id="search-location">
@@ -438,11 +424,11 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                                     </SelectContent>
                                 </Select>
                             </div>
-                        </div>
-                        <div>
-                            <Button size="lg" className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
-                                <Search className="mr-2 h-5 w-5" /> Tìm kiếm
-                            </Button>
+                             <div>
+                                <Button size="lg" className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
+                                    <Search className="mr-2 h-5 w-5" /> Tìm kiếm
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
