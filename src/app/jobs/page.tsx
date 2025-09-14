@@ -539,18 +539,31 @@ const LoggedInView = () => {
             description: `Mức lương tối thiểu mới là ${parseInt(tempSalary || '0').toLocaleString('ja-JP')} JPY.`,
         });
     };
+    
+    const handleSaveFee = () => {
+        setTempAspirations(prev => ({ ...prev, financialAbility: tempFee }));
+        setIsFeeDialogOpen(false);
+        toast({
+            title: "Đã cập nhật mức phí mong muốn",
+            description: `Mức phí tối đa mới là ${parseInt(tempFee || '0').toLocaleString('en-US')} USD.`,
+        });
+    };
 
-    const handleSalaryInputChange = (value: string, currency: 'vnd' | 'jpy') => {
+
+    const handleCurrencyInputChange = (value: string, currency: 'vnd' | 'jpy' | 'usd', field: 'salary' | 'fee') => {
         const num = parseInt(value.replace(/[.,]/g, ''), 10);
         if (isNaN(num)) {
-            setTempSalary('');
+            field === 'salary' ? setTempSalary('') : setTempFee('');
             return;
         }
 
-        if (currency === 'vnd') {
-            setTempSalary(String(Math.round(num / JPY_VND_RATE)));
-        } else {
-            setTempSalary(String(num));
+        let baseValue;
+        if (field === 'salary') {
+            baseValue = currency === 'vnd' ? String(Math.round(num / JPY_VND_RATE)) : String(num);
+            setTempSalary(baseValue);
+        } else { // fee
+            baseValue = currency === 'vnd' ? String(Math.round(num / USD_VND_RATE)) : String(num);
+            setTempFee(baseValue);
         }
     };
     
@@ -559,13 +572,13 @@ const LoggedInView = () => {
         if (isNaN(num) || num === 0) return '';
         
         let rate = 1;
-        let locale = 'ja-JP';
+        let locale = 'en-US'; // Default to USD style
 
         if(currency === 'vnd') {
             rate = value === tempSalary ? JPY_VND_RATE : USD_VND_RATE;
             locale = 'vi-VN';
-        } else if (currency === 'usd') {
-            locale = 'en-US';
+        } else if (currency === 'jpy') {
+            locale = 'ja-JP';
         }
         
         const valueToFormat = Math.round(num * rate);
@@ -577,9 +590,10 @@ const LoggedInView = () => {
         if (isNaN(num) || num === 0) return '';
         
         if (currency === 'vnd') {
-            const rate = value === tempSalary ? JPY_VND_RATE : USD_VND_RATE;
+            const isSalaryField = value === tempSalary;
+            const rate = isSalaryField ? JPY_VND_RATE : USD_VND_RATE;
+            const targetCurrency = isSalaryField ? 'JPY' : 'USD';
             const convertedValue = Math.round(num / rate);
-            const targetCurrency = value === tempSalary ? 'JPY' : 'USD';
             const locale = targetCurrency === 'JPY' ? 'ja-JP' : 'en-US';
             return `≈ ${convertedValue.toLocaleString(locale)} ${targetCurrency}`;
         } else if (currency === 'jpy') {
@@ -590,21 +604,6 @@ const LoggedInView = () => {
             return `≈ ${convertedValue.toLocaleString('vi-VN')} VNĐ`;
         }
     };
-
-    const handleFeeInputChange = (value: string, currency: 'vnd' | 'usd') => {
-        const num = parseInt(value.replace(/[.,]/g, ''), 10);
-        if (isNaN(num)) {
-            setTempFee('');
-            return;
-        }
-
-        if (currency === 'vnd') {
-            setTempFee(String(Math.round(num / USD_VND_RATE)));
-        } else {
-            setTempFee(String(num));
-        }
-    };
-
 
     if (role === 'candidate-empty-profile') {
         return <EmptyProfileView />;
@@ -981,7 +980,7 @@ const LoggedInView = () => {
                                 id="salary-jpy" 
                                 placeholder="200,000"
                                 value={getDisplayValue(tempSalary, 'jpy')}
-                                onChange={(e) => handleSalaryInputChange(e.target.value, 'jpy')}
+                                onChange={(e) => handleCurrencyInputChange(e.target.value, 'jpy', 'salary')}
                             />
                              <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'jpy')}</p>
                         </div>
@@ -993,7 +992,7 @@ const LoggedInView = () => {
                                 id="salary-vnd" 
                                 placeholder="33,000,000"
                                 value={getDisplayValue(tempSalary, 'vnd')}
-                                onChange={(e) => handleSalaryInputChange(e.target.value, 'vnd')}
+                                onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'salary')}
                             />
                             <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'vnd')}</p>
                         </div>
@@ -1023,7 +1022,7 @@ const LoggedInView = () => {
                                 id="fee-usd" 
                                 placeholder="Nhập mức phí mong muốn"
                                 value={getDisplayValue(tempFee, 'usd')}
-                                onChange={(e) => handleFeeInputChange(e.target.value, 'usd')}
+                                onChange={(e) => handleCurrencyInputChange(e.target.value, 'usd', 'fee')}
                             />
                              <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'usd')}</p>
                         </div>
@@ -1035,7 +1034,7 @@ const LoggedInView = () => {
                                 id="fee-vnd" 
                                 placeholder="Nhập mức phí mong muốn"
                                 value={getDisplayValue(tempFee, 'vnd')}
-                                onChange={(e) => handleFeeInputChange(e.target.value, 'vnd')}
+                                onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'fee')}
                             />
                             <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'vnd')}</p>
                         </div>
@@ -1043,7 +1042,7 @@ const LoggedInView = () => {
                 </Tabs>
                 <DialogFooter className="pt-4">
                     <Button variant="outline" onClick={() => setIsFeeDialogOpen(false)}>Hủy</Button>
-                    <Button onClick={() => setIsFeeDialogOpen(false)}>Lưu thay đổi</Button>
+                    <Button onClick={handleSaveFee}>Lưu thay đổi</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -1249,6 +1248,7 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
