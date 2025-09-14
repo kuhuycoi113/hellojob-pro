@@ -284,41 +284,40 @@ const MainContent = () => (
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('all');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
-  const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
-  
   const [searchValue, setSearchValue] = useState("");
   const [openPopover, setOpenPopover] = useState(false);
-  
 
-  useEffect(() => {
-    // Initially, load all unique industries
-    const allUniqueIndustries = Object.values(industriesByJobType)
-      .flat()
-      .filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
-    setAvailableIndustries(allUniqueIndustries);
+  // Memoize the flattened list of all industries and keywords
+  const allSuggestions = React.useMemo(() => {
+    const industries = new Set<string>();
+    const keywords = new Set<string>();
+    Object.values(industriesByJobType).forEach(group => {
+        group.forEach(industry => {
+            industries.add(industry.name);
+            industry.keywords.forEach(keyword => keywords.add(keyword));
+        });
+    });
+    return {
+        industries: Array.from(industries),
+        keywords: Array.from(keywords)
+    };
   }, []);
 
-  const handleJobTypeChange = (value: string) => {
-    setSelectedJobType(value);
-    
-    let visaTypeKey: keyof typeof industriesByJobType | null = null;
-    if (value === 'all') {
-      const allUniqueIndustries = Object.values(industriesByJobType)
-        .flat()
-        .filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
-      setAvailableIndustries(allUniqueIndustries);
-      return;
-    } else if (value.includes('Thực tập sinh')) {
-      visaTypeKey = 'Thực tập sinh kỹ năng';
-    } else if (value.includes('Đặc định')) {
-      visaTypeKey = 'Kỹ năng đặc định';
-    } else if (value.includes('Kỹ sư')) {
-      visaTypeKey = 'Kỹ sư, tri thức';
+  const filteredSuggestions = React.useMemo(() => {
+    if (!searchValue) {
+        return allSuggestions.industries;
     }
-    
-    setAvailableIndustries(visaTypeKey ? industriesByJobType[visaTypeKey] : []);
-  };
+    const lowercasedValue = searchValue.toLowerCase();
+    const combined = [...allSuggestions.industries, ...allSuggestions.keywords];
+    const uniqueResults = new Set(combined.filter(item => item.toLowerCase().includes(lowercasedValue)));
+    return Array.from(uniqueResults);
+  }, [searchValue, allSuggestions]);
+  
+
+  const handleSelectSuggestion = (suggestion: string) => {
+    setSearchValue(suggestion);
+    setOpenPopover(false);
+  }
 
   return (
     <section className="w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white pt-20 md:pt-28 pb-10">
@@ -338,12 +337,41 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <div className="md:col-span-5 space-y-2">
                         <Label htmlFor="search-keyword" className="text-foreground">Ngành nghề, công việc hoặc từ khóa</Label>
-                        <Input id="search-keyword" placeholder="VD: Vận hành máy CNC, Chế biến thực phẩm..." className="h-10"/>
+                         <Popover open={openPopover} onOpenChange={setOpenPopover}>
+                            <PopoverTrigger asChild>
+                                 <Input 
+                                    id="search-keyword" 
+                                    placeholder="VD: Vận hành máy CNC, Chế biến thực phẩm..." 
+                                    className="h-10"
+                                    value={searchValue}
+                                    onChange={(e) => setSearchValue(e.target.value)}
+                                    onClick={() => setOpenPopover(true)}
+                                />
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                                <Command>
+                                    <CommandInput placeholder="Gõ để tìm kiếm..." />
+                                    <CommandList>
+                                        <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
+                                        <CommandGroup>
+                                            {filteredSuggestions.map((suggestion) => (
+                                                <CommandItem
+                                                    key={suggestion}
+                                                    onSelect={() => handleSelectSuggestion(suggestion)}
+                                                >
+                                                    {suggestion}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                     
                     <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
-                        <Select onValueChange={handleJobTypeChange} defaultValue="all">
+                        <Select onValueChange={setSelectedJobType} defaultValue="all">
                             <SelectTrigger id="search-type">
                             <SelectValue placeholder="Tất cả loại hình" />
                             </SelectTrigger>
@@ -401,5 +429,3 @@ export default function HomeClient() {
     </div>
   );
 }
-
-    
