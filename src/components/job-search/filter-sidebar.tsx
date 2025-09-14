@@ -216,7 +216,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             </AccordionContent>
                         </AccordionItem>
 
-                        <AccordionItem value="basic-salary">
+                         <AccordionItem value="basic-salary">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương cơ bản (JPY/tháng)</span>
                             </AccordionTrigger>
@@ -230,12 +230,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
-                        
-                         <AccordionItem value="net-salary">
-                             <AccordionTrigger className="text-base font-semibold">
+
+                        <AccordionItem value="net-salary">
+                            <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Thực lĩnh (JPY/tháng)</span>
                             </AccordionTrigger>
-                             <AccordionContent className="pt-4 space-y-4">
+                            <AccordionContent className="pt-4 space-y-4">
                                 <div>
                                     <Slider defaultValue={[140000, 250000]} max={450000} step={10000} />
                                     <div className="flex justify-between text-xs text-muted-foreground mt-2">
@@ -267,9 +267,13 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     <div><Label htmlFor="age-from">Tuổi từ</Label><Input id="age-from" type="number" placeholder="18" /></div>
                                     <div><Label htmlFor="age-to">đến</Label><Input id="age-to" type="number" placeholder="40" /></div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><Label htmlFor="height-from">Chiều cao từ (cm)</Label><Input id="height-from" type="number" placeholder="150" /></div>
-                                    <div><Label htmlFor="weight-from">Cân nặng từ (kg)</Label><Input id="weight-from" type="number" placeholder="45" /></div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="height-from">Chiều cao từ (cm)</Label>
+                                    <Input id="height-from" type="number" placeholder="150" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="weight-from">Cân nặng từ (kg)</Label>
+                                    <Input id="weight-from" type="number" placeholder="45" />
                                 </div>
                                 
                                 <div>
