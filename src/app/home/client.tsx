@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { BookOpen, Search, ChevronsUpDown, Check, GraduationCap, Briefcase, TrendingUp, BookCopy, ArrowRight, MapPin, MapIcon, SlidersHorizontal, ChevronLeft } from 'lucide-react';
@@ -438,11 +439,15 @@ export default function HomeClient() {
   };
   
   const handleFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
-    setSearchFilters(prev => ({...prev, ...newFilters}));
-  }, []);
+      const updatedFilters = {...searchFilters, ...newFilters};
+      setSearchFilters(updatedFilters);
+      if (isSearching) {
+        applyFilters(updatedFilters);
+      }
+  }, [searchFilters, isSearching]);
 
   const applyFilters = useCallback((currentFilters: SearchFilters) => {
-     const { visa, visaDetail, industry, location } = currentFilters;
+     const { visa, visaDetail, industry, location, jobDetail } = currentFilters;
     const results = jobData.filter(job => {
         
         let visaMatch = true;
@@ -453,6 +458,8 @@ export default function HomeClient() {
         }
 
         const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
+        
+        const jobDetailMatch = !jobDetail || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
         
         let locationMatch = false;
         if (!location || location === 'all') {
@@ -467,7 +474,7 @@ export default function HomeClient() {
             }
         }
         
-        return visaMatch && industryMatch && locationMatch;
+        return visaMatch && industryMatch && locationMatch && jobDetailMatch;
     });
 
     setFilteredJobs(results);
@@ -493,7 +500,7 @@ export default function HomeClient() {
         <SearchModule onSearch={handleSearch} showHero={!isSearching} filters={searchFilters} onFilterChange={handleFilterChange} />
       
       <div className="w-full flex-grow">
-        {isSearching ? <SearchResults jobs={filteredJobs} filters={searchFilters} onFilterChange={handleFilterChange} applyFilters={applyFilters} /> : <MainContent />}
+        {isSearching ? <SearchResults jobs={filteredJobs} filters={searchFilters} onFilterChange={handleFilterChange} applyFilters={() => applyFilters(searchFilters)} /> : <MainContent />}
       </div>
     </div>
   );
