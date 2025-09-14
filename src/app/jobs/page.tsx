@@ -802,7 +802,10 @@ const LoggedInView = () => {
                             <Button 
                                 variant={suggestionPrinciple === 'salary' ? 'default' : 'outline'}
                                 onClick={() => setSuggestionPrinciple('salary')}
-                                className="justify-start text-left h-auto py-2"
+                                className={cn(
+                                    "justify-start text-left h-auto py-2",
+                                    suggestionPrinciple === 'salary' && "bg-accent-green hover:bg-accent-green/90"
+                                )}
                             >
                                 <div>
                                     <p className="font-semibold">Lương tốt</p>
@@ -1056,3 +1059,4 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
