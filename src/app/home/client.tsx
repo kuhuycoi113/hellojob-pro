@@ -283,11 +283,11 @@ const MainContent = () => (
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('all');
   const [selectedVisaGroup, setSelectedVisaGroup] = useState<string | null>('all');
-  const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
+  const [selectedIndustry2, setSelectedIndustry2] = useState<Industry | null>(null);
   const [selectedLocation, setSelectedLocation] = useState('');
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
-  const [isIndustryPopoverOpen, setIsIndustryPopoverOpen] = useState(false);
-  const [industrySearch, setIndustrySearch] = useState('');
+  const [isIndustryPopoverOpen2, setIsIndustryPopoverOpen2] = useState(false);
+  const [industrySearch2, setIndustrySearch2] = useState('');
   const [selectedTest, setSelectedTest] = useState('');
 
 
@@ -301,8 +301,8 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
 
   const handleJobTypeChange = (value: string) => {
     setSelectedJobType(value);
-    setSelectedIndustry(null);
-    setIndustrySearch('');
+    setSelectedIndustry2(null);
+    setIndustrySearch2('');
     setSelectedTest(''); // Reset test filter as well
 
     let visaTypeKey: keyof typeof industriesByJobType | null = null;
@@ -325,16 +325,16 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
     setAvailableIndustries(visaTypeKey ? industriesByJobType[visaTypeKey] : []);
   };
   
-  const handleIndustrySelect = (industry: Industry | null) => {
-    setSelectedIndustry(industry);
-    setIndustrySearch('');
-    setIsIndustryPopoverOpen(false);
+  const handleIndustrySelect2 = (industry: Industry | null) => {
+    setSelectedIndustry2(industry);
+    setIndustrySearch2('');
+    setIsIndustryPopoverOpen2(false);
   }
 
-  const filteredIndustries = industrySearch
+  const filteredIndustries2 = industrySearch2
     ? availableIndustries.filter(industry =>
-        industry.name.toLowerCase().includes(industrySearch.toLowerCase()) ||
-        industry.keywords.some(k => k.toLowerCase().includes(industrySearch.toLowerCase()))
+        industry.name.toLowerCase().includes(industrySearch2.toLowerCase()) ||
+        industry.keywords.some(k => k.toLowerCase().includes(industrySearch2.toLowerCase()))
       )
     : availableIndustries;
 
@@ -369,31 +369,18 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="md:col-span-2 space-y-2">
-                        <Label htmlFor="search-test" className="text-foreground">Test</Label>
-                        <Select onValueChange={setSelectedTest} value={selectedTest} disabled={!selectedVisaGroup}>
-                            <SelectTrigger id="search-test">
-                                <SelectValue placeholder="Test" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {availableIndustries.map(industry => (
-                                    <SelectItem key={industry.slug} value={industry.slug}>{industry.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                     <div className="md:col-span-3 space-y-2">
-                        <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                        <Popover open={isIndustryPopoverOpen} onOpenChange={setIsIndustryPopoverOpen}>
+                    <div className="md:col-span-3 space-y-2">
+                        <Label htmlFor="search-test" className="text-foreground">Ngành nghề 2</Label>
+                        <Popover open={isIndustryPopoverOpen2} onOpenChange={setIsIndustryPopoverOpen2}>
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
                               role="combobox"
-                              aria-expanded={isIndustryPopoverOpen}
+                              aria-expanded={isIndustryPopoverOpen2}
                               className="w-full justify-between h-10 font-normal text-muted-foreground"
-                              disabled={!selectedVisaGroup}
+                              disabled={selectedJobType === 'all'}
                             >
-                              {selectedIndustry?.name || "Tất cả ngành nghề"}
+                              {selectedIndustry2?.name || "Tất cả ngành nghề"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </PopoverTrigger>
@@ -401,31 +388,31 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             <Command>
                               <CommandInput 
                                 placeholder="Tìm ngành nghề hoặc công việc..." 
-                                value={industrySearch}
-                                onValueChange={setIndustrySearch}
+                                value={industrySearch2}
+                                onValueChange={setIndustrySearch2}
                               />
                               <CommandList>
                                 <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
                                 <CommandGroup>
                                     <CommandItem
-                                    onSelect={() => handleIndustrySelect(null)}
+                                    onSelect={() => handleIndustrySelect2(null)}
                                     >
-                                    <Check className={cn("mr-2 h-4 w-4", !selectedIndustry ? "opacity-100" : "opacity-0")}/>
+                                    <Check className={cn("mr-2 h-4 w-4", !selectedIndustry2 ? "opacity-100" : "opacity-0")}/>
                                     Tất cả ngành nghề
                                     </CommandItem>
-                                    {filteredIndustries.map((industry) => (
+                                    {filteredIndustries2.map((industry) => (
                                         <React.Fragment key={industry.slug}>
                                         <CommandItem
-                                            onSelect={() => handleIndustrySelect(industry)}
+                                            onSelect={() => handleIndustrySelect2(industry)}
                                             className="font-semibold"
                                         >
-                                            <Check className={cn("mr-2 h-4 w-4", selectedIndustry?.slug === industry.slug && !industrySearch ? "opacity-100" : "opacity-0")} />
+                                            <Check className={cn("mr-2 h-4 w-4", selectedIndustry2?.slug === industry.slug && !industrySearch2 ? "opacity-100" : "opacity-0")} />
                                             {industry.name}
                                         </CommandItem>
-                                        {industrySearch && industry.keywords.filter(k => k.toLowerCase().includes(industrySearch.toLowerCase())).map(keyword => (
+                                        {industrySearch2 && industry.keywords.filter(k => k.toLowerCase().includes(industrySearch2.toLowerCase())).map(keyword => (
                                             <CommandItem
                                                 key={`${industry.slug}-${keyword}`}
-                                                onSelect={() => handleIndustrySelect(industry)}
+                                                onSelect={() => handleIndustrySelect2(industry)}
                                                 className="pl-8"
                                             >
                                                 {keyword}
@@ -439,7 +426,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                           </PopoverContent>
                         </Popover>
                     </div>
-                    <div className="md:col-span-2 space-y-2">
+                    <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                         <Select onValueChange={setSelectedLocation}>
                             <SelectTrigger id="search-location">
@@ -455,7 +442,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-3">
                         <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={onSearch}>
                             <Search className="mr-2 h-5 w-5" /> Tìm kiếm
                         </Button>
@@ -484,3 +471,5 @@ export default function HomeClient() {
     </div>
   );
 }
+
+    
