@@ -75,7 +75,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
         setAvailableIndustries(uniqueIndustries);
 
-        if (filters.industry) {
+        if (filters.industry && filters.industry !== 'all') {
             const selectedIndustryData = allIndustries.find(ind => ind.name === filters.industry);
             setAvailableJobDetails(selectedIndustryData?.keywords || []);
         } else {
@@ -114,7 +114,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             <AccordionContent className="space-y-4 pt-4">
                                 <div>
                                     <Label>Loại visa</Label>
-                                    <Select value={filters.visa} onValueChange={handleJobTypeChange}>
+                                    <Select value={filters.visa || "all"} onValueChange={handleJobTypeChange}>
                                         <SelectTrigger className={cn(filters.visa && filters.visa !== 'all' && 'text-primary')}>
                                             <SelectValue placeholder="Tất cả loại hình"/>
                                         </SelectTrigger>
@@ -128,7 +128,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 </div>
                                  <div>
                                     <Label>Chi tiết loại hình visa</Label>
-                                    <Select value={filters.visaDetail} onValueChange={handleVisaDetailChange}>
+                                    <Select value={filters.visaDetail || "all-details"} onValueChange={handleVisaDetailChange}>
                                         <SelectTrigger className={cn(filters.visaDetail && filters.visaDetail !== 'all-details' && 'text-primary')}>
                                             <SelectValue placeholder="Tất cả chi tiết"/>
                                         </SelectTrigger>
@@ -155,7 +155,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             <AccordionContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
                                     <Label>Ngành nghề</Label>
-                                    <Select value={filters.industry} onValueChange={(value) => onFilterChange({ industry: value, jobDetail: '' })}>
+                                    <Select value={filters.industry || "all"} onValueChange={(value) => onFilterChange({ industry: value, jobDetail: '' })}>
                                         <SelectTrigger className={cn(filters.industry && filters.industry !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả ngành nghề</SelectItem>
@@ -164,9 +164,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Chi tiết công việc</Label>
-                                     <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry || availableJobDetails.length === 0}>
-                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn công việc chi tiết"/></SelectTrigger>
+                                    <Label>Yêu cầu kinh nghiệm</Label>
+                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry || filters.industry === 'all'}>
+                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}>
+                                            <SelectValue placeholder={!filters.industry || filters.industry === 'all' ? "Phải chọn Ngành nghề trước" : "Chọn chi tiết công việc"} />
+                                        </SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
                                         </SelectContent>
@@ -331,8 +333,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Yêu cầu kinh nghiệm</Label>
-                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
-                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn chi tiết công việc"/></SelectTrigger>
+                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry}>
+                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder={!filters.industry ? "Phải chọn Ngành nghề trước" : "Chọn chi tiết công việc"}/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
                                         </SelectContent>
@@ -386,4 +388,5 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
 
     
+
 
