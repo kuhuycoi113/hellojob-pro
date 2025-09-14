@@ -425,7 +425,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                         </div>
                          <div className="space-y-2">
                             <Label className="text-transparent hidden md:block">Tìm kiếm</Label>
-                            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
+                            <Button size="lg" className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
                                 <Search className="mr-2 h-5 w-5" /> Tìm kiếm
                             </Button>
                         </div>
