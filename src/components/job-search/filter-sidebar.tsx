@@ -55,7 +55,6 @@ const experienceYears = [
     'Trên 5 năm'
 ];
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
-const interviewFormats = ["Phỏng vấn trực tiếp", "Phỏng vấn Online", "Phỏng vấn trực tiếp và Online"];
 
 interface FilterSidebarProps {
     filters: SearchFilters;
@@ -302,10 +301,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                             {experienceYears.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
-                                </div>
-                                <div>
-                                    <Label>Hình thức phỏng vấn</Label>
-                                    <Select><SelectTrigger className="mt-2"><SelectValue placeholder="Chọn hình thức"/></SelectTrigger><SelectContent>{interviewFormats.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent></Select>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
