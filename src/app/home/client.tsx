@@ -30,6 +30,7 @@ import { industriesByJobType, type Industry } from "@/lib/industry-data";
 import { FilterSidebar } from '@/components/job-search/filter-sidebar';
 import { SearchResults } from '@/components/job-search/search-results';
 import { Job, jobData } from '@/lib/mock-data';
+import { locations } from '@/lib/location-data';
 
 
 const featuredEmployers = [
@@ -74,23 +75,6 @@ const japanJobTypes = [
     'Kỹ sư, tri thức đầu Việt',
     'Kỹ sư, tri thức đầu Nhật'
 ];
-
-const locations = {
-    "Việt Nam": [
-        "An Giang", "Bắc Ninh", "Cao Bằng", "Cà Mau", "Cần Thơ", "Đà Nẵng", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Đắk Lắk", "Gia Lai", "Hà Nội", "Hà Tĩnh", "Hải Phòng", "Hưng Yên", "Thừa Thiên Huế", "Khánh Hòa", "Lai Châu", "Lào Cai", "Lạng Sơn", "Lâm Đồng", "Nghệ An", "Ninh Bình", "Phú Thọ", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sơn La", "Tây Ninh", "Thanh Hóa", "Thành phố Hồ Chí Minh", "Thái Nguyên", "Tuyên Quang", "Vĩnh Long"
-    ],
-    "Nhật Bản": {
-        "Hokkaido": ["Hokkaido"],
-        "Tohoku": ["Aomori", "Iwate", "Miyagi", "Akita", "Yamagata", "Fukushima"],
-        "Kanto": ["Ibaraki", "Tochigi", "Gunma", "Saitama", "Chiba", "Tokyo", "Kanagawa"],
-        "Chubu": ["Niigata", "Toyama", "Ishikawa", "Fukui", "Yamanashi", "Nagano", "Gifu", "Shizuoka", "Aichi"],
-        "Kansai": ["Mie", "Shiga", "Kyoto", "Osaka", "Hyogo", "Nara", "Wakayama"],
-        "Chugoku": ["Tottori", "Shimane", "Okayama", "Hiroshima", "Yamaguchi"],
-        "Shikoku": ["Tokushima", "Kagawa", "Ehime", "Kochi"],
-        "Kyushu": ["Fukuoka", "Saga", "Nagasaki", "Kumamoto", "Oita", "Miyazaki", "Kagoshima"],
-        "Okinawa": ["Okinawa"]
-    }
-};
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
@@ -287,12 +271,12 @@ const MainContent = () => (
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const [industryValue, setIndustryValue] = useState("");
+  const [selectedIndustry, setSelectedIndustry] = useState('');
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
 
   const handleVisaTypeChange = (value: string) => {
     setSelectedJobType(value);
-    setIndustryValue(""); // Reset industry when visa type changes
+    setSelectedIndustry(""); // Reset industry when visa type changes
 
     if (!value || value === "all") {
       setAvailableIndustries(allIndustries);
@@ -301,7 +285,6 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
     
     let visaCategory: keyof typeof industriesByJobType | undefined;
     
-    // Find category from visa type detail
     if (value.includes('Thực tập sinh')) {
         visaCategory = 'Thực tập sinh kỹ năng';
     } else if (value.includes('Đặc định')) {
@@ -318,7 +301,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const handleSearchClick = () => {
     onSearch({
         visa: selectedJobType,
-        industry: industryValue,
+        industry: selectedIndustry,
         location: selectedLocation
     });
   }
@@ -355,7 +338,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                     </div>
                     <div className="space-y-2 flex-1">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                         <Select onValueChange={setIndustryValue} value={industryValue}>
+                         <Select onValueChange={setSelectedIndustry} value={selectedIndustry}>
                             <SelectTrigger id="search-industry">
                                 <SelectValue placeholder="Tất cả ngành nghề" />
                             </SelectTrigger>
@@ -375,10 +358,12 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             <SelectTrigger id="search-location">
                             <SelectValue placeholder="Tất cả địa điểm" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="max-h-[300px]">
+                                <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
                                 {Object.entries(locations["Nhật Bản"]).map(([region, prefectures]) => (
                                     <SelectGroup key={region}>
                                         <SelectLabel>{region}</SelectLabel>
+                                        <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
                                         {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                                     </SelectGroup>
                                 ))}
@@ -408,8 +393,22 @@ export default function HomeClient() {
     const results = jobData.filter(job => {
         const visaMatch = !visa || visa === 'all' || (job.visaDetail && job.visaDetail.includes(visa));
         const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
-        const locationMatch = !location || location === 'all' || (job.workLocation && job.workLocation.toLowerCase().includes(location.toLowerCase()));
-
+        
+        let locationMatch = false;
+        if (!location || location === 'all') {
+            locationMatch = true;
+        } else {
+            // Is the selected location a region?
+            const isRegion = Object.keys(locations['Nhật Bản']).includes(location);
+            if (isRegion) {
+                const regionPrefectures = locations['Nhật Bản'][location as keyof typeof locations['Nhật Bản']];
+                locationMatch = regionPrefectures.some(prefecture => job.workLocation.toLowerCase().includes(prefecture.toLowerCase()));
+            } else {
+                // It's a prefecture
+                locationMatch = job.workLocation && job.workLocation.toLowerCase().includes(location.toLowerCase());
+            }
+        }
+        
         return visaMatch && industryMatch && locationMatch;
     });
 
