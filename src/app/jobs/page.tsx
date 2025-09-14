@@ -830,6 +830,10 @@ const LoggedInView = () => {
                             </Button>
                         </div>
                     </div>
+                    <div className="space-y-2 pt-2">
+                        <Label className="font-semibold">Thêm điều kiện mở rộng</Label>
+                        {/* Content for this section will be added in a future prompt */}
+                    </div>
                 </div>
                 <DialogFooter className="flex-row justify-end space-x-2">
                     <DialogClose asChild>
