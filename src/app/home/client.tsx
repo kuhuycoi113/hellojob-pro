@@ -284,39 +284,23 @@ const MainContent = () => (
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('all');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const [searchValue, setSearchValue] = useState("");
-  const [openPopover, setOpenPopover] = useState(false);
+  const [test6Value, setTest6Value] = useState("");
+  const [openTest6Popover, setOpenTest6Popover] = useState(false);
 
-  // Memoize the flattened list of all industries and keywords
-  const allSuggestions = React.useMemo(() => {
-    const industries = new Set<string>();
-    const keywords = new Set<string>();
-    Object.values(industriesByJobType).forEach(group => {
-        group.forEach(industry => {
-            industries.add(industry.name);
-            industry.keywords.forEach(keyword => keywords.add(keyword));
-        });
-    });
-    return {
-        industries: Array.from(industries),
-        keywords: Array.from(keywords)
-    };
-  }, []);
+  const test6Suggestions = ['A', 'B', 'C'];
 
-  const filteredSuggestions = React.useMemo(() => {
-    if (!searchValue) {
-        return allSuggestions.industries;
+  const filteredTest6Suggestions = React.useMemo(() => {
+    if (!test6Value) {
+        return test6Suggestions;
     }
-    const lowercasedValue = searchValue.toLowerCase();
-    const combined = [...allSuggestions.industries, ...allSuggestions.keywords];
-    const uniqueResults = new Set(combined.filter(item => item.toLowerCase().includes(lowercasedValue)));
-    return Array.from(uniqueResults);
-  }, [searchValue, allSuggestions]);
+    const lowercasedValue = test6Value.toLowerCase();
+    return test6Suggestions.filter(item => item.toLowerCase().includes(lowercasedValue));
+  }, [test6Value, test6Suggestions]);
   
 
-  const handleSelectSuggestion = (suggestion: string) => {
-    setSearchValue(suggestion);
-    setOpenPopover(false);
+  const handleSelectTest6Suggestion = (suggestion: string) => {
+    setTest6Value(suggestion);
+    setOpenTest6Popover(false);
   }
 
   return (
@@ -350,8 +334,45 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                         </Select>
                     </div>
                     <div className="md:col-span-3 space-y-2">
-                      <Label htmlFor="search-test6" className="text-foreground">Test 6</Label>
-                      <Input id="search-test6" placeholder="Gõ tìm kiếm" className="h-10" />
+                        <Label htmlFor="search-test6" className="text-foreground">Test 6</Label>
+                        <Popover open={openTest6Popover} onOpenChange={setOpenTest6Popover}>
+                            <PopoverAnchor>
+                                <Command>
+                                    <CommandInput 
+                                        id="search-test6"
+                                        placeholder="Gõ tìm kiếm" 
+                                        className="h-10"
+                                        value={test6Value}
+                                        onValueChange={setTest6Value}
+                                        onFocus={() => setOpenTest6Popover(true)}
+                                    />
+                                    <PopoverContent 
+                                        className="p-0 w-[--radix-popover-trigger-width]" 
+                                        onOpenAutoFocus={(e) => e.preventDefault()}
+                                    >
+                                        <CommandList>
+                                            <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
+                                            <CommandGroup heading="Gợi ý">
+                                                {filteredTest6Suggestions.map((suggestion) => (
+                                                    <CommandItem
+                                                        key={suggestion}
+                                                        onSelect={() => handleSelectTest6Suggestion(suggestion)}
+                                                    >
+                                                        <Check
+                                                            className={cn(
+                                                                "mr-2 h-4 w-4",
+                                                                test6Value === suggestion ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                        {suggestion}
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </PopoverContent>
+                                </Command>
+                            </PopoverAnchor>
+                        </Popover>
                     </div>
                     <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
