@@ -831,9 +831,20 @@ const LoggedInView = () => {
                             </Button>
                         </div>
                     </div>
-                    <div className="space-y-2 pt-2">
-                        <Label className="font-semibold">Thêm điều kiện mở rộng</Label>
-                    </div>
+                    <Collapsible>
+                        <CollapsibleTrigger asChild>
+                            <Button variant="outline" className="w-full justify-start text-left font-semibold">
+                                <ChevronDown className="mr-2 h-4 w-4" />
+                                Thêm điều kiện mở rộng
+                            </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                            {/* Placeholder for future advanced filter controls */}
+                            <div className="pt-4">
+                                <p className="text-sm text-muted-foreground">Các điều kiện lọc nâng cao sẽ được thêm vào đây.</p>
+                            </div>
+                        </CollapsibleContent>
+                    </Collapsible>
                 </div>
                 <DialogFooter className="flex-row justify-end space-x-2">
                     <DialogClose asChild>
@@ -997,13 +1008,13 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2">
                     <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        <TrendingUp className="mr-2 h-4 w-4" /> Lương tốt
+                        <TrendingUp className="mr-2 h-4 w-4 text-accent-green" /> Lương tốt
                     </Button>
                     <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        <ShieldCheck className="mr-2 h-4 w-4" /> {feeButtonText}
+                        <ShieldCheck className="mr-2 h-4 w-4 text-primary" /> {feeButtonText}
                     </Button>
                     <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        <ThumbsUp className="mr-2 h-4 w-4" /> {companyButtonText}
+                        <ThumbsUp className="mr-2 h-4 w-4 text-accent-orange" /> {companyButtonText}
                     </Button>
                 </CardContent>
             </Card>
