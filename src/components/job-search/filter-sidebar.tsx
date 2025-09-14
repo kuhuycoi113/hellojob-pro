@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -51,51 +50,36 @@ const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a)
 const interviewFormats = ["Phỏng vấn trực tiếp", "Phỏng vấn Online", "Phỏng vấn trực tiếp và Online"];
 
 interface FilterSidebarProps {
-    initialFilters?: SearchFilters;
-    onApply?: (filters: any) => void;
+    filters: SearchFilters;
+    onFilterChange: (newFilters: Partial<SearchFilters>) => void;
+    onApply: () => void;
 }
 
-export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) => {
-    const [jobType, setJobType] = useState(initialFilters?.visa || '');
-    const [visaDetail, setVisaDetail] = useState(initialFilters?.visaDetail || '');
-    const [industry, setIndustry] = useState(initialFilters?.industry || '');
-    const [workLocation, setWorkLocation] = useState(initialFilters?.location || '');
-    const [jobDetail, setJobDetail] = useState('');
+export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
 
-
     useEffect(() => {
-        setJobType(initialFilters?.visa || '');
-        setVisaDetail(initialFilters?.visaDetail || '');
-        setIndustry(initialFilters?.industry || '');
-        setWorkLocation(initialFilters?.location || '');
-    }, [initialFilters]);
-    
-     useEffect(() => {
-        if (industry) {
-            const selectedIndustryData = allIndustries.find(ind => ind.name === industry);
+        if (filters.industry) {
+            const selectedIndustryData = allIndustries.find(ind => ind.name === filters.industry);
             setAvailableJobDetails(selectedIndustryData?.keywords || []);
         } else {
             setAvailableJobDetails([]);
         }
-        setJobDetail(''); // Reset job detail when industry changes
-    }, [industry]);
-
-    const handleApplyFilters = () => {
-        if (onApply) {
-            onApply({
-                visa: jobType,
-                visaDetail: visaDetail,
-                industry,
-                location: workLocation
-            });
-        }
-    }
+        // Don't reset jobDetail here, let it be controlled by the parent state
+    }, [filters.industry]);
 
     const handleJobTypeChange = (value: string) => {
-        setJobType(value);
-        setVisaDetail(''); // Reset visa detail when job type changes
+        onFilterChange({ visa: value, visaDetail: '' });
     }
+    
+     const handleVisaDetailChange = (value: string) => {
+        const newFilters: Partial<SearchFilters> = { visaDetail: value };
+        const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].includes(value));
+        if (parentType && filters.visa !== parentType) {
+            newFilters.visa = parentType;
+        }
+        onFilterChange(newFilters);
+    };
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -112,7 +96,7 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                             <AccordionContent className="space-y-4 pt-4">
                                 <div>
                                     <Label>Loại visa</Label>
-                                    <Select value={jobType} onValueChange={handleJobTypeChange}>
+                                    <Select value={filters.visa} onValueChange={handleJobTypeChange}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Tất cả loại hình"/>
                                         </SelectTrigger>
@@ -126,14 +110,19 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                                 </div>
                                  <div>
                                     <Label>Chi tiết loại hình visa</Label>
-                                    <Select value={visaDetail} onValueChange={setVisaDetail} disabled={!jobType || jobType === 'all'}>
+                                    <Select value={filters.visaDetail} onValueChange={handleVisaDetailChange}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Tất cả chi tiết"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all-details">Tất cả chi tiết</SelectItem>
-                                            {(visaDetailsByVisaType[jobType] || []).map(detail => (
-                                                <SelectItem key={detail} value={detail}>{detail}</SelectItem>
+                                             {japanJobTypes.map(type => (
+                                                <SelectGroup key={type}>
+                                                    <SelectLabel>{type}</SelectLabel>
+                                                    {(visaDetailsByVisaType[type] || []).map(detail => (
+                                                        <SelectItem key={detail} value={detail}>{detail}</SelectItem>
+                                                    ))}
+                                                </SelectGroup>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -148,7 +137,7 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                             <AccordionContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
                                     <Label>Ngành nghề</Label>
-                                    <Select value={industry} onValueChange={setIndustry}>
+                                    <Select value={filters.industry} onValueChange={(value) => onFilterChange({ industry: value, jobDetail: '' })}>
                                         <SelectTrigger><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả ngành nghề</SelectItem>
@@ -158,7 +147,7 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Chi tiết công việc</Label>
-                                     <Select value={jobDetail} onValueChange={setJobDetail} disabled={!industry || availableJobDetails.length === 0}>
+                                     <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry || availableJobDetails.length === 0}>
                                         <SelectTrigger><SelectValue placeholder="Chọn công việc chi tiết"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
@@ -176,7 +165,7 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                             <AccordionContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
                                     <Label>Nơi làm việc (Nhật Bản)</Label>
-                                    <Select value={workLocation} onValueChange={setWorkLocation}><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Nhật Bản</SelectItem>{Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (<SelectGroup key={region}><SelectLabel>{region}</SelectLabel><SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>{(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectGroup>))}</SelectContent></Select>
+                                    <Select value={filters.location} onValueChange={(value) => onFilterChange({ location: value })}><SelectTrigger><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả Nhật Bản</SelectItem>{Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (<SelectGroup key={region}><SelectLabel>{region}</SelectLabel><SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>{(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectGroup>))}</SelectContent></Select>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Nơi phỏng vấn (Việt Nam)</Label>
@@ -265,7 +254,7 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
-                     <Button className="w-full bg-primary text-white mt-6" onClick={handleApplyFilters}>Áp dụng bộ lọc</Button>
+                     <Button className="w-full bg-primary text-white mt-6" onClick={onApply}>Áp dụng bộ lọc</Button>
                 </CardContent>
             </Card>
         </div>

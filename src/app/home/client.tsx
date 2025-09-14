@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { BookOpen, Search, ChevronsUpDown, Check, GraduationCap, Briefcase, TrendingUp, BookCopy, ArrowRight, MapPin, MapIcon, SlidersHorizontal } from 'lucide-react';
+import { BookOpen, Search, ChevronsUpDown, Check, GraduationCap, Briefcase, TrendingUp, BookCopy, ArrowRight, MapPin, MapIcon, SlidersHorizontal, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
@@ -267,69 +267,62 @@ const MainContent = () => (
 
   type SearchModuleProps = {
       onSearch: (filters: SearchFilters) => void;
-      onBack?: () => void;
-      isSearching: boolean;
+      showHero: boolean;
+      filters: SearchFilters;
+      onFilterChange: (newFilters: Partial<SearchFilters>) => void;
   }
   
-const SearchModule = ({ onSearch, onBack, isSearching }: SearchModuleProps) => {
-  const [selectedJobType, setSelectedJobType] = useState('');
-  const [selectedVisaDetail, setSelectedVisaDetail] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
-  const [selectedIndustry, setSelectedIndustry] = useState('');
+const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchModuleProps) => {
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   useEffect(() => {
     // When the hero is hidden (after a search), collapse the search bar by default on mobile.
-    if (isSearching) {
+    if (!showHero) {
       setIsSearchExpanded(false);
     }
-  }, [isSearching]);
+  }, [showHero]);
 
   const handleVisaTypeChange = (value: string) => {
-    setSelectedJobType(value);
-    setSelectedVisaDetail('');
-    setSelectedIndustry(""); // Reset industry when visa type changes
+    onFilterChange({ visa: value, visaDetail: '', industry: '' }); // Reset dependent filters
     const newIndustries = industriesByJobType[value as keyof typeof industriesByJobType] || allIndustries;
     const uniqueIndustries = Array.from(new Map(newIndustries.map(item => [item.name, item])).values());
     setAvailableIndustries(uniqueIndustries);
   };
   
   const handleVisaDetailChange = (value: string) => {
+    const newFilters: Partial<SearchFilters> = { visaDetail: value };
     const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].includes(value));
-    if (parentType) {
-        if(selectedJobType !== parentType) {
-            handleVisaTypeChange(parentType);
-        }
+    if (parentType && filters.visa !== parentType) {
+        newFilters.visa = parentType;
+        const newIndustries = industriesByJobType[parentType as keyof typeof industriesByJobType] || allIndustries;
+        const uniqueIndustries = Array.from(new Map(newIndustries.map(item => [item.name, item])).values());
+        setAvailableIndustries(uniqueIndustries);
+        newFilters.industry = ''; // Also reset industry if visa type changes
     }
-    setSelectedVisaDetail(value);
+    onFilterChange(newFilters);
   }
   
   const handleSearchClick = () => {
-    onSearch({
-        visa: selectedJobType,
-        visaDetail: selectedVisaDetail,
-        industry: selectedIndustry,
-        location: selectedLocation
-    });
+    onSearch(filters);
      if (window.innerWidth < 768) { // md breakpoint
       setIsSearchExpanded(false);
     }
   }
 
   const searchSummary = [
-    selectedVisaDetail || selectedJobType,
-    selectedIndustry,
-    selectedLocation
+    filters.visaDetail || filters.visa,
+    filters.industry,
+    filters.location
   ].filter(Boolean).join(' / ');
 
 
   return (
     <section className={cn(
         "w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white transition-all duration-500",
-        !isSearching ? "pt-20 md:pt-28 pb-10" : "pt-8 pb-8 md:pt-12 md:pb-12"
+        showHero ? "pt-20 md:pt-28 pb-10" : "pt-8 pb-8 md:pt-12 md:pb-12"
     )}>
-        {!isSearching && (
+        {showHero && (
             <div className="container mx-auto px-4 md:px-6">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4">
@@ -343,11 +336,11 @@ const SearchModule = ({ onSearch, onBack, isSearching }: SearchModuleProps) => {
         )}
         <div className={cn(
             "container mx-auto px-4 md:px-6 relative z-10",
-            !isSearching && "mt-[-6rem] md:mt-4"
+            showHero && "mt-[-6rem] md:mt-4"
         )}>
             <Card className="max-w-6xl mx-auto shadow-2xl">
                  {/* Mobile Collapsed View */}
-                {isSearching && (
+                {!showHero && (
                     <div className="md:hidden p-2">
                         <Button 
                             variant="ghost" 
@@ -366,12 +359,12 @@ const SearchModule = ({ onSearch, onBack, isSearching }: SearchModuleProps) => {
                 {/* Full Search View (Desktop always, Mobile when expanded) */}
                 <div className={cn(
                     "p-4 md:p-6",
-                    isSearching && !isSearchExpanded ? "hidden md:block" : "block"
+                    !showHero && !isSearchExpanded ? "hidden md:block" : "block"
                 )}>
                     <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                         <div className="space-y-2 flex-1">
                             <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
-                            <Select onValueChange={handleVisaDetailChange} value={selectedVisaDetail}>
+                            <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail}>
                                 <SelectTrigger id="search-type">
                                 <SelectValue placeholder="Tất cả loại hình" />
                                 </SelectTrigger>
@@ -390,7 +383,7 @@ const SearchModule = ({ onSearch, onBack, isSearching }: SearchModuleProps) => {
                         </div>
                         <div className="space-y-2 flex-1">
                             <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                            <Select onValueChange={setSelectedIndustry} value={selectedIndustry}>
+                            <Select onValueChange={(value) => onFilterChange({ industry: value })} value={filters.industry}>
                                 <SelectTrigger id="search-industry">
                                     <SelectValue placeholder="Tất cả ngành nghề" />
                                 </SelectTrigger>
@@ -406,7 +399,7 @@ const SearchModule = ({ onSearch, onBack, isSearching }: SearchModuleProps) => {
                         </div>
                         <div className="space-y-2 flex-1">
                             <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
-                            <Select onValueChange={setSelectedLocation} value={selectedLocation}>
+                            <Select onValueChange={(value) => onFilterChange({ location: value })} value={filters.location}>
                                 <SelectTrigger id="search-location">
                                 <SelectValue placeholder="Tất cả địa điểm" />
                                 </SelectTrigger>
@@ -442,12 +435,21 @@ export default function HomeClient() {
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', visaDetail: '', industry: '', location: '' });
 
   const handleSearch = (filters: SearchFilters) => {
-    setSearchFilters(filters);
-    const { visa, visaDetail, industry, location } = filters;
+    applyFilters(filters);
+    setIsSearching(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  const handleFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
+    setSearchFilters(prev => ({...prev, ...newFilters}));
+  }, []);
+
+  const applyFilters = (currentFilters: SearchFilters) => {
+     const { visa, visaDetail, industry, location } = currentFilters;
     const results = jobData.filter(job => {
         
         let visaMatch = true;
-        if (visaDetail && visaDetail !== 'all') {
+        if (visaDetail && visaDetail !== 'all-details') {
             visaMatch = job.visaDetail === visaDetail;
         } else if (visa && visa !== 'all') {
             visaMatch = job.visaType === visa;
@@ -472,21 +474,20 @@ export default function HomeClient() {
     });
 
     setFilteredJobs(results);
-    setIsSearching(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  
-    const handleBackToHome = () => {
-        setIsSearching(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+
+  const handleBackToHome = () => {
+      setIsSearching(false);
+      setSearchFilters({ visa: '', visaDetail: '', industry: '', location: '' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   return (
     <div className="flex flex-col items-center min-h-screen">
-        <SearchModule onSearch={handleSearch} isSearching={isSearching} />
+        <SearchModule onSearch={handleSearch} showHero={!isSearching} filters={searchFilters} onFilterChange={handleFilterChange} />
       
       <div className="w-full flex-grow">
-        {isSearching ? <SearchResults jobs={filteredJobs} initialFilters={searchFilters} onBack={handleBackToHome} /> : <MainContent />}
+        {isSearching ? <SearchResults jobs={filteredJobs} initialFilters={searchFilters} /> : <MainContent />}
       </div>
     </div>
   );
