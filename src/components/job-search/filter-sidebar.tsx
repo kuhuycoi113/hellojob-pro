@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { industriesByJobType } from "@/lib/industry-data";
-import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler } from "lucide-react";
+import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages } from "lucide-react";
 import { locations } from "@/lib/location-data";
 import { type SearchFilters } from './search-results';
 
@@ -77,7 +77,7 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry']} className="w-full">
+                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements']} className="w-full">
                          <AccordionItem value="jobType">
                             <AccordionTrigger className="text-base font-semibold">
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
@@ -102,7 +102,7 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                                 <span className="flex items-center gap-2"><Building className="h-5 w-5"/>Ngành nghề</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-2 pt-4">
-                               <Select value={industry} onValueChange={setIndustry}><SelectTrigger><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả ngành nghề</SelectItem>{allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name}</SelectItem>)}</SelectContent></Select>
+                               <Select value={industry} onValueChange={setIndustry}><SelectTrigger><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger><SelectContent className="max-h-60"><SelectItem value="all">Tất cả ngành nghề</SelectItem>{allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}</SelectContent></Select>
                             </AccordionContent>
                         </AccordionItem>
 
@@ -154,31 +154,24 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                                     <div><Label htmlFor="age-from">Tuổi từ</Label><Input id="age-from" type="number" placeholder="18" /></div>
                                     <div><Label htmlFor="age-to">đến</Label><Input id="age-to" type="number" placeholder="40" /></div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><Label htmlFor="height-from">Chiều cao từ (cm)</Label><Input id="height-from" type="number" placeholder="150" /></div>
-                                    <div><Label htmlFor="weight-from">Cân nặng từ (kg)</Label><Input id="weight-from" type="number" placeholder="45" /></div>
-                                </div>
+                                
                                 <div>
                                     <Label className="font-semibold">Trình độ tiếng Nhật</Label>
-                                    <div className="grid grid-cols-3 gap-2 pt-2">
-                                        {languageLevels.map(item => (
-                                            <div key={item} className="flex items-center space-x-2">
-                                                <Checkbox id={`lang-${item}`} />
-                                                <Label htmlFor={`lang-${item}`} className="font-normal cursor-pointer text-xs">{item}</Label>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <Select>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn trình độ" /></SelectTrigger>
+                                        <SelectContent>
+                                            {languageLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                  <div>
                                     <Label className="font-semibold">Học vấn</Label>
-                                    <div className="grid grid-cols-2 gap-2 pt-2">
-                                        {educationLevels.map(item => (
-                                            <div key={item} className="flex items-center space-x-2">
-                                                <Checkbox id={`edu-${item}`} />
-                                                <Label htmlFor={`edu-${item}`} className="font-normal cursor-pointer text-sm">{item}</Label>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <Select>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn học vấn" /></SelectTrigger>
+                                        <SelectContent>
+                                            {educationLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div>
                                     <Label className="font-semibold">Kinh nghiệm</Label>
@@ -193,29 +186,12 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
                                     <Label>Hình thức phỏng vấn</Label>
                                     <Select><SelectTrigger className="mt-2"><SelectValue placeholder="Chọn hình thức"/></SelectTrigger><SelectContent>{interviewFormats.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent></Select>
                                 </div>
-                                <div>
-                                    <Label className="font-semibold">Yêu cầu khác</Label>
-                                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2">
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox id="cond-tattoo" />
-                                            <Label htmlFor="cond-tattoo" className="font-normal cursor-pointer text-sm flex items-center gap-1.5"><Star className="h-4 w-4 text-yellow-500" />Không xăm</Label>
-                                        </div>
-                                         <div className="flex items-center space-x-2">
-                                            <Checkbox id="cond-hepatitis" />
-                                            <Label htmlFor="cond-hepatitis" className="font-normal cursor-pointer text-sm flex items-center gap-1.5"><Dna className="h-4 w-4 text-red-500"/>Không VGB</Label>
-                                        </div>
-                                         <div className="flex items-center space-x-2">
-                                            <Checkbox id="cond-vision" />
-                                            <Label htmlFor="cond-vision" className="font-normal cursor-pointer text-sm flex items-center gap-1.5"><Camera className="h-4 w-4 text-blue-500"/>Không cận thị</Label>
-                                        </div>
-                                    </div>
-                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
                         <AccordionItem value="specialConditions" className="border-b-0">
                             <AccordionTrigger className="text-base font-semibold">
-                               <span className="flex items-center gap-2"><Check className="h-5 w-5"/>Điều kiện đặc biệt</span>
+                               <span className="flex items-center gap-2"><Star className="h-5 w-5"/>Điều kiện đặc biệt</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-2 pt-4">
                                 {specialConditions.map(item => (
