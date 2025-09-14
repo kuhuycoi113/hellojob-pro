@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { BookOpen, Search, ChevronsUpDown, Check, GraduationCap, Briefcase, TrendingUp, BookCopy, ArrowRight, MapPin, MapIcon } from 'lucide-react';
+import { BookOpen, Search, ChevronsUpDown, Check, GraduationCap, Briefcase, TrendingUp, BookCopy, ArrowRight, MapPin, MapIcon, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
@@ -276,6 +276,14 @@ const SearchModule = ({ onSearch, showHero }: SearchModuleProps) => {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedIndustry, setSelectedIndustry] = useState('');
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+
+  useEffect(() => {
+    // When the hero is hidden (after a search), collapse the search bar by default on mobile.
+    if (!showHero) {
+      setIsSearchExpanded(false);
+    }
+  }, [showHero]);
 
   const handleVisaTypeChange = (value: string) => {
     setSelectedJobType(value);
@@ -303,7 +311,17 @@ const SearchModule = ({ onSearch, showHero }: SearchModuleProps) => {
         industry: selectedIndustry,
         location: selectedLocation
     });
+     if (window.innerWidth < 768) { // md breakpoint
+      setIsSearchExpanded(false);
+    }
   }
+
+  const searchSummary = [
+    selectedVisaDetail || selectedJobType,
+    selectedIndustry,
+    selectedLocation
+  ].filter(Boolean).join(' / ');
+
 
   return (
     <section className={cn(
@@ -327,68 +345,89 @@ const SearchModule = ({ onSearch, showHero }: SearchModuleProps) => {
             showHero && "mt-[-6rem] md:mt-4"
         )}>
             <Card className="max-w-6xl mx-auto shadow-2xl">
-                <CardContent className="p-4 md:p-6">
-                <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
-                    <div className="space-y-2 flex-1">
-                        <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
-                        <Select onValueChange={handleVisaDetailChange} value={selectedVisaDetail}>
-                            <SelectTrigger id="search-type">
-                            <SelectValue placeholder="Tất cả loại hình" />
-                            </SelectTrigger>
-                            <SelectContent>
-                            <SelectItem value="all">Tất cả loại hình</SelectItem>
-                             {japanJobTypes.map(type => (
-                                <SelectGroup key={type}>
-                                    <SelectLabel>{type}</SelectLabel>
-                                    {(visaDetailsByVisaType[type] || []).map(detail => (
-                                        <SelectItem key={detail} value={detail}>{detail}</SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2 flex-1">
-                        <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                         <Select onValueChange={setSelectedIndustry} value={selectedIndustry}>
-                            <SelectTrigger id="search-industry">
-                                <SelectValue placeholder="Tất cả ngành nghề" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                                {availableIndustries.map((industry) => (
-                                    <SelectItem key={industry.slug} value={industry.name}>
-                                        {industry.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2 flex-1">
-                        <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
-                        <Select onValueChange={setSelectedLocation} value={selectedLocation}>
-                            <SelectTrigger id="search-location">
-                            <SelectValue placeholder="Tất cả địa điểm" />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-[300px]">
-                                <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                                {Object.entries(locations["Nhật Bản"]).map(([region, prefectures]) => (
-                                    <SelectGroup key={region}>
-                                        <SelectLabel>{region}</SelectLabel>
-                                        <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
-                                        {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                                    </SelectGroup>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
-                            <Search className="mr-2 h-5 w-5" /> Tìm kiếm
+                 {/* Mobile Collapsed View */}
+                {!showHero && (
+                    <div className="md:hidden p-2">
+                        <Button 
+                            variant="ghost" 
+                            className="w-full justify-start text-left h-auto"
+                            onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                        >
+                            <SlidersHorizontal className="h-5 w-5 mr-3 text-muted-foreground"/>
+                            <div className="flex-grow">
+                                <p className="text-xs text-muted-foreground">Đang lọc theo</p>
+                                <p className="font-semibold text-foreground truncate">{searchSummary || 'Tất cả'}</p>
+                            </div>
                         </Button>
                     </div>
+                )}
+                
+                {/* Full Search View (Desktop always, Mobile when expanded) */}
+                <div className={cn(
+                    "p-4 md:p-6",
+                    !showHero && !isSearchExpanded ? "hidden md:block" : "block"
+                )}>
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
+                        <div className="space-y-2 flex-1">
+                            <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
+                            <Select onValueChange={handleVisaDetailChange} value={selectedVisaDetail}>
+                                <SelectTrigger id="search-type">
+                                <SelectValue placeholder="Tất cả loại hình" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                <SelectItem value="all">Tất cả loại hình</SelectItem>
+                                {japanJobTypes.map(type => (
+                                    <SelectGroup key={type}>
+                                        <SelectLabel>{type}</SelectLabel>
+                                        {(visaDetailsByVisaType[type] || []).map(detail => (
+                                            <SelectItem key={detail} value={detail}>{detail}</SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2 flex-1">
+                            <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
+                            <Select onValueChange={setSelectedIndustry} value={selectedIndustry}>
+                                <SelectTrigger id="search-industry">
+                                    <SelectValue placeholder="Tất cả ngành nghề" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Tất cả ngành nghề</SelectItem>
+                                    {availableIndustries.map((industry) => (
+                                        <SelectItem key={industry.slug} value={industry.name}>
+                                            {industry.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2 flex-1">
+                            <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
+                            <Select onValueChange={setSelectedLocation} value={selectedLocation}>
+                                <SelectTrigger id="search-location">
+                                <SelectValue placeholder="Tất cả địa điểm" />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-[300px]">
+                                    <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                                    {Object.entries(locations["Nhật Bản"]).map(([region, prefectures]) => (
+                                        <SelectGroup key={region}>
+                                            <SelectLabel>{region}</SelectLabel>
+                                            <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                            {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                        </SelectGroup>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div>
+                            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
+                                <Search className="mr-2 h-5 w-5" /> Tìm kiếm
+                            </Button>
+                        </div>
+                    </div>
                 </div>
-                </CardContent>
             </Card>
         </div>
     </section>
@@ -433,10 +472,12 @@ export default function HomeClient() {
 
     setFilteredJobs(results);
     setIsSearching(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
     const handleBackToHome = () => {
         setIsSearching(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
   return (
