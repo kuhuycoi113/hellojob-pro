@@ -306,7 +306,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 <div>
                                     <Label className="font-semibold">Yêu cầu kinh nghiệm</Label>
                                     <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
                                         </SelectContent>
@@ -338,6 +338,17 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                             <SelectItem value="none">Không nhận hình xăm</SelectItem>
                                             <SelectItem value="small">Nhận xăm nhỏ (kín)</SelectItem>
                                             <SelectItem value="all">Nhận cả xăm to (lộ)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                 <div>
+                                    <Label className="font-semibold">Tay thuận</Label>
+                                    <Select>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn tay thuận" /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="right">Tay phải</SelectItem>
+                                            <SelectItem value="left">Tay trái</SelectItem>
+                                            <SelectItem value="both">Cả hai tay</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
