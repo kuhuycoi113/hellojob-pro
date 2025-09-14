@@ -16,6 +16,7 @@ import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, Use
 import { locations } from "@/lib/location-data";
 import { type SearchFilters } from './search-results';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const japanJobTypes = [
     'Thực tập sinh kỹ năng',
@@ -29,7 +30,7 @@ const visaDetailsByVisaType: { [key: string]: string[] } = {
     'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
 };
 
-const specialConditions = [
+const allSpecialConditions = [
   'Tuyển gấp', 'Nhóm ngành 1', 'Nhóm ngành 2', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi',
   'Hỗ trợ Ginou 2', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng',
   'Muốn về công ty trước khi ra visa', 'Muốn về công ty sau khi ra visa', 'Nhận visa katsudo', 'Không nhận visa katsudo',
@@ -149,7 +150,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         const vietnamVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Đặc định đầu Việt", "Đặc định đi mới", "Kỹ sư, tri thức đầu Việt"];
         const japanVisas = ["Thực tập sinh 3 Go", "Đặc định đầu Nhật", "Kỹ sư, tri thức đầu Nhật"];
         
-        if (vietnamVisas.includes(filters.visaDetail)) {
+        if (filters.visaDetail && vietnamVisas.includes(filters.visaDetail)) {
             return (
                 <SelectGroup>
                     <SelectLabel>Việt Nam</SelectLabel>
@@ -158,7 +159,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
             );
         }
 
-        if (japanVisas.includes(filters.visaDetail)) {
+        if (filters.visaDetail && japanVisas.includes(filters.visaDetail)) {
             return (
                  <SelectGroup>
                     <SelectLabel>Nhật Bản</SelectLabel>
@@ -292,34 +293,39 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương & Phúc lợi</span>
                             </AccordionTrigger>
                             <AccordionContent className="pt-4 space-y-4">
-                                <div>
-                                    <Label>Lương cơ bản (JPY/tháng)</Label>
-                                    <Slider defaultValue={[160000]} max={500000} step={10000} className="mt-2"/>
-                                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                                        <span>16万</span>
-                                        <span>50万</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <Label>Thực lĩnh (JPY/tháng)</Label>
-                                    <Slider defaultValue={[140000]} max={450000} step={10000} className="mt-2"/>
-                                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                                        <span>14万</span>
-                                        <span>45万</span>
-                                    </div>
-                                </div>
-                                 <div className="space-y-2">
-                                    <Label htmlFor="hourly-salary">Lương cơ bản (giờ)</Label>
-                                    <Input id="hourly-salary" type="number" placeholder="VD: 1000" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="annual-income">Thu nhập (năm)</Label>
-                                    <Input id="annual-income" type="text" placeholder="VD: 300 vạn" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="annual-bonus">Thưởng (năm)</Label>
-                                    <Input id="annual-bonus" type="text" placeholder="VD: 2 tháng lương" />
-                                </div>
+                               <Tabs defaultValue="monthly" className="w-full">
+                                    <TabsList className="grid w-full grid-cols-3">
+                                        <TabsTrigger value="monthly">Tháng</TabsTrigger>
+                                        <TabsTrigger value="hourly">Giờ</TabsTrigger>
+                                        <TabsTrigger value="yearly">Năm</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="monthly" className="space-y-4 pt-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="basic-salary-month">Lương cơ bản (JPY/tháng)</Label>
+                                            <Input id="basic-salary-month" type="number" placeholder="VD: 200000" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="net-salary-month">Thực lĩnh (JPY/tháng)</Label>
+                                            <Input id="net-salary-month" type="number" placeholder="VD: 160000" />
+                                        </div>
+                                    </TabsContent>
+                                    <TabsContent value="hourly" className="pt-4">
+                                         <div className="space-y-2">
+                                            <Label htmlFor="hourly-salary">Lương theo giờ (JPY)</Label>
+                                            <Input id="hourly-salary" type="number" placeholder="VD: 1000" />
+                                        </div>
+                                    </TabsContent>
+                                     <TabsContent value="yearly" className="space-y-4 pt-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="annual-income">Thu nhập năm (Vạn JPY)</Label>
+                                            <Input id="annual-income" type="number" placeholder="VD: 300" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="annual-bonus">Thưởng năm (Vạn JPY)</Label>
+                                            <Input id="annual-bonus" type="text" placeholder="VD: 20" />
+                                        </div>
+                                    </TabsContent>
+                                </Tabs>
                             </AccordionContent>
                         </AccordionItem>
 
@@ -485,7 +491,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                <span className="flex items-center gap-2"><Star className="h-5 w-5"/>Điều kiện đặc biệt</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-2 pt-4">
-                                {specialConditions.map(item => (
+                                {allSpecialConditions.map(item => (
                                     <div key={item} className="flex items-center space-x-2">
                                         <Checkbox id={`cond-${item}`} />
                                         <Label htmlFor={`cond-${item}`} className="font-normal cursor-pointer">{item}</Label>
@@ -501,4 +507,4 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     );
  
 
-
+    

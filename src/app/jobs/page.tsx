@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -649,13 +650,12 @@ const LoggedInView = () => {
                         </AccordionTrigger>
                          <Button
                             id="highlight-target-button"
-                            variant="default"
-                            size="sm"
+                            variant="ghost"
+                            size="icon"
                             className="ml-auto flex-shrink-0"
                             onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}
                         >
-                            Sửa gợi ý
-                            <Pencil className="h-4 w-4 ml-2"/>
+                            <Pencil className="h-4 w-4"/>
                         </Button>
                     </div>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
@@ -1257,5 +1257,7 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
 
     
