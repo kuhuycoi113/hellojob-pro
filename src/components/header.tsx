@@ -460,7 +460,7 @@ export function Header() {
                             {renderDialogContent()}
                         </DialogContent>
                     </Dialog>
-                     <Button asChild variant="ghost">
+                     <Button asChild>
                         <Link href="/jobs">
                            Trang việc làm
                         </Link>
