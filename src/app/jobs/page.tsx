@@ -252,7 +252,7 @@ const EmptyProfileView = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                     {industries.map(industry => (
                         <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                            <p className="font-semibold text-sm">{industry.name.vi}</p>
+                            <p className="font-semibold text-sm">{industry.name}</p>
                         </Button>
                     ))}
                 </div>
@@ -1022,7 +1022,7 @@ const LoggedInView = () => {
                             <Label htmlFor="fee-usd">Phí (USD)</Label>
                             <Input 
                                 id="fee-usd" 
-                                placeholder="Nhập mức phí mong muốn"
+                                placeholder="3,000 USD"
                                 value={getDisplayValue(tempFee, 'usd')}
                                 onChange={(e) => handleCurrencyInputChange(e.target.value, 'usd', 'fee')}
                             />
