@@ -67,19 +67,25 @@ interface FilterSidebarProps {
 
 export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
+    const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
+
 
     useEffect(() => {
+        const industries = filters.visa ? (industriesByJobType[filters.visa as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
+        const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
+        setAvailableIndustries(uniqueIndustries);
+
         if (filters.industry) {
             const selectedIndustryData = allIndustries.find(ind => ind.name === filters.industry);
             setAvailableJobDetails(selectedIndustryData?.keywords || []);
         } else {
             setAvailableJobDetails([]);
         }
-        // Don't reset jobDetail here, let it be controlled by the parent state
-    }, [filters.industry]);
+    }, [filters.visa, filters.industry]);
+
 
     const handleJobTypeChange = (value: string) => {
-        onFilterChange({ visa: value, visaDetail: '' });
+        onFilterChange({ visa: value, visaDetail: '', industry: '', jobDetail: '' });
     }
     
      const handleVisaDetailChange = (value: string) => {
@@ -87,6 +93,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].includes(value));
         if (parentType && filters.visa !== parentType) {
             newFilters.visa = parentType;
+            newFilters.industry = '';
+            newFilters.jobDetail = '';
         }
         onFilterChange(newFilters);
     };
@@ -151,7 +159,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         <SelectTrigger className={cn(filters.industry && filters.industry !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                                            {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                            {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -321,12 +329,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                 <div>
-                                    <Label className="font-semibold">Yêu cầu kinh nghiệm</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn chi tiết công việc" /></SelectTrigger>
+                                <div className="space-y-2">
+                                    <Label>Yêu cầu kinh nghiệm</Label>
+                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
+                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn chi tiết công việc"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
-                                            {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                            {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -378,3 +386,4 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
 
     
+
