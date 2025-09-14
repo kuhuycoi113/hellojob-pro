@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useCallback, useRef, useState } from "react";
@@ -6,11 +7,12 @@ import { Button } from "../ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { FilterSidebar } from "./filter-sidebar";
-import { jobData } from "@/lib/mock-data";
+import { Job, jobData } from "@/lib/mock-data";
 import { JobCard } from "../job-card";
 import { ChevronLeft, ListFilter, Loader2 } from "lucide-react";
 
 type SearchResultsProps = {
+    jobs: Job[];
     onBack: () => void;
 }
 
@@ -30,7 +32,7 @@ const CompactSearchForm = ({ onBack, searchTerm }: { onBack: () => void, searchT
     </div>
 );
 
-export const SearchResults = ({ onBack }: SearchResultsProps) => {
+export const SearchResults = ({ jobs, onBack }: SearchResultsProps) => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(24);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
@@ -38,23 +40,23 @@ export const SearchResults = ({ onBack }: SearchResultsProps) => {
     const loadMoreJobs = useCallback(() => {
         setIsLoadingMore(true);
         setTimeout(() => {
-            setVisibleJobsCount(prevCount => Math.min(prevCount + 24, jobData.length));
+            setVisibleJobsCount(prevCount => Math.min(prevCount + 24, jobs.length));
             setIsLoadingMore(false);
         }, 1000); // Simulate network delay
-    }, []);
+    }, [jobs.length]);
 
     const lastJobElementRef = useCallback((node: HTMLDivElement) => {
         if (isLoadingMore) return;
         if (observer.current) observer.current.disconnect();
 
         observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && visibleJobsCount < jobData.length) {
+            if (entries[0].isIntersecting && visibleJobsCount < jobs.length) {
                 loadMoreJobs();
             }
         });
 
         if (node) observer.current.observe(node);
-    }, [isLoadingMore, loadMoreJobs, visibleJobsCount]);
+    }, [isLoadingMore, loadMoreJobs, visibleJobsCount, jobs.length]);
       
     return (
      <div className="w-full bg-secondary">
@@ -67,7 +69,7 @@ export const SearchResults = ({ onBack }: SearchResultsProps) => {
 
                 <div className="md:col-span-3 lg:col-span-3">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">Kết quả ({jobData.length})</h2>
+                        <h2 className="text-xl font-bold">Kết quả ({jobs.length})</h2>
                         <Sheet>
                           <SheetTrigger asChild>
                              <Button variant="ghost" size="sm" className="flex items-center gap-1 md:hidden">
@@ -99,14 +101,21 @@ export const SearchResults = ({ onBack }: SearchResultsProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="grid grid-cols-1 gap-4">
-                      {jobData.slice(0, visibleJobsCount).map((job, index) => {
-                          if (index === visibleJobsCount - 1) {
-                              return <div ref={lastJobElementRef} key={job.id}><JobCard job={job} /></div>
-                          }
-                          return <JobCard key={job.id} job={job} />
-                      })}
-                    </div>
+                    {jobs.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-4">
+                        {jobs.slice(0, visibleJobsCount).map((job, index) => {
+                            if (index === visibleJobsCount - 1) {
+                                return <div ref={lastJobElementRef} key={job.id}><JobCard job={job} /></div>
+                            }
+                            return <JobCard key={job.id} job={job} />
+                        })}
+                        </div>
+                    ) : (
+                        <div className="text-center py-16 bg-background rounded-lg">
+                            <p className="text-lg font-semibold text-muted-foreground">Không tìm thấy công việc nào phù hợp.</p>
+                            <p className="text-sm text-muted-foreground mt-2">Hãy thử thay đổi bộ lọc hoặc quay lại trang chủ.</p>
+                        </div>
+                    )}
                     {isLoadingMore && (
                         <div className="flex justify-center items-center p-4">
                             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -118,4 +127,3 @@ export const SearchResults = ({ onBack }: SearchResultsProps) => {
      </div>
     )
   };
-

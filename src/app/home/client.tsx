@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils';
 import { industriesByJobType, type Industry } from "@/lib/industry-data";
 import { FilterSidebar } from '@/components/job-search/filter-sidebar';
 import { SearchResults } from '@/components/job-search/search-results';
+import { Job, jobData } from '@/lib/mock-data';
 
 
 const featuredEmployers = [
@@ -280,7 +281,7 @@ const MainContent = () => (
   );
 
   type SearchModuleProps = {
-      onSearch: () => void;
+      onSearch: (filters: { visa: string; industry: string; location: string }) => void;
   }
   
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
@@ -288,26 +289,46 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [industryValue, setIndustryValue] = useState("");
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const handleVisaTypeChange = (value: string) => {
     setSelectedJobType(value);
     setIndustryValue(""); // Reset industry when visa type changes
 
-    let visaCategory: keyof typeof industriesByJobType | 'Default' = 'Default';
-    if (value.includes('Thực tập sinh')) {
-      visaCategory = 'Thực tập sinh kỹ năng';
-    } else if (value.includes('Đặc định')) {
-      visaCategory = 'Kỹ năng đặc định';
-    } else if (value.includes('Kỹ sư, tri thức')) {
-      visaCategory = 'Kỹ sư, tri thức';
+    if (!value || value === "all") {
+      setAvailableIndustries(allIndustries);
+      return;
     }
     
-    if (value === 'all') {
-        setAvailableIndustries(allIndustries);
-    } else {
-        setAvailableIndustries(industriesByJobType[visaCategory] || []);
+    let visaCategory: keyof typeof industriesByJobType | undefined;
+    for (const category in industriesByJobType) {
+        if (industriesByJobType[category as keyof typeof industriesByJobType].some(ind => value.includes(ind.name))) {
+            visaCategory = category as keyof typeof industriesByJobType;
+            break;
+        }
     }
+
+    if (!visaCategory) {
+        // Find category from visa type detail
+        if (value.includes('Thực tập sinh')) {
+            visaCategory = 'Thực tập sinh kỹ năng';
+        } else if (value.includes('Đặc định')) {
+            visaCategory = 'Kỹ năng đặc định';
+        } else if (value.includes('Kỹ sư, tri thức')) {
+            visaCategory = 'Kỹ sư, tri thức';
+        }
+    }
+    
+    setAvailableIndustries(visaCategory ? industriesByJobType[visaCategory] : allIndustries);
   };
+  
+  const handleSearchClick = () => {
+    onSearch({
+        visa: selectedJobType,
+        industry: industryValue,
+        location: selectedLocation
+    });
+  }
 
   return (
     <section className="w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white pt-20 md:pt-28 pb-10">
@@ -324,7 +345,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
         <div className="container mx-auto px-4 md:px-6 mt-[-6rem] md:mt-4 relative z-10">
             <Card className="max-w-6xl mx-auto shadow-2xl">
                 <CardContent className="p-4 md:p-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                     <div className="space-y-2 flex-1">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                         <Select onValueChange={handleVisaTypeChange} value={selectedJobType}>
@@ -341,19 +362,38 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                     </div>
                     <div className="space-y-2 flex-1">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                        <Select onValueChange={setIndustryValue} value={industryValue}>
-                          <SelectTrigger id="search-industry">
-                            <SelectValue placeholder="Tất cả ngành nghề" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                            {availableIndustries.map((industry) => (
-                              <SelectItem key={industry.slug} value={industry.name}>
-                                {industry.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" role="combobox" aria-expanded={popoverOpen} className="w-full justify-between h-10 font-normal">
+                                    {industryValue ? availableIndustries.find((industry) => industry.name === industryValue)?.name : "Tất cả ngành nghề"}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                <Command>
+                                    <CommandInput placeholder="Tìm ngành nghề..." />
+                                    <CommandList>
+                                        <CommandEmpty>Không tìm thấy ngành nghề.</CommandEmpty>
+                                        <CommandGroup>
+                                            <CommandItem value="all" onSelect={() => {setIndustryValue(""); setPopoverOpen(false);}}>Tất cả ngành nghề</CommandItem>
+                                            {availableIndustries.map((industry) => (
+                                                <CommandItem
+                                                    key={industry.slug}
+                                                    value={industry.name}
+                                                    onSelect={(currentValue) => {
+                                                        setIndustryValue(currentValue === industryValue ? "" : industry.name);
+                                                        setPopoverOpen(false);
+                                                    }}
+                                                >
+                                                    <Check className={cn("mr-2 h-4 w-4", industryValue === industry.name ? "opacity-100" : "opacity-0")} />
+                                                    {industry.name}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                     <div className="space-y-2 flex-1">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
@@ -372,7 +412,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                         </Select>
                     </div>
                     <div>
-                        <Button size="lg" className="w-auto bg-primary hover:bg-primary/90 text-white text-lg" onClick={onSearch}>
+                        <Button size="lg" className="w-auto bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
                             <Search className="mr-2 h-5 w-5" /> Tìm kiếm
                         </Button>
                     </div>
@@ -387,15 +427,30 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
 
 export default function HomeClient() {
   const [isSearching, setIsSearching] = useState(false);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>(jobData);
+
+  const handleSearch = (filters: { visa: string; industry: string; location: string }) => {
+    const { visa, industry, location } = filters;
+    const results = jobData.filter(job => {
+        const visaMatch = !visa || visa === 'all' || (job.visaDetail && job.visaDetail.includes(visa));
+        const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
+        const locationMatch = !location || location === 'all' || (job.workLocation && job.workLocation.toLowerCase().includes(location.toLowerCase()));
+
+        return visaMatch && industryMatch && locationMatch;
+    });
+
+    setFilteredJobs(results);
+    setIsSearching(true);
+  };
 
   return (
     <div className="flex flex-col items-center min-h-screen">
       <div className="w-full">
-        {!isSearching && <SearchModule onSearch={() => setIsSearching(true)} />}
+        {!isSearching && <SearchModule onSearch={handleSearch} />}
       </div>
       
       <div className="w-full flex-grow">
-        {isSearching ? <SearchResults onBack={() => setIsSearching(false)} /> : <MainContent />}
+        {isSearching ? <SearchResults jobs={filteredJobs} onBack={() => setIsSearching(false)} /> : <MainContent />}
       </div>
     </div>
   );
