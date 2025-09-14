@@ -387,7 +387,7 @@ const LoggedInView = () => {
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
-    const [suggestionPrinciple, setSuggestionPrinciple] = useState('salary');
+    const [suggestionPrinciple, setSuggestionPrinciple] = useState<'salary' | 'fee' | 'company' | null>(null);
     const [forceUpdate, setForceUpdate] = useState(0); 
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
@@ -484,6 +484,8 @@ const LoggedInView = () => {
         const storedPrinciple = localStorage.getItem('suggestionPrinciple');
         if (storedPrinciple === 'salary' || storedPrinciple === 'fee' || storedPrinciple === 'company') {
             setSuggestionPrinciple(storedPrinciple);
+        } else {
+            setSuggestionPrinciple(null); // Set to null if nothing is stored
         }
          const storedType = localStorage.getItem('suggestionType');
         if(storedType === 'accurate' || storedType === 'related') {
@@ -501,7 +503,11 @@ const LoggedInView = () => {
             desiredIndustry: tempDesiredIndustry,
         };
         localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
-        localStorage.setItem('suggestionPrinciple', suggestionPrinciple);
+        if (suggestionPrinciple) {
+            localStorage.setItem('suggestionPrinciple', suggestionPrinciple);
+        } else {
+            localStorage.removeItem('suggestionPrinciple');
+        }
         localStorage.setItem('suggestionType', suggestionType);
         console.log("Suggestion principle saved:", suggestionPrinciple);
         console.log("Suggestion type saved:", suggestionType);
@@ -1062,5 +1068,6 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
