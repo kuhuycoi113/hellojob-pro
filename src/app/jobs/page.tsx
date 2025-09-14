@@ -551,7 +551,7 @@ const LoggedInView = () => {
 
 
     const handleCurrencyInputChange = (value: string, currency: 'vnd' | 'jpy' | 'usd', field: 'salary' | 'fee') => {
-        const num = parseInt(value.replace(/[.,]/g, ''), 10);
+        let num = parseInt(value.replace(/[.,]/g, ''), 10);
         if (isNaN(num)) {
             field === 'salary' ? setTempSalary('') : setTempFee('');
             return;
@@ -562,6 +562,8 @@ const LoggedInView = () => {
             baseValue = currency === 'vnd' ? String(Math.round(num / JPY_VND_RATE)) : String(num);
             setTempSalary(baseValue);
         } else { // fee
+            if (currency === 'usd' && num > 4200) num = 4200;
+            if (currency === 'vnd' && num > 4200 * USD_VND_RATE) num = 4200 * USD_VND_RATE;
             baseValue = currency === 'vnd' ? String(Math.round(num / USD_VND_RATE)) : String(num);
             setTempFee(baseValue);
         }
@@ -1249,14 +1251,4 @@ export default function JobsDashboardPage() {
     )
 }
 
-
-
-
-
-
-
-
-
-
-
-
+    
