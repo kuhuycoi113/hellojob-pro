@@ -1034,7 +1034,7 @@ const LoggedInView = () => {
                             <Label htmlFor="fee-vnd">Phí (VNĐ)</Label>
                             <Input 
                                 id="fee-vnd" 
-                                placeholder="Nhập mức phí mong muốn"
+                                placeholder="70.000.000 VNĐ"
                                 value={getDisplayValue(tempFee, 'vnd')}
                                 onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'fee')}
                             />
