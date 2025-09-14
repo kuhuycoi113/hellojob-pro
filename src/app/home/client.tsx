@@ -92,6 +92,8 @@ const locations = {
     }
 };
 
+const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name.vi === v.name.vi)) === i);
+
 const MainContent = () => (
     <>
       {/* Why Choose Us for Candidates */}
@@ -284,6 +286,7 @@ const MainContent = () => (
   
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('all');
+  const [selectedIndustry, setSelectedIndustry] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [test6Value, setTest6Value] = useState("");
   const [openTest6Popover, setOpenTest6Popover] = useState(false);
@@ -320,7 +323,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
             <Card className="max-w-6xl mx-auto shadow-2xl">
                 <CardContent className="p-4 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                    <div className="md:col-span-2 space-y-2">
+                    <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                         <Select onValueChange={setSelectedJobType} defaultValue="all">
                             <SelectTrigger id="search-type">
@@ -334,48 +337,19 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="md:col-span-3 space-y-2">
-                        <Label htmlFor="search-test6" className="text-foreground">Test 6</Label>
-                        <Popover open={openTest6Popover} onOpenChange={setOpenTest6Popover}>
-                            <PopoverAnchor>
-                                <Command>
-                                    <CommandInput 
-                                        id="search-test6"
-                                        placeholder="Gõ tìm kiếm" 
-                                        className="h-10"
-                                        value={test6Value}
-                                        onValueChange={setTest6Value}
-                                        onFocus={() => setOpenTest6Popover(true)}
-                                    />
-                                    <PopoverContent 
-                                        className="p-0 w-[--radix-popover-trigger-width]" 
-                                        onOpenAutoFocus={(e) => e.preventDefault()}
-                                    >
-                                        <CommandList>
-                                            <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
-                                            <CommandGroup heading="Gợi ý">
-                                                {filteredTest6Suggestions.map((suggestion) => (
-                                                    <CommandItem
-                                                        key={suggestion}
-                                                        onSelect={() => handleSelectTest6Suggestion(suggestion)}
-                                                    >
-                                                        <Check
-                                                            className={cn(
-                                                                "mr-2 h-4 w-4",
-                                                                test6Value === suggestion ? "opacity-100" : "opacity-0"
-                                                            )}
-                                                        />
-                                                        {suggestion}
-                                                    </CommandItem>
-                                                ))}
-                                            </CommandGroup>
-                                        </CommandList>
-                                    </PopoverContent>
-                                </Command>
-                            </PopoverAnchor>
-                        </Popover>
+                     <div className="md:col-span-3 space-y-2">
+                        <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
+                        <Select onValueChange={setSelectedIndustry}>
+                            <SelectTrigger id="search-industry">
+                                <SelectValue placeholder="Tất cả ngành nghề" />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-60">
+                                <SelectItem value="all">Tất cả ngành nghề</SelectItem>
+                                {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name.vi}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
                     </div>
-                    <div className="md:col-span-3 space-y-2">
+                    <div className="md:col-span-4 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                         <Select onValueChange={setSelectedLocation}>
                             <SelectTrigger id="search-location">
