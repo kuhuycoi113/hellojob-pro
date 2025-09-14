@@ -57,12 +57,13 @@ interface FilterSidebarProps {
 
 export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) => {
     const [jobType, setJobType] = useState(initialFilters?.visa || '');
-    const [visaDetail, setVisaDetail] = useState('');
+    const [visaDetail, setVisaDetail] = useState(initialFilters?.visaDetail || '');
     const [industry, setIndustry] = useState(initialFilters?.industry || '');
     const [workLocation, setWorkLocation] = useState(initialFilters?.location || '');
 
     useEffect(() => {
         setJobType(initialFilters?.visa || '');
+        setVisaDetail(initialFilters?.visaDetail || '');
         setIndustry(initialFilters?.industry || '');
         setWorkLocation(initialFilters?.location || '');
     }, [initialFilters]);
@@ -70,7 +71,8 @@ export const FilterSidebar = ({ initialFilters, onApply }: FilterSidebarProps) =
     const handleApplyFilters = () => {
         if (onApply) {
             onApply({
-                visa: visaDetail || jobType,
+                visa: jobType,
+                visaDetail: visaDetail,
                 industry,
                 location: workLocation
             });

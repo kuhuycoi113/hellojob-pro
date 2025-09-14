@@ -13,6 +13,7 @@ import { ChevronLeft, ListFilter, Loader2 } from "lucide-react";
 
 export type SearchFilters = {
     visa: string;
+    visaDetail: string;
     industry: string;
     location: string;
 }

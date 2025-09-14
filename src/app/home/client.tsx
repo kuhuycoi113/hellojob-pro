@@ -66,15 +66,16 @@ const featuredCourses = [
 ]
 
 const japanJobTypes = [
-    'Thực tập sinh 3 năm',
-    'Thực tập sinh 1 năm',
-    'Thực tập sinh 3 Go',
-    'Đặc định đầu Việt',
-    'Đặc định đầu Nhật',
-    'Đặc định đi mới',
-    'Kỹ sư, tri thức đầu Việt',
-    'Kỹ sư, tri thức đầu Nhật'
+    'Thực tập sinh kỹ năng',
+    'Kỹ năng đặc định',
+    'Kỹ sư, tri thức',
 ];
+
+const visaDetailsByVisaType: { [key: string]: string[] } = {
+    'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
+    'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
+    'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
+};
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
@@ -270,30 +271,16 @@ const MainContent = () => (
   
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('');
+  const [selectedVisaDetail, setSelectedVisaDetail] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedIndustry, setSelectedIndustry] = useState('');
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
 
   const handleVisaTypeChange = (value: string) => {
     setSelectedJobType(value);
+    setSelectedVisaDetail('');
     setSelectedIndustry(""); // Reset industry when visa type changes
-
-    if (!value || value === "all") {
-      setAvailableIndustries(allIndustries);
-      return;
-    }
-    
-    let visaCategory: keyof typeof industriesByJobType | undefined;
-    
-    if (value.includes('Thực tập sinh')) {
-        visaCategory = 'Thực tập sinh kỹ năng';
-    } else if (value.includes('Đặc định')) {
-        visaCategory = 'Kỹ năng đặc định';
-    } else if (value.includes('Kỹ sư, tri thức')) {
-        visaCategory = 'Kỹ sư, tri thức';
-    }
-    
-    const newIndustries = visaCategory ? industriesByJobType[visaCategory] : allIndustries;
+    const newIndustries = industriesByJobType[value as keyof typeof industriesByJobType] || allIndustries;
     const uniqueIndustries = Array.from(new Map(newIndustries.map(item => [item.name, item])).values());
     setAvailableIndustries(uniqueIndustries);
   };
@@ -301,6 +288,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const handleSearchClick = () => {
     onSearch({
         visa: selectedJobType,
+        visaDetail: selectedVisaDetail,
         industry: selectedIndustry,
         location: selectedLocation
     });
@@ -324,14 +312,26 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
                     <div className="space-y-2 flex-1">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
-                        <Select onValueChange={handleVisaTypeChange} value={selectedJobType}>
+                        <Select onValueChange={(value) => {
+                            // Find the parent visa type and set both states
+                            const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].includes(value));
+                            if (parentType) {
+                                handleVisaTypeChange(parentType);
+                            }
+                            setSelectedVisaDetail(value);
+                        }} value={selectedVisaDetail}>
                             <SelectTrigger id="search-type">
                             <SelectValue placeholder="Tất cả loại hình" />
                             </SelectTrigger>
                             <SelectContent>
                             <SelectItem value="all">Tất cả loại hình</SelectItem>
-                            {japanJobTypes.map(type => (
-                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                             {japanJobTypes.map(type => (
+                                <SelectGroup key={type}>
+                                    <SelectLabel>{type}</SelectLabel>
+                                    {(visaDetailsByVisaType[type] || []).map(detail => (
+                                        <SelectItem key={detail} value={detail}>{detail}</SelectItem>
+                                    ))}
+                                </SelectGroup>
                             ))}
                             </SelectContent>
                         </Select>
@@ -387,13 +387,20 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
 export default function HomeClient() {
   const [isSearching, setIsSearching] = useState(false);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>(jobData);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', industry: '', location: '' });
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', visaDetail: '', industry: '', location: '' });
 
   const handleSearch = (filters: SearchFilters) => {
     setSearchFilters(filters);
-    const { visa, industry, location } = filters;
+    const { visa, visaDetail, industry, location } = filters;
     const results = jobData.filter(job => {
-        const visaMatch = !visa || visa === 'all' || (job.visaDetail && job.visaDetail.includes(visa));
+        
+        let visaMatch = true;
+        if (visaDetail && visaDetail !== 'all') {
+            visaMatch = job.visaDetail === visaDetail;
+        } else if (visa && visa !== 'all') {
+            visaMatch = job.visaType === visa;
+        }
+
         const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
         
         let locationMatch = false;
