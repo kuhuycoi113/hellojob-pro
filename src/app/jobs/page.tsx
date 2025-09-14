@@ -398,6 +398,7 @@ const LoggedInView = () => {
     const [tempSalary, setTempSalary] = useState('');
     const [tempFee, setTempFee] = useState('');
     const JPY_VND_RATE = 165;
+    const USD_VND_RATE = 25000;
 
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
@@ -553,22 +554,57 @@ const LoggedInView = () => {
         }
     };
     
-    const getDisplayValue = (currency: 'vnd' | 'jpy') => {
-        const num = Number(tempSalary);
+    const getDisplayValue = (value: string, currency: 'vnd' | 'jpy' | 'usd') => {
+        const num = Number(value);
         if (isNaN(num) || num === 0) return '';
-        const locale = currency === 'vnd' ? 'vi-VN' : 'ja-JP';
-        const valueToFormat = currency === 'vnd' ? Math.round(num * JPY_VND_RATE) : num;
+        
+        let rate = 1;
+        let locale = 'ja-JP';
+
+        if(currency === 'vnd') {
+            rate = value === tempSalary ? JPY_VND_RATE : USD_VND_RATE;
+            locale = 'vi-VN';
+        } else if (currency === 'usd') {
+            locale = 'en-US';
+        }
+        
+        const valueToFormat = Math.round(num * rate);
         return valueToFormat.toLocaleString(locale);
     };
     
-    const getConvertedValue = (currency: 'vnd' | 'jpy') => {
-        const num = Number(tempSalary);
+    const getConvertedValue = (value: string, currency: 'vnd' | 'jpy' | 'usd') => {
+        const num = Number(value);
         if (isNaN(num) || num === 0) return '';
+        
         if (currency === 'vnd') {
-            return `≈ ${num.toLocaleString('ja-JP')} JPY`;
+            const rate = value === tempSalary ? JPY_VND_RATE : USD_VND_RATE;
+            const convertedValue = Math.round(num / rate);
+            const targetCurrency = value === tempSalary ? 'JPY' : 'USD';
+            const locale = targetCurrency === 'JPY' ? 'ja-JP' : 'en-US';
+            return `≈ ${convertedValue.toLocaleString(locale)} ${targetCurrency}`;
+        } else if (currency === 'jpy') {
+            const convertedValue = Math.round(num * JPY_VND_RATE);
+            return `≈ ${convertedValue.toLocaleString('vi-VN')} VNĐ`;
+        } else { // usd
+            const convertedValue = Math.round(num * USD_VND_RATE);
+            return `≈ ${convertedValue.toLocaleString('vi-VN')} VNĐ`;
         }
-        return `≈ ${Math.round(num * JPY_VND_RATE).toLocaleString('vi-VN')} VNĐ`;
     };
+
+    const handleFeeInputChange = (value: string, currency: 'vnd' | 'usd') => {
+        const num = parseInt(value.replace(/[.,]/g, ''), 10);
+        if (isNaN(num)) {
+            setTempFee('');
+            return;
+        }
+
+        if (currency === 'vnd') {
+            setTempFee(String(Math.round(num / USD_VND_RATE)));
+        } else {
+            setTempFee(String(num));
+        }
+    };
+
 
     if (role === 'candidate-empty-profile') {
         return <EmptyProfileView />;
@@ -936,7 +972,7 @@ const LoggedInView = () => {
                 <Tabs defaultValue="jpy" className="w-full pt-4">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="jpy" className="data-[state=active]:bg-accent-yellow">JPY</TabsTrigger>
-                        <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VND</TabsTrigger>
+                        <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VNĐ</TabsTrigger>
                     </TabsList>
                     <TabsContent value="jpy" className="pt-4">
                         <div className="space-y-2">
@@ -944,10 +980,10 @@ const LoggedInView = () => {
                             <Input 
                                 id="salary-jpy" 
                                 placeholder="200,000"
-                                value={getDisplayValue('jpy')}
+                                value={getDisplayValue(tempSalary, 'jpy')}
                                 onChange={(e) => handleSalaryInputChange(e.target.value, 'jpy')}
                             />
-                             <p className="text-xs text-muted-foreground">{getConvertedValue('jpy')}</p>
+                             <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'jpy')}</p>
                         </div>
                     </TabsContent>
                     <TabsContent value="vnd" className="pt-4">
@@ -955,11 +991,11 @@ const LoggedInView = () => {
                             <Label htmlFor="salary-vnd">Lương tối thiểu (VNĐ)</Label>
                             <Input 
                                 id="salary-vnd" 
-                                placeholder="33.000.000"
-                                value={getDisplayValue('vnd')}
+                                placeholder="33,000,000"
+                                value={getDisplayValue(tempSalary, 'vnd')}
                                 onChange={(e) => handleSalaryInputChange(e.target.value, 'vnd')}
                             />
-                            <p className="text-xs text-muted-foreground">{getConvertedValue('vnd')}</p>
+                            <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'vnd')}</p>
                         </div>
                     </TabsContent>
                 </Tabs>
@@ -978,7 +1014,7 @@ const LoggedInView = () => {
                 <Tabs defaultValue="usd" className="w-full pt-4">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="usd" className="data-[state=active]:bg-accent-yellow">USD</TabsTrigger>
-                        <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VND</TabsTrigger>
+                        <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VNĐ</TabsTrigger>
                     </TabsList>
                     <TabsContent value="usd" className="pt-4">
                         <div className="space-y-2">
@@ -986,9 +1022,10 @@ const LoggedInView = () => {
                             <Input 
                                 id="fee-usd" 
                                 placeholder="Nhập mức phí mong muốn"
-                                value={''}
-                                onChange={(e) => {}}
+                                value={getDisplayValue(tempFee, 'usd')}
+                                onChange={(e) => handleFeeInputChange(e.target.value, 'usd')}
                             />
+                             <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'usd')}</p>
                         </div>
                     </TabsContent>
                     <TabsContent value="vnd" className="pt-4">
@@ -997,9 +1034,10 @@ const LoggedInView = () => {
                             <Input 
                                 id="fee-vnd" 
                                 placeholder="Nhập mức phí mong muốn"
-                                value={''}
-                                onChange={(e) => {}}
+                                value={getDisplayValue(tempFee, 'vnd')}
+                                onChange={(e) => handleFeeInputChange(e.target.value, 'vnd')}
                             />
+                            <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'vnd')}</p>
                         </div>
                     </TabsContent>
                 </Tabs>
@@ -1211,6 +1249,7 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
