@@ -81,7 +81,7 @@ const ginouExpiryOptions = [
     "Trên 4,5 năm", "Trên 4 năm", "Trên 3,5 năm", "Trên 3 năm", "Trên 2,5 năm", "Trên 2 năm", "Trên 1,5 năm", "Trên 1 năm", "Trên 0,5 năm"
 ];
 const otherSkills = [
-    "Có bằng lái xe AT", "Có bằng lái xe MT", "Có bằng lái xe tải cỡ nhỏ", "Có bằng lái xe tải cỡ trung", "Có bằng lái xe tải cỡ lớn", "Có bằng lái xe buýt cỡ trung", "Có bằng lái xe buýt cỡ lớn", "Lái được máy xúc, máy đào", "Lái được xe nâng", "Có bằng cầu", "Vận hành máy CNC", "Có bằng tiện, mài", "Có bằng hàn", "Có bằng cắt", "Có bằng gia công kim loại", "Làm được giàn giáo", "Thi công nội thất", "Quản lý thi công xây dựng", "Quản lý khối lượng xây dựng", "Thiết kế BIM xây dựng", "Đọc được bản vẽ kỹ thuật"
+    "Có bằng lái xe AT", "Có bằng lái xe MT", "Có bằng lái xe tải cỡ nhỏ", "Có bằng lái xe tải cỡ trung", "Có bằng lái xe tải cỡ lớn", "Có bằng lái xe buýt cỡ trung", "Có bằng lái xe buýt cỡ lớn", "Lái được máy xúc, máy đào", "Lái được xe nâng", "Có bằng cầu", "Vận hành máy CNC", "Có bằng tiện, mài", "Có bằng hàn", "Có bằng cắt", "Có bằng gia công kim loại", "Làm được giàn giáo", "Thi công nội thất", "Quản lý thi công xây dựng", "Quản lý khối lượng xây dựng", "Thiết kế BIM xây dựng", "Đọc được bản vẽ kỹ thuật", "Có bằng thi công nội thất"
 ];
 const getFutureMonths = () => {
     const months = [];
@@ -181,6 +181,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
             </>
         )
     }
+
+    const showHourlyWage = ["Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới"].includes(filters.visaDetail || '');
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -293,9 +295,9 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             </AccordionTrigger>
                             <AccordionContent className="pt-4 space-y-4">
                                <Tabs defaultValue="monthly" className="w-full">
-                                    <TabsList className="grid w-full grid-cols-3">
+                                    <TabsList className={cn("grid w-full", showHourlyWage ? "grid-cols-3" : "grid-cols-2")}>
                                         <TabsTrigger value="monthly">Tháng</TabsTrigger>
-                                        <TabsTrigger value="hourly">Giờ</TabsTrigger>
+                                        {showHourlyWage && <TabsTrigger value="hourly">Giờ</TabsTrigger>}
                                         <TabsTrigger value="yearly">Năm</TabsTrigger>
                                     </TabsList>
                                     <TabsContent value="monthly" className="space-y-4 pt-4">
@@ -304,12 +306,14 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                             <Input id="basic-salary-month" type="number" placeholder="VD: 200000" />
                                         </div>
                                     </TabsContent>
-                                    <TabsContent value="hourly" className="pt-4">
-                                         <div className="space-y-2">
-                                            <Label htmlFor="hourly-salary">Lương theo giờ (JPY)</Label>
-                                            <Input id="hourly-salary" type="number" placeholder="VD: 1000" />
-                                        </div>
-                                    </TabsContent>
+                                    {showHourlyWage && (
+                                        <TabsContent value="hourly" className="pt-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="hourly-salary">Lương theo giờ (JPY)</Label>
+                                                <Input id="hourly-salary" type="number" placeholder="VD: 1000" />
+                                            </div>
+                                        </TabsContent>
+                                    )}
                                      <TabsContent value="yearly" className="space-y-4 pt-4">
                                         <div className="space-y-2">
                                             <Label htmlFor="annual-income">Thu nhập năm (Vạn JPY)</Label>
@@ -324,7 +328,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             </AccordionContent>
                         </AccordionItem>
                         
-                        <AccordionItem value="netSalary">
+                         <AccordionItem value="netSalary">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600"/>Thực lĩnh</span>
                             </AccordionTrigger>
@@ -516,3 +520,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
     
 
+
+
+    
