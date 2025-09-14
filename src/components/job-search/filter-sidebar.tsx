@@ -81,7 +81,7 @@ const ginouExpiryOptions = [
     "Trên 4,5 năm", "Trên 4 năm", "Trên 3,5 năm", "Trên 3 năm", "Trên 2,5 năm", "Trên 2 năm", "Trên 1,5 năm", "Trên 1 năm", "Trên 0,5 năm"
 ];
 const otherSkills = [
-    "Có bằng lái xe AT", "Có bằng lái xe MT", "Có bằng lái xe tải cỡ nhỏ", "Có bằng lái xe tải cỡ trung", "Có bằng lái xe buýt cỡ trung", "Có bằng lái xe buýt cỡ lớn", "Lái được máy xúc, máy đào", "Lái được xe nâng", "Có bằng cầu", "Vận hành máy CNC", "Có bằng tiện, mài", "Có bằng hàn", "Có bằng cắt", "Có bằng gia công kim loại", "Làm được giàn giáo", "Thi công nội thất", "Quản lý thi công xây dựng", "Quản lý khối lượng xây dựng", "Thiết kế BIM xây dựng", "Đọc được bản vẽ kỹ thuật"
+    "Có bằng lái xe AT", "Có bằng lái xe MT", "Có bằng lái xe tải cỡ nhỏ", "Có bằng lái xe tải cỡ trung", "Có bằng lái xe tải cỡ lớn", "Có bằng lái xe buýt cỡ trung", "Có bằng lái xe buýt cỡ lớn", "Lái được máy xúc, máy đào", "Lái được xe nâng", "Có bằng cầu", "Vận hành máy CNC", "Có bằng tiện, mài", "Có bằng hàn", "Có bằng cắt", "Có bằng gia công kim loại", "Làm được giàn giáo", "Thi công nội thất", "Quản lý thi công xây dựng", "Quản lý khối lượng xây dựng", "Thiết kế BIM xây dựng", "Đọc được bản vẽ kỹ thuật"
 ];
 const getFutureMonths = () => {
     const months = [];
@@ -107,7 +107,6 @@ interface FilterSidebarProps {
 export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
-    const [monthlySalaryType, setMonthlySalaryType] = useState('basic');
 
 
     useEffect(() => {
@@ -300,24 +299,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         <TabsTrigger value="yearly">Năm</TabsTrigger>
                                     </TabsList>
                                     <TabsContent value="monthly" className="space-y-4 pt-4">
-                                        <Tabs defaultValue={monthlySalaryType} onValueChange={setMonthlySalaryType} className="w-full">
-                                             <TabsList className="grid w-full grid-cols-2">
-                                                <TabsTrigger value="basic">Lương cơ bản</TabsTrigger>
-                                                <TabsTrigger value="net">Thực lĩnh</TabsTrigger>
-                                            </TabsList>
-                                            <TabsContent value="basic" className="pt-2">
-                                                 <div className="space-y-2">
-                                                    <Label htmlFor="basic-salary-month">Lương cơ bản (JPY/tháng)</Label>
-                                                    <Input id="basic-salary-month" type="number" placeholder="VD: 200000" />
-                                                </div>
-                                            </TabsContent>
-                                            <TabsContent value="net" className="pt-2">
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="net-salary-month">Thực lĩnh (JPY/tháng)</Label>
-                                                    <Input id="net-salary-month" type="number" placeholder="VD: 160000" />
-                                                </div>
-                                            </TabsContent>
-                                        </Tabs>
+                                         <div className="space-y-2">
+                                            <Label htmlFor="basic-salary-month">Lương cơ bản (JPY/tháng)</Label>
+                                            <Input id="basic-salary-month" type="number" placeholder="VD: 200000" />
+                                        </div>
                                     </TabsContent>
                                     <TabsContent value="hourly" className="pt-4">
                                          <div className="space-y-2">
@@ -336,6 +321,18 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </div>
                                     </TabsContent>
                                 </Tabs>
+                            </AccordionContent>
+                        </AccordionItem>
+                        
+                        <AccordionItem value="netSalary">
+                            <AccordionTrigger className="text-base font-semibold">
+                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600"/>Thực lĩnh</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-4 space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="net-salary-month">Thực lĩnh (JPY/tháng)</Label>
+                                    <Input id="net-salary-month" type="number" placeholder="VD: 160000" />
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
@@ -518,3 +515,4 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
  
 
     
+
