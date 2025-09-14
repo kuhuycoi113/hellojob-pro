@@ -140,21 +140,12 @@ export function Header() {
         (pathname === href || (pathname.startsWith(href) && href !== '/')) ? 'text-primary font-bold' : 'text-foreground/80',
         className
       )}
-       onClick={(e) => {
-        if(onClick) onClick(e);
-      }}
+       onClick={onClick}
     >
       {Icon && <Icon className="h-5 w-5" />}
       {label}
     </Link>
   );
-  
-  const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (pathname === '/') {
-        e.preventDefault();
-        window.location.reload();
-      }
-  }
   
   const FirstStepDialog = () => (
     <>
@@ -434,7 +425,7 @@ export function Header() {
     <>
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2" onClick={handleHomeClick}>
+        <Link href="/" className="flex items-center gap-2">
           <Logo />
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
@@ -444,7 +435,6 @@ export function Header() {
                 href={link.href}
                 label={link.label}
                 icon={link.href === '/ai-profile' ? Sparkles : undefined}
-                onClick={link.href === '/' ? handleHomeClick : undefined} 
             />
           ))}
         </nav>

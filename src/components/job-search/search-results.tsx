@@ -22,78 +22,36 @@ export type SearchFilters = {
 
 type SearchResultsProps = {
     jobs: Job[];
-    initialFilters: SearchFilters;
+    filters: SearchFilters;
+    onFilterChange: (newFilters: Partial<SearchFilters>) => void;
+    applyFilters: () => void;
 }
 
-export const SearchResults = ({ jobs: initialJobs, initialFilters }: SearchResultsProps) => {
-    const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobs);
-    const [filters, setFilters] = useState<SearchFilters>(initialFilters);
+export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters }: SearchResultsProps) => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(24);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
 
-    useEffect(() => {
-        setFilters(initialFilters);
-        setFilteredJobs(initialJobs);
-    }, [initialFilters, initialJobs]);
-
-    const handleFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
-        setFilters(prev => ({ ...prev, ...newFilters }));
-    }, []);
-
-    const applyFilters = useCallback(() => {
-        const results = jobData.filter(job => {
-            let visaMatch = true;
-            if (filters.visaDetail && filters.visaDetail !== 'all-details') {
-                visaMatch = job.visaDetail === filters.visaDetail;
-            } else if (filters.visa && filters.visa !== 'all') {
-                visaMatch = job.visaType === filters.visa;
-            }
-
-            const industryMatch = !filters.industry || filters.industry === 'all' || (job.industry && job.industry.toLowerCase().includes(filters.industry.toLowerCase()));
-            
-            let locationMatch = false;
-            if (!filters.location || filters.location === 'all') {
-                locationMatch = true;
-            } else {
-                const isRegion = Object.keys(locations['Nhật Bản']).includes(filters.location);
-                if (isRegion) {
-                    const regionPrefectures = locations['Nhật Bản'][filters.location as keyof typeof locations['Nhật Bản']];
-                    locationMatch = regionPrefectures.some(prefecture => job.workLocation.toLowerCase().includes(prefecture.toLowerCase()));
-                } else {
-                    locationMatch = job.workLocation && job.workLocation.toLowerCase().includes(filters.location.toLowerCase());
-                }
-            }
-
-            const jobDetailMatch = !filters.jobDetail || (job.title && job.title.toLowerCase().includes(filters.jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(filters.jobDetail.toLowerCase()));
-            
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch;
-        });
-        setFilteredJobs(results);
-        setVisibleJobsCount(24); // Reset pagination on new filter apply
-    }, [filters]);
-
-
     const loadMoreJobs = useCallback(() => {
         setIsLoadingMore(true);
         setTimeout(() => {
-            setVisibleJobsCount(prevCount => Math.min(prevCount + 24, filteredJobs.length));
+            setVisibleJobsCount(prevCount => Math.min(prevCount + 24, jobs.length));
             setIsLoadingMore(false);
         }, 1000); // Simulate network delay
-    }, [filteredJobs.length]);
+    }, [jobs.length]);
 
     const lastJobElementRef = useCallback((node: HTMLDivElement) => {
         if (isLoadingMore) return;
         if (observer.current) observer.current.disconnect();
 
         observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && visibleJobsCount < filteredJobs.length) {
+            if (entries[0].isIntersecting && visibleJobsCount < jobs.length) {
                 loadMoreJobs();
             }
         });
 
         if (node) observer.current.observe(node);
-    }, [isLoadingMore, loadMoreJobs, visibleJobsCount, filteredJobs.length]);
+    }, [isLoadingMore, loadMoreJobs, visibleJobsCount, jobs.length]);
       
 
     return (
@@ -101,12 +59,12 @@ export const SearchResults = ({ jobs: initialJobs, initialFilters }: SearchResul
         <div className="container mx-auto px-4 md:px-6 py-6">
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8">
                 <div className="hidden md:block">
-                  <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onApply={applyFilters} />
+                  <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} />
                 </div>
 
                 <div className="md:col-span-3 lg:col-span-3">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">Kết quả ({filteredJobs.length})</h2>
+                        <h2 className="text-xl font-bold">Kết quả ({jobs.length})</h2>
                         <Sheet>
                           <SheetTrigger asChild>
                              <Button variant="ghost" size="sm" className="flex items-center gap-1 md:hidden">
@@ -122,7 +80,7 @@ export const SearchResults = ({ jobs: initialJobs, initialFilters }: SearchResul
                               </SheetDescription>
                             </SheetHeader>
                             <div className="py-4 h-[calc(100vh-8rem)] overflow-y-auto">
-                              <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onApply={applyFilters} />
+                              <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} />
                             </div>
                           </SheetContent>
                         </Sheet>
@@ -138,9 +96,9 @@ export const SearchResults = ({ jobs: initialJobs, initialFilters }: SearchResul
                             </SelectContent>
                         </Select>
                     </div>
-                    {filteredJobs.length > 0 ? (
+                    {jobs.length > 0 ? (
                         <div className="grid grid-cols-1 gap-4">
-                        {filteredJobs.slice(0, visibleJobsCount).map((job, index) => {
+                        {jobs.slice(0, visibleJobsCount).map((job, index) => {
                             if (index === visibleJobsCount - 1) {
                                 return <div ref={lastJobElementRef} key={job.id}><JobCard job={job} /></div>
                             }

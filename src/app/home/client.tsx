@@ -283,21 +283,18 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
     }
   }, [showHero]);
 
-  const handleVisaTypeChange = (value: string) => {
-    onFilterChange({ visa: value, visaDetail: '', industry: '' }); // Reset dependent filters
-    const newIndustries = industriesByJobType[value as keyof typeof industriesByJobType] || allIndustries;
-    const uniqueIndustries = Array.from(new Map(newIndustries.map(item => [item.name, item])).values());
+  useEffect(() => {
+    const industries = filters.visa ? (industriesByJobType[filters.visa as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
+    const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
     setAvailableIndustries(uniqueIndustries);
-  };
+  }, [filters.visa]);
+
   
   const handleVisaDetailChange = (value: string) => {
     const newFilters: Partial<SearchFilters> = { visaDetail: value };
     const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].includes(value));
     if (parentType && filters.visa !== parentType) {
         newFilters.visa = parentType;
-        const newIndustries = industriesByJobType[parentType as keyof typeof industriesByJobType] || allIndustries;
-        const uniqueIndustries = Array.from(new Map(newIndustries.map(item => [item.name, item])).values());
-        setAvailableIndustries(uniqueIndustries);
         newFilters.industry = ''; // Also reset industry if visa type changes
     }
     onFilterChange(newFilters);
@@ -336,7 +333,6 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
         )}
         <div className={cn(
             "container mx-auto px-4 md:px-6 relative z-10",
-            showHero && "mt-[-6rem] md:mt-4"
         )}>
             <Card className="max-w-6xl mx-auto shadow-2xl">
                  {/* Mobile Collapsed View */}
@@ -369,7 +365,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                                 <SelectValue placeholder="Tất cả loại hình" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                <SelectItem value="all">Tất cả loại hình</SelectItem>
+                                <SelectItem value="all-details">Tất cả loại hình</SelectItem>
                                 {japanJobTypes.map(type => (
                                     <SelectGroup key={type}>
                                         <SelectLabel>{type}</SelectLabel>
@@ -431,20 +427,21 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
 
 export default function HomeClient() {
   const [isSearching, setIsSearching] = useState(false);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>(jobData);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', visaDetail: '', industry: '', location: '' });
 
   const handleSearch = (filters: SearchFilters) => {
     applyFilters(filters);
     setIsSearching(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Remove scroll to top to keep the search bar in view
+    // window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
   const handleFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
     setSearchFilters(prev => ({...prev, ...newFilters}));
   }, []);
 
-  const applyFilters = (currentFilters: SearchFilters) => {
+  const applyFilters = useCallback((currentFilters: SearchFilters) => {
      const { visa, visaDetail, industry, location } = currentFilters;
     const results = jobData.filter(job => {
         
@@ -474,20 +471,29 @@ export default function HomeClient() {
     });
 
     setFilteredJobs(results);
-  };
+  }, []);
 
-  const handleBackToHome = () => {
-      setIsSearching(false);
-      setSearchFilters({ visa: '', visaDetail: '', industry: '', location: '' });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleBackToHome = (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (pathname === '/') {
+        e.preventDefault();
+        if (isSearching) {
+            setIsSearching(false);
+            setSearchFilters({ visa: '', visaDetail: '', industry: '', location: '' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+             window.location.reload();
+        }
+      }
   }
+
+  const pathname = usePathname();
 
   return (
     <div className="flex flex-col items-center min-h-screen">
         <SearchModule onSearch={handleSearch} showHero={!isSearching} filters={searchFilters} onFilterChange={handleFilterChange} />
       
       <div className="w-full flex-grow">
-        {isSearching ? <SearchResults jobs={filteredJobs} initialFilters={searchFilters} /> : <MainContent />}
+        {isSearching ? <SearchResults jobs={filteredJobs} filters={searchFilters} onFilterChange={handleFilterChange} applyFilters={applyFilters} /> : <MainContent />}
       </div>
     </div>
   );
