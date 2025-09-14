@@ -26,7 +26,7 @@ import {
   CommandList,
 } from "@/components/ui/command"
 import { cn } from '@/lib/utils';
-import { industriesByJobType, type Industry } from '@/lib/industry-data';
+import { industriesByJobType, type Industry } from "@/lib/industry-data";
 import { FilterSidebar } from '@/components/job-search/filter-sidebar';
 import { SearchResults } from '@/components/job-search/search-results';
 
@@ -284,9 +284,30 @@ const MainContent = () => (
   }
   
 const SearchModule = ({ onSearch }: SearchModuleProps) => {
-  const [selectedJobType, setSelectedJobType] = useState('all');
+  const [selectedJobType, setSelectedJobType] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [industryValue, setIndustryValue] = useState("");
+  const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
+
+  const handleVisaTypeChange = (value: string) => {
+    setSelectedJobType(value);
+    setIndustryValue(""); // Reset industry when visa type changes
+
+    let visaCategory: keyof typeof industriesByJobType | 'Default' = 'Default';
+    if (value.includes('Thực tập sinh')) {
+      visaCategory = 'Thực tập sinh kỹ năng';
+    } else if (value.includes('Đặc định')) {
+      visaCategory = 'Kỹ năng đặc định';
+    } else if (value.includes('Kỹ sư, tri thức')) {
+      visaCategory = 'Kỹ sư, tri thức';
+    }
+    
+    if (value === 'all') {
+        setAvailableIndustries(allIndustries);
+    } else {
+        setAvailableIndustries(industriesByJobType[visaCategory] || []);
+    }
+  };
 
   return (
     <section className="w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white pt-20 md:pt-28 pb-10">
@@ -303,10 +324,10 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
         <div className="container mx-auto px-4 md:px-6 mt-[-6rem] md:mt-4 relative z-10">
             <Card className="max-w-6xl mx-auto shadow-2xl">
                 <CardContent className="p-4 md:p-6">
-                <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,1fr,auto] gap-4 items-end">
-                    <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div className="space-y-2 flex-1">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
-                        <Select onValueChange={setSelectedJobType} defaultValue="all">
+                        <Select onValueChange={handleVisaTypeChange} value={selectedJobType}>
                             <SelectTrigger id="search-type">
                             <SelectValue placeholder="Tất cả loại hình" />
                             </SelectTrigger>
@@ -318,23 +339,23 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex-1">
                         <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                        <Select onValueChange={(value) => setIndustryValue(value === 'all' ? '' : value)}>
+                        <Select onValueChange={setIndustryValue} value={industryValue}>
                           <SelectTrigger id="search-industry">
                             <SelectValue placeholder="Tất cả ngành nghề" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                            {allIndustries.map((industry) => (
-                              <SelectItem key={industry.slug} value={industry.name.toLowerCase()}>
+                            {availableIndustries.map((industry) => (
+                              <SelectItem key={industry.slug} value={industry.name}>
                                 {industry.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex-1">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                         <Select onValueChange={setSelectedLocation}>
                             <SelectTrigger id="search-location">
@@ -351,7 +372,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                         </Select>
                     </div>
                     <div>
-                        <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={onSearch}>
+                        <Button size="lg" className="w-auto bg-primary hover:bg-primary/90 text-white text-lg" onClick={onSearch}>
                             <Search className="mr-2 h-5 w-5" /> Tìm kiếm
                         </Button>
                     </div>
