@@ -284,6 +284,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
   const [selectedJobType, setSelectedJobType] = useState('all');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>([]);
+  const [test3Input, setTest3Input] = useState('');
   
 
   useEffect(() => {
@@ -333,7 +334,17 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                 <CardContent className="p-4 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     
-                    <div className="md:col-span-5 space-y-2">
+                    <div className="md:col-span-3 space-y-2">
+                        <Label htmlFor="test3-input" className="text-foreground">Test 3</Label>
+                        <Input 
+                            id="test3-input" 
+                            placeholder="Gõ để tìm kiếm..."
+                            value={test3Input}
+                            onChange={(e) => setTest3Input(e.target.value)}
+                        />
+                    </div>
+                    
+                    <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                         <Select onValueChange={handleJobTypeChange} defaultValue="all">
                             <SelectTrigger id="search-type">
@@ -348,7 +359,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                         </Select>
                     </div>
                     
-                    <div className="md:col-span-5 space-y-2">
+                    <div className="md:col-span-4 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                         <Select onValueChange={setSelectedLocation}>
                             <SelectTrigger id="search-location">
