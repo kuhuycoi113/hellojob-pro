@@ -831,17 +831,9 @@ const LoggedInView = () => {
                             </Button>
                         </div>
                     </div>
-                    <Collapsible className="space-y-2 pt-2">
-                        <CollapsibleTrigger asChild>
-                            <Button variant="ghost" className="justify-start p-0 h-auto font-semibold hover:no-underline">
-                                Thêm điều kiện mở rộng
-                                <ChevronDown className="h-4 w-4 ml-2"/>
-                            </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                           {/* Content for this section will be added in a future prompt */}
-                        </CollapsibleContent>
-                    </Collapsible>
+                    <div className="space-y-2 pt-2">
+                        <Label className="font-semibold">Thêm điều kiện mở rộng</Label>
+                    </div>
                 </div>
                 <DialogFooter className="flex-row justify-end space-x-2">
                     <DialogClose asChild>
@@ -1005,13 +997,13 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2">
                     <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        Lương tốt
+                        <TrendingUp className="mr-2 h-4 w-4" /> Lương tốt
                     </Button>
                     <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        {feeButtonText}
+                        <ShieldCheck className="mr-2 h-4 w-4" /> {feeButtonText}
                     </Button>
                     <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        {companyButtonText}
+                        <ThumbsUp className="mr-2 h-4 w-4" /> {companyButtonText}
                     </Button>
                 </CardContent>
             </Card>
