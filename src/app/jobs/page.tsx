@@ -252,7 +252,7 @@ const EmptyProfileView = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                     {industries.map(industry => (
                         <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                            <p className="font-semibold text-sm">{industry.name}</p>
+                            <p className="font-semibold text-sm">{industry.name.vi}</p>
                         </Button>
                     ))}
                 </div>
@@ -811,7 +811,7 @@ const LoggedInView = () => {
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -924,6 +924,7 @@ const LoggedInView = () => {
         </Dialog>
         <Dialog open={isSalaryDialogOpen} onOpenChange={setIsSalaryDialogOpen}>
             <DialogContent className="sm:max-w-md">
+                {/* MLMMTT01 */}
                 <DialogHeader>
                     <DialogTitle>Mức lương mong muốn tối thiểu/tháng</DialogTitle>
                 </DialogHeader>
@@ -1165,6 +1166,7 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
