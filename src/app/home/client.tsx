@@ -335,43 +335,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
             <Card className="max-w-6xl mx-auto shadow-2xl">
                 <CardContent className="p-4 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                    <div className="md:col-span-4 space-y-2">
-                        <Label htmlFor="search-keyword" className="text-foreground">Ngành nghề, công việc hoặc từ khóa</Label>
-                         <Popover open={openPopover} onOpenChange={setOpenPopover}>
-                             <PopoverAnchor asChild>
-                                 <Input 
-                                    id="search-keyword" 
-                                    placeholder="VD: Vận hành máy CNC, Chế biến thực phẩm..." 
-                                    className="h-10"
-                                    value={searchValue}
-                                    onChange={(e) => {
-                                        setSearchValue(e.target.value);
-                                        if (!openPopover) setOpenPopover(true);
-                                    }}
-                                    onClick={() => setOpenPopover(true)}
-                                />
-                            </PopoverAnchor>
-                            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-                                <Command>
-                                    <CommandList>
-                                        <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
-                                        <CommandGroup>
-                                            {filteredSuggestions.map((suggestion) => (
-                                                <CommandItem
-                                                    key={suggestion}
-                                                    onMouseDown={() => handleSelectSuggestion(suggestion)}
-                                                >
-                                                    {suggestion}
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                    
-                    <div className="md:col-span-2 space-y-2">
+                    <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
                         <Select onValueChange={setSelectedJobType} defaultValue="all">
                             <SelectTrigger id="search-type">
@@ -386,12 +350,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                         </Select>
                     </div>
                     
-                    <div className="md:col-span-2 space-y-2">
-                        <Label htmlFor="search-test5" className="text-foreground">Test 5</Label>
-                        <Input id="search-test5" placeholder="Gõ tìm kiếm" className="h-10" />
-                    </div>
-
-                    <div className="md:col-span-2 space-y-2">
+                    <div className="md:col-span-3 space-y-2">
                         <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
                         <Select onValueChange={setSelectedLocation}>
                             <SelectTrigger id="search-location">
@@ -407,7 +366,7 @@ const SearchModule = ({ onSearch }: SearchModuleProps) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-3">
                         <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg" onClick={onSearch}>
                             <Search className="mr-2 h-5 w-5" /> Tìm kiếm
                         </Button>
