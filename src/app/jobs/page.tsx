@@ -389,12 +389,14 @@ const LoggedInView = () => {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [isSalaryDialogOpen, setIsSalaryDialogOpen] = useState(false);
+    const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
     const [suggestionPrinciple, setSuggestionPrinciple] = useState<'salary' | 'fee' | 'company' | null>(null);
     const [forceUpdate, setForceUpdate] = useState(0); 
     const { toast } = useToast();
     const [tempSalary, setTempSalary] = useState('');
+    const [tempFee, setTempFee] = useState('');
     const JPY_VND_RATE = 165;
 
 
@@ -876,7 +878,10 @@ const LoggedInView = () => {
                             </Button>
                             <Button 
                                 variant={suggestionPrinciple === 'fee' ? 'default' : 'outline'}
-                                onClick={() => setSuggestionPrinciple('fee')}
+                                onClick={() => {
+                                    setSuggestionPrinciple('fee');
+                                    setIsFeeDialogOpen(true);
+                                }}
                                 className="justify-start text-left h-auto py-2"
                             >
                                  <div>
@@ -961,6 +966,46 @@ const LoggedInView = () => {
                 <DialogFooter className="pt-4">
                     <Button variant="outline" onClick={() => setIsSalaryDialogOpen(false)}>Hủy</Button>
                     <Button onClick={handleSaveSalary}>Lưu thay đổi</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+        <Dialog open={isFeeDialogOpen} onOpenChange={setIsFeeDialogOpen}>
+            <DialogContent className="sm:max-w-md">
+                {/* MPMM01 */}
+                <DialogHeader>
+                    <DialogTitle>Mức phí mong muốn</DialogTitle>
+                </DialogHeader>
+                <Tabs defaultValue="jpy" className="w-full pt-4">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="jpy">JPY</TabsTrigger>
+                        <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VND</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="jpy" className="pt-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="fee-jpy">Phí (JPY)</Label>
+                            <Input 
+                                id="fee-jpy" 
+                                placeholder="Nhập mức phí mong muốn"
+                                value={''}
+                                onChange={(e) => {}}
+                            />
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="vnd" className="pt-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="fee-vnd">Phí (VNĐ)</Label>
+                            <Input 
+                                id="fee-vnd" 
+                                placeholder="Nhập mức phí mong muốn"
+                                value={''}
+                                onChange={(e) => {}}
+                            />
+                        </div>
+                    </TabsContent>
+                </Tabs>
+                <DialogFooter className="pt-4">
+                    <Button variant="outline" onClick={() => setIsFeeDialogOpen(false)}>Hủy</Button>
+                    <Button onClick={() => setIsFeeDialogOpen(false)}>Lưu thay đổi</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -1166,6 +1211,7 @@ export default function JobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
