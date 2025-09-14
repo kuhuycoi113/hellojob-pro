@@ -213,11 +213,22 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Mức lương (JPY/tháng)</span>
                             </AccordionTrigger>
-                            <AccordionContent className="pt-4">
-                                <Slider defaultValue={[160000, 300000]} max={500000} step={10000} />
-                                <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                                    <span>16万</span>
-                                    <span>50万</span>
+                            <AccordionContent className="pt-4 space-y-4">
+                                <div>
+                                    <Label className="text-xs text-muted-foreground">Lương cơ bản</Label>
+                                    <Slider defaultValue={[160000, 300000]} max={500000} step={10000} />
+                                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                                        <span>16万</span>
+                                        <span>50万</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label className="text-xs text-muted-foreground">Thực lĩnh</Label>
+                                    <Slider defaultValue={[140000, 250000]} max={450000} step={10000} />
+                                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                                        <span>14万</span>
+                                        <span>45万</span>
+                                    </div>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
