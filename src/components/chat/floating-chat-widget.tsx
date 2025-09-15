@@ -23,21 +23,27 @@ export function FloatingChatWidget() {
   
   return (
     <>
-      {/* Mobile full-screen overlay */}
-      {isChatOpen && activeConversation && (
-        <div className="md:hidden fixed inset-0 z-50 bg-background">
-          <ChatWindow conversation={activeConversation} />
-        </div>
-      )}
+      {/* Mobile full-screen overlay and button */}
+      <div className="md:hidden fixed bottom-6 right-6 z-50">
+        {isChatOpen && activeConversation && (
+          <div className="fixed inset-0 bg-background">
+            <ChatWindow conversation={activeConversation} />
+          </div>
+        )}
+         <Button onClick={handleToggleChat} size="icon" className="h-16 w-16 rounded-full bg-primary shadow-lg hover:bg-primary/90">
+            {isChatOpen ? <X className="h-8 w-8" /> : <MessageSquare className="h-8 w-8" />}
+            <span className="sr-only">{isChatOpen ? "Đóng Chat" : "Mở Chat"}</span>
+          </Button>
+      </div>
 
       {/* Desktop floating window */}
       <div className="hidden md:block fixed bottom-6 right-6 z-50">
         {isChatOpen && activeConversation && (
-          <Card className="h-[80vh] max-h-[800px] w-[400px] shadow-2xl flex flex-col overflow-hidden rounded-2xl">
+          <Card className="h-[80vh] max-h-[800px] w-[400px] shadow-2xl flex flex-col overflow-hidden rounded-2xl mb-2">
             <ChatWindow conversation={activeConversation} />
           </Card>
         )}
-        <div className="flex justify-end mt-2">
+        <div className="flex justify-end">
           <Button onClick={handleToggleChat} size="icon" className="h-16 w-16 rounded-full bg-primary shadow-lg hover:bg-primary/90">
             {isChatOpen ? <X className="h-8 w-8" /> : <MessageSquare className="h-8 w-8" />}
             <span className="sr-only">{isChatOpen ? "Đóng Chat" : "Mở Chat"}</span>

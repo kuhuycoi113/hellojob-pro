@@ -75,6 +75,28 @@ export function Header() {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const controlNavbar = () => {
+      if (typeof window !== 'undefined') {
+        if (window.scrollY > lastScrollY && window.scrollY > 80) { // if scroll down hide the navbar
+          setIsVisible(false);
+        } else { // if scroll up show the navbar
+          setIsVisible(true);
+        }
+        setLastScrollY(window.scrollY);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', controlNavbar);
+      return () => {
+        window.removeEventListener('scroll', controlNavbar);
+      };
+    }
+  }, [lastScrollY]);
   
   useEffect(() => {
     setIsClient(true);
@@ -422,7 +444,8 @@ export function Header() {
   return (
     <>
     <header className={cn(
-        "sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-transform duration-300"
+        "sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-transform duration-300",
+         !isVisible && "-translate-y-full"
     )}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2">
@@ -470,10 +493,7 @@ export function Header() {
              )}
         </div>
         <div className="md:hidden">
-            <Button variant="default" size="icon" onClick={() => openChat()}>
-                <MessageSquare />
-                <span className="sr-only">Chat</span>
-            </Button>
+          {/* Chat button removed from here */}
         </div>
       </div>
     </header>
