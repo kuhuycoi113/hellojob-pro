@@ -75,32 +75,10 @@ export function Header() {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
+  
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  useEffect(() => {
-    const controlHeader = () => {
-      if (typeof window !== 'undefined') {
-        if (window.scrollY > lastScrollY && window.scrollY > 80) { // if scroll down
-          setIsVisible(false);
-        } else { // if scroll up
-          setIsVisible(true);
-        }
-        setLastScrollY(window.scrollY);
-      }
-    };
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('scroll', controlHeader);
-      return () => {
-        window.removeEventListener('scroll', controlHeader);
-      };
-    }
-  }, [lastScrollY]);
 
   const handleCreateProfileRedirect = () => {
     const preferences = {
@@ -444,8 +422,7 @@ export function Header() {
   return (
     <>
     <header className={cn(
-        "sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-transform duration-300",
-        !isVisible && "-translate-y-full"
+        "sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-transform duration-300"
     )}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2">
