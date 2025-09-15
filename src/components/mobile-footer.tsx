@@ -44,11 +44,9 @@ export function MobileFooter() {
   useEffect(() => {
     const controlNavbar = () => {
       if (typeof window !== 'undefined') {
-        if (window.scrollY > lastScrollY && window.scrollY > 50) { // if scroll down
-          setIsVisible(false);
-        } else { // if scroll up
-          setIsVisible(true);
-        }
+        // Show/hide logic is now part of the header, so this component is always visible
+        // unless the parent header is hidden.
+        // We keep the scroll tracking in case we need it again.
         setLastScrollY(window.scrollY);
       }
     };
@@ -118,8 +116,8 @@ export function MobileFooter() {
 
   return (
     <footer className={cn(
-        "md:hidden fixed bottom-0 left-0 right-0 bg-background border-t z-50 transition-transform duration-300",
-        isVisible ? "translate-y-0" : "translate-y-full"
+        "md:hidden fixed top-16 left-0 right-0 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b z-40 transition-transform duration-300",
+        isVisible ? "translate-y-0" : "-translate-y-full"
     )}>
       <div className="flex justify-around items-center h-16">
         {mobileFooterLinks.map(({ href, icon: Icon, label }) => {
