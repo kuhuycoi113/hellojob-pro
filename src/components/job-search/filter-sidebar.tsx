@@ -218,14 +218,20 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         if (currency === 'vnd') {
             return `≈ ${num.toLocaleString('ja-JP')} JPY`;
         }
-        return `≈ ${(num * JPY_VND_RATE).toLocaleString('vi-VN')} VNĐ`;
+        
+        const vndValueInMillions = (num * JPY_VND_RATE) / 1000000;
+        const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        });
+        return `≈ ${formattedVnd} triệu đồng`;
     };
 
     const monthlySalaryContent = (
       <div className="space-y-2">
         <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
         <Input id="basic-salary-jpy" type="text" placeholder="VD: 200,000" />
-        <p className="text-xs text-muted-foreground">≈ 36,000,000 VNĐ</p>
+        <p className="text-xs text-muted-foreground">{getConvertedValue("200000", 'jpy')}</p>
       </div>
     );
     
@@ -233,7 +239,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
        <div className="space-y-2">
         <Label htmlFor="net-salary-jpy">Thực lĩnh (JPY/tháng)</Label>
         <Input id="net-salary-jpy" type="text" placeholder="VD: 160,000" />
-        <p className="text-xs text-muted-foreground">≈ 28,800,000 VNĐ</p>
+        <p className="text-xs text-muted-foreground">{getConvertedValue("160000", 'jpy')}</p>
       </div>
     );
 
@@ -347,20 +353,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương & Phúc lợi</span>
                             </AccordionTrigger>
                              <AccordionContent className="pt-2">
-                                {!showSalaryTabs ? (
-                                    <div className="pt-4 space-y-4">{monthlySalaryContent}</div>
-                                ) : (
-                                    <Tabs defaultValue="monthly" className="w-full">
-                                        <TabsList className={cn("grid w-full", showHourlyWage && showYearlyWage ? "grid-cols-3" : "grid-cols-2")}>
-                                            <TabsTrigger value="monthly">Tháng</TabsTrigger>
-                                            {showHourlyWage && <TabsTrigger value="hourly">Giờ</TabsTrigger>}
-                                            {showYearlyWage && <TabsTrigger value="yearly">Năm</TabsTrigger>}
-                                        </TabsList>
-                                        <TabsContent value="monthly" className="pt-4 space-y-4">{monthlySalaryContent}</TabsContent>
-                                        {showHourlyWage && (<TabsContent value="hourly" className="pt-4"><div className="space-y-2"><Label htmlFor="hourly-salary">Lương theo giờ (JPY)</Label><Input id="hourly-salary" type="number" placeholder="VD: 1000" /></div></TabsContent>)}
-                                        {showYearlyWage && (<TabsContent value="yearly" className="space-y-4 pt-4"><div className="space-y-2"><Label htmlFor="annual-income">Thu nhập năm (Vạn JPY)</Label><Input id="annual-income" type="number" placeholder="VD: 300" /></div><div className="space-y-2"><Label htmlFor="annual-bonus">Thưởng năm (Vạn JPY)</Label><Input id="annual-bonus" type="text" placeholder="VD: 20" /></div></TabsContent>)}
-                                    </Tabs>
-                                )}
+                                <div className="pt-4 space-y-4">{monthlySalaryContent}</div>
                             </AccordionContent>
                         </AccordionItem>
                         
