@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useCallback, useRef, useState, useEffect } from "react";
@@ -24,6 +23,11 @@ export type SearchFilters = {
     age?: [number, number];
     basicSalary?: string;
     netSalary?: string;
+    hourlySalary?: string;
+    annualIncome?: string;
+    annualBonus?: string;
+    interviewDate?: string;
+    specialConditions?: string[];
 }
 
 type SearchResultsProps = {
