@@ -21,6 +21,7 @@ import Image from 'next/image';
 import { useChat } from '@/contexts/ChatContext';
 import { mainNavLinks, quickAccessLinks, mobileFooterLinks } from '@/lib/nav-data';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 
 const Logo = () => (
@@ -35,6 +36,31 @@ export function MobileFooter() {
   const { role, setRole } = useAuth();
   const isLoggedIn = role !== 'guest';
 
+  const [showNav, setShowNav] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const isMobile = useIsMobile();
+
+
+  useEffect(() => {
+    if (!isMobile) {
+      setShowNav(true);
+      return;
+    }
+  
+    const controlNavbar = () => {
+      // Logic to hide header on scroll down
+      // `window.scrollY > 80` is a threshold to prevent hiding on small scrolls at the top
+      if (window.scrollY > lastScrollY && window.scrollY > 80) {
+        setShowNav(false);
+      } else {
+        setShowNav(true);
+      }
+      setLastScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', controlNavbar);
+    return () => window.removeEventListener('scroll', controlNavbar);
+  }, [isMobile, lastScrollY]);
 
   useEffect(() => {
     setActivePath(pathname);
@@ -96,7 +122,10 @@ export function MobileFooter() {
   );
 
   return (
-    <footer className="md:hidden sticky top-16 z-40 bg-background border-b">
+    <footer className={cn(
+        "md:hidden sticky top-16 z-40 bg-background border-b transition-transform duration-300",
+        !showNav && "-translate-y-full"
+    )}>
       <div className="flex justify-around items-center h-16">
         {mobileFooterLinks.map(({ href, icon: Icon, label }) => {
            const isActive = (activePath === href) || (href !== '/' && activePath.startsWith(href));
