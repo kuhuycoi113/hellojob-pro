@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -29,11 +30,7 @@ const Logo = () => (
 
 export function Header2() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
   const [activePath, setActivePath] = useState('');
-  const { openChat } = useChat();
-  const { role, setRole } = useAuth();
-  const isLoggedIn = role !== 'guest';
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -61,79 +58,6 @@ export function Header2() {
     }
   }, [lastScrollY]);
 
-  const isQuickAccessLinkActive = quickAccessLinks.some(link => activePath.startsWith(link.href) && link.href !== '/');
-
-  const LoggedInContent = () => (
-    <>
-       <div className="p-4">
-            <Link href="/candidate-profile" className="block" onClick={() => setIsOpen(false)}>
-            <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary hover:bg-accent/20">
-                <Avatar className="h-12 w-12">
-                <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
-                <AvatarFallback>A</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col space-y-1">
-                <p className="text-base font-medium leading-none">Lê Ngọc Hân</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                    Ứng viên Thực tập sinh
-                </p>
-                </div>
-            </div>
-            </Link>
-        </div>
-        
-        <DropdownMenuSeparator />
-
-        <div className="p-2">
-            <div className="grid grid-cols-3 gap-2">
-            {quickAccessLinks.map((link) => {
-                const isActive = (activePath === link.href) || (link.href !== '/' && activePath.startsWith(link.href));
-                return (
-                <Link 
-                    key={link.href}
-                    id={link.href === '/roadmap' ? 'MMN01' : undefined}
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className={cn("flex flex-col items-center justify-start p-2 h-24 cursor-pointer rounded-md hover:bg-accent/80", isActive ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary")}>
-                    <div className={cn("h-10 flex items-center justify-center", isActive ? "text-primary" : "text-muted-foreground")}>
-                    <link.icon className="h-8 w-8"/>
-                    </div>
-                    <span className={cn("text-xs text-center leading-tight font-medium", isActive ? "text-primary" : "text-foreground")}>{link.label}</span>
-                </Link>
-                )
-            })}
-            </div>
-        </div>
-    </>
-  );
-
-  const LoggedOutContent = () => (
-     <div className="p-4 space-y-4">
-        <p className="text-muted-foreground text-center">Đăng nhập để trải nghiệm đầy đủ tính năng của HelloJob.</p>
-        <Button asChild className="w-full" size="lg" onClick={() => setIsOpen(false)}>
-          <Link href="/candidate-profile"><LogIn className="mr-2"/>Đăng nhập / Đăng ký</Link>
-        </Button>
-         <DropdownMenuSeparator />
-         <div className="grid grid-cols-3 gap-2 p-2">
-            {quickAccessLinks.map((link) => (
-              <Link
-                href={link.href}
-                key={link.href}
-                onClick={() => setIsOpen(false)}
-                className="flex flex-col items-center justify-start p-2 h-20 cursor-pointer rounded-md bg-secondary hover:bg-accent/10"
-              >
-                <div className="h-8 flex items-center justify-center text-muted-foreground">
-                  <link.icon />
-                </div>
-                <span className="text-xs text-center text-foreground leading-tight">
-                  {link.label}
-                </span>
-              </Link>
-            ))}
-          </div>
-     </div>
-  );
-
   return (
     <nav className={cn(
         "md:hidden fixed top-16 left-0 right-0 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b z-40 transition-transform duration-300",
@@ -149,53 +73,6 @@ export function Header2() {
             </Link>
            )
         })}
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-             <button className="flex items-center justify-center text-sm text-muted-foreground hover:text-primary transition-colors p-3 flex-shrink-0">
-               <LayoutGrid className={cn("h-5 w-5 mr-2", isQuickAccessLinkActive && 'text-primary')} />
-               <span className={cn("text-center leading-tight", isQuickAccessLinkActive && 'text-primary font-bold')}>Menu</span>
-             </button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-full max-w-sm flex flex-col p-0">
-            <SheetHeader className="p-4 border-b flex flex-row items-center justify-between">
-               <SheetTitle asChild>
-                 <Link
-                    href="/"
-                    className="flex items-center gap-2"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Logo />
-                  </Link>
-               </SheetTitle>
-            </SheetHeader>
-            <div className="flex flex-col h-full overflow-y-auto">
-               {isLoggedIn ? <LoggedInContent /> : <LoggedOutContent />}
-              
-              <div className="mt-auto p-4">
-                  <DropdownMenuSeparator />
-                  <div className="p-2">
-                    <DropdownMenuRadioGroup
-                      value={role}
-                      onValueChange={(value) => setRole(value as 'candidate' | 'candidate-empty-profile' | 'guest')}
-                    >
-                      <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
-                        <div className="grid grid-cols-2 gap-2">
-                           <Button variant={role === 'candidate' ? 'default' : 'outline'} size="sm" onClick={() => setRole('candidate')}>Có Profile</Button>
-                           <Button variant={role === 'candidate-empty-profile' ? 'default' : 'outline'} size="sm" onClick={() => setRole('candidate-empty-profile')}>Profile Trắng</Button>
-                           <Button variant={role === 'guest' ? 'default' : 'outline'} size="sm" className="col-span-2" onClick={() => setRole('guest')}>Khách</Button>
-                        </div>
-                    </DropdownMenuRadioGroup>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <SheetClose asChild>
-                    <Button variant="ghost" className="w-full justify-center mt-4">
-                        <X className="mr-2 h-4 w-4"/> Đóng
-                      </Button>
-                  </SheetClose>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
       </div>
     </nav>
   );
