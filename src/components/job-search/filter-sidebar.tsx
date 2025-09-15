@@ -192,6 +192,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     
     const JPY_VND_RATE = 180;
     
+    const shouldShowSalaryTabs = showHourlyWage || showYearlyWage;
+    
     const monthlySalaryContent = (
       <div className="space-y-2">
         <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
@@ -317,8 +319,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương & Phúc lợi</span>
                             </AccordionTrigger>
-                             <AccordionContent className="pt-4 space-y-4">
-                                {(showHourlyWage || showYearlyWage) ? (
+                             <AccordionContent className="pt-2">
+                                {shouldShowSalaryTabs ? (
                                     <Tabs defaultValue="monthly" className="w-full">
                                         <TabsList className={cn("grid w-full", (showHourlyWage && showYearlyWage) ? "grid-cols-3" : "grid-cols-2")}>
                                             <TabsTrigger value="monthly">Tháng</TabsTrigger>
@@ -361,8 +363,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600"/>Thực lĩnh</span>
                             </AccordionTrigger>
-                            <AccordionContent className="pt-4 space-y-4">
-                                {netSalaryContent}
+                            <AccordionContent className="pt-2">
+                                <div className="pt-4 space-y-4">
+                                    {netSalaryContent}
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
