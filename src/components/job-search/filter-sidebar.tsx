@@ -230,16 +230,16 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     const monthlySalaryContent = (
       <div className="space-y-2">
         <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
-        <Input id="basic-salary-jpy" type="text" placeholder="VD: 200,000" />
-        <p className="text-xs text-muted-foreground">{getConvertedValue("200000", 'jpy')}</p>
+        <Input id="basic-salary-jpy" type="text" placeholder="VD: 200,000" onChange={(e) => onFilterChange({ basicSalary: e.target.value.replace(/,/g, '') })}/>
+        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, 'jpy')}</p>
       </div>
     );
     
     const netSalaryContent = (
        <div className="space-y-2">
         <Label htmlFor="net-salary-jpy">Thực lĩnh (JPY/tháng)</Label>
-        <Input id="net-salary-jpy" type="text" placeholder="VD: 160,000" />
-        <p className="text-xs text-muted-foreground">{getConvertedValue("160000", 'jpy')}</p>
+        <Input id="net-salary-jpy" type="text" placeholder="VD: 160,000" onChange={(e) => onFilterChange({ netSalary: e.target.value.replace(/,/g, '') })}/>
+        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'jpy')}</p>
       </div>
     );
 
@@ -383,9 +383,19 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         ))}
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><Label htmlFor="age-from">Tuổi từ</Label><Input id="age-from" type="number" placeholder="18" /></div>
-                                    <div><Label htmlFor="age-to">đến</Label><Input id="age-to" type="number" placeholder="40" /></div>
+                                 <div className="space-y-2">
+                                    <Label>Tuổi</Label>
+                                    <Slider
+                                        defaultValue={[18, 60]}
+                                        min={18}
+                                        max={70}
+                                        step={1}
+                                        onValueChange={(value) => onFilterChange({ age: value as [number, number] })}
+                                    />
+                                    <div className="flex justify-between text-xs text-muted-foreground">
+                                        <span>{filters.age?.[0] || 18} tuổi</span>
+                                        <span>{filters.age?.[1] || 70} tuổi</span>
+                                    </div>
                                 </div>
                                  <div className="space-y-2">
                                     <Label>Chiều cao (cm)</Label>

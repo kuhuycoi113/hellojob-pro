@@ -21,6 +21,9 @@ export type SearchFilters = {
     jobDetail?: string;
     height?: [number, number];
     weight?: [number, number];
+    age?: [number, number];
+    basicSalary?: string;
+    netSalary?: string;
 }
 
 type SearchResultsProps = {
