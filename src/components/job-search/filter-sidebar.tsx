@@ -68,7 +68,7 @@ const experienceYears = [
     '4,5 - 5 năm',
     'Trên 5 năm'
 ];
-const visionRequirements = ["Yêu cầu thị lực rất tốt", "Yêu cầu thị lực tốt", "Không yêu cầu thị lực", "Không nhận cận thị", "Không nhận viễn thị", "Không nhận loạn thị", "Không nhận mù màu"];
+const visionRequirements = ["Không yêu cầu", "Yêu cầu thị lực tốt", "Không mù màu"];
 const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
 
 const interviewRoundsOptions = ["1 vòng", "2 vòng", "3 vòng", "4 vòng", "5 vòng"];
@@ -312,7 +312,22 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     
     const shouldShowLươngGiờ = !["Thực tập sinh 3 năm", "Thực tập sinh 1 năm"].includes(filters.visaDetail || "");
     const shouldShowLươngNăm = !["Thực tập sinh 3 năm", "Thực tập sinh 1 năm"].includes(filters.visaDetail || "");
+    const shouldShowTabs = shouldShowLươngGiờ || shouldShowLươngNăm;
 
+    const MonthlySalaryContent = () => (
+        <div className="space-y-2">
+            <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
+            <Input 
+                id="basic-salary-jpy" 
+                type="text" 
+                placeholder="VD: 200,000" 
+                onChange={(e) => handleSalaryInputChange(e, 'basicSalary')}
+                value={getDisplayValue(filters.basicSalary)} 
+            />
+            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary)}</p>
+        </div>
+    );
+    
     return (
         <div className="md:col-span-1 lg:col-span-1">
             <Card>
@@ -471,65 +486,59 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương &amp; Đãi ngộ</span>
                             </AccordionTrigger>
                              <AccordionContent className="pt-4">
-                                <Tabs defaultValue="basic">
-                                    <TabsList className={cn("grid w-full h-auto", (shouldShowLươngGiờ && shouldShowLươngNăm) ? "grid-cols-3" : "grid-cols-2")}>
-                                        <TabsTrigger value="basic" className="text-xs">Lương tháng</TabsTrigger>
-                                        {shouldShowLươngGiờ && <TabsTrigger value="hourly" className="text-xs">Lương giờ</TabsTrigger>}
-                                        {shouldShowLươngNăm && <TabsTrigger value="yearly" className="text-xs">Lương năm</TabsTrigger>}
-                                    </TabsList>
-                                    <TabsContent value="basic" className="pt-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
-                                            <Input 
-                                                id="basic-salary-jpy" 
-                                                type="text" 
-                                                placeholder="VD: 200,000" 
-                                                onChange={(e) => handleSalaryInputChange(e, 'basicSalary')}
-                                                value={getDisplayValue(filters.basicSalary)} 
-                                            />
-                                            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary)}</p>
-                                        </div>
-                                    </TabsContent>
-                                     <TabsContent value="hourly" className="pt-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="hourly-salary-jpy">Lương giờ (JPY)</Label>
-                                            <Input 
-                                                id="hourly-salary-jpy" 
-                                                type="text" 
-                                                placeholder="VD: 1,000" 
-                                                onChange={(e) => handleSalaryInputChange(e, 'hourlySalary')}
-                                                value={getDisplayValue(filters.hourlySalary)} 
-                                            />
-                                            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary)}</p>
-                                        </div>
-                                    </TabsContent>
-                                    <TabsContent value="yearly" className="pt-4">
-                                        <div className="space-y-4">
+                                {shouldShowTabs ? (
+                                    <Tabs defaultValue="basic">
+                                        <TabsList className={cn("grid w-full h-auto", (shouldShowLươngGiờ && shouldShowLươngNăm) ? "grid-cols-3" : "grid-cols-2")}>
+                                            <TabsTrigger value="basic" className="text-xs">Lương tháng</TabsTrigger>
+                                            {shouldShowLươngGiờ && <TabsTrigger value="hourly" className="text-xs">Lương giờ</TabsTrigger>}
+                                            {shouldShowLươngNăm && <TabsTrigger value="yearly" className="text-xs">Lương năm</TabsTrigger>}
+                                        </TabsList>
+                                        <TabsContent value="basic" className="pt-4">
+                                            <MonthlySalaryContent />
+                                        </TabsContent>
+                                        <TabsContent value="hourly" className="pt-4">
                                             <div className="space-y-2">
-                                                <Label htmlFor="annual-income-jpy">Thu nhập năm (JPY)</Label>
+                                                <Label htmlFor="hourly-salary-jpy">Lương giờ (JPY)</Label>
                                                 <Input 
-                                                    id="annual-income-jpy" 
+                                                    id="hourly-salary-jpy" 
                                                     type="text" 
-                                                    placeholder="VD: 3,000,000" 
-                                                    onChange={(e) => handleSalaryInputChange(e, 'annualIncome')}
-                                                    value={getDisplayValue(filters.annualIncome)} 
+                                                    placeholder="VD: 1,000" 
+                                                    onChange={(e) => handleSalaryInputChange(e, 'hourlySalary')}
+                                                    value={getDisplayValue(filters.hourlySalary)} 
                                                 />
-                                                    <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualIncome)}</p>
+                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary)}</p>
                                             </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="annual-bonus-jpy">Thưởng năm (JPY)</Label>
-                                                <Input 
-                                                    id="annual-bonus-jpy" 
-                                                    type="text" 
-                                                    placeholder="VD: 500,000" 
-                                                    onChange={(e) => handleSalaryInputChange(e, 'annualBonus')}
-                                                    value={getDisplayValue(filters.annualBonus)} 
-                                                />
-                                                    <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualBonus)}</p>
+                                        </TabsContent>
+                                        <TabsContent value="yearly" className="pt-4">
+                                            <div className="space-y-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="annual-income-jpy">Thu nhập năm (JPY)</Label>
+                                                    <Input 
+                                                        id="annual-income-jpy" 
+                                                        type="text" 
+                                                        placeholder="VD: 3,000,000" 
+                                                        onChange={(e) => handleSalaryInputChange(e, 'annualIncome')}
+                                                        value={getDisplayValue(filters.annualIncome)} 
+                                                    />
+                                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualIncome)}</p>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="annual-bonus-jpy">Thưởng năm (JPY)</Label>
+                                                    <Input 
+                                                        id="annual-bonus-jpy" 
+                                                        type="text" 
+                                                        placeholder="VD: 500,000" 
+                                                        onChange={(e) => handleSalaryInputChange(e, 'annualBonus')}
+                                                        value={getDisplayValue(filters.annualBonus)} 
+                                                    />
+                                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualBonus)}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </TabsContent>
-                                </Tabs>
+                                        </TabsContent>
+                                    </Tabs>
+                                ) : (
+                                    <MonthlySalaryContent />
+                                )}
                             </AccordionContent>
                         </AccordionItem>
                         
