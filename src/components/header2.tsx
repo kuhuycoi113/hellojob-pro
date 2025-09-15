@@ -139,7 +139,7 @@ export function Header2() {
         isVisible ? "translate-y-0" : "-translate-y-full"
     )}>
       <div className="flex items-center h-16 overflow-x-auto whitespace-nowrap px-2">
-        {mainNavLinks.map(({ href, icon: Icon, label }) => {
+        {mainNavLinks.filter(link => link.href !== '/').map(({ href, icon: Icon, label }) => {
            const isActive = (activePath === href) || (href !== '/' && activePath.startsWith(href));
            const showIcon = label === 'Tạo hồ sơ AI';
            return (
