@@ -83,8 +83,7 @@ const CommentItem = ({ comment }: { comment: Comment }) => {
 };
 
 export const CommentSection = () => {
-    const { role } = useAuth();
-    const isLoggedIn = role === 'candidate';
+    const { isLoggedIn } = useAuth();
     const [comments, setComments] = useState(mockComments);
     const [newComment, setNewComment] = useState('');
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
