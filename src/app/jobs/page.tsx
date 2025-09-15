@@ -977,36 +977,16 @@ const LoggedInView = () => {
                 <DialogHeader>
                     <DialogTitle>Mức lương mong muốn tối thiểu/tháng</DialogTitle>
                 </DialogHeader>
-                <Tabs defaultValue="jpy" className="w-full pt-4">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="jpy" className="data-[state=active]:bg-accent-yellow">JPY</TabsTrigger>
-                        <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VNĐ</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="jpy" className="pt-4 space-y-2">
-                        <div className="space-y-2">
-                            <Label htmlFor="salary-jpy">Lương tối thiểu (JPY)</Label>
-                            <Input 
-                                id="salary-jpy" 
-                                placeholder="200,000"
-                                value={getDisplayValue(tempSalary, 'jpy')}
-                                onChange={(e) => handleCurrencyInputChange(e.target.value, 'jpy', 'salary')}
-                            />
-                             <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'jpy')}</p>
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="vnd" className="pt-4 space-y-2">
-                        <div className="space-y-2">
-                            <Label htmlFor="salary-vnd">Lương tối thiểu (VNĐ)</Label>
-                            <Input 
-                                id="salary-vnd" 
-                                placeholder="36,000,000"
-                                value={getDisplayValue(tempSalary, 'vnd')}
-                                onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'salary')}
-                            />
-                            <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'vnd')}</p>
-                        </div>
-                    </TabsContent>
-                </Tabs>
+                <div className="pt-4 space-y-2">
+                    <Label htmlFor="salary-jpy">Lương tối thiểu (JPY)</Label>
+                    <Input 
+                        id="salary-jpy" 
+                        placeholder="200,000"
+                        value={getDisplayValue(tempSalary, 'jpy')}
+                        onChange={(e) => handleCurrencyInputChange(e.target.value, 'jpy', 'salary')}
+                    />
+                    <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'jpy')}</p>
+                </div>
                 <DialogFooter className="pt-4">
                     <Button variant="outline" onClick={() => setIsSalaryDialogOpen(false)}>Hủy</Button>
                     <Button onClick={handleSaveSalary}>Lưu thay đổi</Button>
@@ -1019,36 +999,16 @@ const LoggedInView = () => {
                 <DialogHeader>
                     <DialogTitle>Mức phí mong muốn</DialogTitle>
                 </DialogHeader>
-                <Tabs defaultValue="usd" className="w-full pt-4">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="usd" className="data-[state=active]:bg-accent-yellow">USD</TabsTrigger>
-                        <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VNĐ</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="usd" className="pt-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="fee-usd">Phí (USD)</Label>
-                            <Input 
-                                id="fee-usd" 
-                                placeholder="3,000 USD"
-                                value={getDisplayValue(tempFee, 'usd')}
-                                onChange={(e) => handleCurrencyInputChange(e.target.value, 'usd', 'fee')}
-                            />
-                             <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'usd')}</p>
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="vnd" className="pt-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="fee-vnd">Phí (VNĐ)</Label>
-                            <Input 
-                                id="fee-vnd" 
-                                placeholder="70,000,000 VNĐ"
-                                value={getDisplayValue(tempFee, 'vnd')}
-                                onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'fee')}
-                            />
-                            <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'vnd')}</p>
-                        </div>
-                    </TabsContent>
-                </Tabs>
+                <div className="pt-4 space-y-2">
+                    <Label htmlFor="fee-usd">Phí (USD)</Label>
+                    <Input 
+                        id="fee-usd" 
+                        placeholder="3,000 USD"
+                        value={getDisplayValue(tempFee, 'usd')}
+                        onChange={(e) => handleCurrencyInputChange(e.target.value, 'usd', 'fee')}
+                    />
+                    <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'usd')}</p>
+                </div>
                 <DialogFooter className="pt-4">
                     <Button variant="outline" onClick={() => setIsFeeDialogOpen(false)}>Hủy</Button>
                     <Button onClick={handleSaveFee}>Lưu thay đổi</Button>
