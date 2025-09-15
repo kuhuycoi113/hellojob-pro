@@ -476,7 +476,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             </AccordionTrigger>
                             <AccordionContent className="pt-4">
                                 <Tabs defaultValue="basic">
-                                    <TabsList className="grid w-full grid-cols-3 h-auto">
+                                    <TabsList className={cn("grid w-full h-auto", showHourlyWage ? "grid-cols-3" : "grid-cols-2")}>
                                         <TabsTrigger value="basic" className="text-xs">Lương tháng</TabsTrigger>
                                         {showHourlyWage && <TabsTrigger value="hourly" className="text-xs">Lương giờ</TabsTrigger>}
                                         {showYearlyWage && <TabsTrigger value="yearly" className="text-xs">Lương năm</TabsTrigger>}
@@ -764,3 +764,4 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     
 
     
+
