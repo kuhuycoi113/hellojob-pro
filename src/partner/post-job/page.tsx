@@ -358,9 +358,26 @@ export default function PartnerPostJobPage() {
   const getAvailableConditions = () => {
     if (!currentVisaCategory) return [];
     let conditions = conditionsByVisaType[currentVisaCategory] || [];
+    
+    // Hide 'Yêu cầu mặc Kimono' for Kỹ sư
     if (currentVisaCategory === 'Kỹ sư, tri thức') {
         conditions = conditions.filter(c => c !== 'Yêu cầu mặc Kimono');
     }
+    
+    // Hide 'Nhận nhiều loại bằng' & 'Nhận bằng Senmon' for Tokutei
+    if (currentVisaCategory === 'Kỹ năng đặc định') {
+        conditions = conditions.filter(c => c !== 'Nhận nhiều loại bằng' && c !== 'Nhận bằng Senmon');
+    }
+
+    // New logic for 'Yêu cầu mặc Kimono' for specific Tokutei industries
+    const tokuteiServiceIndustries = ['Nhà hàng', 'Hàng không', 'Vệ sinh toà nhà', 'Lưu trú, khách sạn'];
+    const isTokutei = currentVisaCategory === 'Kỹ năng đặc định';
+    const isServiceIndustry = jobData.industry ? tokuteiServiceIndustries.includes(jobData.industry) : false;
+
+    if (isTokutei && !isServiceIndustry) {
+         conditions = conditions.filter(c => c !== 'Yêu cầu mặc Kimono');
+    }
+
     return conditions;
   };
 
