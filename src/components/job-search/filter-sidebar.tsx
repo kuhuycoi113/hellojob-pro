@@ -337,7 +337,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             <AccordionContent className="space-y-4 pt-4">
                                  <div>
                                     <Label>Chi tiết loại hình visa</Label>
-                                    <Select value={filters.visaDetail} onValueChange={handleVisaDetailChange}>
+                                    <Select value={filters.visaDetail || "all-details"} onValueChange={handleVisaDetailChange}>
                                         <SelectTrigger className={cn(filters.visaDetail && filters.visaDetail !== 'all-details' && 'text-primary')}>
                                             <SelectValue placeholder="Tất cả chi tiết"/>
                                         </SelectTrigger>
@@ -364,7 +364,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             <AccordionContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
                                     <Label>Ngành nghề</Label>
-                                    <Select value={filters.industry} onValueChange={(value) => onFilterChange({ industry: value, jobDetail: '' })}>
+                                    <Select value={filters.industry || "all"} onValueChange={(value) => onFilterChange({ industry: value, jobDetail: '' })}>
                                         <SelectTrigger className={cn(filters.industry && filters.industry !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả ngành nghề</SelectItem>
@@ -605,8 +605,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 )}
                                 <div className="space-y-2">
                                     <Label>Yêu cầu kinh nghiệm</Label>
-                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
-                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn chi tiết công việc"/></SelectTrigger>
+                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry}>
+                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder={!filters.industry ? "Phải chọn Ngành nghề trước" : "Chọn chi tiết công việc"}/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
                                         </SelectContent>
