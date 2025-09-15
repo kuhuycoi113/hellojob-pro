@@ -310,15 +310,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     const showEnglishLevelFilter = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
     const showEducationFilter = !['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'].includes(filters.visaDetail || '');
     
-    const showHourlyWage = ["Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới"].includes(filters.visaDetail || '');
-    const showYearlyWage = [
-        "Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới", 
-        "Thực tập sinh 3 Go", 
-        "Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"
-    ].includes(filters.visaDetail || '');
-    
-    const shouldShowLươngGiờ = showHourlyWage;
-    const shouldShowLươngNăm = showYearlyWage;
+    const shouldShowLươngGiờ = !["Thực tập sinh 3 năm", "Thực tập sinh 1 năm"].includes(filters.visaDetail || "");
+    const shouldShowLươngNăm = !["Thực tập sinh 3 năm", "Thực tập sinh 1 năm"].includes(filters.visaDetail || "");
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -475,11 +468,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
                         <AccordionItem value="salary">
                              <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương và đãi ngộ</span>
+                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương &amp; Đãi ngộ</span>
                             </AccordionTrigger>
                              <AccordionContent className="pt-4">
                                 <Tabs defaultValue="basic">
-                                    <TabsList className={cn("grid w-full h-auto", shouldShowLươngGiờ && shouldShowLươngNăm ? "grid-cols-3" : "grid-cols-2")}>
+                                    <TabsList className={cn("grid w-full h-auto", (shouldShowLươngGiờ && shouldShowLươngNăm) ? "grid-cols-3" : "grid-cols-2")}>
                                         <TabsTrigger value="basic" className="text-xs">Lương tháng</TabsTrigger>
                                         {shouldShowLươngGiờ && <TabsTrigger value="hourly" className="text-xs">Lương giờ</TabsTrigger>}
                                         {shouldShowLươngNăm && <TabsTrigger value="yearly" className="text-xs">Lương năm</TabsTrigger>}
@@ -578,7 +571,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                  <div className="space-y-2">
                                     <Label>Tuổi</Label>
                                     <Slider
-                                        defaultValue={filters.age || [18, 60]}
+                                        defaultValue={[18, 36]}
                                         min={18}
                                         max={60}
                                         step={1}
