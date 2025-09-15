@@ -502,7 +502,27 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương & Phúc lợi</span>
                             </AccordionTrigger>
                              <AccordionContent className="pt-2">
-                                <div className="pt-4 space-y-4">{monthlySalaryContent}</div>
+                                <div className="pt-4 space-y-4">
+                                    {monthlySalaryContent}
+                                     {showHourlyWage && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="hourly-salary-jpy">Lương cơ bản (JPY/giờ)</Label>
+                                            <Input id="hourly-salary-jpy" type="text" placeholder="VD: 1,000" />
+                                        </div>
+                                    )}
+                                    {showYearlyWage && (
+                                        <>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="annual-income-jpy">Thu nhập (JPY/năm)</Label>
+                                                <Input id="annual-income-jpy" type="text" placeholder="VD: 3,000,000" />
+                                            </div>
+                                             <div className="space-y-2">
+                                                <Label htmlFor="annual-bonus-jpy">Thưởng (JPY/năm)</Label>
+                                                <Input id="annual-bonus-jpy" type="text" placeholder="VD: 500,000" />
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
                         
