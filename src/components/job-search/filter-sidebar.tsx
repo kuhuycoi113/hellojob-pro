@@ -244,6 +244,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     );
     
     const showTattooFilter = !['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
+    const showJapaneseLevelFilter = !['Thực tập sinh 1 năm', 'Thực tập sinh 3 năm'].includes(filters.visaDetail || '');
 
 
     return (
@@ -448,6 +449,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     </Select>
                                 </div>
                                 )}
+                                {showJapaneseLevelFilter && (
                                 <div>
                                     <Label className="font-semibold">Trình độ tiếng Nhật</Label>
                                     <Select>
@@ -457,6 +459,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                )}
                                  <div>
                                     <Label className="font-semibold">Trình độ tiếng Anh</Label>
                                     <Select>
