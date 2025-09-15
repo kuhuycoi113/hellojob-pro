@@ -740,9 +740,9 @@ const LoggedInView = () => {
         
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <StatCard title="Job phù hợp/tuần" value="12" change="+5.2%" />
-            <StatCard title="Job phù hợp/tháng" value="48" change="+8.1%" />
-            <StatCard title="Job cùng ngành nghề" value="315" />
+            <StatCard title="Việc làm phù hợp/tuần" value="12" change="+5.2%" />
+            <StatCard title="Việc làm phù hợp/tháng" value="48" change="+8.1%" />
+            <StatCard title="Việc làm cùng ngành nghề" value="315" />
             <StatCard title="Lượt xem hồ sơ" value={viewers.length} change="+12" />
         </div>
         
@@ -1222,5 +1222,6 @@ export default function JobsDashboardPage() {
     
 
     
+
 
 
