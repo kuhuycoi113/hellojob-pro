@@ -192,8 +192,35 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     
     const JPY_VND_RATE = 180;
     
-    const shouldShowSalaryTabs = showHourlyWage || showYearlyWage;
+    const showSalaryTabs = showHourlyWage || showYearlyWage;
     
+    const isNewcomerVisa = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Đặc định đi mới"].includes(filters.visaDetail || '');
+
+    const handleSalaryInputChange = (value: string, currency: 'vnd' | 'jpy') => {
+        let num = parseInt(value.replace(/[.,]/g, ''));
+        if (isNaN(num)) num = 0;
+        const baseValue = currency === 'vnd' ? String(Math.round(num / JPY_VND_RATE)) : String(num);
+        // This assumes you have a way to update the filter state, e.g., onFilterChange({ basicSalary: baseValue });
+    };
+
+    const getDisplayValue = (value: string | undefined, currency: 'vnd' | 'jpy') => {
+        if (!value) return '';
+        const num = Number(value);
+        if (isNaN(num) || num === 0) return '';
+        const valueToFormat = currency === 'vnd' ? Math.round(num * JPY_VND_RATE) : num;
+        return valueToFormat.toLocaleString(currency === 'vnd' ? 'vi-VN' : 'ja-JP');
+    };
+    
+    const getConvertedValue = (value: string | undefined, currency: 'vnd' | 'jpy') => {
+        if (!value) return '';
+        const num = Number(value);
+        if (isNaN(num) || num === 0) return '';
+        if (currency === 'vnd') {
+            return `≈ ${num.toLocaleString('ja-JP')} JPY`;
+        }
+        return `≈ ${(num * JPY_VND_RATE).toLocaleString('vi-VN')} VNĐ`;
+    };
+
     const monthlySalaryContent = (
       <div className="space-y-2">
         <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
@@ -320,41 +347,19 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương & Phúc lợi</span>
                             </AccordionTrigger>
                              <AccordionContent className="pt-2">
-                                {shouldShowSalaryTabs ? (
+                                {!showSalaryTabs ? (
+                                    <div className="pt-4 space-y-4">{monthlySalaryContent}</div>
+                                ) : (
                                     <Tabs defaultValue="monthly" className="w-full">
-                                        <TabsList className={cn("grid w-full", (showHourlyWage && showYearlyWage) ? "grid-cols-3" : "grid-cols-2")}>
+                                        <TabsList className={cn("grid w-full", showHourlyWage && showYearlyWage ? "grid-cols-3" : "grid-cols-2")}>
                                             <TabsTrigger value="monthly">Tháng</TabsTrigger>
                                             {showHourlyWage && <TabsTrigger value="hourly">Giờ</TabsTrigger>}
                                             {showYearlyWage && <TabsTrigger value="yearly">Năm</TabsTrigger>}
                                         </TabsList>
-                                        <TabsContent value="monthly" className="pt-4 space-y-4">
-                                            {monthlySalaryContent}
-                                        </TabsContent>
-                                        {showHourlyWage && (
-                                            <TabsContent value="hourly" className="pt-4">
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="hourly-salary">Lương theo giờ (JPY)</Label>
-                                                    <Input id="hourly-salary" type="number" placeholder="VD: 1000" />
-                                                </div>
-                                            </TabsContent>
-                                        )}
-                                        {showYearlyWage && (
-                                            <TabsContent value="yearly" className="space-y-4 pt-4">
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="annual-income">Thu nhập năm (Vạn JPY)</Label>
-                                                    <Input id="annual-income" type="number" placeholder="VD: 300" />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="annual-bonus">Thưởng năm (Vạn JPY)</Label>
-                                                    <Input id="annual-bonus" type="text" placeholder="VD: 20" />
-                                                </div>
-                                            </TabsContent>
-                                        )}
+                                        <TabsContent value="monthly" className="pt-4 space-y-4">{monthlySalaryContent}</TabsContent>
+                                        {showHourlyWage && (<TabsContent value="hourly" className="pt-4"><div className="space-y-2"><Label htmlFor="hourly-salary">Lương theo giờ (JPY)</Label><Input id="hourly-salary" type="number" placeholder="VD: 1000" /></div></TabsContent>)}
+                                        {showYearlyWage && (<TabsContent value="yearly" className="space-y-4 pt-4"><div className="space-y-2"><Label htmlFor="annual-income">Thu nhập năm (Vạn JPY)</Label><Input id="annual-income" type="number" placeholder="VD: 300" /></div><div className="space-y-2"><Label htmlFor="annual-bonus">Thưởng năm (Vạn JPY)</Label><Input id="annual-bonus" type="text" placeholder="VD: 20" /></div></TabsContent>)}
                                     </Tabs>
-                                ) : (
-                                    <div className="pt-4 space-y-4">
-                                        {monthlySalaryContent}
-                                    </div>
                                 )}
                             </AccordionContent>
                         </AccordionItem>
@@ -363,10 +368,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600"/>Thực lĩnh</span>
                             </AccordionTrigger>
-                            <AccordionContent className="pt-2">
-                                <div className="pt-4 space-y-4">
-                                    {netSalaryContent}
-                                </div>
+                             <AccordionContent className="pt-2">
+                                <div className="pt-4 space-y-4">{netSalaryContent}</div>
                             </AccordionContent>
                         </AccordionItem>
 
@@ -391,13 +394,33 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     <div><Label htmlFor="age-from">Tuổi từ</Label><Input id="age-from" type="number" placeholder="18" /></div>
                                     <div><Label htmlFor="age-to">đến</Label><Input id="age-to" type="number" placeholder="40" /></div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="height-from">Chiều cao từ (cm)</Label>
-                                    <Input id="height-from" type="number" placeholder="150" min="135" max="210" />
+                                 <div className="space-y-2">
+                                    <Label>Chiều cao (cm)</Label>
+                                    <Slider
+                                        defaultValue={[145, 180]}
+                                        min={135}
+                                        max={210}
+                                        step={1}
+                                        onValueChange={(value) => onFilterChange({ height: value as [number, number] })}
+                                    />
+                                    <div className="flex justify-between text-xs text-muted-foreground">
+                                        <span>{filters.height?.[0] || 135} cm</span>
+                                        <span>{filters.height?.[1] || 210} cm</span>
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="weight-from">Cân nặng từ (kg)</Label>
-                                    <Input id="weight-from" type="number" placeholder="45" />
+                                    <Label>Cân nặng (kg)</Label>
+                                     <Slider
+                                        defaultValue={[40, 90]}
+                                        min={35}
+                                        max={120}
+                                        step={1}
+                                        onValueChange={(value) => onFilterChange({ weight: value as [number, number] })}
+                                    />
+                                     <div className="flex justify-between text-xs text-muted-foreground">
+                                        <span>{filters.weight?.[0] || 35} kg</span>
+                                        <span>{filters.weight?.[1] || 120} kg</span>
+                                    </div>
                                 </div>
                                  <div className="space-y-2">
                                     <Label className="font-semibold">Yêu cầu thị lực</Label>

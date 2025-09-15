@@ -17,8 +17,10 @@ export type SearchFilters = {
     visaDetail: string;
     industry: string;
     location: string;
-    interviewLocation: string; // Added this line
-    jobDetail?: string; // Add jobDetail
+    interviewLocation: string;
+    jobDetail?: string;
+    height?: [number, number];
+    weight?: [number, number];
 }
 
 type SearchResultsProps = {

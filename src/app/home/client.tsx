@@ -441,7 +441,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
 export default function HomeClient() {
   const [isSearching, setIsSearching] = useState(false);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', visaDetail: '', industry: '', location: '', interviewLocation: '', jobDetail: '' });
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({ visa: '', visaDetail: '', industry: '', location: '', interviewLocation: '', jobDetail: '', height: [135, 210], weight: [35, 120] });
 
   const handleSearch = (filters: SearchFilters) => {
     applyFilters(filters);
