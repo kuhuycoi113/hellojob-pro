@@ -34,11 +34,32 @@ export function MobileFooter() {
   const { openChat } = useChat();
   const { role, setRole } = useAuth();
   const isLoggedIn = role !== 'guest';
-
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     setActivePath(pathname);
   }, [pathname]);
+
+  useEffect(() => {
+    const controlNavbar = () => {
+      if (typeof window !== 'undefined') {
+        if (window.scrollY > lastScrollY && window.scrollY > 50) { // if scroll down
+          setIsVisible(false);
+        } else { // if scroll up
+          setIsVisible(true);
+        }
+        setLastScrollY(window.scrollY);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', controlNavbar);
+      return () => {
+        window.removeEventListener('scroll', controlNavbar);
+      };
+    }
+  }, [lastScrollY]);
 
   const isQuickAccessLinkActive = quickAccessLinks.some(link => activePath.startsWith(link.href) && link.href !== '/');
 
@@ -96,7 +117,10 @@ export function MobileFooter() {
   );
 
   return (
-    <footer className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t z-50">
+    <footer className={cn(
+        "md:hidden fixed bottom-0 left-0 right-0 bg-background border-t z-50 transition-transform duration-300",
+        isVisible ? "translate-y-0" : "translate-y-full"
+    )}>
       <div className="flex justify-around items-center h-16">
         {mobileFooterLinks.map(({ href, icon: Icon, label }) => {
            const isActive = (activePath === href) || (href !== '/' && activePath.startsWith(href));
