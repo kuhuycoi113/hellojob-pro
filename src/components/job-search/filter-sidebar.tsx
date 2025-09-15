@@ -251,16 +251,18 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         const num = Number(value);
         if (isNaN(num) || num === 0) return '';
         
-        const vndValueInMillions = (num * JPY_VND_RATE) / 1000000;
-        if (vndValueInMillions % 1 === 0) {
-            return `≈ ${vndValueInMillions.toLocaleString('vi-VN')} triệu đồng`;
+        const vndValue = num * JPY_VND_RATE;
+        const vndValueInMillions = vndValue / 1000000;
+
+        if (vndValueInMillions < 10) {
+             const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
+            });
+            return `≈ ${formattedVnd} triệu VNĐ`;
         }
-        
-        const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1
-        });
-        return `≈ ${formattedVnd} triệu đồng`;
+
+        return `≈ ${Math.round(vndValueInMillions)} triệu VNĐ`;
     };
     
     const showTattooFilter = !['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
