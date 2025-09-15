@@ -415,7 +415,7 @@ const LoggedInView = () => {
         const dynamicChartData = days.map(day => ({
             name: day,
             'Việc làm phù hợp với bạn': Math.floor(Math.random() * 15) + 1,
-            'Hồ sơ của bạn': Math.floor(Math.random() * 10) + 1
+            'Người có nhu cầu tìm việc giống bạn': Math.floor(Math.random() * 10) + 1
         }));
         // @ts-ignore
         setChartData(dynamicChartData);
@@ -1235,6 +1235,7 @@ export default function JobsDashboardPage() {
     
 
     
+
 
 
 

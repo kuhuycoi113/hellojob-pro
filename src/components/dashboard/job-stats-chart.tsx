@@ -7,7 +7,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cart
 interface ChartData {
     name: string;
     "Việc làm phù hợp với bạn": number;
-    "Hồ sơ của bạn": number;
+    "Người có nhu cầu tìm việc giống bạn": number;
 }
 
 interface JobStatsChartProps {
@@ -36,7 +36,7 @@ export function JobStatsChart({ data }: JobStatsChartProps) {
               />
               <Legend />
               <Line type="monotone" dataKey="Việc làm phù hợp với bạn" stroke="hsl(var(--primary))" strokeWidth={2} activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey="Hồ sơ của bạn" stroke="hsl(var(--accent-green))" strokeWidth={2} />
+              <Line type="monotone" dataKey="Người có nhu cầu tìm việc giống bạn" stroke="hsl(var(--accent-green))" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
