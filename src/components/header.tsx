@@ -608,9 +608,6 @@ export function Header() {
            {isClient && !isLoggedIn ? (
                <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
            ) : null}
-           <Button asChild size="sm">
-              <Link href="/jobs">Việc</Link>
-           </Button>
            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                 <DialogTrigger asChild>
                     <Button size="sm" className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo</Button>
@@ -619,6 +616,9 @@ export function Header() {
                     {renderDialogContent()}
                 </DialogContent>
             </Dialog>
+           <Button asChild size="sm">
+              <Link href="/jobs">Việc</Link>
+           </Button>
           <MobileMenu />
         </div>
       </div>
