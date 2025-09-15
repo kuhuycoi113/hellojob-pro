@@ -77,6 +77,8 @@ export function Header() {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
 
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -500,8 +502,20 @@ export function Header() {
                 </>
              )}
         </div>
-        <div className="md:hidden">
-             {/* The chat button was here. It's now a floating widget. */}
+        <div className="md:hidden flex items-center gap-2">
+             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <Menu />
+                    </Button>
+                </SheetTrigger>
+                <SheetContent>
+                    <SheetHeader>
+                        <SheetTitle><Logo /></SheetTitle>
+                    </SheetHeader>
+                    {isLoggedIn ? <LoggedInContent /> : <LoggedOutContent />}
+                </SheetContent>
+            </Sheet>
         </div>
       </div>
     </header>
@@ -549,3 +563,84 @@ export function Header() {
     </>
   );
 }
+
+const LoggedInContent = () => {
+    const { setRole } = useAuth();
+    return (
+    <>
+       <div className="p-4">
+            <Link href="/candidate-profile" className="block" >
+            <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary hover:bg-accent/20">
+                <Avatar className="h-12 w-12">
+                <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
+                <AvatarFallback>A</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col space-y-1">
+                <p className="text-base font-medium leading-none">Lê Ngọc Hân</p>
+                <p className="text-xs leading-none text-muted-foreground">
+                    Ứng viên Thực tập sinh
+                </p>
+                </div>
+            </div>
+            </Link>
+        </div>
+        
+        <DropdownMenuSeparator />
+
+        <div className="p-2">
+            <div className="grid grid-cols-3 gap-2">
+            {quickAccessLinks.map((link) => {
+                const isActive = false;
+                return (
+                <Link 
+                    key={link.href}
+                    id={link.href === '/roadmap' ? 'MMN01' : undefined}
+                    href={link.href}
+                    
+                    className={cn("flex flex-col items-center justify-start p-2 h-24 cursor-pointer rounded-md hover:bg-accent/80", isActive ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary")}>
+                    <div className={cn("h-10 flex items-center justify-center", isActive ? "text-primary" : "text-muted-foreground")}>
+                    <link.icon className="h-8 w-8"/>
+                    </div>
+                    <span className={cn("text-xs text-center leading-tight font-medium", isActive ? "text-primary" : "text-foreground")}>{link.label}</span>
+                </Link>
+                )
+            })}
+            </div>
+        </div>
+         <div className="p-4 mt-auto">
+             <Button variant="outline" className="w-full" onClick={() => setRole('guest')}>
+                <LogOut className="mr-2 h-4 w-4"/> Đăng xuất
+            </Button>
+        </div>
+    </>
+  );
+}
+
+const LoggedOutContent = () => {
+  return (
+     <div className="p-4 space-y-4 h-full flex flex-col">
+        <div className="grid grid-cols-3 gap-2">
+            {quickAccessLinks.map((link) => {
+                const isActive = false;
+                return (
+                <Link 
+                    key={link.href}
+                    id={link.href === '/roadmap' ? 'MMN01' : undefined}
+                    href={link.href}
+                    className={cn("flex flex-col items-center justify-start p-2 h-24 cursor-pointer rounded-md hover:bg-accent/80", isActive ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary")}>
+                    <div className={cn("h-10 flex items-center justify-center", isActive ? "text-primary" : "text-muted-foreground")}>
+                    <link.icon className="h-8 w-8"/>
+                    </div>
+                    <span className={cn("text-xs text-center leading-tight font-medium", isActive ? "text-primary" : "text-foreground")}>{link.label}</span>
+                </Link>
+                )
+            })}
+        </div>
+        <div className="mt-auto">
+            <Button asChild className="w-full" size="lg">
+                <Link href="/candidate-profile"><LogIn className="mr-2"/>Đăng nhập / Đăng ký</Link>
+            </Button>
+        </div>
+     </div>
+  );
+};

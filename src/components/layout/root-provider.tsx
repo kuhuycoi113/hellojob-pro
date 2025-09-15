@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -35,7 +36,7 @@ export function RootProvider({
             <AuthProvider>
                 {!isCallPage && <Header />}
                 {!isCallPage && <MobileFooter />}
-                <main className="min-h-screen">{children}</main>
+                <main className="min-h-screen pb-20 md:pb-0">{children}</main>
                 {!isCallPage && <Footer />}
                 {!isCallPage && <FloatingChatWidget />}
                 <Toaster />
