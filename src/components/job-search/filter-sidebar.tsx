@@ -296,26 +296,15 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
             'Muốn về công ty trước khi ra visa', 'Muốn về công ty sau khi ra visa', 'Nhận visa katsudo',
             'Không nhận visa katsudo', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại',
             'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Yêu cầu mặc Kimono',
-            'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé', 'Nhận nhiều loại bằng'
+            'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé'
         ];
         const traineeVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Thực tập sinh 3 Go"];
         if (traineeVisas.includes(visaDetail)) {
              conditionsToHide.push(...nonApplicableForTrainee);
         }
-
-        const nonApplicableForTokutei = ['Nhận nhiều loại bằng', 'Nhận bằng Senmon'];
-        const tokuteiVisas = ["Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới"];
-        if (tokuteiVisas.includes(visaDetail)) {
-            conditionsToHide.push(...nonApplicableForTokutei);
-        }
         
         return allSpecialConditions.filter(cond => !conditionsToHide.includes(cond));
     };
-    
-    const showEnglishLevelFilter = (['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '')) || 
-      (['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'].includes(filters.visaDetail || '') && ['Nhà hàng', 'Hàng không', 'Vệ sinh toà nhà', 'Lưu trú, khách sạn'].includes(filters.industry || ''));
-
-    const showEducationFilter = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -419,53 +408,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label>Số vòng phỏng vấn</Label>
-                                    <Select><SelectTrigger><SelectValue placeholder="Chọn số vòng" /></SelectTrigger>
-                                        <SelectContent>
-                                            {interviewRoundsOptions.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Ngày phỏng vấn</Label>
-                                     <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant={"outline"}
-                                                className={cn(
-                                                    "w-full justify-start text-left font-normal",
-                                                    !filters.interviewDate && "text-muted-foreground",
-                                                    filters.interviewDate && filters.interviewDate !== 'flexible' && "text-primary"
-                                                )}
-                                                disabled={isFlexibleDate}
-                                            >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                {filters.interviewDate && filters.interviewDate !== 'flexible' ? format(new Date(filters.interviewDate), "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <CalendarComponent
-                                                mode="single"
-                                                selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? new Date(filters.interviewDate) : undefined}
-                                                onSelect={handleDateSelect}
-                                                fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
-                                                toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
-                                                locale={vi}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox id="flexible-date" checked={isFlexibleDate} onCheckedChange={handleFlexibleDateChange} />
-                                    <label
-                                        htmlFor="flexible-date"
-                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    >
-                                        Đủ người thì phỏng vấn
-                                    </label>
-                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
@@ -509,13 +451,13 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     <Slider
                                         defaultValue={filters.age || [18, 60]}
                                         min={18}
-                                        max={70}
+                                        max={60}
                                         step={1}
                                         onValueChange={(value) => onFilterChange({ age: value as [number, number] })}
                                     />
                                     <div className="flex justify-between text-xs text-muted-foreground">
                                         <span>{filters.age?.[0] || 18} tuổi</span>
-                                        <span>{filters.age?.[1] || 70} tuổi</span>
+                                        <span>{filters.age?.[1] || 60} tuổi</span>
                                     </div>
                                 </div>
                                  <div className="space-y-2">
@@ -575,18 +517,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                {showEnglishLevelFilter && (
-                                 <div className="space-y-2">
-                                    <Label className="font-semibold">Trình độ tiếng Anh</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn trình độ" /></SelectTrigger>
-                                        <SelectContent>
-                                            {englishLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                )}
-                                {showEducationFilter && (
                                  <div className="space-y-2">
                                     <Label className="font-semibold">Học vấn</Label>
                                     <Select>
@@ -596,7 +526,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                )}
                                 <div className="space-y-2">
                                     <Label>Yêu cầu kinh nghiệm</Label>
                                     <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
@@ -669,6 +598,53 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                 <div className="space-y-2">
+                                    <Label>Số vòng phỏng vấn</Label>
+                                    <Select><SelectTrigger><SelectValue placeholder="Chọn số vòng" /></SelectTrigger>
+                                        <SelectContent>
+                                            {interviewRoundsOptions.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Ngày phỏng vấn</Label>
+                                     <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal",
+                                                    !filters.interviewDate && "text-muted-foreground",
+                                                    filters.interviewDate && filters.interviewDate !== 'flexible' && "text-primary"
+                                                )}
+                                                disabled={isFlexibleDate}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {filters.interviewDate && filters.interviewDate !== 'flexible' ? format(new Date(filters.interviewDate), "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <CalendarComponent
+                                                mode="single"
+                                                selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? new Date(filters.interviewDate) : undefined}
+                                                onSelect={handleDateSelect}
+                                                fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
+                                                toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
+                                                locale={vi}
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox id="flexible-date" checked={isFlexibleDate} onCheckedChange={handleFlexibleDateChange} />
+                                    <label
+                                        htmlFor="flexible-date"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Đủ người thì phỏng vấn
+                                    </label>
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
@@ -692,4 +668,3 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         </div>
     );
 }
-
