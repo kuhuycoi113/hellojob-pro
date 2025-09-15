@@ -239,9 +239,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
        <div className="space-y-2">
         <Label htmlFor="net-salary-jpy">Thực lĩnh (JPY/tháng)</Label>
         <Input id="net-salary-jpy" type="text" placeholder="VD: 160,000" onChange={(e) => onFilterChange({ netSalary: e.target.value.replace(/,/g, '') })} value={filters.netSalary?.toLocaleString('ja-JP') || ''} />
-        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'jpy')}</p>
+         {filters.netSalary && <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'jpy')}</p>}
       </div>
     );
+    
+    const showTattooFilter = !['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
+
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -434,6 +437,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                {showTattooFilter && (
                                 <div className="space-y-2">
                                     <Label className="font-semibold">Yêu cầu hình xăm</Label>
                                     <Select>
@@ -443,6 +447,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                )}
                                 <div>
                                     <Label className="font-semibold">Trình độ tiếng Nhật</Label>
                                     <Select>
