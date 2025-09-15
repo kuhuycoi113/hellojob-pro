@@ -249,37 +249,33 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     );
     
     const showTattooFilter = !['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
-    const showJapaneseLevelFilter = !['Thực tập sinh 1 năm', 'Thực tập sinh 3 năm'].includes(filters.visaDetail || '');
-    const showEnglishLevelFilter = (() => {
-        const engineerVisas = ["Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"];
-        const serviceIndustries = ["Nhà hàng", "Hàng không", "Vệ sinh toà nhà", "Lưu trú, khách sạn"];
-        const tokuteiVisas = ["Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới"];
-
-        if (engineerVisas.includes(filters.visaDetail || '')) {
-            return true;
-        }
-
-        if (tokuteiVisas.includes(filters.visaDetail || '') && serviceIndustries.includes(filters.industry || '')) {
-            return true;
-        }
-
-        return false;
-    })();
-    const showEducationFilter = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
     
     const getAvailableSpecialConditions = () => {
         const visaDetail = filters.visaDetail || '';
-        const nonApplicableConditions = ['Nhóm ngành 1', 'Nhóm ngành 2', 'Hỗ trợ Ginou 2'];
-        const nonApplicableVisas = [
+        
+        let conditionsToHide: string[] = [];
+
+        const nonApplicableForMost = ['Nhóm ngành 1', 'Nhóm ngành 2', 'Hỗ trợ Ginou 2'];
+        const nonApplicableVisasForMost = [
             "Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Thực tập sinh 3 Go",
             "Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"
         ];
-        
-        if (nonApplicableVisas.includes(visaDetail)) {
-            return allSpecialConditions.filter(cond => !nonApplicableConditions.includes(cond));
+        if (nonApplicableVisasForMost.includes(visaDetail)) {
+            conditionsToHide.push(...nonApplicableForMost);
+        }
+
+        const nonApplicableForTrainee = [
+            'Muốn về công ty trước khi ra visa', 'Muốn về công ty sau khi ra visa', 'Nhận visa katsudo',
+            'Không nhận visa katsudo', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại',
+            'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Nhận bằng Senmon', 'Yêu cầu mặc Kimono',
+            'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé'
+        ];
+        const traineeVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Thực tập sinh 3 Go"];
+        if (traineeVisas.includes(visaDetail)) {
+             conditionsToHide.push(...nonApplicableForTrainee);
         }
         
-        return allSpecialConditions;
+        return allSpecialConditions.filter(cond => !conditionsToHide.includes(cond));
     };
 
 
@@ -497,8 +493,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     </Select>
                                 </div>
                                 )}
-                                {showJapaneseLevelFilter && (
-                                <div>
+                                <div className="space-y-2">
                                     <Label className="font-semibold">Trình độ tiếng Nhật</Label>
                                     <Select>
                                         <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn trình độ" /></SelectTrigger>
@@ -507,9 +502,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                )}
                                 {showEnglishLevelFilter && (
-                                 <div>
+                                 <div className="space-y-2">
                                     <Label className="font-semibold">Trình độ tiếng Anh</Label>
                                     <Select>
                                         <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn trình độ" /></SelectTrigger>
@@ -520,7 +514,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 </div>
                                 )}
                                 {showEducationFilter && (
-                                 <div>
+                                 <div className="space-y-2">
                                     <Label className="font-semibold">Học vấn</Label>
                                     <Select>
                                         <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn học vấn" /></SelectTrigger>
@@ -539,7 +533,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div>
+                                <div className="space-y-2">
                                     <Label className="font-semibold">Kinh nghiệm</Label>
                                      <Select>
                                         <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn số năm kinh nghiệm" /></SelectTrigger>
@@ -548,7 +542,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div>
+                                <div className="space-y-2">
                                     <Label className="font-semibold">Tay thuận</Label>
                                     <Select>
                                         <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn tay thuận" /></SelectTrigger>
@@ -559,7 +553,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div>
+                                <div className="space-y-4">
                                     <Label className="font-semibold pt-2">Yêu cầu năng lực khác</Label>
                                     <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-2">
                                       {otherSkills.map(skill => (
