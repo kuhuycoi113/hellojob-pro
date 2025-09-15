@@ -605,6 +605,9 @@ export function Header() {
              )}
         </div>
         <div className="md:hidden flex items-center gap-2">
+           {isClient && !isLoggedIn ? (
+               <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
+           ) : null}
            <Button asChild size="sm">
               <Link href="/jobs">Việc</Link>
            </Button>
