@@ -982,7 +982,7 @@ const LoggedInView = () => {
                         <TabsTrigger value="jpy" className="data-[state=active]:bg-accent-yellow">JPY</TabsTrigger>
                         <TabsTrigger value="vnd" className="data-[state=active]:bg-accent-green">VNĐ</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="jpy" className="pt-4">
+                    <TabsContent value="jpy" className="pt-4 space-y-2">
                         <div className="space-y-2">
                             <Label htmlFor="salary-jpy">Lương tối thiểu (JPY)</Label>
                             <Input 
@@ -994,12 +994,12 @@ const LoggedInView = () => {
                              <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'jpy')}</p>
                         </div>
                     </TabsContent>
-                    <TabsContent value="vnd" className="pt-4">
+                    <TabsContent value="vnd" className="pt-4 space-y-2">
                         <div className="space-y-2">
                             <Label htmlFor="salary-vnd">Lương tối thiểu (VNĐ)</Label>
                             <Input 
                                 id="salary-vnd" 
-                                placeholder="33,000,000"
+                                placeholder="36,000,000"
                                 value={getDisplayValue(tempSalary, 'vnd')}
                                 onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'salary')}
                             />

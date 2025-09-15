@@ -257,6 +257,34 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         </>
     );
 
+    const netSalaryContent = (
+        <>
+            {showVndTab ? (
+                <Tabs defaultValue="jpy" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="jpy">JPY</TabsTrigger>
+                        <TabsTrigger value="vnd">VNĐ</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="jpy" className="pt-4 space-y-2">
+                        <Label htmlFor="net-salary-jpy">Thực lĩnh (JPY/tháng)</Label>
+                        <Input id="net-salary-jpy" type="text" placeholder="VD: 160,000" />
+                        <p className="text-xs text-muted-foreground">≈ 28,800,000 VNĐ</p>
+                    </TabsContent>
+                    <TabsContent value="vnd" className="pt-4 space-y-2">
+                         <Label htmlFor="net-salary-vnd">Thực lĩnh (VNĐ/tháng)</Label>
+                        <Input id="net-salary-vnd" type="text" placeholder="VD: 28,800,000" />
+                        <p className="text-xs text-muted-foreground">≈ 160,000 JPY</p>
+                    </TabsContent>
+                </Tabs>
+            ) : (
+                <div className="space-y-2">
+                    <Label htmlFor="net-salary-month">Thực lĩnh (JPY/tháng)</Label>
+                    <Input id="net-salary-month" type="number" placeholder="VD: 160000" />
+                </div>
+            )}
+        </>
+    );
+
     return (
         <div className="md:col-span-1 lg:col-span-1">
             <Card>
@@ -411,10 +439,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600"/>Thực lĩnh</span>
                             </AccordionTrigger>
                             <AccordionContent className="pt-4 space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="net-salary-month">Thực lĩnh (JPY/tháng)</Label>
-                                    <Input id="net-salary-month" type="number" placeholder="VD: 160000" />
-                                </div>
+                                {netSalaryContent}
                             </AccordionContent>
                         </AccordionItem>
 
