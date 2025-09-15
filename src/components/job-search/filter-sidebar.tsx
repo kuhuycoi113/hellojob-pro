@@ -231,7 +231,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
       <div className="space-y-2">
         <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
         <Input id="basic-salary-jpy" type="text" placeholder="VD: 200,000" onChange={(e) => onFilterChange({ basicSalary: e.target.value.replace(/,/g, '') })} value={filters.basicSalary?.toLocaleString('ja-JP') || ''} />
-        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, 'jpy')}</p>
+        {filters.basicSalary && <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, 'jpy')}</p>}
       </div>
     );
     
@@ -391,7 +391,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     <Slider
                                         defaultValue={[18, 36]}
                                         min={18}
-                                        max={70}
+                                        max={60}
                                         step={1}
                                         onValueChange={(value) => onFilterChange({ age: value as [number, number] })}
                                     />
