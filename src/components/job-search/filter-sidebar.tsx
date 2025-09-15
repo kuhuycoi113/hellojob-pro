@@ -266,6 +266,21 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         return false;
     })();
     const showEducationFilter = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
+    
+    const getAvailableSpecialConditions = () => {
+        const visaDetail = filters.visaDetail || '';
+        const nonApplicableConditions = ['Nhóm ngành 1', 'Nhóm ngành 2', 'Hỗ trợ Ginou 2'];
+        const nonApplicableVisas = [
+            "Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Thực tập sinh 3 Go",
+            "Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"
+        ];
+        
+        if (nonApplicableVisas.includes(visaDetail)) {
+            return allSpecialConditions.filter(cond => !nonApplicableConditions.includes(cond));
+        }
+        
+        return allSpecialConditions;
+    };
 
 
     return (
@@ -563,7 +578,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 <span className="flex items-center gap-2"><ListChecks className="h-5 w-5"/>Quy trình tuyển dụng</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
-                                
                                 <div className="space-y-2">
                                     <Label>Yêu cầu hạn Ginou còn</Label>
                                     <Select><SelectTrigger><SelectValue placeholder="Chọn thời gian" /></SelectTrigger>
@@ -596,7 +610,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                <span className="flex items-center gap-2"><Star className="h-5 w-5"/>Điều kiện đặc biệt</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-2 pt-4">
-                                {allSpecialConditions.map(item => (
+                                {getAvailableSpecialConditions().map(item => (
                                     <div key={item} className="flex items-center space-x-2">
                                         <Checkbox id={`cond-${item}`} />
                                         <Label htmlFor={`cond-${item}`} className="font-normal cursor-pointer">{item}</Label>
