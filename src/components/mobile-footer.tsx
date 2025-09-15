@@ -16,7 +16,7 @@ import {
 import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { DropdownMenuSeparator } from './ui/dropdown-menu';
+import { DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator } from './ui/dropdown-menu';
 import Image from 'next/image';
 import { useChat } from '@/contexts/ChatContext';
 import { mainNavLinks, quickAccessLinks, mobileFooterLinks } from '@/lib/nav-data';
@@ -130,6 +130,20 @@ export function MobileFooter() {
                {isLoggedIn ? <LoggedInContent /> : <LoggedOutContent />}
               
               <div className="mt-auto p-4">
+                  <DropdownMenuSeparator />
+                  <div className="p-2">
+                    <DropdownMenuRadioGroup
+                      value={role}
+                      onValueChange={(value) => setRole(value as 'candidate' | 'candidate-empty-profile' | 'guest')}
+                    >
+                      <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
+                        <div className="grid grid-cols-2 gap-2">
+                           <Button variant={role === 'candidate' ? 'default' : 'outline'} size="sm" onClick={() => setRole('candidate')}>Có Profile</Button>
+                           <Button variant={role === 'candidate-empty-profile' ? 'default' : 'outline'} size="sm" onClick={() => setRole('candidate-empty-profile')}>Profile Trắng</Button>
+                           <Button variant={role === 'guest' ? 'default' : 'outline'} size="sm" className="col-span-2" onClick={() => setRole('guest')}>Khách</Button>
+                        </div>
+                    </DropdownMenuRadioGroup>
+                  </div>
                   <DropdownMenuSeparator />
                   <SheetClose asChild>
                     <Button variant="ghost" className="w-full justify-center mt-4">
