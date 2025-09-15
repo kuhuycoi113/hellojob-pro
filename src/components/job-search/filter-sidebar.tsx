@@ -17,6 +17,11 @@ import { locations } from "@/lib/location-data";
 import { type SearchFilters } from './search-results';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { vi } from 'date-fns/locale';
 
 const japanJobTypes = [
     'Thực tập sinh kỹ năng',
@@ -108,6 +113,7 @@ interface FilterSidebarProps {
 export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
+    const [isFlexibleDate, setIsFlexibleDate] = useState(false);
 
 
     useEffect(() => {
@@ -124,6 +130,28 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         }
 
     }, [filters.visa, filters.industry]);
+
+    useEffect(() => {
+        if (filters.interviewDate === 'flexible') {
+            setIsFlexibleDate(true);
+        } else {
+            setIsFlexibleDate(false);
+        }
+    }, [filters.interviewDate]);
+
+    const handleDateSelect = (date: Date | undefined) => {
+        onFilterChange({ interviewDate: date ? format(date, 'yyyy-MM-dd') : '' });
+    };
+
+    const handleFlexibleDateChange = (checked: boolean) => {
+        if (checked) {
+            onFilterChange({ interviewDate: 'flexible' });
+        } else {
+            // If user unchecks it, revert to empty or previous date.
+            // For simplicity, we'll clear it.
+            onFilterChange({ interviewDate: '' });
+        }
+    };
 
 
     const handleJobTypeChange = (value: string) => {
@@ -277,7 +305,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         
         return allSpecialConditions.filter(cond => !conditionsToHide.includes(cond));
     };
-
+    
     const showEnglishLevelFilter = (['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '')) || 
       (['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'].includes(filters.visaDetail || '') && ['Nhà hàng', 'Hàng không', 'Vệ sinh toà nhà', 'Lưu trú, khách sạn'].includes(filters.industry || ''));
 
@@ -395,7 +423,42 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Ngày phỏng vấn</Label>
-                                    <Input type="date" />
+                                     <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal",
+                                                    !filters.interviewDate && "text-muted-foreground",
+                                                    filters.interviewDate && filters.interviewDate !== 'flexible' && "text-primary"
+                                                )}
+                                                disabled={isFlexibleDate}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {filters.interviewDate && filters.interviewDate !== 'flexible' ? format(new Date(filters.interviewDate), "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <CalendarComponent
+                                                mode="single"
+                                                selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? new Date(filters.interviewDate) : undefined}
+                                                onSelect={handleDateSelect}
+                                                fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
+                                                toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
+                                                locale={vi}
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox id="flexible-date" checked={isFlexibleDate} onCheckedChange={handleFlexibleDateChange} />
+                                    <label
+                                        htmlFor="flexible-date"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Đủ người thì phỏng vấn
+                                    </label>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
