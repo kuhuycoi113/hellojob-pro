@@ -295,12 +295,18 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         const nonApplicableForTrainee = [
             'Muốn về công ty trước khi ra visa', 'Muốn về công ty sau khi ra visa', 'Nhận visa katsudo',
             'Không nhận visa katsudo', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại',
-            'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Nhận bằng Senmon', 'Yêu cầu mặc Kimono',
+            'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Yêu cầu mặc Kimono',
             'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé', 'Nhận nhiều loại bằng'
         ];
         const traineeVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Thực tập sinh 3 Go"];
         if (traineeVisas.includes(visaDetail)) {
              conditionsToHide.push(...nonApplicableForTrainee);
+        }
+
+        const nonApplicableForTokutei = ['Nhận nhiều loại bằng', 'Nhận bằng Senmon'];
+        const tokuteiVisas = ["Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới"];
+        if (tokuteiVisas.includes(visaDetail)) {
+            conditionsToHide.push(...nonApplicableForTokutei);
         }
         
         return allSpecialConditions.filter(cond => !conditionsToHide.includes(cond));
@@ -503,13 +509,13 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     <Slider
                                         defaultValue={filters.age || [18, 60]}
                                         min={18}
-                                        max={60}
+                                        max={70}
                                         step={1}
                                         onValueChange={(value) => onFilterChange({ age: value as [number, number] })}
                                     />
                                     <div className="flex justify-between text-xs text-muted-foreground">
                                         <span>{filters.age?.[0] || 18} tuổi</span>
-                                        <span>{filters.age?.[1] || 60} tuổi</span>
+                                        <span>{filters.age?.[1] || 70} tuổi</span>
                                     </div>
                                 </div>
                                  <div className="space-y-2">
