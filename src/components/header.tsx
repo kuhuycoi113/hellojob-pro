@@ -501,10 +501,7 @@ export function Header() {
              )}
         </div>
         <div className="md:hidden">
-            <Button variant="default" size="icon" onClick={() => openChat()}>
-                <MessageSquare />
-                <span className="sr-only">Chat</span>
-            </Button>
+             {/* The chat button was here. It's now a floating widget. */}
         </div>
       </div>
     </header>
