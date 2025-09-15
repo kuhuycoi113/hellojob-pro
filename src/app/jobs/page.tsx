@@ -397,6 +397,7 @@ const LoggedInView = () => {
     const { toast } = useToast();
     const [tempSalary, setTempSalary] = useState('');
     const [tempFee, setTempFee] = useState('');
+    const [chartData, setChartData] = useState([]);
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 25000;
 
@@ -407,6 +408,18 @@ const LoggedInView = () => {
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
+
+    useEffect(() => {
+        // Generate dynamic chart data
+        const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+        const dynamicChartData = days.map(day => ({
+            name: day,
+            'Việc làm phù hợp với bạn': Math.floor(Math.random() * 15) + 1,
+            'Hồ sơ của bạn': Math.floor(Math.random() * 10) + 1
+        }));
+        // @ts-ignore
+        setChartData(dynamicChartData);
+    }, []);
 
     useEffect(() => {
         if (searchParams.get('highlight') === 'suggested') {
@@ -753,7 +766,7 @@ const LoggedInView = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <JobStatsChart />
+            <JobStatsChart data={chartData} />
             <div className="lg:col-span-1">
                 {/* Aspirations Section */}
                 <div className="mb-8">
@@ -1222,6 +1235,7 @@ export default function JobsDashboardPage() {
     
 
     
+
 
 
 

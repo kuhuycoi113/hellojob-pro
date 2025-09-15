@@ -4,17 +4,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid, LineChart, Line } from 'recharts';
 
-const data = [
-  { name: 'T2', 'Job phù hợp': 4, 'Hồ sơ của bạn': 2 },
-  { name: 'T3', 'Job phù hợp': 3, 'Hồ sơ của bạn': 5 },
-  { name: 'T4', 'Job phù hợp': 5, 'Hồ sơ của bạn': 3 },
-  { name: 'T5', 'Job phù hợp': 2, 'Hồ sơ của bạn': 6 },
-  { name: 'T6', 'Job phù hợp': 7, 'Hồ sơ của bạn': 4 },
-  { name: 'T7', 'Job phù hợp': 6, 'Hồ sơ của bạn': 5 },
-  { name: 'CN', 'Job phù hợp': 8, 'Hồ sơ của bạn': 7 },
-];
+interface ChartData {
+    name: string;
+    "Việc làm phù hợp với bạn": number;
+    "Hồ sơ của bạn": number;
+}
 
-export function JobStatsChart() {
+interface JobStatsChartProps {
+    data: ChartData[];
+}
+
+export function JobStatsChart({ data }: JobStatsChartProps) {
   return (
     <Card className="lg:col-span-2 shadow-xl">
       <CardHeader>
@@ -35,7 +35,7 @@ export function JobStatsChart() {
                 }}
               />
               <Legend />
-              <Line type="monotone" dataKey="Job phù hợp" stroke="hsl(var(--primary))" strokeWidth={2} activeDot={{ r: 8 }} />
+              <Line type="monotone" dataKey="Việc làm phù hợp với bạn" stroke="hsl(var(--primary))" strokeWidth={2} activeDot={{ r: 8 }} />
               <Line type="monotone" dataKey="Hồ sơ của bạn" stroke="hsl(var(--accent-green))" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
