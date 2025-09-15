@@ -533,9 +533,9 @@ export function Header() {
                 <DropdownMenuRadioGroup value={role} onValueChange={(value) => setRole(value as 'candidate' | 'candidate-empty-profile' | 'guest')}>
                   <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant={role === 'candidate' ? 'default' : 'outline'} size="sm" onClick={() => setRole('candidate')}>Có Profile</Button>
-                    <Button variant={role === 'candidate-empty-profile' ? 'default' : 'outline'} size="sm" onClick={() => setRole('candidate-empty-profile')}>Profile Trắng</Button>
-                    <Button variant={role === 'guest' ? 'default' : 'outline'} size="sm" className="col-span-2" onClick={() => setRole('guest')}>Khách</Button>
+                     <Button variant={role === 'candidate' ? 'default' : 'outline'} size="sm" onClick={() => setRole('candidate')}>Có Profile</Button>
+                     <Button variant={role === 'candidate-empty-profile' ? 'default' : 'outline'} size="sm" onClick={() => setRole('candidate-empty-profile')}>Profile Trắng</Button>
+                     <Button variant={role === 'guest' ? 'default' : 'outline'} size="sm" className="col-span-2" onClick={() => setRole('guest')}>Khách</Button>
                   </div>
                 </DropdownMenuRadioGroup>
               </div>
@@ -604,7 +604,15 @@ export function Header() {
                 </>
              )}
         </div>
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center gap-2">
+           <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                <DialogTrigger asChild>
+                    <Button size="sm" className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-2xl">
+                    {renderDialogContent()}
+                </DialogContent>
+            </Dialog>
           <MobileMenu />
         </div>
       </div>
