@@ -302,9 +302,26 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         if (traineeVisas.includes(visaDetail)) {
              conditionsToHide.push(...nonApplicableForTrainee);
         }
+
+        if (traineeVisas.includes(visaDetail)) {
+            conditionsToHide.push('Nhận nhiều loại bằng');
+        }
+
+        const tokuteiVisas = ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'];
+        if (tokuteiVisas.includes(visaDetail)) {
+            conditionsToHide.push('Nhận nhiều loại bằng', 'Nhận bằng Senmon');
+        }
+        
+        const engineerVisas = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'];
+        if (engineerVisas.includes(visaDetail)) {
+            conditionsToHide.push('Yêu cầu mặc Kimono');
+        }
         
         return allSpecialConditions.filter(cond => !conditionsToHide.includes(cond));
     };
+
+    const showEnglishLevelFilter = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
+    const showEducationFilter = !['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'].includes(filters.visaDetail || '');
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -396,10 +413,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                         
                          <AccordionItem value="interviewLocation">
                             <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><MapPin className="h-5 w-5"/>Phỏng vấn, tuyển tại</span>
+                                <span className="flex items-center gap-2"><FileText className="h-5 w-5"/>Phỏng vấn, tuyển tại</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
+                                    <Label>Địa điểm phỏng vấn</Label>
                                     <Select value={filters.interviewLocation} onValueChange={(value) => onFilterChange({ interviewLocation: value })}>
                                         <SelectTrigger className={cn(filters.interviewLocation && filters.interviewLocation !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
@@ -407,6 +425,53 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                             {renderInterviewLocations()}
                                         </SelectContent>
                                     </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Số vòng phỏng vấn</Label>
+                                    <Select><SelectTrigger><SelectValue placeholder="Chọn số vòng" /></SelectTrigger>
+                                        <SelectContent>
+                                            {interviewRoundsOptions.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Ngày phỏng vấn</Label>
+                                     <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal",
+                                                    !filters.interviewDate && "text-muted-foreground",
+                                                    filters.interviewDate && filters.interviewDate !== 'flexible' && "text-primary"
+                                                )}
+                                                disabled={isFlexibleDate}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {filters.interviewDate && filters.interviewDate !== 'flexible' ? format(new Date(filters.interviewDate), "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <CalendarComponent
+                                                mode="single"
+                                                selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? new Date(filters.interviewDate) : undefined}
+                                                onSelect={handleDateSelect}
+                                                fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
+                                                toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
+                                                locale={vi}
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox id="flexible-date" checked={isFlexibleDate} onCheckedChange={handleFlexibleDateChange} />
+                                    <label
+                                        htmlFor="flexible-date"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Đủ người thì phỏng vấn
+                                    </label>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
@@ -517,6 +582,18 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                {showEnglishLevelFilter && (
+                                 <div className="space-y-2">
+                                    <Label className="font-semibold">Trình độ tiếng Anh</Label>
+                                    <Select>
+                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn trình độ" /></SelectTrigger>
+                                        <SelectContent>
+                                            {englishLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                )}
+                                {showEducationFilter && (
                                  <div className="space-y-2">
                                     <Label className="font-semibold">Học vấn</Label>
                                     <Select>
@@ -526,6 +603,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                )}
                                 <div className="space-y-2">
                                     <Label>Yêu cầu kinh nghiệm</Label>
                                     <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
@@ -605,45 +683,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                             {interviewRoundsOptions.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Ngày phỏng vấn</Label>
-                                     <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant={"outline"}
-                                                className={cn(
-                                                    "w-full justify-start text-left font-normal",
-                                                    !filters.interviewDate && "text-muted-foreground",
-                                                    filters.interviewDate && filters.interviewDate !== 'flexible' && "text-primary"
-                                                )}
-                                                disabled={isFlexibleDate}
-                                            >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                {filters.interviewDate && filters.interviewDate !== 'flexible' ? format(new Date(filters.interviewDate), "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <CalendarComponent
-                                                mode="single"
-                                                selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? new Date(filters.interviewDate) : undefined}
-                                                onSelect={handleDateSelect}
-                                                fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
-                                                toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
-                                                locale={vi}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox id="flexible-date" checked={isFlexibleDate} onCheckedChange={handleFlexibleDateChange} />
-                                    <label
-                                        htmlFor="flexible-date"
-                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    >
-                                        Đủ người thì phỏng vấn
-                                    </label>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
