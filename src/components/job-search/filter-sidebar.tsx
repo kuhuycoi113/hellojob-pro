@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -109,6 +109,71 @@ interface FilterSidebarProps {
     onFilterChange: (newFilters: Partial<SearchFilters>) => void;
     onApply: () => void;
 }
+
+const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<FilterSidebarProps, 'filters' | 'onFilterChange'>) => {
+    const JPY_VND_RATE = 180;
+
+    const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof SearchFilters) => {
+        const rawValue = e.target.value;
+        const numericValue = parseInt(rawValue.replace(/[^0-9]/g, ''), 10);
+        
+        if (isNaN(numericValue)) {
+            onFilterChange({ [field]: '' });
+            return;
+        }
+
+        const salaryLimits: { [key: string]: number } = {
+            'Thực tập sinh kỹ năng': 500000,
+            'Kỹ năng đặc định': 1500000,
+            'Kỹ sư, tri thức': 10000000,
+        };
+        const limit = salaryLimits[filters.visa as keyof typeof salaryLimits] || 10000000;
+        const clampedValue = Math.min(numericValue, limit);
+        
+        onFilterChange({ [field]: String(clampedValue) });
+    };
+
+    const getDisplayValue = (value: string | undefined) => {
+        if (!value) return '';
+        const num = Number(value);
+        if (isNaN(num)) return '';
+        return num.toLocaleString('ja-JP');
+    };
+    
+    const getConvertedValue = (value: string | undefined) => {
+        const num = Number(value);
+        if (isNaN(num)) return "≈ 0 VNĐ";
+        
+        const vndValue = num * JPY_VND_RATE;
+        const vndValueInMillions = vndValue / 1000000;
+
+        if (vndValueInMillions < 10) {
+             const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
+            });
+            return `≈ ${formattedVnd} triệu VNĐ`;
+        }
+
+        return `≈ ${Math.round(vndValueInMillions)} triệu VNĐ`;
+    };
+
+    return (
+        <div className="space-y-2">
+            <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
+            <Input 
+                id="basic-salary-jpy" 
+                type="text" 
+                placeholder="VD: 200,000" 
+                onChange={(e) => handleSalaryInputChange(e, 'basicSalary')}
+                value={getDisplayValue(filters.basicSalary)} 
+            />
+            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary)}</p>
+        </div>
+    );
+});
+MonthlySalaryContent.displayName = 'MonthlySalaryContent';
+
 
 export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
@@ -316,19 +381,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     const shouldShowLươngNăm = !["Thực tập sinh 3 năm", "Thực tập sinh 1 năm"].includes(filters.visaDetail || "");
     const shouldShowTabs = shouldShowLươngGiờ || shouldShowLươngNăm;
 
-    const MonthlySalaryContent = () => (
-        <div className="space-y-2">
-            <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
-            <Input 
-                id="basic-salary-jpy" 
-                type="text" 
-                placeholder="VD: 200,000" 
-                onChange={(e) => handleSalaryInputChange(e, 'basicSalary')}
-                value={getDisplayValue(filters.basicSalary)} 
-            />
-            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary)}</p>
-        </div>
-    );
     
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -496,7 +548,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                             {shouldShowLươngNăm && <TabsTrigger value="yearly" className="text-xs">Lương năm</TabsTrigger>}
                                         </TabsList>
                                         <TabsContent value="basic" className="pt-4">
-                                            <MonthlySalaryContent />
+                                            <MonthlySalaryContent filters={filters} onFilterChange={onFilterChange} />
                                         </TabsContent>
                                         <TabsContent value="hourly" className="pt-4">
                                             <div className="space-y-2">
@@ -539,7 +591,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </TabsContent>
                                     </Tabs>
                                 ) : (
-                                    <MonthlySalaryContent />
+                                    <MonthlySalaryContent filters={filters} onFilterChange={onFilterChange} />
                                 )}
                             </AccordionContent>
                         </AccordionItem>

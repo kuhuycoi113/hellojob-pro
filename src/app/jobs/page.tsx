@@ -605,7 +605,7 @@ const LoggedInView = () => {
     
     const getConvertedValue = (value: string, currency: 'vnd' | 'jpy' | 'usd') => {
         const num = Number(value);
-        if (isNaN(num) || num === 0) return '';
+        if (isNaN(num) || num === 0) return '≈ 0 ' + (currency === 'jpy' ? 'VNĐ' : 'USD');
         
         if (currency === 'vnd') {
             const isSalaryField = value === tempSalary;
@@ -1302,6 +1302,7 @@ export default function JobsDashboardPage() {
     
 
     
+
 
 
 
