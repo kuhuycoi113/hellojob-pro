@@ -20,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { format } from 'date-fns';
+import { format, startOfTomorrow, parse } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 const japanJobTypes = [
@@ -110,53 +110,41 @@ interface FilterSidebarProps {
     onApply: () => void;
 }
 
-const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<FilterSidebarProps, 'filters' | 'onFilterChange'>) => {
+const MonthlySalaryContent = ({ filters, onFilterChange }: Pick<FilterSidebarProps, 'filters' | 'onFilterChange'>) => {
     const JPY_VND_RATE = 180;
+    const placeholderValue = 200000;
 
-    const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof SearchFilters) => {
+    const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value;
-        const numericValue = parseInt(rawValue.replace(/[^0-9]/g, ''), 10);
-        
-        if (isNaN(numericValue)) {
-            onFilterChange({ [field]: '' });
-            return;
-        }
-
-        const salaryLimits: { [key: string]: number } = {
-            'Thực tập sinh kỹ năng': 500000,
-            'Kỹ năng đặc định': 1500000,
-            'Kỹ sư, tri thức': 10000000,
-        };
-        const limit = salaryLimits[filters.visa as keyof typeof salaryLimits] || 10000000;
-        const clampedValue = Math.min(numericValue, limit);
-        
-        onFilterChange({ [field]: String(clampedValue) });
+        onFilterChange({ basicSalary: rawValue });
     };
 
     const getDisplayValue = (value: string | undefined) => {
         if (!value) return '';
-        const num = Number(value);
-        if (isNaN(num)) return '';
-        return num.toLocaleString('ja-JP');
+        return value;
     };
     
-    const getConvertedValue = (value: string | undefined) => {
-        const num = Number(value);
-        if (isNaN(num)) return "≈ 0 VNĐ";
+    const getConvertedValue = (value: string | undefined, placeholder: string) => {
+        const numericString = value || placeholder.replace(/[^0-9]/g, '');
+        const num = Number(numericString.replace(/[^0-9]/g, ''));
+        if (isNaN(num)) return "≈ 0 triệu VNĐ";
         
         const vndValue = num * JPY_VND_RATE;
         const vndValueInMillions = vndValue / 1000000;
 
-        if (vndValueInMillions < 10) {
+        if (vndValueInMillions < 10 && vndValueInMillions > 0) {
              const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
                 minimumFractionDigits: 1,
                 maximumFractionDigits: 1
             });
-            return `≈ ${formattedVnd} triệu VNĐ`;
+            // Replace comma with dot for consistency if needed, but vi-VN uses comma
+            return `≈ ${formattedVnd.replace('.',',')} triệu VNĐ`;
         }
 
         return `≈ ${Math.round(vndValueInMillions)} triệu VNĐ`;
     };
+    
+    const placeholderText = "VD: 200,000";
 
     return (
         <div className="space-y-2">
@@ -164,14 +152,14 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
             <Input 
                 id="basic-salary-jpy" 
                 type="text" 
-                placeholder="VD: 200,000" 
-                onChange={(e) => handleSalaryInputChange(e, 'basicSalary')}
+                placeholder={placeholderText} 
+                onChange={handleSalaryInputChange}
                 value={getDisplayValue(filters.basicSalary)} 
             />
-            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary)}</p>
+            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, placeholderText)}</p>
         </div>
     );
-});
+};
 MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 
 
