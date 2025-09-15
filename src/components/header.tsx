@@ -55,6 +55,7 @@ import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { AuthDialog } from './auth-dialog';
 import { locations } from '@/lib/location-data';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileSecondaryHeader } from './mobile-secondary-header';
 
 
 export const Logo = ({ className }: { className?: string }) => (
@@ -453,72 +454,75 @@ export function Header() {
 
   return (
     <>
-    <header className={cn(
-        "sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-transform duration-300",
+    <div className={cn(
+        "sticky top-0 z-50 w-full transition-transform duration-300",
         !showNav && "-translate-y-full"
     )}>
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <Logo />
-        </Link>
-        <nav className="hidden md:flex items-center gap-6 text-sm">
-          {mainNavLinks.map((link) => (
-            <NavLink 
-                key={link.href} 
-                href={link.href}
-                label={link.label}
-                icon={link.href === '/ai-profile' ? Sparkles : undefined}
-            />
-          ))}
-        </nav>
-        <div className="hidden md:flex items-center gap-2">
-            
-             {isClient && (
-                <>
-                    {isLoggedIn ? (
-                        <Link href="/candidate-profile" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                            <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
-                                <AvatarImage src={"https://placehold.co/100x100.png" || undefined} alt="User Avatar" data-ai-hint="user avatar" />
-                                <AvatarFallback>A</AvatarFallback>
-                            </Avatar>
-                        </Link>
-                    ): (
-                         <Button onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập / Đăng ký</Button>
+        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+                <Link href="/" className="flex items-center gap-2">
+                <Logo />
+                </Link>
+                <nav className="hidden md:flex items-center gap-6 text-sm">
+                {mainNavLinks.map((link) => (
+                    <NavLink 
+                        key={link.href} 
+                        href={link.href}
+                        label={link.label}
+                        icon={link.href === '/ai-profile' ? Sparkles : undefined}
+                    />
+                ))}
+                </nav>
+                <div className="hidden md:flex items-center gap-2">
+                    
+                    {isClient && (
+                        <>
+                            {isLoggedIn ? (
+                                <Link href="/candidate-profile" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                    <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
+                                        <AvatarImage src={"https://placehold.co/100x100.png" || undefined} alt="User Avatar" data-ai-hint="user avatar" />
+                                        <AvatarFallback>A</AvatarFallback>
+                                    </Avatar>
+                                </Link>
+                            ): (
+                                <Button onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập / Đăng ký</Button>
+                            )}
+                            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                                <DialogTrigger asChild>
+                                    <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-2xl">
+                                    {renderDialogContent()}
+                                </DialogContent>
+                            </Dialog>
+                            <Button asChild>
+                                <Link href="/jobs">
+                                Trang việc làm
+                                </Link>
+                            </Button>
+                            <MainMenu />
+                        </>
                     )}
-                     <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-                        <DialogTrigger asChild>
-                            <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-2xl">
-                            {renderDialogContent()}
-                        </DialogContent>
-                    </Dialog>
-                     <Button asChild>
-                        <Link href="/jobs">
-                           Trang việc làm
-                        </Link>
-                    </Button>
-                    <MainMenu />
-                </>
-             )}
-        </div>
-        <div className="md:hidden flex items-center gap-2">
-             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                        <Menu />
-                    </Button>
-                </SheetTrigger>
-                <SheetContent>
-                    <SheetHeader>
-                        <SheetTitle><Logo /></SheetTitle>
-                    </SheetHeader>
-                    {isLoggedIn ? <LoggedInContent /> : <LoggedOutContent />}
-                </SheetContent>
-            </Sheet>
-        </div>
-      </div>
-    </header>
+                </div>
+                <div className="md:hidden flex items-center gap-2">
+                    <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                        <SheetTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <Menu />
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent>
+                            <SheetHeader>
+                                <SheetTitle><Logo /></SheetTitle>
+                            </SheetHeader>
+                            {isLoggedIn ? <LoggedInContent /> : <LoggedOutContent />}
+                        </SheetContent>
+                    </Sheet>
+                </div>
+            </div>
+        </header>
+        <MobileSecondaryHeader />
+    </div>
      <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
         <AlertDialogContent>
             <AlertDialogHeader>

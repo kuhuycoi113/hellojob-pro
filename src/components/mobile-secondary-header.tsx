@@ -6,47 +6,17 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { mobileFooterLinks } from '@/lib/nav-data';
-import { useIsMobile } from '@/hooks/use-mobile';
-
 
 export function MobileSecondaryHeader() {
   const pathname = usePathname();
   const [activePath, setActivePath] = useState('');
   
-  const [showNav, setShowNav] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const isMobile = useIsMobile();
-
-
-  useEffect(() => {
-    if (!isMobile) {
-      setShowNav(true);
-      return;
-    }
-  
-    const controlNavbar = () => {
-      // If scrolling down and past a small threshold, hide the nav.
-      if (window.scrollY > lastScrollY && window.scrollY > 80) { // 80px is a reasonable threshold
-        setShowNav(false);
-      } else { // If scrolling up, show the nav.
-        setShowNav(true);
-      }
-      setLastScrollY(window.scrollY);
-    };
-
-    window.addEventListener('scroll', controlNavbar);
-    return () => window.removeEventListener('scroll', controlNavbar);
-  }, [isMobile, lastScrollY]);
-
   useEffect(() => {
     setActivePath(pathname);
   }, [pathname]);
 
   return (
-    <header className={cn(
-        "md:hidden sticky top-16 z-30 w-full bg-background/95 backdrop-blur-sm border-b transition-transform duration-300",
-        !showNav && "-translate-y-full"
-    )}>
+    <header className="md:hidden sticky top-16 z-30 w-full bg-background/95 backdrop-blur-sm border-b">
        <div className="w-full overflow-x-auto whitespace-nowrap no-scrollbar">
           <div className="flex items-center h-14 px-2">
             {mobileFooterLinks.map(({ href, icon: Icon, label }) => {

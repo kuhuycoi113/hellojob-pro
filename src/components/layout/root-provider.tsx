@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Toaster } from '@/components/ui/toaster';
-import { MobileSecondaryHeader } from '@/components/mobile-secondary-header';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { FloatingChatWidget } from '@/components/chat/floating-chat-widget';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -35,7 +34,6 @@ export function RootProvider({
         <ChatProvider>
             <AuthProvider>
                 {!isCallPage && <Header />}
-                {!isCallPage && <MobileSecondaryHeader />}
                 <main className="min-h-screen">{children}</main>
                 {!isCallPage && <Footer />}
                 {!isCallPage && <FloatingChatWidget />}
