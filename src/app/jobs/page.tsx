@@ -1055,16 +1055,6 @@ const LoggedInView = () => {
                         />
                          <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'jpy')}</p>
                     </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="salary-vnd">Lương tối thiểu (VNĐ)</Label>
-                        <Input 
-                            id="salary-vnd" 
-                            placeholder="36,000,000"
-                            value={getDisplayValue(tempSalary, 'vnd')}
-                            onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'salary')}
-                        />
-                         <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'vnd')}</p>
-                    </div>
                 </div>
                 <DialogFooter className="pt-4">
                     <Button variant="outline" onClick={() => setIsSalaryDialogOpen(false)}>Hủy</Button>
@@ -1312,6 +1302,7 @@ export default function JobsDashboardPage() {
     
 
     
+
 
 
 
