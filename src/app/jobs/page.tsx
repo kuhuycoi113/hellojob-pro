@@ -650,7 +650,7 @@ const LoggedInView = () => {
                         </AccordionTrigger>
                          <Button
                             id="highlight-target-button"
-                            variant="ghost"
+                            variant="default"
                             size="sm"
                             className="ml-auto flex-shrink-0"
                             onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}
