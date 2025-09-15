@@ -245,6 +245,21 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     
     const showTattooFilter = !['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
     const showJapaneseLevelFilter = !['Thực tập sinh 1 năm', 'Thực tập sinh 3 năm'].includes(filters.visaDetail || '');
+    const showEnglishLevelFilter = (() => {
+        const engineerVisas = ["Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"];
+        const serviceIndustries = ["Nhà hàng", "Hàng không", "Vệ sinh toà nhà", "Lưu trú, khách sạn"];
+        const tokuteiVisas = ["Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới"];
+
+        if (engineerVisas.includes(filters.visaDetail || '')) {
+            return true;
+        }
+
+        if (tokuteiVisas.includes(filters.visaDetail || '') && serviceIndustries.includes(filters.industry || '')) {
+            return true;
+        }
+
+        return false;
+    })();
 
 
     return (
@@ -460,6 +475,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     </Select>
                                 </div>
                                 )}
+                                {showEnglishLevelFilter && (
                                  <div>
                                     <Label className="font-semibold">Trình độ tiếng Anh</Label>
                                     <Select>
@@ -469,6 +485,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                )}
                                  <div>
                                     <Label className="font-semibold">Học vấn</Label>
                                     <Select>
