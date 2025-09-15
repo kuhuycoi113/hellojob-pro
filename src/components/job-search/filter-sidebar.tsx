@@ -215,25 +215,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         )
     }
 
-    const showHourlyWage = ["Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới"].includes(filters.visaDetail || '');
-    const showYearlyWage = [
-        "Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới", 
-        "Thực tập sinh 3 Go", 
-        "Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"
-    ].includes(filters.visaDetail || '');
-    
-    const JPY_VND_RATE = 180;
-    
-    const showSalaryTabs = showHourlyWage || showYearlyWage;
-    
-    const isNewcomerVisa = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Đặc định đi mới"].includes(filters.visaDetail || '');
-
     const salaryLimits: { [key: string]: number } = {
         'Thực tập sinh kỹ năng': 500000,
         'Kỹ năng đặc định': 1500000,
         'Kỹ sư, tri thức': 10000000,
     };
-
+    
     const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof SearchFilters) => {
         const rawValue = e.target.value;
         const numericValue = parseInt(rawValue.replace(/[^0-9]/g, ''), 10);
@@ -256,6 +243,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         return num.toLocaleString('ja-JP');
     };
     
+    const JPY_VND_RATE = 180;
+
     const getConvertedValue = (value: string | undefined) => {
         if (!value) return '';
         const num = Number(value);
@@ -315,6 +304,13 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
     const showEnglishLevelFilter = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
     const showEducationFilter = !['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'].includes(filters.visaDetail || '');
+    
+    const showHourlyWage = ["Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới"].includes(filters.visaDetail || '');
+    const showYearlyWage = [
+        "Đặc định đầu Việt", "Đặc định đầu Nhật", "Đặc định đi mới", 
+        "Thực tập sinh 3 Go", 
+        "Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"
+    ].includes(filters.visaDetail || '');
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -471,85 +467,43 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
                         <AccordionItem value="salary">
                              <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương cơ bản (tháng)</span>
+                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương & Đãi ngộ</span>
                             </AccordionTrigger>
-                             <AccordionContent className="pt-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="basic-salary-jpy">Lương tối thiểu (JPY)</Label>
-                                    <Input 
-                                        id="basic-salary-jpy" 
-                                        type="text" 
-                                        placeholder="VD: 200,000" 
-                                        onChange={(e) => handleSalaryInputChange(e, 'basicSalary')}
-                                        value={getDisplayValue(filters.basicSalary)} 
-                                    />
-                                    {filters.basicSalary ? (
-                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary)}</p>
-                                    ) : (
-                                        <p className="text-xs text-muted-foreground">≈ 36.0 triệu đồng</p>
-                                    )}
-                                </div>
+                            <AccordionContent className="pt-4">
+                                <Tabs defaultValue="basic">
+                                    <TabsList className="grid w-full grid-cols-2 h-auto">
+                                        <TabsTrigger value="basic" className="text-xs">Lương tháng</TabsTrigger>
+                                        <TabsTrigger value="net" className="text-xs">Thực lĩnh</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="basic" className="pt-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="basic-salary-jpy">Lương tối thiểu (JPY/tháng)</Label>
+                                            <Input 
+                                                id="basic-salary-jpy" 
+                                                type="text" 
+                                                placeholder="VD: 200,000" 
+                                                onChange={(e) => handleSalaryInputChange(e, 'basicSalary')}
+                                                value={getDisplayValue(filters.basicSalary)} 
+                                            />
+                                            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary) || '≈ 36.0 triệu đồng'}</p>
+                                        </div>
+                                    </TabsContent>
+                                    <TabsContent value="net" className="pt-4">
+                                         <div className="space-y-2">
+                                            <Label htmlFor="net-salary-jpy">Thực lĩnh tối thiểu (JPY/tháng)</Label>
+                                            <Input 
+                                                id="net-salary-jpy" 
+                                                type="text" 
+                                                placeholder="VD: 160,000" 
+                                                onChange={(e) => handleSalaryInputChange(e, 'netSalary')}
+                                                value={getDisplayValue(filters.netSalary)} 
+                                            />
+                                             <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary)}</p>
+                                        </div>
+                                    </TabsContent>
+                                </Tabs>
                             </AccordionContent>
                         </AccordionItem>
-
-                         <AccordionItem value="netSalary">
-                            <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600"/>Thực lĩnh</span>
-                            </AccordionTrigger>
-                             <AccordionContent className="pt-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="net-salary-jpy">Thực lĩnh tối thiểu (JPY/tháng)</Label>
-                                    <Input 
-                                        id="net-salary-jpy" 
-                                        type="text" 
-                                        placeholder="VD: 160,000" 
-                                        onChange={(e) => handleSalaryInputChange(e, 'netSalary')}
-                                        value={getDisplayValue(filters.netSalary)} 
-                                    />
-                                     {filters.netSalary && <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary)}</p>}
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-
-                        {showHourlyWage && (
-                            <AccordionItem value="hourlySalary">
-                                <AccordionTrigger className="text-base font-semibold">
-                                    <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương giờ</span>
-                                </AccordionTrigger>
-                                <AccordionContent className="pt-4">
-                                     <div className="space-y-2">
-                                        <Label htmlFor="hourly-salary-jpy">Lương cơ bản (JPY/giờ)</Label>
-                                        <Input id="hourly-salary-jpy" type="text" placeholder="VD: 1,000" />
-                                    </div>
-                                </AccordionContent>
-                            </AccordionItem>
-                        )}
-                        {showYearlyWage && (
-                            <>
-                                <AccordionItem value="annualIncome">
-                                    <AccordionTrigger className="text-base font-semibold">
-                                        <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Thu nhập năm</span>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="pt-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="annual-income-jpy">Thu nhập tối thiểu (JPY/năm)</Label>
-                                            <Input id="annual-income-jpy" type="text" placeholder="VD: 3,000,000" />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                                <AccordionItem value="annualBonus">
-                                    <AccordionTrigger className="text-base font-semibold">
-                                        <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Thưởng năm</span>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="pt-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="annual-bonus-jpy">Thưởng tối thiểu (JPY/năm)</Label>
-                                            <Input id="annual-bonus-jpy" type="text" placeholder="VD: 500,000" />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </>
-                        )}
                         
                          <AccordionItem value="requirements">
                             <AccordionTrigger className="text-base font-semibold">
