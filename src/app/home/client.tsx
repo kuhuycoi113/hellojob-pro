@@ -32,6 +32,7 @@ import { FilterSidebar } from '@/components/job-search/filter-sidebar';
 import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
 import { Job, jobData } from '@/lib/mock-data';
 import { locations } from '@/lib/location-data';
+import { isWithinInterval, startOfTomorrow, parse } from 'date-fns';
 
 
 const featuredEmployers = [
@@ -450,7 +451,7 @@ export default function HomeClient() {
       jobDetail: '',
       height: [135, 210],
       weight: [35, 120],
-      age: [18, 36],
+      age: [18, 70],
       basicSalary: '',
       netSalary: '',
       hourlySalary: '',
@@ -474,7 +475,7 @@ export default function HomeClient() {
   }, [searchFilters, isSearching]);
 
   const applyFilters = useCallback((currentFilters: SearchFilters) => {
-     const { visa, visaDetail, industry, location, jobDetail, interviewLocation } = currentFilters;
+     const { visa, visaDetail, industry, location, jobDetail, interviewLocation, interviewDate } = currentFilters;
     const results = jobData.filter(job => {
         
         let visaMatch = true;
@@ -503,7 +504,23 @@ export default function HomeClient() {
         
         const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
         
-        return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch;
+        const interviewDateMatch = (() => {
+            if (!interviewDate || interviewDate === 'flexible') return true;
+            if (!job.interviewDate) return false;
+            
+            try {
+                const tomorrow = startOfTomorrow();
+                const selectedDate = new Date(interviewDate);
+                const jobDate = parse(job.interviewDate, 'yyyy-MM-dd', new Date());
+
+                return isWithinInterval(jobDate, { start: tomorrow, end: selectedDate });
+            } catch (error) {
+                console.error("Error parsing date:", error);
+                return false;
+            }
+        })();
+
+        return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && interviewDateMatch;
     });
 
     setFilteredJobs(results);
