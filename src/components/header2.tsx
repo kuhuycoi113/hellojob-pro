@@ -113,6 +113,24 @@ export function Header2() {
         <Button asChild className="w-full" size="lg" onClick={() => setIsOpen(false)}>
           <Link href="/candidate-profile"><LogIn className="mr-2"/>Đăng nhập / Đăng ký</Link>
         </Button>
+         <DropdownMenuSeparator />
+         <div className="grid grid-cols-3 gap-2 p-2">
+            {quickAccessLinks.map((link) => (
+              <Link
+                href={link.href}
+                key={link.href}
+                onClick={() => setIsOpen(false)}
+                className="flex flex-col items-center justify-start p-2 h-20 cursor-pointer rounded-md bg-secondary hover:bg-accent/10"
+              >
+                <div className="h-8 flex items-center justify-center text-muted-foreground">
+                  <link.icon />
+                </div>
+                <span className="text-xs text-center text-foreground leading-tight">
+                  {link.label}
+                </span>
+              </Link>
+            ))}
+          </div>
      </div>
   );
 
