@@ -68,7 +68,7 @@ export function MobileSecondaryHeader() {
        <div className="w-full overflow-x-auto whitespace-nowrap no-scrollbar">
           <div className="flex items-center h-14 px-2">
             {mobileFooterLinks.map(({ href, icon: Icon, label }) => {
-            const isActive = (activePath === href && href === '/') || (href !== '/' && activePath.startsWith(href));
+            const isActive = (href !== '/' && activePath.startsWith(href)) || (href === '/' && activePath === '/');
             return (
                 <Link href={href} key={href} className={cn(
                     "flex flex-col items-center justify-center text-xs text-muted-foreground hover:text-primary transition-colors flex-shrink-0 w-20 pt-1",
