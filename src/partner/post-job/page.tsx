@@ -354,7 +354,17 @@ export default function PartnerPostJobPage() {
   ];
 
   const currentVisaCategory = jobData.visaDetail ? getVisaCategory(jobData.visaDetail) : null;
-  const availableConditions = currentVisaCategory ? conditionsByVisaType[currentVisaCategory] : [];
+  
+  const getAvailableConditions = () => {
+    if (!currentVisaCategory) return [];
+    let conditions = conditionsByVisaType[currentVisaCategory] || [];
+    if (currentVisaCategory === 'Kỹ sư, tri thức') {
+        conditions = conditions.filter(c => c !== 'Yêu cầu mặc Kimono');
+    }
+    return conditions;
+  };
+
+  const availableConditions = getAvailableConditions();
 
   const annualIncomePlaceholder = (() => {
     if (jobData.visaType?.includes('Kỹ năng đặc định')) return '1,500,000 - 10,000,000 yên/năm';
@@ -849,7 +859,7 @@ export default function PartnerPostJobPage() {
                       Điều kiện đặc biệt
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
-                      {allSpecialConditions.map(condition => (
+                      {availableConditions.map(condition => (
                         <div key={condition} className="flex items-center space-x-2">
                           <Checkbox
                             id={`condition-${condition}`}
