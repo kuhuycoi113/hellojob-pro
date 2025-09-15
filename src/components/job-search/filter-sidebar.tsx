@@ -110,41 +110,44 @@ interface FilterSidebarProps {
     onApply: () => void;
 }
 
+const JPY_VND_RATE = 180;
+
+const getConvertedValue = (value: string | undefined, placeholder: string) => {
+    const numericString = value || placeholder.replace(/[^0-9]/g, '');
+    const num = Number(numericString.replace(/[^0-9]/g, ''));
+    
+    if (isNaN(num)) return "≈ 0 triệu VNĐ";
+
+    const vndValue = num * JPY_VND_RATE;
+    const vndValueInMillions = vndValue / 1000000;
+    
+    if (num === 0) {
+        return "≈ 0 triệu VNĐ";
+    }
+
+    if (vndValueInMillions < 10 && vndValueInMillions > 0) {
+         const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        });
+        return `≈ ${formattedVnd.replace('.',',')} triệu VNĐ`;
+    }
+
+    return `≈ ${Math.round(vndValueInMillions)} triệu VNĐ`;
+};
+
+
 const MonthlySalaryContent = ({ filters, onFilterChange }: Pick<FilterSidebarProps, 'filters' | 'onFilterChange'>) => {
-    const JPY_VND_RATE = 180;
-    const placeholderValue = 200000;
+    
+    const placeholderText = "VD: 200,000";
 
     const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const rawValue = e.target.value;
-        onFilterChange({ basicSalary: rawValue });
+        onFilterChange({ basicSalary: e.target.value });
     };
 
     const getDisplayValue = (value: string | undefined) => {
-        if (!value) return '';
-        return value;
+        return value || '';
     };
-    
-    const getConvertedValue = (value: string | undefined, placeholder: string) => {
-        const numericString = value || placeholder.replace(/[^0-9]/g, '');
-        const num = Number(numericString.replace(/[^0-9]/g, ''));
-        if (isNaN(num)) return "≈ 0 triệu VNĐ";
-        
-        const vndValue = num * JPY_VND_RATE;
-        const vndValueInMillions = vndValue / 1000000;
-
-        if (vndValueInMillions < 10 && vndValueInMillions > 0) {
-             const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
-                minimumFractionDigits: 1,
-                maximumFractionDigits: 1
-            });
-            // Replace comma with dot for consistency if needed, but vi-VN uses comma
-            return `≈ ${formattedVnd.replace('.',',')} triệu VNĐ`;
-        }
-
-        return `≈ ${Math.round(vndValueInMillions)} triệu VNĐ`;
-    };
-    
-    const placeholderText = "VD: 200,000";
 
     return (
         <div className="space-y-2">
@@ -277,45 +280,14 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     
     const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof SearchFilters) => {
         const rawValue = e.target.value;
-        const numericValue = parseInt(rawValue.replace(/[^0-9]/g, ''), 10);
-        
-        if (isNaN(numericValue)) {
-            onFilterChange({ [field]: '' });
-            return;
-        }
-
-        const limit = salaryLimits[filters.visa as keyof typeof salaryLimits] || 10000000;
-        const clampedValue = Math.min(numericValue, limit);
-        
-        onFilterChange({ [field]: String(clampedValue) });
+        onFilterChange({ [field]: rawValue });
     };
 
     const getDisplayValue = (value: string | undefined) => {
         if (!value) return '';
-        const num = Number(value);
+        const num = Number(value.replace(/[^0-9]/g, ''));
         if (isNaN(num)) return '';
         return num.toLocaleString('ja-JP');
-    };
-    
-    const JPY_VND_RATE = 180;
-
-    const getConvertedValue = (value: string | undefined) => {
-        if (!value) return '';
-        const num = Number(value);
-        if (isNaN(num) || num === 0) return '';
-        
-        const vndValue = num * JPY_VND_RATE;
-        const vndValueInMillions = vndValue / 1000000;
-
-        if (vndValueInMillions < 10) {
-             const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
-                minimumFractionDigits: 1,
-                maximumFractionDigits: 1
-            });
-            return `≈ ${formattedVnd} triệu VNĐ`;
-        }
-
-        return `≈ ${Math.round(vndValueInMillions)} triệu VNĐ`;
     };
     
     const showTattooFilter = !['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
@@ -548,7 +520,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                                     onChange={(e) => handleSalaryInputChange(e, 'hourlySalary')}
                                                     value={getDisplayValue(filters.hourlySalary)} 
                                                 />
-                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary)}</p>
+                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary, 'VD: 1,000')}</p>
                                             </div>
                                         </TabsContent>
                                         <TabsContent value="yearly" className="pt-4">
@@ -562,7 +534,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                                         onChange={(e) => handleSalaryInputChange(e, 'annualIncome')}
                                                         value={getDisplayValue(filters.annualIncome)} 
                                                     />
-                                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualIncome)}</p>
+                                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualIncome, 'VD: 3,000,000')}</p>
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label htmlFor="annual-bonus-jpy">Thưởng năm (JPY)</Label>
@@ -573,7 +545,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                                         onChange={(e) => handleSalaryInputChange(e, 'annualBonus')}
                                                         value={getDisplayValue(filters.annualBonus)} 
                                                     />
-                                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualBonus)}</p>
+                                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualBonus, 'VD: 500,000')}</p>
                                                 </div>
                                             </div>
                                         </TabsContent>
@@ -598,7 +570,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         onChange={(e) => handleSalaryInputChange(e, 'netSalary')}
                                         value={getDisplayValue(filters.netSalary)} 
                                     />
-                                    <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary)}</p>
+                                    <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'VD: 160,000')}</p>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
