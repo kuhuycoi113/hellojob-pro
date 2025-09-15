@@ -62,6 +62,8 @@ export function Header2() {
     }
   }, [lastScrollY]);
 
+  const navLinks = mainNavLinks.filter(link => link.href !== '/');
+  
   const isQuickAccessLinkActive = quickAccessLinks.some(link => activePath.startsWith(link.href) && link.href !== '/');
 
   const LoggedInContent = () => (
@@ -139,8 +141,8 @@ export function Header2() {
         isVisible ? "translate-y-0" : "-translate-y-full"
     )}>
       <div className="flex items-center h-16 overflow-x-auto whitespace-nowrap px-2">
-        {mainNavLinks.filter(link => link.href !== '/').map(({ href, icon: Icon, label }) => {
-           const isActive = (activePath === href) || (href !== '/' && activePath.startsWith(href));
+        {navLinks.map(({ href, icon: Icon, label }) => {
+           const isActive = (pathname === href) || (href !== '/' && pathname.startsWith(href));
            const showIcon = label === 'Tạo hồ sơ AI';
            return (
             <Link href={href} key={href} className="flex items-center justify-center text-sm text-muted-foreground hover:text-primary transition-colors p-3 flex-shrink-0">
@@ -149,6 +151,9 @@ export function Header2() {
             </Link>
            )
         })}
+        <Link href="/consultant-profile" className="flex items-center justify-center text-sm text-muted-foreground hover:text-primary transition-colors p-3 flex-shrink-0">
+            <span className={cn( "text-center leading-tight", pathname.startsWith('/consultant-profile') ? 'text-primary font-bold' : 'font-medium')}>Tư vấn viên</span>
+        </Link>
       </div>
     </nav>
   );
