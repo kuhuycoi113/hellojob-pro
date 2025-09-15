@@ -268,7 +268,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
             'Muốn về công ty trước khi ra visa', 'Muốn về công ty sau khi ra visa', 'Nhận visa katsudo',
             'Không nhận visa katsudo', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại',
             'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Nhận bằng Senmon', 'Yêu cầu mặc Kimono',
-            'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé'
+            'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé', 'Nhận nhiều loại bằng'
         ];
         const traineeVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Thực tập sinh 3 Go"];
         if (traineeVisas.includes(visaDetail)) {
