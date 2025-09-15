@@ -410,7 +410,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                  <div className="space-y-2">
                                     <Label>Tuổi</Label>
                                     <Slider
-                                        defaultValue={[18, 36]}
+                                        defaultValue={filters.age || [18, 36]}
                                         min={18}
                                         max={60}
                                         step={1}
