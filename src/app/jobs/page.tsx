@@ -35,6 +35,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { Checkbox } from '../ui/checkbox';
 
 
 const aspirations = [
@@ -390,7 +391,7 @@ const LoggedInView = () => {
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [isSalaryDialogOpen, setIsSalaryDialogOpen] = useState(false);
     const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
-    const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations']>>({});
+    const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations'] & { educationRequirement?: string, languageRequirement?: string, yearsOfExperience?: string, specialConditions?: string[] }>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
     const [suggestionPrinciple, setSuggestionPrinciple] = useState<'salary' | 'fee' | 'company' | null>(null);
     const [forceUpdate, setForceUpdate] = useState(0); 
@@ -633,6 +634,12 @@ const LoggedInView = () => {
     };
     const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
+
+    const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
+    const languageLevels = ["Không yêu cầu", "N5", "N4", "N3", "N2", "N1"];
+    const experienceYears = ['Không yêu cầu', 'Dưới 1 năm', '1-2 năm', '2-3 năm', 'Trên 3 năm'];
+    const allSpecialConditions = ['Lương tốt', 'Tăng ca', 'Công ty uy tín', 'Hỗ trợ nhà ở', 'Bay nhanh'];
+
 
     return (
         <>
@@ -969,10 +976,56 @@ const LoggedInView = () => {
                                 Thêm điều kiện mở rộng
                             </Button>
                         </CollapsibleTrigger>
-                        <CollapsibleContent>
-                            {/* Placeholder for future advanced filter controls */}
-                            <div className="pt-4">
-                                <p className="text-sm text-muted-foreground">Các điều kiện lọc nâng cao sẽ được thêm vào đây.</p>
+                        <CollapsibleContent className="pt-4 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Học vấn</Label>
+                                    <Select value={tempAspirations.educationRequirement} onValueChange={value => setTempAspirations(prev => ({...prev, educationRequirement: value}))}>
+                                        <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
+                                        <SelectContent>
+                                            {educationLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Trình độ tiếng Nhật</Label>
+                                    <Select value={tempAspirations.languageRequirement} onValueChange={value => setTempAspirations(prev => ({...prev, languageRequirement: value}))}>
+                                        <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
+                                        <SelectContent>
+                                            {languageLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
+                                    <Label>Số năm kinh nghiệm</Label>
+                                    <Select value={tempAspirations.yearsOfExperience} onValueChange={value => setTempAspirations(prev => ({...prev, yearsOfExperience: value}))}>
+                                        <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
+                                        <SelectContent>
+                                            {experienceYears.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="space-y-2 pt-2">
+                                <Label>Các điều kiện khác</Label>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2">
+                                     {allSpecialConditions.map(item => (
+                                        <div key={item} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`cond-modal-${item}`}
+                                                checked={tempAspirations.specialConditions?.includes(item)}
+                                                onCheckedChange={checked => {
+                                                    const current = tempAspirations.specialConditions || [];
+                                                    const newConditions = checked
+                                                        ? [...current, item]
+                                                        : current.filter(c => c !== item);
+                                                    setTempAspirations(prev => ({...prev, specialConditions: newConditions}));
+                                                }}
+                                            />
+                                            <Label htmlFor={`cond-modal-${item}`} className="text-sm font-normal cursor-pointer">{item}</Label>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </CollapsibleContent>
                     </Collapsible>
@@ -1235,6 +1288,7 @@ export default function JobsDashboardPage() {
     
 
     
+
 
 
 
