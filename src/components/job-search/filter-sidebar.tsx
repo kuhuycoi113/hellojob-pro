@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -91,7 +92,7 @@ const otherSkills = [
 const getFutureMonths = () => {
     const months = [];
     const today = new Date();
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= 12; i++) { // next 12 months
         const futureDate = new Date(today.getFullYear(), today.getMonth() + i, 1);
         const month = futureDate.getMonth() + 1;
         const year = futureDate.getFullYear();
@@ -243,7 +244,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         return valueToFormat.toLocaleString(currency === 'vnd' ? 'vi-VN' : 'ja-JP');
     };
     
-    const getConvertedValue = (value: string | undefined, currency: 'jpy') => {
+    const getConvertedValue = (value: string | undefined) => {
         if (!value) return '';
         const num = Number(value);
         if (isNaN(num) || num === 0) return '';
@@ -260,8 +261,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
       <div className="space-y-2">
         <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
         <Input id="basic-salary-jpy" type="text" placeholder="VD: 200,000" onChange={(e) => onFilterChange({ basicSalary: e.target.value.replace(/,/g, '') })} value={filters.basicSalary?.toLocaleString('ja-JP') || ''} />
-         {!filters.basicSalary && <p className="text-xs text-muted-foreground">≈ 36 triệu đồng</p>}
-         {filters.basicSalary && <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, 'jpy')}</p>}
+         {!filters.basicSalary && <p className="text-xs text-muted-foreground">≈ 36.0 triệu đồng</p>}
+         {filters.basicSalary && <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary)}</p>}
       </div>
     );
     
@@ -269,7 +270,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
        <div className="space-y-2">
         <Label htmlFor="net-salary-jpy">Thực lĩnh (JPY/tháng)</Label>
         <Input id="net-salary-jpy" type="text" placeholder="VD: 160,000" onChange={(e) => onFilterChange({ netSalary: e.target.value.replace(/,/g, '') })} value={filters.netSalary?.toLocaleString('ja-JP') || ''} />
-         {filters.netSalary && <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'jpy')}</p>}
+         {filters.netSalary && <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary)}</p>}
       </div>
     );
     
@@ -681,7 +682,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                <span className="flex items-center gap-2"><Star className="h-5 w-5"/>Điều kiện đặc biệt</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-2 pt-4">
-                                {getAvailableSpecialConditions().map(item => (
+                                {allSpecialConditions.map(item => (
                                     <div key={item} className="flex items-center space-x-2">
                                         <Checkbox id={`cond-${item}`} />
                                         <Label htmlFor={`cond-${item}`} className="font-normal cursor-pointer">{item}</Label>
