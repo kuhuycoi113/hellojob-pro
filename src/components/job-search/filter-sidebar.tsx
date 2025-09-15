@@ -132,12 +132,21 @@ const getConvertedValue = (value: string | undefined, placeholder: string) => {
         });
         return `≈ ${formattedVnd.replace('.',',')} triệu VNĐ`;
     }
+    
+    const roundedValue = Math.round(vndValueInMillions);
+    if(roundedValue === 0 && vndValueInMillions > 0) {
+        const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        });
+        return `≈ ${formattedVnd.replace('.',',')} triệu VNĐ`;
+    }
 
-    return `≈ ${Math.round(vndValueInMillions)} triệu VNĐ`;
+    return `≈ ${roundedValue} triệu VNĐ`;
 };
 
 
-const MonthlySalaryContent = ({ filters, onFilterChange }: Pick<FilterSidebarProps, 'filters' | 'onFilterChange'>) => {
+const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<FilterSidebarProps, 'filters' | 'onFilterChange'>) => {
     
     const placeholderText = "VD: 200,000";
 
@@ -165,7 +174,7 @@ const MonthlySalaryContent = ({ filters, onFilterChange }: Pick<FilterSidebarPro
             <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, placeholderText)}</p>
         </div>
     );
-};
+});
 MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 
 
@@ -276,14 +285,28 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     }
 
     const salaryLimits: { [key: string]: number } = {
-        'Thực tập sinh kỹ năng': 500000,
-        'Kỹ năng đặc định': 1500000,
-        'Kỹ sư, tri thức': 10000000,
+        'basicSalary': 10000000,
+        'netSalary': 10000000,
+        'hourlySalary': 15000,
+        'annualIncome': 30000000,
+        'annualBonus': 5000000,
     };
     
     const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof SearchFilters) => {
         const rawValue = e.target.value;
-        onFilterChange({ [field]: rawValue });
+        let num = Number(rawValue.replace(/[^0-9]/g, ''));
+
+        if (isNaN(num)) {
+            onFilterChange({ [field]: '' });
+            return;
+        }
+
+        const limit = salaryLimits[field as keyof typeof salaryLimits];
+        if (limit && num > limit) {
+            num = limit;
+        }
+
+        onFilterChange({ [field]: String(num) });
     };
 
     const getDisplayValue = (value: string | undefined) => {
