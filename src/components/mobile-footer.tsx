@@ -147,64 +147,35 @@ export function MobileFooter() {
         "md:hidden sticky top-16 z-40 bg-background border-b transition-transform duration-300",
         !showNav && "-translate-y-full"
     )}>
-      <div className="flex justify-around items-center h-16">
+      <div className="flex justify-around items-center h-16 overflow-x-auto whitespace-nowrap no-scrollbar px-2">
         {mobileFooterLinks.map(({ href, icon: Icon, label }) => {
            const isActive = (activePath === href) || (href !== '/' && activePath.startsWith(href));
            return (
-            <Link href={href} key={href} className="flex flex-col items-center justify-center text-xs text-muted-foreground hover:text-primary transition-colors w-1/5 pt-1">
+            <Link href={href} key={href} className="flex flex-col items-center justify-center text-xs text-muted-foreground hover:text-primary transition-colors flex-shrink-0 w-20 pt-1">
               <Icon className={cn("h-6 w-6 mb-1", isActive ? 'text-primary' : '')} />
               <span className={cn( "text-center leading-tight", isActive ? 'text-primary font-bold' : '')}>{label}</span>
             </Link>
            )
         })}
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-             <button className="flex flex-col items-center justify-center text-xs text-muted-foreground hover:text-primary transition-colors w-1/5 pt-1">
-               <LayoutGrid className={cn("h-6 w-6 mb-1", isQuickAccessLinkActive && 'text-primary')} />
-               <span className={cn("text-center leading-tight", isQuickAccessLinkActive && 'text-primary font-bold')}>Menu</span>
-             </button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-full max-w-sm flex flex-col p-0">
-            <SheetHeader className="p-4 border-b flex flex-row items-center justify-between">
-               <SheetTitle asChild>
-                 <Link
-                    href="/"
-                    className="flex items-center gap-2"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Logo />
-                  </Link>
-               </SheetTitle>
-            </SheetHeader>
-            <div className="flex flex-col h-full overflow-y-auto">
-               {isLoggedIn ? <LoggedInContent /> : <LoggedOutContent />}
-              
-              <div className="mt-auto p-4">
-                  <DropdownMenuSeparator />
-                  <div className="p-2">
-                    <DropdownMenuRadioGroup
-                      value={role}
-                      onValueChange={(value) => setRole(value as 'candidate' | 'candidate-empty-profile' | 'guest')}
-                    >
-                      <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
-                        <div className="grid grid-cols-2 gap-2">
-                           <Button variant={role === 'candidate' ? 'default' : 'outline'} size="sm" onClick={() => setRole('candidate')}>Có Profile</Button>
-                           <Button variant={role === 'candidate-empty-profile' ? 'default' : 'outline'} size="sm" onClick={() => setRole('candidate-empty-profile')}>Profile Trắng</Button>
-                           <Button variant={role === 'guest' ? 'default' : 'outline'} size="sm" className="col-span-2" onClick={() => setRole('guest')}>Khách</Button>
-                        </div>
-                    </DropdownMenuRadioGroup>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <SheetClose asChild>
-                    <Button variant="ghost" className="w-full justify-center mt-4">
-                        <X className="mr-2 h-4 w-4"/> Đóng
-                      </Button>
-                  </SheetClose>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
       </div>
     </footer>
   );
+}
+
+// Helper for hiding scrollbar
+const noScrollbarCSS = `
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+`;
+
+if (typeof window !== 'undefined') {
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = noScrollbarCSS;
+    document.head.appendChild(styleSheet);
 }
