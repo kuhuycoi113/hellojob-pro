@@ -34,9 +34,9 @@ export function RootProvider({
         <ChatProvider>
             <AuthProvider>
                 {!isCallPage && <Header />}
+                {!isCallPage && <MobileFooter />}
                 <main className="min-h-screen">{children}</main>
                 {!isCallPage && <Footer />}
-                {!isCallPage && <MobileFooter />}
                 {!isCallPage && <FloatingChatWidget />}
                 <Toaster />
             </AuthProvider>
