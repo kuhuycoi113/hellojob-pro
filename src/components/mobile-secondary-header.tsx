@@ -2,31 +2,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, Sparkles, User, Briefcase, MessageSquare, LayoutGrid, X, Compass, BookOpen, LifeBuoy, Info, Handshake, Gem, UserPlus, PlusCircle, FileText, LogIn } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-  SheetTrigger,
-} from '@/components/ui/sheet';
 import { useState, useEffect } from 'react';
-import { Button } from './ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator } from './ui/dropdown-menu';
-import Image from 'next/image';
-import { useChat } from '@/contexts/ChatContext';
-import { mainNavLinks, quickAccessLinks, mobileFooterLinks } from '@/lib/nav-data';
-import { useAuth } from '@/contexts/AuthContext';
+import { mobileFooterLinks } from '@/lib/nav-data';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-
-const Logo = () => (
-    <Image src="/img/HJPNG.png" alt="HelloJob Logo" width={110} height={36} className="h-9 w-auto" />
-);
 
 export function MobileSecondaryHeader() {
   const pathname = usePathname();
@@ -44,9 +25,10 @@ export function MobileSecondaryHeader() {
     }
   
     const controlNavbar = () => {
-      if (window.scrollY > lastScrollY && window.scrollY > 80) {
+      // If scrolling down and past the header height, hide the nav.
+      if (window.scrollY > lastScrollY && window.scrollY > 128) { // 128px is h-16 (header) + h-14 (secondary header)
         setShowNav(false);
-      } else {
+      } else { // If scrolling up, show the nav.
         setShowNav(true);
       }
       setLastScrollY(window.scrollY);
