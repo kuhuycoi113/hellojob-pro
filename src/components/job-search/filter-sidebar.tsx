@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -673,14 +672,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     <Select><SelectTrigger><SelectValue placeholder="Chọn ca làm việc" /></SelectTrigger>
                                         <SelectContent>
                                             {workShifts.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                 <div className="space-y-2">
-                                    <Label>Số vòng phỏng vấn</Label>
-                                    <Select><SelectTrigger><SelectValue placeholder="Chọn số vòng" /></SelectTrigger>
-                                        <SelectContent>
-                                            {interviewRoundsOptions.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
