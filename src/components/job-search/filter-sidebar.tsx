@@ -111,12 +111,17 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
 
     useEffect(() => {
-        const industries = allIndustries;
+        const industries = filters.visa ? (industriesByJobType[filters.visa as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
         const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
         setAvailableIndustries(uniqueIndustries);
 
-        const allJobDetails = allIndustries.flatMap(ind => ind.keywords);
-        setAvailableJobDetails([...new Set(allJobDetails)]);
+        if (filters.industry && filters.industry !== 'all') {
+            const selectedIndustryData = allIndustries.find(ind => ind.name === filters.industry);
+            setAvailableJobDetails(selectedIndustryData?.keywords || []);
+        } else {
+             const allJobDetails = uniqueIndustries.flatMap(ind => ind.keywords);
+             setAvailableJobDetails([...new Set(allJobDetails)]);
+        }
 
     }, [filters.visa, filters.industry]);
 
