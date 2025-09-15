@@ -146,7 +146,10 @@ const MonthlySalaryContent = ({ filters, onFilterChange }: Pick<FilterSidebarPro
     };
 
     const getDisplayValue = (value: string | undefined) => {
-        return value || '';
+        if (!value) return '';
+        const num = Number(value.replace(/[^0-9]/g, ''));
+        if (isNaN(num)) return '';
+        return num.toLocaleString('ja-JP');
     };
 
     return (
@@ -341,6 +344,25 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     const shouldShowLươngNăm = !["Thực tập sinh 3 năm", "Thực tập sinh 1 năm"].includes(filters.visaDetail || "");
     const shouldShowTabs = shouldShowLươngGiờ || shouldShowLươngNăm;
 
+    const getConvertedHourlyValue = (value: string | undefined, placeholder: string) => {
+        const numericString = value || placeholder.replace(/[^0-9]/g, '');
+        const num = Number(numericString.replace(/[^0-9]/g, ''));
+        
+        if (isNaN(num)) return "≈ 0 trăm nghìn VNĐ";
+
+        const vndValue = num * JPY_VND_RATE;
+        const vndValueInHundredK = vndValue / 100000;
+        
+        if (num === 0) {
+            return "≈ 0 trăm nghìn VNĐ";
+        }
+        
+        const formattedVnd = vndValueInHundredK.toLocaleString('vi-VN', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        });
+        return `≈ ${formattedVnd.replace('.',',')} trăm nghìn VNĐ`;
+    };
     
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -520,7 +542,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                                     onChange={(e) => handleSalaryInputChange(e, 'hourlySalary')}
                                                     value={getDisplayValue(filters.hourlySalary)} 
                                                 />
-                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary, 'VD: 1,000')}</p>
+                                                <p className="text-xs text-muted-foreground">{getConvertedHourlyValue(filters.hourlySalary, 'VD: 1,000')}</p>
                                             </div>
                                         </TabsContent>
                                         <TabsContent value="yearly" className="pt-4">
