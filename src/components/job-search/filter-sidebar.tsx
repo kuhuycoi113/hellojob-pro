@@ -63,7 +63,16 @@ const experienceYears = [
     '4,5 - 5 năm',
     'Trên 5 năm'
 ];
-const visionRequirements = ["Yêu cầu thị lực rất tốt", "Yêu cầu thị lực tốt", "Không yêu cầu thị lực", "Không nhận cận thị", "Không nhận viễn thị", "Không nhận loạn thị", "Không nhận mù màu"];
+const visionRequirements = [
+    "Không yêu cầu",
+    "Yêu cầu thị lực tốt",
+    "Không nhận cận thị",
+    "Không nhận viễn thị",
+    "Không nhận loạn thị",
+    "Không nhận mù màu",
+    "Yêu cầu thị lực rất tốt",
+    "20/20", "10/10", "8/10"
+];
 const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
 
 const interviewRoundsOptions = ["1 vòng", "2 vòng", "3 vòng", "4 vòng", "5 vòng"];
@@ -265,6 +274,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
         return false;
     })();
+    const showEducationFilter = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
 
 
     return (
@@ -491,6 +501,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     </Select>
                                 </div>
                                 )}
+                                {showEducationFilter && (
                                  <div>
                                     <Label className="font-semibold">Học vấn</Label>
                                     <Select>
@@ -500,6 +511,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                )}
                                 <div className="space-y-2">
                                     <Label>Yêu cầu kinh nghiệm</Label>
                                     <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
