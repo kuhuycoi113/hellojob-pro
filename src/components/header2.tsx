@@ -139,20 +139,20 @@ export function Header2() {
         "md:hidden fixed top-16 left-0 right-0 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b z-40 transition-transform duration-300",
         isVisible ? "translate-y-0" : "-translate-y-full"
     )}>
-      <div className="flex justify-around items-center h-16">
-        {mobileFooterLinks.map(({ href, icon: Icon, label }) => {
+      <div className="flex items-center h-16 overflow-x-auto whitespace-nowrap px-2">
+        {mainNavLinks.map(({ href, icon: Icon, label }) => {
            const isActive = (activePath === href) || (href !== '/' && activePath.startsWith(href));
            return (
-            <Link href={href} key={href} className="flex items-center justify-center text-xs text-muted-foreground hover:text-primary transition-colors w-1/5 p-1">
-              <Icon className={cn("h-5 w-5 mr-1", isActive ? 'text-primary' : '')} />
-              <span className={cn( "text-center leading-tight", isActive ? 'text-primary font-bold' : '')}>{label}</span>
+            <Link href={href} key={href} className="flex items-center justify-center text-sm text-muted-foreground hover:text-primary transition-colors p-3 flex-shrink-0">
+              {Icon && <Icon className={cn("h-5 w-5 mr-2", isActive ? 'text-primary' : '')} />}
+              <span className={cn( "text-center leading-tight", isActive ? 'text-primary font-bold' : 'font-medium')}>{label}</span>
             </Link>
            )
         })}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
-             <button className="flex flex-col items-center justify-center text-xs text-muted-foreground hover:text-primary transition-colors w-1/5 pt-1">
-               <LayoutGrid className={cn("h-6 w-6 mb-1", isQuickAccessLinkActive && 'text-primary')} />
+             <button className="flex items-center justify-center text-sm text-muted-foreground hover:text-primary transition-colors p-3 flex-shrink-0">
+               <LayoutGrid className={cn("h-5 w-5 mr-2", isQuickAccessLinkActive && 'text-primary')} />
                <span className={cn("text-center leading-tight", isQuickAccessLinkActive && 'text-primary font-bold')}>Menu</span>
              </button>
           </SheetTrigger>
