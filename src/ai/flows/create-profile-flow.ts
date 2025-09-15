@@ -36,11 +36,15 @@ const prompt = ai.definePrompt({
   input: {schema: CreateProfileInputSchema},
   output: {schema: CandidateProfileSchema, format: 'json'},
   model: 'googleai/gemini-2.0-flash',
-  prompt: `You are an expert resume analyst. Your task is to extract structured information from the provided document or text.
+  prompt: `You are an expert resume analyst. Your task is to extract structured information from the provided document or text and generate a professional profile.
+
+  Follow this process carefully:
+  1.  **Prioritize Structured Data:** First, meticulously scan the document/text to find and extract information that directly maps to the fields in the provided JSON schema (e.g., 'name', 'school', 'company', dates, etc.). Populate these fields with the exact information found.
+  2.  **Generate Descriptive Fields:** After extracting all possible structured data, generate the content for descriptive fields like 'about'. Read the entire document to understand the candidate's background and write a brief, professional summary.
+  3.  **Handle Missing Information:** If some information is not available in the source, leave the corresponding string fields empty and array fields as empty arrays. Do not invent information.
+
   Analyze the content carefully and populate all the fields in the provided JSON schema.
   Pay close attention to dates, job titles, and skills.
-
-  If some information is not available, leave the corresponding string fields empty and array fields as empty arrays.
   
   {{#if document}}
   Document:
