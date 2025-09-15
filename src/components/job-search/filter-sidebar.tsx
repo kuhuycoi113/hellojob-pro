@@ -442,7 +442,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Ngày phỏng vấn</Label>
+                                    <Label>Phỏng vấn từ giờ đến</Label>
                                      <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
