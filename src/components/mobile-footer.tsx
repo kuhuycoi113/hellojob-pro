@@ -118,6 +118,27 @@ export function MobileFooter() {
         <Button asChild className="w-full" size="lg" onClick={() => setIsOpen(false)}>
           <Link href="/candidate-profile"><LogIn className="mr-2"/>Đăng nhập / Đăng ký</Link>
         </Button>
+        <DropdownMenuSeparator/>
+         <div className="p-2">
+            <div className="grid grid-cols-3 gap-2">
+            {quickAccessLinks.map((link) => {
+                const isActive = (activePath === link.href) || (link.href !== '/' && activePath.startsWith(link.href));
+                return (
+                <Link 
+                    key={link.href}
+                    id={link.href === '/roadmap' ? 'MMN01' : undefined}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className={cn("flex flex-col items-center justify-start p-2 h-24 cursor-pointer rounded-md hover:bg-accent/80", isActive ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary")}>
+                    <div className={cn("h-10 flex items-center justify-center", isActive ? "text-primary" : "text-muted-foreground")}>
+                    <link.icon className="h-8 w-8"/>
+                    </div>
+                    <span className={cn("text-xs text-center leading-tight font-medium", isActive ? "text-primary" : "text-foreground")}>{link.label}</span>
+                </Link>
+                )
+            })}
+            </div>
+        </div>
      </div>
   );
 
