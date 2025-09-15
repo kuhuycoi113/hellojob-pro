@@ -230,7 +230,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     const monthlySalaryContent = (
       <div className="space-y-2">
         <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
-        <Input id="basic-salary-jpy" type="text" placeholder="VD: 200,000" onChange={(e) => onFilterChange({ basicSalary: e.target.value.replace(/,/g, '') })}/>
+        <Input id="basic-salary-jpy" type="text" placeholder="VD: 200,000" onChange={(e) => onFilterChange({ basicSalary: e.target.value.replace(/,/g, '') })} value={filters.basicSalary?.toLocaleString('ja-JP') || ''} />
         <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, 'jpy')}</p>
       </div>
     );
@@ -238,7 +238,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     const netSalaryContent = (
        <div className="space-y-2">
         <Label htmlFor="net-salary-jpy">Thực lĩnh (JPY/tháng)</Label>
-        <Input id="net-salary-jpy" type="text" placeholder="VD: 160,000" onChange={(e) => onFilterChange({ netSalary: e.target.value.replace(/,/g, '') })}/>
+        <Input id="net-salary-jpy" type="text" placeholder="VD: 160,000" onChange={(e) => onFilterChange({ netSalary: e.target.value.replace(/,/g, '') })} value={filters.netSalary?.toLocaleString('ja-JP') || ''} />
         <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'jpy')}</p>
       </div>
     );
@@ -386,7 +386,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                  <div className="space-y-2">
                                     <Label>Tuổi</Label>
                                     <Slider
-                                        defaultValue={[18, 60]}
+                                        defaultValue={[18, 36]}
                                         min={18}
                                         max={70}
                                         step={1}
@@ -394,7 +394,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     />
                                     <div className="flex justify-between text-xs text-muted-foreground">
                                         <span>{filters.age?.[0] || 18} tuổi</span>
-                                        <span>{filters.age?.[1] || 70} tuổi</span>
+                                        <span>{filters.age?.[1] || 36} tuổi</span>
                                     </div>
                                 </div>
                                  <div className="space-y-2">
