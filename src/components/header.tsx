@@ -54,6 +54,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { AuthDialog } from './auth-dialog';
 import { locations } from '@/lib/location-data';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 
 export const Logo = ({ className }: { className?: string }) => (
@@ -77,10 +78,36 @@ export function Header() {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
 
+  const [showNav, setShowNav] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const isMobile = useIsMobile();
+
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+  
+  useEffect(() => {
+    if (!isMobile) {
+      setShowNav(true);
+      return;
+    }
+
+    const controlNavbar = () => {
+      if (window.scrollY > lastScrollY && window.scrollY > 80) { // if scroll down hide the navbar
+        setShowNav(false);
+      } else { // if scroll up show the navbar
+        setShowNav(true);
+      }
+      setLastScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', controlNavbar);
+
+    return () => {
+      window.removeEventListener('scroll', controlNavbar);
+    };
+  }, [isMobile, lastScrollY]);
 
 
   const handleCreateProfileRedirect = () => {
@@ -424,7 +451,10 @@ export function Header() {
 
   return (
     <>
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className={cn(
+        "sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-transform duration-300",
+        !showNav && "-translate-y-full"
+    )}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <Logo />
