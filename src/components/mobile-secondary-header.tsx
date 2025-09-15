@@ -25,8 +25,8 @@ export function MobileSecondaryHeader() {
     }
   
     const controlNavbar = () => {
-      // If scrolling down and past the header height, hide the nav.
-      if (window.scrollY > lastScrollY && window.scrollY > 128) { // 128px is h-16 (header) + h-14 (secondary header)
+      // If scrolling down and past a small threshold, hide the nav.
+      if (window.scrollY > lastScrollY && window.scrollY > 80) { // 80px is a reasonable threshold
         setShowNav(false);
       } else { // If scrolling up, show the nav.
         setShowNav(true);
