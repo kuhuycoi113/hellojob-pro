@@ -47,7 +47,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 desiredIndustry: preferences.desiredIndustry || profile.desiredIndustry,
                 aspirations: {
                     ...profile.aspirations,
-                    ...preferences,
+                    desiredVisaType: preferences.desiredVisaType,
+                    desiredVisaDetail: preferences.desiredVisaDetail,
+                    desiredLocation: preferences.desiredLocation,
                 }
             };
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));

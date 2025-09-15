@@ -53,6 +53,7 @@ import { mainNavLinks, quickAccessLinks } from '@/lib/nav-data';
 import { useAuth } from '@/contexts/AuthContext';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { AuthDialog } from './auth-dialog';
+import { locations } from '@/lib/location-data';
 
 
 export const Logo = ({ className }: { className?: string }) => (
