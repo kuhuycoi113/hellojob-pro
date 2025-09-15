@@ -249,7 +249,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     );
     
     const showTattooFilter = !['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
-    
+
     const getAvailableSpecialConditions = () => {
         const visaDetail = filters.visaDetail || '';
         
@@ -278,6 +278,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         return allSpecialConditions.filter(cond => !conditionsToHide.includes(cond));
     };
 
+    const showEnglishLevelFilter = (['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '')) || 
+      (['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'].includes(filters.visaDetail || '') && ['Nhà hàng', 'Hàng không', 'Vệ sinh toà nhà', 'Lưu trú, khách sạn'].includes(filters.industry || ''));
+
+    const showEducationFilter = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -619,3 +623,4 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         </div>
     );
 }
+
