@@ -1044,15 +1044,27 @@ const LoggedInView = () => {
                 <DialogHeader>
                     <DialogTitle>Mức lương mong muốn tối thiểu/tháng</DialogTitle>
                 </DialogHeader>
-                <div className="pt-4 space-y-2">
-                    <Label htmlFor="salary-jpy">Lương tối thiểu (JPY)</Label>
-                    <Input 
-                        id="salary-jpy" 
-                        placeholder="200,000"
-                        value={getDisplayValue(tempSalary, 'jpy')}
-                        onChange={(e) => handleCurrencyInputChange(e.target.value, 'jpy', 'salary')}
-                    />
-                    <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'jpy')}</p>
+                <div className="pt-4 space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="salary-jpy">Lương tối thiểu (JPY)</Label>
+                        <Input 
+                            id="salary-jpy" 
+                            placeholder="200,000"
+                            value={getDisplayValue(tempSalary, 'jpy')}
+                            onChange={(e) => handleCurrencyInputChange(e.target.value, 'jpy', 'salary')}
+                        />
+                         <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'jpy')}</p>
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="salary-vnd">Lương tối thiểu (VNĐ)</Label>
+                        <Input 
+                            id="salary-vnd" 
+                            placeholder="36,000,000"
+                            value={getDisplayValue(tempSalary, 'vnd')}
+                            onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'salary')}
+                        />
+                         <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'vnd')}</p>
+                    </div>
                 </div>
                 <DialogFooter className="pt-4">
                     <Button variant="outline" onClick={() => setIsSalaryDialogOpen(false)}>Hủy</Button>
@@ -1066,15 +1078,27 @@ const LoggedInView = () => {
                 <DialogHeader>
                     <DialogTitle>Mức phí mong muốn</DialogTitle>
                 </DialogHeader>
-                <div className="pt-4 space-y-2">
-                    <Label htmlFor="fee-usd">Phí (USD)</Label>
-                    <Input 
-                        id="fee-usd" 
-                        placeholder="3,000 USD"
-                        value={getDisplayValue(tempFee, 'usd')}
-                        onChange={(e) => handleCurrencyInputChange(e.target.value, 'usd', 'fee')}
-                    />
-                    <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'usd')}</p>
+                <div className="pt-4 space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="fee-usd">Phí (USD)</Label>
+                        <Input 
+                            id="fee-usd" 
+                            placeholder="3,000"
+                            value={getDisplayValue(tempFee, 'usd')}
+                            onChange={(e) => handleCurrencyInputChange(e.target.value, 'usd', 'fee')}
+                        />
+                         <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'usd')}</p>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="fee-vnd">Phí (VNĐ)</Label>
+                        <Input 
+                            id="fee-vnd" 
+                            placeholder="75,000,000"
+                            value={getDisplayValue(tempFee, 'vnd')}
+                            onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'fee')}
+                        />
+                        <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'vnd')}</p>
+                    </div>
                 </div>
                 <DialogFooter className="pt-4">
                     <Button variant="outline" onClick={() => setIsFeeDialogOpen(false)}>Hủy</Button>
@@ -1288,6 +1312,7 @@ export default function JobsDashboardPage() {
     
 
     
+
 
 
 
