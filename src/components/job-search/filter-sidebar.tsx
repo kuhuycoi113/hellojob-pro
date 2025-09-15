@@ -251,7 +251,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         if (isNaN(num) || num === 0) return '';
         
         const vndValueInMillions = (num * JPY_VND_RATE) / 1000000;
-        // Check if it's a whole number
         if (vndValueInMillions % 1 === 0) {
             return `≈ ${vndValueInMillions.toLocaleString('vi-VN')} triệu đồng`;
         }
@@ -324,7 +323,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements', 'interviewLocation', 'process']} className="w-full">
+                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements', 'interviewLocation', 'process', 'salary', 'netSalary']} className="w-full">
                          <AccordionItem value="jobType">
                             <AccordionTrigger className="text-base font-semibold">
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
@@ -354,7 +353,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
                         <AccordionItem value="industry">
                             <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><Building className="h-5 w-5"/>Ngành nghề & Công việc</span>
+                                <span className="flex items-center gap-2"><Building className="h-5 w-5"/>Ngành nghề &amp; Công việc</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
@@ -472,13 +471,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
 
                         <AccordionItem value="salary">
                              <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương & Đãi ngộ</span>
+                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương và đãi ngộ</span>
                             </AccordionTrigger>
                             <AccordionContent className="pt-4">
                                 <Tabs defaultValue="basic">
                                     <TabsList className="grid w-full grid-cols-2 h-auto">
                                         <TabsTrigger value="basic" className="text-xs">Lương tháng</TabsTrigger>
-                                        <TabsTrigger value="net" className="text-xs">Thực lĩnh</TabsTrigger>
                                         {showHourlyWage && <TabsTrigger value="hourly" className="text-xs">Lương giờ</TabsTrigger>}
                                         {showYearlyWage && <TabsTrigger value="yearly" className="text-xs">Lương năm</TabsTrigger>}
                                     </TabsList>
@@ -495,25 +493,18 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                             <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary) || '≈ 36.0 triệu đồng'}</p>
                                         </div>
                                     </TabsContent>
-                                    <TabsContent value="net" className="pt-4">
-                                         <div className="space-y-2">
-                                            <Label htmlFor="net-salary-jpy">Thực lĩnh tối thiểu (JPY/tháng)</Label>
-                                            <Input 
-                                                id="net-salary-jpy" 
-                                                type="text" 
-                                                placeholder="VD: 160,000" 
-                                                onChange={(e) => handleSalaryInputChange(e, 'netSalary')}
-                                                value={getDisplayValue(filters.netSalary)} 
-                                            />
-                                            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary)}</p>
-                                        </div>
-                                    </TabsContent>
                                     {showHourlyWage && (
                                         <TabsContent value="hourly" className="pt-4">
                                             <div className="space-y-2">
                                                 <Label htmlFor="hourly-salary-jpy">Lương giờ (JPY)</Label>
-                                                <Input id="hourly-salary-jpy" type="text" placeholder="VD: 1,000" />
-                                                <p className="text-xs text-muted-foreground">≈ 180,000 đồng</p>
+                                                <Input 
+                                                  id="hourly-salary-jpy" 
+                                                  type="text" 
+                                                  placeholder="VD: 1,000" 
+                                                  onChange={(e) => handleSalaryInputChange(e, 'hourlySalary')}
+                                                  value={getDisplayValue(filters.hourlySalary)} 
+                                                />
+                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary) || '≈ 180,000 đồng'}</p>
                                             </div>
                                         </TabsContent>
                                     )}
@@ -522,18 +513,49 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                             <div className="space-y-4">
                                                 <div className="space-y-2">
                                                     <Label htmlFor="annual-income-jpy">Thu nhập năm (JPY)</Label>
-                                                    <Input id="annual-income-jpy" type="text" placeholder="VD: 3,000,000" />
-                                                    <p className="text-xs text-muted-foreground">≈ 540.0 triệu đồng</p>
+                                                    <Input 
+                                                        id="annual-income-jpy" 
+                                                        type="text" 
+                                                        placeholder="VD: 3,000,000" 
+                                                        onChange={(e) => handleSalaryInputChange(e, 'annualIncome')}
+                                                        value={getDisplayValue(filters.annualIncome)} 
+                                                    />
+                                                     <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualIncome)}</p>
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label htmlFor="annual-bonus-jpy">Thưởng năm (JPY)</Label>
-                                                    <Input id="annual-bonus-jpy" type="text" placeholder="VD: 500,000" />
-                                                     <p className="text-xs text-muted-foreground">≈ 90.0 triệu đồng</p>
+                                                    <Input 
+                                                        id="annual-bonus-jpy" 
+                                                        type="text" 
+                                                        placeholder="VD: 500,000" 
+                                                        onChange={(e) => handleSalaryInputChange(e, 'annualBonus')}
+                                                        value={getDisplayValue(filters.annualBonus)} 
+                                                    />
+                                                     <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualBonus)}</p>
                                                 </div>
                                             </div>
                                         </TabsContent>
                                     )}
                                 </Tabs>
+                            </AccordionContent>
+                        </AccordionItem>
+                        
+                         <AccordionItem value="netSalary">
+                            <AccordionTrigger className="text-base font-semibold">
+                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-500"/>Thực lĩnh</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-4 pt-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="net-salary-jpy">Thực lĩnh tối thiểu (JPY/tháng)</Label>
+                                    <Input 
+                                        id="net-salary-jpy" 
+                                        type="text" 
+                                        placeholder="VD: 160,000" 
+                                        onChange={(e) => handleSalaryInputChange(e, 'netSalary')}
+                                        value={getDisplayValue(filters.netSalary)} 
+                                    />
+                                    <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary)}</p>
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
                         
@@ -741,5 +763,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         </div>
     );
 }
+
+    
 
     
