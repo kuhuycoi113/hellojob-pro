@@ -125,8 +125,8 @@ export function Header2() {
         {mobileFooterLinks.map(({ href, icon: Icon, label }) => {
            const isActive = (activePath === href) || (href !== '/' && activePath.startsWith(href));
            return (
-            <Link href={href} key={href} className="flex flex-col items-center justify-center text-xs text-muted-foreground hover:text-primary transition-colors w-1/5 pt-1">
-              <Icon className={cn("h-6 w-6 mb-1", isActive ? 'text-primary' : '')} />
+            <Link href={href} key={href} className="flex items-center justify-center text-xs text-muted-foreground hover:text-primary transition-colors w-1/5 p-1">
+              <Icon className={cn("h-5 w-5 mr-1", isActive ? 'text-primary' : '')} />
               <span className={cn( "text-center leading-tight", isActive ? 'text-primary font-bold' : '')}>{label}</span>
             </Link>
            )
