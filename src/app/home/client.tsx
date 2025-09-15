@@ -438,32 +438,38 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
   );
 }
 
+const initialSearchFilters: SearchFilters = {
+    visa: '', 
+    visaDetail: '', 
+    industry: '', 
+    location: '', 
+    interviewLocation: '', 
+    jobDetail: '',
+    height: [135, 210],
+    weight: [35, 120],
+    age: [18, 70],
+    basicSalary: '',
+    netSalary: '',
+    hourlySalary: '',
+    annualIncome: '',
+    annualBonus: '',
+    interviewDate: '',
+    specialConditions: [],
+    languageRequirement: '',
+    educationRequirement: '',
+    yearsOfExperience: '',
+    tattooRequirement: '',
+    hepatitisBRequirement: '',
+};
 
 export default function HomeClient() {
   const [isSearching, setIsSearching] = useState(false);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({ 
-      visa: '', 
-      visaDetail: '', 
-      industry: '', 
-      location: '', 
-      interviewLocation: '', 
-      jobDetail: '',
-      height: [135, 210],
-      weight: [35, 120],
-      age: [18, 70],
-      basicSalary: '',
-      netSalary: '',
-      hourlySalary: '',
-      annualIncome: '',
-      annualBonus: '',
-  });
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>(initialSearchFilters);
 
   const handleSearch = (filters: SearchFilters) => {
     applyFilters(filters);
     setIsSearching(true);
-    // Remove scroll to top to keep the search bar in view
-    // window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
   const handleFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
@@ -474,8 +480,22 @@ export default function HomeClient() {
       }
   }, [searchFilters, isSearching]);
 
+  const handleResetFilters = useCallback(() => {
+    setSearchFilters(initialSearchFilters);
+    if(isSearching) {
+        applyFilters(initialSearchFilters);
+    }
+  }, [isSearching]);
+
   const applyFilters = useCallback((currentFilters: SearchFilters) => {
-     const { visa, visaDetail, industry, location, jobDetail, interviewLocation, interviewDate } = currentFilters;
+     const { 
+         visa, visaDetail, industry, location, jobDetail, interviewLocation, 
+         interviewDate, height, weight, age, basicSalary, netSalary, 
+         hourlySalary, annualIncome, annualBonus, specialConditions,
+         languageRequirement, educationRequirement, yearsOfExperience, 
+         tattooRequirement, hepatitisBRequirement 
+    } = currentFilters;
+     
     const results = jobData.filter(job => {
         
         let visaMatch = true;
@@ -520,7 +540,29 @@ export default function HomeClient() {
             }
         })();
 
-        return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && interviewDateMatch;
+        // Salary filters
+        const parseSalary = (salaryStr?: string) => salaryStr ? parseInt(salaryStr.replace(/[^0-9]/g, ''), 10) : 0;
+        const basicSalaryMatch = !basicSalary || parseSalary(job.salary.basic) >= parseSalary(basicSalary);
+        const netSalaryMatch = !netSalary || parseSalary(job.salary.actual) >= parseSalary(netSalary);
+        
+        // Age filter
+        const ageMatch = (() => {
+            if (!age || !job.ageRequirement) return true;
+            const [minFilterAge, maxFilterAge] = age;
+            const [minJobAge, maxJobAge] = job.ageRequirement.split('-').map(Number);
+            return minFilterAge <= maxJobAge && maxFilterAge >= minJobAge;
+        })();
+
+        // Special conditions
+        const specialConditionsMatch = !specialConditions || specialConditions.length === 0 || specialConditions.every(cond => job.tags.includes(cond));
+        
+        // Other requirements
+        const educationMatch = !educationRequirement || !job.educationRequirement || job.educationRequirement === educationRequirement;
+        const languageMatch = !languageRequirement || !job.languageRequirement || job.languageRequirement === languageRequirement;
+        const tattooMatch = !tattooRequirement || !job.tattooRequirement || job.tattooRequirement === tattooRequirement;
+        const hepatitisBMatch = !hepatitisBRequirement || !job.hepatitisBRequirement || job.hepatitisBRequirement === hepatitisBRequirement;
+
+        return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && ageMatch && specialConditionsMatch && educationMatch && languageMatch && tattooMatch && hepatitisBMatch;
     });
 
     setFilteredJobs(results);
@@ -531,7 +573,7 @@ export default function HomeClient() {
         e.preventDefault();
         if (isSearching) {
             setIsSearching(false);
-            setSearchFilters({ visa: '', visaDetail: '', industry: '', location: '', interviewLocation: '', jobDetail: '' });
+            setSearchFilters(initialSearchFilters);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
              window.location.reload();
@@ -546,7 +588,7 @@ export default function HomeClient() {
         <SearchModule onSearch={handleSearch} showHero={!isSearching} filters={searchFilters} onFilterChange={handleFilterChange} />
       
       <div className="w-full flex-grow">
-        {isSearching ? <SearchResults jobs={filteredJobs} filters={searchFilters} onFilterChange={handleFilterChange} applyFilters={() => applyFilters(searchFilters)} /> : <MainContent />}
+        {isSearching ? <SearchResults jobs={filteredJobs} filters={searchFilters} onFilterChange={handleFilterChange} applyFilters={() => applyFilters(searchFilters)} resetFilters={handleResetFilters}/> : <MainContent />}
       </div>
     </div>
   );

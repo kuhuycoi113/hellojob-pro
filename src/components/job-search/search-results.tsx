@@ -28,6 +28,11 @@ export type SearchFilters = {
     annualBonus?: string;
     interviewDate?: string;
     specialConditions?: string[];
+    languageRequirement?: string;
+    educationRequirement?: string;
+    yearsOfExperience?: string;
+    tattooRequirement?: string;
+    hepatitisBRequirement?: string;
 }
 
 type SearchResultsProps = {
@@ -35,9 +40,10 @@ type SearchResultsProps = {
     filters: SearchFilters;
     onFilterChange: (newFilters: Partial<SearchFilters>) => void;
     applyFilters: () => void;
+    resetFilters: () => void;
 }
 
-export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters }: SearchResultsProps) => {
+export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, resetFilters }: SearchResultsProps) => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(24);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
@@ -69,7 +75,7 @@ export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters }: S
         <div className="container mx-auto px-4 md:px-6 py-6">
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8">
                 <div className="hidden md:block">
-                  <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} />
+                  <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} onReset={resetFilters}/>
                 </div>
 
                 <div className="md:col-span-3 lg:col-span-3">
@@ -90,7 +96,7 @@ export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters }: S
                               </SheetDescription>
                             </SheetHeader>
                             <div className="py-4 h-[calc(100vh-8rem)] overflow-y-auto">
-                              <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} />
+                              <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} onReset={resetFilters} />
                             </div>
                           </SheetContent>
                         </Sheet>

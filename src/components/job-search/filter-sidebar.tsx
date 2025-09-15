@@ -5,14 +5,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { industriesByJobType, type Industry } from "@/lib/industry-data";
-import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks } from "lucide-react";
+import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2 } from "lucide-react";
 import { locations } from "@/lib/location-data";
 import { type SearchFilters } from './search-results';
 import { cn } from '@/lib/utils';
@@ -108,6 +108,7 @@ interface FilterSidebarProps {
     filters: SearchFilters;
     onFilterChange: (newFilters: Partial<SearchFilters>) => void;
     onApply: () => void;
+    onReset: () => void;
 }
 
 const JPY_VND_RATE = 180;
@@ -178,7 +179,7 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
 MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 
 
-export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSidebarProps) => {
+export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isFlexibleDate, setIsFlexibleDate] = useState(false);
@@ -215,8 +216,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         if (checked) {
             onFilterChange({ interviewDate: 'flexible' });
         } else {
-            // If user unchecks it, revert to empty or previous date.
-            // For simplicity, we'll clear it.
             onFilterChange({ interviewDate: '' });
         }
     };
@@ -388,12 +387,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     };
     
     return (
-        <div className="md:col-span-1 lg:col-span-1">
-            <Card>
+        <div className="md:col-span-1 lg:col-span-1 relative">
+            <Card className="flex flex-col h-full">
                 <CardHeader>
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-grow overflow-y-auto pr-4">
                     <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements', 'interviewLocation', 'process', 'salary', 'netSalary']} className="w-full">
                          <AccordionItem value="jobType">
                             <AccordionTrigger className="text-base font-semibold">
@@ -818,8 +817,13 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
-                     <Button className="w-full bg-primary text-white mt-6" onClick={onApply}>Áp dụng bộ lọc</Button>
                 </CardContent>
+                 <CardFooter className="p-4 sticky bottom-0 bg-background/95 backdrop-blur-sm border-t mt-4">
+                    <div className="grid grid-cols-2 gap-2 w-full">
+                        <Button variant="outline" onClick={onReset}><Trash2 className="mr-2 h-4 w-4" />Xóa bộ lọc</Button>
+                        <Button className="w-full bg-primary text-white" onClick={onApply}>Áp dụng</Button>
+                    </div>
+                </CardFooter>
             </Card>
         </div>
     );
