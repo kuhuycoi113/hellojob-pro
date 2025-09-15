@@ -68,7 +68,7 @@ const experienceYears = [
     '4,5 - 5 năm',
     'Trên 5 năm'
 ];
-const visionRequirements = ["Không yêu cầu", "Yêu cầu thị lực tốt", "Không nhận cận thị", "Không nhận viễn thị", "Không nhận loạn thị", "Không nhận mù màu", "Yêu cầu thị lực rất tốt", "20/20", "10/10"];
+const visionRequirements = ["Yêu cầu thị lực rất tốt", "Yêu cầu thị lực tốt", "Không yêu cầu thị lực", "Không nhận cận thị", "Không nhận viễn thị", "Không nhận loạn thị", "Không nhận mù màu"];
 const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
 
 const interviewRoundsOptions = ["1 vòng", "2 vòng", "3 vòng", "4 vòng", "5 vòng"];
@@ -316,6 +316,9 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         "Thực tập sinh 3 Go", 
         "Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"
     ].includes(filters.visaDetail || '');
+    
+    const shouldShowLươngGiờ = showHourlyWage;
+    const shouldShowLươngNăm = showYearlyWage;
 
     return (
         <div className="md:col-span-1 lg:col-span-1">
@@ -474,12 +477,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                              <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><DollarSign className="h-5 w-5"/>Lương và đãi ngộ</span>
                             </AccordionTrigger>
-                            <AccordionContent className="pt-4">
+                             <AccordionContent className="pt-4">
                                 <Tabs defaultValue="basic">
-                                    <TabsList className={cn("grid w-full h-auto", showHourlyWage ? "grid-cols-3" : "grid-cols-2")}>
+                                    <TabsList className={cn("grid w-full h-auto", shouldShowLươngGiờ && shouldShowLươngNăm ? "grid-cols-3" : "grid-cols-2")}>
                                         <TabsTrigger value="basic" className="text-xs">Lương tháng</TabsTrigger>
-                                        {showHourlyWage && <TabsTrigger value="hourly" className="text-xs">Lương giờ</TabsTrigger>}
-                                        {showYearlyWage && <TabsTrigger value="yearly" className="text-xs">Lương năm</TabsTrigger>}
+                                        {shouldShowLươngGiờ && <TabsTrigger value="hourly" className="text-xs">Lương giờ</TabsTrigger>}
+                                        {shouldShowLươngNăm && <TabsTrigger value="yearly" className="text-xs">Lương năm</TabsTrigger>}
                                     </TabsList>
                                     <TabsContent value="basic" className="pt-4">
                                         <div className="space-y-2">
@@ -491,7 +494,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                                 onChange={(e) => handleSalaryInputChange(e, 'basicSalary')}
                                                 value={getDisplayValue(filters.basicSalary)} 
                                             />
-                                            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary) || '≈ 36 triệu đồng'}</p>
+                                            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary)}</p>
                                         </div>
                                     </TabsContent>
                                      <TabsContent value="hourly" className="pt-4">
@@ -504,7 +507,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                                 onChange={(e) => handleSalaryInputChange(e, 'hourlySalary')}
                                                 value={getDisplayValue(filters.hourlySalary)} 
                                             />
-                                            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary) || '≈ 180,000 đồng'}</p>
+                                            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary)}</p>
                                         </div>
                                     </TabsContent>
                                     <TabsContent value="yearly" className="pt-4">
@@ -760,8 +763,3 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         </div>
     );
 }
-
-    
-
-    
-
