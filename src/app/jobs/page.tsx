@@ -651,11 +651,12 @@ const LoggedInView = () => {
                          <Button
                             id="highlight-target-button"
                             variant="ghost"
-                            size="icon"
+                            size="sm"
                             className="ml-auto flex-shrink-0"
                             onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}
                         >
-                            <Pencil className="h-4 w-4"/>
+                            <span className="hidden sm:inline">Sửa gợi ý</span>
+                            <Pencil className="h-4 w-4 sm:ml-2"/>
                         </Button>
                     </div>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
