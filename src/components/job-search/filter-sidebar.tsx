@@ -229,19 +229,33 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     
     const isNewcomerVisa = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Đặc định đi mới"].includes(filters.visaDetail || '');
 
-    const handleSalaryInputChange = (value: string, currency: 'vnd' | 'jpy') => {
-        let num = parseInt(value.replace(/[.,]/g, ''));
-        if (isNaN(num)) num = 0;
-        const baseValue = currency === 'vnd' ? String(Math.round(num / JPY_VND_RATE)) : String(num);
-        // This assumes you have a way to update the filter state, e.g., onFilterChange({ basicSalary: baseValue });
+    const salaryLimits: { [key: string]: number } = {
+        'Thực tập sinh kỹ năng': 500000,
+        'Kỹ năng đặc định': 1500000,
+        'Kỹ sư, tri thức': 10000000,
     };
 
-    const getDisplayValue = (value: string | undefined, currency: 'vnd' | 'jpy') => {
+    const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const rawValue = e.target.value;
+        // Remove non-digit characters
+        const numericValue = parseInt(rawValue.replace(/[^0-9]/g, ''), 10);
+        
+        if (isNaN(numericValue)) {
+            onFilterChange({ basicSalary: '' });
+            return;
+        }
+
+        const limit = salaryLimits[filters.visa as keyof typeof salaryLimits] || 10000000;
+        const clampedValue = Math.min(numericValue, limit);
+        
+        onFilterChange({ basicSalary: String(clampedValue) });
+    };
+
+    const getDisplayValue = (value: string | undefined) => {
         if (!value) return '';
         const num = Number(value);
-        if (isNaN(num) || num === 0) return '';
-        const valueToFormat = currency === 'vnd' ? Math.round(num * JPY_VND_RATE) : num;
-        return valueToFormat.toLocaleString(currency === 'vnd' ? 'vi-VN' : 'ja-JP');
+        if (isNaN(num)) return '';
+        return num.toLocaleString('ja-JP');
     };
     
     const getConvertedValue = (value: string | undefined) => {
@@ -260,9 +274,18 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
     const monthlySalaryContent = (
       <div className="space-y-2">
         <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
-        <Input id="basic-salary-jpy" type="text" placeholder="VD: 200,000" onChange={(e) => onFilterChange({ basicSalary: e.target.value.replace(/,/g, '') })} value={filters.basicSalary?.toLocaleString('ja-JP') || ''} />
-         {!filters.basicSalary && <p className="text-xs text-muted-foreground">≈ 36.0 triệu đồng</p>}
-         {filters.basicSalary && <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary)}</p>}
+        <Input 
+            id="basic-salary-jpy" 
+            type="text" 
+            placeholder="VD: 200,000" 
+            onChange={handleSalaryInputChange} 
+            value={getDisplayValue(filters.basicSalary)} 
+        />
+         {filters.basicSalary ? (
+             <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary)}</p>
+         ) : (
+             <p className="text-xs text-muted-foreground">≈ 36.0 triệu đồng</p>
+         )}
       </div>
     );
     
