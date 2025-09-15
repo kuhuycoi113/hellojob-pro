@@ -63,11 +63,7 @@ const experienceYears = [
     '4,5 - 5 năm',
     'Trên 5 năm'
 ];
-const visionRequirements = [
-    "Không yêu cầu", "Yêu cầu thị lực tốt", "Không nhận cận thị", 
-    "Không nhận viễn thị", "Không nhận loạn thị", "Không nhận mù màu", 
-    "Yêu cầu thị lực rất tốt", "20/20", "10/10", "8/10"
-];
+const visionRequirements = ["Không yêu cầu", "Yêu cầu thị lực tốt", "Không nhận cận thị", "Không nhận viễn thị", "Không nhận loạn thị", "Không nhận mù màu", "Yêu cầu thị lực rất tốt", "20/20", "10/10", "8/10"];
 const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
 
 const interviewRoundsOptions = ["1 vòng", "2 vòng", "3 vòng", "4 vòng", "5 vòng"];
@@ -279,7 +275,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements']} className="w-full">
+                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements', 'process']} className="w-full">
                          <AccordionItem value="jobType">
                             <AccordionTrigger className="text-base font-semibold">
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
