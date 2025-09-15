@@ -243,13 +243,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
         return valueToFormat.toLocaleString(currency === 'vnd' ? 'vi-VN' : 'ja-JP');
     };
     
-    const getConvertedValue = (value: string | undefined, currency: 'vnd' | 'jpy') => {
+    const getConvertedValue = (value: string | undefined, currency: 'jpy') => {
         if (!value) return '';
         const num = Number(value);
         if (isNaN(num) || num === 0) return '';
-        if (currency === 'vnd') {
-            return `≈ ${num.toLocaleString('ja-JP')} JPY`;
-        }
         
         const vndValueInMillions = (num * JPY_VND_RATE) / 1000000;
         const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
@@ -263,7 +260,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
       <div className="space-y-2">
         <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
         <Input id="basic-salary-jpy" type="text" placeholder="VD: 200,000" onChange={(e) => onFilterChange({ basicSalary: e.target.value.replace(/,/g, '') })} value={filters.basicSalary?.toLocaleString('ja-JP') || ''} />
-        {filters.basicSalary && <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, 'jpy')}</p>}
+         {!filters.basicSalary && <p className="text-xs text-muted-foreground">≈ 36 triệu đồng</p>}
+         {filters.basicSalary && <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, 'jpy')}</p>}
       </div>
     );
     
