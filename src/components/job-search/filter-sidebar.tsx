@@ -64,14 +64,9 @@ const experienceYears = [
     'Trên 5 năm'
 ];
 const visionRequirements = [
-    "Không yêu cầu",
-    "Yêu cầu thị lực tốt",
-    "Không nhận cận thị",
-    "Không nhận viễn thị",
-    "Không nhận loạn thị",
-    "Không nhận mù màu",
-    "Yêu cầu thị lực rất tốt",
-    "20/20", "10/10", "8/10"
+    "Không yêu cầu", "Yêu cầu thị lực tốt", "Không nhận cận thị", 
+    "Không nhận viễn thị", "Không nhận loạn thị", "Không nhận mù màu", 
+    "Yêu cầu thị lực rất tốt", "20/20", "10/10", "8/10"
 ];
 const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
 
@@ -555,7 +550,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                             </AccordionContent>
                         </AccordionItem>
                         
-                        <AccordionItem value="process">
+                         <AccordionItem value="process">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><ListChecks className="h-5 w-5"/>Quy trình tuyển dụng</span>
                             </AccordionTrigger>
