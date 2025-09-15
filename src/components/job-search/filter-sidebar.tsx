@@ -275,7 +275,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements', 'process']} className="w-full">
+                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements', 'interviewLocation', 'process']} className="w-full">
                          <AccordionItem value="jobType">
                             <AccordionTrigger className="text-base font-semibold">
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
@@ -378,6 +378,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                <div className="space-y-2">
+                                    <Label>Ngày phỏng vấn</Label>
+                                    <Input type="date" />
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
@@ -419,7 +423,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                  <div className="space-y-2">
                                     <Label>Tuổi</Label>
                                     <Slider
-                                        defaultValue={filters.age || [18, 36]}
+                                        defaultValue={filters.age || [18, 60]}
                                         min={18}
                                         max={60}
                                         step={1}
@@ -427,7 +431,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                     />
                                     <div className="flex justify-between text-xs text-muted-foreground">
                                         <span>{filters.age?.[0] || 18} tuổi</span>
-                                        <span>{filters.age?.[1] || 36} tuổi</span>
+                                        <span>{filters.age?.[1] || 60} tuổi</span>
                                     </div>
                                 </div>
                                  <div className="space-y-2">
@@ -559,6 +563,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply }: FilterSideba
                                 <span className="flex items-center gap-2"><ListChecks className="h-5 w-5"/>Quy trình tuyển dụng</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
+                                
                                 <div className="space-y-2">
                                     <Label>Yêu cầu hạn Ginou còn</Label>
                                     <Select><SelectTrigger><SelectValue placeholder="Chọn thời gian" /></SelectTrigger>
