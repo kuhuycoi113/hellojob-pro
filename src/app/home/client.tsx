@@ -339,7 +339,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                 </h1>
                 <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80">
                   <span className="md:hidden">Thế giới việc làm Thực tập sinh, Kỹ năng đặc định, Kỹ sư tri thức... cho các bạn Shopping</span>
-                  <span className="hidden md:inline">Khám phá thế giới việc làm đa dạng tại Nhật Bản: từ Thực tập sinh, Kỹ năng đặc định đến Kỹ sư tri thức. Hãy để HelloJob đồng hành cùng bạn trên con đường 'shopping' cơ hội sự nghiệp.</span>
+                  <span className="hidden md:inline">Khám phá trải nghiệm Shopping công việc từ Thực tập sinh, Kỹ năng đặc định đến Kỹ sư tri thức trong Thế giới việc làm tại Nhật Bản cùng HelloJob</span>
                 </p>
               </div>
             </div>
