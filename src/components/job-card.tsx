@@ -105,7 +105,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     <h3 className="font-bold text-base mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
                 </Link>
                  <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={handleSaveJob}>
-                    <Bookmark className={cn("h-5 w-5", isSaved ? "text-accent-orange fill-accent-orange" : "text-gray-400")} />
+                    <Bookmark className={cn("h-5 w-5", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                 </Button>
             </div>
              <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -130,7 +130,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     <span>{job.workLocation}</span>
                 </p>
                 {showPostedTime && (
-                    <div className="flex items-center gap-1.5 text-xs justify-end">
+                    <div className="flex items-center gap-1.5 text-xs text-right">
                         <span className="text-primary font-semibold">Đăng lúc:</span>
                         <span style={{color: '#9B999A'}}>{job.postedTime}</span>
                     </div>
@@ -200,7 +200,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                 )}
                  
                 <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm" onClick={handleSaveJob}>
-                    <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-accent-orange" : "text-gray-400")} />
+                    <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                 </Button>
                 
             </div>
@@ -233,7 +233,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         </p>
                         {showPostedTime && (
                              <p className="flex items-center gap-1 justify-end">
-                                <CalendarClock className="h-4 w-4 flex-shrink-0 text-primary" />
+                                <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
                                 <span style={{ color: '#9B999A' }}>{job.postedTime}</span>
                             </p>
                         )}
