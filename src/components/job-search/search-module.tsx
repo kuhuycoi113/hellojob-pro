@@ -39,10 +39,14 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
   }, [showHero]);
 
   useEffect(() => {
-    const industries = filters.visa ? (industriesByJobType[filters.visa as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
+    const parentVisaSlug = filters.visa || Object.keys(industriesByJobType).find(key => 
+        visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType]?.some(detail => detail.slug === filters.visaDetail)
+    );
+
+    const industries = parentVisaSlug ? (industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
     const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
     setAvailableIndustries(uniqueIndustries);
-  }, [filters.visa]);
+  }, [filters.visa, filters.visaDetail]);
 
   const handleVisaDetailChange = (value: string) => {
     const newFilters: Partial<SearchFilters> = { visaDetail: value };
@@ -160,7 +164,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                         </div>
                         <div className="space-y-2 md:col-span-3">
                             <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                            <Select onValueChange={(value) => onFilterChange({ industry: value, jobDetail: '' })} value={filters.industry}>
+                            <Select onValueChange={(value) => onFilterChange({ industry: value })} value={filters.industry}>
                                 <SelectTrigger id="search-industry">
                                     <SelectValue placeholder="Tất cả ngành nghề" />
                                 </SelectTrigger>

@@ -206,7 +206,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
 
 
     useEffect(() => {
-        const industries = filters.visa ? (industriesByJobType[filters.visa as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
+        const parentVisaSlug = filters.visa || Object.keys(industriesByJobType).find(key => 
+            visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType]?.some(detail => detail.slug === filters.visaDetail)
+        );
+
+        const industries = parentVisaSlug ? (industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
         const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
         setAvailableIndustries(uniqueIndustries);
 
@@ -218,7 +222,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
              setAvailableJobDetails([...new Set(allJobDetails)]);
         }
 
-    }, [filters.visa, filters.industry]);
+    }, [filters.visa, filters.visaDetail, filters.industry]);
 
     useEffect(() => {
         if (filters.interviewDate === 'flexible') {
