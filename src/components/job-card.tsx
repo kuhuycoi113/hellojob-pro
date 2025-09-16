@@ -304,7 +304,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
   return (
     <Card className={cn(
         "rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300",
-        isSaved && "border-accent-orange"
     )}>
         <MobileLayout />
         <DesktopLayout />
