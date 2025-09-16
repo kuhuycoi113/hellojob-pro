@@ -124,14 +124,15 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     <MapPin className="h-4 w-4 flex-shrink-0" />
                     <span>{job.workLocation}</span>
                 </p>
-            </div>
-
-             {showPostedTime && (
+                 {showPostedTime && (
                 <div className="flex items-center gap-1.5 text-xs text-right mt-1">
                     <span className="text-primary font-semibold">Đăng lúc:</span>
                     <span style={{color: '#9B999A'}}>{job.postedTime}</span>
                 </div>
             )}
+            </div>
+
+            
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-2">
                     <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleChatClick}>
@@ -230,7 +231,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             <span>{job.workLocation}</span>
                         </p>
                         {showPostedTime && (
-                             <p className="flex items-center gap-1 justify-end">
+                            <p className="flex items-center gap-1 justify-end">
                                 <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
                                 <span style={{ color: '#9B999A' }}>{job.postedTime}</span>
                             </p>
@@ -284,7 +285,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
   }
 
   return (
-    <Card className="rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300">
+    <Card className={cn(
+        "rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300",
+        isSaved && "border-accent-orange border-2"
+    )}>
         <MobileLayout />
         <DesktopLayout />
     </Card>
