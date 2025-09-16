@@ -44,7 +44,6 @@ const aspirations = [
 ];
 
 const appliedJobs = jobData.slice(0, 3).map(job => ({ ...job, applicationStatus: 'NTD đã xem', appliedDate: '2024-07-20' }));
-const savedJobs = jobData.slice(2, 5);
 
 
 const viewers = [
@@ -385,6 +384,7 @@ const LoggedInView = () => {
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
+    const [savedJobs, setSavedJobs] = useState<Job[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -484,6 +484,12 @@ const LoggedInView = () => {
             setIsLoadingSuggestions(false);
         }
     }, []);
+    
+    const fetchSavedJobs = useCallback(() => {
+        const savedJobIds = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+        const savedJobsData = jobData.filter(job => savedJobIds.includes(job.id));
+        setSavedJobs(savedJobsData);
+    }, []);
 
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
@@ -491,7 +497,14 @@ const LoggedInView = () => {
             return;
         }
         fetchSuggestedJobs();
-    }, [role, fetchSuggestedJobs, forceUpdate]);
+        fetchSavedJobs();
+
+        // Listen for storage changes to update saved jobs list in real-time
+        const handleStorageChange = () => fetchSavedJobs();
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+        
+    }, [role, fetchSuggestedJobs, fetchSavedJobs, forceUpdate]);
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
@@ -750,9 +763,15 @@ const LoggedInView = () => {
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
-                        </div>
+                       {savedJobs.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                            </div>
+                        ) : (
+                             <div className="text-center py-8 text-muted-foreground">
+                                <p>Bạn chưa lưu công việc nào.</p>
+                             </div>
+                        )}
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
@@ -1302,4 +1321,5 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
 

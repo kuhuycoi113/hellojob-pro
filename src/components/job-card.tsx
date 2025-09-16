@@ -2,6 +2,7 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,28 @@ const formatCurrency = (value?: string) => {
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'default', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'default' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
   const { openChat } = useChat();
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+    setIsSaved(savedJobs.includes(job.id));
+  }, [job.id]);
+
+  const handleSaveJob = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+    if (isSaved) {
+      const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
+      localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
+      setIsSaved(false);
+    } else {
+      savedJobs.push(job.id);
+      localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+      setIsSaved(true);
+    }
+  };
+
 
   const handleChatClick = () => {
     const consultant = { id: 'consultant-1', name: job.recruiter.name, avatarUrl: job.recruiter.avatar }; // Simplified user object
@@ -75,9 +98,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
         </div>
         
         <div className="flex-grow flex flex-col">
-            <Link href={`/jobs/${job.id}`} className="group">
-                <h3 className="font-bold text-base mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
-            </Link>
+            <div className='flex justify-between items-start'>
+                <Link href={`/jobs/${job.id}`} className="group flex-grow">
+                    <h3 className="font-bold text-base mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
+                </Link>
+                 <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={handleSaveJob}>
+                    <Bookmark className={cn("h-5 w-5", isSaved ? "text-accent-orange fill-accent-orange" : "text-gray-400")} />
+                </Button>
+            </div>
              <div className="flex flex-wrap items-center gap-2 mb-2">
               {job.visaDetail && (
                 <Badge
@@ -101,7 +129,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                       <span>{job.workLocation}</span>
                     </p>
                     {showPostedTime && (
-                        <p className="flex items-center gap-1.5 text-xs">
+                        <p className="flex items-center gap-1.5 text-xs text-right">
                             <span className="text-primary font-semibold">Đăng lúc:</span>
                             <span className="text-gray-400">{job.postedTime.split(' ')[0]}</span>
                         </p>
@@ -126,7 +154,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                  <div className="flex items-center gap-2">
                     {showApplyButtons ? (
                         <>
-                            <Button variant="outline" size="sm"><Bookmark className="mr-2"/>Lưu</Button>
                             <Button size="sm" className="bg-accent-orange text-white">Ứng tuyển</Button>
                         </>
                     ) : (
@@ -141,9 +168,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                                     <Link href={`/jobs/${job.id}`} className="w-full flex">
                                         <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
                                     </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Heart className="mr-2 h-4 w-4"/> Lưu việc làm
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -175,8 +199,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </div>
                 )}
                  {showApplyButtons && (
-                   <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm">
-                       <Bookmark className="h-4 w-4 text-accent-orange"/>
+                   <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm" onClick={handleSaveJob}>
+                       <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-accent-orange" : "text-accent-orange")} />
                    </Button>
                 )}
             </div>
