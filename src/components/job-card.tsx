@@ -47,6 +47,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
       localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
       setIsSaved(true);
     }
+     // Trigger a storage event to update other components like the "My Jobs" page
+    window.dispatchEvent(new Event('storage'));
   };
 
 
@@ -123,18 +125,16 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
               <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
             </div>
             <div className="flex flex-col gap-1 text-sm text-muted-foreground">
-                <div className="flex justify-between items-center">
-                    <p className="flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4 flex-shrink-0" />
-                      <span>{job.workLocation}</span>
-                    </p>
-                    {showPostedTime && (
-                         <div className="flex items-center gap-1.5 text-xs text-right">
-                            <span className="text-primary font-semibold">Đăng lúc:</span>
-                            <span style={{color: '#9B999A'}}>{job.postedTime}</span>
-                        </div>
-                    )}
-                </div>
+                <p className="flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                    <span>{job.workLocation}</span>
+                </p>
+                {showPostedTime && (
+                    <div className="flex items-center gap-1.5 text-xs justify-end">
+                        <span className="text-primary font-semibold">Đăng lúc:</span>
+                        <span style={{color: '#9B999A'}}>{job.postedTime}</span>
+                    </div>
+                )}
             </div>
 
 
@@ -198,11 +198,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         </div>
                     </div>
                 )}
-                 {showApplyButtons && (
-                   <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm" onClick={handleSaveJob}>
-                       <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-accent-orange" : "text-gray-400")} />
-                   </Button>
-                )}
+                 
+                <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm" onClick={handleSaveJob}>
+                    <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-accent-orange" : "text-gray-400")} />
+                </Button>
+                
             </div>
 
             <div className="w-2/3 p-3 flex-grow flex flex-col justify-between">
