@@ -22,6 +22,7 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format, startOfTomorrow, parse } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { jobData } from '@/lib/mock-data';
 
 const japanJobTypes = [
     'Thực tập sinh kỹ năng',
@@ -183,6 +184,34 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isFlexibleDate, setIsFlexibleDate] = useState(false);
+    
+    const { jobCountsByRegion, jobCountsByPrefecture } = useMemo(() => {
+        const countsByPrefecture: { [key: string]: number } = {};
+        const countsByRegion: { [key: string]: number } = {};
+
+        // Initialize all known prefectures and regions to 0
+        Object.values(locations["Nhật Bản"]).flat().forEach(p => {
+            if (!countsByPrefecture[p]) countsByPrefecture[p] = 0;
+        });
+         Object.keys(locations["Nhật Bản"]).forEach(r => {
+            if (!countsByRegion[r]) countsByRegion[r] = 0;
+        });
+
+        for (const job of jobData) {
+            const prefecture = job.workLocation;
+            if (prefecture && countsByPrefecture.hasOwnProperty(prefecture)) {
+                countsByPrefecture[prefecture]++;
+            }
+        }
+        
+        for (const region in locations["Nhật Bản"]) {
+            const prefecturesInRegion = locations["Nhật Bản"][region as keyof typeof locations["Nhật Bản"]];
+            countsByRegion[region] = prefecturesInRegion.reduce((sum, p) => sum + (countsByPrefecture[p] || 0), 0);
+        }
+
+        return { jobCountsByRegion: countsByRegion, jobCountsByPrefecture: countsByPrefecture };
+    }, []);
+
 
 
     useEffect(() => {
@@ -448,28 +477,72 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                             </AccordionContent>
                         </AccordionItem>
 
-
                          <AccordionItem value="location">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><MapPin className="h-5 w-5"/>Địa điểm làm việc</span>
                             </AccordionTrigger>
-                            <AccordionContent className="space-y-4 pt-4">
-                                <div className="space-y-2">
-                                    <Select value={filters.location} onValueChange={(value) => onFilterChange({ location: value })}>
-                                        <SelectTrigger className={cn(filters.location && filters.location !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn tỉnh/thành phố"/></SelectTrigger>
-                                        <SelectContent className="max-h-60">
-                                            <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                                            {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
-                                                <SelectGroup key={region}>
-                                                    <SelectLabel>{region}</SelectLabel>
-                                                    {region !== 'Hokkaido' && region !== 'Okinawa' && (
-                                                        <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
-                                                    )}
-                                                    {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                                                </SelectGroup>
+                            <AccordionContent className="pt-4">
+                                <div className="space-y-3">
+                                   <div className='p-3 bg-secondary rounded-md'>
+                                      <p className='text-sm font-semibold'>Đã chọn ({Array.isArray(filters.location) ? filters.location.length : 0})</p>
+                                      {Array.isArray(filters.location) && filters.location.length > 0 && (
+                                         <div className='flex flex-wrap gap-1 mt-2 text-xs'>
+                                            {filters.location.map(loc => (
+                                               <span key={loc} className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>{loc}</span>
                                             ))}
-                                        </SelectContent>
-                                    </Select>
+                                         </div>
+                                      )}
+                                   </div>
+                                   <Accordion type="multiple" className="w-full">
+                                    {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
+                                        <AccordionItem key={region} value={region}>
+                                            <AccordionTrigger className="py-2 text-sm hover:no-underline">
+                                                <div className="flex items-center gap-2 w-full">
+                                                    <Checkbox
+                                                        id={`region-${region}`}
+                                                        checked={Array.isArray(filters.location) && prefectures.every(p => filters.location.includes(p))}
+                                                        onCheckedChange={(checked) => {
+                                                            const currentSelection = new Set(Array.isArray(filters.location) ? filters.location : []);
+                                                            if (checked) {
+                                                                prefectures.forEach(p => currentSelection.add(p));
+                                                            } else {
+                                                                prefectures.forEach(p => currentSelection.delete(p));
+                                                            }
+                                                            onFilterChange({ location: Array.from(currentSelection) });
+                                                        }}
+                                                    />
+                                                    <Label htmlFor={`region-${region}`} className="flex-grow text-left font-semibold cursor-pointer">
+                                                        Vùng {region} 
+                                                        <span className="font-normal text-muted-foreground ml-1">({jobCountsByRegion[region] || 0} việc)</span>
+                                                    </Label>
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className="pl-6 space-y-2">
+                                                {prefectures.map((prefecture: string) => (
+                                                    <div key={prefecture} className="flex items-center gap-2">
+                                                         <Checkbox
+                                                            id={`pref-${prefecture}`}
+                                                            checked={Array.isArray(filters.location) && filters.location.includes(prefecture)}
+                                                            onCheckedChange={(checked) => {
+                                                                const currentSelection = new Set(Array.isArray(filters.location) ? filters.location : []);
+                                                                if (checked) {
+                                                                    currentSelection.add(prefecture);
+                                                                } else {
+                                                                    currentSelection.delete(prefecture);
+                                                                }
+                                                                onFilterChange({ location: Array.from(currentSelection) });
+                                                            }}
+                                                        />
+                                                        <Label htmlFor={`pref-${prefecture}`} className="flex-grow text-left font-normal cursor-pointer">
+                                                            {prefecture}
+                                                            <span className="text-muted-foreground ml-1">({jobCountsByPrefecture[prefecture] || 0} việc)</span>
+                                                        </Label>
+                                                    </div>
+                                                ))}
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
+                                   </Accordion>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -73,7 +74,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
   const searchSummary = [
     filters.visaDetail || filters.visa,
     filters.industry,
-    filters.location
+    ...(Array.isArray(filters.location) ? filters.location : [filters.location]),
   ].filter(Boolean).join(' / ');
 
 
@@ -158,7 +159,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                         </div>
                          <div className="space-y-2 md:col-span-3">
                             <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
-                            <Select onValueChange={(value) => onFilterChange({ location: value })} value={filters.location}>
+                            <Select onValueChange={(value) => onFilterChange({ location: value.split(',') })} value={Array.isArray(filters.location) ? filters.location.join(',') : filters.location}>
                                 <SelectTrigger id="search-location">
                                 <SelectValue placeholder="Tất cả địa điểm" />
                                 </SelectTrigger>

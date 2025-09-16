@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback } from 'react';
@@ -14,7 +15,7 @@ const initialSearchFilters: SearchFilters = {
     visa: '', 
     visaDetail: '', 
     industry: '', 
-    location: '', 
+    location: [], 
     interviewLocation: '', 
     jobDetail: '',
     height: [135, 210],
@@ -57,17 +58,9 @@ function JobsPageContent() {
             
             const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
             
-            let locationMatch = false;
-            if (!location || location === 'all') {
-                locationMatch = true;
-            } else {
-                const isRegion = Object.keys(locations['Nhật Bản']).includes(location);
-                if (isRegion) {
-                    const regionPrefectures = locations['Nhật Bản'][location as keyof typeof locations['Nhật Bản']];
-                    locationMatch = regionPrefectures.some(prefecture => job.workLocation.toLowerCase().includes(prefecture.toLowerCase()));
-                } else {
-                    locationMatch = job.workLocation && job.workLocation.toLowerCase().includes(location.toLowerCase());
-                }
+            let locationMatch = true;
+            if (Array.isArray(location) && location.length > 0) {
+                locationMatch = location.includes(job.workLocation);
             }
             
             const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
@@ -79,12 +72,15 @@ function JobsPageContent() {
     }, []);
 
     useEffect(() => {
-        const hasSearchParams = Array.from(searchParams.keys()).length > 0;
-
         const newFilters: Partial<SearchFilters> = {};
         for (const [key, value] of searchParams.entries()) {
-            // @ts-ignore
-            newFilters[key] = value;
+            if (key === 'location') {
+                 // @ts-ignore
+                newFilters[key] = value.split(',');
+            } else {
+                 // @ts-ignore
+                newFilters[key] = value;
+            }
         }
         const updatedFilters = {...initialSearchFilters, ...newFilters};
         setSearchFilters(updatedFilters);
@@ -98,7 +94,9 @@ function JobsPageContent() {
        const query = new URLSearchParams();
         if (updatedFilters.visaDetail && updatedFilters.visaDetail !== 'all-details') query.set('visaDetail', updatedFilters.visaDetail);
         if (updatedFilters.industry && updatedFilters.industry !== 'all') query.set('industry', updatedFilters.industry);
-        if (updatedFilters.location && updatedFilters.location !== 'all') query.set('location', updatedFilters.location);
+        if (Array.isArray(updatedFilters.location) && updatedFilters.location.length > 0) {
+            query.set('location', updatedFilters.location.join(','));
+        }
        router.push(`/jobs?${query.toString()}`);
 
     }, [searchFilters, router]);
@@ -112,7 +110,9 @@ function JobsPageContent() {
         const query = new URLSearchParams();
         if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('visaDetail', filters.visaDetail);
         if (filters.industry && filters.industry !== 'all') query.set('industry', filters.industry);
-        if (filters.location && filters.location !== 'all') query.set('location', filters.location);
+        if (Array.isArray(filters.location) && filters.location.length > 0) {
+            query.set('location', filters.location.join(','));
+        }
         router.push(`/jobs?${query.toString()}`);
     }
 
