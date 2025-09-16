@@ -37,7 +37,7 @@ export const quickAccessLinks = [
   { href: '/post-job', label: 'Đăng tuyển dụng', icon: PlusCircle },
   { href: '/dashboard', label: 'Dữ liệu & Báo cáo', icon: FileText },
   { href: '/franchise', label: 'Đối tác tại Nhật', icon: Handshake },
-  { href: '/consultant-profile', label: 'Tư vấn viên', icon: User },
+  { href: '/my-jobs', label: 'Việc của tôi', icon: Briefcase },
   { href: '/feedback', label: 'Góp ý', icon: MessageSquareWarning },
   { href: '/premium', label: 'Nâng cấp Premium', icon: Gem },
   { href: '/referral', label: 'Giới thiệu bạn bè', icon: UserPlus },
@@ -49,5 +49,5 @@ export const mobileFooterLinks = [
   { href: '/ai-profile', label: 'Hồ sơ AI', icon: Sparkles },
   { href: '/handbook', label: 'Cẩm nang', icon: LifeBuoy },
   { href: '/about', label: 'Giới thiệu', icon: Info },
-  { href: '/consultant-profile', label: 'Tư vấn viên', icon: User },
+  { href: '/my-jobs', label: 'Việc của tôi', icon: Briefcase },
 ];
