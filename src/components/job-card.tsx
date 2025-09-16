@@ -22,7 +22,7 @@ const formatCurrency = (value?: string) => {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'default', showPostedTime = false }: { job: Job, showRecruiterName?: boolean, variant?: 'default' | 'chat', showPostedTime?: boolean }) => {
+export const JobCard = ({ job, showRecruiterName = true, variant = 'default', showPostedTime = false, showLikes = true }: { job: Job, showRecruiterName?: boolean, variant?: 'default' | 'chat', showPostedTime?: boolean, showLikes?: boolean }) => {
 
   // New Chat Layout for the chat variant
   const ChatLayout = () => (
@@ -57,10 +57,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
               <div className={cn("w-1.5 h-1.5 rounded-full", job.isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400')}></div>
               <span>{job.id}</span>
             </div>
-             <div className="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                <span>{job.likes}</span>
-                <Heart className="w-4 h-4 text-red-500 fill-current" />
-            </div>
+            {showLikes && (
+                <div className="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <span>{job.likes}</span>
+                    <Heart className="w-4 h-4 text-red-500 fill-current" />
+                </div>
+            )}
         </div>
         
         <div className="flex-grow flex flex-col">
@@ -135,12 +137,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                 <div className={cn("w-1.5 h-1.5 rounded-full", job.isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400')}></div>
                 <span>{job.id}</span>
                 </div>
-                <div className="absolute bottom-1 right-1 flex items-center gap-2">
-                    <div className="bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                        <span>{job.likes}</span>
-                        <Heart className="w-4 h-4 text-red-500 fill-current" />
+                {showLikes && (
+                    <div className="absolute bottom-1 right-1 flex items-center gap-2">
+                        <div className="bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                            <span>{job.likes}</span>
+                            <Heart className="w-4 h-4 text-red-500 fill-current" />
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             <div className="w-2/3 p-3 flex-grow flex flex-col justify-between">
