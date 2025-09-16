@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark } from 'lucide-react';
+import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark, Phone } from 'lucide-react';
 import { Job } from '@/lib/mock-data';
 import {
     DropdownMenu,
@@ -19,6 +19,7 @@ import {
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useChat } from '@/contexts/ChatContext';
+import { MessengerIcon, ZaloIcon } from './custom-icons';
 
 const formatCurrency = (value?: string) => {
     if (!value) return 'N/A';
@@ -125,7 +126,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     <span>{job.workLocation}</span>
                 </p>
                  {showPostedTime && (
-                <div className="flex items-center gap-1.5 text-xs text-right">
+                <div className="flex items-center gap-1.5 text-xs">
                     <span className="text-primary font-semibold">Đăng lúc:</span>
                     <span style={{color: '#9B999A'}}>{job.postedTime}</span>
                 </div>
@@ -135,7 +136,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
             
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-2">
-                     <Link href={`/consultant-profile/${'consultant-1'}`}>
+                    <Link href={`/consultant-profile/${'consultant-1'}`} className="flex-shrink-0">
                         <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
                             <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                             <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
@@ -143,11 +144,20 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </Link>
                     <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleChatClick}>
                         <MessageSquare className="mr-2 h-4 w-4"/>
-                        Chat với Tư vấn viên
+                        Chat
+                    </Button>
+                    <Button variant="outline" size="icon" className="border-purple-500 hover:bg-purple-50">
+                        <MessengerIcon className="h-5 w-5 text-purple-600"/>
+                    </Button>
+                    <Button variant="outline" size="icon" className="border-blue-500 hover:bg-blue-50">
+                        <ZaloIcon className="h-5 w-5"/>
+                    </Button>
+                    <Button variant="outline" size="icon" className="border-green-500 hover:bg-green-50">
+                        <Phone className="h-5 w-5 text-green-600"/>
                     </Button>
                 </div>
                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" className={cn("flex-shrink-0", isSaved && "border-accent-orange text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                    <Button variant="ghost" size="sm" className={cn("flex-shrink-0", isSaved && "border-2 border-accent-orange text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                         <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                         Lưu
                     </Button>
@@ -190,15 +200,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                 <span>{job.id}</span>
                 </div>
                 {showLikes && (
-                    <div className="absolute bottom-1 right-1 flex items-center gap-2">
-                        <div className="bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <span>{job.likes}</span>
-                            <Heart className="w-4 h-4 text-red-500 fill-current" />
-                        </div>
+                    <div className="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                        <span>{job.likes}</span>
+                        <Heart className="w-4 h-4 text-red-500 fill-current" />
                     </div>
                 )}
                  
-                <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm" onClick={handleSaveJob}>
+                <Button variant="outline" size="icon" className="absolute top-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm" onClick={handleSaveJob}>
                     <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                 </Button>
                 
@@ -231,7 +239,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             <span>{job.workLocation}</span>
                         </p>
                         {showPostedTime && (
-                            <p className="flex items-center gap-1 justify-end">
+                            <p className="flex items-center gap-1">
                                 <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
                                 <span style={{ color: '#9B999A' }}>{job.postedTime}</span>
                             </p>
@@ -243,15 +251,24 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
         <div className="p-3 border-t">
             <div className="flex justify-between items-center">
                  <div className="flex items-center gap-2">
-                    <Button size="icon" className="h-8 w-8 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
-                        <MessageSquare className="text-primary-foreground h-4 w-4"/>
-                    </Button>
-                     <Link href={`/consultant-profile/${'consultant-1'}`}>
+                    <Link href={`/consultant-profile/${'consultant-1'}`} className="flex-shrink-0">
                         <Avatar className="h-8 w-8 cursor-pointer">
                             <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                             <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                     </Link>
+                    <Button size="icon" className="h-8 w-8 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
+                        <MessageSquare className="text-primary-foreground h-4 w-4"/>
+                    </Button>
+                    <Button variant="outline" size="icon" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
+                        <MessengerIcon className="h-4 w-4 text-purple-600"/>
+                    </Button>
+                    <Button variant="outline" size="icon" className="h-8 w-8 border-blue-500 hover:bg-blue-50">
+                        <ZaloIcon className="h-4 w-4"/>
+                    </Button>
+                    <Button variant="outline" size="icon" className="h-8 w-8 border-green-500 hover:bg-green-50">
+                        <Phone className="h-4 w-4 text-green-600"/>
+                    </Button>
                 </div>
                  <div className="flex items-center gap-2">
                     {showApplyButtons ? (
@@ -286,7 +303,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
 
   return (
     <Card className={cn(
-        "rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300"
+        "rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300",
+        isSaved && "border-accent-orange"
     )}>
         <MobileLayout />
         <DesktopLayout />
