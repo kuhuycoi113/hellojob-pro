@@ -513,7 +513,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                                                 <AccordionTrigger className="flex-1 p-0 hover:no-underline">
                                                     <Label htmlFor={`region-${region}`} className="flex-grow text-left font-semibold cursor-pointer">
                                                         Vùng {region} 
-                                                        <span className="font-normal text-muted-foreground ml-1">({jobCountsByRegion[region] || 0} việc)</span>
+                                                        <span className="font-normal text-muted-foreground text-xs ml-1">{jobCountsByRegion[region] || 0} việc</span>
                                                     </Label>
                                                 </AccordionTrigger>
                                             </div>
@@ -535,7 +535,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                                                         />
                                                         <Label htmlFor={`pref-${prefecture}`} className="flex-grow text-left font-normal cursor-pointer">
                                                             {prefecture}
-                                                            <span className="text-muted-foreground ml-1">({jobCountsByPrefecture[prefecture] || 0} việc)</span>
+                                                            <span className="text-muted-foreground text-xs ml-1">{jobCountsByPrefecture[prefecture] || 0} việc</span>
                                                         </Label>
                                                     </div>
                                                 ))}
