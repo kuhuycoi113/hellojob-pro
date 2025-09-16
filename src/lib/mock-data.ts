@@ -113,7 +113,12 @@ const generateRandomJob = (index: number): Job => {
     const recruiter = recruiters[index % recruiters.length];
     const gender = ['Nam', 'Nữ', 'Cả nam và nữ'][index % 3] as 'Nam' | 'Nữ' | 'Cả nam và nữ';
     const quantity = (index % 10) + 1;
-    const title = `${jobTitles[industry as keyof typeof jobTitles][index % 4]}, ${location}, ${quantity} ${gender}`;
+    const languageRequirement = index % 4 === 0 ? 'Không yêu cầu' : 'Tiếng Nhật N4';
+    
+    let title = `${jobTitles[industry as keyof typeof jobTitles][index % 4]}, ${location}, ${quantity} ${gender}`;
+    if (languageRequirement !== 'Không yêu cầu') {
+        title += `, ${languageRequirement}`;
+    }
 
     // Deterministic generation of likes to avoid hydration errors
     const deterministicLikesK = (index * 7) % 10;
@@ -148,7 +153,7 @@ const generateRandomJob = (index: number): Job => {
         gender: gender,
         quantity: quantity,
         ageRequirement: `${18 + (index % 5)}-${35 + (index % 10)}`,
-        languageRequirement: index % 4 === 0 ? 'Không yêu cầu' : 'Tiếng Nhật N4',
+        languageRequirement: languageRequirement,
         educationRequirement: 'Tốt nghiệp THPT trở lên',
         experienceRequirement: 'Không yêu cầu kinh nghiệm',
         yearsOfExperience: 'Không yêu cầu',
