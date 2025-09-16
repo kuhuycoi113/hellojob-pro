@@ -91,12 +91,17 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
             </p>
 
             <div className="mt-auto flex justify-between items-end">
-                 <div className="flex items-center gap-1">
-                    <Button variant="default" size="sm">
+                 <div className="flex items-center gap-2">
+                    <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
                         <MessageSquare className="mr-2 h-4 w-4"/>
                         Chat với Tư vấn viên
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8"><User className="h-5 w-5 text-muted-foreground"/></Button>
+                    <Link href={`/consultant-profile/consultant-1`}>
+                        <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                            <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                            <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                    </Link>
                 </div>
                  <div className="flex items-center gap-2">
                     {showPostedTime && (
@@ -188,13 +193,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
         <div className="p-3 border-t">
              {showRecruiterName && (
                 <div className="flex items-center gap-2 text-xs mb-2">
-                  <Avatar className="w-6 h-6">
-                    <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
-                    <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-grow">
-                    <p className="font-semibold text-blue-600 truncate">{job.recruiter.name}</p>
-                  </div>
+                  <p className="font-semibold text-blue-600 truncate">{job.recruiter.name}</p>
                 </div>
             )}
             <div className="flex justify-between items-center">
@@ -204,7 +203,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             <MessageSquare className="text-primary h-5 w-5"/>
                         </Link>
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7"><User className="h-5 w-5"/></Button>
+                     <Link href={`/consultant-profile/consultant-1`}>
+                        <Avatar className="h-7 w-7 cursor-pointer">
+                            <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                            <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                    </Link>
                 </div>
                  <div className="flex items-center gap-2">
                     {showPostedTime && (
