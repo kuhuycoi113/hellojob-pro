@@ -496,29 +496,29 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                                    <Accordion type="multiple" className="w-full">
                                     {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
                                         <AccordionItem key={region} value={region}>
-                                            <AccordionTrigger className="py-2 text-sm hover:no-underline">
-                                                <div className="flex items-center gap-2 w-full">
-                                                    <Checkbox
-                                                        id={`region-${region}`}
-                                                        checked={Array.isArray(filters.location) && prefectures.every(p => filters.location.includes(p))}
-                                                        onCheckedChange={(checked) => {
-                                                            const currentSelection = new Set(Array.isArray(filters.location) ? filters.location : []);
-                                                            if (checked) {
-                                                                prefectures.forEach(p => currentSelection.add(p));
-                                                            } else {
-                                                                prefectures.forEach(p => currentSelection.delete(p));
-                                                            }
-                                                            onFilterChange({ location: Array.from(currentSelection) });
-                                                        }}
-                                                    />
+                                             <div className="flex items-center gap-2 py-2 text-sm hover:no-underline" >
+                                                <Checkbox
+                                                    id={`region-${region}`}
+                                                    checked={Array.isArray(filters.location) && (prefectures as string[]).every(p => filters.location.includes(p))}
+                                                    onCheckedChange={(checked) => {
+                                                        const currentSelection = new Set(Array.isArray(filters.location) ? filters.location : []);
+                                                        if (checked) {
+                                                            (prefectures as string[]).forEach(p => currentSelection.add(p));
+                                                        } else {
+                                                            (prefectures as string[]).forEach(p => currentSelection.delete(p));
+                                                        }
+                                                        onFilterChange({ location: Array.from(currentSelection) });
+                                                    }}
+                                                />
+                                                <AccordionTrigger className="flex-1 p-0 hover:no-underline">
                                                     <Label htmlFor={`region-${region}`} className="flex-grow text-left font-semibold cursor-pointer">
                                                         Vùng {region} 
                                                         <span className="font-normal text-muted-foreground ml-1">({jobCountsByRegion[region] || 0} việc)</span>
                                                     </Label>
-                                                </div>
-                                            </AccordionTrigger>
+                                                </AccordionTrigger>
+                                            </div>
                                             <AccordionContent className="pl-6 space-y-2">
-                                                {prefectures.map((prefecture: string) => (
+                                                {(prefectures as string[]).map((prefecture: string) => (
                                                     <div key={prefecture} className="flex items-center gap-2">
                                                          <Checkbox
                                                             id={`pref-${prefecture}`}
