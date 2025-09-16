@@ -147,7 +147,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </Link>
                 </div>
                  <div className="flex items-center gap-2">
-                     <Button variant="ghost" size="sm" className="flex-shrink-0" onClick={handleSaveJob}>
+                     <Button variant="outline" size="sm" className={cn("flex-shrink-0", isSaved && "border-accent-orange text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                         <Bookmark className={cn("h-5 w-5", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                         Lưu
                     </Button>
@@ -287,10 +287,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
   return (
     <Card className={cn(
         "rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300",
-        isSaved && "border-accent-orange border-2"
+        isSaved && "border-accent-orange"
     )}>
         <MobileLayout />
         <DesktopLayout />
     </Card>
   );
 };
+
