@@ -159,7 +159,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </Button>
                 </div>
                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" className={cn(isSaved && "border border-accent-orange text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                    <Button variant={isSaved ? "secondary" : "ghost"} size="sm" className={cn(isSaved && "border border-accent-orange text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                         <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                         Lưu
                     </Button>
@@ -202,13 +202,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                 <span>{job.id}</span>
                 </div>
                 {showLikes && (
-                    <div className="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <div className="absolute bottom-1 right-1 bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                         <span>{job.likes}</span>
                         <Heart className="w-4 h-4 text-red-500 fill-current" />
                     </div>
                 )}
                  
-                <Button variant="outline" size="icon" className="absolute top-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm" onClick={handleSaveJob}>
+                <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm" onClick={handleSaveJob}>
                     <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                 </Button>
                 
@@ -242,7 +242,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                                 <span>{job.workLocation}</span>
                             </p>
                              {showPostedTime && (
-                                <p className="flex items-center gap-1 text-right">
+                                <p className="flex items-center gap-1 text-right ml-2">
                                     <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
                                     <span style={{ color: '#9B999A' }}>{job.postedTime}</span>
                                 </p>
