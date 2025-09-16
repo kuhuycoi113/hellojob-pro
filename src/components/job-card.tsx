@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock } from 'lucide-react';
+import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark } from 'lucide-react';
 import { Job } from '@/lib/mock-data';
 import {
     DropdownMenu,
@@ -22,7 +22,7 @@ const formatCurrency = (value?: string) => {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'default', showPostedTime = false, showLikes = true }: { job: Job, showRecruiterName?: boolean, variant?: 'default' | 'chat', showPostedTime?: boolean, showLikes?: boolean }) => {
+export const JobCard = ({ job, showRecruiterName = true, variant = 'default', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'default' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
 
   // New Chat Layout for the chat variant
   const ChatLayout = () => (
@@ -95,30 +95,37 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     <Button variant="ghost" size="icon" className="h-8 w-8"><MessageSquare className="h-5 w-5 text-muted-foreground"/></Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8"><User className="h-5 w-5 text-muted-foreground"/></Button>
                 </div>
-                 <div className="flex items-center gap-4">
+                 <div className="flex items-center gap-2">
                     {showPostedTime && (
-                        <div className="text-xs text-right">
+                        <div className="text-xs text-right mr-2">
                             <span className="text-primary font-semibold">Đăng lúc:</span>{' '}
                             <span style={{color: '#9B999A'}}>{job.postedTime}</span>
                         </div>
                     )}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreHorizontal className="h-5 w-5 text-muted-foreground"/>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                                <Link href={`/jobs/${job.id}`} className="w-full flex">
-                                    <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Heart className="mr-2 h-4 w-4"/> Lưu việc làm
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    {showApplyButtons ? (
+                        <>
+                            <Button variant="outline" size="sm"><Bookmark className="mr-2"/>Lưu</Button>
+                            <Button size="sm" className="bg-accent-orange text-white">Ứng tuyển</Button>
+                        </>
+                    ) : (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreHorizontal className="h-5 w-5 text-muted-foreground"/>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild>
+                                    <Link href={`/jobs/${job.id}`} className="w-full flex">
+                                        <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Heart className="mr-2 h-4 w-4"/> Lưu việc làm
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                 </div>
             </div>
         </div>
@@ -199,25 +206,32 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                 </div>
                  <div className="flex items-center gap-2">
                     {showPostedTime && (
-                        <div className="text-xs text-right">
+                        <div className="text-xs text-right mr-1">
                              <span className="text-primary font-semibold">Đăng lúc:</span>{' '}
                              <span style={{color: '#9B999A'}}>{job.postedTime}</span>
                         </div>
                     )}
-                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7">
-                                <MoreHorizontal />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/jobs/${job.id}`} className="w-full flex">
-                                    <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    {showApplyButtons ? (
+                        <>
+                            <Button variant="outline" size="sm" className="h-8"><Bookmark className="mr-1"/>Lưu</Button>
+                            <Button size="sm" className="bg-accent-orange text-white h-8">Ứng tuyển</Button>
+                        </>
+                     ) : (
+                         <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-7 w-7">
+                                    <MoreHorizontal />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem asChild>
+                                    <Link href={`/jobs/${job.id}`} className="w-full flex">
+                                        <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
+                                    </Link>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                     )}
                 </div>
             </div>
         </div>

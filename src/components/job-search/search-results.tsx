@@ -116,9 +116,9 @@ export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, res
                         <div className="grid grid-cols-1 gap-4">
                         {jobs.slice(0, visibleJobsCount).map((job, index) => {
                             if (index === visibleJobsCount - 1) {
-                                return <div ref={lastJobElementRef} key={job.id}><JobCard job={job} showPostedTime={true} showLikes={false} /></div>
+                                return <div ref={lastJobElementRef} key={job.id}><JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} /></div>
                             }
-                            return <JobCard key={job.id} job={job} showPostedTime={true} showLikes={false} />
+                            return <JobCard key={job.id} job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} />
                         })}
                         </div>
                     ) : (
