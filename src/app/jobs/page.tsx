@@ -7,7 +7,7 @@ import { SearchResults, type SearchFilters } from '@/components/job-search/searc
 import { Job, jobData } from '@/lib/mock-data';
 import { locations } from '@/lib/location-data';
 import { Loader2 } from 'lucide-react';
-import { MainContent } from '@/components/home/main-content';
+import { SearchModule } from '@/components/job-search/search-module';
 
 
 const initialSearchFilters: SearchFilters = {
@@ -37,7 +37,6 @@ function JobsPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const [isSearching, setIsSearching] = useState(false);
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
     const [searchFilters, setSearchFilters] = useState<SearchFilters>(initialSearchFilters);
 
@@ -81,21 +80,16 @@ function JobsPageContent() {
 
     useEffect(() => {
         const hasSearchParams = Array.from(searchParams.keys()).length > 0;
-        setIsSearching(hasSearchParams);
 
-        if (hasSearchParams) {
-            const newFilters: Partial<SearchFilters> = {};
-            for (const [key, value] of searchParams.entries()) {
-                // @ts-ignore
-                newFilters[key] = value;
-            }
-            const updatedFilters = {...initialSearchFilters, ...newFilters};
-            setSearchFilters(updatedFilters);
-            applyFilters(updatedFilters);
-        } else {
-            // If no search params, show all jobs
-            setFilteredJobs(jobData);
+        const newFilters: Partial<SearchFilters> = {};
+        for (const [key, value] of searchParams.entries()) {
+            // @ts-ignore
+            newFilters[key] = value;
         }
+        const updatedFilters = {...initialSearchFilters, ...newFilters};
+        setSearchFilters(updatedFilters);
+        applyFilters(updatedFilters);
+        
     }, [searchParams, applyFilters]);
     
     const handleFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
@@ -109,19 +103,34 @@ function JobsPageContent() {
 
     }, [searchFilters, router]);
   
-  const handleResetFilters = useCallback(() => {
-    setSearchFilters(initialSearchFilters);
-    router.push('/jobs');
-  }, [router]);
+    const handleResetFilters = useCallback(() => {
+        setSearchFilters(initialSearchFilters);
+        router.push('/jobs');
+    }, [router]);
+    
+    const handleNewSearch = (filters: SearchFilters) => {
+        const query = new URLSearchParams();
+        if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('visaDetail', filters.visaDetail);
+        if (filters.industry && filters.industry !== 'all') query.set('industry', filters.industry);
+        if (filters.location && filters.location !== 'all') query.set('location', filters.location);
+        router.push(`/jobs?${query.toString()}`);
+    }
 
     return (
-        <SearchResults 
-            jobs={filteredJobs} 
-            filters={searchFilters} 
-            onFilterChange={handleFilterChange} 
-            applyFilters={() => applyFilters(searchFilters)} 
-            resetFilters={handleResetFilters}
-        />
+        <div className="flex flex-col">
+            <SearchModule 
+                onSearch={handleNewSearch} 
+                filters={searchFilters} 
+                onFilterChange={handleFilterChange} 
+            />
+            <SearchResults 
+                jobs={filteredJobs} 
+                filters={searchFilters} 
+                onFilterChange={handleFilterChange} 
+                applyFilters={() => applyFilters(searchFilters)} 
+                resetFilters={handleResetFilters}
+            />
+        </div>
     );
 }
 
