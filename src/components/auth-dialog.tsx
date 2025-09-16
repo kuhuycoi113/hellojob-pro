@@ -143,7 +143,7 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
             </p>
         </div>
         <div className="hidden md:block relative">
-            <Image src="https://placehold.co/800x1200.png" alt="HelloJob" fill className="object-cover" data-ai-hint="happy worker japan"/>
+            <Image src="https://storage.googleapis.com/hellojob-staging-storage-4a39d.appspot.com/uploads/1722416175782_2 workers.png" alt="Japanese workers" fill className="object-cover" data-ai-hint="happy worker japan"/>
              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
              <div className="absolute bottom-8 left-8 text-white">
                 <h3 className="text-2xl font-bold font-headline">"Hành trình vạn dặm, bắt đầu từ một bước chân."</h3>
