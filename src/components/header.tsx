@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -90,6 +91,11 @@ export function Header() {
   }, []);
   
   useEffect(() => {
+    if (!isMobile) {
+      setShowNav(true);
+      return;
+    }
+    
     const controlNavbar = () => {
       if (window.scrollY > lastScrollY && window.scrollY > 80) { // if scroll down hide the navbar
         setShowNav(false);
@@ -104,7 +110,7 @@ export function Header() {
     return () => {
       window.removeEventListener('scroll', controlNavbar);
     };
-  }, [lastScrollY]);
+  }, [isMobile, lastScrollY]);
 
 
   const handleCreateProfileRedirect = () => {
@@ -502,6 +508,14 @@ export function Header() {
                     <Button asChild variant="default" size="sm">
                         <Link href="/jobs">Việc</Link>
                     </Button>
+                    <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" size="sm">Tạo</Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-2xl">
+                            {renderDialogContent()}
+                        </DialogContent>
+                    </Dialog>
                     <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                         <SheetTrigger asChild>
                             <Button variant="ghost" size="icon">
