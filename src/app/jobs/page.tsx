@@ -66,7 +66,7 @@ function JobsPageContent() {
             const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
             
             let locationMatch = true;
-            if (Array.isArray(location) && location.length > 0) {
+            if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
                  locationMatch = location.some(loc => {
                     const isRegion = Object.keys(locations['Nhật Bản']).includes(loc);
                     if (isRegion) {
@@ -98,7 +98,7 @@ function JobsPageContent() {
             const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
             const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
              let locationMatch = true;
-            if (Array.isArray(location) && location.length > 0) {
+            if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
                  locationMatch = location.some(loc => {
                     const isRegion = Object.keys(locations['Nhật Bản']).includes(loc);
                     if (isRegion) {
@@ -145,12 +145,13 @@ function JobsPageContent() {
     // Handler for the "Apply" button. It updates the URL and applied filters.
     const handleApplyFilters = useCallback(() => {
         const query = new URLSearchParams();
-        if (stagedFilters.visaDetail && stagedFilters.visaDetail !== 'all-details') query.set('visaDetail', stagedFilters.visaDetail);
-        if (stagedFilters.industry && stagedFilters.industry !== 'all') query.set('industry', stagedFilters.industry);
-        if (Array.isArray(stagedFilters.location) && stagedFilters.location.length > 0) {
-            query.set('location', stagedFilters.location.join(','));
-        }
-        // Add other filters to query as needed
+        Object.entries(stagedFilters).forEach(([key, value]) => {
+            if (value && (!Array.isArray(value) || value.length > 0)) {
+                 if (key !== 'visa' && key !== 'jobDetail' && !(Array.isArray(value) && value.includes('all'))) {
+                     query.set(key, Array.isArray(value) ? value.join(',') : String(value));
+                 }
+            }
+        });
         router.push(`/jobs?${query.toString()}`);
     }, [stagedFilters, router]);
   
@@ -170,7 +171,7 @@ function JobsPageContent() {
         const query = new URLSearchParams();
         if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('visaDetail', filters.visaDetail);
         if (filters.industry && filters.industry !== 'all') query.set('industry', filters.industry);
-        if (Array.isArray(filters.location) && filters.location.length > 0) {
+        if (Array.isArray(filters.location) && filters.location.length > 0 && !filters.location.includes('all')) {
             query.set('location', filters.location.join(','));
         }
         router.push(`/jobs?${query.toString()}`);

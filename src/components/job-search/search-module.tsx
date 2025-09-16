@@ -14,15 +14,26 @@ import { locations } from '@/lib/location-data';
 import type { SearchFilters } from './search-results';
 
 const japanJobTypes = [
-    'Thực tập sinh kỹ năng',
-    'Kỹ năng đặc định',
-    'Kỹ sư, tri thức',
+    { name: 'Thực tập sinh kỹ năng', slug: 'thuc-tap-sinh-ky-nang' },
+    { name: 'Kỹ năng đặc định', slug: 'ky-nang-dac-dinh' },
+    { name: 'Kỹ sư, tri thức', slug: 'ky-su-tri-thuc' }
 ];
 
-const visaDetailsByVisaType: { [key: string]: string[] } = {
-    'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-    'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-    'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
+const visaDetailsByVisaType: { [key: string]: { name: string, slug: string }[] } = {
+    'thuc-tap-sinh-ky-nang': [
+        { name: 'Thực tập sinh 3 năm', slug: 'thuc-tap-sinh-3-nam' },
+        { name: 'Thực tập sinh 1 năm', slug: 'thuc-tap-sinh-1-nam' },
+        { name: 'Thực tập sinh 3 Go', slug: 'thuc-tap-sinh-3-go' }
+    ],
+    'ky-nang-dac-dinh': [
+        { name: 'Đặc định đầu Việt', slug: 'dac-dinh-dau-viet' },
+        { name: 'Đặc định đầu Nhật', slug: 'dac-dinh-dau-nhat' },
+        { name: 'Đặc định đi mới', slug: 'dac-dinh-di-moi' }
+    ],
+    'ky-su-tri-thuc': [
+        { name: 'Kỹ sư, tri thức đầu Việt', slug: 'ky-su-tri-thuc-dau-viet' },
+        { name: 'Kỹ sư, tri thức đầu Nhật', slug: 'ky-su-tri-thuc-dau-nhat' }
+    ]
 };
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
@@ -56,14 +67,15 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
 
   const handleVisaDetailChange = (value: string) => {
     const newFilters: Partial<SearchFilters> = { visaDetail: value };
-    const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].includes(value));
+    const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].some(detail => detail.slug === value));
+    
     if (parentType && filters.visa !== parentType) {
         newFilters.visa = parentType;
         newFilters.industry = ''; // Also reset industry if visa type changes
     }
     onFilterChange(newFilters);
   }
-
+  
   const handleSearchClick = () => {
     onSearch(filters);
      if (window.innerWidth < 768) { // md breakpoint
@@ -71,11 +83,37 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
     }
   }
 
-  const searchSummary = [
-    filters.visaDetail || filters.visa,
-    filters.industry,
-    ...(Array.isArray(filters.location) ? filters.location : [filters.location]),
-  ].filter(Boolean).join(' / ');
+  const getFilterName = (slug: string, type: 'visa' | 'visaDetail' | 'industry' | 'location'): string => {
+    if (!slug) return '';
+    if (type === 'visa') {
+      return japanJobTypes.find(j => j.slug === slug)?.name || slug;
+    }
+    if (type === 'visaDetail') {
+      for (const key in visaDetailsByVisaType) {
+        const detail = visaDetailsByVisaType[key].find(d => d.slug === slug);
+        if (detail) return detail.name;
+      }
+    }
+    if (type === 'industry') {
+      return allIndustries.find(i => i.slug === slug)?.name || slug;
+    }
+    return slug;
+  }
+
+  const searchSummaryParts = [
+    getFilterName(filters.visaDetail, 'visaDetail') || getFilterName(filters.visa, 'visa'),
+    getFilterName(filters.industry, 'industry'),
+    ...(Array.isArray(filters.location) ? filters.location.map(l => getFilterName(l, 'location')) : [getFilterName(filters.location, 'location')]),
+  ].filter(Boolean);
+
+  let searchSummary = searchSummaryParts.join(' / ');
+  if (searchSummary.length > 40) {
+      searchSummary = [searchSummaryParts[0], searchSummaryParts[1]].filter(Boolean).join(' / ');
+      const locationCount = Array.isArray(filters.location) ? filters.location.length : (filters.location ? 1 : 0);
+      if (locationCount > 0) {
+          searchSummary += ` / + ${locationCount} địa điểm`;
+      }
+  }
 
 
   return (
@@ -130,11 +168,11 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                                 </SelectTrigger>
                                 <SelectContent>
                                 <SelectItem value="all-details">Tất cả loại hình</SelectItem>
-                                {japanJobTypes.map(type => (
-                                    <SelectGroup key={type}>
-                                        <SelectLabel>{type}</SelectLabel>
-                                        {(visaDetailsByVisaType[type] || []).map(detail => (
-                                            <SelectItem key={detail} value={detail}>{detail}</SelectItem>
+                                {Object.values(japanJobTypes).map(type => (
+                                    <SelectGroup key={type.slug}>
+                                        <SelectLabel>{type.name}</SelectLabel>
+                                        {(visaDetailsByVisaType[type.slug] || []).map(detail => (
+                                            <SelectItem key={detail.slug} value={detail.slug}>{detail.name}</SelectItem>
                                         ))}
                                     </SelectGroup>
                                 ))}
@@ -150,7 +188,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                                 <SelectContent>
                                     <SelectItem value="all">Tất cả ngành nghề</SelectItem>
                                     {availableIndustries.map((industry) => (
-                                        <SelectItem key={industry.slug} value={industry.name}>
+                                        <SelectItem key={industry.slug} value={industry.slug}>
                                             {industry.name}
                                         </SelectItem>
                                     ))}

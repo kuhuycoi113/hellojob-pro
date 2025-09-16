@@ -1,4 +1,5 @@
 
+
 export type Industry = {
     name: string;
     slug: string;
