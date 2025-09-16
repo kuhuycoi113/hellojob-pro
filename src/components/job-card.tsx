@@ -92,7 +92,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
 
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8"><MessageSquare className="h-5 w-5 text-muted-foreground"/></Button>
+                    <Button variant="default" size="sm">
+                        <MessageSquare className="mr-2 h-4 w-4"/>
+                        Chat với Tư vấn viên
+                    </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8"><User className="h-5 w-5 text-muted-foreground"/></Button>
                 </div>
                  <div className="flex items-center gap-2">
