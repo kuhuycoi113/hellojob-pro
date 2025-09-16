@@ -24,6 +24,7 @@ const employer = {
     { src: 'https://picsum.photos/seed/factory1/400/600', alt: 'Dây chuyền sản xuất hiện đại', dataAiHint: 'production line' },
     { src: 'https://picsum.photos/seed/factory2/600/400', alt: 'Khuôn viên công ty rộng rãi', dataAiHint: 'company campus' },
     { src: 'https://picsum.photos/seed/factory3/600/400', alt: 'Hoạt động đội nhóm', dataAiHint: 'team activity' },
+    { src: 'https://picsum.photos/seed/dormitory2/600/400', alt: 'Ký túc xá 2', dataAiHint: 'company dormitory' },
   ],
   jobs: [
     { title: 'Kỹ sư Vận hành Dây chuyền', type: 'Toàn thời gian', date: '25/07/2024' },
@@ -73,12 +74,15 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                         <div className="relative md:col-span-1 aspect-[2/3]">
                             <Image src={employer.images[0].src} alt={employer.images[0].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[0].dataAiHint}/>
                         </div>
-                        <div className="md:col-span-1 grid grid-rows-2 gap-4">
+                        <div className="md:col-span-1 grid grid-rows-3 gap-4">
                             <div className="relative aspect-video">
                                 <Image src={employer.images[1].src} alt={employer.images[1].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[1].dataAiHint}/>
                             </div>
                              <div className="relative aspect-video">
                                 <Image src={employer.images[2].src} alt={employer.images[2].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[2].dataAiHint}/>
+                            </div>
+                             <div className="relative aspect-video">
+                                <Image src={employer.images[3].src} alt={employer.images[3].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[3].dataAiHint}/>
                             </div>
                         </div>
                     </CardContent>
