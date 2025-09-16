@@ -141,10 +141,10 @@ export function Header() {
 
       localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
       setIsDialogOpen(false);
-      router.push('/jobs?highlight=suggested');
+      router.push('/my-jobs?highlight=suggested');
     } else {
       sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
-      sessionStorage.setItem('postLoginRedirect', '/jobs?highlight=suggested');
+      sessionStorage.setItem('postLoginRedirect', '/my-jobs?highlight=suggested');
       setIsDialogOpen(false);
       setIsConfirmLoginOpen(true);
     }
