@@ -1,4 +1,5 @@
 
+
 import {
   Compass,
   BookOpen,
@@ -48,4 +49,5 @@ export const mobileFooterLinks = [
   { href: '/ai-profile', label: 'Hồ sơ AI', icon: Sparkles },
   { href: '/handbook', label: 'Cẩm nang', icon: LifeBuoy },
   { href: '/about', label: 'Giới thiệu', icon: Info },
+  { href: '/consultant-profile', label: 'Tư vấn viên', icon: User },
 ];
