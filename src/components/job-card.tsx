@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Image from 'next/image';
@@ -171,6 +172,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         </div>
                     </div>
                 )}
+                 {showApplyButtons && (
+                   <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm">
+                       <Bookmark className="h-4 w-4 text-primary"/>
+                   </Button>
+                )}
             </div>
 
             <div className="w-2/3 p-3 flex-grow flex flex-col justify-between">
@@ -225,7 +231,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                  <div className="flex items-center gap-2">
                     {showApplyButtons ? (
                         <>
-                            <Button variant="outline" size="sm" className="h-8"><Bookmark className="mr-1"/>Lưu</Button>
                             <Button size="sm" className="bg-accent-orange text-white h-8">Ứng tuyển</Button>
                         </>
                      ) : (
