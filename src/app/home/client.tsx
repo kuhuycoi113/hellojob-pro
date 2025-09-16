@@ -269,22 +269,13 @@ const MainContent = () => (
 
   type SearchModuleProps = {
       onSearch: (filters: SearchFilters) => void;
-      showHero: boolean;
       filters: SearchFilters;
       onFilterChange: (newFilters: Partial<SearchFilters>) => void;
   }
   
-const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchModuleProps) => {
+const SearchModule = ({ onSearch, filters, onFilterChange }: SearchModuleProps) => {
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
-
-  useEffect(() => {
-    // When the hero is hidden (after a search), collapse the search bar by default on mobile.
-    if (!showHero) {
-      setIsSearchExpanded(false);
-    }
-  }, [showHero]);
 
   useEffect(() => {
     const industries = filters.visa ? (industriesByJobType[filters.visa as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
@@ -313,63 +304,30 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
   
   const handleSearchClick = () => {
     onSearch(filters);
-     if (window.innerWidth < 768) { // md breakpoint
-      setIsSearchExpanded(false);
-    }
   }
-
-  const searchSummary = [
-    filters.visaDetail || filters.visa,
-    filters.industry,
-    filters.location
-  ].filter(Boolean).join(' / ');
 
 
   return (
     <section className={cn(
-        "w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white transition-all duration-500",
-        showHero ? "pt-20 md:pt-28 pb-10" : "pt-8 pb-8 md:pt-12 md:pb-12"
+        "w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white transition-all duration-500 pt-20 md:pt-28 pb-10"
     )}>
-        {showHero && (
-            <div className="container mx-auto px-4 md:px-6">
-              <div className="max-w-4xl mx-auto text-center">
+        <div className="container mx-auto px-4 md:px-6">
+            <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4">
                   <span className="md:hidden whitespace-nowrap">Việc làm Nhật Bản</span>
                   <span className="hidden md:inline">Tìm việc làm tại Nhật Bản</span>
                 </h1>
-                <p className="text-lg lg:text-xl max-w-3xl mx-auto mb-10 text-white/80">
+                 <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80">
                   <span className="md:hidden max-w-xs mx-auto block text-base/relaxed">Trải nghiệm Shopping công việc Thực tập sinh, Kỹ năng đặc định, Kỹ sư tri thức trong Thế giới việc làm HelloJob</span>
                   <span className="hidden md:inline">Nhanh tay khám phá trải nghiệm Shopping công việc từ Thực tập sinh, Kỹ năng đặc định đến Kỹ sư tri thức trong Thế giới việc làm tại Nhật Bản cùng HelloJob ngay thôi nào.</span>
                 </p>
-              </div>
             </div>
-        )}
+        </div>
         <div className={cn(
             "container mx-auto px-4 md:px-6 relative z-10",
         )}>
             <Card className="max-w-6xl mx-auto shadow-2xl">
-                 {/* Mobile Collapsed View */}
-                {!showHero && (
-                    <div className="md:hidden p-2">
-                        <Button 
-                            variant="ghost" 
-                            className="w-full justify-start text-left h-auto"
-                            onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                        >
-                            <SlidersHorizontal className="h-5 w-5 mr-3 text-muted-foreground"/>
-                            <div className="flex-grow">
-                                <p className="text-xs text-muted-foreground">Đang lọc theo</p>
-                                <p className="font-semibold text-foreground truncate">{searchSummary || 'Tất cả'}</p>
-                            </div>
-                        </Button>
-                    </div>
-                )}
-                
-                {/* Full Search View (Desktop always, Mobile when expanded) */}
-                <div className={cn(
-                    "p-4 md:p-6",
-                    !showHero && !isSearchExpanded ? "hidden md:block" : "block"
-                )}>
+                <div className="p-4 md:p-6">
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                         <div className="space-y-2 md:col-span-3">
                             <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
@@ -464,133 +422,29 @@ const initialSearchFilters: SearchFilters = {
 };
 
 export default function HomeClient() {
-  const [isSearching, setIsSearching] = useState(false);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const router = useRouter();
   const [searchFilters, setSearchFilters] = useState<SearchFilters>(initialSearchFilters);
 
   const handleSearch = (filters: SearchFilters) => {
-    applyFilters(filters);
-    setIsSearching(true);
+    const query = new URLSearchParams();
+    if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('visaDetail', filters.visaDetail);
+    if (filters.industry && filters.industry !== 'all') query.set('industry', filters.industry);
+    if (filters.location && filters.location !== 'all') query.set('location', filters.location);
+    router.push(`/jobs?${query.toString()}`);
   };
   
   const handleFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
       const updatedFilters = {...searchFilters, ...newFilters};
       setSearchFilters(updatedFilters);
-      if (isSearching) {
-        applyFilters(updatedFilters);
-      }
-  }, [searchFilters, isSearching]);
+  }, [searchFilters]);
 
-  const handleResetFilters = useCallback(() => {
-    setSearchFilters(initialSearchFilters);
-    if(isSearching) {
-        applyFilters(initialSearchFilters);
-    }
-  }, [isSearching]);
-
-  const applyFilters = useCallback((currentFilters: SearchFilters) => {
-     const { 
-         visa, visaDetail, industry, location, jobDetail, interviewLocation, 
-         interviewDate, height, weight, age, basicSalary, netSalary, 
-         hourlySalary, annualIncome, annualBonus, specialConditions,
-         languageRequirement, educationRequirement, yearsOfExperience, 
-         tattooRequirement, hepatitisBRequirement 
-    } = currentFilters;
-     
-    const results = jobData.filter(job => {
-        
-        let visaMatch = true;
-        if (visaDetail && visaDetail !== 'all-details') {
-            visaMatch = job.visaDetail === visaDetail;
-        } else if (visa && visa !== 'all') {
-            visaMatch = job.visaType === visa;
-        }
-
-        const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
-        
-        const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
-        
-        let locationMatch = false;
-        if (!location || location === 'all') {
-            locationMatch = true;
-        } else {
-            const isRegion = Object.keys(locations['Nhật Bản']).includes(location);
-            if (isRegion) {
-                const regionPrefectures = locations['Nhật Bản'][location as keyof typeof locations['Nhật Bản']];
-                locationMatch = regionPrefectures.some(prefecture => job.workLocation.toLowerCase().includes(prefecture.toLowerCase()));
-            } else {
-                locationMatch = job.workLocation && job.workLocation.toLowerCase().includes(location.toLowerCase());
-            }
-        }
-        
-        const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
-        
-        const interviewDateMatch = (() => {
-            if (!interviewDate || interviewDate === 'flexible') return true;
-            if (!job.interviewDate) return false;
-            
-            try {
-                const tomorrow = startOfTomorrow();
-                const selectedDate = new Date(interviewDate);
-                const jobDate = parse(job.interviewDate, 'yyyy-MM-dd', new Date());
-
-                return isWithinInterval(jobDate, { start: tomorrow, end: selectedDate });
-            } catch (error) {
-                console.error("Error parsing date:", error);
-                return false;
-            }
-        })();
-
-        // Salary filters
-        const parseSalary = (salaryStr?: string) => salaryStr ? parseInt(salaryStr.replace(/[^0-9]/g, ''), 10) : 0;
-        const basicSalaryMatch = !basicSalary || parseSalary(job.salary.basic) >= parseSalary(basicSalary);
-        const netSalaryMatch = !netSalary || parseSalary(job.salary.actual) >= parseSalary(netSalary);
-        
-        // Age filter
-        const ageMatch = (() => {
-            if (!age || !job.ageRequirement) return true;
-            const [minFilterAge, maxFilterAge] = age;
-            const [minJobAge, maxJobAge] = job.ageRequirement.split('-').map(Number);
-            return minFilterAge <= maxJobAge && maxFilterAge >= minJobAge;
-        })();
-
-        // Special conditions
-        const specialConditionsMatch = !specialConditions || specialConditions.length === 0 || specialConditions.every(cond => job.tags.includes(cond));
-        
-        // Other requirements
-        const educationMatch = !educationRequirement || !job.educationRequirement || job.educationRequirement === educationRequirement;
-        const languageMatch = !languageRequirement || !job.languageRequirement || job.languageRequirement === languageRequirement;
-        const tattooMatch = !tattooRequirement || !job.tattooRequirement || job.tattooRequirement === tattooRequirement;
-        const hepatitisBMatch = !hepatitisBRequirement || !job.hepatitisBRequirement || job.hepatitisBRequirement === hepatitisBRequirement;
-
-        return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && ageMatch && specialConditionsMatch && educationMatch && languageMatch && tattooMatch && hepatitisBMatch;
-    });
-
-    setFilteredJobs(results);
-  }, []);
-
-  const handleBackToHome = (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (pathname === '/') {
-        e.preventDefault();
-        if (isSearching) {
-            setIsSearching(false);
-            setSearchFilters(initialSearchFilters);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-             window.location.reload();
-        }
-      }
-  }
-
-  const pathname = usePathname();
 
   return (
     <div className="flex flex-col items-center min-h-screen">
-        <SearchModule onSearch={handleSearch} showHero={!isSearching} filters={searchFilters} onFilterChange={handleFilterChange} />
-      
-      <div className="w-full flex-grow">
-        {isSearching ? <SearchResults jobs={filteredJobs} filters={searchFilters} onFilterChange={handleFilterChange} applyFilters={() => applyFilters(searchFilters)} resetFilters={handleResetFilters}/> : <MainContent />}
-      </div>
+        <SearchModule onSearch={handleSearch} filters={searchFilters} onFilterChange={handleFilterChange} />
+        <div className="w-full flex-grow">
+          <MainContent />
+        </div>
     </div>
   );
 }

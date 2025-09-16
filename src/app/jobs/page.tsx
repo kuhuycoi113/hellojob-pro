@@ -5,7 +5,7 @@
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil, X, ThumbsUp, TrendingUp, ShieldCheck, ChevronDown } from 'lucide-react';
+import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil, X, ThumbsUp, TrendingUp, ShieldCheck, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { jobData, type Job } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
@@ -36,6 +36,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
+import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
 
 
 const aspirations = [
@@ -1265,12 +1266,108 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
   );
 };
 
+const initialSearchFilters: SearchFilters = {
+    visa: '', 
+    visaDetail: '', 
+    industry: '', 
+    location: '', 
+    interviewLocation: '', 
+    jobDetail: '',
+    height: [135, 210],
+    weight: [35, 120],
+    age: [18, 70],
+    basicSalary: '',
+    netSalary: '',
+    hourlySalary: '',
+    annualIncome: '',
+    annualBonus: '',
+    specialConditions: [],
+    languageRequirement: '',
+    educationRequirement: '',
+    yearsOfExperience: '',
+    tattooRequirement: '',
+    hepatitisBRequirement: '',
+};
 
 function JobsDashboardPageContent() {
     const { role } = useAuth();
     const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
+    const searchParams = useSearchParams();
+
+    const [isSearching, setIsSearching] = useState(false);
+    const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+    const [searchFilters, setSearchFilters] = useState<SearchFilters>(initialSearchFilters);
+
+    useEffect(() => {
+        const hasSearchParams = Array.from(searchParams.keys()).length > 0;
+        setIsSearching(hasSearchParams);
+
+        if (hasSearchParams) {
+            const newFilters: Partial<SearchFilters> = {};
+            for (const [key, value] of searchParams.entries()) {
+                // @ts-ignore
+                newFilters[key] = value;
+            }
+            setSearchFilters(prev => ({...prev, ...newFilters}));
+            applyFilters({...initialSearchFilters, ...newFilters});
+        }
+    }, [searchParams]);
+
+    const applyFilters = useCallback((currentFilters: SearchFilters) => {
+        const { 
+            visa, visaDetail, industry, location, jobDetail, interviewLocation, 
+            interviewDate, height, weight, age, basicSalary, netSalary, 
+            hourlySalary, annualIncome, annualBonus, specialConditions,
+            languageRequirement, educationRequirement, yearsOfExperience, 
+            tattooRequirement, hepatitisBRequirement 
+        } = currentFilters;
+        
+        let results = jobData.filter(job => {
+            let visaMatch = true;
+            if (visaDetail && visaDetail !== 'all-details') {
+                visaMatch = job.visaDetail === visaDetail;
+            } else if (visa && visa !== 'all') {
+                visaMatch = job.visaType === visa;
+            }
+
+            const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
+            
+            const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
+            
+            let locationMatch = false;
+            if (!location || location === 'all') {
+                locationMatch = true;
+            } else {
+                const isRegion = Object.keys(locations['Nhật Bản']).includes(location);
+                if (isRegion) {
+                    const regionPrefectures = locations['Nhật Bản'][location as keyof typeof locations['Nhật Bản']];
+                    locationMatch = regionPrefectures.some(prefecture => job.workLocation.toLowerCase().includes(prefecture.toLowerCase()));
+                } else {
+                    locationMatch = job.workLocation && job.workLocation.toLowerCase().includes(location.toLowerCase());
+                }
+            }
+            
+            const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
+            
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch;
+        });
+
+        setFilteredJobs(results);
+    }, []);
+
+    const handleFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
+      const updatedFilters = {...searchFilters, ...newFilters};
+      setSearchFilters(updatedFilters);
+      applyFilters(updatedFilters);
+  }, [searchFilters, applyFilters]);
+  
+  const handleResetFilters = useCallback(() => {
+    setSearchFilters(initialSearchFilters);
+    applyFilters(initialSearchFilters);
+  }, [applyFilters]);
+
 
     const handleHighlight = () => {
         setIsHighlighting(true);
@@ -1283,9 +1380,15 @@ function JobsDashboardPageContent() {
     return (
       <div className="bg-secondary min-h-screen">
         <div className="container mx-auto px-2 md:px-4 py-8">
-          {isLoggedIn ? <LoggedInView /> : <LoggedOutView />}
+            {isSearching ? (
+                 <SearchResults jobs={filteredJobs} filters={searchFilters} onFilterChange={handleFilterChange} applyFilters={() => applyFilters(searchFilters)} resetFilters={handleResetFilters}/>
+            ) : isLoggedIn ? (
+                <LoggedInView />
+            ) : (
+                <LoggedOutView />
+            )}
         </div>
-        {role === 'candidate' && showFloatingSelector && <FloatingPrioritySelector onHighlight={handleHighlight} />}
+        {role === 'candidate' && showFloatingSelector && !isSearching && <FloatingPrioritySelector onHighlight={handleHighlight} />}
       </div>
     );
 }
@@ -1293,28 +1396,8 @@ function JobsDashboardPageContent() {
 
 export default function JobsDashboardPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="h-16 w-16 animate-spin"/></div>}>
             <JobsDashboardPageContent />
         </Suspense>
     )
 }
-
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
