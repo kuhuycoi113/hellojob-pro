@@ -1,9 +1,10 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -34,6 +35,17 @@ type SearchModuleProps = {
 
 export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = false }: SearchModuleProps) => {
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(showHero);
+
+  useEffect(() => {
+    // On mobile, if we are not showing the hero (i.e., we are on the results page),
+    // the search bar should be collapsed by default.
+    if (!showHero && window.innerWidth < 768) {
+      setIsSearchExpanded(false);
+    } else {
+      setIsSearchExpanded(true);
+    }
+  }, [showHero]);
 
   useEffect(() => {
     const industries = filters.visa ? (industriesByJobType[filters.visa as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
@@ -53,7 +65,17 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
 
   const handleSearchClick = () => {
     onSearch(filters);
+     if (window.innerWidth < 768) { // md breakpoint
+      setIsSearchExpanded(false);
+    }
   }
+
+  const searchSummary = [
+    filters.visaDetail || filters.visa,
+    filters.industry,
+    filters.location
+  ].filter(Boolean).join(' / ');
+
 
   return (
     <section className={cn(
@@ -64,12 +86,10 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
         <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4">
-                  <span className="md:hidden whitespace-nowrap">Việc làm Nhật Bản</span>
-                  <span className="hidden md:inline">Tìm việc làm tại Nhật Bản</span>
+                  Tìm việc làm tại Nhật Bản
                 </h1>
-                 <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80">
-                  <span className="md:hidden max-w-xs mx-auto block text-base/relaxed">Trải nghiệm Shopping công việc Thực tập sinh, Kỹ năng đặc định, Kỹ sư tri thức trong Thế giới việc làm HelloJob</span>
-                  <span className="hidden md:inline">Nhanh tay khám phá trải nghiệm Shopping công việc từ Thực tập sinh, Kỹ năng đặc định đến Kỹ sư tri thức trong Thế giới việc làm tại Nhật Bản cùng HelloJob ngay thôi nào.</span>
+                <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80">
+                 Chúng tôi không chỉ cung cấp việc làm, mà còn đào tạo tư duy và xây dựng lộ trình phát triển sự nghiệp (SWR) rõ ràng, giúp bạn từ lao động phổ thông trở thành chuyên gia lành nghề.
                 </p>
             </div>
         </div>
@@ -78,7 +98,28 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
             "container mx-auto px-4 md:px-6 relative z-10",
         )}>
             <Card className="max-w-6xl mx-auto shadow-2xl">
-                <CardContent className="p-4 md:p-6">
+                 {/* Mobile Collapsed View */}
+                {!showHero && (
+                    <div className="md:hidden p-2">
+                        <Button 
+                            variant="ghost" 
+                            className="w-full justify-start text-left h-auto"
+                            onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                        >
+                            <SlidersHorizontal className="h-5 w-5 mr-3 text-muted-foreground"/>
+                            <div className="flex-grow">
+                                <p className="text-xs text-muted-foreground">Đang lọc theo</p>
+                                <p className="font-semibold text-foreground truncate">{searchSummary || 'Tất cả'}</p>
+                            </div>
+                        </Button>
+                    </div>
+                )}
+                
+                {/* Full Search View (Desktop always, Mobile when expanded) */}
+                <div className={cn(
+                    "p-4 md:p-6",
+                    isSearchExpanded ? "block" : "hidden md:block"
+                )}>
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                         <div className="space-y-2 md:col-span-3">
                             <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
@@ -142,7 +183,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                             </Button>
                         </div>
                     </div>
-                </CardContent>
+                </div>
             </Card>
         </div>
     </section>
