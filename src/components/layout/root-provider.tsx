@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -12,13 +11,27 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
 import { PasswordGate } from '../password-gate';
 
+function LayoutManager({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname();
+    const isCallPage = pathname.startsWith('/video-call') || pathname.startsWith('/voice-call');
+
+    return (
+        <>
+            {!isCallPage && <Header />}
+            <main className="min-h-screen">{children}</main>
+            {!isCallPage && <Footer />}
+            {!isCallPage && <FloatingChatWidget />}
+            <Toaster />
+        </>
+    );
+}
+
+
 export function RootProvider({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const pathname = usePathname();
-    const isCallPage = pathname.startsWith('/video-call') || pathname.startsWith('/voice-call');
     const [isUnlocked, setIsUnlocked] = useState(false);
 
     useEffect(() => {
@@ -33,11 +46,7 @@ export function RootProvider({
     return (
         <ChatProvider>
             <AuthProvider>
-                {!isCallPage && <Header />}
-                <main className="min-h-screen">{children}</main>
-                {!isCallPage && <Footer />}
-                {!isCallPage && <FloatingChatWidget />}
-                <Toaster />
+                <LayoutManager>{children}</LayoutManager>
             </AuthProvider>
         </ChatProvider>
     );
