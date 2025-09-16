@@ -515,7 +515,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                                 <AccordionTrigger className="flex-1 p-0 hover:no-underline">
                                                     <Label htmlFor={`region-${region}`} className="flex-grow text-left font-semibold cursor-pointer flex justify-between w-full">
                                                         <span>Vùng {region}</span>
-                                                        <span className="text-muted-foreground text-xs">{jobCountsByRegion[region] || 0} việc</span>
+                                                        <span className="text-muted-foreground text-xs ml-1">{jobCountsByRegion[region] || 0} việc</span>
                                                     </Label>
                                                 </AccordionTrigger>
                                             </div>
@@ -537,7 +537,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                                         />
                                                         <Label htmlFor={`pref-${prefecture}`} className="flex w-full items-center justify-between font-normal cursor-pointer">
                                                             <span>{prefecture}</span>
-                                                            <span className="text-muted-foreground text-xs">{jobCountsByPrefecture[prefecture] || 0}</span>
+                                                            <span className="text-muted-foreground text-xs ml-1">{jobCountsByPrefecture[prefecture] || 0}</span>
                                                         </Label>
                                                     </div>
                                                 ))}
@@ -895,9 +895,9 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                 </CardContent>
             </Card>
             <div className="p-4 sticky bottom-0 bg-background/95 backdrop-blur-sm border-t mt-auto">
-                <div className="grid grid-cols-2 gap-2 w-full">
-                    <Button variant="outline" onClick={onReset}>Xóa</Button>
-                    <Button className="w-full bg-primary text-white" onClick={onApply}>
+                <div className="grid grid-cols-3 gap-2 w-full">
+                    <Button variant="outline" onClick={onReset} className="col-span-1">Xóa</Button>
+                    <Button className="w-full bg-primary text-white col-span-2" onClick={onApply}>
                         Áp dụng <Badge variant="secondary" className="ml-2">{resultCount}</Badge>
                     </Button>
                 </div>
@@ -905,5 +905,3 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         </div>
     );
 }
-
-    
