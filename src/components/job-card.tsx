@@ -125,7 +125,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     <span>{job.workLocation}</span>
                 </p>
                  {showPostedTime && (
-                <div className="flex items-center gap-1.5 text-xs justify-end">
+                <div className="flex items-center gap-1.5 text-xs text-right">
                     <span className="text-primary font-semibold">Đăng lúc:</span>
                     <span style={{color: '#9B999A'}}>{job.postedTime}</span>
                 </div>
@@ -135,19 +135,19 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
             
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-2">
-                    <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleChatClick}>
-                        <MessageSquare className="mr-2 h-4 w-4"/>
-                        Chat với Tư vấn viên
-                    </Button>
-                    <Link href={`/consultant-profile/${'consultant-1'}`}>
+                     <Link href={`/consultant-profile/${'consultant-1'}`}>
                         <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
                             <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                             <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                     </Link>
+                    <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleChatClick}>
+                        <MessageSquare className="mr-2 h-4 w-4"/>
+                        Chat với Tư vấn viên
+                    </Button>
                 </div>
                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className={cn("flex-shrink-0", isSaved && "border-accent-orange text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                    <Button variant="ghost" size="sm" className={cn("flex-shrink-0", isSaved && "border-accent-orange text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                         <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                         Lưu
                     </Button>
