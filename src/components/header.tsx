@@ -496,7 +496,7 @@ export function Header() {
                                 </DialogContent>
                             </Dialog>
                             <Button asChild>
-                                <Link href="/jobs">
+                                <Link href="/my-jobs">
                                 Trang việc làm
                                 </Link>
                             </Button>
@@ -509,7 +509,7 @@ export function Header() {
                         <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
                     )}
                     <Button asChild variant="default" size="sm">
-                        <Link href="/jobs">Việc</Link>
+                        <Link href="/my-jobs">Việc</Link>
                     </Button>
                     <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
