@@ -13,17 +13,17 @@ const employer = {
   name: 'Samsung Electronics Vietnam',
   industry: 'Điện tử',
   location: 'Khu công nghệ cao, Quận 9, TP. Hồ Chí Minh',
-  logo: 'https://placehold.co/150x150.png',
+  logo: 'https://picsum.photos/seed/samsunglogo/150/150',
   dataAiHint: 'samsung logo',
-  banner: 'https://placehold.co/1200x400.png',
+  banner: 'https://picsum.photos/seed/samsungbanner/1200/400',
   dataAiHintBanner: 'samsung factory',
   size: '10,000+ nhân viên',
   about: 'Samsung Electronics là một công ty điện tử đa quốc gia của Hàn Quốc, là một trong những nhà sản xuất thiết bị điện tử và linh kiện lớn nhất thế giới. Tại Việt Nam, chúng tôi có các nhà máy sản xuất lớn, tập trung vào việc sản xuất điện thoại di động và các thiết bị điện tử gia dụng, đóng góp lớn vào kim ngạch xuất khẩu của Việt Nam.',
   videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Placeholder video
   images: [
-    { src: 'https://placehold.co/600x400.png', alt: 'Dây chuyền sản xuất', dataAiHint: 'production line' },
-    { src: 'https://placehold.co/600x400.png', alt: 'Khuôn viên công ty', dataAiHint: 'company campus' },
-    { src: 'https://placehold.co/600x400.png', alt: 'Hoạt động nhóm', dataAiHint: 'team activity' },
+    { src: 'https://picsum.photos/seed/factory1/400/600', alt: 'Dây chuyền sản xuất hiện đại', dataAiHint: 'production line' },
+    { src: 'https://picsum.photos/seed/factory2/600/400', alt: 'Khuôn viên công ty rộng rãi', dataAiHint: 'company campus' },
+    { src: 'https://picsum.photos/seed/factory3/600/400', alt: 'Hoạt động đội nhóm', dataAiHint: 'team activity' },
   ],
   jobs: [
     { title: 'Kỹ sư Vận hành Dây chuyền', type: 'Toàn thời gian', date: '25/07/2024' },
@@ -69,8 +69,18 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                 </Card>}
                 <Card>
                     <CardHeader><CardTitle className="font-headline text-2xl">Hình ảnh</CardTitle></CardHeader>
-                    <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {employer.images.map((img, i) => <Image key={i} src={img.src} alt={img.alt} width={600} height={400} className="rounded-lg object-cover aspect-video" data-ai-hint={img.dataAiHint}/>)}
+                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="relative md:col-span-1 aspect-[2/3]">
+                            <Image src={employer.images[0].src} alt={employer.images[0].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[0].dataAiHint}/>
+                        </div>
+                        <div className="md:col-span-1 grid grid-rows-2 gap-4">
+                            <div className="relative aspect-video">
+                                <Image src={employer.images[1].src} alt={employer.images[1].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[1].dataAiHint}/>
+                            </div>
+                             <div className="relative aspect-video">
+                                <Image src={employer.images[2].src} alt={employer.images[2].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[2].dataAiHint}/>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
