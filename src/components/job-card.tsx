@@ -100,14 +100,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
         </div>
         
         <div className="flex-grow flex flex-col">
-            <div className='flex justify-between items-start'>
-                <Link href={`/jobs/${job.id}`} className="group flex-grow">
-                    <h3 className="font-bold text-base mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
-                </Link>
-                 <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" onClick={handleSaveJob}>
-                    <Bookmark className={cn("h-5 w-5", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
-                </Button>
-            </div>
+            <Link href={`/jobs/${job.id}`} className="group flex-grow">
+                <h3 className="font-bold text-base mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
+            </Link>
              <div className="flex flex-wrap items-center gap-2 mb-2">
               {job.visaDetail && (
                 <Badge
@@ -129,15 +124,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     <MapPin className="h-4 w-4 flex-shrink-0" />
                     <span>{job.workLocation}</span>
                 </p>
-                {showPostedTime && (
-                    <div className="flex items-center gap-1.5 text-xs text-right">
-                        <span className="text-primary font-semibold">Đăng lúc:</span>
-                        <span style={{color: '#9B999A'}}>{job.postedTime}</span>
-                    </div>
-                )}
             </div>
 
-
+             {showPostedTime && (
+                <div className="flex items-center gap-1.5 text-xs text-right mt-1">
+                    <span className="text-primary font-semibold">Đăng lúc:</span>
+                    <span style={{color: '#9B999A'}}>{job.postedTime}</span>
+                </div>
+            )}
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-2">
                     <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleChatClick}>
@@ -152,6 +146,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </Link>
                 </div>
                  <div className="flex items-center gap-2">
+                     <Button variant="ghost" size="sm" className="flex-shrink-0" onClick={handleSaveJob}>
+                        <Bookmark className={cn("h-5 w-5", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
+                        Lưu
+                    </Button>
                     {showApplyButtons ? (
                         <>
                             <Button size="sm" className="bg-accent-orange text-white">Ứng tuyển</Button>
