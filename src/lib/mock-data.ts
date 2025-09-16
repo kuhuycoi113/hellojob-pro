@@ -117,7 +117,8 @@ const generateRandomJob = (index: number): Job => {
     
     let title = `${jobTitles[industry as keyof typeof jobTitles][index % 4]}, ${location}, ${quantity} ${gender}`;
     if (languageRequirement !== 'Không yêu cầu') {
-        title += `, ${languageRequirement}`;
+        const simplifiedLanguage = languageRequirement.replace('Tiếng Nhật ', '').replace('JLPT ', '');
+        title += `, ${simplifiedLanguage}`;
     }
 
     // Deterministic generation of likes to avoid hydration errors
