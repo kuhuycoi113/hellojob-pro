@@ -42,9 +42,10 @@ type SearchResultsProps = {
     onFilterChange: (newFilters: Partial<SearchFilters>) => void;
     applyFilters: () => void;
     resetFilters: () => void;
+    resultCount: number;
 }
 
-export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, resetFilters }: SearchResultsProps) => {
+export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, resetFilters, resultCount }: SearchResultsProps) => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(24);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
@@ -76,7 +77,7 @@ export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, res
         <div className="container mx-auto px-4 md:px-6 py-6">
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8">
                 <div className="hidden md:block">
-                  <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} onReset={resetFilters}/>
+                  <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} onReset={resetFilters} resultCount={resultCount} />
                 </div>
 
                 <div className="md:col-span-3 lg:col-span-3">
@@ -97,7 +98,7 @@ export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, res
                               </SheetDescription>
                             </SheetHeader>
                             <div className="py-4 h-[calc(100vh-8rem)] overflow-y-auto">
-                              <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} onReset={resetFilters} />
+                              <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} onReset={resetFilters} resultCount={resultCount}/>
                             </div>
                           </SheetContent>
                         </Sheet>

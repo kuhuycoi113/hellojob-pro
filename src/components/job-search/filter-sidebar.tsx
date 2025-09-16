@@ -23,6 +23,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format, startOfTomorrow, parse } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { jobData } from '@/lib/mock-data';
+import { Badge } from '../ui/badge';
 
 const japanJobTypes = [
     'Thực tập sinh kỹ năng',
@@ -110,6 +111,7 @@ interface FilterSidebarProps {
     onFilterChange: (newFilters: Partial<SearchFilters>) => void;
     onApply: () => void;
     onReset: () => void;
+    resultCount: number;
 }
 
 const JPY_VND_RATE = 180;
@@ -180,7 +182,7 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
 MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 
 
-export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: FilterSidebarProps) => {
+export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resultCount }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isFlexibleDate, setIsFlexibleDate] = useState(false);
@@ -191,7 +193,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
 
         // Initialize all known prefectures and regions to 0
         Object.values(locations["Nhật Bản"]).flat().forEach(p => {
-            if (!countsByPrefecture[p]) countsByPrefecture[p] = 0;
+            if (typeof p === 'string' && !countsByPrefecture[p]) countsByPrefecture[p] = 0;
         });
          Object.keys(locations["Nhật Bản"]).forEach(r => {
             if (!countsByRegion[r]) countsByRegion[r] = 0;
@@ -266,9 +268,9 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
         const vietnamVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Đặc định đầu Việt", "Đặc định đi mới", "Kỹ sư, tri thức đầu Việt"];
         const japanVisas = ["Thực tập sinh 3 Go", "Đặc định đầu Nhật", "Kỹ sư, tri thức đầu Nhật"];
 
-        if (vietnamVisas.includes(value) && !locations['Việt Nam'].includes(filters.interviewLocation || '')) {
+        if (vietnamVisas.includes(value) && filters.interviewLocation && !locations['Việt Nam'].includes(filters.interviewLocation)) {
             newFilters.interviewLocation = ''; 
-        } else if (japanVisas.includes(value) && !locations['Phỏng vấn tại Nhật Bản'].includes(filters.interviewLocation || '')) {
+        } else if (japanVisas.includes(value) && filters.interviewLocation && !locations['Phỏng vấn tại Nhật Bản'].includes(filters.interviewLocation)) {
              newFilters.interviewLocation = '';
         }
 
@@ -496,7 +498,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                                    <Accordion type="multiple" className="w-full">
                                     {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
                                         <AccordionItem key={region} value={region}>
-                                             <div className="flex items-center gap-2 py-2 text-sm hover:no-underline" >
+                                            <div className="flex items-center gap-2 py-2 text-sm hover:no-underline" >
                                                 <Checkbox
                                                     id={`region-${region}`}
                                                     checked={Array.isArray(filters.location) && (prefectures as string[]).every(p => filters.location.includes(p))}
@@ -511,9 +513,9 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                                                     }}
                                                 />
                                                 <AccordionTrigger className="flex-1 p-0 hover:no-underline">
-                                                    <Label htmlFor={`region-${region}`} className="flex-grow text-left font-semibold cursor-pointer">
-                                                        Vùng {region} 
-                                                        <span className="text-muted-foreground text-xs ml-1">{jobCountsByRegion[region] || 0} việc</span>
+                                                    <Label htmlFor={`region-${region}`} className="flex-grow text-left font-semibold cursor-pointer flex justify-between w-full">
+                                                        <span>Vùng {region}</span>
+                                                        <span className="text-muted-foreground text-xs">{jobCountsByRegion[region] || 0} việc</span>
                                                     </Label>
                                                 </AccordionTrigger>
                                             </div>
@@ -535,7 +537,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                                                         />
                                                         <Label htmlFor={`pref-${prefecture}`} className="flex w-full items-center justify-between font-normal cursor-pointer">
                                                             <span>{prefecture}</span>
-                                                            <span className="text-muted-foreground text-xs">{jobCountsByPrefecture[prefecture] || 0} việc</span>
+                                                            <span className="text-muted-foreground text-xs">{jobCountsByPrefecture[prefecture] || 0}</span>
                                                         </Label>
                                                     </div>
                                                 ))}
@@ -894,8 +896,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
             </Card>
             <div className="p-4 sticky bottom-0 bg-background/95 backdrop-blur-sm border-t mt-auto">
                 <div className="grid grid-cols-2 gap-2 w-full">
-                    <Button variant="outline" onClick={onReset}><Trash2 className="mr-2 h-4 w-4" />Xóa bộ lọc</Button>
-                    <Button className="w-full bg-primary text-white" onClick={onApply}>Áp dụng</Button>
+                    <Button variant="outline" onClick={onReset}><Trash2 className="mr-2 h-4 w-4" />Xóa</Button>
+                    <Button className="w-full bg-primary text-white" onClick={onApply}>
+                        Áp dụng <Badge variant="secondary" className="ml-2">{resultCount}</Badge>
+                    </Button>
                 </div>
             </div>
         </div>

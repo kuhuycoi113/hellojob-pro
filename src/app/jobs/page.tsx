@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense, useCallback } from 'react';
+import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
 import { Job, jobData } from '@/lib/mock-data';
@@ -38,13 +38,20 @@ function JobsPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
+    // `appliedFilters` are the filters currently reflected in the displayed job list.
+    const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(initialSearchFilters);
+    // `stagedFilters` are the filters the user is currently selecting in the sidebar, before clicking "Apply".
+    const [stagedFilters, setStagedFilters] = useState<SearchFilters>(initialSearchFilters);
+    
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-    const [searchFilters, setSearchFilters] = useState<SearchFilters>(initialSearchFilters);
-
-    const applyFilters = useCallback((currentFilters: SearchFilters) => {
+    const [stagedResultCount, setStagedResultCount] = useState<number>(jobData.length);
+    
+    // This function applies filters and updates the displayed job list.
+    // It is now only called when the user clicks "Apply" or on initial page load.
+    const runFilter = useCallback((filtersToApply: SearchFilters) => {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, 
-        } = currentFilters;
+        } = filtersToApply;
         
         let results = jobData.filter(job => {
             let visaMatch = true;
@@ -60,7 +67,14 @@ function JobsPageContent() {
             
             let locationMatch = true;
             if (Array.isArray(location) && location.length > 0) {
-                locationMatch = location.includes(job.workLocation);
+                 locationMatch = location.some(loc => {
+                    const isRegion = Object.keys(locations['Nhật Bản']).includes(loc);
+                    if (isRegion) {
+                        const regionPrefectures = locations['Nhật Bản'][loc as keyof typeof locations['Nhật Bản']];
+                        return regionPrefectures.some(prefecture => job.workLocation.toLowerCase().includes(prefecture.toLowerCase()));
+                    }
+                    return job.workLocation && job.workLocation.toLowerCase().includes(loc.toLowerCase());
+                });
             }
             
             const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
@@ -71,41 +85,87 @@ function JobsPageContent() {
         setFilteredJobs(results);
     }, []);
 
+    // This function ONLY counts the results based on staged filters without updating the UI.
+    const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
+        const { visa, visaDetail, industry, location, jobDetail, interviewLocation } = filtersToCount;
+        const count = jobData.filter(job => {
+            let visaMatch = true;
+            if (visaDetail && visaDetail !== 'all-details') {
+                visaMatch = job.visaDetail === visaDetail;
+            } else if (visa && visa !== 'all') {
+                visaMatch = job.visaType === visa;
+            }
+            const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
+            const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
+             let locationMatch = true;
+            if (Array.isArray(location) && location.length > 0) {
+                 locationMatch = location.some(loc => {
+                    const isRegion = Object.keys(locations['Nhật Bản']).includes(loc);
+                    if (isRegion) {
+                        const regionPrefectures = locations['Nhật Bản'][loc as keyof typeof locations['Nhật Bản']];
+                        return regionPrefectures.some(prefecture => job.workLocation.toLowerCase().includes(prefecture.toLowerCase()));
+                    }
+                    return job.workLocation && job.workLocation.toLowerCase().includes(loc.toLowerCase());
+                });
+            }
+            const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch;
+        }).length;
+        setStagedResultCount(count);
+    }, []);
+
+    // Effect for initial load and URL changes
     useEffect(() => {
         const newFilters: Partial<SearchFilters> = {};
         for (const [key, value] of searchParams.entries()) {
-            if (key === 'location') {
-                 // @ts-ignore
+            if (key === 'location' && value) {
                 newFilters[key] = value.split(',');
             } else {
                  // @ts-ignore
                 newFilters[key] = value;
             }
         }
-        const updatedFilters = {...initialSearchFilters, ...newFilters};
-        setSearchFilters(updatedFilters);
-        applyFilters(updatedFilters);
+        const initialFilters = {...initialSearchFilters, ...newFilters};
+        setAppliedFilters(initialFilters);
+        setStagedFilters(initialFilters); // Sync staged with applied on load
+        runFilter(initialFilters);
+        countStagedResults(initialFilters); // Count results for initial load
         
-    }, [searchParams, applyFilters]);
+    }, [searchParams, runFilter, countStagedResults]);
     
-    const handleFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
-      const updatedFilters = {...searchFilters, ...newFilters};
-      setSearchFilters(updatedFilters);
-       const query = new URLSearchParams();
-        if (updatedFilters.visaDetail && updatedFilters.visaDetail !== 'all-details') query.set('visaDetail', updatedFilters.visaDetail);
-        if (updatedFilters.industry && updatedFilters.industry !== 'all') query.set('industry', updatedFilters.industry);
-        if (Array.isArray(updatedFilters.location) && updatedFilters.location.length > 0) {
-            query.set('location', updatedFilters.location.join(','));
-        }
-       router.push(`/jobs?${query.toString()}`);
+    // Handler for changes in the filter sidebar. It updates the staged filters and recounts.
+    const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
+      setStagedFilters(prev => {
+          const updated = {...prev, ...newFilters};
+          countStagedResults(updated);
+          return updated;
+      });
+    }, [countStagedResults]);
 
-    }, [searchFilters, router]);
+    // Handler for the "Apply" button. It updates the URL and applied filters.
+    const handleApplyFilters = useCallback(() => {
+        const query = new URLSearchParams();
+        if (stagedFilters.visaDetail && stagedFilters.visaDetail !== 'all-details') query.set('visaDetail', stagedFilters.visaDetail);
+        if (stagedFilters.industry && stagedFilters.industry !== 'all') query.set('industry', stagedFilters.industry);
+        if (Array.isArray(stagedFilters.location) && stagedFilters.location.length > 0) {
+            query.set('location', stagedFilters.location.join(','));
+        }
+        // Add other filters to query as needed
+        router.push(`/jobs?${query.toString()}`);
+    }, [stagedFilters, router]);
   
+    // Handler for resetting filters.
     const handleResetFilters = useCallback(() => {
-        setSearchFilters(initialSearchFilters);
-        router.push('/jobs');
-    }, [router]);
+        setStagedFilters(initialSearchFilters);
+        countStagedResults(initialSearchFilters);
+        if (searchParams.toString() !== '') {
+            router.push('/jobs');
+        } else {
+             runFilter(initialSearchFilters);
+        }
+    }, [router, runFilter, countStagedResults, searchParams]);
     
+    // Handler for new searches initiated from the SearchModule (e.g., on the homepage)
     const handleNewSearch = (filters: SearchFilters) => {
         const query = new URLSearchParams();
         if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('visaDetail', filters.visaDetail);
@@ -120,15 +180,16 @@ function JobsPageContent() {
         <div className="flex flex-col">
             <SearchModule 
                 onSearch={handleNewSearch} 
-                filters={searchFilters} 
-                onFilterChange={handleFilterChange} 
+                filters={stagedFilters} // SearchModule always reflects the latest user interaction
+                onFilterChange={handleStagedFilterChange} 
             />
             <SearchResults 
                 jobs={filteredJobs} 
-                filters={searchFilters} 
-                onFilterChange={handleFilterChange} 
-                applyFilters={() => applyFilters(searchFilters)} 
+                filters={stagedFilters} // Pass staged filters to the sidebar
+                onFilterChange={handleStagedFilterChange} 
+                applyFilters={handleApplyFilters} 
                 resetFilters={handleResetFilters}
+                resultCount={stagedResultCount}
             />
         </div>
     );
