@@ -334,11 +334,12 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
             <div className="container mx-auto px-4 md:px-6">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4">
-                  <span className="whitespace-nowrap md:hidden">Việc làm Nhật Bản</span>
+                  <span className="md:hidden whitespace-nowrap">Việc làm Nhật Bản</span>
                   <span className="hidden md:inline">Tìm việc làm tại Nhật Bản</span>
                 </h1>
                 <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80">
-                 Thế giới việc làm Thực tập sinh, Kỹ năng đặc định, Kỹ sư tri thức... cho các bạn Shopping
+                  <span className="md:hidden">Thế giới việc làm Thực tập sinh, Kỹ năng đặc định, Kỹ sư tri thức... cho các bạn Shopping</span>
+                  <span className="hidden md:inline">Khám phá thế giới việc làm đa dạng tại Nhật Bản: từ Thực tập sinh, Kỹ năng đặc định đến Kỹ sư tri thức. Hãy để HelloJob đồng hành cùng bạn trên con đường 'shopping' cơ hội sự nghiệp.</span>
                 </p>
               </div>
             </div>
