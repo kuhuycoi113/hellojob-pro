@@ -13,6 +13,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { use } from 'react';
 import { cn } from '@/lib/utils';
+import { consultants } from '@/lib/chat-data';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -55,6 +56,9 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         notFound();
     }
     
+    const jobIndex = parseInt(job.id.replace('JP-DEMO', ''), 10);
+    const assignedConsultant = consultants[jobIndex % consultants.length];
+
     const RequirementItem = ({ icon: Icon, label, value, className }: { icon: React.ElementType, label: string, value?: string | number, className?: string }) => {
         if (!value) return null;
         return (
@@ -190,20 +194,22 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         </Card>
                         <Card className="shadow-lg">
                              <CardHeader>
-                                <CardTitle className="text-lg font-bold flex items-center gap-2"><UserRound/>Nhà tuyển dụng</CardTitle>
+                                <CardTitle className="text-lg font-bold flex items-center gap-2"><UserRound/>Tư vấn viên</CardTitle>
                              </CardHeader>
                              <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
                                      <Avatar className="h-12 w-12">
-                                        <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
-                                        <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                                        <AvatarImage src={assignedConsultant.avatarUrl} alt={assignedConsultant.name} />
+                                        <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                     <div>
-                                        <p className="font-semibold text-primary">{job.recruiter.name}</p>
-                                        <p className="text-sm text-muted-foreground">{job.recruiter.company}</p>
+                                        <p className="font-semibold text-primary">{assignedConsultant.name}</p>
+                                        <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
                                     </div>
                                 </div>
-                                <Button variant="secondary" className="w-full">Xem trang công ty</Button>
+                                <Button asChild variant="secondary" className="w-full">
+                                    <Link href={`/consultant-profile/${assignedConsultant.id}`}>Xem hồ sơ tư vấn viên</Link>
+                                </Button>
                              </CardContent>
                              <div className="border-t p-4 flex justify-center">
                                  <Button variant="ghost" className="text-muted-foreground text-sm"><Share2 className="mr-2 h-4 w-4"/>Chia sẻ tin này</Button>
