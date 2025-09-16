@@ -173,7 +173,7 @@ export function Header() {
       )}
        onClick={onClick}
     >
-      {Icon && <Icon className="h-5 w-5" />}
+      {Icon && <Icon className={cn("h-5 w-5", href === '/ai-profile' && 'text-accent-orange')} />}
       {label}
     </Link>
   );
