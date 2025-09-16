@@ -24,18 +24,7 @@ import { format, startOfTomorrow, parse } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
-
-const japanJobTypes = [
-    'Thực tập sinh kỹ năng',
-    'Kỹ năng đặc định',
-    'Kỹ sư, tri thức'
-];
-
-const visaDetailsByVisaType: { [key: string]: string[] } = {
-    'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-    'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-    'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
-};
+import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 
 const allSpecialConditions = [
   'Tuyển gấp', 'Nhóm ngành 1', 'Nhóm ngành 2', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi',
@@ -222,7 +211,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         setAvailableIndustries(uniqueIndustries);
 
         if (filters.industry && filters.industry !== 'all') {
-            const selectedIndustryData = allIndustries.find(ind => ind.name === filters.industry);
+            const selectedIndustryData = allIndustries.find(ind => ind.slug === filters.industry);
             setAvailableJobDetails(selectedIndustryData?.keywords || []);
         } else {
              const allJobDetails = uniqueIndustries.flatMap(ind => ind.keywords);
@@ -258,15 +247,15 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     
      const handleVisaDetailChange = (value: string) => {
         const newFilters: Partial<SearchFilters> = { visaDetail: value };
-        const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].includes(value));
+        const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].some(detail => detail.slug === value));
         if (parentType && filters.visa !== parentType) {
             newFilters.visa = parentType;
             newFilters.industry = '';
             newFilters.jobDetail = '';
         }
         
-        const vietnamVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Đặc định đầu Việt", "Đặc định đi mới", "Kỹ sư, tri thức đầu Việt"];
-        const japanVisas = ["Thực tập sinh 3 Go", "Đặc định đầu Nhật", "Kỹ sư, tri thức đầu Nhật"];
+        const vietnamVisas = ["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam", "dac-dinh-dau-viet", "dac-dinh-di-moi", "ky-su-tri-thuc-dau-viet"];
+        const japanVisas = ["thuc-tap-sinh-3-go", "dac-dinh-dau-nhat", "ky-su-tri-thuc-dau-nhat"];
 
         if (vietnamVisas.includes(value) && filters.interviewLocation && !locations['Việt Nam'].includes(filters.interviewLocation)) {
             newFilters.interviewLocation = ''; 
@@ -278,8 +267,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     };
 
     const renderInterviewLocations = () => {
-        const vietnamVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Đặc định đầu Việt", "Đặc định đi mới", "Kỹ sư, tri thức đầu Việt"];
-        const japanVisas = ["Thực tập sinh 3 Go", "Đặc định đầu Nhật", "Kỹ sư, tri thức đầu Nhật"];
+        const vietnamVisas = ["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam", "dac-dinh-dau-viet", "dac-dinh-di-moi", "ky-su-tri-thuc-dau-viet"];
+        const japanVisas = ["thuc-tap-sinh-3-go", "dac-dinh-dau-nhat", "ky-su-tri-thuc-dau-nhat"];
         
         if (filters.visaDetail && vietnamVisas.includes(filters.visaDetail)) {
             return (
@@ -346,7 +335,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         return num.toLocaleString('ja-JP');
     };
     
-    const showTattooFilter = !['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
+    const showTattooFilter = !['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '');
 
     const getAvailableSpecialConditions = () => {
         const visaDetail = filters.visaDetail || '';
@@ -355,8 +344,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
 
         const nonApplicableForMost = ['Nhóm ngành 1', 'Nhóm ngành 2', 'Hỗ trợ Ginou 2'];
         const nonApplicableVisasForMost = [
-            "Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Thực tập sinh 3 Go",
-            "Kỹ sư, tri thức đầu Việt", "Kỹ sư, tri thức đầu Nhật"
+            "thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam", "thuc-tap-sinh-3-go",
+            "ky-su-tri-thuc-dau-viet", "ky-su-tri-thuc-dau-nhat"
         ];
         if (nonApplicableVisasForMost.includes(visaDetail)) {
             conditionsToHide.push(...nonApplicableForMost);
@@ -368,7 +357,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Yêu cầu mặc Kimono',
             'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé'
         ];
-        const traineeVisas = ["Thực tập sinh 3 năm", "Thực tập sinh 1 năm", "Thực tập sinh 3 Go"];
+        const traineeVisas = ["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam", "thuc-tap-sinh-3-go"];
         if (traineeVisas.includes(visaDetail)) {
              conditionsToHide.push(...nonApplicableForTrainee);
         }
@@ -377,12 +366,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             conditionsToHide.push('Nhận nhiều loại bằng');
         }
 
-        const tokuteiVisas = ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'];
+        const tokuteiVisas = ['dac-dinh-dau-viet', 'dac-dinh-dau-nhat', 'dac-dinh-di-moi'];
         if (tokuteiVisas.includes(visaDetail)) {
             conditionsToHide.push('Nhận nhiều loại bằng', 'Nhận bằng Senmon');
         }
         
-        const engineerVisas = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'];
+        const engineerVisas = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
         if (engineerVisas.includes(visaDetail)) {
             conditionsToHide.push('Yêu cầu mặc Kimono');
         }
@@ -390,11 +379,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         return allSpecialConditions.filter(cond => !conditionsToHide.includes(cond));
     };
 
-    const showEnglishLevelFilter = ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'].includes(filters.visaDetail || '');
-    const showEducationFilter = !['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'].includes(filters.visaDetail || '');
+    const showEnglishLevelFilter = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '');
+    const showEducationFilter = !['dac-dinh-dau-viet', 'dac-dinh-dau-nhat', 'dac-dinh-di-moi'].includes(filters.visaDetail || '');
     
-    const shouldShowLươngGiờ = !["Thực tập sinh 3 năm", "Thực tập sinh 1 năm"].includes(filters.visaDetail || "");
-    const shouldShowLươngNăm = !["Thực tập sinh 3 năm", "Thực tập sinh 1 năm"].includes(filters.visaDetail || "");
+    const shouldShowLươngGiờ = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(filters.visaDetail || "");
+    const shouldShowLươngNăm = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(filters.visaDetail || "");
     const shouldShowTabs = shouldShowLươngGiờ || shouldShowLươngNăm;
 
     const getConvertedHourlyValue = (value: string | undefined, placeholder: string) => {
@@ -439,10 +428,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         <SelectContent>
                                             <SelectItem value="all-details">Tất cả chi tiết</SelectItem>
                                              {japanJobTypes.map(type => (
-                                                <SelectGroup key={type}>
-                                                    <SelectLabel>{type}</SelectLabel>
-                                                    {(visaDetailsByVisaType[type] || []).map(detail => (
-                                                        <SelectItem key={detail} value={detail}>{detail}</SelectItem>
+                                                <SelectGroup key={type.slug}>
+                                                    <SelectLabel>{type.name}</SelectLabel>
+                                                    {(visaDetailsByVisaType[type.slug] || []).map(detail => (
+                                                        <SelectItem key={detail.slug} value={detail.slug}>{detail.name}</SelectItem>
                                                     ))}
                                                 </SelectGroup>
                                             ))}
@@ -463,7 +452,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         <SelectTrigger className={cn(filters.industry && filters.industry !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                                            {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                            {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>

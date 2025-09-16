@@ -12,29 +12,8 @@ import { cn } from '@/lib/utils';
 import { industriesByJobType, type Industry } from "@/lib/industry-data";
 import { locations } from '@/lib/location-data';
 import type { SearchFilters } from './search-results';
+import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 
-const japanJobTypes = [
-    { name: 'Thực tập sinh kỹ năng', slug: 'thuc-tap-sinh-ky-nang' },
-    { name: 'Kỹ năng đặc định', slug: 'ky-nang-dac-dinh' },
-    { name: 'Kỹ sư, tri thức', slug: 'ky-su-tri-thuc' }
-];
-
-const visaDetailsByVisaType: { [key: string]: { name: string, slug: string }[] } = {
-    'thuc-tap-sinh-ky-nang': [
-        { name: 'Thực tập sinh 3 năm', slug: 'thuc-tap-sinh-3-nam' },
-        { name: 'Thực tập sinh 1 năm', slug: 'thuc-tap-sinh-1-nam' },
-        { name: 'Thực tập sinh 3 Go', slug: 'thuc-tap-sinh-3-go' }
-    ],
-    'ky-nang-dac-dinh': [
-        { name: 'Đặc định đầu Việt', slug: 'dac-dinh-dau-viet' },
-        { name: 'Đặc định đầu Nhật', slug: 'dac-dinh-dau-nhat' },
-        { name: 'Đặc định đi mới', slug: 'dac-dinh-di-moi' }
-    ],
-    'ky-su-tri-thuc': [
-        { name: 'Kỹ sư, tri thức đầu Việt', slug: 'ky-su-tri-thuc-dau-viet' },
-        { name: 'Kỹ sư, tri thức đầu Nhật', slug: 'ky-su-tri-thuc-dau-nhat' }
-    ]
-};
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
@@ -168,7 +147,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                                 </SelectTrigger>
                                 <SelectContent>
                                 <SelectItem value="all-details">Tất cả loại hình</SelectItem>
-                                {Object.values(japanJobTypes).map(type => (
+                                {japanJobTypes.map(type => (
                                     <SelectGroup key={type.slug}>
                                         <SelectLabel>{type.name}</SelectLabel>
                                         {(visaDetailsByVisaType[type.slug] || []).map(detail => (

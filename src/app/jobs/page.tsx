@@ -9,6 +9,8 @@ import { Job, jobData } from '@/lib/mock-data';
 import { locations } from '@/lib/location-data';
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
+import { industriesByJobType } from '@/lib/industry-data';
+import { visaDetailsByVisaType } from '@/lib/visa-data';
 
 
 const initialSearchFilters: SearchFilters = {
@@ -53,15 +55,18 @@ function JobsPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, 
         } = filtersToApply;
         
+        const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
+        const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
+
         let results = jobData.filter(job => {
             let visaMatch = true;
             if (visaDetail && visaDetail !== 'all-details') {
-                visaMatch = job.visaDetail === visaDetail;
+                visaMatch = job.visaDetail === visaName;
             } else if (visa && visa !== 'all') {
-                visaMatch = job.visaType === visa;
+                visaMatch = job.visaType === visaName; // This might need adjustment if visa slugs are used
             }
 
-            const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
+            const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industryName.toLowerCase()));
             
             const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
             
@@ -88,14 +93,18 @@ function JobsPageContent() {
     // This function ONLY counts the results based on staged filters without updating the UI.
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
         const { visa, visaDetail, industry, location, jobDetail, interviewLocation } = filtersToCount;
+        
+        const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
+        const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
+        
         const count = jobData.filter(job => {
             let visaMatch = true;
             if (visaDetail && visaDetail !== 'all-details') {
-                visaMatch = job.visaDetail === visaDetail;
+                visaMatch = job.visaDetail === visaName;
             } else if (visa && visa !== 'all') {
-                visaMatch = job.visaType === visa;
+                visaMatch = job.visaType === visaName;
             }
-            const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industry.toLowerCase()));
+            const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industryName.toLowerCase()));
             const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
              let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
