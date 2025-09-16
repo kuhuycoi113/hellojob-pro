@@ -121,16 +121,18 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
               <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
             </div>
             <div className="flex flex-col gap-1 text-sm text-muted-foreground">
-                <p className="flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4 flex-shrink-0" />
-                    <span>{job.workLocation}</span>
-                </p>
-                 {showPostedTime && (
-                <div className="flex items-center gap-1.5 text-xs">
-                    <span className="text-primary font-semibold">Đăng lúc:</span>
-                    <span style={{color: '#9B999A'}}>{job.postedTime}</span>
+                <div className="flex justify-between items-center">
+                    <p className="flex items-center gap-1.5">
+                        <MapPin className="h-4 w-4 flex-shrink-0" />
+                        <span>{job.workLocation}</span>
+                    </p>
+                    {showPostedTime && (
+                        <p className="flex items-center gap-1.5 text-xs">
+                            <span className="text-primary font-semibold">Đăng lúc:</span>
+                            <span style={{color: '#9B999A'}}>{job.postedTime}</span>
+                        </p>
+                    )}
                 </div>
-            )}
             </div>
 
             
@@ -157,7 +159,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </Button>
                 </div>
                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" className={cn("flex-shrink-0", isSaved && "border-2 border-accent-orange text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                    <Button variant="ghost" size="sm" className={cn(isSaved && "border border-accent-orange text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                         <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                         Lưu
                     </Button>
@@ -234,16 +236,18 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
                     </div>
                      <div className="flex flex-col gap-1 text-xs text-muted-foreground mb-2">
-                        <p className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3 flex-shrink-0" />
-                            <span>{job.workLocation}</span>
-                        </p>
-                        {showPostedTime && (
-                            <p className="flex items-center gap-1">
-                                <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
-                                <span style={{ color: '#9B999A' }}>{job.postedTime}</span>
+                        <div className="flex justify-between items-center w-full">
+                           <p className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3 flex-shrink-0" />
+                                <span>{job.workLocation}</span>
                             </p>
-                        )}
+                             {showPostedTime && (
+                                <p className="flex items-center gap-1 text-right">
+                                    <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
+                                    <span style={{ color: '#9B999A' }}>{job.postedTime}</span>
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
