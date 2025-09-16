@@ -108,7 +108,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                             onClick={() => setIsSearchExpanded(!isSearchExpanded)}
                         >
                             <SlidersHorizontal className="h-5 w-5 mr-3 text-muted-foreground"/>
-                            <div className="flex-grow">
+                            <div className="flex-grow min-w-0">
                                 <p className="text-xs text-muted-foreground">Đang lọc theo</p>
                                 <p className="font-semibold text-foreground truncate">{searchSummary || 'Tất cả'}</p>
                             </div>
