@@ -1,4 +1,7 @@
 
+
+import { consultants } from './chat-data';
+
 export interface Job {
     id: string;
     isRecording: boolean;
@@ -61,15 +64,6 @@ export interface Job {
     }
 }
 
-const recruiters = [
-    { name: 'Nguyễn Thị Ngân', avatar: 'https://placehold.co/32x32.png', company: 'Hoàng Long CMS' },
-    { name: 'Trần Văn Mạnh', avatar: 'https://placehold.co/32x32.png', company: 'Vinamex' },
-    { name: 'Lê Thuỳ Trang', avatar: 'https://placehold.co/32x32.png', company: 'Esuhai' },
-    { name: 'Hoàng An', avatar: 'https://placehold.co/32x32.png', company: 'JapanWorks' },
-    { name: 'Phạm Minh Tuấn', avatar: 'https://placehold.co/32x32.png', company: 'Kaizen Yoshida' },
-    { name: 'Vũ Thị Lan', avatar: 'https://placehold.co/32x32.png', company: 'TTC Việt Nam' },
-];
-
 const industries = ['Chế biến thực phẩm', 'Cơ khí', 'Xây dựng', 'Nông nghiệp', 'Điện tử', 'Dệt may', 'Điều dưỡng', 'Nhà hàng'];
 const locations = ['Tokyo', 'Osaka', 'Aichi', 'Fukuoka', 'Hokkaido', 'Kanagawa', 'Saitama', 'Chiba', 'Hyogo', 'Hiroshima', 'Kyoto', 'Nagano', 'Gifu', 'Ibaraki', 'Miyagi'];
 
@@ -110,7 +104,15 @@ const generateRandomJob = (index: number): Job => {
     const visaDetail = visaDetails[index % visaDetails.length];
     
     const location = locations[index % locations.length];
-    const recruiter = recruiters[index % recruiters.length];
+    
+    // Assign a random consultant for each job
+    const randomConsultant = consultants[Math.floor(Math.random() * consultants.length)];
+    const recruiter = {
+        name: randomConsultant.name,
+        avatar: randomConsultant.avatarUrl,
+        company: 'HelloJob' // Or some other logic for company
+    };
+
     const gender = ['Nam', 'Nữ', 'Cả nam và nữ'][index % 3] as 'Nam' | 'Nữ' | 'Cả nam và nữ';
     const quantity = (index % 10) + 1;
     const languageRequirement = index % 4 === 0 ? 'Không yêu cầu' : 'Tiếng Nhật N4';
