@@ -35,7 +35,7 @@ const prompt = ai.definePrompt({
   name: 'createProfilePrompt',
   input: {schema: CreateProfileInputSchema},
   output: {schema: CandidateProfileSchema, format: 'json'},
-  model: 'googleai/gemini-flash',
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert resume analyst. Your task is to extract structured information from the provided document or text and generate a professional profile.
 
   Follow this process carefully:
