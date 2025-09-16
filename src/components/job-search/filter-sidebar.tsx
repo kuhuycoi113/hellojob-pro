@@ -416,8 +416,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
     };
     
     return (
-        <div className="md:col-span-1 lg:col-span-1 relative">
-            <Card className="flex flex-col h-full">
+        <div className="md:col-span-1 lg:col-span-1 h-full flex flex-col">
+            <Card className="flex-grow flex flex-col">
                 <CardHeader>
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
@@ -891,13 +891,13 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                         </AccordionItem>
                     </Accordion>
                 </CardContent>
-                 <CardFooter className="p-4 sticky bottom-0 bg-background/95 backdrop-blur-sm border-t mt-4">
-                    <div className="grid grid-cols-2 gap-2 w-full">
-                        <Button variant="outline" onClick={onReset}><Trash2 className="mr-2 h-4 w-4" />Xóa bộ lọc</Button>
-                        <Button className="w-full bg-primary text-white" onClick={onApply}>Áp dụng</Button>
-                    </div>
-                </CardFooter>
             </Card>
+            <CardFooter className="p-4 sticky bottom-0 bg-background/95 backdrop-blur-sm border-t mt-auto">
+                <div className="grid grid-cols-2 gap-2 w-full">
+                    <Button variant="outline" onClick={onReset}><Trash2 className="mr-2 h-4 w-4" />Xóa bộ lọc</Button>
+                    <Button className="w-full bg-primary text-white" onClick={onApply}>Áp dụng</Button>
+                </div>
+            </CardFooter>
         </div>
     );
 }
