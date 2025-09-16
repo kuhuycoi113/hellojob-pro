@@ -513,7 +513,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                                                 <AccordionTrigger className="flex-1 p-0 hover:no-underline">
                                                     <Label htmlFor={`region-${region}`} className="flex-grow text-left font-semibold cursor-pointer">
                                                         Vùng {region} 
-                                                        <span className="font-normal text-muted-foreground text-xs ml-1">{jobCountsByRegion[region] || 0} việc</span>
+                                                        <span className="text-muted-foreground text-xs ml-1">{jobCountsByRegion[region] || 0} việc</span>
                                                     </Label>
                                                 </AccordionTrigger>
                                             </div>
@@ -533,9 +533,9 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                                                                 onFilterChange({ location: Array.from(currentSelection) });
                                                             }}
                                                         />
-                                                        <Label htmlFor={`pref-${prefecture}`} className="flex-grow text-left font-normal cursor-pointer">
-                                                            {prefecture}
-                                                            <span className="text-muted-foreground text-xs ml-1">{jobCountsByPrefecture[prefecture] || 0} việc</span>
+                                                        <Label htmlFor={`pref-${prefecture}`} className="flex w-full items-center justify-between font-normal cursor-pointer">
+                                                            <span>{prefecture}</span>
+                                                            <span className="text-muted-foreground text-xs">{jobCountsByPrefecture[prefecture] || 0} việc</span>
                                                         </Label>
                                                     </div>
                                                 ))}
@@ -892,12 +892,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset }: Fil
                     </Accordion>
                 </CardContent>
             </Card>
-            <CardFooter className="p-4 sticky bottom-0 bg-background/95 backdrop-blur-sm border-t mt-auto">
+            <div className="p-4 sticky bottom-0 bg-background/95 backdrop-blur-sm border-t mt-auto">
                 <div className="grid grid-cols-2 gap-2 w-full">
                     <Button variant="outline" onClick={onReset}><Trash2 className="mr-2 h-4 w-4" />Xóa bộ lọc</Button>
                     <Button className="w-full bg-primary text-white" onClick={onApply}>Áp dụng</Button>
                 </div>
-            </CardFooter>
+            </div>
         </div>
     );
 }
