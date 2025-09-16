@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { useChat } from '@/contexts/ChatContext';
 
 const formatCurrency = (value?: string) => {
     if (!value) return 'N/A';
@@ -23,6 +24,13 @@ const formatCurrency = (value?: string) => {
 };
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'default', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'default' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
+  const { openChat } = useChat();
+
+  const handleChatClick = () => {
+    const consultant = { id: 'consultant-1', name: job.recruiter.name, avatarUrl: job.recruiter.avatar }; // Simplified user object
+    // @ts-ignore
+    openChat(consultant);
+  };
 
   // New Chat Layout for the chat variant
   const ChatLayout = () => (
@@ -92,7 +100,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
 
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-2">
-                    <Button size="sm" className="bg-primary hover:bg-primary/90">
+                    <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleChatClick}>
                         <MessageSquare className="mr-2 h-4 w-4"/>
                         Chat với Tư vấn viên
                     </Button>
@@ -192,14 +200,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
         </div>
         <div className="p-3 border-t">
             <div className="flex justify-between items-center">
-                 <div className="flex items-center gap-1">
-                    <Button asChild variant="ghost" size="icon" className="h-7 w-7">
-                        <Link href="/chat">
-                            <MessageSquare className="text-primary h-5 w-5"/>
-                        </Link>
+                 <div className="flex items-center gap-2">
+                    <Button size="sm" className="h-8" onClick={handleChatClick}>
+                        <MessageSquare className="text-primary-foreground h-4 w-4"/>
                     </Button>
                      <Link href={`/consultant-profile/consultant-1`}>
-                        <Avatar className="h-7 w-7 cursor-pointer">
+                        <Avatar className="h-8 w-8 cursor-pointer">
                             <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                             <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                         </Avatar>
