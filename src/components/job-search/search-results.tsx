@@ -48,6 +48,7 @@ type SearchResultsProps = {
 export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, resetFilters, resultCount }: SearchResultsProps) => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(24);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
 
     const loadMoreJobs = useCallback(() => {
@@ -71,6 +72,15 @@ export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, res
         if (node) observer.current.observe(node);
     }, [isLoadingMore, loadMoreJobs, visibleJobsCount, jobs.length]);
       
+    const handleApply = () => {
+        applyFilters();
+        setIsSheetOpen(false); // Close sheet on apply
+    };
+
+    const handleReset = () => {
+        resetFilters();
+        setIsSheetOpen(false); // Close sheet on reset
+    }
 
     return (
      <div className="w-full bg-secondary">
@@ -83,7 +93,7 @@ export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, res
                 <div className="md:col-span-3 lg:col-span-3">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-bold">Kết quả ({jobs.length})</h2>
-                        <Sheet>
+                        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                           <SheetTrigger asChild>
                              <Button variant="ghost" size="sm" className="flex items-center gap-1 md:hidden">
                                 <ListFilter className="w-4 h-4" />
@@ -98,7 +108,7 @@ export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, res
                               </SheetDescription>
                             </SheetHeader>
                             <div className="py-4 h-[calc(100vh-8rem)] overflow-y-auto">
-                              <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={applyFilters} onReset={resetFilters} resultCount={resultCount}/>
+                              <FilterSidebar filters={filters} onFilterChange={onFilterChange} onApply={handleApply} onReset={handleReset} resultCount={resultCount}/>
                             </div>
                           </SheetContent>
                         </Sheet>
