@@ -95,16 +95,18 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
               <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
             </div>
             <div className="flex flex-col gap-1 text-sm text-muted-foreground">
-                <p className="flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4 flex-shrink-0" />
-                  <span>{job.workLocation}</span>
-                </p>
-                 {showPostedTime && (
-                    <p className="flex items-center gap-1.5 text-xs justify-end">
-                        <span className="text-primary font-semibold">Đăng lúc:</span>
-                        <span className="text-muted-foreground">{job.postedTime}</span>
+                <div className="flex justify-between items-center">
+                    <p className="flex items-center gap-1.5">
+                      <MapPin className="h-4 w-4 flex-shrink-0" />
+                      <span>{job.workLocation}</span>
                     </p>
-                )}
+                    {showPostedTime && (
+                        <p className="flex items-center gap-1.5 text-xs">
+                            <span className="text-primary font-semibold">Đăng lúc:</span>
+                            <span className="text-gray-400">{job.postedTime.split(' ')[0]}</span>
+                        </p>
+                    )}
+                </div>
             </div>
 
 
@@ -174,7 +176,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                 )}
                  {showApplyButtons && (
                    <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm">
-                       <Bookmark className="h-4 w-4 text-primary"/>
+                       <Bookmark className="h-4 w-4 text-accent-orange"/>
                    </Button>
                 )}
             </div>
@@ -208,7 +210,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         {showPostedTime && (
                             <p className="flex items-center gap-1 justify-end">
                                 <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
-                                <span className="text-muted-foreground">{job.postedTime}</span>
+                                <span className="text-gray-400">{job.postedTime.split(' ')[0]}</span>
                             </p>
                         )}
                     </div>
