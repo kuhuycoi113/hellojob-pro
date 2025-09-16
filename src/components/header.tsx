@@ -49,7 +49,7 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import Image from 'next/image';
 import { useChat } from '@/contexts/ChatContext';
-import { mainNavLinks, quickAccessLinks } from '@/lib/nav-data';
+import { mainNavLinks, quickAccessLinks, mobileFooterLinks } from '@/lib/nav-data';
 import { useAuth } from '@/contexts/AuthContext';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { AuthDialog } from './auth-dialog';
@@ -505,6 +505,9 @@ export function Header() {
                     )}
                 </div>
                 <div className="md:hidden flex items-center gap-2">
+                    <Button asChild variant="ghost" size="sm">
+                        <Link href="/jobs">Việc</Link>
+                    </Button>
                     <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                         <SheetTrigger asChild>
                             <Button variant="ghost" size="icon">
