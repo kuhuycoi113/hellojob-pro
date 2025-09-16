@@ -896,7 +896,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             </Card>
             <div className="p-4 sticky bottom-0 bg-background/95 backdrop-blur-sm border-t mt-auto">
                 <div className="grid grid-cols-2 gap-2 w-full">
-                    <Button variant="outline" onClick={onReset}><Trash2 className="mr-2 h-4 w-4" />Xóa</Button>
+                    <Button variant="outline" onClick={onReset}>Xóa</Button>
                     <Button className="w-full bg-primary text-white" onClick={onApply}>
                         Áp dụng <Badge variant="secondary" className="ml-2">{resultCount}</Badge>
                     </Button>
@@ -905,3 +905,5 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         </div>
     );
 }
+
+    
