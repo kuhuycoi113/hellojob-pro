@@ -99,10 +99,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                   <MapPin className="h-4 w-4 flex-shrink-0" />
                   <span>{job.workLocation}</span>
                 </p>
-                {showPostedTime && (
+                 {showPostedTime && (
                     <p className="flex items-center gap-1.5 text-xs justify-end">
                         <span className="text-primary font-semibold">Đăng lúc:</span>
-                        <span>{job.postedTime}</span>
+                        <span className="text-muted-foreground">{job.postedTime}</span>
                     </p>
                 )}
             </div>
@@ -206,9 +206,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             <span>{job.workLocation}</span>
                         </p>
                         {showPostedTime && (
-                             <p className="flex items-center gap-1 text-primary justify-end">
-                                <CalendarClock className="h-3 w-3 flex-shrink-0" />
-                                <span>{job.postedTime}</span>
+                            <p className="flex items-center gap-1 justify-end">
+                                <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
+                                <span className="text-muted-foreground">{job.postedTime}</span>
                             </p>
                         )}
                     </div>
