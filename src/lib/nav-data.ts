@@ -44,10 +44,8 @@ export const quickAccessLinks = [
 
 // Re-ordered to a stable, logical order to fix hydration errors.
 export const mobileFooterLinks = [
-  { href: '/', label: 'Trang chủ', icon: Home },
   { href: '/roadmap', label: 'Lộ trình', icon: Compass },
   { href: '/ai-profile', label: 'Hồ sơ AI', icon: Sparkles },
   { href: '/handbook', label: 'Cẩm nang', icon: LifeBuoy },
-  { href: '/jobs', label: 'Việc làm', icon: Briefcase },
   { href: '/about', label: 'Giới thiệu', icon: Info },
 ];
