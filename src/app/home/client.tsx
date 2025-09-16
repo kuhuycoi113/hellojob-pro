@@ -184,7 +184,7 @@ const MainContent = () => (
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-stretch">
             {featuredEmployers.map(emp => (
-              <Link href={`/employers/${emp.id}`} key={emp.id} className="flex justify-center items-center bg-white">
+              <Link href={`/employers/${'emp.id'}`} key={emp.id} className="flex justify-center items-center bg-white">
                 <Image src={emp.logo} alt={emp.name} width={150} height={50} className="grayscale hover:grayscale-0 transition-all duration-300" data-ai-hint={emp.dataAiHint}/>
               </Link>
             ))}
@@ -337,7 +337,7 @@ const SearchModule = ({ onSearch, showHero, filters, onFilterChange }: SearchMod
                   Tìm việc làm tại Nhật Bản
                 </h1>
                 <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80">
-                 Chúng tôi không chỉ cung cấp việc làm, mà còn đào tạo tư duy và xây dựng lộ trình phát triển sự nghiệp (SWR) rõ ràng, giúp bạn từ lao động phổ thông trở thành chuyên gia lành nghề.
+                 Thế giới việc làm Thực tập sinh, Kỹ năng đặc định, Kỹ sư tri thức... cho các bạn Shopping
                 </p>
               </div>
             </div>
