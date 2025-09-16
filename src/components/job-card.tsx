@@ -191,7 +191,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                   </Avatar>
                   <div className="flex-grow">
                     <p className="font-semibold text-blue-600 truncate">{job.recruiter.name}</p>
-                    <p className="text-muted-foreground truncate">{job.recruiter.company}</p>
                   </div>
                 </div>
             )}

@@ -87,7 +87,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             <CardHeader>
                                 <h1 className="text-2xl md:text-3xl font-bold font-headline mb-3">{job.title}</h1>
                                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
-                                    <p className="flex items-center gap-2"><Building className="h-4 w-4"/> {job.recruiter.company}</p>
                                     <p className="flex items-center gap-2"><MapPin className="h-4 w-4"/> {job.workLocation}</p>
                                     <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4"/> Đăng {job.postedTime}</p>
                                 </div>
