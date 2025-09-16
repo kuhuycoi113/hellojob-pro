@@ -93,10 +93,19 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
               {job.salary.actual && <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 border-green-200">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
               <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
             </div>
-            <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span>{job.workLocation}</span>
-            </p>
+            <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+                <p className="flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4 flex-shrink-0" />
+                  <span>{job.workLocation}</span>
+                </p>
+                {showPostedTime && (
+                    <p className="flex items-center gap-1.5">
+                        <CalendarClock className="h-4 w-4 flex-shrink-0" />
+                        <span className="text-xs">{job.postedTime}</span>
+                    </p>
+                )}
+            </div>
+
 
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-2">
@@ -104,7 +113,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         <MessageSquare className="mr-2 h-4 w-4"/>
                         Chat với Tư vấn viên
                     </Button>
-                    <Link href={`/consultant-profile/consultant-1`}>
+                    <Link href={`/consultant-profile/${'consultant-1'}`}>
                         <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
                             <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                             <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
@@ -112,12 +121,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </Link>
                 </div>
                  <div className="flex items-center gap-2">
-                    {showPostedTime && (
-                        <div className="text-xs text-right mr-2">
-                            <span className="text-primary font-semibold">Đăng lúc:</span>{' '}
-                            <span style={{color: '#9B999A'}}>{job.postedTime}</span>
-                        </div>
-                    )}
                     {showApplyButtons ? (
                         <>
                             <Button variant="outline" size="sm"><Bookmark className="mr-2"/>Lưu</Button>
@@ -191,20 +194,28 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         {job.salary.actual && <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
                         <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
                     </div>
-                    <p className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
-                        <MapPin className="h-3 w-3" />
-                        <span>{job.workLocation}</span>
-                    </p>
+                     <div className="flex flex-col gap-1 text-xs text-muted-foreground mb-2">
+                        <p className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3 flex-shrink-0" />
+                            <span>{job.workLocation}</span>
+                        </p>
+                        {showPostedTime && (
+                             <p className="flex items-center gap-1">
+                                <CalendarClock className="h-3 w-3 flex-shrink-0" />
+                                <span>{job.postedTime}</span>
+                            </p>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
         <div className="p-3 border-t">
             <div className="flex justify-between items-center">
                  <div className="flex items-center gap-2">
-                    <Button size="sm" className="h-8" onClick={handleChatClick}>
+                    <Button size="icon" className="h-8 w-8 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
                         <MessageSquare className="text-primary-foreground h-4 w-4"/>
                     </Button>
-                     <Link href={`/consultant-profile/consultant-1`}>
+                     <Link href={`/consultant-profile/${'consultant-1'}`}>
                         <Avatar className="h-8 w-8 cursor-pointer">
                             <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                             <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
@@ -212,12 +223,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </Link>
                 </div>
                  <div className="flex items-center gap-2">
-                    {showPostedTime && (
-                        <div className="text-xs text-right mr-1">
-                             <span className="text-primary font-semibold">Đăng lúc:</span>{' '}
-                             <span style={{color: '#9B999A'}}>{job.postedTime}</span>
-                        </div>
-                    )}
                     {showApplyButtons ? (
                         <>
                             <Button variant="outline" size="sm" className="h-8"><Bookmark className="mr-1"/>Lưu</Button>
