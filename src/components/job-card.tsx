@@ -92,7 +92,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
 
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-2">
-                    <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
+                    <Button size="sm" className="bg-primary hover:bg-primary/90">
                         <MessageSquare className="mr-2 h-4 w-4"/>
                         Chat với Tư vấn viên
                     </Button>
@@ -191,11 +191,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
             </div>
         </div>
         <div className="p-3 border-t">
-             {showRecruiterName && (
-                <div className="flex items-center gap-2 text-xs mb-2">
-                  <p className="font-semibold text-blue-600 truncate">{job.recruiter.name}</p>
-                </div>
-            )}
             <div className="flex justify-between items-center">
                  <div className="flex items-center gap-1">
                     <Button asChild variant="ghost" size="icon" className="h-7 w-7">
