@@ -8,7 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { FloatingChatWidget } from '@/components/chat/floating-chat-widget';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { useEffect, useState } from 'react';
+import * as React from 'react';
 import { PasswordGate } from '../password-gate';
 
 function LayoutManager({ children }: { children: React.ReactNode }) {
@@ -32,9 +32,9 @@ export function RootProvider({
 }: {
     children: React.ReactNode;
 }) {
-    const [isUnlocked, setIsUnlocked] = useState(false);
+    const [isUnlocked, setIsUnlocked] = React.useState(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const unlocked = localStorage.getItem('hellojob_password_unlocked') === 'true';
         setIsUnlocked(unlocked);
     }, []);
