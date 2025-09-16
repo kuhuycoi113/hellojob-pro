@@ -520,27 +520,28 @@ export function Header() {
 const LoggedOutContent = () => {
     return (
         <div className="p-4 space-y-4 h-full flex flex-col">
-        <Button asChild className="w-full" size="lg">
-            <Link href="/candidate-profile"><LogIn className="mr-2"/>Đăng nhập / Đăng ký</Link>
-        </Button>
-        <div className="grid grid-cols-3 gap-2">
-            {quickAccessLinks.map((link) => {
-                const isActive = false;
-                return (
-                <Link 
-                    key={link.href}
-                    id={link.href === '/roadmap' ? 'MMN01' : undefined}
-                    href={link.href}
-                    className={cn("flex flex-col items-center justify-start p-2 h-24 cursor-pointer rounded-md hover:bg-accent/80", isActive ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary")}>
-                    <div className={cn("h-10 flex items-center justify-center", isActive ? "text-primary" : "text-muted-foreground")}>
-                    <link.icon className="h-8 w-8"/>
-                    </div>
-                    <span className={cn("text-xs text-center leading-tight font-medium", isActive ? "text-primary" : "text-foreground")}>{link.label}</span>
-                </Link>
-                )
-            })}
-        </div>
-        <MobileRoleSwitcher />
+          <p className="text-sm text-center text-muted-foreground">Đăng nhập để trải nghiệm đầy đủ tính năng của HelloJob.</p>
+          <Button asChild className="w-full" size="lg" onClick={() => setIsAuthDialogOpen(true)}>
+              <Link href="#"><LogIn className="mr-2"/>Đăng nhập / Đăng ký</Link>
+          </Button>
+          <div className="grid grid-cols-3 gap-2">
+              {quickAccessLinks.map((link) => {
+                  const isActive = false;
+                  return (
+                  <Link 
+                      key={link.href}
+                      id={link.href === '/roadmap' ? 'MMN01' : undefined}
+                      href={link.href}
+                      className={cn("flex flex-col items-center justify-start p-2 h-24 cursor-pointer rounded-md hover:bg-accent/80", isActive ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary")}>
+                      <div className={cn("h-10 flex items-center justify-center", isActive ? "text-primary" : "text-muted-foreground")}>
+                      <link.icon className="h-8 w-8"/>
+                      </div>
+                      <span className={cn("text-xs text-center leading-tight font-medium", isActive ? "text-primary" : "text-foreground")}>{link.label}</span>
+                  </Link>
+                  )
+              })}
+          </div>
+          <MobileRoleSwitcher />
         </div>
     );
 };
@@ -678,3 +679,6 @@ const LoggedOutContent = () => {
 
 
 
+
+
+    
