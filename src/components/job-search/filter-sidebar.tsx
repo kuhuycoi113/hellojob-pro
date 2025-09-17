@@ -854,6 +854,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                     </Select>
                                 </div>
                                 )}
+                                {['thuc-tap-sinh-3-go', 'dac-dinh-dau-nhat', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '') && (
                                 <div className="space-y-2">
                                     <Label>Yêu cầu thời điểm về công ty</Label>
                                     <Select><SelectTrigger><SelectValue placeholder="Chọn thời điểm" /></SelectTrigger>
@@ -862,6 +863,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                )}
                                 <div className="space-y-2">
                                     <Label>Ca làm việc</Label>
                                     <Select><SelectTrigger><SelectValue placeholder="Chọn ca làm việc" /></SelectTrigger>
