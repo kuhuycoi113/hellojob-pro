@@ -105,14 +105,14 @@ const generateRandomJob = (index: number): Job => {
     
     const location = locations[index % locations.length];
     
-    // Assign a random consultant for each job
-    const randomConsultant = (consultants && consultants.length > 0)
-        ? consultants[Math.floor(Math.random() * consultants.length)]
+    // Assign a consultant based on the job index to ensure consistency
+    const assignedConsultant = (consultants && consultants.length > 0)
+        ? consultants[index % consultants.length]
         : { name: 'HelloJob', avatarUrl: '/img/favi2.png' }; // Fallback
     
     const recruiter = {
-        name: randomConsultant.name,
-        avatar: randomConsultant.avatarUrl,
+        name: assignedConsultant.name,
+        avatar: assignedConsultant.avatarUrl,
         company: 'HelloJob' // Or some other logic for company
     };
 
