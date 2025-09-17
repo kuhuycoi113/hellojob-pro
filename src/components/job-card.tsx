@@ -127,7 +127,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         <span>{job.workLocation}</span>
                     </p>
                     {showPostedTime && (
-                        <p className="flex items-center gap-1.5 text-xs">
+                        <p className="flex items-center gap-1.5 text-xs justify-end flex-grow text-right">
                             <span className="text-primary font-semibold">Đăng lúc:</span>
                             <span style={{color: '#9B999A'}}>{job.postedTime}</span>
                         </p>
@@ -159,7 +159,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </Button>
                 </div>
                  <div className="flex items-center gap-2">
-                    <Button variant={isSaved ? "secondary" : "ghost"} size="sm" className={cn(isSaved && "border border-accent-orange text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                    <Button variant={isSaved ? "outline" : "ghost"} size="sm" className={cn(isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                         <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                         Lưu
                     </Button>
@@ -242,7 +242,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                                 <span>{job.workLocation}</span>
                             </p>
                              {showPostedTime && (
-                                <p className="flex items-center gap-1 text-right ml-2">
+                                <p className="flex items-center gap-1 text-right ml-2 justify-end flex-grow">
                                     <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
                                     <span style={{ color: '#9B999A' }}>{job.postedTime}</span>
                                 </p>
