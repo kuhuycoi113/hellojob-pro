@@ -285,21 +285,30 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-2">
                             <div className="flex gap-2">
-                                <Button size="icon" className="h-14 w-14 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
-                                    <MessageSquare className="h-6 w-6"/>
+                                <Button size="icon" className="h-16 w-16 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
+                                    <MessageSquare className="h-8 w-8"/>
                                 </Button>
-                                <Button variant="outline" size="icon" className="h-14 w-14 border-purple-500 hover:bg-purple-50">
-                                    <Image src="/img/Mess.svg" alt="Messenger" width={32} height={32} />
+                                <Button variant="outline" size="icon" className="h-16 w-16 border-purple-500 hover:bg-purple-50">
+                                    <Image src="/img/Mess.svg" alt="Messenger" width={40} height={40} />
                                 </Button>
-                                <Button variant="outline" size="icon" className="h-14 w-14 border-blue-500 hover:bg-blue-50">
-                                    <Image src="/img/Zalo.svg" alt="Zalo" width={32} height={32} />
+                                <Button variant="outline" size="icon" className="h-16 w-16 border-blue-500 hover:bg-blue-50">
+                                    <Image src="/img/Zalo.svg" alt="Zalo" width={40} height={40} />
                                 </Button>
-                                <Button variant="outline" size="icon" className="h-14 w-14 border-green-500 hover:bg-green-50">
-                                    <Image src="/img/phone.svg" alt="Phone" width={32} height={32} />
+                                <Button variant="outline" size="icon" className="h-16 w-16 border-green-500 hover:bg-green-50">
+                                    <Image src="/img/phone.svg" alt="Phone" width={40} height={40} />
                                 </Button>
                             </div>
                         </PopoverContent>
                     </Popover>
+                    <Button variant="outline" size="icon" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
+                        <Image src="/img/Mess.svg" alt="Messenger" width={16} height={16} />
+                    </Button>
+                    <Button variant="outline" size="icon" className="h-8 w-8 border-blue-500 hover:bg-blue-50">
+                        <Image src="/img/Zalo.svg" alt="Zalo" width={16} height={16} />
+                    </Button>
+                    <Button variant="outline" size="icon" className="h-8 w-8 border-green-500 hover:bg-green-50">
+                        <Image src="/img/phone.svg" alt="Phone" width={16} height={16} />
+                    </Button>
                 </div>
                  <div className="flex items-center gap-2">
                     {showApplyButtons ? (
