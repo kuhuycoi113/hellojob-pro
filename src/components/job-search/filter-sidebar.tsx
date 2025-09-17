@@ -214,10 +214,22 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     const availableConditions = useMemo(() => {
         const tokuteiVisaSlugs = ['dac-dinh-dau-viet', 'dac-dinh-dau-nhat', 'dac-dinh-di-moi'];
         const isTokutei = tokuteiVisaSlugs.includes(filters.visaDetail || '');
-        if (isTokutei) {
-            return allSpecialConditions;
+
+        const atJapanVisaSlugs = ['thuc-tap-sinh-3-go', 'dac-dinh-dau-nhat', 'ky-su-tri-thuc-dau-nhat'];
+        const isAtJapan = atJapanVisaSlugs.includes(filters.visaDetail || '');
+        
+        let conditions = [...allSpecialConditions];
+
+        if (!isTokutei) {
+             conditions = conditions.filter(cond => !['Nhóm ngành 1', 'Nhóm ngành 2', 'Hỗ trợ Ginou 2'].includes(cond));
         }
-        return allSpecialConditions.filter(cond => !['Nhóm ngành 1', 'Nhóm ngành 2', 'Hỗ trợ Ginou 2'].includes(cond));
+
+        if (!isAtJapan) {
+            conditions = conditions.filter(cond => !['Muốn về công ty trước khi ra visa', 'Muốn về công ty sau khi ra visa'].includes(cond));
+        }
+        
+        return conditions;
+
     }, [filters.visaDetail]);
 
 
