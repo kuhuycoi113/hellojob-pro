@@ -203,6 +203,22 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         return { jobCountsByRegion: countsByRegion, jobCountsByPrefecture: countsByPrefecture };
     }, []);
 
+    const showGinouFilter = useMemo(() => 
+        ['dac-dinh-dau-viet', 'dac-dinh-dau-nhat'].includes(filters.visaDetail || ''),
+    [filters.visaDetail]);
+
+    const showArrivalTimeFilter = useMemo(() => 
+        ['thuc-tap-sinh-3-go', 'dac-dinh-dau-nhat', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || ''),
+    [filters.visaDetail]);
+
+    const availableConditions = useMemo(() => {
+        const tokuteiVisaSlugs = ['dac-dinh-dau-viet', 'dac-dinh-dau-nhat', 'dac-dinh-di-moi'];
+        const isTokutei = tokuteiVisaSlugs.includes(filters.visaDetail || '');
+        if (isTokutei) {
+            return allSpecialConditions;
+        }
+        return allSpecialConditions.filter(cond => !['Nhóm ngành 1', 'Nhóm ngành 2', 'Hỗ trợ Ginou 2'].includes(cond));
+    }, [filters.visaDetail]);
 
 
     useEffect(() => {
@@ -341,48 +357,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     
     const showTattooFilter = !['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '');
 
-    const getAvailableSpecialConditions = () => {
-        const visaDetail = filters.visaDetail || '';
-        
-        let conditionsToHide: string[] = [];
-
-        const nonApplicableForMost = ['Nhóm ngành 1', 'Nhóm ngành 2', 'Hỗ trợ Ginou 2'];
-        const nonApplicableVisasForMost = [
-            "thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam", "thuc-tap-sinh-3-go",
-            "ky-su-tri-thuc-dau-viet", "ky-su-tri-thuc-dau-nhat"
-        ];
-        if (nonApplicableVisasForMost.includes(visaDetail)) {
-            conditionsToHide.push(...nonApplicableForMost);
-        }
-
-        const nonApplicableForTrainee = [
-            'Muốn về công ty trước khi ra visa', 'Muốn về công ty sau khi ra visa', 'Nhận visa katsudo',
-            'Không nhận visa katsudo', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại',
-            'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Yêu cầu mặc Kimono',
-            'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé'
-        ];
-        const traineeVisas = ["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam", "thuc-tap-sinh-3-go"];
-        if (traineeVisas.includes(visaDetail)) {
-             conditionsToHide.push(...nonApplicableForTrainee);
-        }
-
-        if (traineeVisas.includes(visaDetail)) {
-            conditionsToHide.push('Nhận nhiều loại bằng');
-        }
-
-        const tokuteiVisas = ['dac-dinh-dau-viet', 'dac-dinh-dau-nhat', 'dac-dinh-di-moi'];
-        if (tokuteiVisas.includes(visaDetail)) {
-            conditionsToHide.push('Nhận nhiều loại bằng', 'Nhận bằng Senmon');
-        }
-        
-        const engineerVisas = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
-        if (engineerVisas.includes(visaDetail)) {
-            conditionsToHide.push('Yêu cầu mặc Kimono');
-        }
-        
-        return allSpecialConditions.filter(cond => !conditionsToHide.includes(cond));
-    };
-
+    
     const showEnglishLevelFilter = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '');
     const showEducationFilter = !['dac-dinh-dau-viet', 'dac-dinh-dau-nhat', 'dac-dinh-di-moi'].includes(filters.visaDetail || '');
     
@@ -844,7 +819,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 <span className="flex items-center gap-2"><ListChecks className="h-5 w-5"/>Quy trình tuyển dụng</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
-                                {['dac-dinh-dau-nhat', 'dac-dinh-dau-viet'].includes(filters.visaDetail || '') && (
+                                {showGinouFilter && (
                                 <div className="space-y-2">
                                     <Label>Yêu cầu hạn Ginou còn</Label>
                                     <Select><SelectTrigger><SelectValue placeholder="Chọn thời gian" /></SelectTrigger>
@@ -854,7 +829,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                     </Select>
                                 </div>
                                 )}
-                                {['thuc-tap-sinh-3-go', 'dac-dinh-dau-nhat', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '') && (
+                                {showArrivalTimeFilter && (
                                 <div className="space-y-2">
                                     <Label>Yêu cầu thời điểm về công ty</Label>
                                     <Select><SelectTrigger><SelectValue placeholder="Chọn thời điểm" /></SelectTrigger>
@@ -880,7 +855,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                <span className="flex items-center gap-2"><Star className="h-5 w-5"/>Điều kiện đặc biệt</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-2 pt-4">
-                                {allSpecialConditions.map(item => (
+                                {availableConditions.map(item => (
                                     <div key={item} className="flex items-center space-x-2">
                                         <Checkbox id={`cond-${item}`} />
                                         <Label htmlFor={`cond-${item}`} className="font-normal cursor-pointer">{item}</Label>
