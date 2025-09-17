@@ -172,14 +172,20 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         <MessageSquare className="mr-2 h-4 w-4"/>
                         Chat
                     </Button>
-                    <Button variant="outline" size="icon" className="border-purple-500 hover:bg-purple-50">
-                        <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
+                    <Button asChild variant="outline" size="icon" className="border-purple-500 hover:bg-purple-50">
+                        <Link href="https://m.me/your_user_id" target="_blank">
+                            <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
+                        </Link>
                     </Button>
-                    <Button variant="outline" size="icon" className="border-blue-500 hover:bg-blue-50">
-                        <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
+                    <Button asChild variant="outline" size="icon" className="border-blue-500 hover:bg-blue-50">
+                        <Link href="https://zalo.me/your_zalo_id" target="_blank">
+                            <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
+                        </Link>
                     </Button>
-                    <Button variant="outline" size="icon" className="border-green-500 hover:bg-green-50">
-                        <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
+                    <Button asChild variant="outline" size="icon" className="border-green-500 hover:bg-green-50">
+                        <Link href="tel:your_phone_number">
+                            <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
+                        </Link>
                     </Button>
                 </div>
                  <div className="flex items-center gap-2">
@@ -255,9 +261,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             <span>{job.workLocation}</span>
                         </p>
                         {showPostedTime && (
-                            <p className="flex items-center gap-1 justify-end">
-                                <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
-                                <span className="text-primary font-semibold">Đăng lúc:</span>
+                            <p className="flex items-center gap-1.5 text-xs justify-end text-right w-full">
+                                <span className="text-primary">Đăng lúc:</span>
                                 <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
                             </p>
                         )}
@@ -296,14 +301,20 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                                 <Button size="icon" className="h-16 w-16 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
                                     <MessageSquare className="h-8 w-8"/>
                                 </Button>
-                                <Button variant="outline" size="icon" className="h-16 w-16 border-purple-500 hover:bg-purple-50">
-                                    <Image src="/img/Mess.svg" alt="Messenger" width={40} height={40} />
+                                <Button asChild variant="outline" size="icon" className="h-16 w-16 border-purple-500 hover:bg-purple-50">
+                                    <Link href="https://m.me/your_user_id" target="_blank">
+                                        <Image src="/img/Mess.svg" alt="Messenger" width={40} height={40} />
+                                    </Link>
                                 </Button>
-                                <Button variant="outline" size="icon" className="h-16 w-16 border-blue-500 hover:bg-blue-50">
-                                    <Image src="/img/Zalo.svg" alt="Zalo" width={40} height={40} />
+                                <Button asChild variant="outline" size="icon" className="h-16 w-16 border-blue-500 hover:bg-blue-50">
+                                    <Link href="https://zalo.me/your_zalo_id" target="_blank">
+                                      <Image src="/img/Zalo.svg" alt="Zalo" width={40} height={40} />
+                                    </Link>
                                 </Button>
-                                <Button variant="outline" size="icon" className="h-16 w-16 border-green-500 hover:bg-green-50">
-                                    <Image src="/img/phone.svg" alt="Phone" width={40} height={40} />
+                                <Button asChild variant="outline" size="icon" className="h-16 w-16 border-green-500 hover:bg-green-50">
+                                    <Link href="tel:your_phone_number">
+                                        <Image src="/img/phone.svg" alt="Phone" width={40} height={40} />
+                                    </Link>
                                 </Button>
                             </div>
                         </PopoverContent>
