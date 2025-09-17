@@ -106,17 +106,16 @@ const generateRandomJob = (index: number): Job => {
     
     const location = locations[index % locations.length];
     
-    // Assign a consultant based on the job index to ensure consistency
     const assignedConsultant = (consultants && consultants.length > 0)
         ? consultants[index % consultants.length]
-        : { id: 'bot-hellojob', name: 'HelloJob', avatarUrl: '/img/favi2.png', mainExpertise: 'AI Assistant' }; // Fallback
+        : { id: 'bot-hellojob', name: 'HelloJob', avatarUrl: '/img/favi2.png', mainExpertise: 'AI Assistant' };
     
     const recruiter = {
         id: assignedConsultant.id,
         name: assignedConsultant.name,
         avatar: assignedConsultant.avatarUrl,
         mainExpertise: assignedConsultant.mainExpertise,
-        company: 'HelloJob' // Or some other logic for company
+        company: 'HelloJob'
     };
 
     const gender = ['Nam', 'Nữ', 'Cả nam và nữ'][index % 3] as 'Nam' | 'Nữ' | 'Cả nam và nữ';
@@ -129,13 +128,19 @@ const generateRandomJob = (index: number): Job => {
         title += `, ${simplifiedLanguage}`;
     }
 
-    // Deterministic generation of likes to avoid hydration errors
     const deterministicLikesK = (index * 7) % 10;
     const deterministicLikesHundred = (index * 3) % 10;
     const imageSrc = jobImagePlaceholders[industry] || `https://placehold.co/600x400.png?text=${encodeURIComponent(industry)}`;
 
+    const creationDate = new Date(2024, 7, 1); // August 1st, 2024 for consistency with postedTime
+    const year = creationDate.getFullYear().toString().slice(-2);
+    const month = (creationDate.getMonth() + 1).toString().padStart(2, '0');
+    const randomChars = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const newJobId = `JP-${year}${month}-${randomChars}${index}`;
+
+
     return {
-        id: `JP-DEMO${1000 + index}`,
+        id: newJobId,
         isRecording: index % 5 === 0,
         image: { src: imageSrc, type: 'minhhoa' },
         likes: `${deterministicLikesK}k${deterministicLikesHundred}`,
@@ -188,3 +193,5 @@ const generateRandomJob = (index: number): Job => {
 };
 
 export const jobData: Job[] = Array.from({ length: 100 }, (_, i) => generateRandomJob(i));
+
+    
