@@ -11,7 +11,7 @@ import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles,
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
-import { use } from 'react';
+import { use, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { consultants } from '@/lib/chat-data';
 import { ContactButtons } from '@/components/contact-buttons';
@@ -52,11 +52,33 @@ const convertToVnd = (jpyValue?: string) => {
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const job = jobData.find(j => j.id === resolvedParams.id);
+    const [isSaved, setIsSaved] = useState(false);
+
+    useEffect(() => {
+        if (job) {
+            const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            setIsSaved(savedJobs.includes(job.id));
+        }
+    }, [job]);
 
     if (!job) {
         notFound();
     }
     
+    const handleSaveJob = () => {
+        const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+        if (isSaved) {
+            const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
+            localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
+            setIsSaved(false);
+        } else {
+            savedJobs.push(job.id);
+            localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+            setIsSaved(true);
+        }
+        window.dispatchEvent(new Event('storage'));
+    };
+
     const assignedConsultant = job.recruiter;
 
     const RequirementItem = ({ icon: Icon, label, value, className }: { icon: React.ElementType, label: string, value?: string | number, className?: string }) => {
@@ -98,7 +120,10 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             <CardContent>
                                 <div className="flex flex-col sm:flex-row gap-4">
                                      <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white">Ứng tuyển ngay</Button>
-                                     <Button size="lg" variant="outline" className="w-full sm:w-auto"><Heart className="mr-2"/> Lưu tin</Button>
+                                     <Button size="lg" variant="outline" className={cn("w-full sm:w-auto", isSaved && "border-accent-orange text-accent-orange bg-accent-orange/5")} onClick={handleSaveJob}>
+                                        <Heart className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
+                                        {isSaved ? 'Đã lưu' : 'Lưu tin'}
+                                    </Button>
                                 </div>
                             </CardContent>
                         </Card>
