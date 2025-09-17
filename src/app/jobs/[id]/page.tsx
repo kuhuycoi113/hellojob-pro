@@ -89,7 +89,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
                                     <p className="flex items-center gap-2"><MapPin className="h-4 w-4"/> {job.workLocation}</p>
                                     <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4"/> Đăng {job.postedTime}</p>
-                                    <p className="flex items-center gap-2 text-xs font-semibold text-sky-600 bg-sky-100 px-2 py-1 rounded-md">
+                                     <p className="flex items-center gap-2 text-xs font-semibold text-sky-600 bg-sky-100 px-2 py-1 rounded-md">
                                         <Image src="/img/japanflag.png" alt="Japan flag" width={16} height={16} className="h-4 w-4"/>
                                         Mã việc làm: {job.id}
                                     </p>

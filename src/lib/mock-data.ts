@@ -96,6 +96,34 @@ const jobImagePlaceholders: {[key: string]: string} = {
     'Nhà hàng': '/img/nha_hang.jpg',
 };
 
+const existingJobIds = new Set<string>();
+
+const generateUniqueJobId = (): string => {
+    const generateRandomChars = (length: number): string => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    };
+    
+    const creationDate = new Date(2024, 7, 1);
+    const year = creationDate.getFullYear().toString().slice(-2);
+    const month = (creationDate.getMonth() + 1).toString().padStart(2, '0');
+    const prefix = year + month;
+
+    let newId: string;
+    while (true) {
+        const randomPart = generateRandomChars(6);
+        newId = prefix + randomPart;
+        if (!existingJobIds.has(newId)) {
+            existingJobIds.add(newId);
+            return newId;
+        }
+    }
+};
+
 
 const generateRandomJob = (index: number): Job => {
     const industry = industries[index % industries.length];
@@ -132,11 +160,7 @@ const generateRandomJob = (index: number): Job => {
     const deterministicLikesHundred = (index * 3) % 10;
     const imageSrc = jobImagePlaceholders[industry] || `https://placehold.co/600x400.png?text=${encodeURIComponent(industry)}`;
 
-    const creationDate = new Date(2024, 7, 1); // August 1st, 2024 for consistency with postedTime
-    const year = creationDate.getFullYear().toString().slice(-2);
-    const month = (creationDate.getMonth() + 1).toString().padStart(2, '0');
-    const randomChars = Math.random().toString(36).substring(2, 7).toUpperCase();
-    const newJobId = `JP-${year}${month}-${randomChars}${index}`;
+    const newJobId = generateUniqueJobId();
 
 
     return {
@@ -193,5 +217,3 @@ const generateRandomJob = (index: number): Job => {
 };
 
 export const jobData: Job[] = Array.from({ length: 100 }, (_, i) => generateRandomJob(i));
-
-    
