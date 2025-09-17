@@ -98,6 +98,9 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
   }
 
   let searchSummary = searchSummaryParts.join(' / ');
+  if (searchSummary.length > 40) {
+      searchSummary = searchSummaryParts.slice(0, 2).join(' / ') + ` + ${searchSummaryParts.length - 2} khác...`;
+  }
 
 
   return (
@@ -111,8 +114,11 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                 <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4">
                   Tìm việc làm tại Nhật Bản
                 </h1>
-                <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80">
+                <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80 md:hidden">
                  Chúng tôi không chỉ cung cấp việc làm, mà còn đào tạo tư duy và xây dựng lộ trình phát triển sự nghiệp (SWR) rõ ràng, giúp bạn từ lao động phổ thông trở thành chuyên gia lành nghề.
+                </p>
+                 <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80 hidden md:block">
+                 Nhanh tay khám phá trải nghiệm Shopping công việc từ Thực tập sinh, Kỹ năng đặc định đến Kỹ sư tri thức trong Thế giới việc làm tại Nhật Bản cùng HelloJob ngay thôi nào.
                 </p>
             </div>
         </div>
