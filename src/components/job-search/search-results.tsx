@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { FilterSidebar } from "./filter-sidebar";
 import { Job, jobData } from "@/lib/mock-data";
-import { JobCard } from "../job-card";
 import { ChevronLeft, ListFilter, Loader2 } from "lucide-react";
 import { locations } from "@/lib/location-data";
 
@@ -34,6 +33,7 @@ export type SearchFilters = {
     yearsOfExperience?: string;
     tattooRequirement?: string;
     hepatitisBRequirement?: string;
+    netFee?: string;
 }
 
 type SearchResultsProps = {

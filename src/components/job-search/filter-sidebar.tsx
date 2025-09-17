@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -105,38 +106,30 @@ interface FilterSidebarProps {
 }
 
 const JPY_VND_RATE = 180;
+const USD_VND_RATE = 26300;
 
-const getConvertedValue = (value: string | undefined, placeholder: string) => {
+const getConvertedValue = (value: string | undefined, placeholder: string, rate: number, unit: string) => {
     const numericString = value || placeholder.replace(/[^0-9]/g, '');
     const num = Number(numericString.replace(/[^0-9]/g, ''));
     
-    if (isNaN(num)) return "≈ 0 triệu VNĐ";
+    if (isNaN(num)) return `≈ 0 ${unit}`;
 
-    const vndValue = num * JPY_VND_RATE;
-    const vndValueInMillions = vndValue / 1000000;
+    const convertedValue = num * rate;
     
     if (num === 0) {
-        return "≈ 0 triệu VNĐ";
+        return `≈ 0 ${unit}`;
     }
 
-    if (vndValueInMillions < 10 && vndValueInMillions > 0) {
-         const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
+    if (unit === 'triệu VNĐ') {
+        const valueInMillions = convertedValue / 1000000;
+        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
             minimumFractionDigits: 1,
             maximumFractionDigits: 1
         });
         return `≈ ${formattedVnd.replace('.',',')} triệu VNĐ`;
     }
     
-    const roundedValue = Math.round(vndValueInMillions);
-    if(roundedValue === 0 && vndValueInMillions > 0) {
-        const formattedVnd = vndValueInMillions.toLocaleString('vi-VN', {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1
-        });
-        return `≈ ${formattedVnd.replace('.',',')} triệu VNĐ`;
-    }
-
-    return `≈ ${roundedValue} triệu VNĐ`;
+    return `≈ ${convertedValue.toLocaleString('vi-VN')} VNĐ`;
 };
 
 
@@ -165,7 +158,7 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
                 onChange={handleSalaryInputChange}
                 value={getDisplayValue(filters.basicSalary)} 
             />
-            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, placeholderText)}</p>
+            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, placeholderText, JPY_VND_RATE, 'triệu VNĐ')}</p>
         </div>
     );
 });
@@ -328,6 +321,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         'hourlySalary': 15000,
         'annualIncome': 30000000,
         'annualBonus': 5000000,
+        'netFee': 3800,
     };
     
     const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof SearchFilters) => {
@@ -358,8 +352,9 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     const showTattooFilter = !visasToHideTattoo.includes(filters.visaDetail || '');
     
     const showEducationFilter = useMemo(() => {
-        const visasToHide = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'thuc-tap-sinh-3-go'];
-        return !visasToHide.includes(filters.visaDetail || '');
+        const visasToShow = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
+        // Show if no specific visa is selected OR if the selected visa is one of the engineer visas
+        return !filters.visaDetail || visasToShow.includes(filters.visaDetail);
     }, [filters.visaDetail]);
     
     const showEnglishLevelFilter = useMemo(() => {
@@ -374,27 +369,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     const shouldShowLươngGiờ = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(filters.visaDetail || "");
     const shouldShowLươngNăm = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(filters.visaDetail || "");
     const shouldShowTabs = shouldShowLươngGiờ || shouldShowLươngNăm;
-
-    const getConvertedHourlyValue = (value: string | undefined, placeholder: string) => {
-        const numericString = value || placeholder.replace(/[^0-9]/g, '');
-        const num = Number(numericString.replace(/[^0-9]/g, ''));
-        
-        if (isNaN(num)) return "≈ 0 trăm nghìn VNĐ";
-
-        const vndValue = num * JPY_VND_RATE;
-        const vndValueInHundredK = vndValue / 100000;
-        
-        if (num === 0) {
-            return "≈ 0 trăm nghìn VNĐ";
-        }
-        
-        const formattedVnd = vndValueInHundredK.toLocaleString('vi-VN', {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1
-        });
-        return `≈ ${formattedVnd.replace('.',',')} trăm nghìn VNĐ`;
-    };
     
+    const showFeeFilter = useMemo(() => {
+        const visasToShowFee = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
+        return !!filters.visaDetail && visasToShowFee.includes(filters.visaDetail);
+    }, [filters.visaDetail]);
+
     return (
         <div className="md:col-span-1 lg:col-span-1 h-full flex flex-col">
             <Card className="flex-grow flex flex-col">
@@ -608,7 +588,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                                     onChange={(e) => handleSalaryInputChange(e, 'hourlySalary')}
                                                     value={getDisplayValue(filters.hourlySalary)} 
                                                 />
-                                                <p className="text-xs text-muted-foreground">{getConvertedHourlyValue(filters.hourlySalary, 'VD: 1,000')}</p>
+                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary, 'VD: 1,000', JPY_VND_RATE, 'trăm nghìn VNĐ')}</p>
                                             </div>
                                         </TabsContent>
                                         <TabsContent value="yearly" className="pt-4">
@@ -622,7 +602,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                                         onChange={(e) => handleSalaryInputChange(e, 'annualIncome')}
                                                         value={getDisplayValue(filters.annualIncome)} 
                                                     />
-                                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualIncome, 'VD: 3,000,000')}</p>
+                                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualIncome, 'VD: 3,000,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label htmlFor="annual-bonus-jpy">Thưởng năm (JPY)</Label>
@@ -633,7 +613,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                                         onChange={(e) => handleSalaryInputChange(e, 'annualBonus')}
                                                         value={getDisplayValue(filters.annualBonus)} 
                                                     />
-                                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualBonus, 'VD: 500,000')}</p>
+                                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualBonus, 'VD: 500,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
                                                 </div>
                                             </div>
                                         </TabsContent>
@@ -658,11 +638,32 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         onChange={(e) => handleSalaryInputChange(e, 'netSalary')}
                                         value={getDisplayValue(filters.netSalary)} 
                                     />
-                                    <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'VD: 160,000')}</p>
+                                    <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'VD: 160,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
 
+                        {showFeeFilter && (
+                            <AccordionItem value="netFee">
+                                <AccordionTrigger className="text-base font-semibold">
+                                    <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-red-500"/>Tổng phí và học phí</span>
+                                </AccordionTrigger>
+                                <AccordionContent className="space-y-4 pt-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="net-fee-usd">Phí tối đa (USD)</Label>
+                                        <Input 
+                                            id="net-fee-usd" 
+                                            type="text" 
+                                            placeholder="VD: 3800" 
+                                            onChange={(e) => handleSalaryInputChange(e, 'netFee')}
+                                            value={getDisplayValue(filters.netFee)} 
+                                        />
+                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, 'VD: 3800', USD_VND_RATE, 'triệu VNĐ')}</p>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        )}
+                        
                         <AccordionItem value="experience">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Kinh nghiệm</span>
