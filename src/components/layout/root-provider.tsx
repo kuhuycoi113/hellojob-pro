@@ -26,20 +26,20 @@ function LayoutManager({ children }: { children: ReactNode }) {
     );
 }
 
-function GatedContent({ children }: { children: ReactNode }) {
-    const [isUnlocked, setIsUnlocked] = useState(false);
+// function GatedContent({ children }: { children: ReactNode }) {
+//     const [isUnlocked, setIsUnlocked] = useState(false);
 
-    useEffect(() => {
-        const unlocked = localStorage.getItem('hellojob_password_unlocked') === 'true';
-        setIsUnlocked(unlocked);
-    }, []);
+//     useEffect(() => {
+//         const unlocked = localStorage.getItem('hellojob_password_unlocked') === 'true';
+//         setIsUnlocked(unlocked);
+//     }, []);
 
-    if (!isUnlocked) {
-        return <PasswordGate onUnlock={() => setIsUnlocked(true)} />;
-    }
+//     if (!isUnlocked) {
+//         return <PasswordGate onUnlock={() => setIsUnlocked(true)} />;
+//     }
 
-    return <>{children}</>;
-}
+//     return <>{children}</>;
+// }
 
 
 export function RootProvider({
@@ -48,12 +48,12 @@ export function RootProvider({
     children: React.ReactNode;
 }) {
     return (
-      <GatedContent>
+    //   <GatedContent>
         <ChatProvider>
             <AuthProvider>
                 <LayoutManager>{children}</LayoutManager>
             </AuthProvider>
         </ChatProvider>
-      </GatedContent>
+    //   </GatedContent>
     );
 }
