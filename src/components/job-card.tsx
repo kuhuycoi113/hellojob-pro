@@ -151,9 +151,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     <MapPin className="h-4 w-4 flex-shrink-0" />
                     <span>{job.workLocation}</span>
                 </p>
-                {showPostedTime && (
-                    <p className="flex items-center gap-1.5 text-xs justify-end flex-grow text-right w-full">
-                        <span className="text-primary-dark">Đăng lúc:</span>
+                 {showPostedTime && (
+                    <p className="flex items-center gap-1.5 text-xs justify-end text-right w-full">
+                        <span className="text-muted-foreground">Đăng lúc:</span>
                         <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
                     </p>
                 )}
@@ -174,12 +174,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </Button>
                     <Button asChild variant="outline" size="icon" className="border-purple-500 hover:bg-purple-50">
                         <Link href="https://m.me/your_user_id" target="_blank">
-                            <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
+                             <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
                         </Link>
                     </Button>
                     <Button asChild variant="outline" size="icon" className="border-blue-500 hover:bg-blue-50">
                         <Link href="https://zalo.me/your_zalo_id" target="_blank">
-                            <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
+                           <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
                         </Link>
                     </Button>
                     <Button asChild variant="outline" size="icon" className="border-green-500 hover:bg-green-50">
@@ -261,10 +261,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             <span>{job.workLocation}</span>
                         </p>
                         {showPostedTime && (
-                            <p className="flex items-center gap-1 text-right ml-2 justify-end flex-grow">
-                                <span className="text-primary">Đăng lúc:</span>
+                           <p className="flex items-center gap-1.5 text-xs justify-end flex-grow text-right">
+                                <span className="text-muted-foreground">Đăng lúc:</span>
                                 <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
-                            </p>
+                           </p>
                         )}
                     </div>
                 </div>
@@ -312,7 +312,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                                     </Link>
                                 </Button>
                                 <Button asChild variant="outline" size="icon" className="h-16 w-16 border-green-500 hover:bg-green-50">
-                                    <Link href="tel:your_phone_number">
+                                     <Link href="tel:your_phone_number">
                                         <Image src="/img/phone.svg" alt="Phone" width={40} height={40} />
                                     </Link>
                                 </Button>
