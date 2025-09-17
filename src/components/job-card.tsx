@@ -152,8 +152,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     <span>{job.workLocation}</span>
                 </p>
                 {showPostedTime && (
-                    <p className="flex items-center gap-1.5 text-xs justify-end text-right w-full">
-                        <span className="text-primary">Đăng lúc:</span>
+                    <p className="flex items-center gap-1.5 text-xs justify-end flex-grow text-right w-full">
+                        <span className="text-primary-dark">Đăng lúc:</span>
                         <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
                     </p>
                 )}
@@ -261,7 +261,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             <span>{job.workLocation}</span>
                         </p>
                         {showPostedTime && (
-                            <p className="flex items-center gap-1.5 text-xs justify-end text-right w-full">
+                            <p className="flex items-center gap-1 text-right ml-2 justify-end flex-grow">
                                 <span className="text-primary">Đăng lúc:</span>
                                 <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
                             </p>
