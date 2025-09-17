@@ -112,7 +112,8 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
         <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4 whitespace-nowrap">
-                  Việc làm Nhật Bản
+                    <span className="md:hidden">Việc làm Nhật Bản</span>
+                    <span className="hidden md:inline">Tìm việc làm tại Nhật Bản</span>
                 </h1>
                 <p className="text-sm xs:text-base sm:text-lg max-w-3xl mx-auto mb-10 text-white/80 md:hidden">
                  Trải nghiệm Shopping công việc Thực tập sinh, Kỹ năng đặc định, Kỹ sư tri thức trong Thế giới việc làm HelloJob
