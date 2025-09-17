@@ -147,7 +147,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         </JobDetailSection>
 
                         { (job.details.videoUrl || (job.details.images && job.details.images.length > 0)) &&
-                            <JobDetailSection title="Hình ảnh & Video công việc" icon={ImageIcon}>
+                           <JobDetailSection title="Hình ảnh & Video công việc" icon={ImageIcon}>
                                 <div className="space-y-6">
                                     {job.details.videoUrl && (
                                         <div className="aspect-video">
@@ -155,10 +155,18 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                         </div>
                                     )}
                                     {job.details.images && job.details.images.length > 0 && (
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {job.details.images.map((image, index) => (
-                                                <Image key={index} src={image.src} alt={image.alt} width={600} height={400} className="rounded-lg object-cover" data-ai-hint={image.dataAiHint} />
-                                            ))}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="relative aspect-[2/3] md:col-span-1 rounded-lg overflow-hidden">
+                                                <Image src={job.details.images[0].src} alt={job.details.images[0].alt} fill className="object-cover" data-ai-hint={job.details.images[0].dataAiHint}/>
+                                            </div>
+                                            <div className="md:col-span-1 grid grid-rows-2 gap-4">
+                                                <div className="relative rounded-lg overflow-hidden">
+                                                    <Image src={job.details.images[1].src} alt={job.details.images[1].alt} fill className="object-cover" data-ai-hint={job.details.images[1].dataAiHint}/>
+                                                </div>
+                                                <div className="relative rounded-lg overflow-hidden">
+                                                    <Image src={job.details.images[2 % job.details.images.length].src} alt={job.details.images[2 % job.details.images.length].alt} fill className="object-cover" data-ai-hint={job.details.images[2 % job.details.images.length].dataAiHint}/>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
