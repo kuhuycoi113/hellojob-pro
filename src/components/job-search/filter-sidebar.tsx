@@ -355,7 +355,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         return num.toLocaleString('ja-JP');
     };
     
-    const showTattooFilter = !['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '');
+    const visasToHideTattoo = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
+    const showTattooFilter = !visasToHideTattoo.includes(filters.visaDetail || '');
     
     const visasToHideEducation = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'thuc-tap-sinh-3-go'];
     const showEducationFilter = !visasToHideEducation.includes(filters.visaDetail || '');
@@ -393,7 +394,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow overflow-y-auto pr-4">
-                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements', 'interviewLocation', 'process', 'salary', 'netSalary']} className="w-full">
+                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements', 'interviewLocation', 'process', 'salary', 'netSalary', 'specialConditions']} className="w-full">
                          <AccordionItem value="jobType">
                             <AccordionTrigger className="text-base font-semibold">
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
