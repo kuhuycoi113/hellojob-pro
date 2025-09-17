@@ -1,6 +1,9 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { RootProvider } from '@/components/layout/root-provider';
+import { Montserrat } from 'next/font/google';
+import { cn } from '@/lib/utils';
 
 const siteConfig = {
   name: "HelloJob",
@@ -8,6 +11,14 @@ const siteConfig = {
   description: "Nền tảng việc làm và phát triển sự nghiệp tại Nhật Bản. Tìm kiếm việc làm Kỹ năng đặc định (Tokutei Ginou), Thực tập sinh, Kỹ sư. Xây dựng lộ trình sự nghiệp (SWR) bền vững.",
   ogImage: "/metadata/opengraph-image.jpg",
 };
+
+const montserrat = Montserrat({
+  subsets: ['vietnamese'],
+  weight: ['400', '700', '900'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
+
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -80,18 +91,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className="scroll-smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="antialiased pb-20 md:pb-0">
+    <html lang="vi" className={cn("scroll-smooth", montserrat.variable)}>
+      <body className="antialiased pb-20 md:pb-0 font-body">
         <RootProvider>{children}</RootProvider>
       </body>
     </html>
   );
 }
+

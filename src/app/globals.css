@@ -3,10 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Montserrat', sans-serif;
-}
-
 @layer base {
   :root {
     --background: 210 29% 97%;
@@ -151,3 +147,4 @@ body {
     border-color: hsl(var(--accent-blue));
   }
 }
+
