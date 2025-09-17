@@ -153,7 +153,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                 </p>
                 {showPostedTime && (
                     <p className="flex items-center gap-1.5 text-xs justify-end text-right w-full">
-                        <span className="text-primary font-semibold">Đăng lúc:</span>
+                        <span className="text-primary">Đăng lúc:</span>
                         <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
                     </p>
                 )}
@@ -255,9 +255,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             <span>{job.workLocation}</span>
                         </p>
                         {showPostedTime && (
-                            <p className="flex items-center gap-1">
+                            <p className="flex items-center gap-1 justify-end">
                                 <CalendarClock className="h-3 w-3 flex-shrink-0 text-primary" />
-                                <span style={{ color: '#9B999A' }}>{job.postedTime}</span>
+                                <span className="text-primary font-semibold">Đăng lúc:</span>
+                                <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
                             </p>
                         )}
                     </div>
