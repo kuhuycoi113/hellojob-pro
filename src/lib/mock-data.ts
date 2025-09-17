@@ -1,5 +1,4 @@
 
-
 import { consultants } from './chat-data';
 
 export interface Job {
@@ -180,8 +179,9 @@ const generateRandomJob = (index: number): Job => {
             benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li></ul>`,
             videoUrl: index % 4 === 0 ? 'https://www.youtube.com/embed/dQw4w9WgXcQ' : undefined,
             images: index % 3 === 0 ? [
-                { src: 'https://placehold.co/600x400.png?text=Workplace', alt: 'Nơi làm việc', dataAiHint: 'factory workplace' },
-                { src: 'https://placehold.co/600x400.png?text=Dormitory', alt: 'Ký túc xá', dataAiHint: 'company dormitory' }
+                { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
+                { src: '/img/donhang2.jpg', alt: 'Mẫu đơn hàng 2', dataAiHint: 'recruitment form' },
+                { src: '/img/donhang3.jpg', alt: 'Mẫu đơn hàng 3', dataAiHint: 'job details' }
             ] : []
         }
     };
