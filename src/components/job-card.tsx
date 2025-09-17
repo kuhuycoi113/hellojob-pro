@@ -173,7 +173,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         Chat
                     </Button>
                     <Button variant="outline" size="icon" className="border-purple-500 hover:bg-purple-50">
-                        <MessengerIcon className="h-5 w-5 text-purple-600"/>
+                        <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
                     </Button>
                     <Button variant="outline" size="icon" className="border-blue-500 hover:bg-blue-50">
                         <ZaloIcon className="h-5 w-5"/>
@@ -279,7 +279,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         <MessageSquare className="text-primary-foreground h-4 w-4"/>
                     </Button>
                     <Button variant="outline" size="icon" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
-                        <MessengerIcon className="h-4 w-4 text-purple-600"/>
+                        <Image src="/img/Mess.svg" alt="Messenger" width={16} height={16} />
                     </Button>
                     <Button variant="outline" size="icon" className="h-8 w-8 border-blue-500 hover:bg-blue-50">
                         <ZaloIcon className="h-4 w-4"/>
