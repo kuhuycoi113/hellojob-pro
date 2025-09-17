@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark, Phone } from 'lucide-react';
+import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark, Phone, LogIn } from 'lucide-react';
 import { Job } from '@/lib/mock-data';
 import {
     DropdownMenu,
@@ -16,10 +16,22 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useChat } from '@/contexts/ChatContext';
 import { MessengerIcon, ZaloIcon } from './custom-icons';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthDialog } from './auth-dialog';
 
 const formatCurrency = (value?: string) => {
     if (!value) return 'N/A';
@@ -28,7 +40,10 @@ const formatCurrency = (value?: string) => {
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'default', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'default' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
   const { openChat } = useChat();
+  const { isLoggedIn } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
 
   useEffect(() => {
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -50,6 +65,21 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
     }
      // Trigger a storage event to update other components like the "My Jobs" page
     window.dispatchEvent(new Event('storage'));
+  };
+
+  const handleApplyClick = () => {
+    if (!isLoggedIn) {
+        sessionStorage.setItem('postLoginRedirect', `/jobs/${job.id}`);
+        setIsConfirmLoginOpen(true);
+    } else {
+        // Logic for logged in user to apply
+        console.log("Applying for job...");
+    }
+  };
+  
+  const handleConfirmLogin = () => {
+    setIsConfirmLoginOpen(false);
+    setIsAuthDialogOpen(true);
   };
 
 
@@ -92,12 +122,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
               <div className={cn("w-1.5 h-1.5 rounded-full", job.isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400')}></div>
               <span>{job.id}</span>
             </div>
-            {showLikes && (
-                <div className="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                    <span>{job.likes}</span>
-                    <Heart className="w-4 h-4 text-red-500 fill-current" />
-                </div>
-            )}
         </div>
         
         <div className="flex-grow flex flex-col">
@@ -121,7 +145,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
               <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
             </div>
             <div className="flex flex-col gap-1 text-sm text-muted-foreground">
-                <div className="flex justify-between items-center">
+                 <div className="flex justify-between items-center w-full">
                     <p className="flex items-center gap-1.5">
                         <MapPin className="h-4 w-4 flex-shrink-0" />
                         <span>{job.workLocation}</span>
@@ -159,14 +183,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                     </Button>
                 </div>
                  <div className="flex items-center gap-2">
-                    <Button variant={isSaved ? "outline" : "ghost"} size="sm" className={cn(isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                    <Button variant="outline" size="sm" className={cn(isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                         <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                         Lưu
                     </Button>
                     {showApplyButtons ? (
-                        <>
-                            <Button size="sm" className="bg-accent-orange text-white">Ứng tuyển</Button>
-                        </>
+                        <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
                     ) : (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -201,17 +223,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                 <div className={cn("w-1.5 h-1.5 rounded-full", job.isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400')}></div>
                 <span>{job.id}</span>
                 </div>
-                {showLikes && (
-                    <div className="absolute bottom-1 right-1 bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                        <span>{job.likes}</span>
-                        <Heart className="w-4 h-4 text-red-500 fill-current" />
-                    </div>
-                )}
-                 
-                <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm" onClick={handleSaveJob}>
-                    <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
-                </Button>
-                
             </div>
 
             <div className="w-2/3 p-3 flex-grow flex flex-col justify-between">
@@ -277,7 +288,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                  <div className="flex items-center gap-2">
                     {showApplyButtons ? (
                         <>
-                            <Button size="sm" className="bg-accent-orange text-white h-8">Ứng tuyển</Button>
+                           <Button variant="outline" size="sm" className="h-8" onClick={handleSaveJob}>
+                                <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
+                            </Button>
+                            <Button size="sm" className="bg-accent-orange text-white h-8" onClick={handleApplyClick}>Ứng tuyển</Button>
                         </>
                      ) : (
                          <DropdownMenu>
@@ -306,11 +320,30 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
   }
 
   return (
-    <Card className={cn(
-        "rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300",
-    )}>
-        <MobileLayout />
-        <DesktopLayout />
-    </Card>
+    <>
+        <Card className={cn(
+            "rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300",
+        )}>
+            <MobileLayout />
+            <DesktopLayout />
+        </Card>
+        <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+        <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Bạn cần có tài khoản để ứng tuyển. Đi đến trang đăng ký/đăng nhập?
+                </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                <AlertDialogCancel>Từ chối</AlertDialogCancel>
+                <AlertDialogAction onClick={handleConfirmLogin}>
+                    Đồng ý
+                </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    </>
   );
 };
