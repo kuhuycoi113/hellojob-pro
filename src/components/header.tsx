@@ -603,9 +603,6 @@ const LoggedOutContent = () => {
                     {isClient && !isLoggedIn && (
                         <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
                     )}
-                    <Button asChild variant="default" size="sm">
-                        <Link href="/my-jobs">Việc</Link>
-                    </Button>
                     <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
                             <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" size="sm">Tạo</Button>
@@ -614,6 +611,9 @@ const LoggedOutContent = () => {
                             {renderDialogContent()}
                         </DialogContent>
                     </Dialog>
+                    <Button asChild variant="default" size="sm">
+                        <Link href="/my-jobs">Việc</Link>
+                    </Button>
                     <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                         <SheetTrigger asChild>
                             <Button variant="ghost" size="icon">
