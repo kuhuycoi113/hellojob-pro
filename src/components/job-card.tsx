@@ -283,14 +283,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                                 <Button size="icon" className="h-8 w-8 bg-primary hover:bg-primary/90">
                                     <MessageSquare className="text-primary-foreground h-4 w-4"/>
                                 </Button>
-                                 <Button variant="outline" size="icon" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
+                                <Button variant="outline" size="icon" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
                                     <Image src="/img/Mess.svg" alt="Messenger" width={16} height={16} />
                                 </Button>
                                 <Button variant="outline" size="icon" className="h-8 w-8 border-blue-500 hover:bg-blue-50">
                                     <Image src="/img/Zalo.svg" alt="Zalo" width={16} height={16} />
                                 </Button>
                                 <Button variant="outline" size="icon" className="h-8 w-8 border-green-500 hover:bg-green-50">
-                                     <Image src="/img/phone.svg" alt="Phone" width={16} height={16} />
+                                    <Image src="/img/phone.svg" alt="Phone" width={16} height={16} />
                                 </Button>
                             </div>
                         </PopoverTrigger>
