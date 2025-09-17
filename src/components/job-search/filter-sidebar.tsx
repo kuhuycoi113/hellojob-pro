@@ -320,7 +320,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         'hourlySalary': 15000,
         'annualIncome': 30000000,
         'annualBonus': 5000000,
-        'netFee': 3800,
     };
     
     const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof SearchFilters) => {
@@ -372,6 +371,21 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         }
     };
     
+    const getFeeLabel = () => {
+        switch (filters.visaDetail) {
+            case 'thuc-tap-sinh-3-nam':
+            case 'thuc-tap-sinh-1-nam':
+                return 'Phí và học phí tối đa';
+            case 'dac-dinh-dau-viet':
+                return 'Phí và vé máy bay tối đa';
+            case 'dac-dinh-di-moi':
+            case 'ky-su-tri-thuc-dau-viet':
+                return 'Phí, học phí và vé tối đa';
+            default:
+                return 'Phí tối đa (USD)';
+        }
+    };
+
     const visasToHideTattoo = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
     const showTattooFilter = !visasToHideTattoo.includes(filters.visaDetail || '');
     
@@ -674,7 +688,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 </AccordionTrigger>
                                 <AccordionContent className="space-y-4 pt-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="net-fee-usd">Phí tối đa (USD)</Label>
+                                        <Label htmlFor="net-fee-usd">{getFeeLabel()}</Label>
                                         <Input 
                                             id="net-fee-usd" 
                                             type="text" 
@@ -922,3 +936,5 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         </div>
     );
 }
+
+    
