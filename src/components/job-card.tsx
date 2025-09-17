@@ -43,6 +43,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
   const [isSaved, setIsSaved] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
+  const [isConsultantPopoverOpen, setIsConsultantPopoverOpen] = useState(false);
 
   useEffect(() => {
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -152,14 +153,16 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
             
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-2">
-                    <Popover>
+                    <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
                         <PopoverTrigger asChild>
-                             <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
-                                <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
-                                    <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
-                                    <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                            </Link>
+                             <div onMouseEnter={() => setIsConsultantPopoverOpen(true)} onMouseLeave={() => setIsConsultantPopoverOpen(false)}>
+                                <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
+                                    <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                                        <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                        <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                </Link>
+                             </div>
                         </PopoverTrigger>
                          <PopoverContent className="w-80" side="top" align="start">
                             <div className="flex gap-4">
