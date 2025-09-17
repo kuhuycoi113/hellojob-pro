@@ -356,10 +356,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     };
     
     const showTattooFilter = !['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '');
-
+    
+    const visasToHideEducation = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'thuc-tap-sinh-3-go'];
+    const showEducationFilter = !visasToHideEducation.includes(filters.visaDetail || '');
     
     const showEnglishLevelFilter = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '');
-    const showEducationFilter = !['dac-dinh-dau-viet', 'dac-dinh-dau-nhat', 'dac-dinh-di-moi'].includes(filters.visaDetail || '');
     
     const shouldShowLươngGiờ = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(filters.visaDetail || "");
     const shouldShowLươngNăm = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(filters.visaDetail || "");
