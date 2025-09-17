@@ -114,7 +114,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                 <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4 whitespace-nowrap">
                   Việc làm Nhật Bản
                 </h1>
-                <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80 md:hidden">
+                <p className="text-sm xs:text-base sm:text-lg max-w-3xl mx-auto mb-10 text-white/80 md:hidden">
                  Trải nghiệm Shopping công việc Thực tập sinh, Kỹ năng đặc định, Kỹ sư tri thức trong Thế giới việc làm HelloJob
                 </p>
                  <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80 hidden md:block">
@@ -158,7 +158,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                                 </SelectTrigger>
                                 <SelectContent>
                                 <SelectItem value="all-details">Tất cả loại hình</SelectItem>
-                                {japanJobTypes.map(type => (
+                                 {japanJobTypes.map(type => (
                                     <SelectGroup key={type.slug}>
                                         <SelectLabel>{type.name}</SelectLabel>
                                         {(visaDetailsByVisaType[type.slug] || []).map(detail => (
