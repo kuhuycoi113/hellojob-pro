@@ -844,6 +844,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 <span className="flex items-center gap-2"><ListChecks className="h-5 w-5"/>Quy trình tuyển dụng</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
+                                {['dac-dinh-dau-nhat', 'ky-su-tri-thuc-dau-nhat', 'thuc-tap-sinh-3-go'].includes(filters.visaDetail || '') && (
                                 <div className="space-y-2">
                                     <Label>Yêu cầu hạn Ginou còn</Label>
                                     <Select><SelectTrigger><SelectValue placeholder="Chọn thời gian" /></SelectTrigger>
@@ -852,6 +853,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                )}
                                 <div className="space-y-2">
                                     <Label>Yêu cầu thời điểm về công ty</Label>
                                     <Select><SelectTrigger><SelectValue placeholder="Chọn thời điểm" /></SelectTrigger>
