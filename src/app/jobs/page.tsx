@@ -34,6 +34,7 @@ const initialSearchFilters: SearchFilters = {
     yearsOfExperience: '',
     tattooRequirement: '',
     hepatitisBRequirement: '',
+    quantity: '',
 };
 
 function JobsPageContent() {
@@ -52,11 +53,13 @@ function JobsPageContent() {
     // It is now only called when the user clicks "Apply" or on initial page load.
     const runFilter = useCallback((filtersToApply: SearchFilters) => {
         const { 
-            visa, visaDetail, industry, location, jobDetail, interviewLocation, 
+            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
+        const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
+
 
         let results = jobData.filter(job => {
             let visaMatch = true;
@@ -83,8 +86,12 @@ function JobsPageContent() {
             }
             
             const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
+
+            const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
+
+            const feeMatch = feeLimit === null || !job.netFee || parseInt(job.netFee.replace(/[^0-9]/g, '')) <= feeLimit;
             
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch;
         });
 
         setFilteredJobs(results);
@@ -92,10 +99,11 @@ function JobsPageContent() {
 
     // This function ONLY counts the results based on staged filters without updating the UI.
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
-        const { visa, visaDetail, industry, location, jobDetail, interviewLocation } = filtersToCount;
+        const { visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee } = filtersToCount;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
+        const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
         
         const count = jobData.filter(job => {
             let visaMatch = true;
@@ -118,7 +126,9 @@ function JobsPageContent() {
                 });
             }
             const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch;
+            const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
+            const feeMatch = feeLimit === null || !job.netFee || parseInt(job.netFee.replace(/[^0-9]/g, '')) <= feeLimit;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch;
         }).length;
         setStagedResultCount(count);
     }, []);

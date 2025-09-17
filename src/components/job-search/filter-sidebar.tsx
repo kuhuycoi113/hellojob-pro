@@ -882,6 +882,17 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="quantity-filter">Tuyển từ... người trở lên</Label>
+                                    <Input 
+                                        id="quantity-filter" 
+                                        type="number" 
+                                        min="1"
+                                        placeholder="Nhập số lượng tối thiểu" 
+                                        value={filters.quantity || ''}
+                                        onChange={(e) => onFilterChange({ quantity: e.target.value })}
+                                    />
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
