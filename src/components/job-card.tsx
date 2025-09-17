@@ -147,18 +147,16 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
               <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
             </div>
             <div className="flex flex-col gap-1 text-sm text-muted-foreground">
-                 <div className="flex justify-between items-center w-full">
-                    <p className="flex items-center gap-1.5">
-                        <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span>{job.workLocation}</span>
+                <p className="flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                    <span>{job.workLocation}</span>
+                </p>
+                {showPostedTime && (
+                    <p className="flex items-center gap-1.5 text-xs justify-end text-right w-full">
+                        <span className="text-primary font-semibold">Đăng lúc:</span>
+                        <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
                     </p>
-                    {showPostedTime && (
-                        <p className="flex items-center gap-1.5 text-xs justify-end flex-grow text-right">
-                            <span className="text-primary font-semibold">Đăng lúc:</span>
-                            <span style={{color: '#9B999A'}}>{job.postedTime}</span>
-                        </p>
-                    )}
-                </div>
+                )}
             </div>
 
             
