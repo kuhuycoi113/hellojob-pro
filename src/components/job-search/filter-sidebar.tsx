@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -358,10 +357,19 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     const visasToHideTattoo = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
     const showTattooFilter = !visasToHideTattoo.includes(filters.visaDetail || '');
     
-    const visasToHideEducation = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'thuc-tap-sinh-3-go'];
-    const showEducationFilter = !visasToHideEducation.includes(filters.visaDetail || '');
+    const showEducationFilter = useMemo(() => {
+        const visasToHide = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'thuc-tap-sinh-3-go'];
+        return !visasToHide.includes(filters.visaDetail || '');
+    }, [filters.visaDetail]);
     
-    const showEnglishLevelFilter = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '');
+    const showEnglishLevelFilter = useMemo(() => {
+        const isEngineerVisa = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '');
+        const isTokuteiServiceIndustry = 
+            filters.visa === 'ky-nang-dac-dinh' && 
+            ['nha-hang-tokutei', 'hang-khong-tokutei', 've-sinh-toa-nha-tokutei', 'luu-tru-khach-san-tokutei'].includes(filters.industry || '');
+        
+        return isEngineerVisa || isTokuteiServiceIndustry;
+    }, [filters.visaDetail, filters.visa, filters.industry]);
     
     const shouldShowLươngGiờ = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(filters.visaDetail || "");
     const shouldShowLươngNăm = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(filters.visaDetail || "");
