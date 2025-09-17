@@ -394,7 +394,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow overflow-y-auto pr-4">
-                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'requirements', 'interviewLocation', 'process', 'salary', 'netSalary', 'specialConditions']} className="w-full">
+                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'experience', 'requirements', 'interviewLocation', 'process', 'salary', 'netSalary', 'specialConditions']} className="w-full">
                          <AccordionItem value="jobType">
                             <AccordionTrigger className="text-base font-semibold">
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
@@ -434,15 +434,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả ngành nghề</SelectItem>
                                             {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Chi tiết công việc</Label>
-                                     <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
-                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn công việc chi tiết"/></SelectTrigger>
-                                        <SelectContent className="max-h-60">
-                                            {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -663,6 +654,32 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
+
+                        <AccordionItem value="experience">
+                            <AccordionTrigger className="text-base font-semibold">
+                                <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Kinh nghiệm</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-4 pt-4">
+                                <div className="space-y-2">
+                                    <Label>Yêu cầu kinh nghiệm</Label>
+                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
+                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn chi tiết công việc"/></SelectTrigger>
+                                        <SelectContent className="max-h-60">
+                                            {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Số năm kinh nghiệm</Label>
+                                     <Select value={filters.yearsOfExperience} onValueChange={(value) => onFilterChange({ yearsOfExperience: value })}>
+                                        <SelectTrigger><SelectValue placeholder="Chọn số năm" /></SelectTrigger>
+                                        <SelectContent>
+                                            {experienceYears.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
                         
                          <AccordionItem value="requirements">
                             <AccordionTrigger className="text-base font-semibold">
@@ -773,24 +790,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                     </Select>
                                 </div>
                                 )}
-                                <div className="space-y-2">
-                                    <Label>Yêu cầu kinh nghiệm</Label>
-                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
-                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn chi tiết công việc"/></SelectTrigger>
-                                        <SelectContent className="max-h-60">
-                                            {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="font-semibold">Kinh nghiệm</Label>
-                                     <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn số năm kinh nghiệm" /></SelectTrigger>
-                                        <SelectContent>
-                                            {experienceYears.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
                                 <div className="space-y-2">
                                     <Label className="font-semibold">Tay thuận</Label>
                                     <Select>
