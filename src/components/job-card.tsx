@@ -111,8 +111,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
             <Link href={`/jobs/${job.id}`}>
                 <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-lg" />
             </Link>
-             <div className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
-              <div className={cn("w-1.5 h-1.5 rounded-full", job.isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400')}></div>
+            <div className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1.5">
+              <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
               <span>{job.id}</span>
             </div>
         </div>
@@ -222,9 +222,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                 <Link href={`/jobs/${job.id}`}>
                     <Image src={job.image.src} alt={job.title} fill className="object-cover" />
                 </Link>
-                <div className="absolute top-1 left-1 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                <div className={cn("w-1.5 h-1.5 rounded-full", job.isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400')}></div>
-                <span>{job.id}</span>
+                <div className="absolute top-1 left-1 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1.5">
+                  <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
+                  <span>{job.id}</span>
                 </div>
                  <Button size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 hover:bg-white border border-gray-200 shadow" onClick={handleSaveJob}>
                     <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
