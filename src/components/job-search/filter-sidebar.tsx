@@ -333,7 +333,21 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             return;
         }
 
-        const limit = salaryLimits[field as keyof typeof salaryLimits];
+        let limit = salaryLimits[field as keyof typeof salaryLimits];
+        if (field === 'netFee') {
+            switch (filters.visaDetail) {
+                case 'thuc-tap-sinh-1-nam':
+                    limit = 1400;
+                    break;
+                case 'dac-dinh-dau-viet':
+                    limit = 2500;
+                    break;
+                default:
+                    limit = 3800;
+                    break;
+            }
+        }
+        
         if (limit && num > limit) {
             num = limit;
         }
@@ -346,6 +360,17 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         const num = Number(value.replace(/[^0-9]/g, ''));
         if (isNaN(num)) return '';
         return num.toLocaleString('ja-JP');
+    };
+    
+    const getFeePlaceholder = () => {
+        switch (filters.visaDetail) {
+            case 'thuc-tap-sinh-1-nam':
+                return "1000";
+            case 'dac-dinh-dau-viet':
+                return "1600";
+            default:
+                return "3000";
+        }
     };
     
     const visasToHideTattoo = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
@@ -654,11 +679,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         <Input 
                                             id="net-fee-usd" 
                                             type="text" 
-                                            placeholder="VD: 3800" 
+                                            placeholder={getFeePlaceholder()}
                                             onChange={(e) => handleSalaryInputChange(e, 'netFee')}
                                             value={getDisplayValue(filters.netFee)} 
                                         />
-                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, 'VD: 3800', USD_VND_RATE, 'triệu VNĐ')}</p>
+                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
                                     </div>
                                 </AccordionContent>
                             </AccordionItem>
@@ -669,7 +694,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Kinh nghiệm</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
-                                <div className="space-y-2">
+                                 <div className="space-y-2">
                                     <Label>Yêu cầu kinh nghiệm</Label>
                                     <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
                                         <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn chi tiết công việc"/></SelectTrigger>
