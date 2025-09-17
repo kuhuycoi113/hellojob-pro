@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -407,7 +406,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal/> Bộ lọc tìm kiếm</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow overflow-y-auto pr-4">
-                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'experience', 'requirements', 'interviewLocation', 'process', 'salary', 'netSalary', 'specialConditions']} className="w-full">
+                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'experience', 'requirements', 'interviewLocation', 'process', 'salary', 'netSalary', 'specialConditions', 'netFee']} className="w-full">
                          <AccordionItem value="jobType">
                             <AccordionTrigger className="text-base font-semibold">
                                  <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Loại hình công việc</span>
@@ -671,7 +670,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                         {showFeeFilter && (
                             <AccordionItem value="netFee">
                                 <AccordionTrigger className="text-base font-semibold">
-                                    <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-red-500"/>Tổng phí và học phí</span>
+                                    <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-red-500"/>Mức phí</span>
                                 </AccordionTrigger>
                                 <AccordionContent className="space-y-4 pt-4">
                                     <div className="space-y-2">
