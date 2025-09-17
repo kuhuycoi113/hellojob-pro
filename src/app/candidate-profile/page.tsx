@@ -46,7 +46,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGr
 import { Slider } from '@/components/ui/slider';
 import { translateProfile } from '@/ai/flows/translate-profile-flow';
 import type { TranslateProfileInput } from '@/ai/schemas/translate-profile-schema';
-import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
+import { JpFlagIcon, EnFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon } from '@/components/custom-icons';
 import { industriesByJobType } from '@/lib/industry-data';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -211,6 +211,9 @@ const emptyCandidate: EnrichedCandidateProfile = {
       weight: '50',
       tattooStatus: 'Không có',
       hepatitisBStatus: 'Không viêm gan B',
+      messenger: 'lethian.2000',
+      zalo: '0901234567',
+      line: 'lethian.line',
     },
     aspirations: {
         desiredLocation: 'Osaka',
@@ -364,11 +367,6 @@ const EditDialog = ({
 };
 
 
-const ZaloIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg viewBox="0 0 262 263" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <path d="M131 0C58.649 0 0 58.649 0 131C0 203.351 58.649 262 131 262C203.351 262 262 203.351 262 131C262 58.649 203.351 0 131 0ZM197.838 170.368L173.962 194.244C171.139 197.067 167.247 197.68 163.639 196.223L126.541 182.903C125.129 182.413 123.824 181.711 122.625 180.892L74.832 144.37C71.748 142.029 70.832 137.989 72.585 134.577L84.975 111.758C86.728 108.347 90.722 106.889 94.276 108.347L131.374 121.612C132.786 122.102 134.091 122.748 135.29 123.623L183.083 160.145C186.167 162.486 187.083 166.526 185.33 169.937L197.838 170.368Z" fill="#0068FF"/>
-    </svg>
-)
 
 const formatYen = (value?: string | number) => {
     if (value === null || value === undefined || value === '') return 'Chưa cập nhật';
@@ -1255,6 +1253,18 @@ export default function CandidateProfilePage() {
             </SelectContent>
           </Select>
         </div>
+         <div className="space-y-2">
+            <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
+            <Input id="zalo" value={tempCandidate.personalInfo.zalo || ''} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value)} />
+        </div>
+         <div className="space-y-2">
+            <Label htmlFor="messenger">Messenger (Link hoặc ID)</Label>
+            <Input id="messenger" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
+        </div>
+         <div className="space-y-2">
+            <Label htmlFor="line">Line (Link hoặc ID)</Label>
+            <Input id="line" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
+        </div>
       </div>
     </div>
   );
@@ -1779,6 +1789,14 @@ export default function CandidateProfilePage() {
                     <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus}</p>
                     <p><strong>{t.language}:</strong> {candidate.personalInfo.language}</p>
                   </CardContent>
+                  <CardContent>
+                    <div className="space-y-2">
+                        {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Phone className="mr-2"/>{candidate.personalInfo.phone}</Link></Button>}
+                        {candidate.personalInfo.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${candidate.personalInfo.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.messenger}</Link></Button>}
+                        {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.zalo}</Link></Button>}
+                        {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${candidate.personalInfo.line}`} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
+                    </div>
+                  </CardContent>
                 </Card>
 
                  <Card>
@@ -1925,6 +1943,7 @@ export default function CandidateProfilePage() {
     
 
     
+
 
 
 
