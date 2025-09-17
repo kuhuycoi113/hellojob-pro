@@ -32,6 +32,8 @@ import { useChat } from '@/contexts/ChatContext';
 import { MessengerIcon, ZaloIcon } from './custom-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
 
 const formatCurrency = (value?: string) => {
     if (!value) return 'N/A';
@@ -275,18 +277,29 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                     </Link>
-                    <Button size="icon" className="h-8 w-8 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
-                        <MessageSquare className="text-primary-foreground h-4 w-4"/>
-                    </Button>
-                    <Button variant="outline" size="icon" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
-                        <Image src="/img/Mess.svg" alt="Messenger" width={16} height={16} />
-                    </Button>
-                    <Button variant="outline" size="icon" className="h-8 w-8 border-blue-500 hover:bg-blue-50">
-                        <ZaloIcon className="h-4 w-4"/>
-                    </Button>
-                    <Button variant="outline" size="icon" className="h-8 w-8 border-green-500 hover:bg-green-50">
-                        <Image src="/img/phone.svg" alt="Phone" width={16} height={16} />
-                    </Button>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button size="icon" className="h-8 w-8 bg-primary hover:bg-primary/90">
+                                <MessageSquare className="text-primary-foreground h-4 w-4"/>
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-2">
+                            <div className="flex gap-2">
+                                <Button size="icon" className="h-14 w-14 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
+                                    <MessageSquare className="h-6 w-6"/>
+                                </Button>
+                                <Button variant="outline" size="icon" className="h-14 w-14 border-purple-500 hover:bg-purple-50">
+                                    <Image src="/img/Mess.svg" alt="Messenger" width={32} height={32} />
+                                </Button>
+                                <Button variant="outline" size="icon" className="h-14 w-14 border-blue-500 hover:bg-blue-50">
+                                    <Image src="/img/Zalo.svg" alt="Zalo" width={32} height={32} />
+                                </Button>
+                                <Button variant="outline" size="icon" className="h-14 w-14 border-green-500 hover:bg-green-50">
+                                    <Image src="/img/phone.svg" alt="Phone" width={32} height={32} />
+                                </Button>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                 </div>
                  <div className="flex items-center gap-2">
                     {showApplyButtons ? (
