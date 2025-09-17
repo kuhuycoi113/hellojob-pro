@@ -179,11 +179,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         <ZaloIcon className="h-5 w-5"/>
                     </Button>
                     <Button variant="outline" size="icon" className="border-green-500 hover:bg-green-50">
-                        <Phone className="h-5 w-5 text-green-600"/>
+                        <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
                     </Button>
                 </div>
                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className={cn(isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                    <Button variant="outline" size="sm" className={cn("bg-white", isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                         <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                         Lưu
                     </Button>
@@ -223,6 +223,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                 <div className={cn("w-1.5 h-1.5 rounded-full", job.isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400')}></div>
                 <span>{job.id}</span>
                 </div>
+                 <Button size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 hover:bg-white border border-gray-200 shadow" onClick={handleSaveJob}>
+                    <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
+                 </Button>
             </div>
 
             <div className="w-2/3 p-3 flex-grow flex flex-col justify-between">
@@ -282,15 +285,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         <ZaloIcon className="h-4 w-4"/>
                     </Button>
                     <Button variant="outline" size="icon" className="h-8 w-8 border-green-500 hover:bg-green-50">
-                        <Phone className="h-4 w-4 text-green-600"/>
+                        <Image src="/img/phone.svg" alt="Phone" width={16} height={16} />
                     </Button>
                 </div>
                  <div className="flex items-center gap-2">
                     {showApplyButtons ? (
                         <>
-                           <Button variant="outline" size="sm" className="h-8" onClick={handleSaveJob}>
-                                <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
-                            </Button>
                             <Button size="sm" className="bg-accent-orange text-white h-8" onClick={handleApplyClick}>Ứng tuyển</Button>
                         </>
                      ) : (
