@@ -14,6 +14,7 @@ import Image from 'next/image';
 import { use } from 'react';
 import { cn } from '@/lib/utils';
 import { consultants } from '@/lib/chat-data';
+import { ContactButtons } from '@/components/contact-buttons';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -205,9 +206,12 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                         <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
                                     </div>
                                 </div>
-                                <Button asChild variant="secondary" className="w-full">
-                                    <Link href={`/consultant-profile/${assignedConsultant.id}`}>Xem hồ sơ tư vấn viên</Link>
-                                </Button>
+                                <div className="space-y-2">
+                                    <ContactButtons contact={assignedConsultant} />
+                                    <Button asChild variant="secondary" className="w-full">
+                                        <Link href={`/consultant-profile/${assignedConsultant.id}`}>Xem hồ sơ tư vấn viên</Link>
+                                    </Button>
+                                </div>
                              </CardContent>
                              <div className="border-t p-4 flex justify-center">
                                  <Button variant="ghost" className="text-muted-foreground text-sm"><Share2 className="mr-2 h-4 w-4"/>Chia sẻ tin này</Button>

@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -28,11 +27,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { useChat } from '@/contexts/ChatContext';
-import { MessengerIcon, ZaloIcon } from './custom-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ContactButtons } from './contact-buttons';
 
 
 const formatCurrency = (value?: string) => {
@@ -41,7 +38,6 @@ const formatCurrency = (value?: string) => {
 };
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'default', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'default' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
-  const { openChat } = useChat();
   const { isLoggedIn } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
@@ -82,13 +78,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
   const handleConfirmLogin = () => {
     setIsConfirmLoginOpen(false);
     setIsAuthDialogOpen(true);
-  };
-
-
-  const handleChatClick = () => {
-    const consultant = { id: 'consultant-1', name: job.recruiter.name, avatarUrl: job.recruiter.avatar }; // Simplified user object
-    // @ts-ignore
-    openChat(consultant);
   };
 
   // New Chat Layout for the chat variant
@@ -162,39 +151,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
             
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-2">
-                    <Link href={`/consultant-profile/${'consultant-1'}`} className="flex-shrink-0">
+                    <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
                         <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
                             <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                             <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                     </Link>
-                    <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleChatClick}>
-                        <MessageSquare className="mr-2 h-4 w-4"/>
-                        Chat
-                    </Button>
-                    <Button asChild variant="outline" size="icon" className="border-purple-500 hover:bg-purple-50">
-                        <Link href="https://m.me/your_user_id" target="_blank">
-                             <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
-                        </Link>
-                    </Button>
-                    <Button asChild variant="outline" size="icon" className="border-blue-500 hover:bg-blue-50">
-                        <Link href="https://zalo.me/your_zalo_id" target="_blank">
-                           <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
-                        </Link>
-                    </Button>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" size="icon" className="border-green-500 hover:bg-green-50">
-                                <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-2">
-                            <div className="flex flex-col items-center gap-2">
-                                <p className="font-semibold text-lg">090-1234-5678</p>
-                                <Button size="sm" variant="secondary" onClick={() => navigator.clipboard.writeText('090-1234-5678')}>Sao chép</Button>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                    <ContactButtons contact={job.recruiter} />
                 </div>
                  <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" className={cn("bg-white", isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
@@ -281,54 +244,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
         <div className="p-3 border-t">
             <div className="flex justify-between items-center">
                  <div className="flex items-center gap-2">
-                    <Link href={`/consultant-profile/${'consultant-1'}`} className="flex-shrink-0">
+                    <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
                         <Avatar className="h-8 w-8 cursor-pointer">
                             <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                             <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                     </Link>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <div className="flex items-center gap-2">
-                                <Button size="icon" className="h-8 w-8 bg-primary hover:bg-primary/90">
-                                    <MessageSquare className="text-primary-foreground h-4 w-4"/>
-                                </Button>
-                                <Button variant="outline" size="icon" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
-                                    <Image src="/img/Mess.svg" alt="Messenger" width={16} height={16} />
-                                </Button>
-                                <Button variant="outline" size="icon" className="h-8 w-8 border-blue-500 hover:bg-blue-50">
-                                    <Image src="/img/Zalo.svg" alt="Zalo" width={16} height={16} />
-                                </Button>
-                                <Button asChild variant="outline" size="icon" className="h-8 w-8 border-green-500 hover:bg-green-50">
-                                     <Link href="tel:your_phone_number">
-                                        <Image src="/img/phone.svg" alt="Phone" width={16} height={16} />
-                                    </Link>
-                                </Button>
-                            </div>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-2">
-                            <div className="flex gap-2">
-                                <Button size="icon" className="h-16 w-16 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
-                                    <MessageSquare className="h-8 w-8"/>
-                                </Button>
-                                <Button asChild variant="outline" size="icon" className="h-16 w-16 border-purple-500 hover:bg-purple-50">
-                                    <Link href="https://m.me/your_user_id" target="_blank">
-                                        <Image src="/img/Mess.svg" alt="Messenger" width={40} height={40} />
-                                    </Link>
-                                </Button>
-                                <Button asChild variant="outline" size="icon" className="h-16 w-16 border-blue-500 hover:bg-blue-50">
-                                    <Link href="https://zalo.me/your_zalo_id" target="_blank">
-                                      <Image src="/img/Zalo.svg" alt="Zalo" width={40} height={40} />
-                                    </Link>
-                                </Button>
-                                <Button asChild variant="outline" size="icon" className="h-16 w-16 border-green-500 hover:bg-green-50">
-                                     <Link href="tel:your_phone_number">
-                                        <Image src="/img/phone.svg" alt="Phone" width={40} height={40} />
-                                    </Link>
-                                </Button>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                    <ContactButtons contact={job.recruiter} />
                 </div>
                  <div className="flex items-center gap-2">
                     {showApplyButtons ? (
