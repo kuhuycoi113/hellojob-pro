@@ -19,9 +19,11 @@ export interface Job {
     title: string;
     support?: string[];
     recruiter: {
+      id: string; // Add recruiter ID
       name: string;
       avatar: string;
       company: string;
+      mainExpertise?: string;
     };
     status: 'Đang tuyển' | 'Tạm dừng';
     interviewDate: string;
@@ -108,11 +110,13 @@ const generateRandomJob = (index: number): Job => {
     // Assign a consultant based on the job index to ensure consistency
     const assignedConsultant = (consultants && consultants.length > 0)
         ? consultants[index % consultants.length]
-        : { name: 'HelloJob', avatarUrl: '/img/favi2.png' }; // Fallback
+        : { id: 'bot-hellojob', name: 'HelloJob', avatarUrl: '/img/favi2.png', mainExpertise: 'AI Assistant' }; // Fallback
     
     const recruiter = {
+        id: assignedConsultant.id,
         name: assignedConsultant.name,
         avatar: assignedConsultant.avatarUrl,
+        mainExpertise: assignedConsultant.mainExpertise,
         company: 'HelloJob' // Or some other logic for company
     };
 

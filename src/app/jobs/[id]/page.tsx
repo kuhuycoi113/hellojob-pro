@@ -56,8 +56,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         notFound();
     }
     
-    const jobIndex = parseInt(job.id.replace('JP-DEMO', ''), 10);
-    const assignedConsultant = consultants[jobIndex % consultants.length];
+    const assignedConsultant = job.recruiter;
 
     const RequirementItem = ({ icon: Icon, label, value, className }: { icon: React.ElementType, label: string, value?: string | number, className?: string }) => {
         if (!value) return null;
@@ -198,7 +197,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                              <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
                                      <Avatar className="h-12 w-12">
-                                        <AvatarImage src={assignedConsultant.avatarUrl} alt={assignedConsultant.name} />
+                                        <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
                                         <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                     <div>
