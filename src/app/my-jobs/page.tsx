@@ -5,7 +5,7 @@
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil, X, ThumbsUp, TrendingUp, ShieldCheck, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil, X, ThumbsUp, TrendingUp, ShieldCheck, ChevronDown, SlidersHorizontal, DollarSign } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { jobData, type Job } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
@@ -389,7 +389,6 @@ const LoggedInView = () => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
-    const [isSalaryDialogOpen, setIsSalaryDialogOpen] = useState(false);
     const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations'] & { educationRequirement?: string, languageRequirement?: string, yearsOfExperience?: string, specialConditions?: string[] }>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
@@ -400,7 +399,7 @@ const LoggedInView = () => {
     const [tempFee, setTempFee] = useState('');
     const [chartData, setChartData] = useState([]);
     const JPY_VND_RATE = 180;
-    const USD_VND_RATE = 25000;
+    const USD_VND_RATE = 26300;
 
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
@@ -555,86 +554,74 @@ const LoggedInView = () => {
         setForceUpdate(prev => prev + 1); // Trigger a re-fetch
     };
 
-    const openSalaryDialog = () => {
-        setTempSalary(tempAspirations.desiredSalary || '');
-        setIsSalaryDialogOpen(true);
+    const openFeeDialog = () => {
+        const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
+        if (storedProfileRaw) {
+            const profile = JSON.parse(storedProfileRaw);
+            setTempAspirations(profile.aspirations || {}); // Load aspirations to get visa detail
+            setTempFee(profile.aspirations?.financialAbility || '');
+        }
+        setIsFeeDialogOpen(true);
     };
 
-    const handleSaveSalary = () => {
-        setTempAspirations(prev => ({...prev, desiredSalary: tempSalary}));
-        setIsSalaryDialogOpen(false);
-        toast({
-            title: "Đã cập nhật lương mong muốn",
-            description: `Mức lương tối thiểu mới là ${parseInt(tempSalary || '0').toLocaleString('ja-JP')} JPY.`,
-        });
-    };
-    
     const handleSaveFee = () => {
         setTempAspirations(prev => ({ ...prev, financialAbility: tempFee }));
         setIsFeeDialogOpen(false);
         toast({
-            title: "Đã cập nhật mức phí mong muốn",
+            title: "Đã cập nhật phí mong muốn",
             description: `Mức phí tối đa mới là ${parseInt(tempFee || '0').toLocaleString('en-US')} USD.`,
         });
     };
+    
+    // Logic for the Fee Dialog (MPMM01)
+    const getFeePlaceholder = () => {
+        const visaDetail = tempAspirations.desiredVisaDetail;
+        if (visaDetail === 'Thực tập sinh 1 năm') return "1000";
+        if (visaDetail === 'Đặc định đầu Việt') return "1600";
+        return "3000";
+    };
 
-
-    const handleCurrencyInputChange = (value: string, currency: 'vnd' | 'jpy' | 'usd', field: 'salary' | 'fee') => {
-        let num = parseInt(value.replace(/[.,]/g, ''), 10);
+    const handleFeeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const rawValue = e.target.value;
+        let num = parseInt(rawValue.replace(/[,.]/g, ''), 10);
+        
         if (isNaN(num)) {
-            field === 'salary' ? setTempSalary('') : setTempFee('');
+            setTempFee('');
             return;
         }
 
-        let baseValue;
-        if (field === 'salary') {
-            baseValue = currency === 'vnd' ? String(Math.round(num / JPY_VND_RATE)) : String(num);
-            setTempSalary(baseValue);
-        } else { // fee
-            if (currency === 'usd' && num > 4200) num = 4200;
-            if (currency === 'vnd' && num > 4200 * USD_VND_RATE) num = 4200 * USD_VND_RATE;
-            baseValue = currency === 'vnd' ? String(Math.round(num / USD_VND_RATE)) : String(num);
-            setTempFee(baseValue);
-        }
-    };
-    
-    const getDisplayValue = (value: string, currency: 'vnd' | 'jpy' | 'usd') => {
-        const num = Number(value);
-        if (isNaN(num) || num === 0) return '';
-        
-        let rate = 1;
-        let locale = 'en-US'; // Default to USD style
+        const visaDetail = tempAspirations.desiredVisaDetail;
+        let limit = 3800; // Default limit
+        if (visaDetail === 'Thực tập sinh 1 năm') limit = 1400;
+        if (visaDetail === 'Đặc định đầu Việt') limit = 2500;
 
-        if(currency === 'vnd') {
-            rate = value === tempSalary ? JPY_VND_RATE : USD_VND_RATE;
-            locale = 'vi-VN';
-        } else if (currency === 'jpy') {
-            locale = 'ja-JP';
+        if (num > limit) {
+            num = limit;
         }
         
-        const valueToFormat = Math.round(num * rate);
-        return valueToFormat.toLocaleString(locale);
+        setTempFee(String(num));
     };
-    
-    const getConvertedValue = (value: string, currency: 'vnd' | 'jpy' | 'usd') => {
+
+    const getFeeDisplayValue = (value: string) => {
+        if (!value) return '';
+        const num = Number(value.replace(/[^0-9]/g, ''));
+        if (isNaN(num)) return '';
+        return num.toLocaleString('en-US');
+    };
+
+    const getConvertedFeeValue = (value: string) => {
         const num = Number(value);
-        if (isNaN(num) || num === 0) return '≈ 0 ' + (currency === 'jpy' ? 'VNĐ' : 'USD');
+        if (isNaN(num) || num === 0) return '≈ 0 triệu VNĐ';
         
-        if (currency === 'vnd') {
-            const isSalaryField = value === tempSalary;
-            const rate = isSalaryField ? JPY_VND_RATE : USD_VND_RATE;
-            const targetCurrency = isSalaryField ? 'JPY' : 'USD';
-            const convertedValue = Math.round(num / rate);
-            const locale = targetCurrency === 'JPY' ? 'ja-JP' : 'en-US';
-            return `≈ ${convertedValue.toLocaleString(locale)} ${targetCurrency}`;
-        } else if (currency === 'jpy') {
-            const convertedValue = Math.round(num * JPY_VND_RATE);
-            return `≈ ${convertedValue.toLocaleString('vi-VN')} VNĐ`;
-        } else { // usd
-            const convertedValue = Math.round(num * USD_VND_RATE);
-            return `≈ ${convertedValue.toLocaleString('vi-VN')} VNĐ`;
-        }
+        const vndValue = num * USD_VND_RATE;
+        const valueInMillions = vndValue / 1000000;
+        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        });
+        return `≈ ${formattedVnd.replace('.',',')} triệu VNĐ`;
     };
+
 
     if (role === 'candidate-empty-profile') {
         return <EmptyProfileView />;
@@ -945,14 +932,13 @@ const LoggedInView = () => {
                         <Label className="font-semibold">Ưu tiên tìm việc</Label>
                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                              <Button
-                                variant={suggestionPrinciple === 'salary' ? 'default' : 'outline'}
+                                variant="outline"
                                 onClick={() => {
                                     setSuggestionPrinciple('salary');
-                                    openSalaryDialog();
                                 }}
                                 className={cn(
                                     "justify-start text-left h-auto py-2",
-                                    suggestionPrinciple === 'salary' && "bg-accent-green hover:bg-accent-green/90"
+                                    suggestionPrinciple === 'salary' && "ring-2 ring-primary border-primary bg-primary/10"
                                 )}
                             >
                                 <div>
@@ -961,12 +947,15 @@ const LoggedInView = () => {
                                 </div>
                             </Button>
                             <Button 
-                                variant={suggestionPrinciple === 'fee' ? 'default' : 'outline'}
+                                variant="outline"
                                 onClick={() => {
                                     setSuggestionPrinciple('fee');
-                                    setIsFeeDialogOpen(true);
+                                    openFeeDialog();
                                 }}
-                                className="justify-start text-left h-auto py-2"
+                                 className={cn(
+                                    "justify-start text-left h-auto py-2",
+                                    suggestionPrinciple === 'fee' && "ring-2 ring-primary border-primary bg-primary/10"
+                                )}
                             >
                                  <div>
                                     <p className="font-semibold">{feeButtonText}</p>
@@ -974,11 +963,11 @@ const LoggedInView = () => {
                                 </div>
                             </Button>
                             <Button 
-                                variant={suggestionPrinciple === 'company' ? 'default' : 'outline'}
+                                variant="outline"
                                 onClick={() => setSuggestionPrinciple('company')}
                                 className={cn(
                                     "justify-start text-left h-auto py-2",
-                                    suggestionPrinciple === 'company' && "bg-accent-orange hover:bg-accent-orange/90"
+                                    suggestionPrinciple === 'company' && "ring-2 ring-primary border-primary bg-primary/10"
                                 )}
                             >
                                  <div>
@@ -1057,56 +1046,24 @@ const LoggedInView = () => {
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-        <Dialog open={isSalaryDialogOpen} onOpenChange={setIsSalaryDialogOpen}>
-            <DialogContent className="sm:max-w-md">
-                {/* MLMMTT01 */}
-                <DialogHeader>
-                    <DialogTitle>Mức lương mong muốn tối thiểu/tháng</DialogTitle>
-                </DialogHeader>
-                <div className="pt-4 space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="salary-jpy">Lương tối thiểu (JPY)</Label>
-                        <Input 
-                            id="salary-jpy" 
-                            placeholder="200,000"
-                            value={getDisplayValue(tempSalary, 'jpy')}
-                            onChange={(e) => handleCurrencyInputChange(e.target.value, 'jpy', 'salary')}
-                        />
-                         <p className="text-xs text-muted-foreground">{getConvertedValue(tempSalary, 'jpy')}</p>
-                    </div>
-                </div>
-                <DialogFooter className="pt-4">
-                    <Button variant="outline" onClick={() => setIsSalaryDialogOpen(false)}>Hủy</Button>
-                    <Button onClick={handleSaveSalary}>Lưu thay đổi</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
         <Dialog open={isFeeDialogOpen} onOpenChange={setIsFeeDialogOpen}>
             <DialogContent className="sm:max-w-md">
                 {/* MPMM01 */}
                 <DialogHeader>
                     <DialogTitle>Mức phí mong muốn</DialogTitle>
+                    <DialogDescription>Nhập mức phí tối đa bạn sẵn sàng chi trả (USD).</DialogDescription>
                 </DialogHeader>
                 <div className="pt-4 space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="fee-usd">Phí (USD)</Label>
+                        <Label htmlFor="fee-usd">Phí tối đa (USD)</Label>
                         <Input 
                             id="fee-usd" 
-                            placeholder="3,000"
-                            value={getDisplayValue(tempFee, 'usd')}
-                            onChange={(e) => handleCurrencyInputChange(e.target.value, 'usd', 'fee')}
+                            type="text"
+                            placeholder={getFeePlaceholder()}
+                            value={getFeeDisplayValue(tempFee)}
+                            onChange={handleFeeInputChange}
                         />
-                         <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'usd')}</p>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="fee-vnd">Phí (VNĐ)</Label>
-                        <Input 
-                            id="fee-vnd" 
-                            placeholder="75,000,000"
-                            value={getDisplayValue(tempFee, 'vnd')}
-                            onChange={(e) => handleCurrencyInputChange(e.target.value, 'vnd', 'fee')}
-                        />
-                        <p className="text-xs text-muted-foreground">{getConvertedValue(tempFee, 'vnd')}</p>
+                         <p className="text-xs text-muted-foreground">{getConvertedFeeValue(tempFee)}</p>
                     </div>
                 </div>
                 <DialogFooter className="pt-4">
@@ -1321,5 +1278,6 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
