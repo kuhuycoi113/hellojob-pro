@@ -61,12 +61,23 @@ export function ContactButtons({ contact }: ContactButtonsProps) {
         </div>
 
         {/* Mobile Buttons */}
-        <div className="md:hidden flex items-center gap-2">
-             <Popover>
+         <div id="MB4NUT01" className="md:hidden">
+            <Popover>
                 <PopoverTrigger asChild>
-                    <Button size="sm" className="bg-primary hover:bg-primary/90">
-                       <MessageSquare className="mr-2 h-4 w-4"/> Liên hệ
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button size="icon" variant="outline" className="h-9 w-9 bg-primary/10 border-primary/20 text-primary">
+                            <MessageSquare className="h-5 w-5"/>
+                        </Button>
+                        <Button size="icon" variant="outline" className="h-9 w-9 border-purple-500/50">
+                            <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
+                        </Button>
+                         <Button size="icon" variant="outline" className="h-9 w-9 border-blue-500/50">
+                            <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
+                        </Button>
+                         <Button size="icon" variant="outline" className="h-9 w-9 border-green-500/50">
+                            <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
+                        </Button>
+                    </div>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-2">
                     <div className="flex gap-2">
