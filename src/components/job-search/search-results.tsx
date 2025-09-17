@@ -10,6 +10,7 @@ import { FilterSidebar } from "./filter-sidebar";
 import { Job, jobData } from "@/lib/mock-data";
 import { ChevronLeft, ListFilter, Loader2 } from "lucide-react";
 import { locations } from "@/lib/location-data";
+import { JobCard } from "../job-card";
 
 export type SearchFilters = {
     visa: string;
