@@ -30,6 +30,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
 import { ContactButtons } from './contact-buttons';
+import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from '@/components/ui/popover';
 
 
 const formatCurrency = (value?: string) => {
@@ -151,12 +152,34 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
             
             <div className="mt-auto flex justify-between items-end">
                  <div className="flex items-center gap-2">
-                    <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
-                        <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
-                            <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
-                            <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                    </Link>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                             <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
+                                <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                                    <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                    <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                            </Link>
+                        </PopoverTrigger>
+                         <PopoverContent className="w-80" side="top" align="start">
+                            <div className="flex gap-4">
+                               <Avatar className="h-16 w-16">
+                                    <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                    <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="space-y-1">
+                                <h4 className="text-sm font-semibold">{job.recruiter.name}</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    {job.recruiter.mainExpertise}
+                                </p>
+                                 <Button asChild size="sm" variant="link" className="p-0 h-auto">
+                                    <Link href={`/consultant-profile/${job.recruiter.id}`}>Xem hồ sơ</Link>
+                                </Button>
+                                </div>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+
                     <ContactButtons contact={job.recruiter} />
                 </div>
                  <div className="flex items-center gap-2">
