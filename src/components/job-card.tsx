@@ -176,7 +176,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                         <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
                     </Button>
                     <Button variant="outline" size="icon" className="border-blue-500 hover:bg-blue-50">
-                        <ZaloIcon className="h-5 w-5"/>
+                        <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
                     </Button>
                     <Button variant="outline" size="icon" className="border-green-500 hover:bg-green-50">
                         <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
