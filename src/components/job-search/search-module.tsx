@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -67,7 +66,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
   }
 
   const getFilterName = (slug: string, type: 'visa' | 'visaDetail' | 'industry' | 'location'): string => {
-    if (!slug) return '';
+    if (!slug || slug === 'all' || slug === 'all-details') return '';
     if (type === 'visa') {
       return japanJobTypes.find(j => j.slug === slug)?.name || slug;
     }
@@ -86,17 +85,19 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
   const searchSummaryParts = [
     getFilterName(filters.visaDetail, 'visaDetail') || getFilterName(filters.visa, 'visa'),
     getFilterName(filters.industry, 'industry'),
-    ...(Array.isArray(filters.location) ? filters.location.map(l => getFilterName(l, 'location')) : [getFilterName(filters.location, 'location')]),
   ].filter(Boolean);
 
-  let searchSummary = searchSummaryParts.join(' / ');
-  if (searchSummary.length > 40) {
-      searchSummary = [searchSummaryParts[0], searchSummaryParts[1]].filter(Boolean).join(' / ');
-      const locationCount = Array.isArray(filters.location) ? filters.location.length : (filters.location ? 1 : 0);
-      if (locationCount > 0) {
-          searchSummary += ` / + ${locationCount} địa điểm`;
+  const locationFilters = Array.isArray(filters.location) ? filters.location.filter(l => l !== 'all') : [];
+  
+  if (locationFilters.length > 0) {
+      if(locationFilters.length <= 2) {
+          searchSummaryParts.push(...locationFilters.map(l => getFilterName(l, 'location')));
+      } else {
+          searchSummaryParts.push(`${locationFilters.length} địa điểm`);
       }
   }
+
+  let searchSummary = searchSummaryParts.join(' / ');
 
 
   return (
