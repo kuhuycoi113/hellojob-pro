@@ -182,11 +182,19 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                            <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
                         </Link>
                     </Button>
-                    <Button asChild variant="outline" size="icon" className="border-green-500 hover:bg-green-50">
-                        <Link href="tel:your_phone_number">
-                            <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
-                        </Link>
-                    </Button>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" size="icon" className="border-green-500 hover:bg-green-50">
+                                <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-2">
+                            <div className="flex flex-col items-center gap-2">
+                                <p className="font-semibold text-lg">090-1234-5678</p>
+                                <Button size="sm" variant="secondary" onClick={() => navigator.clipboard.writeText('090-1234-5678')}>Sao chép</Button>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                 </div>
                  <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" className={cn("bg-white", isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
@@ -291,8 +299,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                                 <Button variant="outline" size="icon" className="h-8 w-8 border-blue-500 hover:bg-blue-50">
                                     <Image src="/img/Zalo.svg" alt="Zalo" width={16} height={16} />
                                 </Button>
-                                <Button variant="outline" size="icon" className="h-8 w-8 border-green-500 hover:bg-green-50">
-                                    <Image src="/img/phone.svg" alt="Phone" width={16} height={16} />
+                                <Button asChild variant="outline" size="icon" className="h-8 w-8 border-green-500 hover:bg-green-50">
+                                     <Link href="tel:your_phone_number">
+                                        <Image src="/img/phone.svg" alt="Phone" width={16} height={16} />
+                                    </Link>
                                 </Button>
                             </div>
                         </PopoverTrigger>
