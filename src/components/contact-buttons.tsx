@@ -61,11 +61,11 @@ export function ContactButtons({ contact }: ContactButtonsProps) {
         </div>
 
         {/* Mobile Buttons */}
-         <div id="MB4NUT01" className="md:hidden">
+         <div className="md:hidden">
             <Popover>
                 <PopoverTrigger asChild>
-                    <div className="flex items-center gap-2">
-                        <Button size="icon" variant="outline" className="h-9 w-9 bg-primary/10 border-primary/20 text-primary">
+                    <div id="MB4NUT01" className="flex items-center gap-2">
+                        <Button size="icon" variant="default" className="h-9 w-9 bg-primary text-primary-foreground hover:bg-primary/90">
                             <MessageSquare className="h-5 w-5"/>
                         </Button>
                         <Button size="icon" variant="outline" className="h-9 w-9 border-purple-500/50">
