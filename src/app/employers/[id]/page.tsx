@@ -71,18 +71,15 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                 <Card>
                     <CardHeader><CardTitle className="font-headline text-2xl">Hình ảnh</CardTitle></CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="relative md:col-span-1 aspect-[2/3]">
+                        <div className="relative aspect-[2/3] md:col-span-1">
                             <Image src={employer.images[0].src} alt={employer.images[0].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[0].dataAiHint}/>
                         </div>
-                        <div className="md:col-span-1 grid grid-rows-3 gap-4">
-                            <div className="relative aspect-video">
+                        <div className="md:col-span-1 grid grid-rows-2 gap-4">
+                            <div className="relative">
                                 <Image src={employer.images[1].src} alt={employer.images[1].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[1].dataAiHint}/>
                             </div>
-                             <div className="relative aspect-video">
+                             <div className="relative">
                                 <Image src={employer.images[2].src} alt={employer.images[2].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[2].dataAiHint}/>
-                            </div>
-                             <div className="relative aspect-video">
-                                <Image src={employer.images[3].src} alt={employer.images[3].alt} fill className="rounded-lg object-cover" data-ai-hint={employer.images[3].dataAiHint}/>
                             </div>
                         </div>
                     </CardContent>
