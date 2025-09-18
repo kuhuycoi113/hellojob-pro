@@ -10,7 +10,7 @@ import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/locat
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType } from '@/lib/industry-data';
-import { visaDetailsByVisaType } from '@/lib/visa-data';
+import { visaDetailsByVisaType, japanJobTypes } from '@/lib/visa-data';
 
 
 const initialSearchFilters: SearchFilters = {
@@ -69,7 +69,7 @@ function JobsPageContent() {
         const jobDetailName = Object.values(industriesByJobType).flat().flatMap(i => i.keywords).find(k => k.slug === jobDetail)?.name || jobDetail;
         const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
         
-        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']].flatMap(group => group.locations);
+        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
         const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
 
         const roundsSlug = interviewRounds;
@@ -130,7 +130,7 @@ function JobsPageContent() {
         const jobDetailName = Object.values(industriesByJobType).flat().flatMap(i => i.keywords).find(k => k.slug === jobDetail)?.name || jobDetail;
         const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
         
-        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']].flatMap(group => group.locations);
+        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
         const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
         
         const roundsSlug = interviewRounds;
@@ -176,14 +176,19 @@ function JobsPageContent() {
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters };
         for (const [key, value] of searchParams.entries()) {
-            if (key === 'location') {
-                 if (!Array.isArray(newFilters.location)) {
-                    newFilters.location = [];
+            if (key === 'location' || key === 'specialConditions') {
+                 if (!Array.isArray(newFilters[key])) {
+                    // @ts-ignore
+                    newFilters[key] = [];
                 }
-                newFilters.location = searchParams.getAll(key);
-            } else if (Array.isArray(newFilters[key as keyof SearchFilters])) {
-                // If the key corresponds to an array in filters, use getAll
-                (newFilters[key as keyof SearchFilters] as any) = searchParams.getAll(key);
+                // @ts-ignore
+                newFilters[key] = searchParams.getAll(key);
+            } else if (key === 'age' || key === 'height' || key === 'weight') {
+                const values = searchParams.getAll(key);
+                if (values.length === 2) {
+                     // @ts-ignore
+                    newFilters[key] = [parseInt(values[0], 10), parseInt(values[1], 10)];
+                }
             } else {
                  // @ts-ignore
                 newFilters[key] = value;
@@ -212,7 +217,7 @@ function JobsPageContent() {
             if (value && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
                  if (key !== 'visa' && !(Array.isArray(value) && value.includes('all'))) {
                     if (Array.isArray(value)) {
-                        value.forEach(item => query.append(key, item));
+                        value.forEach(item => query.append(key, String(item)));
                     } else {
                         query.set(key, String(value));
                     }
