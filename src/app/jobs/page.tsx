@@ -37,6 +37,12 @@ const initialSearchFilters: SearchFilters = {
     quantity: '',
 };
 
+// Helper function to escape regex special characters
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+
 function JobsPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -74,7 +80,8 @@ function JobsPageContent() {
 
             const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industryName.toLowerCase()));
             
-            const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetailName.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetailName.toLowerCase()));
+            const jobDetailRegex = jobDetailName ? new RegExp(`\\b${escapeRegExp(jobDetailName)}\\b`, 'i') : null;
+            const jobDetailMatch = !jobDetailRegex || (job.title && jobDetailRegex.test(job.title)) || (job.details.description && jobDetailRegex.test(job.details.description));
             
             let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
@@ -119,7 +126,10 @@ function JobsPageContent() {
                 visaMatch = job.visaType === targetVisaType;
             }
             const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industryName.toLowerCase()));
-            const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetailName.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetailName.toLowerCase()));
+
+            const jobDetailRegex = jobDetailName ? new RegExp(`\\b${escapeRegExp(jobDetailName)}\\b`, 'i') : null;
+            const jobDetailMatch = !jobDetailRegex || (job.title && jobDetailRegex.test(job.title)) || (job.details.description && jobDetailRegex.test(job.details.description));
+            
              let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
                  locationMatch = location.some(loc => {
