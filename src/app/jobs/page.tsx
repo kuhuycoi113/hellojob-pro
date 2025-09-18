@@ -9,7 +9,7 @@ import { Job, jobData } from '@/lib/mock-data';
 import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/location-data';
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
-import { industriesByJobType } from '@/lib/industry-data';
+import { industriesByJobType, type Industry } from '@/lib/industry-data';
 import { visaDetailsByVisaType, japanJobTypes } from '@/lib/visa-data';
 
 
@@ -86,7 +86,16 @@ const parseExperienceToRange = (expStr?: string): [number, number] => {
     return [0, Infinity]; // Default fallback
 };
 
-const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
+const parseAgeRequirement = (ageStr?: string): [number, number] | null => {
+    if (!ageStr) return null;
+    const parts = ageStr.split('-').map(p => parseInt(p.trim(), 10));
+    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        return [parts[0], parts[1]];
+    }
+    return null;
+};
+
+const allIndustries: Industry[] = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
 function JobsPageContent() {
     const router = useRouter();
@@ -102,7 +111,8 @@ function JobsPageContent() {
     const runFilter = useCallback((filtersToApply: SearchFilters) => {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
-            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience
+            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
+            age
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -122,8 +132,11 @@ function JobsPageContent() {
         const annualIncomeMin = parseSalary(annualIncome);
         const annualBonusMin = parseSalary(annualBonus);
         
-        const yoeName = experienceYears.find(y => y.slug === yearsOfExperience)?.name || '';
+        const yoeSlug = yearsOfExperience || '';
+        const yoeName = experienceYears.find(y => y.slug === yoeSlug)?.name || '';
         const [minExp, maxExp] = parseExperienceToRange(yoeName);
+        
+        const expReqSlug = experienceRequirement || '';
 
 
         let results = jobData.filter(job => {
@@ -140,10 +153,10 @@ function JobsPageContent() {
 
             const jobDetailMatch = !jobDetail || (job.title && createSlug(job.title).includes(jobDetail)) || (job.details.description && createSlug(job.details.description).includes(jobDetail));
             
-            const expReqMatch = !experienceRequirement || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(experienceRequirement);
+            const expReqMatch = !expReqSlug || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(expReqSlug);
             
             const [jobMinExp] = parseExperienceToRange(job.yearsOfExperience);
-            const yearsOfExperienceMatch = !yearsOfExperience || (jobMinExp <= maxExp);
+            const yearsOfExperienceMatch = !yoeSlug || (jobMinExp <= maxExp);
 
             let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
@@ -187,7 +200,18 @@ function JobsPageContent() {
                 genderMatch = job.gender === targetGender || job.gender === 'Cả nam và nữ';
             }
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch;
+            let ageMatch = true;
+            if (age && job.ageRequirement) {
+                const jobAgeRange = parseAgeRequirement(job.ageRequirement);
+                if (jobAgeRange) {
+                    const [filterMinAge, filterMaxAge] = age;
+                    const [jobMinAge, jobMaxAge] = jobAgeRange;
+                    // Check for overlap
+                    ageMatch = Math.max(filterMinAge, jobMinAge) <= Math.min(filterMaxAge, jobMaxAge);
+                }
+            }
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch;
         });
 
         setFilteredJobs(results);
@@ -196,7 +220,8 @@ function JobsPageContent() {
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
-            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience
+            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
+            age
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -216,8 +241,11 @@ function JobsPageContent() {
         const annualIncomeMin = parseSalary(annualIncome);
         const annualBonusMin = parseSalary(annualBonus);
         
-        const yoeName = experienceYears.find(y => y.slug === yearsOfExperience)?.name || '';
+        const yoeSlug = yearsOfExperience || '';
+        const yoeName = experienceYears.find(y => y.slug === yoeSlug)?.name || '';
         const [minExp, maxExp] = parseExperienceToRange(yoeName);
+        
+        const expReqSlug = experienceRequirement || '';
 
 
         const count = jobData.filter(job => {
@@ -233,10 +261,10 @@ function JobsPageContent() {
 
             const jobDetailMatch = !jobDetail || (job.title && createSlug(job.title).includes(jobDetail)) || (job.details.description && createSlug(job.details.description).includes(jobDetail));
 
-            const expReqMatch = !experienceRequirement || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(experienceRequirement);
+            const expReqMatch = !expReqSlug || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(expReqSlug);
             
             const [jobMinExp] = parseExperienceToRange(job.yearsOfExperience);
-            const yearsOfExperienceMatch = !yearsOfExperience || (jobMinExp <= maxExp);
+            const yearsOfExperienceMatch = !yoeSlug || (jobMinExp <= maxExp);
 
              let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
@@ -275,7 +303,18 @@ function JobsPageContent() {
                 genderMatch = job.gender === targetGender || job.gender === 'Cả nam và nữ';
             }
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch;
+            let ageMatch = true;
+            if (age && job.ageRequirement) {
+                const jobAgeRange = parseAgeRequirement(job.ageRequirement);
+                if (jobAgeRange) {
+                    const [filterMinAge, filterMaxAge] = age;
+                    const [jobMinAge, jobMaxAge] = jobAgeRange;
+                    // Check for overlap
+                    ageMatch = Math.max(filterMinAge, jobMinAge) <= Math.min(filterMaxAge, jobMaxAge);
+                }
+            }
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -295,6 +334,8 @@ function JobsPageContent() {
                 }
             } else if (key === 'yoe') {
                 newFilters['yearsOfExperience'] = value;
+            } else if (key === 'expReq') {
+                newFilters['experienceRequirement'] = value;
             }
              else {
                  // @ts-ignore
@@ -311,6 +352,14 @@ function JobsPageContent() {
     const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
       setStagedFilters(prev => {
           const updated = {...prev, ...newFilters};
+          if (newFilters.visa !== undefined) {
+             updated.visaDetail = '';
+             updated.industry = '';
+             updated.jobDetail = '';
+          }
+          if (newFilters.industry !== undefined) {
+             updated.jobDetail = '';
+          }
           countStagedResults(updated);
           return updated;
       });
@@ -325,6 +374,8 @@ function JobsPageContent() {
                         value.forEach(item => query.append(key, String(item)));
                     } else if (key === 'yearsOfExperience') {
                         query.set('yoe', String(value));
+                    } else if (key === 'experienceRequirement') {
+                        query.set('expReq', String(value));
                     }
                     else {
                         query.set(key, String(value));
