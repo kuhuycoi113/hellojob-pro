@@ -259,7 +259,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   // Default variant: 'grid-item'
   return (
     <>
-        <Card className={cn("rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300 h-full flex flex-col")}>
+        <Card id="HIENTHIVIEC02" className={cn("rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300 h-full flex flex-col")}>
              <Link href={`/jobs/${job.id}`} className="group" onClick={handleCardClick}>
                 <div className="relative w-full aspect-video">
                      <Image src={job.image.src} alt={job.title} fill className="object-cover group-hover:scale-105 transition-transform" />
