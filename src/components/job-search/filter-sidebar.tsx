@@ -14,7 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { industriesByJobType, type Industry } from "@/lib/industry-data";
 import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2 } from "lucide-react";
 import { japanRegions, allJapanLocations, interviewLocations } from '@/lib/location-data';
-import { type SearchFilters } from './search-results';
+import { type SearchFilters, experienceYears } from './search-results';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -28,13 +28,14 @@ import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 
 const createSlug = (str: string) => {
+    if (!str) return '';
     return str
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/đ/g, "d")
         .replace(/\s+/g, '-')
-        .replace(/[^\w\-]+/g, '');
+        .replace(/[^\w\-.]+/g, '');
 };
 
 const conditionsByVisaDetail: { [key: string]: string[] } = {
@@ -58,20 +59,6 @@ const englishLevels = [
     "Trình độ tương đương 9.0", "Trình độ tương đương 8.0", "Trình độ tương đương 7.0", "Trình độ tương đương 6.0", "Trình độ tương đương 5.0", "Trình độ tương đương 4.0"
 ];
 const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon", "Không yêu cầu"];
-const experienceYears = [
-    'Không yêu cầu',
-    'Dưới 0,5 năm',
-    '0,5 - 1 năm',
-    '1 - 1,5 năm',
-    '1,5 - 2 năm',
-    '2 - 2,5 năm',
-    '2,5 - 3 năm',
-    '3 - 3,5 năm',
-    '3,5 - 4 năm',
-    '4 - 4,5 năm',
-    '4,5 - 5 năm',
-    'Trên 5 năm'
-];
 const visionRequirements = ["Không yêu cầu", "Yêu cầu thị lực tốt", "Không mù màu"];
 const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
 
@@ -245,7 +232,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     }, []);
 
     const allJobDetailsForExperience = useMemo(() => {
-        return [...new Set(Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords || []).filter(Boolean))];
+        return [...new Set(Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords).filter(Boolean))];
     }, []);
 
 
@@ -278,7 +265,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             const selectedIndustryData = allIndustries.find(ind => ind.slug === filters.industry);
             setAvailableJobDetails(selectedIndustryData?.keywords || []);
         } else {
-             const allJobDetails = uniqueIndustries.flatMap(ind => ind.keywords || []);
+             const allJobDetails = uniqueIndustries.flatMap(ind => ind.keywords);
              setAvailableJobDetails([...new Set(allJobDetails)]);
         }
 
@@ -725,9 +712,9 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 <div className="space-y-2">
                                     <Label>Số năm kinh nghiệm</Label>
                                      <Select value={filters.yearsOfExperience} onValueChange={(value) => onFilterChange({ yearsOfExperience: value })}>
-                                        <SelectTrigger><SelectValue placeholder="Chọn số năm" /></SelectTrigger>
+                                        <SelectTrigger className={cn(filters.yearsOfExperience && 'text-primary')}><SelectValue placeholder="Chọn số năm" /></SelectTrigger>
                                         <SelectContent>
-                                            {experienceYears.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                             {experienceYears.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>

@@ -4,7 +4,7 @@
 
 import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
+import { SearchResults, type SearchFilters, experienceYears } from '@/components/job-search/search-results';
 import { Job, jobData } from '@/lib/mock-data';
 import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/location-data';
 import { Loader2 } from 'lucide-react';
@@ -55,7 +55,7 @@ const createSlug = (str: string) => {
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/đ/g, "d")
         .replace(/\s+/g, '-')
-        .replace(/[^\w\-]+/g, '');
+        .replace(/[^\w\-.]+/g, '');
 };
 
 
@@ -67,7 +67,7 @@ const parseSalary = (salaryStr?: string): number | null => {
 };
 
 const parseExperienceToRange = (expStr?: string): [number, number] => {
-    if (!expStr || expStr === 'Không yêu cầu') return [0, 0];
+    if (!expStr || expStr === 'Không yêu cầu') return [0, Infinity];
     
     const cleanedStr = expStr.toLowerCase().replace(',', '.');
     
@@ -86,6 +86,7 @@ const parseExperienceToRange = (expStr?: string): [number, number] => {
     return [0, Infinity]; // Default fallback
 };
 
+const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
 function JobsPageContent() {
     const router = useRouter();
@@ -97,7 +98,6 @@ function JobsPageContent() {
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
     const [stagedResultCount, setStagedResultCount] = useState<number>(jobData.length);
 
-    const allIndustries = useMemo(() => Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i), []);
     
     const runFilter = useCallback((filtersToApply: SearchFilters) => {
         const { 
@@ -121,8 +121,10 @@ function JobsPageContent() {
         const hourlySalaryMin = parseSalary(hourlySalary);
         const annualIncomeMin = parseSalary(annualIncome);
         const annualBonusMin = parseSalary(annualBonus);
+        
+        const yoeName = experienceYears.find(y => y.slug === yearsOfExperience)?.name || '';
+        const [minExp, maxExp] = parseExperienceToRange(yoeName);
 
-        const [minExp, maxExp] = parseExperienceToRange(yearsOfExperience);
 
         let results = jobData.filter(job => {
             let visaMatch = true;
@@ -140,7 +142,7 @@ function JobsPageContent() {
             
             const expReqMatch = !experienceRequirement || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(experienceRequirement);
             
-            const [jobMinExp, jobMaxExp] = parseExperienceToRange(job.yearsOfExperience);
+            const [jobMinExp] = parseExperienceToRange(job.yearsOfExperience);
             const yearsOfExperienceMatch = !yearsOfExperience || (jobMinExp <= maxExp);
 
             let locationMatch = true;
@@ -189,7 +191,7 @@ function JobsPageContent() {
         });
 
         setFilteredJobs(results);
-    }, [allIndustries]);
+    }, []);
 
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
         const { 
@@ -214,7 +216,9 @@ function JobsPageContent() {
         const annualIncomeMin = parseSalary(annualIncome);
         const annualBonusMin = parseSalary(annualBonus);
         
-        const [minExp, maxExp] = parseExperienceToRange(yearsOfExperience);
+        const yoeName = experienceYears.find(y => y.slug === yearsOfExperience)?.name || '';
+        const [minExp, maxExp] = parseExperienceToRange(yoeName);
+
 
         const count = jobData.filter(job => {
             let visaMatch = true;
@@ -231,7 +235,7 @@ function JobsPageContent() {
 
             const expReqMatch = !experienceRequirement || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(experienceRequirement);
             
-            const [jobMinExp, jobMaxExp] = parseExperienceToRange(job.yearsOfExperience);
+            const [jobMinExp] = parseExperienceToRange(job.yearsOfExperience);
             const yearsOfExperienceMatch = !yearsOfExperience || (jobMinExp <= maxExp);
 
              let locationMatch = true;
@@ -274,7 +278,7 @@ function JobsPageContent() {
             return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch;
         }).length;
         setStagedResultCount(count);
-    }, [allIndustries]);
+    }, []);
 
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters };
@@ -289,7 +293,10 @@ function JobsPageContent() {
                      // @ts-ignore
                     newFilters[key] = [parseInt(values[0], 10), parseInt(values[1], 10)];
                 }
-            } else {
+            } else if (key === 'yoe') {
+                newFilters['yearsOfExperience'] = value;
+            }
+             else {
                  // @ts-ignore
                 newFilters[key] = value;
             }
@@ -316,7 +323,10 @@ function JobsPageContent() {
                  if (key !== 'visa' && !(Array.isArray(value) && value.includes('all'))) {
                     if (Array.isArray(value)) {
                         value.forEach(item => query.append(key, String(item)));
-                    } else {
+                    } else if (key === 'yearsOfExperience') {
+                        query.set('yoe', String(value));
+                    }
+                    else {
                         query.set(key, String(value));
                     }
                  }
