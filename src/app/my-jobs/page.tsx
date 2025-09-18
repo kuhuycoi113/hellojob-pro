@@ -494,7 +494,7 @@ const LoggedInView = () => {
             return;
         }
         fetchSuggestedJobs();
-        fetchBehavioralSuggestions();
+        fetchBehavioralSuggestions(); // Fetch behavioral suggestions
         fetchSavedJobs();
 
         const handleStorageChange = () => {
@@ -1312,6 +1312,7 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
