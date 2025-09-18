@@ -153,7 +153,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                 ))}
               </CardContent>
             </Card>
-             <Card className="shadow-xl">
+             <Card id="consultant-jobs-section" className="shadow-xl">
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl text-primary flex items-center justify-between">
                         <span>Việc làm phụ trách</span>
