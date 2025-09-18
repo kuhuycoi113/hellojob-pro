@@ -133,6 +133,3 @@ export const conversations: Conversation[] = [
     ],
   },
 ];
-
-// Legacy users array for other parts of the app if needed
-export const users: User[] = [ ...consultants ];

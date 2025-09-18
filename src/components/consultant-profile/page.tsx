@@ -8,10 +8,10 @@ import { Star, PieChart, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useChat } from '@/contexts/ChatContext';
-import { consultants } from '@/lib/chat-data';
+import { consultants as consultantChatData } from '@/lib/chat-data';
 
 
-const ConsultantCard = ({ consultant }: { consultant: typeof consultants[0] }) => {
+const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[0] }) => {
     const { openChat } = useChat();
 
     return (
@@ -24,7 +24,7 @@ const ConsultantCard = ({ consultant }: { consultant: typeof consultants[0] }) =
                 <h2 className="text-xl font-headline font-bold mt-4">{consultant.name}</h2>
                 <p className="text-primary font-semibold text-sm flex-grow">{consultant.mainExpertise}</p>
                 <div className="flex flex-wrap justify-center gap-2 mt-3">
-                    {consultant.strengths.map(strength => (
+                    {consultant.strengths?.map(strength => (
                         <Badge key={strength} variant="secondary" className="bg-green-100 text-green-800 border-green-200">{strength}</Badge>
                     ))}
                 </div>
@@ -53,7 +53,7 @@ export default function ConsultantListPage() {
             </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
-            {consultants.map((consultant) => (
+            {consultantChatData.map((consultant) => (
                 <ConsultantCard key={consultant.id} consultant={consultant} />
             ))}
         </div>

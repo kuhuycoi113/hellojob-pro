@@ -65,7 +65,7 @@ export interface Job {
     }
 }
 
-const industries = ['Chế biến thực phẩm', 'Cơ khí', 'Xây dựng', 'Nông nghiệp', 'Điện tử', 'Dệt may', 'Điều dưỡng', 'Nhà hàng'];
+const industries = ['Chế biến thực phẩm', 'Cơ khí', 'Xây dựng', 'Nông nghiệp', 'Điện tử', 'Dệt may', 'Điều dưỡng', 'Nhà hàng', 'Vận tải'];
 const locations = ['Tokyo', 'Osaka', 'Aichi', 'Fukuoka', 'Hokkaido', 'Kanagawa', 'Saitama', 'Chiba', 'Hyogo', 'Hiroshima', 'Kyoto', 'Nagano', 'Gifu', 'Ibaraki', 'Miyagi'];
 
 const visaDetailsByVisaType: { [key: string]: string[] } = {
@@ -82,7 +82,8 @@ const jobTitles = {
     'Điện tử': ['Lắp ráp bảng mạch', 'Kiểm tra chất lượng (QC)', 'Vận hành dây chuyền SMT', 'Sửa chữa thiết bị'],
     'Dệt may': ['May công nghiệp', 'Vận hành máy dệt', 'Nhuộm vải', 'Cắt vải tự động'],
     'Điều dưỡng': ['Chăm sóc người cao tuổi', 'Hộ lý tại viện dưỡng lão', 'Hỗ trợ sinh hoạt', 'Nhân viên chăm sóc'],
-    'Nhà hàng': ['Phục vụ bàn', 'Phụ bếp', 'Lễ tân nhà hàng', 'Pha chế đồ uống']
+    'Nhà hàng': ['Phục vụ bàn', 'Phụ bếp', 'Lễ tân nhà hàng', 'Pha chế đồ uống'],
+    'Vận tải': ['Lái xe tải', 'Giao nhận hàng hoá', 'Quản lý kho', 'Điều phối viên vận tải']
 };
 
 const jobImagePlaceholders: {[key: string]: string} = {
@@ -94,6 +95,7 @@ const jobImagePlaceholders: {[key: string]: string} = {
     'Dệt may': '/img/det_may.jpg',
     'Điều dưỡng': '/img/dieu_duong.jpg',
     'Nhà hàng': '/img/nha_hang.jpg',
+    'Vận tải': `https://picsum.photos/seed/logistics/600/400`,
 };
 
 const existingJobIds = new Set<string>();
@@ -134,9 +136,38 @@ const generateRandomJob = (index: number): Job => {
     
     const location = locations[index % locations.length];
     
-    const assignedConsultant = (consultants && consultants.length > 0)
-        ? consultants[index % consultants.length]
-        : { id: 'bot-hellojob', name: 'HelloJob', avatarUrl: '/img/favi2.png', mainExpertise: 'AI Assistant' };
+    // --- Start of CHIAVIECLAM01 Algorithm ---
+    const findMatchingConsultant = () => {
+        const lowerCaseIndustry = industry.toLowerCase();
+        const lowerCaseVisaType = visaType.toLowerCase();
+        const lowerCaseVisaDetail = visaDetail.toLowerCase();
+        
+        // Keywords to search for in mainExpertise
+        const industryKeywords = [lowerCaseIndustry, industry]; // e.g., 'cơ khí'
+        const visaKeywords = [
+            ...visaType.split(' '), // e.g., ['kỹ', 'năng', 'đặc', 'định']
+            ...visaDetail.split(' '), // e.g., ['đặc', 'định', 'đầu', 'việt']
+            'tokutei', 'tts', 'thực tập sinh' // common abbreviations
+        ].map(k => k.toLowerCase());
+
+        const allKeywords = [...new Set([...industryKeywords, ...visaKeywords])];
+
+        const expertConsultants = consultants.filter(c => {
+            const expertise = c.mainExpertise?.toLowerCase() || '';
+            return allKeywords.some(keyword => expertise.includes(keyword));
+        });
+
+        if (expertConsultants.length > 0) {
+            // If experts are found, pick one cyclically to distribute jobs among them
+            return expertConsultants[index % expertConsultants.length];
+        }
+
+        // If no expert is found, fall back to random assignment
+        return consultants[index % consultants.length];
+    };
+    
+    const assignedConsultant = findMatchingConsultant();
+     // --- End of CHIAVIECLAM01 Algorithm ---
     
     const recruiter = {
         id: assignedConsultant.id,
