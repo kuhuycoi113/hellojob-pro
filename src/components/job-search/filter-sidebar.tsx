@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { industriesByJobType, type Industry } from "@/lib/industry-data";
+import { industriesByJobType, type Industry, type JobDetail } from "@/lib/industry-data";
 import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2 } from "lucide-react";
 import { locations } from "@/lib/location-data";
 import { type SearchFilters } from './search-results';
@@ -96,7 +96,7 @@ const getFutureMonths = () => {
 
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
-const allJobDetailsForExperience = [...new Set(Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords))];
+const allJobDetailsForExperience = [...new Set(Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords.map(k => k.name)))];
 
 
 interface FilterSidebarProps {
@@ -168,7 +168,7 @@ MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 
 
 export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resultCount }: FilterSidebarProps) => {
-    const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
+    const [availableJobDetails, setAvailableJobDetails] = useState<JobDetail[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isFlexibleDate, setIsFlexibleDate] = useState(false);
     
@@ -229,7 +229,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             setAvailableJobDetails(selectedIndustryData?.keywords || []);
         } else {
              const allJobDetails = uniqueIndustries.flatMap(ind => ind.keywords);
-             setAvailableJobDetails([...new Set(allJobDetails)]);
+             setAvailableJobDetails([...new Map(allJobDetails.map(item => [item.slug, item])).values()]);
         }
 
     }, [filters.visa, filters.visaDetail, filters.industry]);
@@ -475,7 +475,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn công việc"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all-details">Tất cả công việc</SelectItem>
-                                            {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
+                                            {availableJobDetails.map(detail => <SelectItem key={detail.slug} value={detail.slug}>{detail.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
