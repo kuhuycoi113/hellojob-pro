@@ -464,14 +464,14 @@ const LoggedInView = () => {
         setIsLoadingBehavioral(true);
         try {
             const storedProfile = localStorage.getItem('generatedCandidateProfile');
-            const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-            
-            if (storedProfile && behavioralSignals.length > 0) {
-                const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-                const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
-                setBehavioralSuggestedJobs(matchResults);
+            if (storedProfile) {
+                 const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+                 const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+                 // The flow will now receive signals. If signals are empty, it will fall back to profile-based matching.
+                 const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
+                 setBehavioralSuggestedJobs(matchResults);
             } else {
-                setBehavioralSuggestedJobs([]); // No signals, no suggestions
+                 setBehavioralSuggestedJobs([]);
             }
         } catch (error) {
             console.error("Failed to fetch behavioral suggestions:", error);
@@ -1312,6 +1312,7 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
