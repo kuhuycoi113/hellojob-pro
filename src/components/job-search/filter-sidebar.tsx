@@ -213,7 +213,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         const countsByPrefecture: { [key: string]: number } = {};
         const countsByRegion: { [key: string]: number } = {};
 
-        // Initialize all known prefectures and regions to 0
         allJapanLocations.forEach(p => {
             if (!countsByPrefecture[p.name]) countsByPrefecture[p.name] = 0;
         });
@@ -252,7 +251,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         if (!filters.visaDetail) {
             return allSpecialConditions;
         }
-        return conditionsByVisaDetail[filters.visaDetail] || [];
+        return conditionsByVisaDetail[filters.visaDetail as keyof typeof conditionsByVisaDetail] || [];
     }, [filters.visaDetail]);
 
 
@@ -269,7 +268,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             const selectedIndustryData = allIndustries.find(ind => ind.slug === filters.industry);
             setAvailableJobDetails(selectedIndustryData?.keywords || []);
         } else {
-             const allJobDetails = uniqueIndustries.flatMap(ind => ind.keywords);
+             const allJobDetails = uniqueIndustries.flatMap(ind => ind.keywords || []);
              setAvailableJobDetails([...new Map(allJobDetails.map(item => [item.slug, item])).values()]);
         }
 
@@ -302,7 +301,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     
      const handleVisaDetailChange = (value: string) => {
         const newFilters: Partial<SearchFilters> = { visaDetail: value };
-        const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key] || []).some(detail => detail.slug === value));
+        const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
         if (parentType && filters.visa !== parentType) {
             newFilters.visa = parentType;
             newFilters.industry = '';
@@ -467,7 +466,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Chi tiết công việc</Label>
-                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry}>
+                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry || filters.industry === 'all'}>
                                         <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn công việc"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all-details">Tất cả công việc</SelectItem>
@@ -735,7 +734,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                             <AccordionContent className="space-y-4 pt-4">
                                 <div>
                                     <Label className="font-semibold">Giới tính</Label>
-                                    <RadioGroup value={filters.gender} onValueChange={(value) => onFilterChange({ gender: value })} className="flex items-center space-x-4 pt-2">
+                                    <RadioGroup value={filters.gender} onValueChange={(value) => onFilterChange({ gender: value as any })} className="flex items-center space-x-4 pt-2">
                                         <div className="flex items-center space-x-2">
                                             <RadioGroupItem value="" id="gender-all" />
                                             <Label htmlFor="gender-all" className='font-normal'>Tất cả</Label>

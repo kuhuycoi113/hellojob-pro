@@ -20,6 +20,7 @@ const initialSearchFilters: SearchFilters = {
     location: [], 
     interviewLocation: '', 
     jobDetail: '',
+    experienceRequirement: '', // Ensure this is part of the initial state
     gender: '',
     height: [135, 210],
     weight: [35, 120],
@@ -58,20 +59,16 @@ function JobsPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // `appliedFilters` are the filters currently reflected in the displayed job list.
     const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(initialSearchFilters);
-    // `stagedFilters` are the filters the user is currently selecting in the sidebar, before clicking "Apply".
     const [stagedFilters, setStagedFilters] = useState<SearchFilters>(initialSearchFilters);
     
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
     const [stagedResultCount, setStagedResultCount] = useState<number>(jobData.length);
     
-    // This function applies filters and updates the displayed job list.
-    // It is now only called when the user clicks "Apply" or on initial page load.
     const runFilter = useCallback((filtersToApply: SearchFilters) => {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
-            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender
+            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -80,6 +77,9 @@ function JobsPageContent() {
         const allJobDetails = Object.values(industriesByJobType).flat().flatMap(i => i.keywords);
         const jobDetailObject = allJobDetails.find(j => j.slug === jobDetail);
         const jobDetailName = jobDetailObject ? jobDetailObject.name : jobDetail;
+        
+        const experienceObject = allJobDetails.find(j => j.slug === experienceRequirement);
+        const experienceName = experienceObject ? experienceObject.name : experienceRequirement;
         
         const feeLimit = parseSalary(netFee);
         
@@ -116,10 +116,8 @@ function JobsPageContent() {
                 locationMatch = location.some(locSlug => {
                     const region = japanRegions.find(r => r.slug === locSlug);
                     if (region) {
-                        // It's a region slug, check if job location is in any of its prefectures
                         return region.prefectures.some(p => job.workLocation.toLowerCase().includes(p.name.toLowerCase()));
                     }
-                    // It's a prefecture slug, find its name and compare
                     const locationName = allJapanLocations.find(l => l.slug === locSlug)?.name;
                     return locationName ? job.workLocation && job.workLocation.toLowerCase().includes(locationName.toLowerCase()) : false;
                 });
@@ -141,8 +139,7 @@ function JobsPageContent() {
             const jobNetSalary = parseSalary(job.salary.actual);
             const netSalaryMatch = netSalaryMin === null || (jobNetSalary !== null && jobNetSalary >= netSalaryMin);
 
-            // Assuming hourly salary isn't available in mock data, so this will be improved later
-            const hourlySalaryMatch = hourlySalaryMin === null; // Placeholder
+            const hourlySalaryMatch = hourlySalaryMin === null;
 
             const jobAnnualIncome = parseSalary(job.salary.annualIncome);
             const annualIncomeMatch = annualIncomeMin === null || (jobAnnualIncome !== null && jobAnnualIncome >= annualIncomeMin);
@@ -156,13 +153,15 @@ function JobsPageContent() {
                 genderMatch = job.gender === targetGender || job.gender === 'Cả nam và nữ';
             }
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch;
+            const experienceRegex = experienceName ? new RegExp(`\\b${escapeRegExp(experienceName)}\\b`, 'i') : null;
+            const experienceMatch = !experienceRegex || (job.experienceRequirement && experienceRegex.test(job.experienceRequirement));
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && experienceMatch;
         });
 
         setFilteredJobs(results);
     }, []);
 
-    // This function ONLY counts the results based on staged filters without updating the UI.
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
@@ -172,11 +171,11 @@ function JobsPageContent() {
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
         
-        const allJobDetails = Object.values(industriesByJobType).flat().flatMap(i => i.keywords);
-        const jobDetailObject = allJobDetails.find(j => j.slug === jobDetail);
+        const allJobDetails = Object.values(industriesByJobType).flat().flatMap(i => i.keywords || []);
+        const jobDetailObject = allJobDetails.find(j => j && j.slug === jobDetail);
         const jobDetailName = jobDetailObject ? jobDetailObject.name : jobDetail;
         
-        const experienceObject = allJobDetails.find(j => j.slug === experienceRequirement);
+        const experienceObject = allJobDetails.find(j => j && j.slug === experienceRequirement);
         const experienceName = experienceObject ? experienceObject.name : experienceRequirement;
         
         const feeLimit = parseSalary(netFee);
@@ -240,8 +239,8 @@ function JobsPageContent() {
             
             let genderMatch = true;
             if (gender) {
-                const targetGender = gender === 'nam' ? 'Nam' : 'Nữ';
-                genderMatch = job.gender === targetGender || job.gender === 'Cả nam và nữ';
+                const targetGender = gender === 'nam' ? 'Nam' : (gender === 'nu' ? 'Nữ' : '');
+                genderMatch = !targetGender || job.gender === targetGender || job.gender === 'Cả nam và nữ';
             }
 
             const experienceRegex = experienceName ? new RegExp(`\\b${escapeRegExp(experienceName)}\\b`, 'i') : null;
@@ -252,7 +251,6 @@ function JobsPageContent() {
         setStagedResultCount(count);
     }, []);
 
-    // Effect for initial load and URL changes
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters };
         for (const [key, value] of searchParams.entries()) {
@@ -272,13 +270,12 @@ function JobsPageContent() {
             }
         }
         setAppliedFilters(newFilters);
-        setStagedFilters(newFilters); // Sync staged with applied on load
+        setStagedFilters(newFilters);
         runFilter(newFilters);
-        countStagedResults(newFilters); // Count results for initial load
+        countStagedResults(newFilters);
         
     }, [searchParams, runFilter, countStagedResults]);
     
-    // Handler for changes in the filter sidebar. It updates the staged filters and recounts.
     const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
       setStagedFilters(prev => {
           const updated = {...prev, ...newFilters};
@@ -287,7 +284,6 @@ function JobsPageContent() {
       });
     }, [countStagedResults]);
 
-    // Handler for the "Apply" button. It updates the URL and applied filters.
     const handleApplyFilters = useCallback(() => {
         const query = new URLSearchParams();
         Object.entries(stagedFilters).forEach(([key, value]) => {
@@ -304,7 +300,6 @@ function JobsPageContent() {
         router.push(`/jobs?${query.toString()}`);
     }, [stagedFilters, router]);
   
-    // Handler for resetting filters.
     const handleResetFilters = useCallback(() => {
         setStagedFilters(initialSearchFilters);
         countStagedResults(initialSearchFilters);
@@ -315,10 +310,8 @@ function JobsPageContent() {
         }
     }, [router, runFilter, countStagedResults, searchParams]);
     
-    // Handler for new searches initiated from the SearchModule (e.g., on the homepage)
     const handleNewSearch = (filters: SearchFilters) => {
         const query = new URLSearchParams();
-        // This is simplified, can be expanded to include all filters from home search
         if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('visaDetail', filters.visaDetail);
         if (filters.industry && filters.industry !== 'all') query.set('industry', filters.industry);
         if (Array.isArray(filters.location) && filters.location.length > 0 && !filters.location.includes('all')) {
@@ -333,12 +326,12 @@ function JobsPageContent() {
         <div className="flex flex-col">
             <SearchModule 
                 onSearch={handleNewSearch} 
-                filters={stagedFilters} // SearchModule always reflects the latest user interaction
+                filters={stagedFilters}
                 onFilterChange={handleStagedFilterChange} 
             />
             <SearchResults 
                 jobs={filteredJobs} 
-                filters={stagedFilters} // Pass staged filters to the sidebar
+                filters={stagedFilters}
                 onFilterChange={handleStagedFilterChange} 
                 applyFilters={handleApplyFilters} 
                 resetFilters={handleResetFilters}
