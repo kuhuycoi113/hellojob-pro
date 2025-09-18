@@ -8,7 +8,8 @@ import { Star, PieChart, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useChat } from '@/contexts/ChatContext';
-import { consultants as consultantChatData } from '@/lib/chat-data';
+import { consultants as consultantChatData } from '@/lib/consultant-data';
+import { ContactButtons } from '../contact-buttons';
 
 
 const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[0] }) => {
@@ -34,9 +35,7 @@ const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[
                 </div>
             </Link>
             <div className="mt-4 pt-4 border-t">
-                <Button className="w-full" onClick={() => openChat(consultant)}>
-                    <MessageSquare className="mr-2 h-4 w-4" /> Chat với tư vấn viên
-                </Button>
+                <ContactButtons contact={consultant} />
             </div>
         </Card>
     );

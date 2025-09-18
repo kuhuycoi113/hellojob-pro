@@ -1,5 +1,5 @@
 
-import * as chatData from './chat-data';
+import { consultants } from './consultant-data';
 import type { User } from './chat-data';
 
 export interface Job {
@@ -153,7 +153,7 @@ const generateRandomJob = (index: number): Job => {
 
         const allKeywords = [...new Set([...industryKeywords, ...visaKeywords])];
 
-        const expertConsultants = chatData.consultants.filter(c => {
+        const expertConsultants = consultants.filter(c => {
             const expertise = c.mainExpertise?.toLowerCase() || '';
             return allKeywords.some(keyword => expertise.includes(keyword));
         });
@@ -164,7 +164,7 @@ const generateRandomJob = (index: number): Job => {
         }
 
         // If no expert is found, fall back to random assignment
-        return chatData.consultants[index % chatData.consultants.length];
+        return consultants[index % consultants.length];
     };
     
     const assignedConsultant = findMatchingConsultant();

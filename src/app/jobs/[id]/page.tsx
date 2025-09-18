@@ -13,7 +13,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { use, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { consultants } from '@/lib/chat-data';
+import { consultants } from '@/lib/consultant-data';
 import { ContactButtons } from '@/components/contact-buttons';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (

@@ -8,80 +8,11 @@ import { Star, PieChart, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useChat } from '@/contexts/ChatContext';
-import { consultants as consultantChatData } from '@/lib/chat-data';
 import { ContactButtons } from '@/components/contact-buttons';
+import { consultants as consultantChatData } from '@/lib/consultant-data';
 
 
-const consultantListData = [
-    {
-        id: 'le-xuan-long',
-        name: 'Lê Xuân Long',
-        avatarUrl: '/img/long.jpg',
-        dataAiHint: 'professional man portrait',
-        experience: '2 năm',
-        mainExpertise: 'Tư vấn việc làm Kỹ năng đặc định (Tokutei)',
-        successfulCandidates: 185,
-        strengths: ['Tận tình', 'Nhiều đơn', 'Hiểu rõ ngành'],
-        avatar: '/img/long.jpg',
-    },
-    {
-        id: 'nguyen-thi-phuong-loan',
-        name: 'Nguyễn Thị Phương Loan',
-        avatarUrl: '/img/TVV002.jpg',
-        dataAiHint: 'professional woman portrait',
-        experience: '2 năm',
-        mainExpertise: 'Tư vấn Đặc định và Kỹ sư, tri thức',
-        successfulCandidates: 160,
-        strengths: ['Nhiệt tình', 'Hỗ trợ 24/7', 'Quan hệ rộng'],
-        avatar: '/img/TVV002.jpg',
-    },
-    {
-        id: 'nguyen-thi-ngoc-oanh',
-        name: 'Nguyễn Thị Ngọc Oanh',
-        avatarUrl: '/img/TVV003.png',
-        dataAiHint: 'professional woman portrait',
-        experience: '5 năm',
-        mainExpertise: 'Tư vấn Tokutei Vận tải, Xây dựng, Thực phẩm',
-        successfulCandidates: 450,
-        strengths: ['Nhiều đơn gấp', 'Hỗ trợ nhiệt tình', 'Kinh nghiệm'],
-        avatar: '/img/TVV003.png',
-    },
-    {
-        id: 'pham-thi-ha',
-        name: 'Phạm Thị Hà',
-        avatarUrl: '/img/TVV004.png',
-        dataAiHint: 'professional woman portrait',
-        experience: '4 năm',
-        mainExpertise: 'Tư vấn Nhà hàng, Cơ khí, Điều dưỡng, Nông nghiệp',
-        successfulCandidates: 320,
-        strengths: ['Tận tâm', 'Am hiểu thủ tục', 'Hỗ trợ chi tiết'],
-        avatar: '/img/TVV004.png',
-    },
-    {
-        id: 'nguyen-van-minh',
-        name: 'Đào Quang Minh',
-        avatarUrl: '/img/TVV005.jpg',
-        dataAiHint: 'male consultant portrait',
-        experience: '1 năm',
-        mainExpertise: 'Tư vấn Công xưởng và Ngoài trời',
-        successfulCandidates: 95,
-        strengths: ['Kinh nghiệm', 'Quan hệ rộng', 'Tỷ lệ đỗ cao'],
-        avatar: '/img/TVV005.jpg',
-    },
-    {
-        id: 'nguyen-thi-thu-trang',
-        name: 'Nguyễn Thị Thu Trang',
-        avatarUrl: '/img/TVV006.jpg',
-        dataAiHint: 'female consultant smiling',
-        experience: '2 năm',
-        mainExpertise: 'Tư vấn Thực tập sinh kỹ năng và Đặc định',
-        successfulCandidates: 175,
-        strengths: ['Nhiệt tình', 'Am hiểu ngành', 'Hỗ trợ nhanh'],
-        avatar: '/img/TVV006.jpg',
-    },
-];
-
-const ConsultantCard = ({ consultant }: { consultant: typeof consultantListData[0] }) => {
+const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[0] }) => {
     // Find the corresponding full consultant data for the chat context
     const chatConsultant = consultantChatData.find(c => c.id === consultant.id);
 
@@ -122,7 +53,7 @@ export default function ConsultantListPage() {
             </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 items-stretch">
-            {consultantListData.map((consultant) => (
+            {consultantChatData.map((consultant) => (
                 <ConsultantCard key={consultant.id} consultant={consultant} />
             ))}
         </div>

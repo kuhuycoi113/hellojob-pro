@@ -2,7 +2,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { Conversation, Message, User, conversations, currentUser, helloJobBot, consultants, Attachment } from '@/lib/chat-data';
+import { Conversation, Message, User, conversations, currentUser, helloJobBot, Attachment } from '@/lib/chat-data';
+import { consultants } from '@/lib/consultant-data';
 import { recommendJobs, type JobRecommendationResponse } from '@/ai/flows/recommend-jobs-flow';
 
 interface ChatContextType {

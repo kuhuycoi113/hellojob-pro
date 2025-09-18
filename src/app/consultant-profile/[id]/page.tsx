@@ -10,87 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Award, Briefcase, Handshake, MessageSquare, PieChart, Send, ShieldCheck, Sparkles, Star, Target, Users, Phone } from 'lucide-react';
 import { MessengerIcon, ZaloIcon } from '@/components/custom-icons';
 import { ContactButtons } from '@/components/contact-buttons';
-
-const consultantData = [
-  {
-    id: 'le-xuan-long',
-    name: 'Lê Xuân Long',
-    avatarUrl: '/img/long.jpg',
-    dataAiHint: 'professional man portrait',
-    experience: '2 năm',
-    mainExpertise: 'Tư vấn việc làm Kỹ năng đặc định (Tokutei)',
-    subExpertise: 'Thực tập sinh Nhật Bản',
-    successfulCandidates: 185,
-    managedJobs: 250,
-    strengths: ['Tận tình', 'Nhiều đơn', 'Hiểu rõ ngành'],
-    avatar: '/img/long.jpg',
-  },
-  {
-    id: 'nguyen-thi-phuong-loan',
-    name: 'Nguyễn Thị Phương Loan',
-    avatarUrl: '/img/TVV002.jpg',
-    dataAiHint: 'professional woman portrait',
-    experience: '2 năm',
-    mainExpertise: 'Tư vấn Đặc định và Kỹ sư, tri thức',
-    subExpertise: 'Thị trường lao động tại Aichi',
-    successfulCandidates: 160,
-    managedJobs: 210,
-    strengths: ['Nhiệt tình', 'Hỗ trợ 24/7', 'Quan hệ rộng'],
-    avatar: '/img/TVV002.jpg',
-  },
-  {
-    id: 'nguyen-thi-ngoc-oanh',
-    name: 'Nguyễn Thị Ngọc Oanh',
-    avatarUrl: '/img/TVV003.png',
-    dataAiHint: 'professional woman portrait',
-    experience: '5 năm',
-    mainExpertise: 'Tư vấn Tokutei Vận tải, Xây dựng, Thực phẩm',
-    subExpertise: 'Các đơn hàng gấp, bay nhanh',
-    successfulCandidates: 450,
-    managedJobs: 190,
-    strengths: ['Nhiều đơn gấp', 'Hỗ trợ nhiệt tình', 'Kinh nghiệm'],
-    avatar: '/img/TVV003.png',
-  },
-  {
-    id: 'pham-thi-ha',
-    name: 'Phạm Thị Hà',
-    avatarUrl: '/img/TVV004.png',
-    dataAiHint: 'professional woman portrait',
-    experience: '4 năm',
-    mainExpertise: 'Tư vấn Nhà hàng, Cơ khí, Điều dưỡng, Nông nghiệp',
-    subExpertise: 'Thủ tục visa & giấy tờ',
-    successfulCandidates: 320,
-    managedJobs: 150,
-    strengths: ['Tận tâm', 'Am hiểu thủ tục', 'Hỗ trợ chi tiết'],
-    avatar: '/img/TVV004.png',
-  },
-  {
-    id: 'nguyen-van-minh',
-    name: 'Đào Quang Minh',
-    avatarUrl: '/img/TVV005.jpg',
-    dataAiHint: 'male consultant portrait',
-    experience: '1 năm',
-    mainExpertise: 'Tư vấn Công xưởng và Ngoài trời',
-    subExpertise: 'Các đơn hàng lương cao',
-    successfulCandidates: 95,
-    managedJobs: 320,
-    strengths: ['Kinh nghiệm', 'Quan hệ rộng', 'Tỷ lệ đỗ cao'],
-    avatar: '/img/TVV005.jpg',
-  },
-  {
-    id: 'nguyen-thi-thu-trang',
-    name: 'Nguyễn Thị Thu Trang',
-    avatarUrl: '/img/TVV006.jpg',
-    dataAiHint: 'female consultant smiling',
-    experience: '2 năm',
-    mainExpertise: 'Tư vấn Thực tập sinh kỹ năng và Đặc định',
-    subExpertise: 'Hỗ trợ ứng viên nữ',
-    successfulCandidates: 175,
-    managedJobs: 180,
-    strengths: ['Nhiệt tình', 'Am hiểu ngành', 'Hỗ trợ nhanh'],
-    avatar: '/img/TVV006.jpg',
-  },
-];
+import { consultants as consultantData } from '@/lib/consultant-data';
 
 const companyValues = [
     {
@@ -161,8 +81,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
               <CardContent className="space-y-4 text-sm">
                 <p className="flex items-start gap-3"><PieChart className="h-5 w-5 mt-0.5 text-muted-foreground"/> <span><strong>Kinh nghiệm:</strong> {consultant.experience}</span></p>
                 <p className="flex items-start gap-3"><Star className="h-5 w-5 mt-0.5 text-muted-foreground"/> <span><strong>Lĩnh vực chính:</strong> {consultant.mainExpertise}</span></p>
-                <p className="flex items-start gap-3"><Briefcase className="h-5 w-5 mt-0.5 text-muted-foreground"/> <span><strong>Lĩnh vực phụ:</strong> {consultant.subExpertise}</span></p>
-              </CardContent>
+                </CardContent>
             </Card>
 
             <Card className="shadow-xl">
@@ -173,7 +92,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                         <p className="text-muted-foreground text-sm mt-1">Ứng viên thành công</p>
                     </div>
                      <div>
-                        <p className="text-3xl font-bold text-primary">{consultant.managedJobs}</p>
+                        <p className="text-3xl font-bold text-primary">{consultant.managedJobs || 'N/A'}</p>
                         <p className="text-muted-foreground text-sm mt-1">Việc làm đang quản lý</p>
                     </div>
                 </CardContent>
