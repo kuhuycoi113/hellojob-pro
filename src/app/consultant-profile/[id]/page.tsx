@@ -11,9 +11,10 @@ import { Award, Briefcase, Handshake, MessageSquare, PieChart, Send, ShieldCheck
 import { MessengerIcon, ZaloIcon } from '@/components/custom-icons';
 import { ContactButtons } from '@/components/contact-buttons';
 import { consultants as consultantData } from '@/lib/consultant-data';
-import { jobData } from '@/lib/mock-data';
+import { jobData, type Job } from '@/lib/mock-data';
 import { JobCard } from '@/components/job-card';
 import Link from 'next/link';
+import { industryGroups } from '@/lib/industry-data';
 
 const companyValues = [
     {
@@ -59,14 +60,57 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
         notFound();
     }
     
-    // HIENTHIVIEC01 Algorithm
-    const consultantJobs = jobData
-      .filter(job => job.recruiter.id === consultant.id)
-      .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
-      .slice(0, 4);
+    // PHANLOAINHOMNGANH01 Algorithm
+    const getJobsByGroupedExpertise = (expertise: string): Job[] | null => {
+        const lowerExpertise = expertise.toLowerCase();
+        let targetIndustries: string[] = [];
 
-    // Calculate total managed jobs
-    const managedJobsCount = jobData.filter(job => job.recruiter.id === consultant.id).length;
+        for (const groupName in industryGroups) {
+            if (lowerExpertise.includes(groupName.toLowerCase())) {
+                targetIndustries = industryGroups[groupName as keyof typeof industryGroups];
+                break;
+            }
+        }
+        
+        if (targetIndustries.length > 0) {
+            return jobData.filter(job => 
+                targetIndustries.some(industry => job.industry.toLowerCase().includes(industry.toLowerCase()))
+            );
+        }
+
+        return null;
+    }
+
+    // HIENTHIVIEC01 Algorithm
+    const getConsultantJobs = (): Job[] => {
+        // First, try to get jobs based on grouped expertise using the new algorithm
+        const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
+        if (jobsByGroup) {
+            return jobsByGroup
+                .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
+                .slice(0, 4);
+        }
+        
+        // Fallback to original logic: filter by recruiter ID
+        return jobData
+          .filter(job => job.recruiter.id === consultant.id)
+          .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
+          .slice(0, 4);
+    };
+
+    const consultantJobs = getConsultantJobs();
+    
+    // Calculate total managed jobs based on the same logic for accuracy
+    const calculateManagedJobsCount = () => {
+       const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
+       if (jobsByGroup) {
+           return jobsByGroup.length;
+       }
+       return jobData.filter(job => job.recruiter.id === consultant.id).length;
+    };
+    
+    const managedJobsCount = calculateManagedJobsCount();
+
 
   return (
     <div className="bg-secondary">

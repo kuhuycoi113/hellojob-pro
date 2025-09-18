@@ -1,5 +1,4 @@
 
-
 export type Industry = {
     name: string;
     slug: string;
@@ -65,4 +64,10 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
       { name: "Việc làm bán chuyên nghiệp", slug: "viec-lam-ban-chuyen-nghiep-ks", keywords: ["Công việc mùa hè", "Lao động kỳ nghỉ", "Sinh viên thực tập", "Trao đổi văn hóa quốc tế"] }
     ],
     'Default': defaultIndustries,
+};
+
+export const industryGroups = {
+  'Công xưởng': ['Chế biến thực phẩm', 'Cơ khí', 'Điện tử', 'Dệt may', 'May mặc', 'Cơ khí, kim loại', 'Cơ khí, chế tạo máy', 'Điện, điện tử'],
+  'Ngoài trời': ['Xây dựng', 'Nông nghiệp', 'Ngư nghiệp'],
+  'Dịch vụ & Chăm sóc con người': ['Điều dưỡng', 'Nhà hàng', 'Vận tải', 'Lưu trú, khách sạn', 'Vệ sinh toà nhà', 'Hàng không'],
 };
