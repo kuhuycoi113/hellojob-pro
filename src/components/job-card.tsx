@@ -124,7 +124,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   if (variant === 'list-item') {
      return (
-        <Card className="flex flex-col md:flex-row items-stretch w-full p-3 gap-4 border border-border hover:shadow-lg transition-shadow duration-300">
+        <Card id="HIENTHIVIEC01" className="flex flex-col md:flex-row items-stretch w-full p-3 gap-4 border border-border hover:shadow-lg transition-shadow duration-300">
             <div className="relative w-full md:w-40 h-40 md:h-auto flex-shrink-0">
                 <Link href={`/jobs/${job.id}`} onClick={handleCardClick}>
                     <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-lg" />
