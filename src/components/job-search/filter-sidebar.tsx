@@ -96,6 +96,8 @@ const getFutureMonths = () => {
 
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
+const allJobDetailsForExperience = [...new Set(Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords))];
+
 
 interface FilterSidebarProps {
     filters: SearchFilters;
@@ -721,10 +723,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 <div className="space-y-2">
                                     <Label>Yêu cầu kinh nghiệm</Label>
                                     <Select value={filters.experienceRequirement} onValueChange={(value) => onFilterChange({ experienceRequirement: value })}>
-                                        <SelectTrigger className={cn(filters.experienceRequirement && 'text-primary')}><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
+                                        <SelectTrigger className={cn(filters.experienceRequirement && filters.experienceRequirement !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn công việc"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
-                                            <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                                            {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name}</SelectItem>)}
+                                            <SelectItem value="all">Tất cả công việc</SelectItem>
+                                            {allJobDetailsForExperience.map(jobDetail => <SelectItem key={jobDetail} value={jobDetail}>{jobDetail}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
