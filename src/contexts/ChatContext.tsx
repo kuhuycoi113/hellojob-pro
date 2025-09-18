@@ -1,7 +1,8 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Conversation, Message, User, conversations, currentUser, helloJobBot, consultants, Attachment } from '@/lib/chat-data';
 import { recommendJobs, type JobRecommendationResponse } from '@/ai/flows/recommend-jobs-flow';
 
