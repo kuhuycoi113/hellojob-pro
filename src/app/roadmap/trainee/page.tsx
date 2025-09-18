@@ -1,4 +1,5 @@
 
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileSignature, School, Plane, UserCheck, CheckCircle, TrendingUp, User, Briefcase, Calendar, Map, DollarSign, ChevronRight, Sparkles } from 'lucide-react';
 import React from 'react';
@@ -42,7 +43,7 @@ const roadmapSteps = [
   {
     icon: School,
     title: 'Bước 2: Đào tạo Tiếng Nhật & Kỹ năng cơ bản',
-    description: 'Tham gia các khóa học đào tạo集中的 (Shuuchuu) tại trung tâm của HelloJob. Bạn sẽ được học tiếng Nhật giao tiếp cơ bản, văn hóa doanh nghiệp và các kỹ năng cần thiết trước khi phỏng vấn.',
+    description: 'Tham gia các khóa học đào tạo tập trung (Shuuchuu) tại trung tâm của HelloJob. Bạn sẽ được học tiếng Nhật giao tiếp cơ bản, văn hóa doanh nghiệp và các kỹ năng cần thiết trước khi phỏng vấn.',
     details: ['Học tiếng Nhật tối thiểu N5', 'Tìm hiểu văn hóa Hou-Ren-Sou', 'Đào tạo tay nghề cơ bản (nếu cần)']
   },
   {
@@ -200,7 +201,7 @@ export default function TraineeRoadmapPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                  {featuredJobs.map(job => (
-                    <JobCard key={job.id} job={job} />
+                    <JobCard key={job.id} job={job} variant="grid-item"/>
                  ))}
             </div>
             <div className="text-center mt-12">

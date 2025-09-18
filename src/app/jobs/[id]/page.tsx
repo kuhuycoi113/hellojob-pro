@@ -312,7 +312,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
                         {isLoadingBehavioral ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                 {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64" />)}
+                                 {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
                             </div>
                         ) : behavioralSuggestions.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -329,7 +329,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         <h2 className="text-2xl font-bold font-headline mb-6"><Star className="inline-block mr-3 text-primary h-7 w-7"/>Gợi ý cho bạn</h2>
                         {isLoading ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64" />)}
+                                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
                             </div>
                         ) : profileSuggestions.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

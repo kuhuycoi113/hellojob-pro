@@ -72,7 +72,7 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
 };
 
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'default', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'default' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
+export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
   const { isLoggedIn } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
@@ -122,240 +122,193 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
       logInteraction(job, 'view');
   };
 
-  // New Chat Layout for the chat variant
-  const ChatLayout = () => (
-    <Link href={`/jobs/${job.id}`} className="block w-full" onClick={handleCardClick}>
-        <Card className="flex items-center p-2 gap-3 hover:bg-secondary/50 transition-colors">
-            <div className="relative w-16 h-16 flex-shrink-0">
-                <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
+  if (variant === 'list-item') {
+     return (
+        <Card className="flex flex-col md:flex-row items-stretch w-full p-3 gap-4 border border-border hover:shadow-lg transition-shadow duration-300">
+            <div className="relative w-full md:w-40 h-40 md:h-auto flex-shrink-0">
+                <Link href={`/jobs/${job.id}`} onClick={handleCardClick}>
+                    <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-lg" />
+                </Link>
+                <div className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
+                <span>{job.id}</span>
+                </div>
             </div>
-            <div className="flex-grow overflow-hidden">
-                <h4 className="font-semibold text-sm truncate">{job.title}</h4>
-                <p className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-1">
-                    <MapPin className="h-3 w-3 flex-shrink-0" />
-                    {job.workLocation}
-                </p>
-                <p className="text-xs text-green-600 font-bold flex items-center gap-1 mt-1">
-                    <DollarSign className="h-3 w-3 flex-shrink-0" />
-                    {formatCurrency(job.salary.basic)}
-                </p>
-            </div>
-        </Card>
-    </Link>
-  );
-
-  // Desktop layout
-  const DesktopLayout = () => (
-    <div className="hidden md:flex flex-row items-stretch w-full p-3 gap-4">
-        <div className="relative w-32 h-32 flex-shrink-0">
-            <Link href={`/jobs/${job.id}`} onClick={handleCardClick}>
-                <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-lg" />
-            </Link>
-             <div className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-              <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
-              <span>{job.id}</span>
-            </div>
-        </div>
-        
-        <div className="flex-grow flex flex-col">
-            <Link href={`/jobs/${job.id}`} className="group flex-grow" onClick={handleCardClick}>
-                <h3 className="font-bold text-base mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
-            </Link>
-             <div className="flex flex-wrap items-center gap-2 mb-2">
-              {job.visaDetail && (
-                <Badge
-                    variant="outline"
-                    className={cn("text-xs", {
-                        "border-accent-green text-accent-green": job.visaType?.includes("Thực tập sinh"),
-                        "border-accent-blue text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
-                        "border-accent-orange text-accent-orange": job.visaType?.includes("Kỹ sư, tri thức"),
-                    })}
-                >
-                    {job.visaDetail}
-                </Badge>
-              )}
-              {job.salary.actual && <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 border-green-200">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
-              <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
-            </div>
-            <div className="flex flex-col gap-1 text-sm text-muted-foreground">
-                <p className="flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4 flex-shrink-0" />
-                    <span>{job.workLocation}</span>
-                </p>
-                 {showPostedTime && (
-                    <p className="flex items-center gap-1.5 text-xs justify-end text-right w-full">
-                        <span className="text-primary">Đăng lúc:</span>
-                        <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
-                    </p>
-                )}
-            </div>
-
             
-            <div className="mt-auto flex justify-between items-end">
-                 <div className="flex items-center gap-2">
-                    <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
-                        <PopoverTrigger asChild>
-                             <div onMouseEnter={() => setIsConsultantPopoverOpen(true)} onMouseLeave={() => setIsConsultantPopoverOpen(false)}>
-                                <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
-                                    <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+            <div className="flex-grow flex flex-col">
+                <Link href={`/jobs/${job.id}`} className="group flex-grow" onClick={handleCardClick}>
+                    <h3 className="font-bold text-lg mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
+                </Link>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                {job.visaDetail && (
+                    <Badge
+                        variant="outline"
+                        className={cn("text-xs", {
+                            "border-accent-green text-accent-green": job.visaType?.includes("Thực tập sinh"),
+                            "border-accent-blue text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
+                            "border-accent-orange text-accent-orange": job.visaType?.includes("Kỹ sư, tri thức"),
+                        })}
+                    >
+                        {job.visaDetail}
+                    </Badge>
+                )}
+                {job.salary.actual && <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 border-green-200">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
+                <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
+                </div>
+                <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+                    <p className="flex items-center gap-1.5">
+                        <MapPin className="h-4 w-4 flex-shrink-0" />
+                        <span>{job.workLocation}</span>
+                    </p>
+                    {showPostedTime && (
+                        <p className="flex items-center gap-1.5 text-xs justify-end text-right w-full">
+                            <span className="text-primary">Đăng lúc:</span>
+                            <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
+                        </p>
+                    )}
+                </div>
+
+                
+                <div className="mt-auto pt-2 flex justify-between items-end">
+                    <div className="flex items-center gap-2">
+                        <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
+                            <PopoverTrigger asChild>
+                                <div onMouseEnter={() => setIsConsultantPopoverOpen(true)} onMouseLeave={() => setIsConsultantPopoverOpen(false)}>
+                                    <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
+                                        <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                                            <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                            <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                    </Link>
+                                </div>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80" side="top" align="start">
+                                <div className="flex gap-4">
+                                <Avatar className="h-16 w-16">
                                         <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                                         <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                                     </Avatar>
-                                </Link>
-                             </div>
-                        </PopoverTrigger>
-                         <PopoverContent className="w-80" side="top" align="start">
-                            <div className="flex gap-4">
-                               <Avatar className="h-16 w-16">
-                                    <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
-                                    <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div className="space-y-1">
-                                <h4 className="text-sm font-semibold">{job.recruiter.name}</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    {job.recruiter.mainExpertise}
-                                </p>
-                                 <Button asChild size="sm" variant="link" className="p-0 h-auto">
-                                    <Link href={`/consultant-profile/${job.recruiter.id}`}>Xem hồ sơ</Link>
-                                </Button>
+                                    <div className="space-y-1">
+                                    <h4 className="text-sm font-semibold">{job.recruiter.name}</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        {job.recruiter.mainExpertise}
+                                    </p>
+                                    <Button asChild size="sm" variant="link" className="p-0 h-auto">
+                                        <Link href={`/consultant-profile/${job.recruiter.id}`}>Xem hồ sơ</Link>
+                                    </Button>
+                                    </div>
                                 </div>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                            </PopoverContent>
+                        </Popover>
 
-                    <ContactButtons contact={job.recruiter} />
-                </div>
-                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className={cn("bg-white", isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
-                        <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
-                        Lưu
-                    </Button>
-                    {showApplyButtons ? (
-                        <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
-                    ) : (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                    <MoreHorizontal className="h-5 w-5 text-muted-foreground"/>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                    <Link href={`/jobs/${job.id}`} className="w-full flex" onClick={handleCardClick}>
-                                        <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
-                                    </Link>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    )}
+                        <ContactButtons contact={job.recruiter} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" className={cn("bg-white", isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                            <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
+                            Lưu
+                        </Button>
+                        {showApplyButtons ? (
+                            <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
+                        ) : (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                        <MoreHorizontal className="h-5 w-5 text-muted-foreground"/>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/jobs/${job.id}`} className="w-full flex" onClick={handleCardClick}>
+                                            <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
+                                        </Link>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-  );
+        </Card>
+     );
+  }
 
-  // Mobile layout
-  const MobileLayout = () => (
-     <div className="md:hidden flex flex-col w-full">
-        <div className="flex flex-row items-stretch">
-            <div className="relative w-1/3 flex-shrink-0 aspect-[4/3]">
-                <Link href={`/jobs/${job.id}`} onClick={handleCardClick}>
-                    <Image src={job.image.src} alt={job.title} fill className="object-cover" />
+  if (variant === 'chat') {
+    return (
+        <Link href={`/jobs/${job.id}`} className="block w-full" onClick={handleCardClick}>
+            <Card className="flex items-center p-2 gap-3 hover:bg-secondary/50 transition-colors">
+                <div className="relative w-16 h-16 flex-shrink-0">
+                    <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
+                </div>
+                <div className="flex-grow overflow-hidden">
+                    <h4 className="font-semibold text-sm truncate">{job.title}</h4>
+                    <p className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-1">
+                        <MapPin className="h-3 w-3 flex-shrink-0" />
+                        {job.workLocation}
+                    </p>
+                    <p className="text-xs text-green-600 font-bold flex items-center gap-1 mt-1">
+                        <DollarSign className="h-3 w-3 flex-shrink-0" />
+                        {formatCurrency(job.salary.basic)}
+                    </p>
+                </div>
+            </Card>
+        </Link>
+    );
+  }
+
+  // Default variant: 'grid-item'
+  return (
+    <>
+        <Card className={cn("rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300 h-full flex flex-col")}>
+             <Link href={`/jobs/${job.id}`} className="group" onClick={handleCardClick}>
+                <div className="relative w-full aspect-video">
+                     <Image src={job.image.src} alt={job.title} fill className="object-cover group-hover:scale-105 transition-transform" />
+                      <div className="absolute top-2 left-2 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                        <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
+                        <span>{job.id}</span>
+                      </div>
+                </div>
+             </Link>
+             <div className="p-3 flex-grow flex flex-col">
+                <Link href={`/jobs/${job.id}`} className="group flex-grow" onClick={handleCardClick}>
+                    <h3 className="font-bold text-sm mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2 h-10">{job.title}</h3>
                 </Link>
-                 <div className="absolute top-1 left-1 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                  <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
-                  <span>{job.id}</span>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
+                    {job.visaDetail && (
+                    <Badge
+                        variant="outline"
+                        className={cn("text-xs px-1.5 py-0", {
+                            "border-accent-green/70 text-accent-green bg-green-50": job.visaType?.includes("Thực tập sinh"),
+                            "border-accent-blue/70 text-accent-blue bg-blue-50": job.visaType?.includes("Kỹ năng đặc định"),
+                            "border-accent-orange/70 text-accent-orange bg-orange-50": job.visaType?.includes("Kỹ sư, tri thức"),
+                        })}
+                    >
+                        {job.visaDetail}
+                    </Badge>
+                    )}
+                    {job.salary.actual && <Badge variant="secondary" className="text-xs px-1.5 py-0 bg-green-100 text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
+                    <Badge variant="secondary" className="text-xs px-1.5 py-0">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
                 </div>
-                 <Button size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 hover:bg-white border border-gray-200 shadow" onClick={handleSaveJob}>
-                    <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
-                 </Button>
-            </div>
+                 <div className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+                    <MapPin className="h-3 w-3 flex-shrink-0" />
+                    <span>{job.workLocation}</span>
+                </div>
 
-            <div className="w-2/3 p-3 flex-grow flex flex-col justify-between">
-                <div>
-                    <Link href={`/jobs/${job.id}`} className="group" onClick={handleCardClick}>
-                        <h3 className="font-bold text-sm mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-3">{job.title}</h3>
-                    </Link>
-                    <div className="flex flex-wrap gap-1 mb-2">
-                        {job.visaDetail && (
-                        <Badge
-                            variant="outline"
-                            className={cn("text-xs", {
-                                "border-accent-green text-accent-green": job.visaType?.includes("Thực tập sinh"),
-                                "border-accent-blue text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
-                                "border-accent-orange text-accent-orange": job.visaType?.includes("Kỹ sư, tri thức"),
-                            })}
-                        >
-                            {job.visaDetail}
-                        </Badge>
-                        )}
-                        {job.salary.actual && <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
-                        <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
-                    </div>
-                     <div className="flex flex-col gap-1 text-xs text-muted-foreground mb-2">
-                        <p className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3 flex-shrink-0" />
-                            <span>{job.workLocation}</span>
-                        </p>
-                        {showPostedTime && (
-                           <p className="flex items-center gap-1.5 text-xs justify-end flex-grow text-right">
-                                <span className="text-primary">Đăng lúc:</span>
-                                <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
-                           </p>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div className="p-3 border-t">
-            <div className="flex justify-between items-center">
-                 <div className="flex items-center gap-2">
+                <div className="mt-auto flex justify-between items-center">
                     <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
-                        <Avatar className="h-8 w-8 cursor-pointer">
+                        <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
                             <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                             <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                     </Link>
-                    <ContactButtons contact={job.recruiter} />
+                    <div className="flex items-center gap-1">
+                        <ContactButtons contact={job.recruiter} />
+                         <Button variant="outline" size="icon" className="h-8 w-8 bg-white" onClick={handleSaveJob}>
+                            <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
+                        </Button>
+                    </div>
                 </div>
-                 <div className="flex items-center gap-2">
-                    {showApplyButtons ? (
-                        <>
-                            <Button size="sm" className="bg-accent-orange text-white h-8" onClick={handleApplyClick}>Ứng tuyển</Button>
-                        </>
-                     ) : (
-                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-7 w-7">
-                                    <MoreHorizontal />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem asChild>
-                                    <Link href={`/jobs/${job.id}`} className="w-full flex" onClick={handleCardClick}>
-                                        <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
-                                    </Link>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                     )}
-                </div>
-            </div>
-        </div>
-    </div>
-  );
-
-  if (variant === 'chat') {
-    return <ChatLayout />;
-  }
-
-  return (
-    <>
-        <Card className={cn(
-            "rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow duration-300",
-        )}>
-            <MobileLayout />
-            <DesktopLayout />
+             </div>
         </Card>
         <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
         <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>

@@ -150,10 +150,11 @@ export const SearchResults = ({ jobs, filters, onFilterChange, applyFilters, res
                     {jobs.length > 0 ? (
                         <div className="grid grid-cols-1 gap-4">
                         {jobs.slice(0, visibleJobsCount).map((job, index) => {
+                            const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" />;
                             if (index === visibleJobsCount - 1) {
-                                return <div ref={lastJobElementRef} key={job.id}><JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} /></div>
+                                return <div ref={lastJobElementRef} key={job.id}>{card}</div>
                             }
-                            return <JobCard key={job.id} job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} />
+                            return <div key={job.id}>{card}</div>
                         })}
                         </div>
                     ) : (

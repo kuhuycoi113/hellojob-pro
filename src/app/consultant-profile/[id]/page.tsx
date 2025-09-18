@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { use } from 'react';
@@ -217,7 +218,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                         <Button variant="link" asChild><Link href="/jobs">Xem tất cả <ChevronRight className="h-4 w-4"/></Link></Button>
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {consultantJobs.length > 0 ? (
                         consultantJobs.map(job => (
                             <JobCard key={job.id} job={job} showRecruiterName={false} />
