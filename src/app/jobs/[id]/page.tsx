@@ -81,12 +81,16 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
 
                 // Fetch profile-based suggestions
-                const profileResults = await matchJobsToProfile(profile || {}, 'related');
-                setProfileSuggestions(profileResults.map(r => r.job).filter(j => j.id !== resolvedParams.id).slice(0, 4));
+                if (profile) {
+                    const profileResults = await matchJobsToProfile(profile, 'related');
+                    setProfileSuggestions(profileResults.map(r => r.job).filter(j => j.id !== resolvedParams.id).slice(0, 4));
+                }
 
                 // Fetch behavior-based suggestions if signals exist
-                const behavioralResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
-                setBehavioralSuggestions(behavioralResults.filter(r => r.job.id !== resolvedParams.id).slice(0, 4));
+                if (behavioralSignals.length > 0) {
+                    const behavioralResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
+                    setBehavioralSuggestions(behavioralResults.filter(r => r.job.id !== resolvedParams.id).slice(0, 4));
+                }
 
             } catch (error) {
                 console.error("Failed to fetch job suggestions:", error);
@@ -304,7 +308,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 </div>
                  {/* Suggestions Section */}
                 <div className="mt-16 pt-12 border-t space-y-12">
-                    <section>
+                    <section id="behavioral-suggestions">
                         <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
                         {isLoadingBehavioral ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -313,10 +317,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         ) : behavioralSuggestions.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {behavioralSuggestions.map((item) => (
-                                    <div key={item.job.id}>
-                                        {item.reason && <p className="text-sm text-muted-foreground font-semibold mb-2 ml-2 italic">{item.reason}</p>}
-                                        <JobCard job={item.job} />
-                                    </div>
+                                    <JobCard key={item.job.id} job={item.job} />
                                 ))}
                             </div>
                         ) : (
