@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -463,6 +464,16 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                <div className="space-y-2">
+                                    <Label>Chi tiết công việc</Label>
+                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry}>
+                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn công việc"/></SelectTrigger>
+                                        <SelectContent className="max-h-60">
+                                            <SelectItem value="all-details">Tất cả công việc</SelectItem>
+                                            {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
 
@@ -707,12 +718,13 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 <span className="flex items-center gap-2"><Briefcase className="h-5 w-5"/>Kinh nghiệm</span>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-4 pt-4">
-                                 <div className="space-y-2">
+                                <div className="space-y-2">
                                     <Label>Yêu cầu kinh nghiệm</Label>
-                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })}>
-                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn chi tiết công việc"/></SelectTrigger>
+                                    <Select value={filters.experienceRequirement} onValueChange={(value) => onFilterChange({ experienceRequirement: value })}>
+                                        <SelectTrigger className={cn(filters.experienceRequirement && 'text-primary')}><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
-                                            {availableJobDetails.map(detail => <SelectItem key={detail} value={detail}>{detail}</SelectItem>)}
+                                            <SelectItem value="all">Tất cả ngành nghề</SelectItem>
+                                            {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -896,12 +908,12 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="quantity-filter">Tuyển từ... người trở lên</Label>
+                                    <Label htmlFor="quantity-filter">Số lượng tuyển tối thiểu</Label>
                                     <Input 
                                         id="quantity-filter" 
                                         type="number" 
                                         min="1"
-                                        placeholder="Nhập số lượng tối thiểu" 
+                                        placeholder="Nhập số người" 
                                         value={filters.quantity || ''}
                                         onChange={(e) => onFilterChange({ quantity: e.target.value })}
                                     />

@@ -19,6 +19,7 @@ export type SearchFilters = {
     location: string[];
     interviewLocation: string;
     jobDetail?: string;
+    experienceRequirement?: string;
     height?: [number, number];
     weight?: [number, number];
     age?: [number, number];
