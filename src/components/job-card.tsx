@@ -128,119 +128,105 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   if (variant === 'list-item') {
      return (
-        <Card id="HIENTHIVIEC01" className="flex flex-col w-full p-3 gap-4 border border-border hover:shadow-lg transition-shadow duration-300">
-            <div className="flex flex-col md:flex-row items-stretch gap-4">
-                <div className="relative w-full md:w-40 h-40 md:h-auto flex-shrink-0">
-                    <Link href={`/jobs/${job.id}`} onClick={handleCardClick}>
-                        <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-lg" />
-                    </Link>
-                    <div className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
-                    <span>{job.id}</span>
+        <>
+            <Card id="HIENTHIVIEC01" className="flex flex-col w-full p-3 gap-4 border border-border hover:shadow-lg transition-shadow duration-300">
+                <div className="flex flex-col md:flex-row items-stretch gap-4">
+                    <div className="relative w-full md:w-40 h-40 md:h-auto flex-shrink-0">
+                        <Link href={`/jobs/${job.id}`} onClick={handleCardClick}>
+                            <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-lg" />
+                        </Link>
+                        <div className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
+                        <span>{job.id}</span>
+                        </div>
+                        <Button variant="outline" size="icon" className="absolute top-1.5 right-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white md:hidden" onClick={handleSaveJob}>
+                            <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
+                        </Button>
                     </div>
-                    <Button variant="outline" size="icon" className="absolute top-1.5 right-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
-                        <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
-                    </Button>
-                </div>
-                
-                <div className="flex-grow flex flex-col">
-                    <Link href={`/jobs/${job.id}`} className="group flex-grow" onClick={handleCardClick}>
-                        <h3 className="font-bold text-lg mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
-                    </Link>
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                    {job.visaDetail && (
-                        <Badge
-                            variant="outline"
-                            className={cn("text-xs", {
-                                "border-accent-green text-accent-green": job.visaType?.includes("Thực tập sinh"),
-                                "border-accent-blue text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
-                                "border-accent-orange text-accent-orange": job.visaType?.includes("Kỹ sư, tri thức"),
-                            })}
-                        >
-                            {job.visaDetail}
-                        </Badge>
-                    )}
-                    {job.salary.actual && <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 border-green-200">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
-                    <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                        <p className="flex items-center gap-1.5">
-                            <MapPin className="h-4 w-4 flex-shrink-0" />
-                            <span>{job.workLocation}</span>
-                        </p>
-                    </div>
-
                     
-                    <div className="mt-auto pt-2 flex justify-between items-end">
-                        <div className="flex items-center gap-2">
-                            <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
-                                <PopoverTrigger asChild>
-                                    <div onMouseEnter={() => setIsConsultantPopoverOpen(true)} onMouseLeave={() => setIsConsultantPopoverOpen(false)}>
-                                        <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
-                                            <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                    <div className="flex-grow flex flex-col">
+                        <Link href={`/jobs/${job.id}`} className="group flex-grow" onClick={handleCardClick}>
+                            <h3 className="font-bold text-lg mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
+                        </Link>
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                        {job.visaDetail && (
+                            <Badge
+                                variant="outline"
+                                className={cn("text-xs", {
+                                    "border-accent-green text-accent-green": job.visaType?.includes("Thực tập sinh"),
+                                    "border-accent-blue text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
+                                    "border-accent-orange text-accent-orange": job.visaType?.includes("Kỹ sư, tri thức"),
+                                })}
+                            >
+                                {job.visaDetail}
+                            </Badge>
+                        )}
+                        {job.salary.actual && <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 border-green-200">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
+                        <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                            <p className="flex items-center gap-1.5">
+                                <MapPin className="h-4 w-4 flex-shrink-0" />
+                                <span>{job.workLocation}</span>
+                            </p>
+                        </div>
+
+                        
+                        <div className="mt-auto pt-2 flex justify-between items-end">
+                            <div className="flex items-center gap-2">
+                                <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
+                                    <PopoverTrigger asChild>
+                                        <div onMouseEnter={() => setIsConsultantPopoverOpen(true)} onMouseLeave={() => setIsConsultantPopoverOpen(false)}>
+                                            <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
+                                                <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                                                    <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                                    <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                                                </Avatar>
+                                            </Link>
+                                        </div>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-80" side="top" align="start">
+                                        <div className="flex gap-4">
+                                        <Avatar className="h-16 w-16">
                                                 <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                                                 <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                                             </Avatar>
-                                        </Link>
-                                    </div>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-80" side="top" align="start">
-                                    <div className="flex gap-4">
-                                    <Avatar className="h-16 w-16">
-                                            <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
-                                            <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="space-y-1">
-                                        <h4 className="text-sm font-semibold">{job.recruiter.name}</h4>
-                                        <p className="text-sm text-muted-foreground">
-                                            {job.recruiter.mainExpertise}
-                                        </p>
-                                        <Button asChild size="sm" variant="link" className="p-0 h-auto">
-                                            <Link href={`/consultant-profile/${job.recruiter.id}`}>Xem hồ sơ</Link>
-                                        </Button>
+                                            <div className="space-y-1">
+                                            <h4 className="text-sm font-semibold">{job.recruiter.name}</h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                {job.recruiter.mainExpertise}
+                                            </p>
+                                            <Button asChild size="sm" variant="link" className="p-0 h-auto">
+                                                <Link href={`/consultant-profile/${job.recruiter.id}`}>Xem hồ sơ</Link>
+                                            </Button>
+                                            </div>
                                         </div>
-                                    </div>
-                                </PopoverContent>
-                            </Popover>
+                                    </PopoverContent>
+                                </Popover>
 
-                            <ContactButtons contact={job.recruiter} />
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" className={cn("bg-white hidden md:flex", isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
-                                <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
-                                Lưu
-                            </Button>
-                            {showApplyButtons ? (
+                                <ContactButtons contact={job.recruiter} />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button variant="outline" size="sm" className={cn("bg-white hidden md:flex", isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                                    <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
+                                    Lưu
+                                </Button>
+                                {/* CHUCNANGUNGTUYEN01 */}
                                 <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
-                            ) : (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                                            <MoreHorizontal className="h-5 w-5 text-muted-foreground"/>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem asChild>
-                                            <Link href={`/jobs/${job.id}`} className="w-full flex" onClick={handleCardClick}>
-                                                <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
-                                            </Link>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-             {showPostedTime && (
-                <div className="w-full mt-2">
-                    <p className="flex items-center gap-1.5 text-xs justify-end text-right w-full">
-                        <span className="text-primary">Đăng lúc:</span>
-                        <span style={ { color: '#9B999A' } }>{job.postedTime}</span>
-                    </p>
-                </div>
-            )}
-        </Card>
+                 {showPostedTime && (
+                    <div className="w-full mt-2">
+                        <p className="flex items-center gap-1.5 justify-end text-right w-full" style={{ fontSize: '11px', color: '#9B999A' }}>
+                            <span>Đăng lúc:</span>
+                            <span>{job.postedTime}</span>
+                        </p>
+                    </div>
+                )}
+            </Card>
+        </>
      );
   }
 
