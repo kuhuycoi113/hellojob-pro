@@ -88,7 +88,7 @@ export const consultants: User[] = [
   },
   {
     id: 'nguyen-van-minh',
-    name: 'Nguyễn Văn Minh',
+    name: 'Đào Quang Minh',
     avatarUrl: 'https://placehold.co/200x200.png',
     dataAiHint: 'male consultant portrait',
     experience: '6 năm',
