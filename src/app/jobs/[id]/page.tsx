@@ -152,7 +152,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 </p>
                                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
                                     <p className="flex items-center gap-2"><MapPin className="h-4 w-4"/> {job.workLocation}</p>
-                                    <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4"/> Đăng {job.postedTime}</p>
+                                    <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4"/> <span className="text-primary">Đăng lúc:</span> {job.postedTime}</p>
                                 </div>
                             </CardHeader>
                             <CardContent>
