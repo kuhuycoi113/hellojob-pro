@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Award, Briefcase, Handshake, MessageSquare, PieChart, Send, ShieldCheck, Sparkles, Star, Target, Users, Phone } from 'lucide-react';
 import { MessengerIcon, ZaloIcon } from '@/components/custom-icons';
+import { ContactButtons } from '@/components/contact-buttons';
 
 const consultantData = [
   {
@@ -22,6 +23,7 @@ const consultantData = [
     successfulCandidates: 185,
     managedJobs: 250,
     strengths: ['Tận tình', 'Nhiều đơn', 'Hiểu rõ ngành'],
+    avatar: '/img/long.jpg',
   },
   {
     id: 'nguyen-thi-phuong-loan',
@@ -34,6 +36,7 @@ const consultantData = [
     successfulCandidates: 160,
     managedJobs: 210,
     strengths: ['Nhiệt tình', 'Hỗ trợ 24/7', 'Quan hệ rộng'],
+    avatar: '/img/TVV002.jpg',
   },
   {
     id: 'nguyen-thi-ngoc-oanh',
@@ -46,6 +49,7 @@ const consultantData = [
     successfulCandidates: 450,
     managedJobs: 190,
     strengths: ['Nhiều đơn gấp', 'Hỗ trợ nhiệt tình', 'Kinh nghiệm'],
+    avatar: '/img/TVV003.png',
   },
   {
     id: 'pham-thi-ha',
@@ -58,6 +62,7 @@ const consultantData = [
     successfulCandidates: 320,
     managedJobs: 150,
     strengths: ['Tận tâm', 'Am hiểu thủ tục', 'Hỗ trợ chi tiết'],
+    avatar: '/img/TVV004.png',
   },
   {
     id: 'nguyen-van-minh',
@@ -70,6 +75,7 @@ const consultantData = [
     successfulCandidates: 95,
     managedJobs: 320,
     strengths: ['Kinh nghiệm', 'Quan hệ rộng', 'Tỷ lệ đỗ cao'],
+    avatar: '/img/TVV005.jpg',
   },
   {
     id: 'nguyen-thi-thu-trang',
@@ -82,6 +88,7 @@ const consultantData = [
     successfulCandidates: 175,
     managedJobs: 180,
     strengths: ['Nhiệt tình', 'Am hiểu ngành', 'Hỗ trợ nhanh'],
+    avatar: '/img/TVV006.jpg',
   },
 ];
 
@@ -172,20 +179,9 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                 </CardContent>
             </Card>
 
-            <div className="w-full bg-accent-blue text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
-              <div className="flex items-center justify-center gap-3">
-                <a href="#" aria-label="Chat on Messenger" className="bg-white rounded-full p-1.5 hover:opacity-90 transition-opacity">
-                    <MessengerIcon className="h-8 w-8"/>
-                </a>
-                <a href="#" aria-label="Call" className="bg-white rounded-full p-1.5 hover:opacity-90 transition-opacity">
-                    <Phone className="h-8 w-8 text-green-500"/>
-                </a>
-                 <a href="#" aria-label="Chat on Zalo" className="bg-white rounded-full p-1.5 hover:opacity-90 transition-opacity">
-                    <ZaloIcon className="h-8 w-8"/>
-                </a>
-                <span className="text-lg font-semibold">Liên hệ tư vấn viên</span>
-              </div>
-            </div>
+            <Card className="shadow-lg p-4">
+                <ContactButtons contact={consultant} />
+            </Card>
           </div>
 
           {/* Right Column - Content */}

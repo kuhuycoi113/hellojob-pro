@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useChat } from '@/contexts/ChatContext';
 import { consultants as consultantChatData } from '@/lib/chat-data';
+import { ContactButtons } from '@/components/contact-buttons';
 
 
 const consultantListData = [
@@ -21,6 +22,7 @@ const consultantListData = [
         mainExpertise: 'Tư vấn việc làm Kỹ năng đặc định (Tokutei)',
         successfulCandidates: 185,
         strengths: ['Tận tình', 'Nhiều đơn', 'Hiểu rõ ngành'],
+        avatar: '/img/long.jpg',
     },
     {
         id: 'nguyen-thi-phuong-loan',
@@ -31,6 +33,7 @@ const consultantListData = [
         mainExpertise: 'Tư vấn Đặc định và Kỹ sư, tri thức',
         successfulCandidates: 160,
         strengths: ['Nhiệt tình', 'Hỗ trợ 24/7', 'Quan hệ rộng'],
+        avatar: '/img/TVV002.jpg',
     },
     {
         id: 'nguyen-thi-ngoc-oanh',
@@ -41,6 +44,7 @@ const consultantListData = [
         mainExpertise: 'Tư vấn Tokutei Vận tải, Xây dựng, Thực phẩm',
         successfulCandidates: 450,
         strengths: ['Nhiều đơn gấp', 'Hỗ trợ nhiệt tình', 'Kinh nghiệm'],
+        avatar: '/img/TVV003.png',
     },
     {
         id: 'pham-thi-ha',
@@ -51,6 +55,7 @@ const consultantListData = [
         mainExpertise: 'Tư vấn Nhà hàng, Cơ khí, Điều dưỡng, Nông nghiệp',
         successfulCandidates: 320,
         strengths: ['Tận tâm', 'Am hiểu thủ tục', 'Hỗ trợ chi tiết'],
+        avatar: '/img/TVV004.png',
     },
     {
         id: 'nguyen-van-minh',
@@ -61,6 +66,7 @@ const consultantListData = [
         mainExpertise: 'Tư vấn Công xưởng và Ngoài trời',
         successfulCandidates: 95,
         strengths: ['Kinh nghiệm', 'Quan hệ rộng', 'Tỷ lệ đỗ cao'],
+        avatar: '/img/TVV005.jpg',
     },
     {
         id: 'nguyen-thi-thu-trang',
@@ -71,12 +77,11 @@ const consultantListData = [
         mainExpertise: 'Tư vấn Thực tập sinh kỹ năng và Đặc định',
         successfulCandidates: 175,
         strengths: ['Nhiệt tình', 'Am hiểu ngành', 'Hỗ trợ nhanh'],
+        avatar: '/img/TVV006.jpg',
     },
 ];
 
 const ConsultantCard = ({ consultant }: { consultant: typeof consultantListData[0] }) => {
-    const { openChat } = useChat();
-    
     // Find the corresponding full consultant data for the chat context
     const chatConsultant = consultantChatData.find(c => c.id === consultant.id);
 
@@ -100,9 +105,7 @@ const ConsultantCard = ({ consultant }: { consultant: typeof consultantListData[
                 </div>
             </Link>
             <div className="mt-4 pt-4 border-t">
-                <Button className="w-full" onClick={() => chatConsultant && openChat(chatConsultant)}>
-                    <MessageSquare className="mr-2 h-4 w-4" /> Chat với tư vấn viên
-                </Button>
+                {chatConsultant && <ContactButtons contact={chatConsultant} />}
             </div>
         </Card>
     );
