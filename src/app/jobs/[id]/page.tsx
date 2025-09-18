@@ -244,12 +244,14 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                             <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
                                         </div>
                                     </div>
-                                    <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+                                    <div className="space-y-2" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                                         <ContactButtons contact={assignedConsultant} />
                                     </div>
                                 </CardContent>
                                 <div className="border-t p-4 flex justify-center">
-                                    <Button variant="ghost" className="text-muted-foreground text-sm" onClick={(e) => e.preventDefault()}><Share2 className="mr-2 h-4 w-4"/>Chia sẻ tin này</Button>
+                                    <Button variant="ghost" className="text-muted-foreground text-sm" onClick={(e) => { e.preventDefault(); e.stopPropagation(); /* Logic chia sẻ */ }}>
+                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ tin này
+                                    </Button>
                                 </div>
                             </Card>
                         </Link>
