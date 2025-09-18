@@ -763,7 +763,7 @@ const LoggedInView = () => {
                 </AccordionItem>
 
                  {/* CANHANHOA01: New Module */}
-                 <AccordionItem value="item-4" className="border rounded-lg border-b-0">
+                 <AccordionItem value="item-4" id="behavioral-suggestions" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
                             <BrainCircuit className="h-5 w-5 text-purple-500" />
@@ -779,7 +779,7 @@ const LoggedInView = () => {
                                 ))}
                             </div>
                        ) : behavioralSuggestedJobs.length > 0 ? (
-                           <div className="space-y-4">
+                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {behavioralSuggestedJobs.map((item) => (
                                     <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
                                 ))}
