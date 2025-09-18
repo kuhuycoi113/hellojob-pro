@@ -5,16 +5,8 @@ export type Industry = {
     keywords: string[];
 };
 
-const defaultIndustries: Industry[] = [
-    { name: 'Công nghệ thông tin', slug: 'it', keywords: ['it', 'công nghệ thông tin', 'software', 'phần mềm', 'developer', 'lập trình'] },
-    { name: 'Cơ khí', slug: 'co-khi', keywords: ['cơ khí', 'chế tạo máy', 'tiện', 'phay', 'bào', 'hàn', 'hàn xì', 'CNC', 'vận hành máy', 'bảo trì', 'sửa chữa', 'đứng máy', 'luyện kim'] },
-    { name: 'Dệt may', slug: 'det-may', keywords: ['dệt may', 'may mặc', 'thời trang', 'sợi', 'nhuộm', 'hoàn tất vải'] },
-    { name: 'Điện tử', slug: 'dien-tu', keywords: ['điện tử', 'lắp ráp', 'linh kiện', 'kiểm tra', 'QC', 'QA', 'sản xuất'] },
-    { name: 'Logistics', slug: 'logistics', keywords: ['logistics', 'vận tải', 'kho bãi', 'xuất nhập khẩu', 'supply chain', 'chuỗi cung ứng'] }
-];
-
 export const industriesByJobType: { [key: string]: Industry[] } = {
-    'Thực tập sinh kỹ năng': [
+    'thuc-tap-sinh-ky-nang': [
       { name: 'Ngư nghiệp', slug: 'ngu-nghiep-tts', keywords: ["Câu cá ngừ cần và dây", "Câu mực", "Câu tôm, cua bằng lồng", "Đánh cá dây câu dài", "Đánh cá lưới kéo", "Đánh cá lưới rê", "Đánh cá lưới sào", "Đánh cá lưới thả", "Đặt lưới đánh cá", "Nuôi sò điệp"] },
       { name: 'Nông nghiệp', slug: 'nong-nghiep-tts', keywords: ["Chăn nuôi bò", "Chăn nuôi bò sữa", "Chăn nuôi gà", "Chăn nuôi lợn", "Nhặt trứng gà", "Nông nghiệp chăn nuôi", "Nông nghiệp trồng trọt", "Thu hoạch bắp cải", "Thu hoạch cà chua", "Thu hoạch dâu tây", "Thu hoạch hoa", "Thu hoạch hoa quả", "Thu hoạch rau củ", "Trồng cây ăn quả", "Trồng nấm", "Trồng nấm công nghệ cao", "Trồng rau củ", "Trồng trọt nhà kính"] },
       { name: 'Thực phẩm', slug: 'thuc-pham-tts', keywords: ["Bánh gạo", "Bánh kẹo", "Bánh ngọt", "Bếp viện", "Chế biến cá", "Chế biến đồ ăn sẵn", "Chế biến gia cầm", "Chế biến sushi", "Chế biến thịt bò, lợn", "Chế biến thuỷ sản sống", "Chiết xuất thuỷ sản", "Cơm hộp", "Cơm nắm", "Cửa hàng siêu thị", "Đậu hũ", "Đồ ăn kèm", "Đồ konbini", "Đóng gói bánh kẹo", "Đóng gói cafe", "Đóng gói gạo", "Đóng gói rau", "Đóng gói rau củ", "Đóng gói rong biển", "Đóng gói thanh cua", "Đóng hộp thực phẩm", "Gia công đồ ăn liền", "Giăm bông, xúc xích...", "Há cảo", "Làm bánh kẹo", "Mỳ tôm", "Salad", "Sản xuất bánh mì", "Sản xuất dưa muối", "Sản xuất mắm cá", "Sản xuất mỳ", "Siêu thị", "Tẩm ướp thuỷ sản", "Thái cá sashimi", "Thịt bò", "Thịt gà", "Thịt lợn", "Thức ăn cơ sở y tế", "Thực phẩm", "Thực phẩm sữa", "Thực phẩm trứng", "Thuỷ sản gia công chế biến", "Thuỷ sản khô", "Thuỷ sản lên men", "Thuỷ sản sấy khô", "Thuỷ sản ủ muối", "Thuỷ sản xông khói"] },
@@ -23,7 +15,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
       { name: 'Xây dựng', slug: 'xay-dung-tts', keywords: ["Bê tông", "Buộc thép", "Chống thấm", "Cốp pha công trình", "Dán tường", "Đổ bê tông áp lực", "Đổ nhựa đường", "Dựng giàn giáo", "Đường ống", "Đường ống điều hoà", "Đường ống nhà máy", "Đường ống nước", "Đường ống xây dựng", "Gia công đường ống", "Gia công khung thép", "Gia công khung thép trong xưởng", "Gia công sắt trong xưởng", "Gia công vật liệu đá", "Hàn khung thép trên cao", "Hoàn thiện nội thất", "Hoàn thiện sàn nhựa", "Hoàn thiện sàn thảm", "Hoàn thiện ván", "Hút nước ngầm công trình", "Khoan giếng máy dập", "Khoan giếng máy khoan", "Khung chắn toà nhà", "Lái máy ủi", "Lái máy xây dựng", "Lái máy xúc", "Lái máy xúc lật", "Lái xe lu", "Làm nền, móng", "Lắp bồn tắm", "Lắp đặt đường ống", "Lắp đặt lò nung-xây dựng", "Lắp đặt pin năng lượng", "Lắp điện lạnh, điều hòa", "Lắp ghép cốt thép", "Lát đá", "Lợp mái nhà", "Lợp ngói", "Mộc cốp pha", "Nội thất gỗ-xây dựng", "Ốp lát gạch", "Phá dỡ", "San lấp mặt bằng", "Sản xuất bê tông", "Sơn xây dựng", "Tấm kim loại kiến trúc", "Tấm kim loại ống gió", "Thi công dán tường", "Thi công lắp rèm", "Thi công móng thép", "Thợ mộc xây dựng", "Trát vữa", "Xây dựng tổng hợp"] },
       { name: 'May mặc', slug: 'may-mac-tts', keywords: ["Chăn ga gối đệm", "Công việc trước kéo sợi", "Công việc trước khi dệt", "Dệt hoàn thiện", "Dệt kim máy sợi dọc", "Dệt may", "Gia công dệt", "Gia công sợi hỗn hợp", "Kéo sợi tinh", "May khăn mặt", "May mặc", "May quần áo", "May quần áo nam", "Nhuộm chỉ", "Nhuộm vải, đan len", "Quần áo phụ nữ, trẻ em", "Quấn sợi", "Sản xuất áo sơ mi", "Sản xuất đồ lót", "Sản xuất ghế ngồi ô tô", "Sản xuất máy dệt kim tròn", "Sản xuất tất", "Sản xuất thảm dệt", "Sản xuất thảm đục lỗ", "Sản xuất thảm nhung nổi", "Sản xuất vải bạt"] }
     ],
-    'Kỹ năng đặc định': [
+    'ky-nang-dac-dinh': [
       { name: 'Ngư nghiệp', slug: 'ngu-nghiep-tokutei', keywords: ["Nuôi trồng thủy sản", "Đánh bắt cá"] },
       { name: 'Nông nghiệp', slug: 'nong-nghiep-tokutei', keywords: ["Chăn nuôi bò", "Chăn nuôi bò sữa", "Chăn nuôi gà", "Chăn nuôi lợn", "Nhặt trứng gà", "Trồng cây ăn quả", "Trồng hoa", "Trồng nấm", "Trồng rau củ quả trong nhà kính", "Trồng rau củ quả ngoài trời"] },
       { name: 'Nhà hàng', slug: 'nha-hang-tokutei', keywords: ["Chạy bàn", "Mua hàng", "Nấu bếp", "Nhà hàng", "Phụ bếp", "Quản lý", "Rửa bát", "Thu ngân"] },
@@ -40,7 +32,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
       { name: 'Lưu trú, khách sạn', slug: 'luu-tru-khach-san-tokutei', keywords: ["(Khách sạn) Tiếp khách, quản lý vệ sinh", "Hành lý khách sạn", "Lễ tân khách sạn", "Lưu trú khách sạn", "Quản lý khách sạn"] },
       { name: 'Điều dưỡng', slug: 'dieu-duong-tokutei', keywords: ['điều dưỡng', 'chăm sóc người già', 'hộ lý'] }
     ],
-    'Kỹ sư, tri thức': [
+    'ky-su-tri-thuc': [
       { name: "Nông lâm ngư nghiệp", slug: "nong-lam-ngu-nghiep-ks", keywords: ["Chăn nuôi", "Công nghệ nông, lâm, ngư nghiệp", "Công nhân chăn nuôi đặc khu", "Công nhân Nông, Lâm, Ngư nghiệp", "Công nhân trồng trọt đặc khu"] },
       { name: "Thực phẩm", slug: "thuc-pham-ks", keywords: ["thực phẩm", "đồ uống"] },
       { name: "Sản xuất, chế tạo, công nghệ", slug: "san-xuat-cong-nghe-ks", keywords: ["Công nghệ môi trường", "Công nghệ sản xuất", "Công nhân sản xuất, gia công sản phẩm (trừ kim loại, máy móc)", "Gia công đồ xa xỉ", "Hoá học làm xưởng", "In ấn", "IT làm xưởng", "Khoan khảo sát dầu mỏ, năng lượng", "Kinh tế làm xưởng", "Lao động nước ngoài lĩnh vực sản xuất", "May mặc", "Môi trường làm xưởng", "Nhân viên sân bay", "Quản lý sản xuất tổng hợp", "Rác thải, phế liệu, tái chế", "Sản xuất sản phẩm", "Sản xuất sản phẩm cho nước ngoài", "Thiết kế thời trang"] },
@@ -62,8 +54,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
       { name: "Thể dục thể thao", slug: "the-thao-ks", keywords: ["Vận động viên chuyên nghiệp", "Vận động viên nghiệp dư"] },
       { name: "Nghề có kỹ năng chuyên nghiệp", slug: "nghe-chuyen-nghiep-ks", keywords: ["Công chức", "Giúp việc gia đình đặc khu", "Huấn luyện động vật", "Nấu nướng", "Người pha chế rượu", "Người quản gia", "Nhà ngoại giao", "Nhân viên tôn giáo", "Phi công"] },
       { name: "Việc làm bán chuyên nghiệp", slug: "viec-lam-ban-chuyen-nghiep-ks", keywords: ["Công việc mùa hè", "Lao động kỳ nghỉ", "Sinh viên thực tập", "Trao đổi văn hóa quốc tế"] }
-    ],
-    'Default': defaultIndustries,
+    ]
 };
 
 export const industryGroups = {

@@ -261,7 +261,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
     
      const handleVisaDetailChange = (value: string) => {
         const newFilters: Partial<SearchFilters> = { visaDetail: value };
-        const parentType = Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].some(detail => detail.slug === value));
+        const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key] || []).some(detail => detail.slug === value));
         if (parentType && filters.visa !== parentType) {
             newFilters.visa = parentType;
             newFilters.industry = '';
@@ -271,11 +271,14 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         const vietnamVisas = ["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam", "dac-dinh-dau-viet", "dac-dinh-di-moi", "ky-su-tri-thuc-dau-viet"];
         const japanVisas = ["thuc-tap-sinh-3-go", "dac-dinh-dau-nhat", "ky-su-tri-thuc-dau-nhat"];
 
-        if (vietnamVisas.includes(value) && filters.interviewLocation && !locations['Việt Nam'].includes(filters.interviewLocation)) {
-            newFilters.interviewLocation = ''; 
-        } else if (japanVisas.includes(value) && filters.interviewLocation && !locations['Phỏng vấn tại Nhật Bản'].includes(filters.interviewLocation)) {
-             newFilters.interviewLocation = '';
+        if (filters.interviewLocation) {
+            if (vietnamVisas.includes(value) && !locations['Việt Nam'].includes(filters.interviewLocation)) {
+                newFilters.interviewLocation = ''; 
+            } else if (japanVisas.includes(value) && !locations['Phỏng vấn tại Nhật Bản'].includes(filters.interviewLocation)) {
+                 newFilters.interviewLocation = '';
+            }
         }
+
 
         onFilterChange(newFilters);
     };
@@ -335,7 +338,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         }
 
         let limit = salaryLimits[field as keyof typeof salaryLimits];
-        if (field === 'netFee') {
+        if (field === 'netFee' && filters.visaDetail) {
             switch (filters.visaDetail) {
                 case 'thuc-tap-sinh-1-nam':
                     limit = 1400;
