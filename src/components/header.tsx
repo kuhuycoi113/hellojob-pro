@@ -523,6 +523,7 @@ const LoggedOutContent = () => {
           <Button asChild className="w-full" size="lg" onClick={() => setIsAuthDialogOpen(true)}>
               <Link href="#"><LogIn className="mr-2"/>Đăng nhập / Đăng ký</Link>
           </Button>
+          <DropdownMenuSeparator />
           <div className="p-2">
             <div className="grid grid-cols-3 gap-2">
                 {quickAccessLinks.map((link) => {
@@ -681,5 +682,7 @@ const LoggedOutContent = () => {
 
 
 
+
+    
 
     
