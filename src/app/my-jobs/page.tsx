@@ -781,10 +781,7 @@ const LoggedInView = () => {
                        ) : behavioralSuggestedJobs.length > 0 ? (
                            <div className="space-y-4">
                                 {behavioralSuggestedJobs.map((item) => (
-                                    <div key={item.job.id}>
-                                        {item.reason && <p className="text-sm text-muted-foreground font-semibold mb-2 ml-2 italic">{item.reason}</p>}
-                                        <JobCard job={item.job} showRecruiterName={false} />
-                                    </div>
+                                    <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
                                 ))}
                             </div>
                        ) : (
@@ -1312,10 +1309,3 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-
-
-
-
-
-
-
