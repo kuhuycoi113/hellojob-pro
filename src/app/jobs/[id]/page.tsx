@@ -121,7 +121,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 <div className="flex flex-col sm:flex-row gap-4">
                                     <Button size="lg" variant="outline" className={cn("w-full sm:w-auto", isSaved && "border-accent-orange text-accent-orange bg-accent-orange/5")} onClick={handleSaveJob}>
                                         <Bookmark className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
-                                        {isSaved ? 'Đã lưu' : 'Lưu việc làm'}
+                                        {isSaved ? 'Việc đã lưu' : 'Lưu việc làm'}
                                     </Button>
                                     <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white">Ứng tuyển ngay</Button>
                                 </div>
