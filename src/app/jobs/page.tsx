@@ -153,20 +153,20 @@ function JobsPageContent() {
 
     // Effect for initial load and URL changes
     useEffect(() => {
-        const newFilters: Partial<SearchFilters> = {};
+        const newFilters: SearchFilters = { ...initialSearchFilters };
         for (const [key, value] of searchParams.entries()) {
-            if (key === 'location' && value) {
-                newFilters[key] = value.split(',');
+            if (Array.isArray(newFilters[key as keyof SearchFilters])) {
+                // If the key corresponds to an array in filters, use getAll
+                newFilters[key as keyof SearchFilters] = searchParams.getAll(key);
             } else {
                  // @ts-ignore
                 newFilters[key] = value;
             }
         }
-        const initialFilters = {...initialSearchFilters, ...newFilters};
-        setAppliedFilters(initialFilters);
-        setStagedFilters(initialFilters); // Sync staged with applied on load
-        runFilter(initialFilters);
-        countStagedResults(initialFilters); // Count results for initial load
+        setAppliedFilters(newFilters);
+        setStagedFilters(newFilters); // Sync staged with applied on load
+        runFilter(newFilters);
+        countStagedResults(newFilters); // Count results for initial load
         
     }, [searchParams, runFilter, countStagedResults]);
     
@@ -185,7 +185,11 @@ function JobsPageContent() {
         Object.entries(stagedFilters).forEach(([key, value]) => {
             if (value && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
                  if (key !== 'visa' && !(Array.isArray(value) && value.includes('all'))) {
-                     query.set(key, Array.isArray(value) ? value.join(',') : String(value));
+                    if (Array.isArray(value)) {
+                        value.forEach(item => query.append(key, item));
+                    } else {
+                        query.set(key, String(value));
+                    }
                  }
             }
         });
@@ -206,10 +210,13 @@ function JobsPageContent() {
     // Handler for new searches initiated from the SearchModule (e.g., on the homepage)
     const handleNewSearch = (filters: SearchFilters) => {
         const query = new URLSearchParams();
+        // This is simplified, can be expanded to include all filters from home search
         if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('visaDetail', filters.visaDetail);
         if (filters.industry && filters.industry !== 'all') query.set('industry', filters.industry);
         if (Array.isArray(filters.location) && filters.location.length > 0 && !filters.location.includes('all')) {
-            query.set('location', filters.location.join(','));
+            filters.location.forEach(loc => query.append('location', loc));
+        } else if (typeof filters.location === 'string' && filters.location && filters.location !== 'all') {
+            query.append('location', filters.location);
         }
         router.push(`/jobs?${query.toString()}`);
     }
@@ -244,3 +251,4 @@ export default function JobsPage() {
     </Suspense>
   );
 }
+

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGr
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { industriesByJobType, type Industry } from "@/lib/industry-data";
-import { japanRegions } from '@/lib/location-data';
+import { japanRegions, allJapanLocations } from '@/lib/location-data';
 import type { SearchFilters } from './search-results';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 
@@ -82,7 +83,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
     // For location, find from japanRegions
     const region = japanRegions.find(r => r.slug === slug);
     if (region) return region.name;
-    const prefecture = japanRegions.flatMap(r => r.prefectures).find(p => p.slug === slug);
+    const prefecture = allJapanLocations.find(p => p.slug === slug);
     if (prefecture) return prefecture.name;
 
     return slug;
@@ -194,7 +195,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                         </div>
                          <div className="space-y-2 flex-1">
                             <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
-                            <Select onValueChange={(value) => onFilterChange({ location: value.split(',') })} value={Array.isArray(filters.location) ? filters.location.join(',') : filters.location}>
+                            <Select onValueChange={(value) => onFilterChange({ location: value === 'all' ? [] : [value] })} value={Array.isArray(filters.location) ? filters.location[0] : filters.location}>
                                 <SelectTrigger id="search-location">
                                 <SelectValue placeholder="Tất cả địa điểm" />
                                 </SelectTrigger>
