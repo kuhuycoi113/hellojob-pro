@@ -95,6 +95,28 @@ const parseAgeRequirement = (ageStr?: string): [number, number] | null => {
     return null;
 };
 
+const parsePhysicalRequirement = (reqStr?: string): [number, number] => {
+    if (!reqStr) return [0, Infinity];
+    const cleanedStr = reqStr.toLowerCase();
+    const numbers = cleanedStr.match(/\d+/g)?.map(Number) || [];
+
+    if (cleanedStr.includes('trên')) {
+        return [numbers[0] || 0, Infinity];
+    }
+    if (cleanedStr.includes('dưới')) {
+        return [0, numbers[0] || Infinity];
+    }
+    if (numbers.length === 2) {
+        return [numbers[0], numbers[1]];
+    }
+    if (numbers.length === 1) {
+        return [numbers[0], numbers[0]]; // Exact match
+    }
+
+    return [0, Infinity];
+};
+
+
 const allIndustries: Industry[] = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
 function JobsPageContent() {
@@ -112,7 +134,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age
+            age, height, weight
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -206,12 +228,25 @@ function JobsPageContent() {
                 if (jobAgeRange) {
                     const [filterMinAge, filterMaxAge] = age;
                     const [jobMinAge, jobMaxAge] = jobAgeRange;
-                    // Check for overlap
                     ageMatch = Math.max(filterMinAge, jobMinAge) <= Math.min(filterMaxAge, jobMaxAge);
                 }
             }
+            
+            let heightMatch = true;
+            if (height) {
+                const [jobMinHeight, jobMaxHeight] = parsePhysicalRequirement(job.heightRequirement);
+                const [filterMinHeight, filterMaxHeight] = height;
+                heightMatch = filterMinHeight <= jobMaxHeight && filterMaxHeight >= jobMinHeight;
+            }
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch;
+            let weightMatch = true;
+            if (weight) {
+                const [jobMinWeight, jobMaxWeight] = parsePhysicalRequirement(job.weightRequirement);
+                const [filterMinWeight, filterMaxWeight] = weight;
+                weightMatch = filterMinWeight <= jobMaxWeight && filterMaxWeight >= jobMinWeight;
+            }
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch;
         });
 
         setFilteredJobs(results);
@@ -221,7 +256,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age
+            age, height, weight
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -309,12 +344,25 @@ function JobsPageContent() {
                 if (jobAgeRange) {
                     const [filterMinAge, filterMaxAge] = age;
                     const [jobMinAge, jobMaxAge] = jobAgeRange;
-                    // Check for overlap
                     ageMatch = Math.max(filterMinAge, jobMinAge) <= Math.min(filterMaxAge, jobMaxAge);
                 }
             }
+            
+            let heightMatch = true;
+            if (height) {
+                const [jobMinHeight, jobMaxHeight] = parsePhysicalRequirement(job.heightRequirement);
+                const [filterMinHeight, filterMaxHeight] = height;
+                heightMatch = filterMinHeight <= jobMaxHeight && filterMaxHeight >= jobMinHeight;
+            }
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch;
+            let weightMatch = true;
+            if (weight) {
+                const [jobMinWeight, jobMaxWeight] = parsePhysicalRequirement(job.weightRequirement);
+                const [filterMinWeight, filterMaxWeight] = weight;
+                weightMatch = filterMinWeight <= jobMaxWeight && filterMaxWeight >= jobMinWeight;
+            }
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
