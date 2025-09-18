@@ -36,6 +36,7 @@ const initialSearchFilters: SearchFilters = {
     hepatitisBRequirement: '',
     quantity: '',
     interviewRounds: '',
+    interviewDate: '',
 };
 
 // Helper function to escape regex special characters
@@ -60,7 +61,7 @@ function JobsPageContent() {
     // It is now only called when the user clicks "Apply" or on initial page load.
     const runFilter = useCallback((filtersToApply: SearchFilters) => {
         const { 
-            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds
+            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -68,7 +69,7 @@ function JobsPageContent() {
         const jobDetailName = Object.values(industriesByJobType).flat().flatMap(i => i.keywords).find(k => k.slug === jobDetail)?.name || jobDetail;
         const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
         
-        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
+        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']].flatMap(group => group.locations);
         const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
 
         const roundsSlug = interviewRounds;
@@ -81,8 +82,8 @@ function JobsPageContent() {
                 const targetVisaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name;
                 visaMatch = job.visaDetail === targetVisaName;
             } else if (visa && visa !== 'all') {
-                const targetVisaType = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visa)?.name;
-                visaMatch = job.visaType === targetVisaType;
+                const targetVisaTypeObject = japanJobTypes.find(v => v.slug === visa);
+                visaMatch = job.visaType === targetVisaTypeObject?.name;
             }
 
             const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industryName.toLowerCase()));
@@ -111,8 +112,10 @@ function JobsPageContent() {
             const feeMatch = feeLimit === null || !job.netFee || parseInt(job.netFee.replace(/[^0-9]/g, '')) <= feeLimit;
 
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
+
+            const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDate && job.interviewDate <= interviewDate);
             
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch;
         });
 
         setFilteredJobs(results);
@@ -120,14 +123,14 @@ function JobsPageContent() {
 
     // This function ONLY counts the results based on staged filters without updating the UI.
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
-        const { visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds } = filtersToCount;
+        const { visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate } = filtersToCount;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
         const jobDetailName = Object.values(industriesByJobType).flat().flatMap(i => i.keywords).find(k => k.slug === jobDetail)?.name || jobDetail;
         const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
         
-        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
+        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']].flatMap(group => group.locations);
         const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
         
         const roundsSlug = interviewRounds;
@@ -139,8 +142,8 @@ function JobsPageContent() {
                 const targetVisaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name;
                 visaMatch = job.visaDetail === targetVisaName;
             } else if (visa && visa !== 'all') {
-                 const targetVisaType = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visa)?.name;
-                visaMatch = job.visaType === targetVisaType;
+                 const targetVisaTypeObject = japanJobTypes.find(v => v.slug === visa);
+                 visaMatch = job.visaType === targetVisaTypeObject?.name;
             }
             const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industryName.toLowerCase()));
 
@@ -162,7 +165,9 @@ function JobsPageContent() {
             const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
             const feeMatch = feeLimit === null || !job.netFee || parseInt(job.netFee.replace(/[^0-9]/g, '')) <= feeLimit;
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch;
+            const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDate && job.interviewDate <= interviewDate);
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
