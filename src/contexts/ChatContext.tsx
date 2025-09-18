@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Conversation, Message, User, conversations, currentUser, helloJobBot, Attachment } from '@/lib/chat-data';
-import { consultants } from '@/lib/consultant-data';
+import { consultants } from "@/lib/consultant-data";
 import { recommendJobs, type JobRecommendationResponse } from '@/ai/flows/recommend-jobs-flow';
 
 interface ChatContextType {
@@ -30,9 +30,9 @@ interface ChatProviderProps {
 }
 
 export const ChatProvider = ({ children }: ChatProviderProps) => {
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
-  const [assignedConsultant, setAssignedConsultant] = useState<User | null>(null);
+  const [isChatOpen, setIsChatOpen] = React.useState(false);
+  const [activeConversation, setActiveConversation] = React.useState<Conversation | null>(null);
+  const [assignedConsultant, setAssignedConsultant] = React.useState<User | null>(null);
 
   useEffect(() => {
     const consultantId = localStorage.getItem('assignedConsultantId');
