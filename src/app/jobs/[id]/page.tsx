@@ -7,7 +7,7 @@ import { jobData, type Job } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark } from 'lucide-react';
+import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -15,6 +15,10 @@ import { use, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { consultants } from '@/lib/consultant-data';
 import { ContactButtons } from '@/components/contact-buttons';
+import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
+import type { CandidateProfile } from '@/ai/schemas';
+import { JobCard } from '@/components/job-card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -54,13 +58,46 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const router = useRouter();
     const job = jobData.find(j => j.id === resolvedParams.id);
     const [isSaved, setIsSaved] = useState(false);
+    const [profileSuggestions, setProfileSuggestions] = useState<Job[]>([]);
+    const [behavioralSuggestions, setBehavioralSuggestions] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (job) {
             const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
             setIsSaved(savedJobs.includes(job.id));
         }
-    }, [job]);
+
+        const fetchSuggestions = async () => {
+            setIsLoading(true);
+            try {
+                const storedProfile = localStorage.getItem('generatedCandidateProfile');
+                const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+                
+                if (storedProfile) {
+                    const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+
+                    // Fetch profile-based suggestions
+                    const profileResults = await matchJobsToProfile(profile, 'related');
+                    setProfileSuggestions(profileResults.map(r => r.job).filter(j => j.id !== resolvedParams.id).slice(0, 4));
+
+                    // Fetch behavior-based suggestions if signals exist
+                    if (behavioralSignals.length > 0) {
+                        const behavioralResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
+                        setBehavioralSuggestions(behavioralResults.filter(r => r.job.id !== resolvedParams.id).slice(0, 4));
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch job suggestions:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchSuggestions();
+
+    }, [job, resolvedParams.id]);
+
 
     if (!job) {
         notFound();
@@ -262,6 +299,42 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             </div>
                         </Card>
                     </aside>
+                </div>
+                 {/* Suggestions Section */}
+                <div className="mt-12 space-y-12">
+                    {behavioralSuggestions.length > 0 && (
+                        <section>
+                            <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
+                            {isLoading ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                     {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64" />)}
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {behavioralSuggestions.map((item) => (
+                                        <div key={item.job.id}>
+                                            {item.reason && <p className="text-sm text-muted-foreground font-semibold mb-2 ml-2 italic">{item.reason}</p>}
+                                            <JobCard job={item.job} />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+                    )}
+                    {profileSuggestions.length > 0 && (
+                        <section>
+                            <h2 className="text-2xl font-bold font-headline mb-6"><Star className="inline-block mr-3 text-primary h-7 w-7"/>Gợi ý cho bạn</h2>
+                            {isLoading ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64" />)}
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {profileSuggestions.map((job) => <JobCard key={job.id} job={job} />)}
+                                </div>
+                            )}
+                        </section>
+                    )}
                 </div>
             </div>
         </div>
