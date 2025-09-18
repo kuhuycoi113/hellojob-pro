@@ -25,6 +25,7 @@ import { vi } from 'date-fns/locale';
 import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 
 const conditionsByVisaDetail: { [key: string]: string[] } = {
   'thuc-tap-sinh-3-nam': ['Tuyển gấp', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Nợ phí', 'Phí mềm', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Bay nhanh', 'Trình cục sớm', 'Có bảng lương'],
@@ -102,7 +103,7 @@ const getFutureMonths = () => {
 
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
-const allJobDetailsForExperience = [...new Set(Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords.map(k => k.name)))];
+
 
 
 interface FilterSidebarProps {
@@ -233,6 +234,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
 
         return { jobCountsByRegion: countsByRegion, jobCountsByPrefecture: countsByPrefecture };
     }, []);
+
+    const allJobDetailsForExperience = useMemo(() => {
+        return [...new Set(Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords || []).filter(Boolean))];
+    }, []);
+
 
     const showGinouFilter = useMemo(() => 
         ['dac-dinh-dau-viet', 'dac-dinh-dau-nhat'].includes(filters.visaDetail || ''),
@@ -706,7 +712,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         <SelectTrigger className={cn(filters.experienceRequirement && filters.experienceRequirement !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn công việc"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả công việc</SelectItem>
-                                            {allJobDetailsForExperience.map(jobDetail => <SelectItem key={jobDetail} value={jobDetail}>{jobDetail}</SelectItem>)}
+                                            {allJobDetailsForExperience.map(jobDetail => <SelectItem key={jobDetail.slug} value={jobDetail.slug}>{jobDetail.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -729,14 +735,20 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                             <AccordionContent className="space-y-4 pt-4">
                                 <div>
                                     <Label className="font-semibold">Giới tính</Label>
-                                    <div className="flex items-center space-x-4 pt-2">
-                                         {['Nam', 'Nữ', 'Cả hai'].map(item => (
-                                            <div key={item} className="flex items-center space-x-2">
-                                                <Checkbox id={`gender-${item}`} />
-                                                <Label htmlFor={`gender-${item}`} className="font-normal cursor-pointer">{item}</Label>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <RadioGroup value={filters.gender} onValueChange={(value) => onFilterChange({ gender: value })} className="flex items-center space-x-4 pt-2">
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="" id="gender-all" />
+                                            <Label htmlFor="gender-all" className='font-normal'>Tất cả</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="nam" id="gender-male" />
+                                            <Label htmlFor="gender-male" className='font-normal'>Nam</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="nu" id="gender-female" />
+                                            <Label htmlFor="gender-female" className='font-normal'>Nữ</Label>
+                                        </div>
+                                    </RadioGroup>
                                 </div>
                                  <div className="space-y-2">
                                     <Label>Tuổi</Label>
