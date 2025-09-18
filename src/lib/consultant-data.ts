@@ -47,7 +47,7 @@ export const consultants: User[] = [
     strengths: ['Tận tâm', 'Am hiểu thủ tục', 'Hỗ trợ chi tiết'],
   },
   {
-    id: 'nguyen-van-minh',
+    id: 'dao-quang-minh',
     name: 'Đào Quang Minh',
     avatarUrl: '/img/TVV005.jpg',
     avatar: '/img/TVV005.jpg',
