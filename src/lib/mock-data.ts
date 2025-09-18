@@ -101,30 +101,30 @@ const jobImagePlaceholders: {[key: string]: string} = {
 
 const existingJobIds = new Set<string>();
 
-const generateUniqueJobId = (): string => {
-    const generateRandomChars = (length: number): string => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let result = '';
-        for (let i = 0; i < length; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return result;
-    };
-    
+const generateUniqueJobId = (index: number): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let deterministicPart = '';
+    let num = index;
+    // Create a base-36 like representation of the index to ensure uniqueness and distribution
+    for (let i = 0; i < 6; i++) {
+        deterministicPart += chars[num % chars.length];
+        num = Math.floor(num / chars.length);
+    }
+
     const creationDate = new Date(2024, 7, 1);
     const year = creationDate.getFullYear().toString().slice(-2);
     const month = (creationDate.getMonth() + 1).toString().padStart(2, '0');
     const prefix = year + month;
 
-    let newId: string;
-    while (true) {
-        const randomPart = generateRandomChars(6);
-        newId = prefix + randomPart;
-        if (!existingJobIds.has(newId)) {
-            existingJobIds.add(newId);
-            return newId;
-        }
+    const newId = prefix + deterministicPart;
+    
+    if (existingJobIds.has(newId)) {
+        // This should not happen with this logic if index is unique
+        return newId + index; // Fallback to ensure uniqueness
     }
+    
+    existingJobIds.add(newId);
+    return newId;
 };
 
 
@@ -192,7 +192,7 @@ const generateRandomJob = (index: number): Job => {
     const deterministicLikesHundred = (index * 3) % 10;
     const imageSrc = jobImagePlaceholders[industry] || `https://placehold.co/600x400.png?text=${encodeURIComponent(industry)}`;
 
-    const newJobId = generateUniqueJobId();
+    const newJobId = generateUniqueJobId(index);
 
 
     return {
