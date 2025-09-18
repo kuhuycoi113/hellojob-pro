@@ -7,17 +7,46 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { mobileFooterLinks } from '@/lib/nav-data';
 import { Sparkles } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+
 
 export function MobileSecondaryHeader() {
   const pathname = usePathname();
   const [activePath, setActivePath] = useState('');
   
+  const [showNav, setShowNav] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const isMobile = useIsMobile();
+
+
   useEffect(() => {
     setActivePath(pathname);
   }, [pathname]);
 
+  useEffect(() => {
+    if (!isMobile) {
+      setShowNav(true);
+      return;
+    }
+  
+    const controlNavbar = () => {
+      if (window.scrollY > lastScrollY && window.scrollY > 80) {
+        setShowNav(false);
+      } else {
+        setShowNav(true);
+      }
+      setLastScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', controlNavbar);
+    return () => window.removeEventListener('scroll', controlNavbar);
+  }, [isMobile, lastScrollY]);
+
   return (
-    <header className="md:hidden sticky top-16 z-30 w-full bg-background/95 backdrop-blur-sm border-b">
+    <header className={cn(
+        "md:hidden sticky top-16 z-30 w-full bg-background/95 backdrop-blur-sm border-b transition-transform duration-300",
+        !showNav && "-translate-y-full"
+    )}>
        <div className="w-full overflow-x-auto whitespace-nowrap no-scrollbar">
           <div className="flex items-center h-14 px-2">
             {mobileFooterLinks.map(({ href, icon: Icon, label }) => {
