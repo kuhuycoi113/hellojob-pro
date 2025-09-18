@@ -167,8 +167,13 @@ const generateRandomJob = (index: number): Job => {
         return consultants[index % consultants.length];
     };
     
-    const assignedConsultant = findMatchingConsultant();
+    let assignedConsultant = findMatchingConsultant();
      // --- End of CHIAVIECLAM01 Algorithm ---
+
+    // Override for specific consultants on specific indices to ensure they have some jobs
+    if (index === 5 || index === 12) { // Assign some jobs to Đào Quang Minh
+        assignedConsultant = consultants.find(c => c.id === 'dao-quang-minh') || assignedConsultant;
+    }
     
     const recruiter = {
         id: assignedConsultant.id,
@@ -250,3 +255,77 @@ const generateRandomJob = (index: number): Job => {
 };
 
 export const jobData: Job[] = Array.from({ length: 100 }, (_, i) => generateRandomJob(i));
+
+// Add 20 more jobs for Đào Quang Minh
+const minh = consultants.find(c => c.id === 'dao-quang-minh');
+if (minh) {
+    const minhRecruiter = {
+        id: minh.id,
+        name: minh.name,
+        avatar: minh.avatarUrl,
+        mainExpertise: minh.mainExpertise,
+        company: 'HelloJob'
+    };
+    const minhIndustries = ['Cơ khí', 'Điện tử', 'Xây dựng', 'Nông nghiệp', 'Chế biến thực phẩm'];
+
+    for (let i = 0; i < 20; i++) {
+        const baseIndex = 100 + i;
+        const industry = minhIndustries[i % minhIndustries.length];
+        const location = locations[baseIndex % locations.length];
+        const visaTypeKeys = Object.keys(visaDetailsByVisaType);
+        const visaType = visaTypeKeys[baseIndex % visaTypeKeys.length];
+        const visaDetails = visaDetailsByVisaType[visaType];
+        const visaDetail = visaDetails[baseIndex % visaDetails.length];
+        const gender = ['Nam', 'Nữ', 'Cả nam và nữ'][baseIndex % 3] as 'Nam' | 'Nữ' | 'Cả nam và nữ';
+        const quantity = (baseIndex % 5) + 1;
+        
+        const title = `${jobTitles[industry as keyof typeof jobTitles][baseIndex % 4]}, ${location}, ${quantity} ${gender}`;
+        const newJobId = generateUniqueJobId(baseIndex);
+
+        const newJob: Job = {
+            id: newJobId,
+            isRecording: baseIndex % 5 === 0,
+            image: { src: jobImagePlaceholders[industry] || `https://placehold.co/600x400.png?text=${encodeURIComponent(industry)}`, type: 'minhhoa' },
+            likes: `${(baseIndex * 2) % 10}k${(baseIndex * 4) % 10}`,
+            salary: {
+                actual: `${(13 + (baseIndex % 10)) * 10000}`,
+                basic: `${(19 + (baseIndex % 12)) * 10000}`,
+            },
+            title: title,
+            recruiter: minhRecruiter,
+            status: 'Đang tuyển',
+            interviewDate: `2024-08-${(baseIndex % 28) + 1}`,
+            interviewRounds: (baseIndex % 3) + 1,
+            netFee: visaType.includes('Thực tập sinh') ? `${80 + (baseIndex % 20)}tr` : undefined,
+            target: `${(baseIndex % 5) + 1}tr`,
+            backFee: `${(baseIndex % 5) + 1}tr`,
+            tags: [industry, visaType.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
+            postedTime: `10:00 01/08/2024`,
+            visaType: visaType,
+            visaDetail: visaDetail,
+            industry: industry,
+            workLocation: location,
+            interviewLocation: 'Hà Nội hoặc TP.HCM',
+            gender: gender,
+            quantity: quantity,
+            ageRequirement: `${18 + (baseIndex % 5)}-${35 + (baseIndex % 10)}`,
+            languageRequirement: 'Tiếng Nhật N4',
+            educationRequirement: 'Tốt nghiệp THPT trở lên',
+            experienceRequirement: 'Không yêu cầu kinh nghiệm',
+            yearsOfExperience: 'Không yêu cầu',
+            heightRequirement: `Trên ${150 + (baseIndex % 10)} cm`,
+            weightRequirement: `Trên ${45 + (baseIndex % 5)} kg`,
+            visionRequirement: 'Thị lực tốt',
+            tattooRequirement: 'Không yêu cầu',
+            hepatitisBRequirement: 'Không yêu cầu',
+            interviewFormat: 'Phỏng vấn Online',
+            specialConditions: 'Chăm chỉ, chịu khó.',
+            details: {
+                description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Công việc dành cho ứng viên muốn làm việc trong ngành ${industry}.</p>`,
+                requirements: `<ul><li>Yêu cầu: Tốt nghiệp THPT trở lên.</li><li>Có sức khỏe tốt.</li></ul>`,
+                benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm theo quy định.</li><li>Hỗ trợ chi phí nhà ở.</li></ul>`,
+            }
+        };
+        jobData.push(newJob);
+    }
+}
