@@ -622,8 +622,8 @@ const LoggedOutContent = () => {
                                 <Menu />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent className="flex flex-col">
-                            <SheetHeader>
+                        <SheetContent className="flex flex-col p-0">
+                            <SheetHeader className="p-4 border-b">
                                 <SheetTitle><Logo /></SheetTitle>
                             </SheetHeader>
                             {isLoggedIn ? <LoggedInContent /> : <LoggedOutContent />}
