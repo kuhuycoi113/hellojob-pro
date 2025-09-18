@@ -145,32 +145,31 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     </div>
                     
                     <div className="flex-grow flex flex-col">
-                        <Link href={`/jobs/${job.id}`} className="group flex-grow" onClick={handleCardClick}>
+                        <Link href={`/jobs/${job.id}`} className="group" onClick={handleCardClick}>
                             <h3 className="font-bold text-lg mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                                {job.visaDetail && (
+                                    <Badge
+                                        variant="outline"
+                                        className={cn("text-xs", {
+                                            "border-accent-green text-accent-green": job.visaType?.includes("Thực tập sinh"),
+                                            "border-accent-blue text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
+                                            "border-accent-orange text-accent-orange": job.visaType?.includes("Kỹ sư, tri thức"),
+                                        })}
+                                    >
+                                        {job.visaDetail}
+                                    </Badge>
+                                )}
+                                {job.salary.actual && <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 border-green-200">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
+                                <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                                <p className="flex items-center gap-1.5">
+                                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                                    <span>{job.workLocation}</span>
+                                </p>
+                            </div>
                         </Link>
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                        {job.visaDetail && (
-                            <Badge
-                                variant="outline"
-                                className={cn("text-xs", {
-                                    "border-accent-green text-accent-green": job.visaType?.includes("Thực tập sinh"),
-                                    "border-accent-blue text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
-                                    "border-accent-orange text-accent-orange": job.visaType?.includes("Kỹ sư, tri thức"),
-                                })}
-                            >
-                                {job.visaDetail}
-                            </Badge>
-                        )}
-                        {job.salary.actual && <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 border-green-200">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
-                        <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                            <p className="flex items-center gap-1.5">
-                                <MapPin className="h-4 w-4 flex-shrink-0" />
-                                <span>{job.workLocation}</span>
-                            </p>
-                        </div>
-
                         
                         <div className="pt-2 flex justify-between items-end mt-auto">
                             <div className="flex items-center gap-1">
