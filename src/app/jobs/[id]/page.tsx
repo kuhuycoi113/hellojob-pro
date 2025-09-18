@@ -228,32 +228,31 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                </div>
                             </CardContent>
                         </Card>
-                        <Card className="shadow-lg">
-                             <CardHeader>
-                                <CardTitle className="text-lg font-bold flex items-center gap-2"><UserRound/>Tư vấn viên</CardTitle>
-                             </CardHeader>
-                             <CardContent className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                     <Avatar className="h-12 w-12">
-                                        <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
-                                        <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="font-semibold text-primary">{assignedConsultant.name}</p>
-                                        <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
+                        <Link href={`/consultant-profile/${assignedConsultant.id}`} className="block group">
+                            <Card className="shadow-lg group-hover:shadow-xl group-hover:border-primary transition-all">
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-bold flex items-center gap-2 group-hover:text-primary transition-colors"><UserRound/>Tư vấn viên</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-12 w-12">
+                                            <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
+                                            <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-semibold text-primary">{assignedConsultant.name}</p>
+                                            <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
+                                        </div>
                                     </div>
+                                    <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+                                        <ContactButtons contact={assignedConsultant} />
+                                    </div>
+                                </CardContent>
+                                <div className="border-t p-4 flex justify-center">
+                                    <Button variant="ghost" className="text-muted-foreground text-sm" onClick={(e) => e.preventDefault()}><Share2 className="mr-2 h-4 w-4"/>Chia sẻ tin này</Button>
                                 </div>
-                                <div className="space-y-2">
-                                    <ContactButtons contact={assignedConsultant} />
-                                    <Button asChild variant="secondary" className="w-full">
-                                        <Link href={`/consultant-profile/${assignedConsultant.id}`}>Xem hồ sơ tư vấn viên</Link>
-                                    </Button>
-                                </div>
-                             </CardContent>
-                             <div className="border-t p-4 flex justify-center">
-                                 <Button variant="ghost" className="text-muted-foreground text-sm"><Share2 className="mr-2 h-4 w-4"/>Chia sẻ tin này</Button>
-                             </div>
-                        </Card>
+                            </Card>
+                        </Link>
                     </aside>
                 </div>
             </div>
