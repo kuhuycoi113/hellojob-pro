@@ -7,10 +7,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Award, Briefcase, Handshake, MessageSquare, PieChart, Send, ShieldCheck, Sparkles, Star, Target, Users, Phone } from 'lucide-react';
+import { Award, Briefcase, Handshake, MessageSquare, PieChart, Send, ShieldCheck, Sparkles, Star, Target, Users, Phone, ChevronRight } from 'lucide-react';
 import { MessengerIcon, ZaloIcon } from '@/components/custom-icons';
 import { ContactButtons } from '@/components/contact-buttons';
 import { consultants as consultantData } from '@/lib/consultant-data';
+import { jobData } from '@/lib/mock-data';
+import { JobCard } from '@/components/job-card';
+import Link from 'next/link';
 
 const companyValues = [
     {
@@ -55,6 +58,12 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
     if (!consultant) {
         notFound();
     }
+    
+    // HIENTHIVIEC01 Algorithm
+    const consultantJobs = jobData
+      .filter(job => job.recruiter.id === consultant.id)
+      .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
+      .slice(0, 4);
 
   return (
     <div className="bg-secondary">
@@ -140,6 +149,23 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                     </div>
                 ))}
               </CardContent>
+            </Card>
+             <Card className="shadow-xl">
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl text-primary flex items-center justify-between">
+                        <span>Việc làm phụ trách</span>
+                        <Button variant="link" asChild><Link href="/jobs">Xem tất cả <ChevronRight className="h-4 w-4"/></Link></Button>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {consultantJobs.length > 0 ? (
+                        consultantJobs.map(job => (
+                            <JobCard key={job.id} job={job} showRecruiterName={false} />
+                        ))
+                    ) : (
+                        <p className="text-muted-foreground col-span-2">Hiện tại tư vấn viên này chưa phụ trách công việc nào.</p>
+                    )}
+                </CardContent>
             </Card>
           </div>
         </div>
