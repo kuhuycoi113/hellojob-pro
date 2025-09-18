@@ -48,6 +48,7 @@ function escapeRegExp(string: string) {
 }
 
 const createSlug = (str: string) => {
+    if (!str) return '';
     return str
         .toLowerCase()
         .normalize("NFD")
@@ -75,6 +76,8 @@ function JobsPageContent() {
     
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
     const [stagedResultCount, setStagedResultCount] = useState<number>(jobData.length);
+
+    const allIndustries = useMemo(() => Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i), []);
     
     const runFilter = useCallback((filtersToApply: SearchFilters) => {
         const { 
@@ -161,7 +164,7 @@ function JobsPageContent() {
         });
 
         setFilteredJobs(results);
-    }, []);
+    }, [allIndustries]);
 
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
         const { 
@@ -241,7 +244,7 @@ function JobsPageContent() {
             return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && experienceMatch;
         }).length;
         setStagedResultCount(count);
-    }, []);
+    }, [allIndustries]);
 
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters };
