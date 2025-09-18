@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark, Phone, LogIn } from 'lucide-react';
+import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark, Phone, LogIn, Star } from 'lucide-react';
 import { Job } from '@/lib/mock-data';
 import {
     DropdownMenu,
@@ -102,7 +102,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     window.dispatchEvent(new Event('storage'));
   };
 
-  const handleApplyClick = () => {
+  const handleApplyClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    // CHUCNANGUNGTUYEN01: Start of apply functionality
     if (!isLoggedIn) {
         sessionStorage.setItem('postLoginRedirect', `/jobs/${job.id}`);
         setIsConfirmLoginOpen(true);
@@ -110,6 +113,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         // Logic for logged in user to apply
         console.log("Applying for job...");
     }
+    // CHUCNANGUNGTUYEN01: End of apply functionality
   };
   
   const handleConfirmLogin = () => {
@@ -298,15 +302,16 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                 </div>
 
                 <div className="mt-auto flex justify-between items-center">
-                    <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
-                        <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
-                            <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
-                            <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                    </Link>
                     <div className="flex items-center gap-1">
+                        <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
+                            <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                                <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                        </Link>
                         <ContactButtons contact={job.recruiter} />
                     </div>
+                    <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
                 </div>
              </div>
         </Card>
