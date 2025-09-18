@@ -2,7 +2,7 @@
 
 'use client';
 
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { jobData, type Job } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -51,6 +51,7 @@ const convertToVnd = (jpyValue?: string) => {
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
+    const router = useRouter();
     const job = jobData.find(j => j.id === resolvedParams.id);
     const [isSaved, setIsSaved] = useState(false);
 
@@ -228,33 +229,38 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                </div>
                             </CardContent>
                         </Card>
-                        <Link href={`/consultant-profile/${assignedConsultant.id}`} className="block group">
-                            <Card className="shadow-lg group-hover:shadow-xl group-hover:border-primary transition-all">
-                                <CardHeader>
-                                    <CardTitle className="text-lg font-bold flex items-center gap-2 group-hover:text-primary transition-colors"><UserRound/>Tư vấn viên</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <Avatar className="h-12 w-12">
-                                            <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
-                                            <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                        <div>
-                                            <p className="font-semibold text-primary">{assignedConsultant.name}</p>
-                                            <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
-                                        </div>
+                        <Card 
+                            className="shadow-lg group hover:shadow-xl hover:border-primary transition-all cursor-pointer"
+                            onClick={(e) => {
+                                // Only navigate if the click is directly on the card and not on an interactive element inside
+                                if ((e.target as HTMLElement).closest('a, button')) return;
+                                router.push(`/consultant-profile/${assignedConsultant.id}`);
+                            }}
+                        >
+                            <CardHeader>
+                                <CardTitle className="text-lg font-bold flex items-center gap-2 group-hover:text-primary transition-colors"><UserRound/>Tư vấn viên</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="h-12 w-12">
+                                        <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
+                                        <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-semibold text-primary">{assignedConsultant.name}</p>
+                                        <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
                                     </div>
-                                    <div className="space-y-2" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-                                        <ContactButtons contact={assignedConsultant} />
-                                    </div>
-                                </CardContent>
-                                <div className="border-t p-4 flex justify-center">
-                                    <Button variant="ghost" className="text-muted-foreground text-sm" onClick={(e) => { e.preventDefault(); e.stopPropagation(); /* Logic chia sẻ */ }}>
-                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ tin này
-                                    </Button>
                                 </div>
-                            </Card>
-                        </Link>
+                                <div className="space-y-2">
+                                    <ContactButtons contact={assignedConsultant} />
+                                </div>
+                            </CardContent>
+                            <div className="border-t p-4 flex justify-center">
+                                <Button variant="ghost" className="text-muted-foreground text-sm" onClick={(e) => { e.preventDefault(); e.stopPropagation(); /* Logic chia sẻ */ }}>
+                                    <Share2 className="mr-2 h-4 w-4"/>Chia sẻ tin này
+                                </Button>
+                            </div>
+                        </Card>
                     </aside>
                 </div>
             </div>

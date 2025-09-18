@@ -22,10 +22,20 @@ interface ContactButtonsProps {
 export function ContactButtons({ contact }: ContactButtonsProps) {
   const { openChat } = useChat();
 
-  const handleChatClick = () => {
+  const handleChatClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation(); // Prevent card's onClick from firing
     // @ts-ignore
     openChat(contact);
   };
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.stopPropagation(); // Prevent card's onClick from firing
+  };
+
+  const handlePopoverTriggerClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+  }
+
 
   return (
     <>
@@ -36,18 +46,18 @@ export function ContactButtons({ contact }: ContactButtonsProps) {
                 Chat
             </Button>
             <Button asChild variant="outline" size="icon" className="border-purple-500 hover:bg-purple-50">
-                <Link href="https://m.me/your_user_id" target="_blank">
+                <Link href="https://m.me/your_user_id" target="_blank" onClick={handleLinkClick}>
                      <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
                 </Link>
             </Button>
             <Button asChild variant="outline" size="icon" className="border-blue-500 hover:bg-blue-50">
-                <Link href="https://zalo.me/your_zalo_id" target="_blank">
+                <Link href="https://zalo.me/your_zalo_id" target="_blank" onClick={handleLinkClick}>
                    <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
                 </Link>
             </Button>
             <Popover>
                 <PopoverTrigger asChild>
-                    <Button variant="outline" size="icon" className="border-green-500 hover:bg-green-50">
+                    <Button variant="outline" size="icon" className="border-green-500 hover:bg-green-50" onClick={handlePopoverTriggerClick}>
                         <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
                     </Button>
                 </PopoverTrigger>
@@ -64,7 +74,7 @@ export function ContactButtons({ contact }: ContactButtonsProps) {
          <div className="md:hidden">
             <Popover>
                 <PopoverTrigger asChild>
-                    <div id="MB4NUT01" className="flex items-center gap-2">
+                    <div id="MB4NUT01" className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                         <Button size="icon" variant="default" className="h-9 w-9 bg-primary text-primary-foreground hover:bg-primary/90">
                             <MessageSquare className="h-5 w-5"/>
                         </Button>
@@ -85,17 +95,17 @@ export function ContactButtons({ contact }: ContactButtonsProps) {
                             <MessageSquare className="h-7 w-7"/>
                         </Button>
                         <Button asChild variant="outline" size="icon" className="h-14 w-14 border-purple-500 hover:bg-purple-50">
-                            <Link href="https://m.me/your_user_id" target="_blank">
+                            <Link href="https://m.me/your_user_id" target="_blank" onClick={handleLinkClick}>
                                 <Image src="/img/Mess.svg" alt="Messenger" width={32} height={32} />
                             </Link>
                         </Button>
                         <Button asChild variant="outline" size="icon" className="h-14 w-14 border-blue-500 hover:bg-blue-50">
-                            <Link href="https://zalo.me/your_zalo_id" target="_blank">
+                            <Link href="https://zalo.me/your_zalo_id" target="_blank" onClick={handleLinkClick}>
                               <Image src="/img/Zalo.svg" alt="Zalo" width={32} height={32} />
                             </Link>
                         </Button>
                         <Button asChild variant="outline" size="icon" className="h-14 w-14 border-green-500 hover:bg-green-50">
-                             <Link href="tel:09012345678">
+                             <Link href="tel:09012345678" onClick={handleLinkClick}>
                                 <Image src="/img/phone.svg" alt="Phone" width={32} height={32} />
                             </Link>
                         </Button>
