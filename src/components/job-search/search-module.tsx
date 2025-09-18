@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGr
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { industriesByJobType, type Industry } from "@/lib/industry-data";
-import { locations } from '@/lib/location-data';
+import { japanRegions } from '@/lib/location-data';
 import type { SearchFilters } from './search-results';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 
@@ -79,6 +79,12 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
     if (type === 'industry') {
       return allIndustries.find(i => i.slug === slug)?.name || slug;
     }
+    // For location, find from japanRegions
+    const region = japanRegions.find(r => r.slug === slug);
+    if (region) return region.name;
+    const prefecture = japanRegions.flatMap(r => r.prefectures).find(p => p.slug === slug);
+    if (prefecture) return prefecture.name;
+
     return slug;
   }
 
@@ -194,13 +200,13 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                                 </SelectTrigger>
                                 <SelectContent className="max-h-[300px]">
                                     <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                                    {Object.entries(locations["Nhật Bản"]).map(([region, prefectures]) => (
-                                        <SelectGroup key={region}>
-                                            <SelectLabel>{region}</SelectLabel>
-                                            {region !== 'Hokkaido' && region !== 'Okinawa' && (
-                                              <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                    {japanRegions.map((region) => (
+                                        <SelectGroup key={region.slug}>
+                                            <SelectLabel>{region.name}</SelectLabel>
+                                            {region.slug !== 'hokkaido' && region.slug !== 'okinawa' && (
+                                              <SelectItem value={region.slug}>Toàn bộ vùng {region.name}</SelectItem>
                                             )}
-                                            {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                            {region.prefectures.map(p => <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>)}
                                         </SelectGroup>
                                     ))}
                                 </SelectContent>

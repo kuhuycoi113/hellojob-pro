@@ -6,7 +6,7 @@ import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
 import { Job, jobData } from '@/lib/mock-data';
-import { locations } from '@/lib/location-data';
+import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType } from '@/lib/industry-data';
@@ -85,13 +85,15 @@ function JobsPageContent() {
             
             let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
-                 locationMatch = location.some(loc => {
-                    const isRegion = Object.keys(locations['Nhật Bản']).includes(loc);
-                    if (isRegion) {
-                        const regionPrefectures = locations['Nhật Bản'][loc as keyof typeof locations['Nhật Bản']];
-                        return regionPrefectures.some(prefecture => job.workLocation.toLowerCase().includes(prefecture.toLowerCase()));
+                locationMatch = location.some(locSlug => {
+                    const region = japanRegions.find(r => r.slug === locSlug);
+                    if (region) {
+                        // It's a region slug, check if job location is in any of its prefectures
+                        return region.prefectures.some(p => job.workLocation.toLowerCase().includes(p.name.toLowerCase()));
                     }
-                    return job.workLocation && job.workLocation.toLowerCase().includes(loc.toLowerCase());
+                    // It's a prefecture slug, find its name and compare
+                    const locationName = allJapanLocations.find(l => l.slug === locSlug)?.name;
+                    return locationName ? job.workLocation && job.workLocation.toLowerCase().includes(locationName.toLowerCase()) : false;
                 });
             }
             
@@ -132,13 +134,13 @@ function JobsPageContent() {
             
              let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
-                 locationMatch = location.some(loc => {
-                    const isRegion = Object.keys(locations['Nhật Bản']).includes(loc);
-                    if (isRegion) {
-                        const regionPrefectures = locations['Nhật Bản'][loc as keyof typeof locations['Nhật Bản']];
-                        return regionPrefectures.some(prefecture => job.workLocation.toLowerCase().includes(prefecture.toLowerCase()));
+                 locationMatch = location.some(locSlug => {
+                    const region = japanRegions.find(r => r.slug === locSlug);
+                    if (region) {
+                        return region.prefectures.some(p => job.workLocation.toLowerCase().includes(p.name.toLowerCase()));
                     }
-                    return job.workLocation && job.workLocation.toLowerCase().includes(loc.toLowerCase());
+                    const locationName = allJapanLocations.find(l => l.slug === locSlug)?.name;
+                    return locationName ? job.workLocation && job.workLocation.toLowerCase().includes(locationName.toLowerCase()) : false;
                 });
             }
             const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));

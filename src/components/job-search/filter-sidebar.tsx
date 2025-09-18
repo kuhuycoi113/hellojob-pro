@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Slider } from "@/components/ui/slider";
 import { industriesByJobType, type Industry, type JobDetail } from "@/lib/industry-data";
 import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2 } from "lucide-react";
-import { locations } from "@/lib/location-data";
+import { japanRegions, allJapanLocations, interviewLocations } from "@/lib/location-data";
 import { type SearchFilters } from './search-results';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -177,11 +177,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         const countsByRegion: { [key: string]: number } = {};
 
         // Initialize all known prefectures and regions to 0
-        Object.values(locations["Nhật Bản"]).flat().forEach(p => {
-            if (typeof p === 'string' && !countsByPrefecture[p]) countsByPrefecture[p] = 0;
+        allJapanLocations.forEach(p => {
+            if (!countsByPrefecture[p.name]) countsByPrefecture[p.name] = 0;
         });
-         Object.keys(locations["Nhật Bản"]).forEach(r => {
-            if (!countsByRegion[r]) countsByRegion[r] = 0;
+        japanRegions.forEach(r => {
+            if (!countsByRegion[r.name]) countsByRegion[r.name] = 0;
         });
 
         for (const job of jobData) {
@@ -191,9 +191,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             }
         }
         
-        for (const region in locations["Nhật Bản"]) {
-            const prefecturesInRegion = locations["Nhật Bản"][region as keyof typeof locations["Nhật Bản"]];
-            countsByRegion[region] = prefecturesInRegion.reduce((sum, p) => sum + (countsByPrefecture[p] || 0), 0);
+        for (const region of japanRegions) {
+            countsByRegion[region.name] = region.prefectures.reduce((sum, p) => sum + (countsByPrefecture[p.name] || 0), 0);
         }
 
         return { jobCountsByRegion: countsByRegion, jobCountsByPrefecture: countsByPrefecture };
@@ -272,9 +271,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         const japanVisas = ["thuc-tap-sinh-3-go", "dac-dinh-dau-nhat", "ky-su-tri-thuc-dau-nhat"];
 
         if (filters.interviewLocation) {
-            if (vietnamVisas.includes(value) && !locations['Việt Nam'].includes(filters.interviewLocation)) {
+             const interviewLoc = interviewLocations['Việt Nam'].find(l => l.slug === filters.interviewLocation) || interviewLocations['Nhật Bản'].find(l => l.slug === filters.interviewLocation);
+            if (vietnamVisas.includes(value) && !interviewLocations['Việt Nam'].some(l => l.slug === filters.interviewLocation)) {
                 newFilters.interviewLocation = ''; 
-            } else if (japanVisas.includes(value) && !locations['Phỏng vấn tại Nhật Bản'].includes(filters.interviewLocation)) {
+            } else if (japanVisas.includes(value) && !interviewLocations['Nhật Bản'].some(l => l.slug === filters.interviewLocation)) {
                  newFilters.interviewLocation = '';
             }
         }
@@ -291,7 +291,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             return (
                 <SelectGroup>
                     <SelectLabel>Việt Nam</SelectLabel>
-                    {locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}
+                    {interviewLocations['Việt Nam'].map(l=><SelectItem key={l.slug} value={l.slug}>{l.name}</SelectItem>)}
                 </SelectGroup>
             );
         }
@@ -300,7 +300,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             return (
                  <SelectGroup>
                     <SelectLabel>Nhật Bản</SelectLabel>
-                    {locations['Phỏng vấn tại Nhật Bản'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    {interviewLocations['Nhật Bản'].map(p => <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>)}
                 </SelectGroup>
             );
         }
@@ -310,11 +310,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             <>
                 <SelectGroup>
                         <SelectLabel>Việt Nam</SelectLabel>
-                        {locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}
+                        {interviewLocations['Việt Nam'].map(l=><SelectItem key={l.slug} value={l.slug}>{l.name}</SelectItem>)}
                 </SelectGroup>
                     <SelectGroup>
                     <SelectLabel>Nhật Bản</SelectLabel>
-                        {locations['Phỏng vấn tại Nhật Bản'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                        {interviewLocations['Nhật Bản'].map(p => <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>)}
                     </SelectGroup>
             </>
         )
@@ -492,55 +492,57 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                       <p className='text-sm font-semibold'>Đã chọn ({Array.isArray(filters.location) ? filters.location.length : 0})</p>
                                       {Array.isArray(filters.location) && filters.location.length > 0 && (
                                          <div className='flex flex-wrap gap-1 mt-2 text-xs'>
-                                            {filters.location.map(loc => (
-                                               <span key={loc} className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>{loc}</span>
+                                            {filters.location.map(locSlug => (
+                                                <Badge key={locSlug} variant="secondary" className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>
+                                                    {allJapanLocations.find(l => l.slug === locSlug)?.name || japanRegions.find(r => r.slug === locSlug)?.name || locSlug}
+                                                </Badge>
                                             ))}
                                          </div>
                                       )}
                                    </div>
                                    <Accordion type="multiple" className="w-full">
-                                    {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
-                                        <AccordionItem key={region} value={region}>
+                                    {japanRegions.map((region) => (
+                                        <AccordionItem key={region.slug} value={region.slug}>
                                             <div className="flex items-center gap-2 py-2 text-sm hover:no-underline" >
                                                 <Checkbox
-                                                    id={`region-${region}`}
-                                                    checked={Array.isArray(filters.location) && (prefectures as string[]).every(p => filters.location.includes(p))}
+                                                    id={`region-${region.slug}`}
+                                                    checked={Array.isArray(filters.location) && region.prefectures.every(p => filters.location.includes(p.slug))}
                                                     onCheckedChange={(checked) => {
                                                         const currentSelection = new Set(Array.isArray(filters.location) ? filters.location : []);
                                                         if (checked) {
-                                                            (prefectures as string[]).forEach(p => currentSelection.add(p));
+                                                            region.prefectures.forEach(p => currentSelection.add(p.slug));
                                                         } else {
-                                                            (prefectures as string[]).forEach(p => currentSelection.delete(p));
+                                                            region.prefectures.forEach(p => currentSelection.delete(p.slug));
                                                         }
                                                         onFilterChange({ location: Array.from(currentSelection) });
                                                     }}
                                                 />
                                                 <AccordionTrigger className="flex-1 p-0 hover:no-underline">
-                                                    <Label htmlFor={`region-${region}`} className="flex-grow text-left font-semibold cursor-pointer flex justify-between w-full">
-                                                        <span>Vùng {region}</span>
-                                                        <span className="text-muted-foreground text-xs ml-1">{jobCountsByRegion[region] || 0} việc</span>
+                                                    <Label htmlFor={`region-${region.slug}`} className="flex-grow text-left font-semibold cursor-pointer flex justify-between w-full">
+                                                        <span>Vùng {region.name}</span>
+                                                        <span className="text-muted-foreground text-xs ml-1">{jobCountsByRegion[region.name] || 0} việc</span>
                                                     </Label>
                                                 </AccordionTrigger>
                                             </div>
                                             <AccordionContent className="pl-6 space-y-2">
-                                                {(prefectures as string[]).map((prefecture: string) => (
-                                                    <div key={prefecture} className="flex items-center gap-2">
+                                                {region.prefectures.map((prefecture) => (
+                                                    <div key={prefecture.slug} className="flex items-center gap-2">
                                                          <Checkbox
-                                                            id={`pref-${prefecture}`}
-                                                            checked={Array.isArray(filters.location) && filters.location.includes(prefecture)}
+                                                            id={`pref-${prefecture.slug}`}
+                                                            checked={Array.isArray(filters.location) && filters.location.includes(prefecture.slug)}
                                                             onCheckedChange={(checked) => {
                                                                 const currentSelection = new Set(Array.isArray(filters.location) ? filters.location : []);
                                                                 if (checked) {
-                                                                    currentSelection.add(prefecture);
+                                                                    currentSelection.add(prefecture.slug);
                                                                 } else {
-                                                                    currentSelection.delete(prefecture);
+                                                                    currentSelection.delete(prefecture.slug);
                                                                 }
                                                                 onFilterChange({ location: Array.from(currentSelection) });
                                                             }}
                                                         />
-                                                        <Label htmlFor={`pref-${prefecture}`} className="flex w-full items-center justify-between font-normal cursor-pointer">
-                                                            <span>{prefecture}</span>
-                                                            <span className="text-muted-foreground text-xs ml-1">{jobCountsByPrefecture[prefecture] || 0}</span>
+                                                        <Label htmlFor={`pref-${prefecture.slug}`} className="flex w-full items-center justify-between font-normal cursor-pointer">
+                                                            <span>{prefecture.name}</span>
+                                                            <span className="text-muted-foreground text-xs ml-1">{jobCountsByPrefecture[prefecture.name] || 0}</span>
                                                         </Label>
                                                     </div>
                                                 ))}
