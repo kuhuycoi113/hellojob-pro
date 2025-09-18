@@ -58,20 +58,23 @@ function JobsPageContent() {
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
+        const jobDetailName = Object.values(industriesByJobType).flat().flatMap(i => i.keywords).find(k => k.slug === jobDetail)?.name || jobDetail;
         const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
 
 
         let results = jobData.filter(job => {
             let visaMatch = true;
             if (visaDetail && visaDetail !== 'all-details') {
-                visaMatch = job.visaDetail === visaName;
+                const targetVisaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name;
+                visaMatch = job.visaDetail === targetVisaName;
             } else if (visa && visa !== 'all') {
-                visaMatch = job.visaType === visaName; // This might need adjustment if visa slugs are used
+                const targetVisaType = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visa)?.name;
+                visaMatch = job.visaType === targetVisaType;
             }
 
             const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industryName.toLowerCase()));
             
-            const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
+            const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetailName.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetailName.toLowerCase()));
             
             let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
@@ -103,17 +106,20 @@ function JobsPageContent() {
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
+        const jobDetailName = Object.values(industriesByJobType).flat().flatMap(i => i.keywords).find(k => k.slug === jobDetail)?.name || jobDetail;
         const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
         
         const count = jobData.filter(job => {
             let visaMatch = true;
             if (visaDetail && visaDetail !== 'all-details') {
-                visaMatch = job.visaDetail === visaName;
+                const targetVisaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name;
+                visaMatch = job.visaDetail === targetVisaName;
             } else if (visa && visa !== 'all') {
-                visaMatch = job.visaType === visaName;
+                 const targetVisaType = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visa)?.name;
+                visaMatch = job.visaType === targetVisaType;
             }
             const industryMatch = !industry || industry === 'all' || (job.industry && job.industry.toLowerCase().includes(industryName.toLowerCase()));
-            const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetail.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetail.toLowerCase()));
+            const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && job.title.toLowerCase().includes(jobDetailName.toLowerCase())) || (job.details.description && job.details.description.toLowerCase().includes(jobDetailName.toLowerCase()));
              let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
                  locationMatch = location.some(loc => {
@@ -165,8 +171,8 @@ function JobsPageContent() {
     const handleApplyFilters = useCallback(() => {
         const query = new URLSearchParams();
         Object.entries(stagedFilters).forEach(([key, value]) => {
-            if (value && (!Array.isArray(value) || value.length > 0)) {
-                 if (key !== 'visa' && key !== 'jobDetail' && !(Array.isArray(value) && value.includes('all'))) {
+            if (value && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
+                 if (key !== 'visa' && !(Array.isArray(value) && value.includes('all'))) {
                      query.set(key, Array.isArray(value) ? value.join(',') : String(value));
                  }
             }
