@@ -52,6 +52,28 @@ const addedValues = [
     },
 ]
 
+// PHANLOAINHOMNGANH01 Algorithm
+const getJobsByGroupedExpertise = (expertise: string): Job[] | null => {
+    const lowerExpertise = expertise.toLowerCase();
+    let targetIndustries: string[] = [];
+
+    for (const groupName in industryGroups) {
+        if (lowerExpertise.includes(groupName.toLowerCase())) {
+            targetIndustries = industryGroups[groupName as keyof typeof industryGroups];
+            break;
+        }
+    }
+    
+    if (targetIndustries.length > 0) {
+        return jobData.filter(job => 
+            targetIndustries.some(industry => job.industry.toLowerCase().includes(industry.toLowerCase()))
+        );
+    }
+
+    return null;
+}
+
+
 export default function ConsultantDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const consultant = consultantData.find(c => c.id === resolvedParams.id);
@@ -60,30 +82,18 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
         notFound();
     }
     
-    // PHANLOAINHOMNGANH01 Algorithm
-    const getJobsByGroupedExpertise = (expertise: string): Job[] | null => {
-        const lowerExpertise = expertise.toLowerCase();
-        let targetIndustries: string[] = [];
-
-        for (const groupName in industryGroups) {
-            if (lowerExpertise.includes(groupName.toLowerCase())) {
-                targetIndustries = industryGroups[groupName as keyof typeof industryGroups];
-                break;
-            }
-        }
-        
-        if (targetIndustries.length > 0) {
-            return jobData.filter(job => 
-                targetIndustries.some(industry => job.industry.toLowerCase().includes(industry.toLowerCase()))
-            );
-        }
-
-        return null;
-    }
-
     // HIENTHIVIEC01 Algorithm
     const getConsultantJobs = (): Job[] => {
-        // First, try to get jobs based on grouped expertise using the new algorithm
+        // First, try to get jobs explicitly assigned to the consultant
+        const directlyAssignedJobs = jobData.filter(job => job.recruiter.id === consultant.id);
+        
+        if (directlyAssignedJobs.length > 0) {
+            return directlyAssignedJobs
+                .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
+                .slice(0, 4);
+        }
+        
+        // If no jobs are directly assigned, fall back to the grouped expertise logic (PHANLOAINHOMNGANH01)
         const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
         if (jobsByGroup) {
             return jobsByGroup
@@ -91,22 +101,25 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                 .slice(0, 4);
         }
         
-        // Fallback to original logic: filter by recruiter ID
-        return jobData
-          .filter(job => job.recruiter.id === consultant.id)
-          .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
-          .slice(0, 4);
+        // If no jobs are found by either method, return an empty array.
+        return [];
     };
 
     const consultantJobs = getConsultantJobs();
     
-    // Calculate total managed jobs based on the same logic for accuracy
     const calculateManagedJobsCount = () => {
+       // Count directly assigned jobs first for accuracy
+       const directlyAssignedCount = jobData.filter(job => job.recruiter.id === consultant.id).length;
+       if (directlyAssignedCount > 0) {
+           return directlyAssignedCount;
+       }
+       
+       // If no jobs are directly assigned, count based on expertise
        const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
        if (jobsByGroup) {
            return jobsByGroup.length;
        }
-       return jobData.filter(job => job.recruiter.id === consultant.id).length;
+       return 0; // Default to 0 if no jobs are found
     };
     
     const managedJobsCount = calculateManagedJobsCount();
