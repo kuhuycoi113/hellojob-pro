@@ -20,7 +20,7 @@ const initialSearchFilters: SearchFilters = {
     location: [], 
     interviewLocation: '', 
     jobDetail: '',
-    experienceRequirement: '', // Ensure this is part of the initial state
+    experienceRequirement: '',
     gender: '',
     height: [135, 210],
     weight: [35, 120],
@@ -66,6 +66,26 @@ const parseSalary = (salaryStr?: string): number | null => {
     return isNaN(value) ? null : value;
 };
 
+const parseExperienceToRange = (expStr?: string): [number, number] => {
+    if (!expStr || expStr === 'Không yêu cầu') return [0, 0];
+    
+    const cleanedStr = expStr.toLowerCase().replace(',', '.');
+    
+    if (cleanedStr.startsWith('dưới')) {
+        const val = parseFloat(cleanedStr.replace(/[^0-9.]/g, ''));
+        return [0, val];
+    }
+    if (cleanedStr.startsWith('trên')) {
+        const val = parseFloat(cleanedStr.replace(/[^0-9.]/g, ''));
+        return [val, Infinity];
+    }
+    const parts = cleanedStr.split('-').map(p => parseFloat(p.trim().replace(/[^0-9.]/g, '')));
+    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        return [parts[0], parts[1]];
+    }
+    return [0, Infinity]; // Default fallback
+};
+
 
 function JobsPageContent() {
     const router = useRouter();
@@ -82,7 +102,7 @@ function JobsPageContent() {
     const runFilter = useCallback((filtersToApply: SearchFilters) => {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
-            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement
+            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -102,6 +122,8 @@ function JobsPageContent() {
         const annualIncomeMin = parseSalary(annualIncome);
         const annualBonusMin = parseSalary(annualBonus);
 
+        const [minExp, maxExp] = parseExperienceToRange(yearsOfExperience);
+
         let results = jobData.filter(job => {
             let visaMatch = true;
             if (visaDetail && visaDetail !== 'all-details') {
@@ -116,8 +138,11 @@ function JobsPageContent() {
 
             const jobDetailMatch = !jobDetail || (job.title && createSlug(job.title).includes(jobDetail)) || (job.details.description && createSlug(job.details.description).includes(jobDetail));
             
-            const experienceMatch = !experienceRequirement || (job.experienceRequirement && createSlug(job.experienceRequirement).includes(experienceRequirement));
+            const expReqMatch = !experienceRequirement || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(experienceRequirement);
             
+            const [jobMinExp, jobMaxExp] = parseExperienceToRange(job.yearsOfExperience);
+            const yearsOfExperienceMatch = !yearsOfExperience || (jobMinExp <= maxExp);
+
             let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
                 locationMatch = location.some(locSlug => {
@@ -160,7 +185,7 @@ function JobsPageContent() {
                 genderMatch = job.gender === targetGender || job.gender === 'Cả nam và nữ';
             }
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && experienceMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch;
         });
 
         setFilteredJobs(results);
@@ -169,7 +194,7 @@ function JobsPageContent() {
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
-            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement
+            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -189,6 +214,8 @@ function JobsPageContent() {
         const annualIncomeMin = parseSalary(annualIncome);
         const annualBonusMin = parseSalary(annualBonus);
         
+        const [minExp, maxExp] = parseExperienceToRange(yearsOfExperience);
+
         const count = jobData.filter(job => {
             let visaMatch = true;
             if (visaDetail && visaDetail !== 'all-details') {
@@ -202,8 +229,11 @@ function JobsPageContent() {
 
             const jobDetailMatch = !jobDetail || (job.title && createSlug(job.title).includes(jobDetail)) || (job.details.description && createSlug(job.details.description).includes(jobDetail));
 
-            const experienceMatch = !experienceRequirement || (job.experienceRequirement && createSlug(job.experienceRequirement).includes(experienceRequirement));
+            const expReqMatch = !experienceRequirement || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(experienceRequirement);
             
+            const [jobMinExp, jobMaxExp] = parseExperienceToRange(job.yearsOfExperience);
+            const yearsOfExperienceMatch = !yearsOfExperience || (jobMinExp <= maxExp);
+
              let locationMatch = true;
             if (Array.isArray(location) && location.length > 0 && !location.includes('all')) {
                  locationMatch = location.some(locSlug => {
@@ -241,7 +271,7 @@ function JobsPageContent() {
                 genderMatch = job.gender === targetGender || job.gender === 'Cả nam và nữ';
             }
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && experienceMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch;
         }).length;
         setStagedResultCount(count);
     }, [allIndustries]);
