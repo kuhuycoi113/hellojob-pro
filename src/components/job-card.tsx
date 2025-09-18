@@ -38,6 +38,38 @@ const formatCurrency = (value?: string) => {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
+// Function to log user interaction
+const logInteraction = (job: Job, type: 'view' | 'save') => {
+    try {
+        const MAX_SIGNALS = 50; // Limit the number of signals to keep it manageable
+        let signals: Partial<Job>[] = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+
+        // Create a signal object with only relevant properties
+        const signal: Partial<Job> = {
+            id: job.id,
+            industry: job.industry,
+            workLocation: job.workLocation,
+            visaType: job.visaType,
+            visaDetail: job.visaDetail,
+            title: job.title,
+            // We can add salary later if needed for more complex logic
+        };
+
+        // Add the new signal to the front and remove duplicates by job id
+        signals = [signal, ...signals.filter(s => s.id !== job.id)];
+        
+        // Trim the array to the max limit
+        if (signals.length > MAX_SIGNALS) {
+            signals = signals.slice(0, MAX_SIGNALS);
+        }
+
+        localStorage.setItem('behavioralSignals', JSON.stringify(signals));
+    } catch (error) {
+        console.error("Error logging user interaction:", error);
+    }
+};
+
+
 export const JobCard = ({ job, showRecruiterName = true, variant = 'default', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'default' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
   const { isLoggedIn } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
@@ -62,6 +94,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
       savedJobs.push(job.id);
       localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
       setIsSaved(true);
+      logInteraction(job, 'save'); // Log save interaction
     }
      // Trigger a storage event to update other components like the "My Jobs" page
     window.dispatchEvent(new Event('storage'));
@@ -81,10 +114,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
     setIsConfirmLoginOpen(false);
     setIsAuthDialogOpen(true);
   };
+  
+  const handleCardClick = () => {
+      logInteraction(job, 'view');
+  };
 
   // New Chat Layout for the chat variant
   const ChatLayout = () => (
-    <Link href={`/jobs/${job.id}`} className="block w-full">
+    <Link href={`/jobs/${job.id}`} className="block w-full" onClick={handleCardClick}>
         <Card className="flex items-center p-2 gap-3 hover:bg-secondary/50 transition-colors">
             <div className="relative w-16 h-16 flex-shrink-0">
                 <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
@@ -108,7 +145,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
   const DesktopLayout = () => (
     <div className="hidden md:flex flex-row items-stretch w-full p-3 gap-4">
         <div className="relative w-32 h-32 flex-shrink-0">
-            <Link href={`/jobs/${job.id}`}>
+            <Link href={`/jobs/${job.id}`} onClick={handleCardClick}>
                 <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-lg" />
             </Link>
              <div className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -118,7 +155,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
         </div>
         
         <div className="flex-grow flex flex-col">
-            <Link href={`/jobs/${job.id}`} className="group flex-grow">
+            <Link href={`/jobs/${job.id}`} className="group flex-grow" onClick={handleCardClick}>
                 <h3 className="font-bold text-base mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-2">{job.title}</h3>
             </Link>
              <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -201,7 +238,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem asChild>
-                                    <Link href={`/jobs/${job.id}`} className="w-full flex">
+                                    <Link href={`/jobs/${job.id}`} className="w-full flex" onClick={handleCardClick}>
                                         <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
                                     </Link>
                                 </DropdownMenuItem>
@@ -219,7 +256,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
      <div className="md:hidden flex flex-col w-full">
         <div className="flex flex-row items-stretch">
             <div className="relative w-1/3 flex-shrink-0 aspect-[4/3]">
-                <Link href={`/jobs/${job.id}`}>
+                <Link href={`/jobs/${job.id}`} onClick={handleCardClick}>
                     <Image src={job.image.src} alt={job.title} fill className="object-cover" />
                 </Link>
                  <div className="absolute top-1 left-1 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
@@ -233,7 +270,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
 
             <div className="w-2/3 p-3 flex-grow flex flex-col justify-between">
                 <div>
-                    <Link href={`/jobs/${job.id}`} className="group">
+                    <Link href={`/jobs/${job.id}`} className="group" onClick={handleCardClick}>
                         <h3 className="font-bold text-sm mb-2 group-hover:text-primary cursor-pointer leading-tight line-clamp-3">{job.title}</h3>
                     </Link>
                     <div className="flex flex-wrap gap-1 mb-2">
@@ -292,7 +329,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                                 <DropdownMenuItem asChild>
-                                    <Link href={`/jobs/${job.id}`} className="w-full flex">
+                                    <Link href={`/jobs/${job.id}`} className="w-full flex" onClick={handleCardClick}>
                                         <Briefcase className="mr-2 h-4 w-4" /> Xem chi tiết
                                     </Link>
                                 </DropdownMenuItem>

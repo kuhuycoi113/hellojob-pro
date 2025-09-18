@@ -5,7 +5,7 @@
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil, X, ThumbsUp, TrendingUp, ShieldCheck, ChevronDown, SlidersHorizontal, DollarSign } from 'lucide-react';
+import { Briefcase, Bookmark, Star, Eye, List, LayoutGrid, PlusCircle, Edit, LogIn, UserPlus, Loader2, Sparkles, HardHat, UserCheck, GraduationCap, FastForward, ListChecks, ChevronLeft, ChevronRight, Pencil, X, ThumbsUp, TrendingUp, ShieldCheck, ChevronDown, SlidersHorizontal, DollarSign, BrainCircuit } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { jobData, type Job } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
@@ -384,8 +384,10 @@ const LoggedInView = () => {
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
+    const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]); // CANHANHOA01
     const [savedJobs, setSavedJobs] = useState<Job[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
+    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
@@ -442,45 +444,40 @@ const LoggedInView = () => {
         setIsLoadingSuggestions(true);
         try {
             const storedProfile = localStorage.getItem('generatedCandidateProfile');
-            const storedSuggestionType = (localStorage.getItem('suggestionType') as 'accurate' | 'related') || 'related';
-
             if (storedProfile) {
                 const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-                 const userVisaDetail = profile.aspirations?.desiredVisaDetail;
-                
-                const vietnamVisaDetails = ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Đặc định đi mới', 'Kỹ sư, tri thức đầu Việt'];
-                const japanVisaDetails = ['Đặc định đầu Nhật', 'Kỹ sư, tri thức đầu Nhật'];
-
-                if (vietnamVisaDetails.includes(userVisaDetail || '')) {
-                   setCompanyButtonText('Công ty phái cử uy tín');
-                } else if (japanVisaDetails.includes(userVisaDetail || '')) {
-                   setCompanyButtonText('Công ty tiếp nhận uy tín');
-                } else {
-                    setCompanyButtonText('Công ty uy tín');
-                }
-
-                if (userVisaDetail === 'Thực tập sinh 3 Go') {
-                    setFeeButtonText('Nghiệp đoàn uy tín');
-                    setCompanyButtonText('Công ty tiếp nhận uy tín');
-                } else if (userVisaDetail === "Kỹ sư, tri thức đầu Nhật") {
-                   setFeeButtonText("Shokai uy tín");
-                } else if (userVisaDetail === "Đặc định đầu Nhật") {
-                   setFeeButtonText("Shien uy tín");
-                } else {
-                    setFeeButtonText('Phí thấp');
-                }
-
-                const matchResults = await matchJobsToProfile(profile, storedSuggestionType);
-                const jobs = matchResults.map(result => result.job);
-                setSuggestedJobs(jobs);
+                const matchResults = await matchJobsToProfile(profile, 'related', []); // Pass empty signals for profile-based suggestions
+                setSuggestedJobs(matchResults.map(r => r.job));
             } else {
-                setSuggestedJobs(jobData.slice(0, 20)); // Fallback
+                setSuggestedJobs(jobData.slice(0, 20));
             }
         } catch (error) {
-            console.error("Failed to fetch suggested jobs:", error);
-            setSuggestedJobs(jobData.slice(0, 20)); // Fallback on error
+            console.error("Failed to fetch profile-based suggestions:", error);
+            setSuggestedJobs(jobData.slice(0, 20));
         } finally {
             setIsLoadingSuggestions(false);
+        }
+    }, []);
+
+    // CANHANHOA01: New function to fetch behavior-based suggestions
+    const fetchBehavioralSuggestions = useCallback(async () => {
+        setIsLoadingBehavioral(true);
+        try {
+            const storedProfile = localStorage.getItem('generatedCandidateProfile');
+            const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+            
+            if (storedProfile && behavioralSignals.length > 0) {
+                const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+                const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
+                setBehavioralSuggestedJobs(matchResults);
+            } else {
+                setBehavioralSuggestedJobs([]); // No signals, no suggestions
+            }
+        } catch (error) {
+            console.error("Failed to fetch behavioral suggestions:", error);
+            setBehavioralSuggestedJobs([]);
+        } finally {
+            setIsLoadingBehavioral(false);
         }
     }, []);
     
@@ -493,17 +490,21 @@ const LoggedInView = () => {
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
             setIsLoadingSuggestions(false);
+            setIsLoadingBehavioral(false);
             return;
         }
         fetchSuggestedJobs();
+        fetchBehavioralSuggestions(); // CANHANHOA01: Fetch behavioral suggestions
         fetchSavedJobs();
 
-        // Listen for storage changes to update saved jobs list in real-time
-        const handleStorageChange = () => fetchSavedJobs();
+        const handleStorageChange = () => {
+            fetchSavedJobs();
+            fetchBehavioralSuggestions(); // Re-fetch when behavior changes
+        };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
         
-    }, [role, fetchSuggestedJobs, fetchSavedJobs, forceUpdate]);
+    }, [role, fetchSuggestedJobs, fetchSavedJobs, fetchBehavioralSuggestions, forceUpdate]);
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
@@ -650,15 +651,14 @@ const LoggedInView = () => {
          {/* Main Content */}
         <div className="w-full mb-8">
             <Accordion 
-                type="single" 
-                collapsible 
-                className="w-full" 
-                value={openAccordion}
-                onValueChange={setOpenAccordion}
+                type="multiple"
+                className="w-full space-y-4" 
+                value={openAccordion ? [openAccordion] : undefined}
+                onValueChange={(value) => setOpenAccordion(value[0])}
             >
                 <AccordionItem value="item-1" className={cn(
-                    "border-b transition-all duration-500 ease-in-out",
-                    isSuggestionHighlighted ? "ring-2 ring-accent-orange ring-offset-2 shadow-2xl rounded-lg bg-accent-orange/10" : ""
+                    "border-b-0 transition-all duration-500 ease-in-out",
+                    isSuggestionHighlighted ? "ring-2 ring-accent-orange ring-offset-2 shadow-2xl rounded-lg bg-accent-orange/10" : "border rounded-lg"
                 )}>
                     <div className="flex items-center bg-background px-6 rounded-t-lg hover:no-underline">
                         <AccordionTrigger className="flex-grow py-4 font-semibold text-base">
@@ -727,8 +727,8 @@ const LoggedInView = () => {
                        )}
                     </AccordionContent>
                 </AccordionItem>
-                 <AccordionItem value="item-2">
-                    <AccordionTrigger className="bg-background px-6 rounded-t-lg font-semibold text-base hover:no-underline mt-4">
+                 <AccordionItem value="item-2" className="border rounded-lg border-b-0">
+                    <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
                             <Briefcase className="h-5 w-5 text-blue-500" />
                             <span>Việc đã ứng tuyển</span>
@@ -741,8 +741,8 @@ const LoggedInView = () => {
                         </div>
                     </AccordionContent>
                 </AccordionItem>
-                 <AccordionItem value="item-3" className="border-b-0">
-                    <AccordionTrigger className="bg-background px-6 rounded-t-lg font-semibold text-base hover:no-underline mt-4">
+                 <AccordionItem value="item-3" className="border rounded-lg border-b-0">
+                    <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
                             <Bookmark className="h-5 w-5 text-red-500" />
                             <span>Việc đã lưu</span>
@@ -759,6 +759,40 @@ const LoggedInView = () => {
                                 <p>Bạn chưa lưu công việc nào.</p>
                              </div>
                         )}
+                    </AccordionContent>
+                </AccordionItem>
+
+                 {/* CANHANHOA01: New Module */}
+                 <AccordionItem value="item-4" className="border rounded-lg border-b-0">
+                    <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
+                        <div className="flex items-center gap-3">
+                            <BrainCircuit className="h-5 w-5 text-purple-500" />
+                            <span>Có thể bạn quan tâm</span>
+                            <Badge variant="secondary">{isLoadingBehavioral ? '...' : behavioralSuggestedJobs.length}</Badge>
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="bg-background p-6 rounded-b-lg">
+                       {isLoadingBehavioral ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {Array.from({ length: 4 }).map((_, i) => (
+                                    <Card key={i}><CardContent className="p-4 space-y-3"><Skeleton className="h-28 w-full" /><Skeleton className="h-4 w-3/4" /><Skeleton className="h-4 w-1/2" /></CardContent></Card>
+                                ))}
+                            </div>
+                       ) : behavioralSuggestedJobs.length > 0 ? (
+                           <div className="space-y-4">
+                                {behavioralSuggestedJobs.map((item) => (
+                                    <div key={item.job.id}>
+                                        {item.reason && <p className="text-sm text-muted-foreground font-semibold mb-2 ml-2 italic">{item.reason}</p>}
+                                        <JobCard job={item.job} showRecruiterName={false} />
+                                    </div>
+                                ))}
+                            </div>
+                       ) : (
+                           <div className="text-center py-8 text-muted-foreground">
+                             <p>Hãy xem và lưu một vài công việc để chúng tôi có thể gợi ý tốt hơn cho bạn!</p>
+                             <Button asChild variant="link" className="mt-2"><Link href="/jobs">Bắt đầu tìm kiếm</Link></Button>
+                           </div>
+                       )}
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
@@ -1278,6 +1312,7 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
