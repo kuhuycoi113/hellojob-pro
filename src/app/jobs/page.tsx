@@ -6,7 +6,7 @@ import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
 import { Job, jobData } from '@/lib/mock-data';
-import { allJapanLocations, japanRegions } from '@/lib/location-data';
+import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/location-data';
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType } from '@/lib/industry-data';
@@ -66,6 +66,9 @@ function JobsPageContent() {
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
         const jobDetailName = Object.values(industriesByJobType).flat().flatMap(i => i.keywords).find(k => k.slug === jobDetail)?.name || jobDetail;
         const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
+        
+        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
+        const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
 
 
         let results = jobData.filter(job => {
@@ -97,7 +100,7 @@ function JobsPageContent() {
                 });
             }
             
-            const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
+            const interviewLocationMatch = !interviewLocationName || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocationName.toLowerCase()));
 
             const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
 
@@ -117,6 +120,9 @@ function JobsPageContent() {
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
         const jobDetailName = Object.values(industriesByJobType).flat().flatMap(i => i.keywords).find(k => k.slug === jobDetail)?.name || jobDetail;
         const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
+        
+        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
+        const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
         
         const count = jobData.filter(job => {
             let visaMatch = true;
@@ -143,7 +149,7 @@ function JobsPageContent() {
                     return locationName ? job.workLocation && job.workLocation.toLowerCase().includes(locationName.toLowerCase()) : false;
                 });
             }
-            const interviewLocationMatch = !interviewLocation || interviewLocation === 'all' || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocation.toLowerCase()));
+            const interviewLocationMatch = !interviewLocationName || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocationName.toLowerCase()));
             const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
             const feeMatch = feeLimit === null || !job.netFee || parseInt(job.netFee.replace(/[^0-9]/g, '')) <= feeLimit;
             return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch;
@@ -155,9 +161,14 @@ function JobsPageContent() {
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters };
         for (const [key, value] of searchParams.entries()) {
-            if (Array.isArray(newFilters[key as keyof SearchFilters])) {
+            if (key === 'location') {
+                 if (!Array.isArray(newFilters.location)) {
+                    newFilters.location = [];
+                }
+                newFilters.location = searchParams.getAll(key);
+            } else if (Array.isArray(newFilters[key as keyof SearchFilters])) {
                 // If the key corresponds to an array in filters, use getAll
-                newFilters[key as keyof SearchFilters] = searchParams.getAll(key);
+                (newFilters[key as keyof SearchFilters] as any) = searchParams.getAll(key);
             } else {
                  // @ts-ignore
                 newFilters[key] = value;
