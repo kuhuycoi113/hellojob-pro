@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { industriesByJobType, type Industry, type JobDetail } from "@/lib/industry-data";
+import { industriesByJobType, type Industry } from "@/lib/industry-data";
 import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2 } from "lucide-react";
 import { japanRegions, allJapanLocations, interviewLocations } from '@/lib/location-data';
 import { type SearchFilters } from './search-results';
@@ -26,6 +26,16 @@ import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+
+const createSlug = (str: string) => {
+    return str
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '');
+};
 
 const conditionsByVisaDetail: { [key: string]: string[] } = {
   'thuc-tap-sinh-3-nam': ['Tuyển gấp', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Nợ phí', 'Phí mềm', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Bay nhanh', 'Trình cục sớm', 'Có bảng lương'],
@@ -205,7 +215,7 @@ MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 
 
 export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resultCount }: FilterSidebarProps) => {
-    const [availableJobDetails, setAvailableJobDetails] = useState<JobDetail[]>([]);
+    const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isFlexibleDate, setIsFlexibleDate] = useState(false);
     
@@ -269,7 +279,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             setAvailableJobDetails(selectedIndustryData?.keywords || []);
         } else {
              const allJobDetails = uniqueIndustries.flatMap(ind => ind.keywords || []);
-             setAvailableJobDetails([...new Map(allJobDetails.map(item => [item.slug, item])).values()]);
+             setAvailableJobDetails([...new Set(allJobDetails)]);
         }
 
     }, [filters.visa, filters.visaDetail, filters.industry]);
@@ -294,16 +304,14 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         }
     };
 
-
-    const handleJobTypeChange = (value: string) => {
-        onFilterChange({ visa: value, visaDetail: '', industry: '', jobDetail: '' });
-    }
-    
-     const handleVisaDetailChange = (value: string) => {
+    const handleVisaDetailChange = (value: string) => {
         const newFilters: Partial<SearchFilters> = { visaDetail: value };
-        const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
-        if (parentType && filters.visa !== parentType) {
-            newFilters.visa = parentType;
+        const parentTypeSlug = Object.keys(visaDetailsByVisaType).find(key => 
+            (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value)
+        );
+        
+        if (parentTypeSlug && filters.visa !== parentTypeSlug) {
+            newFilters.visa = parentTypeSlug;
             newFilters.industry = '';
             newFilters.jobDetail = '';
         }
@@ -319,7 +327,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                  newFilters.interviewLocation = '';
             }
         }
-
 
         onFilterChange(newFilters);
     };
@@ -470,7 +477,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn công việc"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all-details">Tất cả công việc</SelectItem>
-                                            {availableJobDetails.map(detail => <SelectItem key={detail.slug} value={detail.slug}>{detail.name}</SelectItem>)}
+                                            {availableJobDetails.map(detail => <SelectItem key={detail} value={createSlug(detail)}>{detail}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -711,7 +718,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                         <SelectTrigger className={cn(filters.experienceRequirement && filters.experienceRequirement !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn công việc"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả công việc</SelectItem>
-                                            {allJobDetailsForExperience.map(jobDetail => <SelectItem key={jobDetail.slug} value={jobDetail.slug}>{jobDetail.name}</SelectItem>)}
+                                            {allJobDetailsForExperience.map(jobDetail => <SelectItem key={jobDetail} value={createSlug(jobDetail)}>{jobDetail}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
