@@ -65,6 +65,9 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
       .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
       .slice(0, 4);
 
+    // Calculate total managed jobs
+    const managedJobsCount = jobData.filter(job => job.recruiter.id === consultant.id).length;
+
   return (
     <div className="bg-secondary">
       <div className="container mx-auto px-4 md:px-6 py-12">
@@ -101,7 +104,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                         <p className="text-muted-foreground text-sm mt-1">Ứng viên thành công</p>
                     </div>
                      <div>
-                        <p className="text-3xl font-bold text-primary">{consultant.managedJobs || 'N/A'}</p>
+                        <p className="text-3xl font-bold text-primary">{managedJobsCount}</p>
                         <p className="text-muted-foreground text-sm mt-1">Việc làm đang quản lý</p>
                     </div>
                 </CardContent>
