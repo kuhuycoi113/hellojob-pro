@@ -66,7 +66,7 @@ export function ContactButtons({ contact }: ContactButtonsProps) {
             <Popover>
                 <PopoverTrigger asChild>
                     <div id="MB4NUT01" className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                        <Button size="icon" variant="default" className="h-8 w-8 bg-primary/10 text-primary hover:bg-primary/20">
+                        <Button size="icon" variant="default" className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90">
                             <MessageSquare className="h-4 w-4"/>
                         </Button>
                          <Button size="icon" variant="outline" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
