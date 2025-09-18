@@ -494,7 +494,7 @@ const LoggedInView = () => {
             return;
         }
         fetchSuggestedJobs();
-        fetchBehavioralSuggestions(); // CANHANHOA01: Fetch behavioral suggestions
+        fetchBehavioralSuggestions();
         fetchSavedJobs();
 
         const handleStorageChange = () => {
@@ -1092,7 +1092,7 @@ const LoggedInView = () => {
                         <Label htmlFor="fee-usd">Phí tối đa (USD)</Label>
                         <Input 
                             id="fee-usd" 
-                            type="text"
+                            type="text" 
                             placeholder={getFeePlaceholder()}
                             value={getFeeDisplayValue(tempFee)}
                             onChange={handleFeeInputChange}
@@ -1312,6 +1312,7 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
 
 
 
