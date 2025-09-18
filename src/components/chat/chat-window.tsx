@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Send, Phone, Video, X, Paperclip, Image as ImageIcon } from 'lucide-react';
 import { ChatMessage } from './chat-message';
-import { type Conversation, type Message, currentUser, User, Attachment, helloJobBot } from '@/lib/chat-data';
+import { type Conversation, type Message, currentUser, type User, type Attachment, helloJobBot } from '@/lib/chat-data';
 import { useChat } from '@/contexts/ChatContext';
 import Link from 'next/link';
 import Image from 'next/image';

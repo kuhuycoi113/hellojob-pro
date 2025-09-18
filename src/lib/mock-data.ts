@@ -1,5 +1,6 @@
 
-import { consultants } from './chat-data';
+import * as chatData from './chat-data';
+import type { User } from './chat-data';
 
 export interface Job {
     id: string;
@@ -152,7 +153,7 @@ const generateRandomJob = (index: number): Job => {
 
         const allKeywords = [...new Set([...industryKeywords, ...visaKeywords])];
 
-        const expertConsultants = consultants.filter(c => {
+        const expertConsultants = chatData.consultants.filter(c => {
             const expertise = c.mainExpertise?.toLowerCase() || '';
             return allKeywords.some(keyword => expertise.includes(keyword));
         });
@@ -163,7 +164,7 @@ const generateRandomJob = (index: number): Job => {
         }
 
         // If no expert is found, fall back to random assignment
-        return consultants[index % consultants.length];
+        return chatData.consultants[index % chatData.consultants.length];
     };
     
     const assignedConsultant = findMatchingConsultant();
@@ -212,6 +213,7 @@ const generateRandomJob = (index: number): Job => {
         interviewRounds: (index % 3) + 1,
         netFee: visaType.includes('Thực tập sinh') ? `${90 + (index % 20)}tr` : undefined,
         target: `${(index % 5) + 1}tr`,
+        backFee: `${(index % 5) + 1}tr`,
         tags: [industry, visaType.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
         postedTime: `10:00 01/08/2024`,
         visaType: visaType,
