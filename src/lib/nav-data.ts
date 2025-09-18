@@ -16,6 +16,7 @@ import {
   Sparkles,
   Home,
   Briefcase,
+  UserSearch,
 } from 'lucide-react';
 
 export const mainNavLinks = [
@@ -33,7 +34,7 @@ export const mainNavLinks = [
 
 export const quickAccessLinks = [
   { href: '/roadmap', label: 'Lộ trình', icon: Compass },
-  { href: '/about', label: 'Giới thiệu', icon: Info },
+  { href: '/consultant-profile', label: 'Tư vấn viên', icon: UserSearch },
   { href: '/post-job', label: 'Đăng tuyển dụng', icon: PlusCircle },
   { href: '/dashboard', label: 'Dữ liệu & Báo cáo', icon: FileText },
   { href: '/franchise', label: 'Đối tác tại Nhật', icon: Handshake },
