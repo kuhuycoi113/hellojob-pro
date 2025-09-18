@@ -211,16 +211,15 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     <Bookmark className={cn("h-5 w-5 mr-2", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                                     Lưu
                                 </Button>
-                                {/* CHUCNANGUNGTUYEN01 */}
                                 <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
                             </div>
                         </div>
                     </div>
                 </div>
                  {showPostedTime && (
-                    <div className="w-full mt-2">
+                    <div className="w-full">
                         <p className="flex items-center gap-1.5 justify-end text-right w-full" style={{ fontSize: '11px', color: '#9B999A' }}>
-                            <span>Đăng lúc:</span>
+                            <span className='text-primary'>Đăng lúc:</span>
                             <span>{job.postedTime}</span>
                         </p>
                     </div>
