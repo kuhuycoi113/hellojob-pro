@@ -38,7 +38,7 @@ const formatCurrency = (value?: string) => {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-// Function to log user interaction
+// CANHANHOA01: Function to log user interaction
 const logInteraction = (job: Job, type: 'view' | 'save') => {
     try {
         const MAX_SIGNALS = 50; // Limit the number of signals to keep it manageable
@@ -64,6 +64,8 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
         }
 
         localStorage.setItem('behavioralSignals', JSON.stringify(signals));
+         // Trigger a storage event to update other components like the "My Jobs" page
+        window.dispatchEvent(new Event('storage'));
     } catch (error) {
         console.error("Error logging user interaction:", error);
     }
@@ -94,7 +96,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
       savedJobs.push(job.id);
       localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
       setIsSaved(true);
-      logInteraction(job, 'save'); // Log save interaction
+      logInteraction(job, 'save'); // CANHANHOA01: Log save interaction
     }
      // Trigger a storage event to update other components like the "My Jobs" page
     window.dispatchEvent(new Event('storage'));
@@ -115,6 +117,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'default', sh
     setIsAuthDialogOpen(true);
   };
   
+  // CANHANHOA01: Add handler to log view interaction
   const handleCardClick = () => {
       logInteraction(job, 'view');
   };
