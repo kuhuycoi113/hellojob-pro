@@ -62,7 +62,7 @@ const consultantData = [
   {
     id: 'nguyen-van-minh',
     name: 'Đào Quang Minh',
-    avatarUrl: 'https://placehold.co/200x200.png',
+    avatarUrl: '/img/TVV005.jpg',
     dataAiHint: 'male consultant portrait',
     experience: '6 năm',
     mainExpertise: 'Tư vấn Công xưởng và Ngoài trời',
