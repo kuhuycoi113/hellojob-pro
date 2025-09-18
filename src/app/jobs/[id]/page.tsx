@@ -301,7 +301,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     </aside>
                 </div>
                  {/* Suggestions Section */}
-                <div className="mt-12 space-y-12">
+                <div className="mt-16 pt-12 border-t space-y-12">
                     {behavioralSuggestions.length > 0 && (
                         <section>
                             <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
