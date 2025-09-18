@@ -26,7 +26,7 @@ const consultantData = [
   {
     id: 'nguyen-thi-phuong-loan',
     name: 'Nguyễn Thị Phương Loan',
-    avatarUrl: '/img/chiha.jpg',
+    avatarUrl: '/img/TVV002.jpg',
     dataAiHint: 'professional woman portrait',
     experience: '4 năm',
     mainExpertise: 'Tư vấn việc làm Kỹ sư & Trí thức',
@@ -38,7 +38,7 @@ const consultantData = [
   {
     id: 'nguyen-thi-ngoc-oanh',
     name: 'Nguyễn Thị Ngọc Oanh',
-    avatarUrl: 'https://placehold.co/200x200.png',
+    avatarUrl: '/img/TVV003.png',
     dataAiHint: 'professional woman portrait',
     experience: '3 năm',
     mainExpertise: 'Tư vấn ngành xây dựng & cơ khí',
@@ -50,7 +50,7 @@ const consultantData = [
   {
     id: 'pham-thi-ha',
     name: 'Phạm Thị Hà',
-    avatarUrl: 'https://placehold.co/200x200.png',
+    avatarUrl: '/img/TVV004.png',
     dataAiHint: 'professional woman portrait',
     experience: '2 năm',
     mainExpertise: 'Tư vấn ngành điều dưỡng & chăm sóc sức khỏe',
@@ -74,7 +74,7 @@ const consultantData = [
   {
     id: 'nguyen-thi-thu-trang',
     name: 'Nguyễn Thị Thu Trang',
-    avatarUrl: 'https://placehold.co/200x200.png',
+    avatarUrl: '/img/TVV006.jpg',
     dataAiHint: 'female consultant smiling',
     experience: '3 năm',
     mainExpertise: 'Tư vấn ngành nông nghiệp & thực phẩm',
