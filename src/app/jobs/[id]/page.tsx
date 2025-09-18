@@ -19,6 +19,7 @@ import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
 import type { CandidateProfile } from '@/ai/schemas';
 import { JobCard } from '@/components/job-card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/contexts/AuthContext';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -56,11 +57,13 @@ const convertToVnd = (jpyValue?: string) => {
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const router = useRouter();
+    const { role } = useAuth();
     const job = jobData.find(j => j.id === resolvedParams.id);
     const [isSaved, setIsSaved] = useState(false);
     const [profileSuggestions, setProfileSuggestions] = useState<Job[]>([]);
     const [behavioralSuggestions, setBehavioralSuggestions] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
 
     useEffect(() => {
         if (job) {
@@ -70,27 +73,26 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
         const fetchSuggestions = async () => {
             setIsLoading(true);
+            setIsLoadingBehavioral(true);
             try {
                 const storedProfile = localStorage.getItem('generatedCandidateProfile');
                 const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
                 
-                if (storedProfile) {
-                    const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+                const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
 
-                    // Fetch profile-based suggestions
-                    const profileResults = await matchJobsToProfile(profile, 'related');
-                    setProfileSuggestions(profileResults.map(r => r.job).filter(j => j.id !== resolvedParams.id).slice(0, 4));
+                // Fetch profile-based suggestions
+                const profileResults = await matchJobsToProfile(profile || {}, 'related');
+                setProfileSuggestions(profileResults.map(r => r.job).filter(j => j.id !== resolvedParams.id).slice(0, 4));
 
-                    // Fetch behavior-based suggestions if signals exist
-                    if (behavioralSignals.length > 0) {
-                        const behavioralResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
-                        setBehavioralSuggestions(behavioralResults.filter(r => r.job.id !== resolvedParams.id).slice(0, 4));
-                    }
-                }
+                // Fetch behavior-based suggestions if signals exist
+                const behavioralResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
+                setBehavioralSuggestions(behavioralResults.filter(r => r.job.id !== resolvedParams.id).slice(0, 4));
+
             } catch (error) {
                 console.error("Failed to fetch job suggestions:", error);
             } finally {
                 setIsLoading(false);
+                setIsLoadingBehavioral(false);
             }
         };
 
@@ -302,37 +304,44 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 </div>
                  {/* Suggestions Section */}
                 <div className="mt-16 pt-12 border-t space-y-12">
-                    {behavioralSuggestions.length > 0 && (
-                        <section>
-                            <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
-                            {isLoading ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                     {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64" />)}
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {behavioralSuggestions.map((item) => (
-                                        <div key={item.job.id}>
-                                            {item.reason && <p className="text-sm text-muted-foreground font-semibold mb-2 ml-2 italic">{item.reason}</p>}
-                                            <JobCard job={item.job} />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </section>
-                    )}
-                    {profileSuggestions.length > 0 && (
-                        <section>
-                            <h2 className="text-2xl font-bold font-headline mb-6"><Star className="inline-block mr-3 text-primary h-7 w-7"/>Gợi ý cho bạn</h2>
-                            {isLoading ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64" />)}
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {profileSuggestions.map((job) => <JobCard key={job.id} job={job} />)}
-                                </div>
-                            )}
+                    <section>
+                        <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
+                        {isLoadingBehavioral ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                 {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64" />)}
+                            </div>
+                        ) : behavioralSuggestions.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {behavioralSuggestions.map((item) => (
+                                    <div key={item.job.id}>
+                                        {item.reason && <p className="text-sm text-muted-foreground font-semibold mb-2 ml-2 italic">{item.reason}</p>}
+                                        <JobCard job={item.job} />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-muted-foreground">Không có gợi ý nào. Hãy xem thêm các công việc khác để chúng tôi hiểu bạn hơn!</p>
+                        )}
+                    </section>
+                    
+                    <section>
+                        <h2 className="text-2xl font-bold font-headline mb-6"><Star className="inline-block mr-3 text-primary h-7 w-7"/>Gợi ý cho bạn</h2>
+                        {isLoading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64" />)}
+                            </div>
+                        ) : profileSuggestions.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {profileSuggestions.map((job) => <JobCard key={job.id} job={job} />)}
+                            </div>
+                        ) : (
+                             <p className="text-muted-foreground">Không có gợi ý nào dựa trên hồ sơ của bạn. Hãy cập nhật hồ sơ để nhận gợi ý tốt hơn.</p>
+                        )}
+                    </section>
+
+                    {role === 'candidate' && (
+                        <section id="VL001">
+                            {/* This is the empty module for future design */}
                         </section>
                     )}
                 </div>
