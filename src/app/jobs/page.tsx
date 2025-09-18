@@ -37,12 +37,20 @@ const initialSearchFilters: SearchFilters = {
     quantity: '',
     interviewRounds: '',
     interviewDate: '',
+    netFee: '',
 };
 
 // Helper function to escape regex special characters
 function escapeRegExp(string: string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
+
+const parseSalary = (salaryStr?: string): number | null => {
+    if (!salaryStr) return null;
+    const numericStr = String(salaryStr).replace(/[^0-9]/g, '');
+    const value = parseInt(numericStr, 10);
+    return isNaN(value) ? null : value;
+};
 
 
 function JobsPageContent() {
@@ -61,19 +69,26 @@ function JobsPageContent() {
     // It is now only called when the user clicks "Apply" or on initial page load.
     const runFilter = useCallback((filtersToApply: SearchFilters) => {
         const { 
-            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate
+            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
+            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
         const jobDetailName = Object.values(industriesByJobType).flat().flatMap(i => i.keywords).find(k => k.slug === jobDetail)?.name || jobDetail;
-        const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
+        const feeLimit = parseSalary(netFee);
         
         const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
         const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
 
         const roundsSlug = interviewRounds;
         const roundsToMatch = roundsSlug ? parseInt(roundsSlug.split('-')[0], 10) : null;
+        
+        const basicSalaryMin = parseSalary(basicSalary);
+        const netSalaryMin = parseSalary(netSalary);
+        const hourlySalaryMin = parseSalary(hourlySalary);
+        const annualIncomeMin = parseSalary(annualIncome);
+        const annualBonusMin = parseSalary(annualBonus);
 
 
         let results = jobData.filter(job => {
@@ -109,13 +124,28 @@ function JobsPageContent() {
 
             const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
 
-            const feeMatch = feeLimit === null || !job.netFee || parseInt(job.netFee.replace(/[^0-9]/g, '')) <= feeLimit;
+            const feeMatch = feeLimit === null || !job.netFee || (parseSalary(job.netFee) || 0) <= feeLimit;
 
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
 
             const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDate && job.interviewDate <= interviewDate);
             
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch;
+            const jobBasicSalary = parseSalary(job.salary.basic);
+            const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);
+
+            const jobNetSalary = parseSalary(job.salary.actual);
+            const netSalaryMatch = netSalaryMin === null || (jobNetSalary !== null && jobNetSalary >= netSalaryMin);
+
+            // Assuming hourly salary isn't available in mock data, so this will be improved later
+            const hourlySalaryMatch = hourlySalaryMin === null; // Placeholder
+
+            const jobAnnualIncome = parseSalary(job.salary.annualIncome);
+            const annualIncomeMatch = annualIncomeMin === null || (jobAnnualIncome !== null && jobAnnualIncome >= annualIncomeMin);
+
+            const jobAnnualBonus = parseSalary(job.salary.annualBonus);
+            const annualBonusMatch = annualBonusMin === null || (jobAnnualBonus !== null && jobAnnualBonus >= annualBonusMin);
+            
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch;
         });
 
         setFilteredJobs(results);
@@ -123,18 +153,27 @@ function JobsPageContent() {
 
     // This function ONLY counts the results based on staged filters without updating the UI.
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
-        const { visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate } = filtersToCount;
+        const { 
+            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
+            basicSalary, netSalary, hourlySalary, annualIncome, annualBonus
+        } = filtersToCount;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
         const jobDetailName = Object.values(industriesByJobType).flat().flatMap(i => i.keywords).find(k => k.slug === jobDetail)?.name || jobDetail;
-        const feeLimit = netFee ? parseInt(netFee.replace(/[^0-9]/g, '')) : null;
+        const feeLimit = parseSalary(netFee);
         
         const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
         const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
         
         const roundsSlug = interviewRounds;
         const roundsToMatch = roundsSlug ? parseInt(roundsSlug.split('-')[0], 10) : null;
+        
+        const basicSalaryMin = parseSalary(basicSalary);
+        const netSalaryMin = parseSalary(netSalary);
+        const hourlySalaryMin = parseSalary(hourlySalary);
+        const annualIncomeMin = parseSalary(annualIncome);
+        const annualBonusMin = parseSalary(annualBonus);
         
         const count = jobData.filter(job => {
             let visaMatch = true;
@@ -163,11 +202,25 @@ function JobsPageContent() {
             }
             const interviewLocationMatch = !interviewLocationName || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocationName.toLowerCase()));
             const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
-            const feeMatch = feeLimit === null || !job.netFee || parseInt(job.netFee.replace(/[^0-9]/g, '')) <= feeLimit;
+            const feeMatch = feeLimit === null || !job.netFee || (parseSalary(job.netFee) || 0) <= feeLimit;
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
             const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDate && job.interviewDate <= interviewDate);
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch;
+            const jobBasicSalary = parseSalary(job.salary.basic);
+            const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);
+
+            const jobNetSalary = parseSalary(job.salary.actual);
+            const netSalaryMatch = netSalaryMin === null || (jobNetSalary !== null && jobNetSalary >= netSalaryMin);
+
+            const hourlySalaryMatch = hourlySalaryMin === null;
+
+            const jobAnnualIncome = parseSalary(job.salary.annualIncome);
+            const annualIncomeMatch = annualIncomeMin === null || (jobAnnualIncome !== null && jobAnnualIncome >= annualIncomeMin);
+
+            const jobAnnualBonus = parseSalary(job.salary.annualBonus);
+            const annualBonusMatch = annualBonusMin === null || (jobAnnualBonus !== null && jobAnnualBonus >= annualBonusMin);
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -177,12 +230,9 @@ function JobsPageContent() {
         const newFilters: SearchFilters = { ...initialSearchFilters };
         for (const [key, value] of searchParams.entries()) {
             if (key === 'location' || key === 'specialConditions') {
-                 if (!Array.isArray(newFilters[key])) {
-                    // @ts-ignore
-                    newFilters[key] = [];
-                }
+                const currentValues = newFilters[key as 'location' | 'specialConditions'] || [];
                 // @ts-ignore
-                newFilters[key] = searchParams.getAll(key);
+                newFilters[key] = [...currentValues, value];
             } else if (key === 'age' || key === 'height' || key === 'weight') {
                 const values = searchParams.getAll(key);
                 if (values.length === 2) {

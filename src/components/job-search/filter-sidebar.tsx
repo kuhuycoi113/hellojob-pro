@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Slider } from "@/components/ui/slider";
 import { industriesByJobType, type Industry, type JobDetail } from "@/lib/industry-data";
 import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2 } from "lucide-react";
-import { japanRegions, allJapanLocations, interviewLocations } from "@/lib/location-data";
+import { japanRegions, allJapanLocations, interviewLocations } from '@/lib/location-data';
 import { type SearchFilters } from './search-results';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -140,33 +140,63 @@ const getConvertedValue = (value: string | undefined, placeholder: string, rate:
     return `≈ ${convertedValue.toLocaleString('vi-VN')} VNĐ`;
 };
 
+const handleSalaryInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>, 
+    field: keyof SearchFilters,
+    limit: number | null,
+    onFilterChange: FilterSidebarProps['onFilterChange']
+) => {
+    const rawValue = e.target.value;
+    let num = Number(rawValue.replace(/[^0-9]/g, ''));
+
+    if (isNaN(num)) {
+        onFilterChange({ [field]: '' });
+        return;
+    }
+
+    if (limit && num > limit) {
+        num = limit;
+    }
+
+    onFilterChange({ [field]: String(num) });
+};
+
+const getDisplayValue = (value?: string) => {
+    if (!value) return '';
+    const num = Number(String(value).replace(/[^0-9]/g, ''));
+    if (isNaN(num)) return '';
+    return num.toLocaleString('ja-JP');
+};
+
 
 const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<FilterSidebarProps, 'filters' | 'onFilterChange'>) => {
     
     const placeholderText = "VD: 200,000";
 
-    const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onFilterChange({ basicSalary: e.target.value });
-    };
-
-    const getDisplayValue = (value: string | undefined) => {
-        if (!value) return '';
-        const num = Number(value.replace(/[^0-9]/g, ''));
-        if (isNaN(num)) return '';
-        return num.toLocaleString('ja-JP');
-    };
-
     return (
-        <div className="space-y-2">
-            <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
-            <Input 
-                id="basic-salary-jpy" 
-                type="text" 
-                placeholder={placeholderText} 
-                onChange={handleSalaryInputChange}
-                value={getDisplayValue(filters.basicSalary)} 
-            />
-            <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, placeholderText, JPY_VND_RATE, 'triệu VNĐ')}</p>
+        <div className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="basic-salary-jpy">Lương cơ bản (JPY/tháng)</Label>
+                <Input 
+                    id="basic-salary-jpy" 
+                    type="text" 
+                    placeholder={placeholderText} 
+                    onChange={(e) => handleSalaryInputChange(e, 'basicSalary', 10000000, onFilterChange)}
+                    value={getDisplayValue(filters.basicSalary)} 
+                />
+                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, placeholderText, JPY_VND_RATE, 'triệu VNĐ')}</p>
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="net-salary-jpy">Thực lĩnh tối thiểu (JPY/tháng)</Label>
+                <Input 
+                    id="net-salary-jpy" 
+                    type="text" 
+                    placeholder="VD: 160,000" 
+                    onChange={(e) => handleSalaryInputChange(e, 'netSalary', 10000000, onFilterChange)}
+                    value={getDisplayValue(filters.netSalary)} 
+                />
+                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'VD: 160,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
+            </div>
         </div>
     );
 });
@@ -325,52 +355,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
             </>
         )
     }
-
-    const salaryLimits: { [key: string]: number } = {
-        'basicSalary': 10000000,
-        'netSalary': 10000000,
-        'hourlySalary': 15000,
-        'annualIncome': 30000000,
-        'annualBonus': 5000000,
-    };
-    
-    const handleSalaryInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof SearchFilters) => {
-        const rawValue = e.target.value;
-        let num = Number(rawValue.replace(/[^0-9]/g, ''));
-
-        if (isNaN(num)) {
-            onFilterChange({ [field]: '' });
-            return;
-        }
-
-        let limit = salaryLimits[field as keyof typeof salaryLimits];
-        if (field === 'netFee' && filters.visaDetail) {
-            switch (filters.visaDetail) {
-                case 'thuc-tap-sinh-1-nam':
-                    limit = 1400;
-                    break;
-                case 'dac-dinh-dau-viet':
-                    limit = 2500;
-                    break;
-                default:
-                    limit = 3800;
-                    break;
-            }
-        }
-        
-        if (limit && num > limit) {
-            num = limit;
-        }
-
-        onFilterChange({ [field]: String(num) });
-    };
-
-    const getDisplayValue = (value: string | undefined) => {
-        if (!value) return '';
-        const num = Number(value.replace(/[^0-9]/g, ''));
-        if (isNaN(num)) return '';
-        return num.toLocaleString('ja-JP');
-    };
     
     const getFeePlaceholder = () => {
         switch (filters.visaDetail) {
@@ -651,7 +635,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                                     id="hourly-salary-jpy" 
                                                     type="text" 
                                                     placeholder="VD: 1,000" 
-                                                    onChange={(e) => handleSalaryInputChange(e, 'hourlySalary')}
+                                                    onChange={(e) => handleSalaryInputChange(e, 'hourlySalary', 15000, onFilterChange)}
                                                     value={getDisplayValue(filters.hourlySalary)} 
                                                 />
                                                 <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary, 'VD: 1,000', JPY_VND_RATE, 'trăm nghìn VNĐ')}</p>
@@ -665,7 +649,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                                         id="annual-income-jpy" 
                                                         type="text" 
                                                         placeholder="VD: 3,000,000" 
-                                                        onChange={(e) => handleSalaryInputChange(e, 'annualIncome')}
+                                                        onChange={(e) => handleSalaryInputChange(e, 'annualIncome', 30000000, onFilterChange)}
                                                         value={getDisplayValue(filters.annualIncome)} 
                                                     />
                                                         <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualIncome, 'VD: 3,000,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
@@ -676,7 +660,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                                         id="annual-bonus-jpy" 
                                                         type="text" 
                                                         placeholder="VD: 500,000" 
-                                                        onChange={(e) => handleSalaryInputChange(e, 'annualBonus')}
+                                                        onChange={(e) => handleSalaryInputChange(e, 'annualBonus', 5000000, onFilterChange)}
                                                         value={getDisplayValue(filters.annualBonus)} 
                                                     />
                                                         <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualBonus, 'VD: 500,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
@@ -690,25 +674,6 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                             </AccordionContent>
                         </AccordionItem>
                         
-                         <AccordionItem value="netSalary">
-                            <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-500"/>Thực lĩnh</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-4 pt-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="net-salary-jpy">Thực lĩnh tối thiểu (JPY/tháng)</Label>
-                                    <Input 
-                                        id="net-salary-jpy" 
-                                        type="text" 
-                                        placeholder="VD: 160,000" 
-                                        onChange={(e) => handleSalaryInputChange(e, 'netSalary')}
-                                        value={getDisplayValue(filters.netSalary)} 
-                                    />
-                                    <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'VD: 160,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-
                         {showFeeFilter && (
                             <AccordionItem value="netFee">
                                 <AccordionTrigger className="text-base font-semibold">
@@ -721,7 +686,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                             id="net-fee-usd" 
                                             type="text" 
                                             placeholder={getFeePlaceholder()}
-                                            onChange={(e) => handleSalaryInputChange(e, 'netFee')}
+                                            onChange={(e) => handleSalaryInputChange(e, 'netFee', null, onFilterChange)}
                                             value={getDisplayValue(filters.netFee)} 
                                         />
                                         <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
