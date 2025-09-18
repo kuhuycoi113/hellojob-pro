@@ -47,7 +47,7 @@ export const currentUser: User = {
 // Real consultants
 export const consultants: User[] = [
     {
-    id: 'consultant-1',
+    id: 'le-xuan-long',
     name: 'Lê Xuân Long',
     avatarUrl: '/img/long.jpg',
     dataAiHint: 'professional man portrait',
@@ -57,27 +57,17 @@ export const consultants: User[] = [
     strengths: ['Tận tình', 'Nhiều đơn', 'Hiểu rõ ngành'],
   },
   {
-    id: 'consultant-2',
-    name: 'Phạm Thị Hà',
-    avatarUrl: '/img/chiha.jpg',
-    dataAiHint: 'professional woman portrait',
-    experience: '2 năm',
-    mainExpertise: 'Tư vấn ngành điều dưỡng & chăm sóc sức khỏe',
-    successfulCandidates: 220,
-    strengths: ['Tận tâm', 'Am hiểu thủ tục', 'Hỗ trợ chi tiết'],
-  },
-   {
-    id: 'consultant-3',
+    id: 'nguyen-thi-phuong-loan',
     name: 'Nguyễn Thị Phương Loan',
-    avatarUrl: 'https://placehold.co/200x200.png',
+    avatarUrl: '/img/chiha.jpg',
     dataAiHint: 'professional woman portrait',
     experience: '4 năm',
     mainExpertise: 'Tư vấn việc làm Kỹ sư & Trí thức',
     successfulCandidates: 350,
     strengths: ['Nhiệt tình', 'Hỗ trợ 24/7', 'Quan hệ rộng'],
   },
-  {
-    id: 'consultant-4',
+   {
+    id: 'nguyen-thi-ngoc-oanh',
     name: 'Nguyễn Thị Ngọc Oanh',
     avatarUrl: 'https://placehold.co/200x200.png',
     dataAiHint: 'professional woman portrait',
@@ -87,7 +77,17 @@ export const consultants: User[] = [
     strengths: ['Nhiều đơn gấp', 'Hỗ trợ nhiệt tình', 'Kinh nghiệm'],
   },
   {
-    id: 'consultant-5',
+    id: 'pham-thi-ha',
+    name: 'Phạm Thị Hà',
+    avatarUrl: 'https://placehold.co/200x200.png',
+    dataAiHint: 'professional woman portrait',
+    experience: '2 năm',
+    mainExpertise: 'Tư vấn ngành điều dưỡng & chăm sóc sức khỏe',
+    successfulCandidates: 220,
+    strengths: ['Tận tâm', 'Am hiểu thủ tục', 'Hỗ trợ chi tiết'],
+  },
+  {
+    id: 'nguyen-van-minh',
     name: 'Nguyễn Văn Minh',
     avatarUrl: 'https://placehold.co/200x200.png',
     dataAiHint: 'male consultant portrait',
@@ -97,7 +97,7 @@ export const consultants: User[] = [
     strengths: ['Kinh nghiệm', 'Quan hệ rộng', 'Tỷ lệ đỗ cao'],
   },
   {
-    id: 'consultant-6',
+    id: 'nguyen-thi-thu-trang',
     name: 'Nguyễn Thị Thu Trang',
     avatarUrl: 'https://placehold.co/200x200.png',
     dataAiHint: 'female consultant smiling',
