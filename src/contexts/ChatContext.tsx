@@ -1,8 +1,7 @@
 
 'use client';
 
-import React from 'react';
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Conversation, Message, User, conversations, currentUser, helloJobBot, consultants, Attachment } from '@/lib/chat-data';
 import { recommendJobs, type JobRecommendationResponse } from '@/ai/flows/recommend-jobs-flow';
 
@@ -136,7 +135,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
                 id: `msg-ai-${Date.now()}`,
                 sender: helloJobBot,
                 text: aiResult.message,
-                recommendations: aiResult.requiresClarification ? [] : aiResult.recommendations,
+                recommendations: aiResult.recommendations,
                 suggestedReplies: aiResult.suggestedReplies || [],
                 timestamp: new Date().toISOString(),
             };
