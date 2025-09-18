@@ -64,7 +64,13 @@ const experienceYears = [
 const visionRequirements = ["Không yêu cầu", "Yêu cầu thị lực tốt", "Không mù màu"];
 const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
 
-const interviewRoundsOptions = ["1 vòng", "2 vòng", "3 vòng", "4 vòng", "5 vòng"];
+const interviewRoundsOptions = [
+    { name: "1 vòng", slug: "1-vong" },
+    { name: "2 vòng", slug: "2-vong" },
+    { name: "3 vòng", slug: "3-vong" },
+    { name: "4 vòng", slug: "4-vong" },
+    { name: "5 vòng", slug: "5-vong" }
+];
 const workShifts = [
     "Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)",
     "Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)",
@@ -571,9 +577,13 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Số vòng phỏng vấn</Label>
-                                    <Select><SelectTrigger><SelectValue placeholder="Chọn số vòng" /></SelectTrigger>
+                                    <Select value={filters.interviewRounds} onValueChange={(value) => onFilterChange({ interviewRounds: value })}>
+                                        <SelectTrigger className={cn(filters.interviewRounds && filters.interviewRounds !== 'all' && 'text-primary')}>
+                                            <SelectValue placeholder="Chọn số vòng" />
+                                        </SelectTrigger>
                                         <SelectContent>
-                                            {interviewRoundsOptions.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                            <SelectItem value="all">Tất cả</SelectItem>
+                                            {interviewRoundsOptions.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -955,5 +965,3 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         </div>
     );
 }
-
-    

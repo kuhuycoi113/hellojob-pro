@@ -35,6 +35,7 @@ const initialSearchFilters: SearchFilters = {
     tattooRequirement: '',
     hepatitisBRequirement: '',
     quantity: '',
+    interviewRounds: '',
 };
 
 // Helper function to escape regex special characters
@@ -59,7 +60,7 @@ function JobsPageContent() {
     // It is now only called when the user clicks "Apply" or on initial page load.
     const runFilter = useCallback((filtersToApply: SearchFilters) => {
         const { 
-            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee
+            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -69,6 +70,9 @@ function JobsPageContent() {
         
         const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
         const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
+
+        const roundsSlug = interviewRounds;
+        const roundsToMatch = roundsSlug ? parseInt(roundsSlug.split('-')[0], 10) : null;
 
 
         let results = jobData.filter(job => {
@@ -105,8 +109,10 @@ function JobsPageContent() {
             const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
 
             const feeMatch = feeLimit === null || !job.netFee || parseInt(job.netFee.replace(/[^0-9]/g, '')) <= feeLimit;
+
+            const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
             
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch;
         });
 
         setFilteredJobs(results);
@@ -114,7 +120,7 @@ function JobsPageContent() {
 
     // This function ONLY counts the results based on staged filters without updating the UI.
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
-        const { visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee } = filtersToCount;
+        const { visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds } = filtersToCount;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
         const industryName = Object.values(industriesByJobType).flat().find(i => i.slug === industry)?.name || industry;
@@ -123,6 +129,9 @@ function JobsPageContent() {
         
         const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
         const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
+        
+        const roundsSlug = interviewRounds;
+        const roundsToMatch = roundsSlug ? parseInt(roundsSlug.split('-')[0], 10) : null;
         
         const count = jobData.filter(job => {
             let visaMatch = true;
@@ -152,7 +161,8 @@ function JobsPageContent() {
             const interviewLocationMatch = !interviewLocationName || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocationName.toLowerCase()));
             const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
             const feeMatch = feeLimit === null || !job.netFee || parseInt(job.netFee.replace(/[^0-9]/g, '')) <= feeLimit;
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch;
+            const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -262,4 +272,3 @@ export default function JobsPage() {
     </Suspense>
   );
 }
-

@@ -36,7 +36,8 @@ export type SearchFilters = {
     tattooRequirement?: string;
     hepatitisBRequirement?: string;
     netFee?: string;
-    quantity?: string; // Add quantity to filters
+    quantity?: string;
+    interviewRounds?: string;
 }
 
 type SearchResultsProps = {
