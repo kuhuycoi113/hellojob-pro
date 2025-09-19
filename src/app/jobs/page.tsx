@@ -36,7 +36,7 @@ const initialSearchFilters: SearchFilters = {
     yearsOfExperience: '',
     tattooRequirement: '',
     hepatitisBRequirement: '',
-    visionRequirement: '',
+    visionRequirement: 'all',
     quantity: '',
     interviewRounds: '',
     interviewDate: '',
@@ -247,7 +247,7 @@ function JobsPageContent() {
                 weightMatch = filterMinWeight <= jobMaxWeight && filterMaxWeight >= jobMinWeight;
             }
 
-            const visionMatch = !visionRequirement || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
+            const visionMatch = !visionRequirement || visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
 
             return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch;
         });
@@ -365,7 +365,7 @@ function JobsPageContent() {
                 weightMatch = filterMinWeight <= jobMaxWeight && filterMaxWeight >= jobMinWeight;
             }
 
-            const visionMatch = !visionRequirement || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
+            const visionMatch = !visionRequirement || visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
 
             return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch;
         }).length;

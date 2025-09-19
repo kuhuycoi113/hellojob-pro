@@ -60,7 +60,7 @@ const englishLevels = [
 ];
 const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon", "Không yêu cầu"];
 const visionRequirements = [
-    { name: "Tất cả", slug: "" },
+    { name: "Tất cả", slug: "all" },
     { name: "Không yêu cầu", slug: "khong-yeu-cau" },
     { name: "Yêu cầu thị lực tốt", slug: "yeu-cau-thi-luc-tot" },
     { name: "Không mù màu", slug: "khong-mu-mau" }
@@ -792,7 +792,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 </div>
                                  <div className="space-y-2">
                                     <Label className="font-semibold">Yêu cầu thị lực</Label>
-                                    <Select value={filters.visionRequirement} onValueChange={(value) => onFilterChange({ visionRequirement: value })}>
+                                    <Select value={filters.visionRequirement || 'all'} onValueChange={(value) => onFilterChange({ visionRequirement: value })}>
                                         <SelectTrigger className="mt-2" id="vision-requirement"><SelectValue placeholder="Chọn yêu cầu thị lực" /></SelectTrigger>
                                         <SelectContent>
                                             {visionRequirements.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
