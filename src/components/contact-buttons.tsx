@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useChat } from '@/contexts/ChatContext';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 
 // Define a more generic type for the contact person
 type ContactPerson = {
@@ -23,6 +24,12 @@ interface ContactButtonsProps {
 
 export function ContactButtons({ contact, showChatText = false }: ContactButtonsProps) {
   const { openChat } = useChat();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const handleChatClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // Prevent card's onClick from firing
@@ -49,8 +56,8 @@ export function ContactButtons({ contact, showChatText = false }: ContactButtons
                 className={cn("h-8 hover:bg-primary/90", showChatText ? "bg-primary" : "bg-primary w-8")}
                 onClick={handleChatClick}
             >
-                <MessageSquare className={cn("h-4 w-4", showChatText ? "text-primary-foreground" : "")}/>
-                {showChatText && <span className="ml-2">Chat với Tư vấn viên</span>}
+                <MessageSquare className={cn("h-4 w-4", showChatText && isClient ? "text-primary-foreground" : "")}/>
+                {showChatText && isClient && <span className="ml-2">Chat với Tư vấn viên</span>}
             </Button>
             <Button asChild variant="outline" size="icon" className="h-8 w-8 border-purple-500 text-purple-500 hover:bg-purple-50 hover:text-purple-600">
                 <Link href="https://m.me/your_user_id" target="_blank" onClick={handleLinkClick}>
