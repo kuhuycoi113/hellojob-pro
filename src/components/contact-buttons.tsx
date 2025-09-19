@@ -99,25 +99,27 @@ export function ContactButtons({ contact, showChatText = false }: ContactButtons
                     </div>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-2">
-                    <div className="flex gap-2">
-                        <Button size="icon" className="h-12 w-12 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
-                            <MessageSquare className="h-6 w-6"/>
+                    <div className="flex flex-col gap-2">
+                        <Button size="lg" className="h-12 w-full bg-primary hover:bg-primary/90" onClick={handleChatClick}>
+                            <MessageSquare className="mr-2 h-6 w-6"/> Chat với Tư vấn viên
                         </Button>
-                        <Button asChild variant="outline" size="icon" className="h-12 w-12 border-purple-500 hover:bg-purple-50">
-                            <Link href="https://m.me/your_user_id" target="_blank" onClick={handleLinkClick}>
-                                <Image src="/img/Mess.svg" alt="Messenger" width={28} height={28} />
-                            </Link>
-                        </Button>
-                        <Button asChild variant="outline" size="icon" className="h-12 w-12 border-blue-500 hover:bg-blue-50">
-                            <Link href="https://zalo.me/your_zalo_id" target="_blank" onClick={handleLinkClick}>
-                              <Image src="/img/Zalo.svg" alt="Zalo" width={28} height={28} />
-                            </Link>
-                        </Button>
-                        <Button asChild variant="outline" size="icon" className="h-12 w-12 border-green-500 hover:bg-green-50">
-                             <Link href="tel:09012345678" onClick={handleLinkClick}>
-                                <Image src="/img/phone.svg" alt="Phone" width={28} height={28} />
-                            </Link>
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button asChild variant="outline" size="icon" className="h-12 w-12 flex-1 border-purple-500 hover:bg-purple-50">
+                                <Link href="https://m.me/your_user_id" target="_blank" onClick={handleLinkClick}>
+                                    <Image src="/img/Mess.svg" alt="Messenger" width={28} height={28} />
+                                </Link>
+                            </Button>
+                            <Button asChild variant="outline" size="icon" className="h-12 w-12 flex-1 border-blue-500 hover:bg-blue-50">
+                                <Link href="https://zalo.me/your_zalo_id" target="_blank" onClick={handleLinkClick}>
+                                  <Image src="/img/Zalo.svg" alt="Zalo" width={28} height={28} />
+                                </Link>
+                            </Button>
+                            <Button asChild variant="outline" size="icon" className="h-12 w-12 flex-1 border-green-500 hover:bg-green-50">
+                                 <Link href="tel:09012345678" onClick={handleLinkClick}>
+                                    <Image src="/img/phone.svg" alt="Phone" width={28} height={28} />
+                                </Link>
+                            </Button>
+                        </div>
                     </div>
                 </PopoverContent>
             </Popover>
