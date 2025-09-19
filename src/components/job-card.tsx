@@ -300,7 +300,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                         <span>{job.id}</span>
                       </div>
-                      <Button variant="outline" size="icon" className="absolute bottom-2 right-2 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
+                      <Button variant="outline" size="icon" className="absolute top-2 right-2 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
                         <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                       </Button>
                 </div>
@@ -327,18 +327,25 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <span>{job.workLocation}</span>
                     </div>
 
-                    <div className="mt-auto flex items-center justify-between">
-                        <div className="flex items-center gap-1">
-                            <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                                <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
-                                    <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
-                                    <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                            </Link>
-                            <ContactButtons contact={job.recruiter as any} />
+                    <div className="mt-auto">
+                        <div className="flex items-center justify-between">
+                             <div className="flex items-center gap-1">
+                                <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                                    <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                                        <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                        <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                </Link>
+                                <ContactButtons contact={job.recruiter as any} />
+                            </div>
+                            <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
                         </div>
-                        {/* CHUCNANGUNGTUYEN01 */}
-                        <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
+                        {showPostedTime && (
+                             <p className="mt-1 text-right w-full" style={{ fontSize: '11px' }}>
+                                <span className='text-primary'>Đăng lúc:</span>
+                                <span className='text-muted-foreground'> {job.postedTime.split(' ')[1]}</span>
+                            </p>
+                        )}
                     </div>
                 </div>
              </div>
