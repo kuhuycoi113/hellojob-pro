@@ -121,10 +121,19 @@ const parsePhysicalRequirement = (reqStr?: string): [number, number] => {
 const allIndustries: Industry[] = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
 const tattooRequirements = [
-    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
+    { name: "Không yêu cầu", slug: "all" },
     { name: "Không nhận hình xăm", slug: "khong-nhan-hinh-xam" },
     { name: "Nhận xăm nhỏ (kín)", slug: "nhan-xam-nho-kin" },
     { name: "Nhận cả xăm to (lộ)", slug: "nhan-ca-xam-to-lo" },
+];
+
+const languageLevels = [
+    { name: 'N1', slug: 'n1' },
+    { name: 'N2', slug: 'n2' },
+    { name: 'N3', slug: 'n3' },
+    { name: 'N4', slug: 'n4' },
+    { name: 'N5', slug: 'n5' },
+    { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
 ];
 
 function JobsPageContent() {
@@ -142,7 +151,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age, height, weight, visionRequirement, tattooRequirement
+            age, height, weight, visionRequirement, tattooRequirement, languageRequirement
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -257,10 +266,13 @@ function JobsPageContent() {
             const visionMatch = !visionRequirement || visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
             
             const tattooReqName = tattooRequirements.find(t => t.slug === tattooRequirement)?.name;
-            const tattooMatch = !tattooRequirement || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
+            const tattooMatch = !tattooRequirement || tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
+
+            const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
+            const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
 
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch;
         });
 
         setFilteredJobs(results);
@@ -270,7 +282,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age, height, weight, visionRequirement, tattooRequirement
+            age, height, weight, visionRequirement, tattooRequirement, languageRequirement
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -379,9 +391,13 @@ function JobsPageContent() {
             const visionMatch = !visionRequirement || visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
             
             const tattooReqName = tattooRequirements.find(t => t.slug === tattooRequirement)?.name;
-            const tattooMatch = !tattooRequirement || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
+            const tattooMatch = !tattooRequirement || tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch;
+            const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
+            const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
+
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -405,6 +421,8 @@ function JobsPageContent() {
                 newFilters['experienceRequirement'] = value;
             } else if (key === 'tattoo') {
                 newFilters['tattooRequirement'] = value;
+            } else if (key === 'lang') {
+                newFilters['languageRequirement'] = value;
             }
              else {
                  // @ts-ignore
@@ -447,6 +465,8 @@ function JobsPageContent() {
                         query.set('expReq', String(value));
                     } else if (key === 'tattooRequirement') {
                         query.set('tattoo', String(value));
+                    } else if (key === 'languageRequirement') {
+                        query.set('lang', String(value));
                     }
                     else {
                         query.set(key, String(value));

@@ -51,7 +51,14 @@ const conditionsByVisaDetail: { [key: string]: string[] } = {
 
 const allSpecialConditions = [...new Set(Object.values(conditionsByVisaDetail).flat())];
 
-const languageLevels = ['N1', 'N2', 'N3', 'N4', 'N5', 'Không yêu cầu'];
+const languageLevels = [
+    { name: "N1", slug: "n1" },
+    { name: "N2", slug: "n2" },
+    { name: "N3", slug: "n3" },
+    { name: "N4", slug: "n4" },
+    { name: "N5", slug: "n5" },
+    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
+];
 const englishLevels = [
     "TOEIC 900", "TOEIC 800", "TOEIC 700", "TOEIC 600", "TOEIC 500", "TOEIC 400",
     "IELTS 9.0", "IELTS 8.0", "IELTS 7.0", "IELTS 6.0", "IELTS 5.0", "IELTS 4.0",
@@ -66,7 +73,7 @@ const visionRequirements = [
     { name: "Không mù màu", slug: "khong-mu-mau" }
 ];
 const tattooRequirements = [
-    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
+    { name: "Không yêu cầu", slug: "all" },
     { name: "Không nhận hình xăm", slug: "khong-nhan-hinh-xam" },
     { name: "Nhận xăm nhỏ (kín)", slug: "nhan-xam-nho-kin" },
     { name: "Nhận cả xăm to (lộ)", slug: "nhan-ca-xam-to-lo" },
@@ -808,8 +815,8 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 {showTattooFilter && (
                                 <div className="space-y-2">
                                     <Label className="font-semibold">Yêu cầu hình xăm</Label>
-                                    <Select value={filters.tattooRequirement} onValueChange={(value) => onFilterChange({ tattooRequirement: value })}>
-                                        <SelectTrigger className={cn(filters.tattooRequirement && "text-primary")}><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
+                                    <Select value={filters.tattooRequirement || 'all'} onValueChange={(value) => onFilterChange({ tattooRequirement: value })}>
+                                        <SelectTrigger className={cn(filters.tattooRequirement && filters.tattooRequirement !== 'all' && "text-primary")}><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
                                         <SelectContent>
                                             {tattooRequirements.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
                                         </SelectContent>
@@ -818,10 +825,11 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 )}
                                 <div className="space-y-2">
                                     <Label className="font-semibold">Trình độ tiếng Nhật</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn trình độ" /></SelectTrigger>
+                                    <Select value={filters.languageRequirement} onValueChange={(value) => onFilterChange({ languageRequirement: value })}>
+                                        <SelectTrigger className={cn(filters.languageRequirement && filters.languageRequirement !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
                                         <SelectContent>
-                                            {languageLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                            <SelectItem value="all">Tất cả</SelectItem>
+                                            {languageLevels.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
