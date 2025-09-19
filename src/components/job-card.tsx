@@ -296,11 +296,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
              <div className="group cursor-pointer" onClick={handleCardClick}>
                 <div className="relative aspect-video w-full">
                      <Image src={job.image.src} alt={job.title} fill className="object-cover transition-transform group-hover:scale-105" />
-                      <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/50 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                         <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                         <span>{job.id}</span>
                       </div>
-                      <Button variant="outline" size="icon" className="absolute top-2 right-2 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
+                      <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
                         <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                       </Button>
                 </div>
