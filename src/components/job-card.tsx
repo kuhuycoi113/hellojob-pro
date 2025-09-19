@@ -135,7 +135,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   if (variant === 'list-item') {
      return (
         <>
-            <Card id="HIENTHIVIEC01" className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer" onClick={handleCardClick}>
+            <div id="HIENTHIVIEC01" className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground" onClick={handleCardClick}>
                 <div className="p-3 hover:bg-secondary/30">
                     <div className="flex flex-col items-stretch gap-4 md:flex-row">
                          <div className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
@@ -227,7 +227,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         </div>
                     )}
                 </div>
-            </Card>
+            </div>
              <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
             <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
                 <AlertDialogContent>
@@ -292,13 +292,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   return (
     <>
         <Card id="HIENTHIVIEC02" className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-border shadow-sm transition-shadow duration-300 hover:shadow-lg")}>
-             <Link href={`/jobs/${job.id}`} className="group" onClick={(e) => {
-                if ((e.target as HTMLElement).closest('button')) {
-                    e.preventDefault();
-                } else {
-                    handleCardClick(e);
-                }
-             }}>
+             <div className="group cursor-pointer" onClick={handleCardClick}>
                 <div className="relative aspect-video w-full">
                      <Image src={job.image.src} alt={job.title} fill className="object-cover transition-transform group-hover:scale-105" />
                       <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/50 px-1.5 py-0.5 text-[10px] font-bold text-white">
@@ -310,7 +304,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                       </Button>
                 </div>
                 <div className="flex flex-grow flex-col p-3">
-                    <h3 className="mb-2 h-10 cursor-pointer text-sm font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
+                    <h3 className="mb-2 h-10 text-sm font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
                     <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
                         {job.visaDetail && (
                         <Badge
@@ -334,7 +328,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
                     <div className="mt-auto flex items-center justify-between">
                         <div className="flex items-center gap-1">
-                            <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
+                            <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                                 <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
                                     <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                                     <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
@@ -346,7 +340,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
                     </div>
                 </div>
-             </Link>
+             </div>
         </Card>
         <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
         <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
