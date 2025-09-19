@@ -497,6 +497,8 @@ function JobsPageContent() {
                 newFilters['educationRequirement'] = value;
             } else if (key === 'hand') {
                 newFilters['dominantHand'] = value;
+            } else if (key === 'sl') {
+                newFilters['quantity'] = value;
             }
              else {
                  // @ts-ignore
@@ -546,6 +548,8 @@ function JobsPageContent() {
                         query.set('edu', String(value));
                     } else if (key === 'dominantHand') {
                         query.set('hand', String(value));
+                    } else if (key === 'quantity') {
+                        query.set('sl', String(value));
                     }
                     else {
                         query.set(key, String(value));
