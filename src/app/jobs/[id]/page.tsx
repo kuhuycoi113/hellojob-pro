@@ -230,7 +230,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     {job.details.images && job.details.images.length > 0 && (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
-                                                <Image src={job.details.images[0].src} alt={job.details.images[0].alt} fill className="object-cover" data-ai-hint={job.details.images[0].dataAiHint}/>
+                                                <Image id="TACNGHIEP01" src={job.details.images[0].src} alt={job.details.images[0].alt} fill className="object-cover" data-ai-hint={job.details.images[0].dataAiHint}/>
                                             </div>
                                             <div className="grid grid-cols-1 gap-4">
                                                 <div className="relative aspect-video rounded-lg overflow-hidden">
