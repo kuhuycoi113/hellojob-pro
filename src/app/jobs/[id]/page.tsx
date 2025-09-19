@@ -175,8 +175,8 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 // Silently ignore user cancellation
                 console.log('Share cancelled by user.');
             } else {
+                // For other errors (like PermissionDenied), fall back to copying the link.
                 console.error("Error sharing:", err);
-                // Fallback to copying the link for other errors
                 copyLink();
             }
           }
