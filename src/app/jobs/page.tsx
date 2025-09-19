@@ -530,7 +530,7 @@ function JobsPageContent() {
       setStagedFilters(prev => {
           const updated = {...prev, ...newFilters};
           if (newFilters.visa !== undefined) {
-             updated.visaDetail = '';
+             updated.visaDetail = undefined as any;
              updated.industry = '';
              updated.jobDetail = '';
           }
