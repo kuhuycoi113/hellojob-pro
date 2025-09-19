@@ -159,19 +159,25 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           text: `Hãy xem công việc này trên HelloJob: ${job.title}`,
           url: window.location.href,
         };
+        const copyLink = () => {
+            navigator.clipboard.writeText(window.location.href);
+            toast({
+                title: "Đã sao chép liên kết!",
+                description: "Bạn có thể dán và chia sẻ liên kết này.",
+            });
+        }
         if (navigator.share) {
           try {
             await navigator.share(shareData);
           } catch (err) {
             console.error("Error sharing:", err);
+            // If the user cancels the share sheet, or if there's an error,
+            // fall back to copying the link. This provides a better UX.
+            copyLink();
           }
         } else {
-          // Fallback for desktop
-          navigator.clipboard.writeText(window.location.href);
-          toast({
-            title: "Đã sao chép liên kết!",
-            description: "Bạn có thể dán và chia sẻ liên kết này.",
-          });
+          // Fallback for desktop or browsers that don't support the API
+          copyLink();
         }
     };
 
