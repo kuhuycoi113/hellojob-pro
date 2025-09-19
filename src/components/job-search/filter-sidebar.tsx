@@ -156,6 +156,62 @@ const getFutureMonths = () => {
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
+const parseSalary = (salaryStr?: string): number | null => {
+    if (!salaryStr) return null;
+    const numericStr = String(salaryStr).replace(/[^0-9]/g, '');
+    const value = parseInt(numericStr, 10);
+    return isNaN(value) ? null : value;
+};
+
+const parseExperienceToRange = (expStr?: string): [number, number] => {
+    if (!expStr || expStr === 'Không yêu cầu') return [0, Infinity];
+    
+    const cleanedStr = expStr.toLowerCase().replace(',', '.');
+    
+    if (cleanedStr.startsWith('dưới')) {
+        const val = parseFloat(cleanedStr.replace(/[^0-9.]/g, ''));
+        return [0, val];
+    }
+    if (cleanedStr.startsWith('trên')) {
+        const val = parseFloat(cleanedStr.replace(/[^0-9.]/g, ''));
+        return [val, Infinity];
+    }
+    const parts = cleanedStr.split('-').map(p => parseFloat(p.trim().replace(/[^0-9.]/g, '')));
+    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        return [parts[0], parts[1]];
+    }
+    return [0, Infinity]; // Default fallback
+};
+
+const parseAgeRequirement = (ageStr?: string): [number, number] | null => {
+    if (!ageStr) return null;
+    const parts = ageStr.split('-').map(p => parseInt(p.trim(), 10));
+    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        return [parts[0], parts[1]];
+    }
+    return null;
+};
+
+const parsePhysicalRequirement = (reqStr?: string): [number, number] => {
+    if (!reqStr) return [0, Infinity];
+    const cleanedStr = reqStr.toLowerCase();
+    const numbers = cleanedStr.match(/\d+/g)?.map(Number) || [];
+
+    if (cleanedStr.includes('trên')) {
+        return [numbers[0] || 0, Infinity];
+    }
+    if (cleanedStr.includes('dưới')) {
+        return [0, numbers[0] || Infinity];
+    }
+    if (numbers.length === 2) {
+        return [numbers[0], numbers[1]];
+    }
+    if (numbers.length === 1) {
+        return [numbers[0], numbers[0]]; // Exact match
+    }
+
+    return [0, Infinity];
+};
 
 
 interface FilterSidebarProps {
@@ -266,17 +322,113 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         const countsByPrefecture: { [key: string]: number } = {};
         const countsByRegion: { [key: string]: number } = {};
 
+        // Initialize all locations with 0
         allJapanLocations.forEach(p => {
-            if (!countsByPrefecture[p.name]) countsByPrefecture[p.name] = 0;
+            countsByPrefecture[p.name] = 0;
         });
         japanRegions.forEach(r => {
-            if (!countsByRegion[r.name]) countsByRegion[r.name] = 0;
+            countsByRegion[r.name] = 0;
+        });
+        
+        const filtersToApply = { ...filters };
+        const industryObject = allIndustries.find(i => i.slug === filtersToApply.industry);
+        const industryName = industryObject?.name || filtersToApply.industry;
+        const feeLimit = parseSalary(filtersToApply.netFee);
+        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
+        const interviewLocationName = allInterviewLocations.find(l => l.slug === filtersToApply.interviewLocation)?.name;
+        const roundsSlug = filtersToApply.interviewRounds;
+        const roundsToMatch = roundsSlug ? parseInt(roundsSlug.split('-')[0], 10) : null;
+        const basicSalaryMin = parseSalary(filtersToApply.basicSalary);
+        const netSalaryMin = parseSalary(filtersToApply.netSalary);
+        const hourlySalaryMin = parseSalary(filtersToApply.hourlySalary);
+        const annualIncomeMin = parseSalary(filtersToApply.annualIncome);
+        const annualBonusMin = parseSalary(filtersToApply.annualBonus);
+        const yoeSlug = filtersToApply.yearsOfExperience || '';
+        const yoeName = experienceYears.find(y => y.slug === yoeSlug)?.name || '';
+        const [minExp, maxExp] = parseExperienceToRange(yoeName);
+        const expReqSlug = filtersToApply.experienceRequirement || '';
+        const eduReqName = educationLevels.find(e => e.slug === filtersToApply.educationRequirement)?.name;
+        const dominantHandName = dominantHands.find(d => d.slug === filtersToApply.dominantHand)?.name;
+
+        // Filter jobs based on all criteria EXCEPT location
+        const preFilteredJobs = jobData.filter(job => {
+             let visaMatch = true;
+            if (filtersToApply.visaDetail && filtersToApply.visaDetail !== 'all-details') {
+                const targetVisaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === filtersToApply.visaDetail)?.name;
+                visaMatch = job.visaDetail === targetVisaName;
+            } else if (filtersToApply.visa && filtersToApply.visa !== 'all') {
+                 const targetVisaTypeObject = japanJobTypes.find(v => v.slug === filtersToApply.visa);
+                 visaMatch = job.visaType === targetVisaTypeObject?.name;
+            }
+
+            const industryMatch = !filtersToApply.industry || filtersToApply.industry === 'all' || (job.industry && job.industry === industryName);
+            const jobDetailMatch = !filtersToApply.jobDetail || (job.title && createSlug(job.title).includes(filtersToApply.jobDetail)) || (job.details.description && createSlug(job.details.description).includes(filtersToApply.jobDetail));
+            const expReqMatch = !expReqSlug || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(expReqSlug);
+            const [jobMinExp] = parseExperienceToRange(job.yearsOfExperience);
+            const yearsOfExperienceMatch = !yoeSlug || (jobMinExp <= maxExp);
+            const interviewLocationMatch = !interviewLocationName || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocationName.toLowerCase()));
+            const quantityMatch = !filtersToApply.quantity || job.quantity >= parseInt(filtersToApply.quantity, 10);
+            const feeMatch = feeLimit === null || !job.netFee || (parseSalary(job.netFee) || 0) <= feeLimit;
+            const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
+            const interviewDateMatch = !filtersToApply.interviewDate || filtersToApply.interviewDate === 'flexible' || (job.interviewDate && job.interviewDate <= filtersToApply.interviewDate);
+            const jobBasicSalary = parseSalary(job.salary.basic);
+            const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);
+            const jobNetSalary = parseSalary(job.salary.actual);
+            const netSalaryMatch = netSalaryMin === null || (jobNetSalary !== null && jobNetSalary >= netSalaryMin);
+            const hourlySalaryMatch = hourlySalaryMin === null;
+            const jobAnnualIncome = parseSalary(job.salary.annualIncome);
+            const annualIncomeMatch = annualIncomeMin === null || (jobAnnualIncome !== null && jobAnnualIncome >= annualIncomeMin);
+            const jobAnnualBonus = parseSalary(job.salary.annualBonus);
+            const annualBonusMatch = annualBonusMin === null || (jobAnnualBonus !== null && jobAnnualBonus >= annualBonusMin);
+            let genderMatch = true;
+            if (filtersToApply.gender) {
+                const targetGender = filtersToApply.gender === 'nam' ? 'Nam' : 'Nữ';
+                genderMatch = job.gender === targetGender || job.gender === 'Cả nam và nữ';
+            }
+            let ageMatch = true;
+            if (filtersToApply.age && job.ageRequirement) {
+                const jobAgeRange = parseAgeRequirement(job.ageRequirement);
+                if (jobAgeRange) {
+                    const [filterMinAge, filterMaxAge] = filtersToApply.age;
+                    const [jobMinAge, jobMaxAge] = jobAgeRange;
+                    ageMatch = Math.max(filterMinAge, jobMinAge) <= Math.min(filterMaxAge, jobMaxAge);
+                }
+            }
+            let heightMatch = true;
+            if (filtersToApply.height) {
+                const [jobMinHeight, jobMaxHeight] = parsePhysicalRequirement(job.heightRequirement);
+                const [filterMinHeight, filterMaxHeight] = filtersToApply.height;
+                heightMatch = filterMinHeight <= jobMaxHeight && filterMaxHeight >= jobMinHeight;
+            }
+            let weightMatch = true;
+            if (filtersToApply.weight) {
+                const [jobMinWeight, jobMaxWeight] = parsePhysicalRequirement(job.weightRequirement);
+                const [filterMinWeight, filterMaxWeight] = filtersToApply.weight;
+                weightMatch = filterMinWeight <= jobMaxWeight && filterMaxWeight >= jobMinWeight;
+            }
+            const visionMatch = !filtersToApply.visionRequirement || filtersToApply.visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(filtersToApply.visionRequirement);
+            const tattooReqName = tattooRequirements.find(t => t.slug === filtersToApply.tattooRequirement)?.name;
+            const tattooMatch = !filtersToApply.tattooRequirement || filtersToApply.tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
+            const langReqName = languageLevels.find(l => l.slug === filtersToApply.languageRequirement)?.name;
+            const languageReqMatch = !filtersToApply.languageRequirement || filtersToApply.languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
+            const educationReqMatch = !eduReqName || eduReqName === 'Tất cả' || !job.educationRequirement || job.educationRequirement === eduReqName;
+            const dominantHandMatch = !dominantHandName || dominantHandName === 'Tất cả' || !job.details.description || job.details.description.includes(dominantHandName);
+            const otherSkillMatch = !filtersToApply.otherSkillRequirement || filtersToApply.otherSkillRequirement.length === 0 || filtersToApply.otherSkillRequirement.every(skillSlug => {
+                const skillName = otherSkills.find(s => s.slug === skillSlug)?.name;
+                return skillName ? (job.details.description.includes(skillName) || job.details.requirements.includes(skillName)) : true;
+            });
+            const specialConditionsMatch = !filtersToApply.specialConditions || filtersToApply.specialConditions.length === 0 || filtersToApply.specialConditions.every(cond => {
+                 return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
+            });
+
+            return visaMatch && industryMatch && jobDetailMatch && expReqMatch && yearsOfExperienceMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch;
         });
 
-        for (const job of jobData) {
-            const prefecture = job.workLocation;
-            if (prefecture && countsByPrefecture.hasOwnProperty(prefecture)) {
-                countsByPrefecture[prefecture]++;
+        // Count jobs in the pre-filtered list
+        for (const job of preFilteredJobs) {
+            const prefectureName = job.workLocation;
+            if (countsByPrefecture.hasOwnProperty(prefectureName)) {
+                countsByPrefecture[prefectureName]++;
             }
         }
         
@@ -285,7 +437,8 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         }
 
         return { jobCountsByRegion: countsByRegion, jobCountsByPrefecture: countsByPrefecture };
-    }, []);
+    }, [filters]);
+
 
     const allJobDetailsForExperience = useMemo(() => {
         return [...new Set(Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords).filter(Boolean))];
