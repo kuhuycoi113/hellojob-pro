@@ -223,7 +223,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <div className="w-full px-3 pb-1">
                             <p className="flex items-center justify-end gap-1.5 text-right w-full" style={{ fontSize: '11px', color: '#9B999A' }}>
                                 <span className='text-primary'>Đăng lúc:</span>
-                                <span>{job.postedTime}</span>
+                                <span>{job.postedTime.split(' ')[1]}</span>
                             </p>
                         </div>
                     )}
@@ -341,7 +341,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
                         </div>
                         {showPostedTime && (
-                             <p className="mt-1 text-right w-full" style={{ fontSize: '11px' }}>
+                             <p className="mt-1 text-right text-xs">
                                 <span className='text-primary'>Đăng lúc:</span>
                                 <span className='text-muted-foreground'> {job.postedTime.split(' ')[1]}</span>
                             </p>
