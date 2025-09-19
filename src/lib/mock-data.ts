@@ -1,6 +1,8 @@
 
 import { consultants } from './consultant-data';
 import type { User } from './chat-data';
+import { industriesByJobType } from './industry-data';
+import { japanJobTypes } from './visa-data';
 
 export interface Job {
     id: string;
@@ -66,7 +68,7 @@ export interface Job {
     }
 }
 
-const industries = ['Chế biến thực phẩm', 'Cơ khí', 'Xây dựng', 'Nông nghiệp', 'Điện tử', 'Dệt may', 'Điều dưỡng', 'Nhà hàng', 'Vận tải', 'Sản xuất, dịch vụ tổng hợp', 'Điện, điện tử', 'Chế tạo Vật liệu', 'Cơ khí, chế tạo máy', 'Ô tô', 'Hàng không', 'Vệ sinh toà nhà', 'Lưu trú, khách sạn'];
+
 const locations = ['Tokyo', 'Osaka', 'Aichi', 'Fukuoka', 'Hokkaido', 'Kanagawa', 'Saitama', 'Chiba', 'Hyogo', 'Hiroshima', 'Kyoto', 'Nagano', 'Gifu', 'Ibaraki', 'Miyagi', 'Shizuoka', 'Gunma', 'Tochigi', 'Mie'];
 const interviewLocations = ['Hà Nội', 'TP.HCM', 'Đà Nẵng', 'Online', 'Tại công ty (Nhật Bản)'];
 const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon", "Không yêu cầu"];
@@ -77,29 +79,32 @@ const specialConditionsList = ['Lương tốt', 'Tăng ca', 'Công ty uy tín', 
 
 
 const visaDetailsByVisaType: { [key: string]: string[] } = {
-    'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-    'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-    'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
+    'thuc-tap-sinh-ky-nang': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
+    'ky-nang-dac-dinh': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
+    'ky-su-tri-thuc': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
 };
 
 const jobTitles: { [key: string]: string[] } = {
-    'Chế biến thực phẩm': ['Chế biến cơm hộp', 'Đóng gói bánh kẹo', 'Làm sushi', 'Chế biến thủy sản'],
-    'Cơ khí': ['Vận hành máy CNC', 'Hàn xì', 'Lắp ráp linh kiện', 'Bảo trì máy móc'],
-    'Xây dựng': ['Lắp đặt giàn giáo', 'Hoàn thiện nội thất', 'Lái máy xúc', 'Thợ mộc'],
-    'Nông nghiệp': ['Trồng rau nhà kính', 'Chăn nuôi gia cầm', 'Thu hoạch hoa quả', 'Làm nông nghiệp công nghệ cao'],
-    'Điện tử': ['Lắp ráp bảng mạch', 'Kiểm tra chất lượng (QC)', 'Vận hành dây chuyền SMT', 'Sửa chữa thiết bị'],
-    'Dệt may': ['May công nghiệp', 'Vận hành máy dệt', 'Nhuộm vải', 'Cắt vải tự động'],
-    'Điều dưỡng': ['Chăm sóc người cao tuổi', 'Hộ lý tại viện dưỡng lão', 'Hỗ trợ sinh hoạt', 'Nhân viên chăm sóc'],
-    'Nhà hàng': ['Phục vụ bàn', 'Phụ bếp', 'Lễ tân nhà hàng', 'Pha chế đồ uống'],
-    'Vận tải': ['Lái xe tải', 'Giao nhận hàng hoá', 'Quản lý kho', 'Điều phối viên vận tải'],
+    'Ngư nghiệp': ['Đánh bắt cá ngừ', 'Nuôi trồng hàu'],
+    'Nông nghiệp': ['Trồng rau nhà kính', 'Chăn nuôi gia cầm'],
+    'Thực phẩm': ['Chế biến cơm hộp', 'Đóng gói bánh kẹo', 'Làm sushi', 'Chế biến thủy sản'],
     'Sản xuất, dịch vụ tổng hợp': ['Đóng gói công nghiệp', 'Vệ sinh toà nhà', 'Đóng sách', 'Bảo dưỡng ô tô'],
-    'Điện, điện tử': ['Lắp ráp thiết bị điện tử', 'Bảo trì hệ thống điện', 'Thi công điện', 'Sản xuất bảng mạch in'],
-    'Chế tạo Vật liệu': ['Xử lý nhiệt kim loại', 'Gia công vật liệu composite', 'Kiểm tra vật liệu', 'Vận hành lò nung'],
-    'Cơ khí, chế tạo máy': ['Gia công cơ khí chính xác', 'Thiết kế máy', 'Lắp ráp máy công nghiệp', 'Rèn dập kim loại'],
-    'Ô tô': ['Sửa chữa ô tô', 'Lắp ráp linh kiện ô tô', 'Sơn ô tô', 'Kiểm định chất lượng xe'],
-    'Hàng không': ['Bốc xếp hành lý sân bay', 'Vệ sinh máy bay', 'Phục vụ mặt đất', 'Kiểm tra hàng hoá'],
-    'Vệ sinh toà nhà': ['Vệ sinh toà nhà văn phòng', 'Làm sạch công nghiệp', 'Quản lý vệ sinh', 'Làm sạch khách sạn'],
-    'Lưu trú, khách sạn': ['Lễ tân khách sạn', 'Nhân viên buồng phòng', 'Phục vụ nhà hàng khách sạn', 'Quản lý ca'],
+    'Cơ khí, kim loại': ['Vận hành máy CNC', 'Hàn xì', 'Lắp ráp linh kiện', 'Bảo trì máy móc'],
+    'Xây dựng': ['Lắp đặt giàn giáo', 'Hoàn thiện nội thất', 'Lái máy xúc', 'Thợ mộc'],
+    'May mặc': ['May công nghiệp', 'Vận hành máy dệt'],
+    'Điện, điện tử': ['Lắp ráp bảng mạch', 'Kiểm tra chất lượng (QC)'],
+    'Chế tạo Vật liệu': ['Xử lý nhiệt kim loại', 'Gia công vật liệu composite'],
+    'Cơ khí, chế tạo máy': ['Gia công cơ khí chính xác', 'Thiết kế máy'],
+    'Ô tô': ['Sửa chữa ô tô', 'Lắp ráp linh kiện ô tô'],
+    'Hàng không': ['Bốc xếp hành lý sân bay', 'Phục vụ mặt đất'],
+    'Vận tải': ['Lái xe tải', 'Giao nhận hàng hoá'],
+    'Vệ sinh toà nhà': ['Vệ sinh toà nhà văn phòng', 'Làm sạch công nghiệp'],
+    'Lưu trú, khách sạn': ['Lễ tân khách sạn', 'Nhân viên buồng phòng'],
+    'Điều dưỡng': ['Chăm sóc người cao tuổi', 'Hộ lý tại viện dưỡng lão'],
+    'Nhà hàng': ['Phục vụ bàn', 'Phụ bếp'],
+    "Nông lâm ngư nghiệp": ["Kỹ sư nông nghiệp", "Quản lý trang trại"],
+    "Kinh doanh, kinh tế": ["Nhân viên kinh doanh quốc tế", "Chuyên viên phân tích thị trường"],
+    "Công nghệ thông tin": ["Lập trình viên Java", "Kỹ sư cầu nối (BrSE)"],
 };
 
 const workImagePlaceholders = [
@@ -131,21 +136,19 @@ const jobOrderImages = [
     "/img/donhang2.jpg"
 ];
 
-
 const existingJobIds = new Set<string>();
 
 const generateUniqueJobId = (index: number): string => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let deterministicPart = '';
     let num = index;
-    // Create a base-36 like representation of the index to ensure uniqueness and distribution
     for (let i = 0; i < 6; i++) {
         deterministicPart += chars[num % chars.length];
         num = Math.floor(num / chars.length);
     }
 
     const creationDate = new Date();
-    creationDate.setDate(creationDate.getDate() - (index % 30)); // Randomize post date within last 30 days
+    creationDate.setDate(creationDate.getDate() - (index % 30)); 
     const year = creationDate.getFullYear().toString().slice(-2);
     const month = (creationDate.getMonth() + 1).toString().padStart(2, '0');
     const prefix = year + month;
@@ -153,7 +156,7 @@ const generateUniqueJobId = (index: number): string => {
     const newId = prefix + deterministicPart;
     
     if (existingJobIds.has(newId)) {
-        return generateUniqueJobId(index + 500); // Recursive call with a different index to avoid collision
+        return generateUniqueJobId(index + 1000); 
     }
     
     existingJobIds.add(newId);
@@ -163,33 +166,35 @@ const generateUniqueJobId = (index: number): string => {
 const getRandomItem = <T>(arr: T[], index: number): T => arr[index % arr.length];
 
 const generateRandomJob = (index: number): Job => {
-    const industry = getRandomItem(industries, index);
-    const visaType = getRandomItem(Object.keys(visaDetailsByVisaType), index);
-    const visaDetails = visaDetailsByVisaType[visaType];
-    const visaDetail = getRandomItem(visaDetails, index);
+    // --- Improved Logic to ensure data distribution ---
+    const visaTypeKeys = Object.keys(industriesByJobType);
+    const visaTypeSlug = getRandomItem(visaTypeKeys, index);
+    const visaType = japanJobTypes.find(v => v.slug === visaTypeSlug)?.name || visaTypeSlug;
+    
+    const validIndustries = industriesByJobType[visaTypeSlug as keyof typeof industriesByJobType] || [];
+    const industry = getRandomItem(validIndustries, index) || {name: 'Ngành nghề chung', slug: 'chung', keywords: ['Công việc']};
+    const industryName = industry.name;
+
+    const visaDetails = visaDetailsByVisaType[visaTypeSlug] || [];
+    const visaDetail = getRandomItem(visaDetails, index) || "Chi tiết chung";
     
     const location = getRandomItem(locations, index);
     
     // --- Start of CHIAVIECLAM01 Algorithm ---
     const findMatchingConsultant = () => {
-        const lowerCaseIndustry = industry.toLowerCase();
+        const lowerCaseIndustry = industryName.toLowerCase();
         const lowerCaseVisaType = visaType.toLowerCase();
-        const lowerCaseVisaDetail = visaDetail.toLowerCase();
         
-        const industryKeywords = [lowerCaseIndustry, industry];
-        const visaKeywords = [...visaType.split(' '), ...visaDetail.split(' '), 'tokutei', 'tts'].map(k => k.toLowerCase());
-        const allKeywords = [...new Set([...industryKeywords, ...visaKeywords])];
-
         const expertConsultants = consultants.filter(c => {
             const expertise = c.mainExpertise?.toLowerCase() || '';
-            return allKeywords.some(keyword => expertise.includes(keyword));
+            return expertise.includes(lowerCaseIndustry) || expertise.includes(lowerCaseVisaType);
         });
 
         if (expertConsultants.length > 0) {
-            return expertConsultants[index % expertConsultants.length];
+            return getRandomItem(expertConsultants, index);
         }
 
-        return consultants[index % consultants.length];
+        return getRandomItem(consultants, index);
     };
     
     const assignedConsultant = findMatchingConsultant();
@@ -207,10 +212,7 @@ const generateRandomJob = (index: number): Job => {
     const quantity = (index % 10) + 1;
     const languageRequirement = getRandomItem(languageLevels, index);
     
-    const title = `${getRandomItem(jobTitles[industry as keyof typeof jobTitles] || ['Công việc'], index)}, ${location}, tuyển ${quantity} ${gender}, ${languageRequirement}`;
-
-    const deterministicLikesK = (index * 7) % 10;
-    const deterministicLikesHundred = (index * 3) % 10;
+    const title = `${getRandomItem(jobTitles[industryName as keyof typeof jobTitles] || [industryName], index)}, ${location}, tuyển ${quantity} ${gender}, ${languageRequirement}`;
     
     const isTTS = visaType.includes('Thực tập sinh');
     const isEngineer = visaType.includes('Kỹ sư');
@@ -222,22 +224,22 @@ const generateRandomJob = (index: number): Job => {
 
     const imageCase = index % 4;
     let jobImages = [];
-    if (imageCase === 0) { // All images
+    if (imageCase === 0) { 
         jobImages.push({ src: getRandomItem(jobOrderImages, index), alt: 'Ảnh đơn hàng', dataAiHint: 'job order form' });
         jobImages.push({ src: getRandomItem(workImagePlaceholders, index), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
         jobImages.push({ src: getRandomItem(dormitoryImages, index), alt: 'Ảnh ký túc xá', dataAiHint: 'dormitory room' });
-    } else if (imageCase === 1) { // Job and dorm
+    } else if (imageCase === 1) { 
         jobImages.push({ src: getRandomItem(workImagePlaceholders, index), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
         jobImages.push({ src: getRandomItem(dormitoryImages, index), alt: 'Ảnh ký túc xá', dataAiHint: 'dormitory room' });
-    } else if (imageCase === 2) { // Only job
+    } else if (imageCase === 2) { 
         jobImages.push({ src: getRandomItem(workImagePlaceholders, index), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
-    } // Case 3: No images
+    } 
 
     return {
         id: generateUniqueJobId(index),
         isRecording: index % 5 === 0,
         image: { src: getRandomItem(workImagePlaceholders, index), type: 'thucte' },
-        likes: `${deterministicLikesK}k${deterministicLikesHundred}`,
+        likes: `${(index * 7) % 10}k${(index * 3) % 10}`,
         salary: {
             actual: `${(12 + (index % 10)) * 10000}`,
             basic: `${(18 + (index % 12)) * 10000}`,
@@ -252,11 +254,11 @@ const generateRandomJob = (index: number): Job => {
         netFee: isTTS ? `${80 + (index % 30)}tr` : undefined,
         target: `${(index % 5) + 1}tr`,
         backFee: `${(index % 5) + 1}tr`,
-        tags: [industry, visaType.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
+        tags: [industryName, visaType.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
         postedTime: `10:00 ${postedDate.toLocaleDateString('vi-VN')}`,
         visaType: visaType,
         visaDetail: visaDetail,
-        industry: industry,
+        industry: industryName,
         workLocation: location,
         interviewLocation: getRandomItem(interviewLocations, index),
         gender: gender,
@@ -264,7 +266,7 @@ const generateRandomJob = (index: number): Job => {
         ageRequirement: `${18 + (index % 5)}-${35 + (index % 15)}`,
         languageRequirement: languageRequirement,
         educationRequirement: isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : getRandomItem(educationLevels, index),
-        experienceRequirement: index % 3 === 0 ? 'Không yêu cầu kinh nghiệm' : `Kinh nghiệm ngành ${industry} là một lợi thế`,
+        experienceRequirement: index % 3 === 0 ? 'Không yêu cầu kinh nghiệm' : `Kinh nghiệm ngành ${industryName} là một lợi thế`,
         yearsOfExperience: index % 3 === 0 ? 'Không yêu cầu' : '1-2 năm',
         heightRequirement: `Trên ${150 + (index % 15)} cm`,
         weightRequirement: `Trên ${40 + (index % 10)} kg`,
@@ -277,8 +279,8 @@ const generateRandomJob = (index: number): Job => {
             getRandomItem(specialConditionsList, index + 1),
         ])).join(', '),
         details: {
-            description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản. Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p><ul><li>Chi tiết công việc: ${getRandomItem(jobTitles[industry as keyof typeof jobTitles] || [''], index)}.</li><li>Môi trường làm việc sạch sẽ, hiện đại.</li></ul>`,
-            requirements: `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${index % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`,
+            description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản. Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p><ul><li>Chi tiết công việc: ${getRandomItem(jobTitles[industryName as keyof typeof jobTitles] || [''], index)}.</li><li>Môi trường làm việc sạch sẽ, hiện đại.</li></ul>`,
+            requirements: `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${index % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industryName}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`,
             benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li><li>Thưởng 1-2 lần/năm tùy theo kết quả kinh doanh.</li></ul>`,
             videoUrl: index % 5 === 0 ? getRandomItem(jobVideos, index) : undefined,
             images: jobImages,
@@ -286,4 +288,4 @@ const generateRandomJob = (index: number): Job => {
     };
 };
 
-export const jobData: Job[] = Array.from({ length: 500 }, (_, i) => generateRandomJob(i));
+export const jobData: Job[] = Array.from({ length: 1000 }, (_, i) => generateRandomJob(i));
