@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -261,6 +261,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isFlexibleDate, setIsFlexibleDate] = useState(false);
+    const visaDetailTriggerRef = useRef<HTMLButtonElement>(null);
     
     const { jobCountsByRegion, jobCountsByPrefecture } = useMemo(() => {
         const countsByPrefecture: { [key: string]: number } = {};
@@ -395,6 +396,8 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         }
 
         onFilterChange(newFilters);
+        // Force blur on the trigger to fix double-click issue
+        visaDetailTriggerRef.current?.blur();
     };
 
     const renderInterviewLocations = () => {
@@ -491,8 +494,8 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                             <AccordionContent className="space-y-4 pt-4">
                                  <div>
                                     <Label>Chi tiết loại hình visa</Label>
-                                    <Select key={filters.visa || 'all'} value={filters.visaDetail} onValueChange={handleVisaDetailChange}>
-                                        <SelectTrigger className={cn(filters.visaDetail && filters.visaDetail !== 'all-details' && 'text-primary')}>
+                                    <Select value={filters.visaDetail} onValueChange={handleVisaDetailChange}>
+                                        <SelectTrigger ref={visaDetailTriggerRef} className={cn(filters.visaDetail && filters.visaDetail !== 'all-details' && 'text-primary')}>
                                             <SelectValue placeholder="Tất cả chi tiết"/>
                                         </SelectTrigger>
                                         <SelectContent>
