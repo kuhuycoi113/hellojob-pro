@@ -169,11 +169,16 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         if (navigator.share) {
           try {
             await navigator.share(shareData);
-          } catch (err) {
-            console.error("Error sharing:", err);
-            // If the user cancels the share sheet, or if there's an error,
-            // fall back to copying the link. This provides a better UX.
-            copyLink();
+          } catch (err: any) {
+             // Check if the error is an AbortError, which occurs when the user cancels the share dialog.
+            if (err.name === 'AbortError') {
+                // Silently ignore user cancellation
+                console.log('Share cancelled by user.');
+            } else {
+                console.error("Error sharing:", err);
+                // Fallback to copying the link for other errors
+                copyLink();
+            }
           }
         } else {
           // Fallback for desktop or browsers that don't support the API
