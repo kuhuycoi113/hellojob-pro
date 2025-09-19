@@ -31,6 +31,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
 import { ContactButtons } from './contact-buttons';
 import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from '@/components/ui/popover';
+import { useRouter } from 'next/navigation';
 
 
 const formatCurrency = (value?: string) => {
@@ -74,6 +75,7 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
   const { isLoggedIn } = useAuth();
+  const router = useRouter();
   const [isSaved, setIsSaved] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
@@ -121,18 +123,22 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     setIsAuthDialogOpen(true);
   };
   
-  // CANHANHOA01: Add handler to log view interaction
-  const handleCardClick = () => {
-      logInteraction(job, 'view');
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only navigate if the click target is not an interactive element
+    if ((e.target as HTMLElement).closest('a, button')) {
+      return;
+    }
+    logInteraction(job, 'view');
+    router.push(`/jobs/${job.id}`);
   };
 
   if (variant === 'list-item') {
      return (
         <>
-            <Card id="HIENTHIVIEC01" className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg">
-                <Link href={`/jobs/${job.id}`} className="block p-3 hover:bg-secondary/30" onClick={handleCardClick}>
+            <Card id="HIENTHIVIEC01" className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer" onClick={handleCardClick}>
+                <div className="p-3 hover:bg-secondary/30">
                     <div className="flex flex-col items-stretch gap-4 md:flex-row">
-                        <div className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
+                         <div className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
                             <Image src={job.image.src} alt={job.title} fill className="rounded-lg object-cover" />
                             <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                             <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
@@ -220,7 +226,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             </p>
                         </div>
                     )}
-                </Link>
+                </div>
             </Card>
              <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
             <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
@@ -245,7 +251,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   if (variant === 'chat') {
     return (
-        <Link href={`/jobs/${job.id}`} className="block w-full" onClick={handleCardClick}>
+        <div onClick={() => router.push(`/jobs/${job.id}`)} className="block w-full cursor-pointer">
             <Card className="flex items-start p-3 gap-3 hover:bg-secondary/50 transition-colors">
                 <div className="relative w-20 h-20 flex-shrink-0">
                     <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
@@ -278,7 +284,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     </div>
                 </div>
             </Card>
-        </Link>
+        </div>
     );
   }
 
@@ -286,7 +292,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   return (
     <>
         <Card id="HIENTHIVIEC02" className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-border shadow-sm transition-shadow duration-300 hover:shadow-lg")}>
-             <Link href={`/jobs/${job.id}`} className="group" onClick={handleCardClick}>
+             <Link href={`/jobs/${job.id}`} className="group" onClick={(e) => {
+                if ((e.target as HTMLElement).closest('button')) {
+                    e.preventDefault();
+                } else {
+                    handleCardClick(e);
+                }
+             }}>
                 <div className="relative aspect-video w-full">
                      <Image src={job.image.src} alt={job.title} fill className="object-cover transition-transform group-hover:scale-105" />
                       <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/50 px-1.5 py-0.5 text-[10px] font-bold text-white">
@@ -297,46 +309,44 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                       </Button>
                 </div>
-             </Link>
-             <div className="flex flex-grow flex-col p-3">
-                <Link href={`/jobs/${job.id}`} className="group flex-grow" onClick={handleCardClick}>
+                <div className="flex flex-grow flex-col p-3">
                     <h3 className="mb-2 h-10 cursor-pointer text-sm font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
-                </Link>
-                <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-                    {job.visaDetail && (
-                    <Badge
-                        variant="outline"
-                        className={cn("px-1.5 py-0 text-xs", {
-                            "border-accent-green/70 bg-green-50 text-accent-green": job.visaType?.includes("Thực tập sinh"),
-                            "border-accent-blue/70 bg-blue-50 text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
-                            "border-accent-orange/70 bg-orange-50 text-accent-orange": job.visaType?.includes("Kỹ sư, tri thức"),
-                        })}
-                    >
-                        {job.visaDetail}
-                    </Badge>
-                    )}
-                    {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
-                    <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
-                </div>
-                 <div className="mb-3 flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3 flex-shrink-0" />
-                    <span>{job.workLocation}</span>
-                </div>
-
-                <div className="mt-auto flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                        <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
-                            <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
-                                <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
-                                <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                        </Link>
-                        <ContactButtons contact={job.recruiter} />
+                    <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        {job.visaDetail && (
+                        <Badge
+                            variant="outline"
+                            className={cn("px-1.5 py-0 text-xs", {
+                                "border-accent-green/70 bg-green-50 text-accent-green": job.visaType?.includes("Thực tập sinh"),
+                                "border-accent-blue/70 bg-blue-50 text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
+                                "border-accent-orange/70 bg-orange-50 text-accent-orange": job.visaType?.includes("Kỹ sư, tri thức"),
+                            })}
+                        >
+                            {job.visaDetail}
+                        </Badge>
+                        )}
+                        {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
+                        <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
                     </div>
-                    {/* CHUCNANGUNGTUYEN01 */}
-                    <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
+                     <div className="mb-3 flex items-center gap-1 text-xs text-muted-foreground">
+                        <MapPin className="h-3 w-3 flex-shrink-0" />
+                        <span>{job.workLocation}</span>
+                    </div>
+
+                    <div className="mt-auto flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                            <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0">
+                                <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                                    <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                    <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                            </Link>
+                            <ContactButtons contact={job.recruiter} />
+                        </div>
+                        {/* CHUCNANGUNGTUYEN01 */}
+                        <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
+                    </div>
                 </div>
-             </div>
+             </Link>
         </Card>
         <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
         <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
