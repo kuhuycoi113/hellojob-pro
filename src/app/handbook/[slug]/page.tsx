@@ -248,7 +248,7 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
             </section>
 
             {/* Hot Jobs Section */}
-            <section className="mt-16 pt-8 border-t">
+            <section id="HIENTHIVIEC04" className="mt-16 pt-8 border-t">
                  <h2 className="text-3xl font-headline font-bold mb-6 flex items-center text-accent">
                     <Briefcase className="mr-3 text-primary" />
                     Việc làm nổi bật liên quan
