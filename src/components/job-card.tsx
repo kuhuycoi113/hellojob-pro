@@ -203,7 +203,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     </PopoverContent>
                                 </Popover>
 
-                                <ContactButtons contact={job.recruiter} />
+                                <ContactButtons contact={job.recruiter} showChatText={true} />
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button variant="outline" size="sm" className={cn("bg-white hidden md:flex", isSaved && "border border-accent-orange text-accent-orange bg-background hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>

@@ -7,6 +7,7 @@ import { MessageSquare, Phone } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useChat } from '@/contexts/ChatContext';
+import { cn } from '@/lib/utils';
 
 // Define a more generic type for the contact person
 type ContactPerson = {
@@ -17,9 +18,10 @@ type ContactPerson = {
 
 interface ContactButtonsProps {
     contact: ContactPerson;
+    showChatText?: boolean; // New prop to control text visibility
 }
 
-export function ContactButtons({ contact }: ContactButtonsProps) {
+export function ContactButtons({ contact, showChatText = false }: ContactButtonsProps) {
   const { openChat } = useChat();
 
   const handleChatClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -41,9 +43,14 @@ export function ContactButtons({ contact }: ContactButtonsProps) {
     <>
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-1">
-            <Button size="sm" variant="default" className="h-8 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
-                <MessageSquare className="h-4 w-4 text-primary-foreground"/>
-                <span className="ml-2">Chat với Tư vấn viên</span>
+            <Button 
+                size={showChatText ? "sm" : "icon"} 
+                variant="default" 
+                className={cn("h-8 hover:bg-primary/90", showChatText ? "bg-primary" : "bg-primary w-8")}
+                onClick={handleChatClick}
+            >
+                <MessageSquare className={cn("h-4 w-4", showChatText ? "text-primary-foreground" : "")}/>
+                {showChatText && <span className="ml-2">Chat với Tư vấn viên</span>}
             </Button>
             <Button asChild variant="outline" size="icon" className="h-8 w-8 border-purple-500 text-purple-500 hover:bg-purple-50 hover:text-purple-600">
                 <Link href="https://m.me/your_user_id" target="_blank" onClick={handleLinkClick}>
