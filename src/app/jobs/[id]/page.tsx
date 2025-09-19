@@ -224,7 +224,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 <div className="space-y-6">
                                     {job.details.videoUrl && (
                                         <div className="aspect-video">
-                                            <iframe className="w-full h-full rounded-lg" src={job.details.videoUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                            <iframe id="VIDEOVIECLAM01" className="w-full h-full rounded-lg" src={job.details.videoUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
                                         </div>
                                     )}
                                     {job.details.images && job.details.images.length > 0 && (
