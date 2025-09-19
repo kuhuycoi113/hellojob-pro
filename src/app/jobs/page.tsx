@@ -10,7 +10,7 @@ import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/locat
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType, type Industry } from '@/lib/industry-data';
-import { visaDetailsByVisaType, japanJobTypes } from '@/lib/visa-data';
+import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions } from '@/lib/visa-data';
 
 
 const initialSearchFilters: SearchFilters = {
@@ -480,9 +480,9 @@ function JobsPageContent() {
     }, []);
 
     useEffect(() => {
-        const newFilters: SearchFilters = { ...initialSearchFilters };
+        const newFilters: SearchFilters = { ...initialSearchFilters, location: [], specialConditions: [] };
         for (const [key, value] of searchParams.entries()) {
-            if (key === 'location' || key === 'os') {
+             if (key === 'location' || key === 'os') {
                 const targetKey = key === 'os' ? 'otherSkillRequirement' : key;
                 const currentValues = newFilters[targetKey] || [];
                 // @ts-ignore
@@ -493,9 +493,12 @@ function JobsPageContent() {
                      // @ts-ignore
                     newFilters[key] = [parseInt(values[0], 10), parseInt(values[1], 10)];
                 }
-            } else if (key === 'dk') { // SEO-TU-KHOA-01: Handle 'dk' for special conditions
+            } else if (key === 'dk') {
                 const currentConditions = newFilters.specialConditions || [];
-                newFilters.specialConditions = [...currentConditions, value];
+                const conditionName = allSpecialConditions.find(c => c.slug === value)?.name;
+                if (conditionName) {
+                    newFilters.specialConditions = [...currentConditions, conditionName];
+                }
             } else if (key === 'yoe') {
                 newFilters['yearsOfExperience'] = value;
             } else if (key === 'expReq') {
@@ -545,8 +548,17 @@ function JobsPageContent() {
             if (value && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
                  if (key !== 'visa' && !(Array.isArray(value) && value.includes('all'))) {
                     if (Array.isArray(value)) {
-                        const paramKey = key === 'otherSkillRequirement' ? 'os' : (key === 'specialConditions' ? 'dk' : key);
-                        value.forEach(item => query.append(paramKey, String(item)));
+                        if (key === 'specialConditions') {
+                            value.forEach(item => {
+                                const conditionSlug = allSpecialConditions.find(c => c.name === item)?.slug;
+                                if (conditionSlug) {
+                                    query.append('dk', conditionSlug);
+                                }
+                            });
+                        } else {
+                            const paramKey = key === 'otherSkillRequirement' ? 'os' : key;
+                            value.forEach(item => query.append(paramKey, String(item)));
+                        }
                     } else if (key === 'yearsOfExperience') {
                         query.set('yoe', String(value));
                     } else if (key === 'experienceRequirement') {
@@ -624,3 +636,4 @@ export default function JobsPage() {
     </Suspense>
   );
 }
+
