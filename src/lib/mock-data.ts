@@ -102,26 +102,6 @@ const jobTitles: { [key: string]: string[] } = {
     'Lưu trú, khách sạn': ['Lễ tân khách sạn', 'Nhân viên buồng phòng', 'Phục vụ nhà hàng khách sạn', 'Quản lý ca'],
 };
 
-const jobImagePlaceholders: {[key: string]: string} = {
-    'Chế biến thực phẩm': '/img/che_bien_thuc_pham.jpg',
-    'Cơ khí': '/img/bao_duong_oto.jpg',
-    'Xây dựng': '/img/xay_dung.jpg',
-    'Nông nghiệp': '/img/nong_nghiep.jpg',
-    'Điện tử': '/img/dien_tu.jpg',
-    'Dệt may': '/img/det_may.jpg',
-    'Điều dưỡng': '/img/dieu_duong.jpg',
-    'Nhà hàng': '/img/nha_hang.jpg',
-    'Vận tải': `https://picsum.photos/seed/logistics/600/400`,
-    'Sản xuất, dịch vụ tổng hợp': `https://picsum.photos/seed/manufacturing/600/400`,
-    'Điện, điện tử': '/img/dien_tu.jpg',
-    'Chế tạo Vật liệu': `https://picsum.photos/seed/materials/600/400`,
-    'Cơ khí, chế tạo máy': '/img/bao_duong_oto.jpg',
-    'Ô tô': `https://picsum.photos/seed/automotive/600/400`,
-    'Hàng không': `https://picsum.photos/seed/aviation/600/400`,
-    'Vệ sinh toà nhà': `https://picsum.photos/seed/cleaning/600/400`,
-    'Lưu trú, khách sạn': `https://picsum.photos/seed/hotel/600/400`,
-};
-
 const workImagePlaceholders = [
     "/img/vieclam001.webp",
     "/img/vieclam002.webp",
@@ -146,6 +126,11 @@ const jobVideos = [
     "https://www.youtube.com/embed/jGEMuHjF6vU"
 ];
 
+const jobOrderImages = [
+    "/img/donhang1.jpg",
+    "/img/donhang2.jpg"
+];
+
 
 const existingJobIds = new Set<string>();
 
@@ -159,7 +144,8 @@ const generateUniqueJobId = (index: number): string => {
         num = Math.floor(num / chars.length);
     }
 
-    const creationDate = new Date(2024, 7, 1);
+    const creationDate = new Date();
+    creationDate.setDate(creationDate.getDate() - (index % 30)); // Randomize post date within last 30 days
     const year = creationDate.getFullYear().toString().slice(-2);
     const month = (creationDate.getMonth() + 1).toString().padStart(2, '0');
     const prefix = year + month;
@@ -167,7 +153,7 @@ const generateUniqueJobId = (index: number): string => {
     const newId = prefix + deterministicPart;
     
     if (existingJobIds.has(newId)) {
-        return newId + index; // Fallback to ensure uniqueness
+        return generateUniqueJobId(index + 500); // Recursive call with a different index to avoid collision
     }
     
     existingJobIds.add(newId);
@@ -206,12 +192,8 @@ const generateRandomJob = (index: number): Job => {
         return consultants[index % consultants.length];
     };
     
-    let assignedConsultant = findMatchingConsultant();
+    const assignedConsultant = findMatchingConsultant();
     // --- End of CHIAVIECLAM01 Algorithm ---
-    
-    if (index === 5 || index === 12) {
-        assignedConsultant = consultants.find(c => c.id === 'dao-quang-minh') || assignedConsultant;
-    }
     
     const recruiter = {
         id: assignedConsultant.id,
@@ -230,17 +212,31 @@ const generateRandomJob = (index: number): Job => {
     const deterministicLikesK = (index * 7) % 10;
     const deterministicLikesHundred = (index * 3) % 10;
     
-    const anhViecLamSrc = workImagePlaceholders[index % workImagePlaceholders.length];
-
-    const newJobId = generateUniqueJobId(index);
-
     const isTTS = visaType.includes('Thực tập sinh');
     const isEngineer = visaType.includes('Kỹ sư');
+    
+    const postedDate = new Date();
+    postedDate.setDate(postedDate.getDate() - (index % 30));
+    const interviewDate = new Date(postedDate);
+    interviewDate.setDate(interviewDate.getDate() + (index % 60) + 1);
+
+    const imageCase = index % 4;
+    let jobImages = [];
+    if (imageCase === 0) { // All images
+        jobImages.push({ src: getRandomItem(jobOrderImages, index), alt: 'Ảnh đơn hàng', dataAiHint: 'job order form' });
+        jobImages.push({ src: getRandomItem(workImagePlaceholders, index), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
+        jobImages.push({ src: getRandomItem(dormitoryImages, index), alt: 'Ảnh ký túc xá', dataAiHint: 'dormitory room' });
+    } else if (imageCase === 1) { // Job and dorm
+        jobImages.push({ src: getRandomItem(workImagePlaceholders, index), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
+        jobImages.push({ src: getRandomItem(dormitoryImages, index), alt: 'Ảnh ký túc xá', dataAiHint: 'dormitory room' });
+    } else if (imageCase === 2) { // Only job
+        jobImages.push({ src: getRandomItem(workImagePlaceholders, index), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
+    } // Case 3: No images
 
     return {
-        id: newJobId,
+        id: generateUniqueJobId(index),
         isRecording: index % 5 === 0,
-        image: { src: anhViecLamSrc, type: 'thucte' },
+        image: { src: getRandomItem(workImagePlaceholders, index), type: 'thucte' },
         likes: `${deterministicLikesK}k${deterministicLikesHundred}`,
         salary: {
             actual: `${(12 + (index % 10)) * 10000}`,
@@ -251,13 +247,13 @@ const generateRandomJob = (index: number): Job => {
         title: title,
         recruiter: recruiter,
         status: index % 10 === 0 ? 'Tạm dừng' : 'Đang tuyển',
-        interviewDate: `2024-08-${(index % 28) + 1}`,
+        interviewDate: interviewDate.toISOString().split('T')[0],
         interviewRounds: (index % 3) + 1,
         netFee: isTTS ? `${80 + (index % 30)}tr` : undefined,
         target: `${(index % 5) + 1}tr`,
         backFee: `${(index % 5) + 1}tr`,
         tags: [industry, visaType.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
-        postedTime: `10:00 01/08/2024`,
+        postedTime: `10:00 ${postedDate.toLocaleDateString('vi-VN')}`,
         visaType: visaType,
         visaDetail: visaDetail,
         industry: industry,
@@ -284,95 +280,10 @@ const generateRandomJob = (index: number): Job => {
             description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản. Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p><ul><li>Chi tiết công việc: ${getRandomItem(jobTitles[industry as keyof typeof jobTitles] || [''], index)}.</li><li>Môi trường làm việc sạch sẽ, hiện đại.</li></ul>`,
             requirements: `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${index % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`,
             benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li><li>Thưởng 1-2 lần/năm tùy theo kết quả kinh doanh.</li></ul>`,
-            videoUrl: index % 4 === 0 ? getRandomItem(jobVideos, index) : undefined,
-            images: index % 3 === 0 ? [
-                { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
-                { src: anhViecLamSrc, alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
-                { src: getRandomItem(dormitoryImages, index), alt: 'Ký túc xá', dataAiHint: 'dormitory room' }
-            ] : []
+            videoUrl: index % 5 === 0 ? getRandomItem(jobVideos, index) : undefined,
+            images: jobImages,
         }
     };
 };
 
-export const jobData: Job[] = Array.from({ length: 100 }, (_, i) => generateRandomJob(i));
-
-// Add 20 more jobs for Đào Quang Minh to ensure he has jobs to display
-const minh = consultants.find(c => c.id === 'dao-quang-minh');
-if (minh) {
-    const minhRecruiter = {
-        id: minh.id,
-        name: minh.name,
-        avatar: minh.avatarUrl,
-        mainExpertise: minh.mainExpertise,
-        company: 'HelloJob'
-    };
-    const minhIndustries = ['Cơ khí', 'Điện tử', 'Xây dựng', 'Nông nghiệp', 'Chế biến thực phẩm'];
-
-    for (let i = 0; i < 20; i++) {
-        const baseIndex = 100 + i;
-        const industry = minhIndustries[i % minhIndustries.length];
-        const location = locations[baseIndex % locations.length];
-        const visaTypeKeys = Object.keys(visaDetailsByVisaType);
-        const visaType = visaTypeKeys[baseIndex % visaTypeKeys.length];
-        const visaDetails = visaDetailsByVisaType[visaType];
-        const visaDetail = visaDetails[baseIndex % visaDetails.length];
-        const gender = ['Nam', 'Nữ', 'Cả nam và nữ'][baseIndex % 3] as 'Nam' | 'Nữ' | 'Cả nam và nữ';
-        const quantity = (baseIndex % 5) + 1;
-        
-        const title = `${jobTitles[industry as keyof typeof jobTitles][baseIndex % 4]}, ${location}, ${quantity} ${gender}`;
-        const newJobId = generateUniqueJobId(baseIndex);
-        const anhViecLamSrc = workImagePlaceholders[baseIndex % workImagePlaceholders.length];
-
-        const newJob: Job = {
-            id: newJobId,
-            isRecording: baseIndex % 5 === 0,
-            image: { src: anhViecLamSrc, type: 'thucte' },
-            likes: `${(baseIndex * 2) % 10}k${(baseIndex * 4) % 10}`,
-            salary: {
-                actual: `${(13 + (baseIndex % 10)) * 10000}`,
-                basic: `${(19 + (baseIndex % 12)) * 10000}`,
-            },
-            title: title,
-            recruiter: minhRecruiter,
-            status: 'Đang tuyển',
-            interviewDate: `2024-08-${(baseIndex % 28) + 1}`,
-            interviewRounds: (baseIndex % 3) + 1,
-            netFee: visaType.includes('Thực tập sinh') ? `${80 + (baseIndex % 20)}tr` : undefined,
-            target: `${(baseIndex % 5) + 1}tr`,
-            backFee: `${(baseIndex % 5) + 1}tr`,
-            tags: [industry, visaType.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
-            postedTime: `10:00 01/08/2024`,
-            visaType: visaType,
-            visaDetail: visaDetail,
-            industry: industry,
-            workLocation: location,
-            interviewLocation: 'Hà Nội hoặc TP.HCM',
-            gender: gender,
-            quantity: quantity,
-            ageRequirement: `${18 + (baseIndex % 5)}-${35 + (baseIndex % 10)}`,
-            languageRequirement: 'Tiếng Nhật N4',
-            educationRequirement: 'Tốt nghiệp THPT trở lên',
-            experienceRequirement: 'Không yêu cầu kinh nghiệm',
-            yearsOfExperience: 'Không yêu cầu',
-            heightRequirement: `Trên ${150 + (baseIndex % 10)} cm`,
-            weightRequirement: `Trên ${45 + (baseIndex % 5)} kg`,
-            visionRequirement: 'Thị lực tốt',
-            tattooRequirement: 'Không yêu cầu',
-            hepatitisBRequirement: 'Không yêu cầu',
-            interviewFormat: 'Phỏng vấn Online',
-            specialConditions: 'Chăm chỉ, chịu khó.',
-            details: {
-                description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Công việc dành cho ứng viên muốn làm việc trong ngành ${industry}.</p>`,
-                requirements: `<ul><li>Yêu cầu: Tốt nghiệp THPT trở lên.</li><li>Có sức khỏe tốt.</li></ul>`,
-                benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm theo quy định.</li><li>Hỗ trợ chi phí nhà ở.</li></ul>`,
-                videoUrl: baseIndex % 4 === 0 ? jobVideos[baseIndex % jobVideos.length] : undefined,
-                images: [
-                     { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
-                    { src: anhViecLamSrc, alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
-                    { src: dormitoryImages[baseIndex % dormitoryImages.length], alt: 'Ký túc xá', dataAiHint: 'dormitory room' }
-                ]
-            }
-        };
-        jobData.push(newJob);
-    }
-}
+export const jobData: Job[] = Array.from({ length: 500 }, (_, i) => generateRandomJob(i));
