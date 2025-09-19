@@ -70,9 +70,11 @@ type SearchResultsProps = {
     applyFilters: () => void;
     resetFilters: () => void;
     resultCount: number;
+    sortBy: string;
+    onSortChange: (value: string) => void;
 }
 
-export const SearchResults = ({ jobs, filters, appliedFilters, onFilterChange, applyFilters, resetFilters, resultCount }: SearchResultsProps) => {
+export const SearchResults = ({ jobs, filters, appliedFilters, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange }: SearchResultsProps) => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(24);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -140,14 +142,24 @@ export const SearchResults = ({ jobs, filters, appliedFilters, onFilterChange, a
                           </SheetContent>
                         </Sheet>
                         
-                         <Select>
+                         <Select value={sortBy} onValueChange={onSortChange}>
                             <SelectTrigger id="SAPXEP01" className="w-[180px] hidden md:flex">
                                 <SelectValue placeholder="Sắp xếp theo" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="newest">Mới nhất</SelectItem>
-                                <SelectItem value="salary_desc">Lương cao đến thấp</SelectItem>
-                                <SelectItem value="salary_asc">Lương thấp đến cao</SelectItem>
+                                <SelectItem value="salary_desc">Lương cơ bản: Cao {'>'} Thấp</SelectItem>
+                                <SelectItem value="salary_asc">Lương cơ bản: Thấp {'>'} Cao</SelectItem>
+                                <SelectItem value="net_salary_desc">Thực lĩnh: Cao {'>'} Thấp</SelectItem>
+                                <SelectItem value="net_salary_asc">Thực lĩnh: Thấp {'>'} Cao</SelectItem>
+                                <SelectItem value="fee_asc">Phí thấp {'>'} Cao</SelectItem>
+                                <SelectItem value="fee_desc">Phí cao {'>'} Thấp</SelectItem>
+                                <SelectItem value="interview_date_asc">Ngày phỏng vấn: Gần nhất</SelectItem>
+                                <SelectItem value="interview_date_desc">Ngày phỏng vấn: Xa nhất</SelectItem>
+                                <SelectItem value="has_image">Ưu tiên có ảnh</SelectItem>
+                                <SelectItem value="has_video">Ưu tiên có video</SelectItem>
+                                <SelectItem value="hot">Độ hot</SelectItem>
+                                <SelectItem value="most_applicants">Nhiều người ứng tuyển</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

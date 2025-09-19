@@ -188,12 +188,13 @@ function JobsPageContent() {
 
     const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(initialSearchFilters);
     const [stagedFilters, setStagedFilters] = useState<SearchFilters>(initialSearchFilters);
+    const [sortBy, setSortBy] = useState('newest');
     
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
     const [stagedResultCount, setStagedResultCount] = useState<number>(jobData.length);
 
     
-    const runFilter = useCallback((filtersToApply: SearchFilters) => {
+    const runFilter = useCallback((filtersToApply: SearchFilters, sortOption: string) => {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
@@ -335,6 +336,39 @@ function JobsPageContent() {
 
 
             return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch;
+        });
+
+        // Sorting logic
+        results.sort((a, b) => {
+            switch (sortOption) {
+                case 'newest':
+                    return new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime();
+                case 'salary_desc':
+                    return (parseSalary(b.salary.basic) ?? 0) - (parseSalary(a.salary.basic) ?? 0);
+                case 'salary_asc':
+                    return (parseSalary(a.salary.basic) ?? 0) - (parseSalary(b.salary.basic) ?? 0);
+                case 'net_salary_desc':
+                    return (parseSalary(b.salary.actual) ?? 0) - (parseSalary(a.salary.actual) ?? 0);
+                case 'net_salary_asc':
+                    return (parseSalary(a.salary.actual) ?? 0) - (parseSalary(b.salary.actual) ?? 0);
+                case 'fee_asc':
+                    return (parseSalary(a.netFee) ?? Infinity) - (parseSalary(b.netFee) ?? Infinity);
+                case 'fee_desc':
+                    return (parseSalary(b.netFee) ?? -1) - (parseSalary(a.netFee) ?? -1);
+                case 'interview_date_asc':
+                    return new Date(a.interviewDate).getTime() - new Date(b.interviewDate).getTime();
+                case 'interview_date_desc':
+                    return new Date(b.interviewDate).getTime() - new Date(a.interviewDate).getTime();
+                case 'has_image':
+                    return (b.details.images && b.details.images.length > 0 ? 1 : 0) - (a.details.images && a.details.images.length > 0 ? 1 : 0);
+                case 'has_video':
+                    return (b.details.videoUrl ? 1 : 0) - (a.details.videoUrl ? 1 : 0);
+                case 'hot': // Example logic for 'hot'
+                case 'most_applicants':
+                    return (b.applicants?.count ?? 0) - (a.applicants?.count ?? 0);
+                default:
+                    return 0;
+            }
         });
 
         setFilteredJobs(results);
@@ -481,8 +515,12 @@ function JobsPageContent() {
 
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters, location: [], specialConditions: [] };
+        let hasSortBy = false;
         for (const [key, value] of searchParams.entries()) {
-             if (key === 'location' || key === 'os') {
+             if (key === 'sortBy') {
+                setSortBy(value);
+                hasSortBy = true;
+             } else if (key === 'location' || key === 'os') {
                 const targetKey = key === 'os' ? 'otherSkillRequirement' : key;
                 const currentValues = newFilters[targetKey] || [];
                 // @ts-ignore
@@ -519,9 +557,12 @@ function JobsPageContent() {
                 newFilters[key] = value;
             }
         }
+        if (!hasSortBy) {
+            setSortBy('newest'); // default sort
+        }
         setAppliedFilters(newFilters);
         setStagedFilters(newFilters);
-        runFilter(newFilters);
+        runFilter(newFilters, hasSortBy ? searchParams.get('sortBy')! : 'newest');
         countStagedResults(newFilters);
         
     }, [searchParams, runFilter, countStagedResults]);
@@ -572,16 +613,31 @@ function JobsPageContent() {
                  }
             }
         });
+        if (sortBy !== 'newest') {
+            query.set('sortBy', sortBy);
+        }
         router.push(`/jobs?${query.toString()}`);
-    }, [stagedFilters, router]);
+    }, [stagedFilters, sortBy, router]);
+
+    const handleSortChange = (value: string) => {
+        setSortBy(value);
+        const query = new URLSearchParams(searchParams.toString());
+        if (value === 'newest') {
+            query.delete('sortBy');
+        } else {
+            query.set('sortBy', value);
+        }
+        router.push(`/jobs?${query.toString()}`);
+    };
   
     const handleResetFilters = useCallback(() => {
         setStagedFilters(initialSearchFilters);
+        setSortBy('newest');
         countStagedResults(initialSearchFilters);
         if (searchParams.toString() !== '') {
             router.push('/jobs');
         } else {
-             runFilter(initialSearchFilters);
+             runFilter(initialSearchFilters, 'newest');
         }
     }, [router, runFilter, countStagedResults, searchParams]);
     
@@ -612,6 +668,8 @@ function JobsPageContent() {
                 applyFilters={handleApplyFilters} 
                 resetFilters={handleResetFilters}
                 resultCount={stagedResultCount}
+                sortBy={sortBy}
+                onSortChange={handleSortChange}
             />
         </div>
     );
@@ -628,5 +686,3 @@ export default function JobsPage() {
     </Suspense>
   );
 }
-
-
