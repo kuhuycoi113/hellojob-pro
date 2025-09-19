@@ -793,7 +793,7 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                  <div className="space-y-2">
                                     <Label className="font-semibold">Yêu cầu thị lực</Label>
                                     <Select value={filters.visionRequirement || 'all'} onValueChange={(value) => onFilterChange({ visionRequirement: value })}>
-                                        <SelectTrigger className="mt-2" id="vision-requirement"><SelectValue placeholder="Chọn yêu cầu thị lực" /></SelectTrigger>
+                                        <SelectTrigger className="mt-2" id="vision-requirement"><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
                                         <SelectContent>
                                             {visionRequirements.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
                                         </SelectContent>
