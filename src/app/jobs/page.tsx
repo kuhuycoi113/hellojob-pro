@@ -36,6 +36,7 @@ const initialSearchFilters: SearchFilters = {
     yearsOfExperience: '',
     tattooRequirement: '',
     hepatitisBRequirement: '',
+    visionRequirement: '',
     quantity: '',
     interviewRounds: '',
     interviewDate: '',
@@ -134,7 +135,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age, height, weight
+            age, height, weight, visionRequirement
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -246,7 +247,9 @@ function JobsPageContent() {
                 weightMatch = filterMinWeight <= jobMaxWeight && filterMaxWeight >= jobMinWeight;
             }
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch;
+            const visionMatch = !visionRequirement || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch;
         });
 
         setFilteredJobs(results);
@@ -256,7 +259,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age, height, weight
+            age, height, weight, visionRequirement
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -362,7 +365,9 @@ function JobsPageContent() {
                 weightMatch = filterMinWeight <= jobMaxWeight && filterMaxWeight >= jobMinWeight;
             }
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch;
+            const visionMatch = !visionRequirement || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch;
         }).length;
         setStagedResultCount(count);
     }, []);

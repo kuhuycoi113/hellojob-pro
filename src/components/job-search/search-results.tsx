@@ -39,6 +39,7 @@ export type SearchFilters = {
     netFee?: string;
     quantity?: string;
     interviewRounds?: string;
+    visionRequirement?: string;
 }
 
 export const experienceYears: { name: string; slug: string }[] = [

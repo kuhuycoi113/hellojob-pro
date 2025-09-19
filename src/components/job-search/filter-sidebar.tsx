@@ -59,7 +59,12 @@ const englishLevels = [
     "Trình độ tương đương 9.0", "Trình độ tương đương 8.0", "Trình độ tương đương 7.0", "Trình độ tương đương 6.0", "Trình độ tương đương 5.0", "Trình độ tương đương 4.0"
 ];
 const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon", "Không yêu cầu"];
-const visionRequirements = ["Không yêu cầu", "Yêu cầu thị lực tốt", "Không mù màu"];
+const visionRequirements = [
+    { name: "Tất cả", slug: "" },
+    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
+    { name: "Yêu cầu thị lực tốt", slug: "yeu-cau-thi-luc-tot" },
+    { name: "Không mù màu", slug: "khong-mu-mau" }
+];
 const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
 
 const interviewRoundsOptions = [
@@ -787,10 +792,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 </div>
                                  <div className="space-y-2">
                                     <Label className="font-semibold">Yêu cầu thị lực</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu thị lực" /></SelectTrigger>
+                                    <Select value={filters.visionRequirement} onValueChange={(value) => onFilterChange({ visionRequirement: value })}>
+                                        <SelectTrigger className="mt-2" id="vision-requirement"><SelectValue placeholder="Chọn yêu cầu thị lực" /></SelectTrigger>
                                         <SelectContent>
-                                            {visionRequirements.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                            {visionRequirements.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
