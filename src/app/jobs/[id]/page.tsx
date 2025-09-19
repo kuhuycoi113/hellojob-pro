@@ -20,6 +20,17 @@ import type { CandidateProfile } from '@/ai/schemas';
 import { JobCard } from '@/components/job-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
+import { AuthDialog } from '@/components/auth-dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -57,13 +68,15 @@ const convertToVnd = (jpyValue?: string) => {
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const router = useRouter();
-    const { role } = useAuth();
+    const { role, isLoggedIn } = useAuth();
     const job = jobData.find(j => j.id === resolvedParams.id);
     const [isSaved, setIsSaved] = useState(false);
     const [profileSuggestions, setProfileSuggestions] = useState<Job[]>([]);
     const [behavioralSuggestions, setBehavioralSuggestions] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+    const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
 
     useEffect(() => {
         if (job) {
@@ -123,6 +136,21 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         window.dispatchEvent(new Event('storage'));
     };
 
+    const handleApplyClick = () => {
+        if (!isLoggedIn) {
+            sessionStorage.setItem('postLoginRedirect', `/jobs/${job.id}`);
+            setIsConfirmLoginOpen(true);
+        } else {
+            // Logic for logged in user to apply
+            console.log("Applying for job...");
+        }
+    };
+    
+    const handleConfirmLogin = () => {
+        setIsConfirmLoginOpen(false);
+        setIsAuthDialogOpen(true);
+    };
+
     const assignedConsultant = job.recruiter;
 
     const RequirementItem = ({ icon: Icon, label, value, className }: { icon: React.ElementType, label: string, value?: string | number, className?: string }) => {
@@ -167,7 +195,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                         <Bookmark className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
                                         {isSaved ? 'Việc đã lưu' : 'Lưu việc làm'}
                                     </Button>
-                                    <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white">Ứng tuyển ngay</Button>
+                                    <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển ngay</Button>
                                 </div>
                             </CardContent>
                         </Card>
@@ -229,7 +257,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     )}
                                     {job.details.images && job.details.images.length > 0 && (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="relative aspect-[2/3] rounded-lg overflow-hidden border-2 border-[#9B999A]">
+                                            <div className="relative aspect-[2/3] overflow-hidden rounded-lg border-2 border-[#9B999A]">
                                                 <Image id="ANHDONHANG01" src={job.details.images[0].src} alt={job.details.images[0].alt} fill className="object-cover" data-ai-hint={job.details.images[0].dataAiHint}/>
                                             </div>
                                             <div className="grid grid-cols-1 gap-4">
@@ -347,6 +375,23 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     )}
                 </div>
             </div>
+            <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+            <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Bạn cần đăng nhập để ứng tuyển, bạn có muốn đăng nhập không?
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Từ chối</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmLogin}>
+                        Đồng ý
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
