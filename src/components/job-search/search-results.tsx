@@ -141,7 +141,7 @@ export const SearchResults = ({ jobs, filters, appliedFilters, onFilterChange, a
                         </Sheet>
                         
                          <Select>
-                            <SelectTrigger className="w-[180px] hidden md:flex">
+                            <SelectTrigger id="SAPXEP01" className="w-[180px] hidden md:flex">
                                 <SelectValue placeholder="Sắp xếp theo" />
                             </SelectTrigger>
                             <SelectContent>
