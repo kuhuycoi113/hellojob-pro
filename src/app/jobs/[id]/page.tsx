@@ -368,7 +368,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <ContactButtons contact={assignedConsultant} />
+                                    <ContactButtons contact={assignedConsultant} showChatText={true} />
                                 </div>
                             </CardContent>
                             <div className="border-t p-4 flex justify-center">
