@@ -122,46 +122,48 @@ export const SearchResults = ({ jobs, filters, appliedFilters, onFilterChange, a
                 <div className="md:col-span-3 lg:col-span-3">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-bold">Kết quả ({jobs.length})</h2>
-                        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-                          <SheetTrigger asChild>
-                             <Button variant="ghost" size="sm" className="flex items-center gap-1 md:hidden">
-                                <ListFilter className="w-4 h-4" />
-                                Lọc
-                            </Button>
-                          </SheetTrigger>
-                          <SheetContent>
-                            <SheetHeader>
-                              <SheetTitle>Bộ lọc tìm kiếm</SheetTitle>
-                              <SheetDescription>
-                                Tinh chỉnh kết quả tìm kiếm của bạn.
-                              </SheetDescription>
-                            </SheetHeader>
-                            <div className="py-4 h-[calc(100vh-8rem)] overflow-y-auto">
-                              <FilterSidebar filters={filters} appliedFilters={appliedFilters} onFilterChange={onFilterChange} onApply={handleApply} onReset={handleReset} resultCount={resultCount}/>
-                            </div>
-                          </SheetContent>
-                        </Sheet>
-                        
-                         <Select value={sortBy} onValueChange={onSortChange}>
-                            <SelectTrigger id="SAPXEP01" className="w-[180px] hidden md:flex">
-                                <SelectValue placeholder="Sắp xếp theo" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="newest">Mới nhất</SelectItem>
-                                <SelectItem value="salary_desc">Lương cơ bản: Cao {'>'} Thấp</SelectItem>
-                                <SelectItem value="salary_asc">Lương cơ bản: Thấp {'>'} Cao</SelectItem>
-                                <SelectItem value="net_salary_desc">Thực lĩnh: Cao {'>'} Thấp</SelectItem>
-                                <SelectItem value="net_salary_asc">Thực lĩnh: Thấp {'>'} Cao</SelectItem>
-                                <SelectItem value="fee_asc">Phí thấp {'>'} Cao</SelectItem>
-                                <SelectItem value="fee_desc">Phí cao {'>'} Thấp</SelectItem>
-                                <SelectItem value="interview_date_asc">Ngày phỏng vấn: Gần nhất</SelectItem>
-                                <SelectItem value="interview_date_desc">Ngày phỏng vấn: Xa nhất</SelectItem>
-                                <SelectItem value="has_image">Ưu tiên có ảnh</SelectItem>
-                                <SelectItem value="has_video">Ưu tiên có video</SelectItem>
-                                <SelectItem value="hot">Độ hot</SelectItem>
-                                <SelectItem value="most_applicants">Nhiều người ứng tuyển</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                              <SheetTrigger asChild>
+                                 <Button variant="ghost" size="sm" className="flex items-center gap-1 md:hidden">
+                                    <ListFilter className="w-4 h-4" />
+                                    Lọc
+                                </Button>
+                              </SheetTrigger>
+                              <SheetContent>
+                                <SheetHeader>
+                                  <SheetTitle>Bộ lọc tìm kiếm</SheetTitle>
+                                  <SheetDescription>
+                                    Tinh chỉnh kết quả tìm kiếm của bạn.
+                                  </SheetDescription>
+                                </SheetHeader>
+                                <div className="py-4 h-[calc(100vh-8rem)] overflow-y-auto">
+                                  <FilterSidebar filters={filters} appliedFilters={appliedFilters} onFilterChange={onFilterChange} onApply={handleApply} onReset={handleReset} resultCount={resultCount}/>
+                                </div>
+                              </SheetContent>
+                            </Sheet>
+                            
+                             <Select value={sortBy} onValueChange={onSortChange}>
+                                <SelectTrigger id="SAPXEP01" className="w-auto md:w-[180px]">
+                                    <SelectValue placeholder="Sắp xếp theo" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="newest">Mới nhất</SelectItem>
+                                    <SelectItem value="salary_desc">Lương cơ bản: Cao {'>'} Thấp</SelectItem>
+                                    <SelectItem value="salary_asc">Lương cơ bản: Thấp {'>'} Cao</SelectItem>
+                                    <SelectItem value="net_salary_desc">Thực lĩnh: Cao {'>'} Thấp</SelectItem>
+                                    <SelectItem value="net_salary_asc">Thực lĩnh: Thấp {'>'} Cao</SelectItem>
+                                    <SelectItem value="fee_asc">Phí thấp {'>'} Cao</SelectItem>
+                                    <SelectItem value="fee_desc">Phí cao {'>'} Thấp</SelectItem>
+                                    <SelectItem value="interview_date_asc">Ngày phỏng vấn: Gần nhất</SelectItem>
+                                    <SelectItem value="interview_date_desc">Ngày phỏng vấn: Xa nhất</SelectItem>
+                                    <SelectItem value="has_image">Ưu tiên có ảnh</SelectItem>
+                                    <SelectItem value="has_video">Ưu tiên có video</SelectItem>
+                                    <SelectItem value="hot">Độ hot</SelectItem>
+                                    <SelectItem value="most_applicants">Nhiều người ứng tuyển</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                     {jobs.length > 0 ? (
                         <div className="grid grid-cols-1 gap-4">
