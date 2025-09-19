@@ -164,7 +164,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             navigator.clipboard.writeText(shareUrl);
             toast({
                 title: "Đã sao chép liên kết!",
-                description: "Bạn có thể dán và chia sẻ liên kết việc làm này.",
+                description: "Bạn có thể dán và chia sẽ liên kết việc làm này.",
             });
         }
         if (navigator.share) {
@@ -349,16 +349,20 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <Link href={`/consultant-profile/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
-                                        <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
-                                            <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
-                                            <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                    </Link>
-                                    <div>
-                                        <Link href={`/consultant-profile/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
-                                            <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
+                                    <div onClick={(e) => e.stopPropagation()}>
+                                        <Link href={`/consultant-profile/${assignedConsultant.id}`} >
+                                            <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
+                                                <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
+                                                <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
+                                            </Avatar>
                                         </Link>
+                                    </div>
+                                    <div>
+                                        <div onClick={(e) => e.stopPropagation()}>
+                                            <Link href={`/consultant-profile/${assignedConsultant.id}`} >
+                                                <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
+                                            </Link>
+                                        </div>
                                         <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
                                     </div>
                                 </div>
