@@ -198,7 +198,7 @@ function JobsPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement
+            otherSkillRequirement, specialConditions
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -328,9 +328,13 @@ function JobsPageContent() {
                 const skillName = otherSkills.find(s => s.slug === skillSlug)?.name;
                 return skillName ? (job.details.description.includes(skillName) || job.details.requirements.includes(skillName)) : true;
             });
+            
+            const specialConditionsMatch = !specialConditions || specialConditions.length === 0 || specialConditions.every(cond => {
+                 return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
+            });
 
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch;
         });
 
         setFilteredJobs(results);
@@ -341,7 +345,7 @@ function JobsPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement
+            otherSkillRequirement, specialConditions
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -465,8 +469,12 @@ function JobsPageContent() {
                 const skillName = otherSkills.find(s => s.slug === skillSlug)?.name;
                 return skillName ? (job.details.description.includes(skillName) || job.details.requirements.includes(skillName)) : true;
             });
+            
+            const specialConditionsMatch = !specialConditions || specialConditions.length === 0 || specialConditions.every(cond => {
+                 return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
+            });
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -474,7 +482,7 @@ function JobsPageContent() {
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters };
         for (const [key, value] of searchParams.entries()) {
-            if (key === 'location' || key === 'specialConditions' || key === 'os') {
+            if (key === 'location' || key === 'os') {
                 const targetKey = key === 'os' ? 'otherSkillRequirement' : key;
                 const currentValues = newFilters[targetKey] || [];
                 // @ts-ignore
@@ -485,6 +493,9 @@ function JobsPageContent() {
                      // @ts-ignore
                     newFilters[key] = [parseInt(values[0], 10), parseInt(values[1], 10)];
                 }
+            } else if (key === 'dk') { // SEO-TU-KHOA-01: Handle 'dk' for special conditions
+                const currentConditions = newFilters.specialConditions || [];
+                newFilters.specialConditions = [...currentConditions, value];
             } else if (key === 'yoe') {
                 newFilters['yearsOfExperience'] = value;
             } else if (key === 'expReq') {
@@ -534,7 +545,7 @@ function JobsPageContent() {
             if (value && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
                  if (key !== 'visa' && !(Array.isArray(value) && value.includes('all'))) {
                     if (Array.isArray(value)) {
-                        const paramKey = key === 'otherSkillRequirement' ? 'os' : key;
+                        const paramKey = key === 'otherSkillRequirement' ? 'os' : (key === 'specialConditions' ? 'dk' : key);
                         value.forEach(item => query.append(paramKey, String(item)));
                     } else if (key === 'yearsOfExperience') {
                         query.set('yoe', String(value));

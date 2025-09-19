@@ -49,7 +49,7 @@ const conditionsByVisaDetail: { [key: string]: string[] } = {
   'ky-su-tri-thuc-dau-viet': ['Tuyển gấp', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại', 'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Nhận nhiều loại bằng', 'Nhận bằng Senmon', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Nợ phí', 'Phí mềm', 'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Bay nhanh', 'Trình cục sớm', 'Có bảng lương'],
 };
 
-const allSpecialConditions = [...new Set(Object.values(conditionsByVisaDetail).flat())];
+const allSpecialConditions = [...new Set(Object.values(conditionsByVisaDetail).flat())].map(name => ({ name, slug: createSlug(name) }));
 
 const languageLevels = [
     { name: "N1", slug: "n1" },
@@ -305,7 +305,9 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         if (!activeFilters.visaDetail) {
             return allSpecialConditions;
         }
-        return conditionsByVisaDetail[activeFilters.visaDetail as keyof typeof conditionsByVisaDetail] || [];
+        const conditions = conditionsByVisaDetail[activeFilters.visaDetail as keyof typeof conditionsByVisaDetail] || [];
+        return conditions.map(name => ({name, slug: createSlug(name)}));
+
     }, [activeFilters.visaDetail]);
 
     const showTattooFilter = useMemo(() => {
@@ -991,9 +993,19 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                             </AccordionTrigger>
                             <AccordionContent className="space-y-2 pt-4">
                                 {availableConditions.map(item => (
-                                    <div key={item} className="flex items-center space-x-2">
-                                        <Checkbox id={`cond-${item}`} />
-                                        <Label htmlFor={`cond-${item}`} className="font-normal cursor-pointer">{item}</Label>
+                                    <div key={item.slug} className="flex items-center space-x-2">
+                                        <Checkbox 
+                                            id={`cond-${item.slug}`}
+                                            checked={filters.specialConditions?.includes(item.name)}
+                                            onCheckedChange={(checked) => {
+                                                const currentConditions = filters.specialConditions || [];
+                                                const newConditions = checked
+                                                    ? [...currentConditions, item.name]
+                                                    : currentConditions.filter(c => c !== item.name);
+                                                onFilterChange({ specialConditions: newConditions });
+                                            }}
+                                        />
+                                        <Label htmlFor={`cond-${item.slug}`} className="font-normal cursor-pointer">{item.name}</Label>
                                     </div>
                                 ))}
                             </AccordionContent>
