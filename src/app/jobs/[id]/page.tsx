@@ -65,6 +65,32 @@ const convertToVnd = (jpyValue?: string) => {
     return `≈ ${vndValue.toLocaleString('vi-VN')} VNĐ`;
 };
 
+const HydrationSafeDate = ({ dateString }: { dateString: string }) => {
+    const [formattedDate, setFormattedDate] = useState('');
+    useEffect(() => {
+        // postedTime is in 'HH:mm DD/MM/YYYY' format
+        const parts = dateString.split(' ');
+        if (parts.length === 2) {
+            const time = parts[0];
+            const dateParts = parts[1].split('/');
+            if (dateParts.length === 3) {
+                 // Format to a string that new Date() can parse reliably
+                const isoDateString = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                const date = new Date(isoDateString);
+                setFormattedDate(date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+            }
+        }
+    }, [dateString]);
+    
+    const timePart = dateString.split(' ')[0];
+
+    return (
+        <span>
+            {timePart} {formattedDate}
+        </span>
+    );
+};
+
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
@@ -222,7 +248,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 </p>
                                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
                                     <p className="flex items-center gap-2"><MapPin className="h-4 w-4"/> {job.workLocation}</p>
-                                    <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4"/> <span className="text-primary">Đăng lúc:</span> {job.postedTime}</p>
+                                    <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4"/> <span className="text-primary">Đăng lúc:</span> <HydrationSafeDate dateString={job.postedTime} /></p>
                                 </div>
                             </CardHeader>
                             <CardContent>
