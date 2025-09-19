@@ -65,7 +65,15 @@ const englishLevels = [
     "Giao tiếp IELTS 9.0", "Giao tiếp IELTS 8.0", "Giao tiếp IELTS 7.0", "Giao tiếp IELTS 6.0", "Giao tiếp IELTS 5.0", "Giao tiếp IELTS 4.0",
     "Trình độ tương đương 9.0", "Trình độ tương đương 8.0", "Trình độ tương đương 7.0", "Trình độ tương đương 6.0", "Trình độ tương đương 5.0", "Trình độ tương đương 4.0"
 ];
-const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon", "Không yêu cầu"];
+const educationLevels = [
+    { name: "Tất cả", slug: "all" },
+    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
+    { name: "Tốt nghiệp THPT", slug: "tot-nghiep-thpt" },
+    { name: "Tốt nghiệp Trung cấp", slug: "tot-nghiep-trung-cap" },
+    { name: "Tốt nghiệp Cao đẳng", slug: "tot-nghiep-cao-dang" },
+    { name: "Tốt nghiệp Đại học", slug: "tot-nghiep-dai-hoc" },
+    { name: "Tốt nghiệp Senmon", slug: "tot-nghiep-senmon" },
+];
 const visionRequirements = [
     { name: "Tất cả", slug: "all" },
     { name: "Không yêu cầu", slug: "khong-yeu-cau" },
@@ -123,6 +131,7 @@ const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a)
 
 interface FilterSidebarProps {
     filters: SearchFilters;
+    appliedFilters: SearchFilters;
     onFilterChange: (newFilters: Partial<SearchFilters>) => void;
     onApply: () => void;
     onReset: () => void;
@@ -219,7 +228,7 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
 MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 
 
-export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resultCount }: FilterSidebarProps) => {
+export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply, onReset, resultCount }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isFlexibleDate, setIsFlexibleDate] = useState(false);
@@ -253,26 +262,44 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
         return [...new Set(Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords).filter(Boolean))];
     }, []);
 
+    const activeFilters = { ...appliedFilters, ...filters };
 
     const showGinouFilter = useMemo(() => 
-        ['dac-dinh-dau-viet', 'dac-dinh-dau-nhat'].includes(filters.visaDetail || ''),
-    [filters.visaDetail]);
+        ['dac-dinh-dau-viet', 'dac-dinh-dau-nhat'].includes(activeFilters.visaDetail || ''),
+    [activeFilters.visaDetail]);
 
     const showArrivalTimeFilter = useMemo(() => 
-        ['thuc-tap-sinh-3-go', 'dac-dinh-dau-nhat', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || ''),
-    [filters.visaDetail]);
+        ['thuc-tap-sinh-3-go', 'dac-dinh-dau-nhat', 'ky-su-tri-thuc-dau-nhat'].includes(activeFilters.visaDetail || ''),
+    [activeFilters.visaDetail]);
 
     const availableConditions = useMemo(() => {
-        if (!filters.visaDetail) {
+        if (!activeFilters.visaDetail) {
             return allSpecialConditions;
         }
-        return conditionsByVisaDetail[filters.visaDetail as keyof typeof conditionsByVisaDetail] || [];
-    }, [filters.visaDetail]);
+        return conditionsByVisaDetail[activeFilters.visaDetail as keyof typeof conditionsByVisaDetail] || [];
+    }, [activeFilters.visaDetail]);
 
+    const showTattooFilter = useMemo(() => {
+        const visasToHideTattoo = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
+        const parentVisaSlug = activeFilters.visa || Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === activeFilters.visaDetail));
+        if (parentVisaSlug === 'ky-su-tri-thuc') return false;
+        return !visasToHideTattoo.includes(activeFilters.visaDetail || '');
+    }, [activeFilters.visa, activeFilters.visaDetail]);
+
+    const showEnglishLevelFilter = useMemo(() => {
+        const activeVisa = activeFilters.visa;
+        const activeIndustry = activeFilters.industry;
+        const parentVisaSlug = activeVisa || Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === activeFilters.visaDetail));
+
+        const isEngineerVisa = parentVisaSlug === 'ky-su-tri-thuc';
+        const isTokuteiServiceIndustry = parentVisaSlug === 'ky-nang-dac-dinh' && ['nha-hang-tokutei', 'hang-khong-tokutei', 've-sinh-toa-nha-tokutei', 'luu-tru-khach-san-tokutei'].includes(activeIndustry || '');
+        
+        return isEngineerVisa || isTokuteiServiceIndustry;
+    }, [activeFilters.visa, activeFilters.visaDetail, activeFilters.industry]);
 
     useEffect(() => {
         const parentVisaSlug = filters.visa || Object.keys(industriesByJobType).find(key => 
-            visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType]?.some(detail => detail.slug === filters.visaDetail)
+            (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === filters.visaDetail)
         );
 
         const industries = parentVisaSlug ? (industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
@@ -398,33 +425,22 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                 return 'Phí tối đa (USD)';
         }
     };
-
-    const visasToHideTattoo = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
-    const showTattooFilter = !visasToHideTattoo.includes(filters.visaDetail || '');
     
     const showEducationFilter = useMemo(() => {
         const visasToShow = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
-        // Show if no specific visa is selected OR if the selected visa is one of the engineer visas
-        return !filters.visaDetail || visasToShow.includes(filters.visaDetail);
-    }, [filters.visaDetail]);
-    
-    const showEnglishLevelFilter = useMemo(() => {
-        const isEngineerVisa = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'].includes(filters.visaDetail || '');
-        const isTokuteiServiceIndustry = 
-            filters.visa === 'ky-nang-dac-dinh' && 
-            ['nha-hang-tokutei', 'hang-khong-tokutei', 've-sinh-toa-nha-tokutei', 'luu-tru-khach-san-tokutei'].includes(filters.industry || '');
+        const parentVisaSlug = activeFilters.visa || Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === activeFilters.visaDetail));
         
-        return isEngineerVisa || isTokuteiServiceIndustry;
-    }, [filters.visaDetail, filters.visa, filters.industry]);
+        return parentVisaSlug === 'ky-su-tri-thuc' || !activeFilters.visaDetail;
+    }, [activeFilters.visa, activeFilters.visaDetail]);
     
-    const shouldShowLươngGiờ = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(filters.visaDetail || "");
-    const shouldShowLươngNăm = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(filters.visaDetail || "");
+    const shouldShowLươngGiờ = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(activeFilters.visaDetail || "");
+    const shouldShowLươngNăm = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(activeFilters.visaDetail || "");
     const shouldShowTabs = shouldShowLươngGiờ || shouldShowLươngNăm;
     
     const showFeeFilter = useMemo(() => {
         const visasToShowFee = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
-        return !!filters.visaDetail && visasToShowFee.includes(filters.visaDetail);
-    }, [filters.visaDetail]);
+        return !!activeFilters.visaDetail && visasToShowFee.includes(activeFilters.visaDetail);
+    }, [activeFilters.visaDetail]);
 
     return (
         <div className="md:col-span-1 lg:col-span-1 h-full flex flex-col">
@@ -847,10 +863,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 {showEducationFilter && (
                                  <div className="space-y-2">
                                     <Label className="font-semibold">Học vấn</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn học vấn" /></SelectTrigger>
+                                    <Select value={filters.educationRequirement} onValueChange={(value) => onFilterChange({ educationRequirement: value })}>
+                                        <SelectTrigger className={cn(filters.educationRequirement && filters.educationRequirement !== 'all' && "text-primary")}><SelectValue placeholder="Chọn học vấn" /></SelectTrigger>
                                         <SelectContent>
-                                            {educationLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                            {educationLevels.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>

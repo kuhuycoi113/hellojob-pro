@@ -136,6 +136,16 @@ const languageLevels = [
     { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
 ];
 
+const educationLevels = [
+    { name: "Tất cả", slug: "all" },
+    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
+    { name: "Tốt nghiệp THPT", slug: "tot-nghiep-thpt" },
+    { name: "Tốt nghiệp Trung cấp", slug: "tot-nghiep-trung-cap" },
+    { name: "Tốt nghiệp Cao đẳng", slug: "tot-nghiep-cao-dang" },
+    { name: "Tốt nghiệp Đại học", slug: "tot-nghiep-dai-hoc" },
+    { name: "Tốt nghiệp Senmon", slug: "tot-nghiep-senmon" },
+];
+
 function JobsPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -151,7 +161,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age, height, weight, visionRequirement, tattooRequirement, languageRequirement
+            age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -176,6 +186,7 @@ function JobsPageContent() {
         const [minExp, maxExp] = parseExperienceToRange(yoeName);
         
         const expReqSlug = experienceRequirement || '';
+        const eduReqName = educationLevels.find(e => e.slug === educationRequirement)?.name;
 
 
         let results = jobData.filter(job => {
@@ -271,8 +282,10 @@ function JobsPageContent() {
             const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
             const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
 
+            const educationReqMatch = !eduReqName || eduReqName === 'Tất cả' || !job.educationRequirement || job.educationRequirement === eduReqName;
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch;
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch;
         });
 
         setFilteredJobs(results);
@@ -282,7 +295,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age, height, weight, visionRequirement, tattooRequirement, languageRequirement
+            age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -307,6 +320,7 @@ function JobsPageContent() {
         const [minExp, maxExp] = parseExperienceToRange(yoeName);
         
         const expReqSlug = experienceRequirement || '';
+        const eduReqName = educationLevels.find(e => e.slug === educationRequirement)?.name;
 
 
         const count = jobData.filter(job => {
@@ -396,8 +410,10 @@ function JobsPageContent() {
             const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
             const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
 
+            const educationReqMatch = !eduReqName || eduReqName === 'Tất cả' || !job.educationRequirement || job.educationRequirement === eduReqName;
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch;
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -423,6 +439,8 @@ function JobsPageContent() {
                 newFilters['tattooRequirement'] = value;
             } else if (key === 'lang') {
                 newFilters['languageRequirement'] = value;
+            } else if (key === 'edu') {
+                newFilters['educationRequirement'] = value;
             }
              else {
                  // @ts-ignore
@@ -467,6 +485,8 @@ function JobsPageContent() {
                         query.set('tattoo', String(value));
                     } else if (key === 'languageRequirement') {
                         query.set('lang', String(value));
+                    } else if (key === 'educationRequirement') {
+                        query.set('edu', String(value));
                     }
                     else {
                         query.set(key, String(value));
@@ -509,6 +529,7 @@ function JobsPageContent() {
             <SearchResults 
                 jobs={filteredJobs} 
                 filters={stagedFilters}
+                appliedFilters={appliedFilters}
                 onFilterChange={handleStagedFilterChange} 
                 applyFilters={handleApplyFilters} 
                 resetFilters={handleResetFilters}
