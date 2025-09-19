@@ -36,7 +36,7 @@ const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[
                 </div>
             </Link>
             <div className="mt-4 pt-4 border-t">
-                {chatConsultant && <ContactButtons contact={chatConsultant} />}
+                {chatConsultant && <ContactButtons contact={chatConsultant} showChatText={true} />}
             </div>
         </Card>
     );
