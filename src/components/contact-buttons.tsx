@@ -8,6 +8,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useChat } from '@/contexts/ChatContext';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
+
 
 // Define a more generic type for the contact person
 type ContactPerson = {
@@ -23,6 +25,11 @@ interface ContactButtonsProps {
 
 export function ContactButtons({ contact, showChatText = false }: ContactButtonsProps) {
   const { openChat } = useChat();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleChatClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // Prevent card's onClick from firing
@@ -43,12 +50,12 @@ export function ContactButtons({ contact, showChatText = false }: ContactButtons
     <>
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-1">
-            <Button 
-                size={showChatText ? "sm" : "icon"} 
-                variant="default" 
+             <Button
+                size={showChatText ? 'sm' : 'icon'}
+                variant="default"
                 className={cn(
-                    "h-8 hover:bg-primary/90",
-                    showChatText ? "bg-primary w-auto" : "bg-primary w-8"
+                    'h-8 hover:bg-primary/90',
+                    showChatText ? 'w-auto px-3' : 'w-8'
                 )}
                 onClick={handleChatClick}
             >
