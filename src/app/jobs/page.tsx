@@ -120,6 +120,13 @@ const parsePhysicalRequirement = (reqStr?: string): [number, number] => {
 
 const allIndustries: Industry[] = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
+const tattooRequirements = [
+    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
+    { name: "Không nhận hình xăm", slug: "khong-nhan-hinh-xam" },
+    { name: "Nhận xăm nhỏ (kín)", slug: "nhan-xam-nho-kin" },
+    { name: "Nhận cả xăm to (lộ)", slug: "nhan-ca-xam-to-lo" },
+];
+
 function JobsPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -135,7 +142,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age, height, weight, visionRequirement
+            age, height, weight, visionRequirement, tattooRequirement
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -248,8 +255,12 @@ function JobsPageContent() {
             }
 
             const visionMatch = !visionRequirement || visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
+            
+            const tattooReqName = tattooRequirements.find(t => t.slug === tattooRequirement)?.name;
+            const tattooMatch = !tattooRequirement || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch;
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch;
         });
 
         setFilteredJobs(results);
@@ -259,7 +270,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age, height, weight, visionRequirement
+            age, height, weight, visionRequirement, tattooRequirement
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -366,8 +377,11 @@ function JobsPageContent() {
             }
 
             const visionMatch = !visionRequirement || visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
+            
+            const tattooReqName = tattooRequirements.find(t => t.slug === tattooRequirement)?.name;
+            const tattooMatch = !tattooRequirement || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -389,6 +403,8 @@ function JobsPageContent() {
                 newFilters['yearsOfExperience'] = value;
             } else if (key === 'expReq') {
                 newFilters['experienceRequirement'] = value;
+            } else if (key === 'tattoo') {
+                newFilters['tattooRequirement'] = value;
             }
              else {
                  // @ts-ignore
@@ -429,6 +445,8 @@ function JobsPageContent() {
                         query.set('yoe', String(value));
                     } else if (key === 'experienceRequirement') {
                         query.set('expReq', String(value));
+                    } else if (key === 'tattooRequirement') {
+                        query.set('tattoo', String(value));
                     }
                     else {
                         query.set(key, String(value));

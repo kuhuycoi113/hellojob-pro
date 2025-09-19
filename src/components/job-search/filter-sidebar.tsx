@@ -65,7 +65,13 @@ const visionRequirements = [
     { name: "Yêu cầu thị lực tốt", slug: "yeu-cau-thi-luc-tot" },
     { name: "Không mù màu", slug: "khong-mu-mau" }
 ];
-const tattooRequirements = ["Không yêu cầu", "Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
+const tattooRequirements = [
+    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
+    { name: "Không nhận hình xăm", slug: "khong-nhan-hinh-xam" },
+    { name: "Nhận xăm nhỏ (kín)", slug: "nhan-xam-nho-kin" },
+    { name: "Nhận cả xăm to (lộ)", slug: "nhan-ca-xam-to-lo" },
+];
+
 
 const interviewRoundsOptions = [
     { name: "1 vòng", slug: "1-vong" },
@@ -802,10 +808,10 @@ export const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, resul
                                 {showTattooFilter && (
                                 <div className="space-y-2">
                                     <Label className="font-semibold">Yêu cầu hình xăm</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
+                                    <Select value={filters.tattooRequirement} onValueChange={(value) => onFilterChange({ tattooRequirement: value })}>
+                                        <SelectTrigger className={cn(filters.tattooRequirement && "text-primary")}><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
                                         <SelectContent>
-                                            {tattooRequirements.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                            {tattooRequirements.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
