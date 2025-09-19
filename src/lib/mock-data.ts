@@ -99,6 +99,16 @@ const jobImagePlaceholders: {[key: string]: string} = {
     'Vận tải': `https://picsum.photos/seed/logistics/600/400`,
 };
 
+const workImagePlaceholders = [
+    "/img/vieclam001.webp",
+    "/img/vieclam002.webp",
+    "/img/vieclam003.webp",
+    "/img/vieclam004.webp",
+    "/img/vieclam005.webp",
+    "/img/vieclam006.webp",
+];
+
+
 const existingJobIds = new Set<string>();
 
 const generateUniqueJobId = (index: number): string => {
@@ -247,7 +257,7 @@ const generateRandomJob = (index: number): Job => {
             videoUrl: index % 4 === 0 ? 'https://www.youtube.com/embed/dQw4w9WgXcQ' : undefined,
             images: index % 3 === 0 ? [
                 { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
-                { src: '/img/donhang2.jpg', alt: 'Mẫu đơn hàng 2', dataAiHint: 'recruitment form' },
+                { src: workImagePlaceholders[index % workImagePlaceholders.length], alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
                 { src: '/img/donhang3.jpg', alt: 'Mẫu đơn hàng 3', dataAiHint: 'job details' }
             ] : []
         }
@@ -324,6 +334,11 @@ if (minh) {
                 description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Công việc dành cho ứng viên muốn làm việc trong ngành ${industry}.</p>`,
                 requirements: `<ul><li>Yêu cầu: Tốt nghiệp THPT trở lên.</li><li>Có sức khỏe tốt.</li></ul>`,
                 benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm theo quy định.</li><li>Hỗ trợ chi phí nhà ở.</li></ul>`,
+                images: [
+                     { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
+                    { src: workImagePlaceholders[baseIndex % workImagePlaceholders.length], alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
+                    { src: '/img/donhang3.jpg', alt: 'Mẫu đơn hàng 3', dataAiHint: 'job details' }
+                ]
             }
         };
         jobData.push(newJob);
