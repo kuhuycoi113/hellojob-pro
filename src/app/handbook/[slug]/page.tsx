@@ -331,11 +331,11 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
                 <div className="space-y-4">
                     {hotJobs.map(job => (
                         <div key={job.id}>
-                          {/* Mobile View */}
+                          {/* Mobile View: Use the standard JobCard */}
                           <div className="md:hidden">
                             <JobCard job={job} variant="list-item" showApplyButtons={true} />
                           </div>
-                           {/* Desktop View */}
+                           {/* Desktop View: Use the new custom layout */}
                            <DesktopJobItem job={job} />
                         </div>
                     ))}
@@ -372,5 +372,6 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
     </div>
   );
 }
+
 
 
