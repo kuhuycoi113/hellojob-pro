@@ -108,6 +108,15 @@ const workImagePlaceholders = [
     "/img/vieclam006.webp",
 ];
 
+const dormitoryImages = [
+    "/img/ktx001.jpg",
+    "/img/ktx002.jpeg",
+    "/img/ktx003.jpeg",
+    "/img/ktx004.jpeg",
+    "/img/ktx005.jpeg",
+    "/img/ktx006.jpeg",
+];
+
 
 const existingJobIds = new Set<string>();
 
@@ -258,7 +267,7 @@ const generateRandomJob = (index: number): Job => {
             images: index % 3 === 0 ? [
                 { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
                 { src: workImagePlaceholders[index % workImagePlaceholders.length], alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
-                { src: '/img/donhang3.jpg', alt: 'Mẫu đơn hàng 3', dataAiHint: 'job details' }
+                { src: dormitoryImages[index % dormitoryImages.length], alt: 'Ký túc xá', dataAiHint: 'dormitory room' }
             ] : []
         }
     };
@@ -337,7 +346,7 @@ if (minh) {
                 images: [
                      { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
                     { src: workImagePlaceholders[baseIndex % workImagePlaceholders.length], alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
-                    { src: '/img/donhang3.jpg', alt: 'Mẫu đơn hàng 3', dataAiHint: 'job details' }
+                    { src: dormitoryImages[baseIndex % dormitoryImages.length], alt: 'Ký túc xá', dataAiHint: 'dormitory room' }
                 ]
             }
         };
