@@ -529,15 +529,7 @@ function JobsPageContent() {
     const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
       setStagedFilters(prev => {
           const updated = {...prev, ...newFilters};
-          if (newFilters.visa !== undefined) {
-             updated.visaDetail = undefined as any;
-             updated.industry = '';
-             updated.jobDetail = '';
-          }
-          if (newFilters.industry !== undefined) {
-             updated.jobDetail = '';
-          }
-          countStagedResults(updated);
+          countStagedResults(updated); // Đếm lại kết quả với bộ lọc mới
           return updated;
       });
     }, [countStagedResults]);
@@ -636,4 +628,5 @@ export default function JobsPage() {
     </Suspense>
   );
 }
+
 
