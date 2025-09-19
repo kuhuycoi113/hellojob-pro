@@ -220,7 +220,8 @@ const generateRandomJob = (index: number): Job => {
 
     const deterministicLikesK = (index * 7) % 10;
     const deterministicLikesHundred = (index * 3) % 10;
-    const imageSrc = jobImagePlaceholders[industry] || `https://placehold.co/600x400.png?text=${encodeURIComponent(industry)}`;
+    
+    const anhViecLamSrc = workImagePlaceholders[index % workImagePlaceholders.length];
 
     const newJobId = generateUniqueJobId(index);
 
@@ -228,7 +229,7 @@ const generateRandomJob = (index: number): Job => {
     return {
         id: newJobId,
         isRecording: index % 5 === 0,
-        image: { src: imageSrc, type: 'minhhoa' },
+        image: { src: anhViecLamSrc, type: 'thucte' },
         likes: `${deterministicLikesK}k${deterministicLikesHundred}`,
         salary: {
             actual: `${(12 + (index % 10)) * 10000}`,
@@ -272,7 +273,7 @@ const generateRandomJob = (index: number): Job => {
             videoUrl: index % 4 === 0 ? jobVideos[index % jobVideos.length] : undefined,
             images: index % 3 === 0 ? [
                 { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
-                { src: workImagePlaceholders[index % workImagePlaceholders.length], alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
+                { src: anhViecLamSrc, alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
                 { src: dormitoryImages[index % dormitoryImages.length], alt: 'Ký túc xá', dataAiHint: 'dormitory room' }
             ] : []
         }
@@ -306,11 +307,12 @@ if (minh) {
         
         const title = `${jobTitles[industry as keyof typeof jobTitles][baseIndex % 4]}, ${location}, ${quantity} ${gender}`;
         const newJobId = generateUniqueJobId(baseIndex);
+        const anhViecLamSrc = workImagePlaceholders[baseIndex % workImagePlaceholders.length];
 
         const newJob: Job = {
             id: newJobId,
             isRecording: baseIndex % 5 === 0,
-            image: { src: jobImagePlaceholders[industry] || `https://placehold.co/600x400.png?text=${encodeURIComponent(industry)}`, type: 'minhhoa' },
+            image: { src: anhViecLamSrc, type: 'thucte' },
             likes: `${(baseIndex * 2) % 10}k${(baseIndex * 4) % 10}`,
             salary: {
                 actual: `${(13 + (baseIndex % 10)) * 10000}`,
@@ -352,7 +354,7 @@ if (minh) {
                 videoUrl: baseIndex % 4 === 0 ? jobVideos[baseIndex % jobVideos.length] : undefined,
                 images: [
                      { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
-                    { src: workImagePlaceholders[baseIndex % workImagePlaceholders.length], alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
+                    { src: anhViecLamSrc, alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
                     { src: dormitoryImages[baseIndex % dormitoryImages.length], alt: 'Ký túc xá', dataAiHint: 'dormitory room' }
                 ]
             }
@@ -360,5 +362,3 @@ if (minh) {
         jobData.push(newJob);
     }
 }
-
-    
