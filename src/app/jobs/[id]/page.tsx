@@ -237,7 +237,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                                     <Image id="ANHVIECLAM01" src={job.details.images[1].src} alt={job.details.images[1].alt} fill className="object-cover" data-ai-hint={job.details.images[1].dataAiHint}/>
                                                 </div>
                                                 <div className="relative aspect-video rounded-lg overflow-hidden">
-                                                    <Image src={job.details.images[2].src} alt={job.details.images[2].alt} fill className="object-cover" data-ai-hint={job.details.images[2].dataAiHint}/>
+                                                    <Image id="ANHKTX01" src={job.details.images[2].src} alt={job.details.images[2].alt} fill className="object-cover" data-ai-hint={job.details.images[2].dataAiHint}/>
                                                 </div>
                                             </div>
                                         </div>
