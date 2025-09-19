@@ -337,6 +337,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             </CardContent>
                         </Card>
                         <Card 
+                            id="MDTVV01"
                             className="shadow-lg group hover:shadow-xl hover:border-primary transition-all cursor-pointer"
                             onClick={(e) => {
                                 // Only navigate if the click is directly on the card and not on an interactive element inside
