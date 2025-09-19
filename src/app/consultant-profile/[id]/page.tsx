@@ -168,7 +168,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                 </CardContent>
             </Card>
 
-            <Card className="shadow-lg p-4">
+            <Card id="LIENHE01" className="shadow-lg p-4">
                 <ContactButtons contact={consultant} showChatText={true} />
             </Card>
           </div>
