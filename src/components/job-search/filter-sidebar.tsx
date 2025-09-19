@@ -87,6 +87,13 @@ const tattooRequirements = [
     { name: "Nhận cả xăm to (lộ)", slug: "nhan-ca-xam-to-lo" },
 ];
 
+const dominantHands = [
+    { name: "Tất cả", slug: "all" },
+    { name: "Tay phải", slug: "tay-phai" },
+    { name: "Tay trái", slug: "tay-trai" },
+    { name: "Cả hai tay", slug: "ca-hai-tay" },
+];
+
 
 const interviewRoundsOptions = [
     { name: "1 vòng", slug: "1-vong" },
@@ -287,12 +294,15 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
     }, [activeFilters.visa, activeFilters.visaDetail]);
 
     const showEnglishLevelFilter = useMemo(() => {
-        const activeVisa = activeFilters.visa;
-        const activeIndustry = activeFilters.industry;
-        const parentVisaSlug = activeVisa || Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === activeFilters.visaDetail));
+        // Use a consistent source for logic: activeFilters which is the merged state.
+        const parentVisaSlug = activeFilters.visa || Object.keys(visaDetailsByVisaType).find(key => 
+            (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === activeFilters.visaDetail)
+        );
 
         const isEngineerVisa = parentVisaSlug === 'ky-su-tri-thuc';
-        const isTokuteiServiceIndustry = parentVisaSlug === 'ky-nang-dac-dinh' && ['nha-hang-tokutei', 'hang-khong-tokutei', 've-sinh-toa-nha-tokutei', 'luu-tru-khach-san-tokutei'].includes(activeIndustry || '');
+        const isTokuteiServiceIndustry = 
+            parentVisaSlug === 'ky-nang-dac-dinh' && 
+            ['nha-hang-tokutei', 'hang-khong-tokutei', 've-sinh-toa-nha-tokutei', 'luu-tru-khach-san-tokutei'].includes(activeFilters.industry || '');
         
         return isEngineerVisa || isTokuteiServiceIndustry;
     }, [activeFilters.visa, activeFilters.visaDetail, activeFilters.industry]);
@@ -873,12 +883,12 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 )}
                                 <div className="space-y-2">
                                     <Label className="font-semibold">Tay thuận</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn tay thuận" /></SelectTrigger>
+                                    <Select value={filters.dominantHand} onValueChange={(value) => onFilterChange({ dominantHand: value })}>
+                                        <SelectTrigger className={cn(filters.dominantHand && filters.dominantHand !== 'all' && "text-primary")}>
+                                            <SelectValue placeholder="Chọn tay thuận" />
+                                        </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="right">Tay phải</SelectItem>
-                                            <SelectItem value="left">Tay trái</SelectItem>
-                                            <SelectItem value="both">Cả hai tay</SelectItem>
+                                            {dominantHands.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>

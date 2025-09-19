@@ -40,6 +40,7 @@ export type SearchFilters = {
     quantity?: string;
     interviewRounds?: string;
     visionRequirement?: string;
+    dominantHand?: string;
 }
 
 export const experienceYears: { name: string; slug: string }[] = [

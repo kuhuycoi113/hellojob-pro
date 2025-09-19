@@ -41,6 +41,7 @@ const initialSearchFilters: SearchFilters = {
     interviewRounds: '',
     interviewDate: '',
     netFee: '',
+    dominantHand: '',
 };
 
 // Helper function to escape regex special characters
@@ -146,6 +147,14 @@ const educationLevels = [
     { name: "Tốt nghiệp Senmon", slug: "tot-nghiep-senmon" },
 ];
 
+const dominantHands = [
+    { name: "Tất cả", slug: "all" },
+    { name: "Tay phải", slug: "tay-phai" },
+    { name: "Tay trái", slug: "tay-trai" },
+    { name: "Cả hai tay", slug: "ca-hai-tay" },
+];
+
+
 function JobsPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -161,7 +170,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement
+            age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -187,6 +196,7 @@ function JobsPageContent() {
         
         const expReqSlug = experienceRequirement || '';
         const eduReqName = educationLevels.find(e => e.slug === educationRequirement)?.name;
+        const dominantHandName = dominantHands.find(d => d.slug === dominantHand)?.name;
 
 
         let results = jobData.filter(job => {
@@ -284,8 +294,10 @@ function JobsPageContent() {
 
             const educationReqMatch = !eduReqName || eduReqName === 'Tất cả' || !job.educationRequirement || job.educationRequirement === eduReqName;
 
+            const dominantHandMatch = !dominantHandName || dominantHandName === 'Tất cả' || !job.details.description || job.details.description.includes(dominantHandName);
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch;
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch;
         });
 
         setFilteredJobs(results);
@@ -295,7 +307,7 @@ function JobsPageContent() {
         const { 
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
-            age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement
+            age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -321,6 +333,7 @@ function JobsPageContent() {
         
         const expReqSlug = experienceRequirement || '';
         const eduReqName = educationLevels.find(e => e.slug === educationRequirement)?.name;
+        const dominantHandName = dominantHands.find(d => d.slug === dominantHand)?.name;
 
 
         const count = jobData.filter(job => {
@@ -412,8 +425,9 @@ function JobsPageContent() {
 
             const educationReqMatch = !eduReqName || eduReqName === 'Tất cả' || !job.educationRequirement || job.educationRequirement === eduReqName;
 
+            const dominantHandMatch = !dominantHandName || dominantHandName === 'Tất cả' || !job.details.description || job.details.description.includes(dominantHandName);
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -441,6 +455,8 @@ function JobsPageContent() {
                 newFilters['languageRequirement'] = value;
             } else if (key === 'edu') {
                 newFilters['educationRequirement'] = value;
+            } else if (key === 'hand') {
+                newFilters['dominantHand'] = value;
             }
              else {
                  // @ts-ignore
@@ -487,6 +503,8 @@ function JobsPageContent() {
                         query.set('lang', String(value));
                     } else if (key === 'educationRequirement') {
                         query.set('edu', String(value));
+                    } else if (key === 'dominantHand') {
+                        query.set('hand', String(value));
                     }
                     else {
                         query.set(key, String(value));
