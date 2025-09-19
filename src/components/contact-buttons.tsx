@@ -100,8 +100,8 @@ export function ContactButtons({ contact, showChatText = false }: ContactButtons
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-2">
                     <div className="flex flex-col gap-2">
-                        <Button size="lg" className="h-12 w-full bg-primary hover:bg-primary/90" onClick={handleChatClick}>
-                            <MessageSquare className="mr-2 h-6 w-6"/> Chat với Tư vấn viên
+                        <Button size="lg" className="h-12 w-full bg-primary hover:bg-primary/90 justify-start" onClick={handleChatClick}>
+                            <MessageSquare className="mr-2 h-6 w-6"/> {showChatText ? 'Chat với Tư vấn viên' : 'Chat'}
                         </Button>
                         <div className="flex gap-2">
                             <Button asChild variant="outline" size="icon" className="h-12 w-12 flex-1 border-purple-500 hover:bg-purple-50">
