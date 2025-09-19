@@ -163,7 +163,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             navigator.clipboard.writeText(window.location.href);
             toast({
                 title: "Đã sao chép liên kết!",
-                description: "Bạn có thể dán và chia sẻ liên kết này.",
+                description: "Bạn có thể dán và chia sẻ liên kết việc làm này.",
             });
         }
         if (navigator.share) {
@@ -348,12 +348,16 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <Avatar className="h-12 w-12">
-                                        <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
-                                        <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
-                                    </Avatar>
+                                    <Link href={`/consultant-profile/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
+                                        <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
+                                            <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
+                                            <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                    </Link>
                                     <div>
-                                        <p className="font-semibold text-primary">{assignedConsultant.name}</p>
+                                        <Link href={`/consultant-profile/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
+                                            <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
+                                        </Link>
                                         <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
                                     </div>
                                 </div>
@@ -363,7 +367,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             </CardContent>
                             <div className="border-t p-4 flex justify-center">
                                 <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                    <Share2 className="mr-2 h-4 w-4"/>Chia sẻ tin này
+                                    <Share2 className="mr-2 h-4 w-4"/>Chia sẻ thông tin việc làm này
                                 </Button>
                             </div>
                         </Card>
