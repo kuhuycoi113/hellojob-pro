@@ -117,6 +117,12 @@ const dormitoryImages = [
     "/img/ktx006.jpeg",
 ];
 
+const jobVideos = [
+    "https://www.youtube.com/embed/Zdo4UksgTn8",
+    "https://www.youtube.com/embed/LbfuxUIFmLc",
+    "https://www.youtube.com/embed/jGEMuHjF6vU"
+];
+
 
 const existingJobIds = new Set<string>();
 
@@ -263,7 +269,7 @@ const generateRandomJob = (index: number): Job => {
             description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản. Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p>`,
             requirements: `<ul><li>Yêu cầu: Tốt nghiệp THPT trở lên.</li><li>Có sức khỏe tốt, không mắc các bệnh truyền nhiễm.</li><li>Có khả năng làm việc nhóm và tuân thủ kỷ luật tốt.</li><li>Ưu tiên ứng viên có kinh nghiệm làm việc trong ngành ${industry}.</li></ul>`,
             benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li></ul>`,
-            videoUrl: index % 4 === 0 ? 'https://www.youtube.com/embed/dQw4w9WgXcQ' : undefined,
+            videoUrl: index % 4 === 0 ? jobVideos[index % jobVideos.length] : undefined,
             images: index % 3 === 0 ? [
                 { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
                 { src: workImagePlaceholders[index % workImagePlaceholders.length], alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
@@ -343,6 +349,7 @@ if (minh) {
                 description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Công việc dành cho ứng viên muốn làm việc trong ngành ${industry}.</p>`,
                 requirements: `<ul><li>Yêu cầu: Tốt nghiệp THPT trở lên.</li><li>Có sức khỏe tốt.</li></ul>`,
                 benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm theo quy định.</li><li>Hỗ trợ chi phí nhà ở.</li></ul>`,
+                videoUrl: baseIndex % 4 === 0 ? jobVideos[baseIndex % jobVideos.length] : undefined,
                 images: [
                      { src: '/img/donhang1.jpg', alt: 'Mẫu đơn hàng 1', dataAiHint: 'job order form' },
                     { src: workImagePlaceholders[baseIndex % workImagePlaceholders.length], alt: 'Tác nghiệp việc làm', dataAiHint: 'workplace action' },
@@ -353,3 +360,5 @@ if (minh) {
         jobData.push(newJob);
     }
 }
+
+    
