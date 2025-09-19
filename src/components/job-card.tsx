@@ -338,7 +338,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <ContactButtons contact={job.recruiter as any} />
                         </div>
                         {/* CHUCNANGUNGTUYEN01 */}
-                        {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>}
+                        <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
                     </div>
                 </div>
              </div>
