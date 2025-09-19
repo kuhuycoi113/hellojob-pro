@@ -154,13 +154,14 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     };
 
     const handleShare = async () => {
+        const shareUrl = `https://vi.hellojob.jp/jobs/${job.id}`;
         const shareData = {
           title: job.title,
           text: `Hãy xem công việc này trên HelloJob: ${job.title}`,
-          url: window.location.href,
+          url: shareUrl,
         };
         const copyLink = () => {
-            navigator.clipboard.writeText(window.location.href);
+            navigator.clipboard.writeText(shareUrl);
             toast({
                 title: "Đã sao chép liên kết!",
                 description: "Bạn có thể dán và chia sẻ liên kết việc làm này.",
