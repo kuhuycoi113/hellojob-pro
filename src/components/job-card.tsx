@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -206,14 +207,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                         </PopoverContent>
                                     </Popover>
 
-                                    <ContactButtons contact={job.recruiter} showChatText={true} />
+                                    <ContactButtons contact={job.recruiter as any} showChatText={true} />
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                                         <Bookmark className={cn("mr-2 h-5 w-5", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                                         Lưu
                                     </Button>
-                                    <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
+                                    {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>}
                                 </div>
                             </div>
                         </div>
@@ -334,10 +335,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                                 </Avatar>
                             </Link>
-                            <ContactButtons contact={job.recruiter} />
+                            <ContactButtons contact={job.recruiter as any} />
                         </div>
                         {/* CHUCNANGUNGTUYEN01 */}
-                        <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
+                        {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>}
                     </div>
                 </div>
              </div>

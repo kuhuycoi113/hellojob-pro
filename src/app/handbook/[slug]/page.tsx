@@ -4,14 +4,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Scroll, Timer, UserCircle, Briefcase, ChevronRight, Video, FileText, PlusCircle, ChevronDown, Newspaper, Image as ImageIcon, Smartphone } from 'lucide-react';
+import { Scroll, Timer, UserCircle, Briefcase, ChevronRight, Video, FileText, PlusCircle, ChevronDown, Newspaper, Image as ImageIcon, Smartphone, MapPin, DollarSign, Bookmark, Star } from 'lucide-react';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { useEffect, useState, use } from 'react';
 import { articles, type HandbookArticle } from '@/lib/handbook-data';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { jobData } from '@/lib/mock-data';
+import { jobData, Job } from '@/lib/mock-data';
 import { JobCard } from '@/components/job-card';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,6 +23,8 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { CommentSection } from '@/components/handbook/comment-section';
+import { ContactButtons } from '@/components/contact-buttons';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 
 const ShareDialogContent = () => (
@@ -65,6 +67,69 @@ const ShareDialogContent = () => (
     </div>
     </>
 );
+
+const DesktopJobItem = ({ job }: { job: Job }) => {
+    const router = useRouter();
+    const [isSaved, setIsSaved] = useState(false); // Local state for save button
+
+    useEffect(() => {
+        const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+        setIsSaved(savedJobs.includes(job.id));
+    }, [job.id]);
+
+    const handleSaveJob = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+        if (isSaved) {
+            const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
+            localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
+            setIsSaved(false);
+        } else {
+            savedJobs.push(job.id);
+            localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+            setIsSaved(true);
+        }
+        window.dispatchEvent(new Event('storage'));
+    };
+
+    return (
+        <Card className="hidden md:flex p-4 gap-4 transition-shadow hover:shadow-md cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
+            <div className="relative w-40 h-auto flex-shrink-0">
+                <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
+                <div className="absolute top-1 left-1 bg-black/50 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                    {job.id}
+                </div>
+                 <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
+                    <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
+                </Button>
+            </div>
+            <div className="flex flex-col flex-grow">
+                <h4 className="font-bold text-base leading-tight mb-2 hover:text-primary line-clamp-2">{job.title}</h4>
+                <div className="flex flex-wrap gap-2 text-xs mb-3">
+                    <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800">{job.salary.basic} JPY</Badge>
+                     <Badge variant="secondary">{job.workLocation}</Badge>
+                </div>
+                <div className="mt-auto flex justify-between items-end">
+                    <div className="flex items-center gap-2">
+                        <Link href={`/consultant-profile/${job.recruiter.id}`} onClick={(e) => e.stopPropagation()}>
+                            <Avatar className="h-9 w-9">
+                                <AvatarImage src={job.recruiter.avatar} />
+                                <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                        </Link>
+                         <ContactButtons contact={job.recruiter as any} />
+                    </div>
+                    <div className="text-right">
+                        <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/jobs/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
+                        <p className="text-xs text-muted-foreground mt-1">Đăng lúc: {job.postedTime.split(' ')[1]}</p>
+                    </div>
+                </div>
+            </div>
+        </Card>
+    )
+}
 
 
 export default function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -255,7 +320,14 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
                 </h2>
                 <div className="space-y-4">
                     {hotJobs.map(job => (
-                        <JobCard key={job.id} job={job} />
+                        <div key={job.id}>
+                          {/* Mobile View */}
+                          <div className="md:hidden">
+                            <JobCard job={job} variant="list-item" showApplyButtons={true} />
+                          </div>
+                           {/* Desktop View */}
+                           <DesktopJobItem job={job} />
+                        </div>
                     ))}
                 </div>
             </section>
