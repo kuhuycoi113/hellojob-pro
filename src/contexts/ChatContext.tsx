@@ -30,9 +30,9 @@ interface ChatProviderProps {
 }
 
 export const ChatProvider = ({ children }: ChatProviderProps) => {
-  const [isChatOpen, setIsChatOpen] = React.useState(false);
-  const [activeConversation, setActiveConversation] = React.useState<Conversation | null>(null);
-  const [assignedConsultant, setAssignedConsultant] = React.useState<User | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [assignedConsultant, setAssignedConsultant] = useState<User | null>(null);
 
   useEffect(() => {
     const consultantId = localStorage.getItem('assignedConsultantId');
