@@ -94,26 +94,28 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
     };
 
     return (
-        <Card className="hidden md:flex p-4 gap-4 transition-shadow hover:shadow-md cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
-            <div className="relative w-40 h-auto flex-shrink-0">
+        <Card 
+            className="hidden md:flex p-4 gap-4 transition-shadow hover:shadow-md cursor-pointer" 
+            onClick={() => router.push(`/jobs/${job.id}`)}
+        >
+            <div className="relative w-48 h-auto flex-shrink-0">
                 <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
-                <div className="absolute top-1 left-1 bg-black/50 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold">
-                    {job.id}
+                <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
+                    <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
+                    <span>{job.id}</span>
                 </div>
-                 <Button variant="outline" size="icon" className="absolute bottom-1 right-1 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
-                    <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
-                </Button>
             </div>
             <div className="flex flex-col flex-grow">
                 <h4 className="font-bold text-base leading-tight mb-2 hover:text-primary line-clamp-2">{job.title}</h4>
                 <div className="flex flex-wrap gap-2 text-xs mb-3">
                     <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>
-                    <Badge variant="secondary" className="bg-green-100 text-green-800">{job.salary.basic} JPY</Badge>
+                    {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {job.salary.actual}</Badge>}
+                    <Badge variant="secondary">Cơ bản: {job.salary.basic}</Badge>
                      <Badge variant="secondary">{job.workLocation}</Badge>
                 </div>
                 <div className="mt-auto flex justify-between items-end">
                     <div className="flex items-center gap-2">
-                        <Link href={`/consultant-profile/${job.recruiter.id}`} onClick={(e) => e.stopPropagation()}>
+                         <Link href={`/consultant-profile/${job.recruiter.id}`} onClick={(e) => e.stopPropagation()}>
                             <Avatar className="h-9 w-9">
                                 <AvatarImage src={job.recruiter.avatar} />
                                 <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
@@ -122,8 +124,16 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
                          <ContactButtons contact={job.recruiter as any} />
                     </div>
                     <div className="text-right">
-                        <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/jobs/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
-                        <p className="text-xs text-muted-foreground mt-1">Đăng lúc: {job.postedTime.split(' ')[1]}</p>
+                       <div className="flex items-center gap-2">
+                         <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                             <Bookmark className={cn("mr-2 h-4 w-4", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
+                             Lưu
+                         </Button>
+                         <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/jobs/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
+                       </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            <span className="text-primary">Đăng lúc:</span> {job.postedTime.split(' ')[1]}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -362,3 +372,4 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
     </div>
   );
 }
+
