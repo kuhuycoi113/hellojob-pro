@@ -31,6 +31,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useToast } from '@/hooks/use-toast';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -68,6 +69,7 @@ const convertToVnd = (jpyValue?: string) => {
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const router = useRouter();
+    const { toast } = useToast();
     const { role, isLoggedIn } = useAuth();
     const job = jobData.find(j => j.id === resolvedParams.id);
     const [isSaved, setIsSaved] = useState(false);
@@ -149,6 +151,28 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const handleConfirmLogin = () => {
         setIsConfirmLoginOpen(false);
         setIsAuthDialogOpen(true);
+    };
+
+    const handleShare = async () => {
+        const shareData = {
+          title: job.title,
+          text: `Hãy xem công việc này trên HelloJob: ${job.title}`,
+          url: window.location.href,
+        };
+        if (navigator.share) {
+          try {
+            await navigator.share(shareData);
+          } catch (err) {
+            console.error("Error sharing:", err);
+          }
+        } else {
+          // Fallback for desktop
+          navigator.clipboard.writeText(window.location.href);
+          toast({
+            title: "Đã sao chép liên kết!",
+            description: "Bạn có thể dán và chia sẻ liên kết này.",
+          });
+        }
     };
 
     const assignedConsultant = job.recruiter;
@@ -327,7 +351,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 </div>
                             </CardContent>
                             <div className="border-t p-4 flex justify-center">
-                                <Button variant="ghost" className="text-muted-foreground text-sm" onClick={(e) => { e.preventDefault(); e.stopPropagation(); /* Logic chia sẻ */ }}>
+                                <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
                                     <Share2 className="mr-2 h-4 w-4"/>Chia sẻ tin này
                                 </Button>
                             </div>
