@@ -41,6 +41,7 @@ export type SearchFilters = {
     interviewRounds?: string;
     visionRequirement?: string;
     dominantHand?: string;
+    otherSkillRequirement?: string[];
 }
 
 export const experienceYears: { name: string; slug: string }[] = [

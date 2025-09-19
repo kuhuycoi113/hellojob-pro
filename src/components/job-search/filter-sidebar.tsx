@@ -117,8 +117,30 @@ const ginouExpiryOptions = [
     "Trên 4,5 năm", "Trên 4 năm", "Trên 3,5 năm", "Trên 3 năm", "Trên 2,5 năm", "Trên 2 năm", "Trên 1,5 năm", "Trên 1 năm", "Trên 0,5 năm"
 ];
 const otherSkills = [
-    "Có bằng lái xe AT", "Có bằng lái xe MT", "Có bằng lái xe tải cỡ nhỏ", "Có bằng lái xe tải cỡ trung", "Có bằng lái xe tải cỡ lớn", "Có bằng lái xe buýt cỡ trung", "Có bằng lái xe buýt cỡ lớn", "Lái được máy xúc, máy đào", "Lái được xe nâng", "Có bằng cầu", "Vận hành máy CNC", "Có bằng tiện, mài", "Có bằng hàn", "Có bằng cắt", "Có bằng gia công kim loại", "Làm được giàn giáo", "Thi công nội thất", "Quản lý thi công xây dựng", "Quản lý khối lượng xây dựng", "Thiết kế BIM xây dựng", "Đọc được bản vẽ kỹ thuật", "Có bằng thi công nội thất"
+    { name: "Có bằng lái xe AT", slug: "co-bang-lai-xe-at" },
+    { name: "Có bằng lái xe MT", slug: "co-bang-lai-xe-mt" },
+    { name: "Có bằng lái xe tải cỡ nhỏ", slug: "co-bang-lai-xe-tai-co-nho" },
+    { name: "Có bằng lái xe tải cỡ trung", slug: "co-bang-lai-xe-tai-co-trung" },
+    { name: "Có bằng lái xe tải cỡ lớn", slug: "co-bang-lai-xe-tai-co-lon" },
+    { name: "Có bằng lái xe buýt cỡ trung", slug: "co-bang-lai-xe-buyt-co-trung" },
+    { name: "Có bằng lái xe buýt cỡ lớn", slug: "co-bang-lai-xe-buyt-co-lon" },
+    { name: "Lái được máy xúc, máy đào", slug: "lai-duoc-may-xuc-may-dao" },
+    { name: "Lái được xe nâng", slug: "lai-duoc-xe-nang" },
+    { name: "Có bằng cầu", slug: "co-bang-cau" },
+    { name: "Vận hành máy CNC", slug: "van-hanh-may-cnc" },
+    { name: "Có bằng tiện, mài", slug: "co-bang-tien-mai" },
+    { name: "Có bằng hàn", slug: "co-bang-han" },
+    { name: "Có bằng cắt", slug: "co-bang-cat" },
+    { name: "Có bằng gia công kim loại", slug: "co-bang-gia-cong-kim-loai" },
+    { name: "Làm được giàn giáo", slug: "lam-duoc-gian-giao" },
+    { name: "Thi công nội thất", slug: "thi-cong-noi-that" },
+    { name: "Quản lý thi công xây dựng", slug: "quan-ly-thi-cong-xay-dung" },
+    { name: "Quản lý khối lượng xây dựng", slug: "quan-ly-khoi-luong-xay-dung" },
+    { name: "Thiết kế BIM xây dựng", slug: "thiet-ke-bim-xay-dung" },
+    { name: "Đọc được bản vẽ kỹ thuật", slug: "doc-duoc-ban-ve-ky-thuat" },
+    { name: "Có bằng thi công nội thất", slug: "co-bang-thi-cong-noi-that" }
 ];
+
 const getFutureMonths = () => {
     const months = [];
     const today = new Date();
@@ -896,9 +918,19 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                     <Label className="font-semibold pt-2">Yêu cầu năng lực khác</Label>
                                     <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-2">
                                       {otherSkills.map(skill => (
-                                        <div key={skill} className="flex items-center space-x-2">
-                                            <Checkbox id={`skill-${skill}`} />
-                                            <Label htmlFor={`skill-${skill}`} className="font-normal text-sm cursor-pointer">{skill}</Label>
+                                        <div key={skill.slug} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`skill-${skill.slug}`}
+                                                checked={filters.otherSkillRequirement?.includes(skill.slug)}
+                                                onCheckedChange={(checked) => {
+                                                    const currentSkills = filters.otherSkillRequirement || [];
+                                                    const newSkills = checked
+                                                        ? [...currentSkills, skill.slug]
+                                                        : currentSkills.filter((s) => s !== skill.slug);
+                                                    onFilterChange({ otherSkillRequirement: newSkills });
+                                                }}
+                                            />
+                                            <Label htmlFor={`skill-${skill.slug}`} className="font-normal text-sm cursor-pointer">{skill.name}</Label>
                                         </div>
                                       ))}
                                     </div>
