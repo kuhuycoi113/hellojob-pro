@@ -109,7 +109,7 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
         )}
 
         {recommendedJobs.length > 0 && (
-            <div className="w-full md:w-[450px] lg:w-[500px] flex-shrink-0 mt-1">
+            <div className="w-full max-w-xs md:max-w-sm flex-shrink-0 mt-1">
                 <div className="space-y-2">
                 {recommendedJobs.map((job, index) => {
                     const reason = message.recommendations?.[index]?.reason;
