@@ -1326,8 +1326,8 @@ export default function CandidateProfilePage() {
             <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
         </div>
         <div className="space-y-2">
-            <Label htmlFor="line">Line (Link hoặc ID)</Label>
-            <Input id="line" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
+            <Label htmlFor="line">Line (Link hồ sơ)</Label>
+            <Input id="line" placeholder="Dán link Line của bạn vào đây" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
         </div>
       </div>
     </div>
@@ -1867,7 +1867,7 @@ export default function CandidateProfilePage() {
                         {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Phone className="mr-2"/>{formatPhoneNumber(candidate.personalInfo.phone)}</Link></Button>}
                         {candidate.personalInfo.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${candidate.personalInfo.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.messenger}</Link></Button>}
                         {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(candidate.personalInfo.zalo)}</Link></Button>}
-                        {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${candidate.personalInfo.line}`} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
+                        {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
                     </div>
                   </CardContent>
                 </Card>
@@ -2030,3 +2030,4 @@ export default function CandidateProfilePage() {
 
 
     
+
