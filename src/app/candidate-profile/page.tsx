@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon, Ruler, QrCode } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon, Ruler, QrCode, Info } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -51,6 +51,7 @@ import { industriesByJobType } from '@/lib/industry-data';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { locations } from '@/lib/location-data';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 type MediaItem = {
@@ -304,6 +305,11 @@ const parseZaloInput = (input: string): string => {
     return trimmedInput.replace(/\D/g, '');
 };
 
+const parseLineInput = (input: string): string => {
+    if (!input) return '';
+    return input.trim();
+};
+
 
 const EditDialog = ({
   children,
@@ -354,6 +360,8 @@ const EditDialog = ({
              newCandidate[section] = { ...newCandidate[section]!, [field]: parseMessengerInput(value) };
         } else if (section === 'personalInfo' && field === 'zalo') {
             newCandidate[section] = { ...newCandidate[section]!, [field]: parseZaloInput(value) };
+        } else if (section === 'personalInfo' && field === 'line') {
+             newCandidate[section] = { ...newCandidate[section]!, [field]: parseLineInput(value) };
         } else {
              // @ts-ignore
              newCandidate[section] = { ...newCandidate[section], [field]: value };
@@ -1193,7 +1201,17 @@ export default function CandidateProfilePage() {
 
     return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle className="font-bold">Lưu ý quan trọng</AlertTitle>
+            <AlertDescription>
+                Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên lạc (Zalo, SĐT...) để có thể sử dụng nút 
+                <Badge className="mx-1 bg-accent-orange text-white align-middle">Ứng tuyển</Badge> 
+                trên các tin tuyển dụng.
+            </AlertDescription>
+        </Alert>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
         <div className="space-y-2">
           <Label>Họ và tên</Label>
           <Input value={tempCandidate.name} onChange={e => handleTempChange('name', e.target.value)} />
@@ -2056,3 +2074,6 @@ export default function CandidateProfilePage() {
 
 
 
+
+
+      
