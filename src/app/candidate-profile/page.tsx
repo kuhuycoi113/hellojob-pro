@@ -351,9 +351,9 @@ const EditDialog = ({
         const [field, value] = args;
         
         if (section === 'personalInfo' && field === 'messenger') {
-             newCandidate[section] = { ...newCandidate[section], [field]: parseMessengerInput(value) };
+             newCandidate[section] = { ...newCandidate[section]!, [field]: parseMessengerInput(value) };
         } else if (section === 'personalInfo' && field === 'zalo') {
-            newCandidate[section] = { ...newCandidate[section], [field]: parseZaloInput(value) };
+            newCandidate[section] = { ...newCandidate[section]!, [field]: parseZaloInput(value) };
         } else {
              // @ts-ignore
              newCandidate[section] = { ...newCandidate[section], [field]: value };
@@ -1199,19 +1199,6 @@ export default function CandidateProfilePage() {
           <Input value={tempCandidate.name} onChange={e => handleTempChange('name', e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="phone">Số điện thoại</Label>
-          <div className="flex items-center gap-2">
-            <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-              <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="+84">VN</SelectItem>
-                <SelectItem value="+81">JP</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input id="phone" type="tel" pattern="[0-9\s]*" title="Vui lòng chỉ nhập số" value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
-          </div>
-        </div>
-        <div className="space-y-2">
           <Label>Ngày sinh</Label>
           <Popover>
             <PopoverTrigger asChild>
@@ -1254,6 +1241,10 @@ export default function CandidateProfilePage() {
               <SelectItem value="Khác">Khác</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+         <div className="space-y-2">
+            <Label>Ngôn ngữ</Label>
+            <Input id="language" placeholder="VD: Tiếng Nhật N3" value={tempCandidate.personalInfo.language} onChange={e => handleTempChange('personalInfo', 'language', e.target.value)} />
         </div>
         <div className="space-y-2">
           <div className="flex justify-between items-center">
@@ -1302,6 +1293,21 @@ export default function CandidateProfilePage() {
               <SelectItem value="Viêm gan B thể động">Viêm gan B thể động</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+      </div>
+      <div className="mt-6 pt-6 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="phone">Số điện thoại</Label>
+          <div className="flex items-center gap-2">
+            <Select value={phoneCountry} onValueChange={setPhoneCountry}>
+              <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="+84">VN</SelectItem>
+                <SelectItem value="+81">JP</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input id="phone" type="tel" pattern="[0-9\s]*" title="Vui lòng chỉ nhập số" value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
+          </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
@@ -2030,4 +2036,5 @@ export default function CandidateProfilePage() {
 
 
     
+
 
