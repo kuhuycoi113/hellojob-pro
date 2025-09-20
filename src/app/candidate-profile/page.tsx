@@ -298,7 +298,7 @@ const parseZaloInput = (input: string): string => {
     const trimmedInput = input.trim();
     if (trimmedInput.includes('zalo.me/')) {
         const parts = trimmedInput.split('/');
-        return parts.pop() || '';
+        return parts.pop()?.replace(/\D/g, '') || '';
     }
     // Keep only numbers
     return trimmedInput.replace(/\D/g, '');
@@ -914,7 +914,7 @@ export default function CandidateProfilePage() {
     
     const [basicSalaryCurrency, setBasicSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
     const [netSalaryCurrency, setNetSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
-    const [financialAbilityCurrency, setFinancialAbilityCurrency] = useState<'JPY' | 'VND'>('USD');
+    const [financialAbilityCurrency, setFinancialAbilityCurrency] = useState<'JPY' | 'VND' | 'USD'>('USD');
     const JPY_VND_RATE = 165;
     const USD_VND_RATE = 25000;
   
@@ -1298,25 +1298,39 @@ export default function CandidateProfilePage() {
       <div className="mt-6 pt-6 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="phone">Số điện thoại</Label>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-              <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-[100px] rounded-r-none">
+                <SelectValue>
+                  <div className="flex items-center gap-2">
+                    {phoneCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
+                    {phoneCountry}
+                  </div>
+                </SelectValue>
+              </SelectTrigger>
               <SelectContent>
-                <SelectItem value="+84">VN</SelectItem>
-                <SelectItem value="+81">JP</SelectItem>
+                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
+                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
               </SelectContent>
             </Select>
-            <Input id="phone" type="tel" pattern="[0-9\s]*" title="Vui lòng chỉ nhập số" value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
+            <Input id="phone" type="tel" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
           </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
             <div className="flex items-center relative">
                  <Select value={zaloCountry} onValueChange={setZaloCountry}>
-                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="w-[100px] rounded-r-none">
+                       <SelectValue>
+                         <div className="flex items-center gap-2">
+                           {zaloCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
+                           {zaloCountry}
+                         </div>
+                       </SelectValue>
+                    </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="+84">VN</SelectItem>
-                        <SelectItem value="+81">JP</SelectItem>
+                         <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
+                         <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
                     </SelectContent>
                 </Select>
                 <Input id="zalo" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.zalo || ''} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value)} />
@@ -1632,14 +1646,17 @@ export default function CandidateProfilePage() {
 
   const formatPhoneNumber = (phone: string | undefined): string => {
     if (!phone) return 'Chưa cập nhật';
-    // Simple formatter, can be improved
-    if (phone.length === 10) { // VN Mobile
-        return `${phone.slice(0, 4)} ${phone.slice(4, 7)} ${phone.slice(7)}`;
+    const cleanPhone = phone.replace(/\s/g, '');
+    if (cleanPhone.length === 9) { // Assumes VN mobile without leading 0
+        return `${cleanPhone.slice(0, 3)} ${cleanPhone.slice(3, 6)} ${cleanPhone.slice(6)}`;
     }
-    if (phone.length === 11 && (phone.startsWith('0') || phone.startsWith('81'))) { // JP Mobile
-         return `${phone.slice(0, 3)} ${phone.slice(3, 7)} ${phone.slice(7)}`;
+    if (cleanPhone.length === 10 && cleanPhone.startsWith('0')) { // VN Mobile
+        return `${cleanPhone.slice(0, 4)} ${cleanPhone.slice(4, 7)} ${cleanPhone.slice(7)}`;
     }
-    return phone;
+    if (cleanPhone.length === 11 && (cleanPhone.startsWith('0') || cleanPhone.startsWith('81'))) { // JP Mobile
+         return `${cleanPhone.slice(0, 3)} ${cleanPhone.slice(3, 7)} ${cleanPhone.slice(7)}`;
+    }
+    return phone; // Fallback
   }
 
   return (
@@ -2036,5 +2053,6 @@ export default function CandidateProfilePage() {
 
 
     
+
 
 
