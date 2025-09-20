@@ -1,8 +1,7 @@
-
 import { consultants } from './consultant-data';
 import type { User } from './chat-data';
 import { industriesByJobType } from './industry-data';
-import { japanJobTypes, visaDetailsByVisaType, allSpecialConditions } from './visa-data';
+import { japanJobTypes, visaDetailsByVisaType, allSpecialConditions, conditionsByVisaDetail } from './visa-data';
 
 export interface Job {
     id: string;
@@ -59,6 +58,7 @@ export interface Job {
     hepatitisBRequirement?: string;
     interviewFormat?: string;
     specialConditions?: string;
+    otherSkillRequirement?: string[]; // Added this for filtering
     details: {
         description: string;
         requirements: string;
@@ -75,7 +75,31 @@ const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "T
 const languageLevels = ['N1', 'N2', 'N3', 'N4', 'N5', 'Không yêu cầu'];
 const tattooOptions = ["Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
 const hepBOptions = ["Không nhận viêm gan B", "Nhận viêm gan B (thể tĩnh)"];
-const specialConditionsList = ['Lương tốt', 'Tăng ca', 'Công ty uy tín', 'Hỗ trợ nhà ở', 'Bay nhanh', 'Không yêu cầu kinh nghiệm', 'Nhận tuổi cao', 'Hỗ trợ Ginou 2'];
+
+const otherSkills = [
+    { name: "Có bằng lái xe AT", slug: "co-bang-lai-xe-at" },
+    { name: "Có bằng lái xe MT", slug: "co-bang-lai-xe-mt" },
+    { name: "Có bằng lái xe tải cỡ nhỏ", slug: "co-bang-lai-xe-tai-co-nho" },
+    { name: "Có bằng lái xe tải cỡ trung", slug: "co-bang-lai-xe-tai-co-trung" },
+    { name: "Có bằng lái xe tải cỡ lớn", slug: "co-bang-lai-xe-tai-co-lon" },
+    { name: "Có bằng lái xe buýt cỡ trung", slug: "co-bang-lai-xe-buyt-co-trung" },
+    { name: "Có bằng lái xe buýt cỡ lớn", slug: "co-bang-lai-xe-buyt-co-lon" },
+    { name: "Lái được máy xúc, máy đào", slug: "lai-duoc-may-xuc-may-dao" },
+    { name: "Lái được xe nâng", slug: "lai-duoc-xe-nang" },
+    { name: "Có bằng cầu", slug: "co-bang-cau" },
+    { name: "Vận hành máy CNC", slug: "van-hanh-may-cnc" },
+    { name: "Có bằng tiện, mài", slug: "co-bang-tien-mai" },
+    { name: "Có bằng hàn", slug: "co-bang-han" },
+    { name: "Có bằng cắt", slug: "co-bang-cat" },
+    { name: "Có bằng gia công kim loại", slug: "co-bang-gia-cong-kim-loai" },
+    { name: "Làm được giàn giáo", slug: "lam-duoc-gian-giao" },
+    { name: "Thi công nội thất", slug: "thi-cong-noi-that" },
+    { name: "Quản lý thi công xây dựng", slug: "quan-ly-thi-cong-xay-dung" },
+    { name: "Quản lý khối lượng xây dựng", slug: "quan-ly-khoi-luong-xay-dung" },
+    { name: "Thiết kế BIM xây dựng", slug: "thiet-ke-bim-xay-dung" },
+    { name: "Đọc được bản vẽ kỹ thuật", slug: "doc-duoc-ban-ve-ky-thuat" },
+    { name: "Có bằng thi công nội thất", slug: "co-bang-thi-cong-noi-that" }
+];
 
 
 const workImagePlaceholders = [
@@ -136,7 +160,6 @@ const generateUniqueJobId = (index: number): string => {
 
 const getRandomItem = <T>(arr: T[], index: number): T => {
     if (!arr || arr.length === 0) {
-        // Return a default or handle the error appropriately
         return null as any; 
     }
     return arr[index % arr.length];
@@ -155,15 +178,12 @@ const createJobList = (): Job[] => {
             if (!industries) continue;
             
             for (const industry of industries) {
-                const keywords = industry.keywords;
-                if (!keywords || keywords.length === 0) {
-                    // Create at least one job for the industry even if no keywords
-                    keywords.push(industry.name);
-                }
-
-                // Create 2 jobs for each keyword to ensure coverage
-                for (let i=0; i < 2; i++) {
-                    const keyword = getRandomItem(keywords, jobIndex); // Still get random keyword to vary titles
+                // Use a copy of keywords to avoid infinite loop if keywords is empty
+                const keywords = industry.keywords && industry.keywords.length > 0 ? [...industry.keywords] : [industry.name];
+                
+                // Create 2 jobs for each industry to have some variety
+                for (let i = 0; i < 2; i++) {
+                    const keyword = getRandomItem(keywords, jobIndex);
                     const location = getRandomItem(locations, jobIndex);
                     const gender = getRandomItem(['Nam', 'Nữ', 'Cả nam và nữ'], jobIndex) as 'Nam' | 'Nữ' | 'Cả nam và nữ';
                     const quantity = (jobIndex % 10) + 1;
@@ -204,16 +224,24 @@ const createJobList = (): Job[] => {
                         jobImages.push({ src: getRandomItem(workImagePlaceholders, jobIndex), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
                     }
                     
-                    // Logic to add special conditions
+                    const detailSlug = detail.slug;
                     const applicableConditions = allSpecialConditions.filter(cond => {
-                        const visaDetails = Object.keys(visaDetailsByVisaType).flatMap(key => visaDetailsByVisaType[key]);
-                        const detailObj = visaDetails.find(d => d.name === detail.name);
-                        return detailObj; // for now, let's assume all are applicable. A more complex logic can be added later.
-                    }).map(c => c.name);
+                        const conditionList = conditionsByVisaDetail[detailSlug as keyof typeof conditionsByVisaDetail];
+                        return conditionList ? conditionList.includes(cond.name) : false;
+                    });
 
                     const shuffledConditions = [...applicableConditions].sort(() => 0.5 - Math.random());
-                    const selectedConditionsCount = Math.floor(Math.random() * 2) + 2; // 2 to 3 conditions
-                    const specialConditions = shuffledConditions.slice(0, selectedConditionsCount).join(', ');
+                    const selectedConditionsCount = Math.floor(Math.random() * 2) + 2; 
+                    const specialConditions = shuffledConditions.slice(0, selectedConditionsCount).map(c => c.name).join(', ');
+
+                    // Logic to add other skill requirements
+                    const shuffledOtherSkills = [...otherSkills].sort(() => 0.5 - Math.random());
+                    const selectedOtherSkillsCount = Math.floor(Math.random() * 2) + 1; // 1 to 2 skills
+                    const selectedOtherSkills = shuffledOtherSkills.slice(0, selectedOtherSkillsCount);
+                    
+                    const otherSkillsText = selectedOtherSkills.map(s => `<li>${s.name}</li>`).join('');
+                    const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
+
 
                     const job: Job = {
                         id: generateUniqueJobId(jobIndex),
@@ -260,9 +288,10 @@ const createJobList = (): Job[] => {
                         hepatitisBRequirement: getRandomItem(hepBOptions, jobIndex),
                         interviewFormat: 'Phỏng vấn Online',
                         specialConditions: specialConditions,
+                        otherSkillRequirement: selectedOtherSkills.map(s => s.slug),
                         details: {
                             description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản. Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p><ul><li>Chi tiết công việc: ${keyword}.</li><li>Môi trường làm việc sạch sẽ, hiện đại.</li></ul>`,
-                            requirements: `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`,
+                            requirements: `${requirementsBase}<ul>${otherSkillsText}</ul>`,
                             benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li><li>Thưởng 1-2 lần/năm tùy theo kết quả kinh doanh.</li></ul>`,
                             videoUrl: jobIndex % 5 === 0 ? getRandomItem(jobVideos, jobIndex) : undefined,
                             images: jobImages,
