@@ -258,6 +258,33 @@ const commonInterests = ['Cơ khí', 'Điện tử', 'IT', 'Logistics', 'Dệt m
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v,i,a)=>a.findIndex(t=>(t.name === v.name))===i);
 
+const parseMessengerInput = (input: string): string => {
+  if (!input) return '';
+  const trimmedInput = input.trim();
+  try {
+    // If it's a full URL, try to parse it
+    if (trimmedInput.startsWith('http') || trimmedInput.startsWith('www.')) {
+      const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
+      // Handle facebook.com/profile.php?id=...
+      if (url.hostname.includes('facebook.com') && url.pathname.includes('/profile.php')) {
+        const id = url.searchParams.get('id');
+        if (id) return id;
+      }
+      // Handle facebook.com/username or m.me/username
+      const pathParts = url.pathname.split('/').filter(Boolean);
+      if (pathParts.length > 0) {
+        // The last part of the path is a good candidate for the username/id
+        return pathParts[pathParts.length - 1];
+      }
+    }
+  } catch (error) {
+    // If URL parsing fails, it's probably not a URL, so treat it as a plain username
+    console.warn("Could not parse input as URL, treating as username:", error);
+  }
+  // Fallback: treat the input as a plain username/id
+  return trimmedInput;
+};
+
 const EditDialog = ({
   children,
   title,
@@ -302,16 +329,20 @@ const EditDialog = ({
 
       if (section === 'personalInfo' || section === 'aspirations') {
         const [field, value] = args;
-        // @ts-ignore
-        newCandidate[section] = { ...newCandidate[section], [field]: value };
-         // Logic to reset visa detail when visa type changes
+        
+        if (section === 'personalInfo' && field === 'messenger') {
+             newCandidate[section] = { ...newCandidate[section], [field]: parseMessengerInput(value) };
+        } else {
+             // @ts-ignore
+             newCandidate[section] = { ...newCandidate[section], [field]: value };
+        }
+
         if (section === 'aspirations' && field === 'desiredVisaType') {
             newCandidate.aspirations!.desiredVisaDetail = '';
-            // Do not reset industry, but do reset job detail
             newCandidate.aspirations!.desiredJobDetail = ''; 
         }
         if (section === 'aspirations' && field === 'desiredIndustry') {
-            newCandidate.aspirations!.desiredJobDetail = ''; // Also reset job detail
+            newCandidate.aspirations!.desiredJobDetail = '';
         }
       } else if (section === 'documents') {
           const [docType, index, value] = args;
@@ -401,30 +432,22 @@ export default function CandidateProfilePage() {
 
 
   useEffect(() => {
-    // This logic determines which profile state to show based on the user's role.
-    // This is the core of the user state management you requested.
     let isNew = false;
     let profileToLoad: EnrichedCandidateProfile;
 
     const storedProfile = localStorage.getItem('generatedCandidateProfile');
-    // State 1: A brand new user who has just registered.
     const isCandidateWithEmptyProfile = role === 'candidate-empty-profile';
     
     if (isCandidateWithEmptyProfile) {
-        // If the role is explicitly 'candidate-empty-profile', always force a new, blank profile state.
-        // This ignores any potentially lingering data in localStorage.
         isNew = true;
     } else if (storedProfile) {
-        // State 2: A returning user with a saved profile.
         try {
             const parsedProfile = JSON.parse(storedProfile);
-            // A simple check to see if the stored profile has meaningful data.
             isNew = !parsedProfile.name && !parsedProfile.headline && !parsedProfile.about;
         } catch {
-            isNew = true; // If parsing fails, treat it as a new profile.
+            isNew = true;
         }
     } else {
-        // State 3: A guest or a user without any saved profile data.
         isNew = true;
     }
     
@@ -444,8 +467,7 @@ export default function CandidateProfilePage() {
     ];
 
     if (isNew) {
-        // If it's a new profile, we load an empty structure but with default media placeholders.
-        const newEmptyProfile = JSON.parse(JSON.stringify(emptyCandidate)); // Deep copy to avoid mutation
+        const newEmptyProfile = JSON.parse(JSON.stringify(emptyCandidate));
         Object.keys(newEmptyProfile).forEach(key => {
             if (typeof newEmptyProfile[key] === 'string') newEmptyProfile[key] = '';
             if (Array.isArray(newEmptyProfile[key])) newEmptyProfile[key] = [];
@@ -457,13 +479,12 @@ export default function CandidateProfilePage() {
         });
          profileToLoad = {
              ...newEmptyProfile,
-             name: 'Ứng viên mới', // A default name to indicate it's a new profile
-             avatarUrl: undefined, // ensure avatarUrl is not an empty string
+             name: 'Ứng viên mới',
+             avatarUrl: undefined,
              videos: defaultVideos,
              images: defaultImages
          };
     } else {
-      // If not a new profile, load the data from localStorage.
       try {
         const parsedProfile = JSON.parse(storedProfile!);
         profileToLoad = {
@@ -479,7 +500,7 @@ export default function CandidateProfilePage() {
       } catch (error) {
         console.error("Failed to parse candidate profile from localStorage", error);
         profileToLoad = { ...emptyCandidate, videos: defaultVideos, images: defaultImages };
-        isNew = true; // Mark as new if parsing fails
+        isNew = true;
       }
     }
     setProfileByLang({ vi: profileToLoad, ja: null, en: null });
@@ -488,12 +509,11 @@ export default function CandidateProfilePage() {
 
   const handleSave = (updatedCandidate: EnrichedCandidateProfile) => {
     setProfileByLang({ vi: updatedCandidate, ja: null, en: null });
-    setCurrentLang('vi'); // Revert to Vietnamese on save
-    setIsNewProfile(false); // After saving, it's no longer a "new" profile
+    setCurrentLang('vi');
+    setIsNewProfile(false);
   };
 
   useEffect(() => {
-    // Only save to localStorage if the role is a candidate with a filled profile.
     if (profileByLang.vi && role === 'candidate') {
       localStorage.setItem('generatedCandidateProfile', JSON.stringify(profileByLang.vi));
     }
@@ -503,13 +523,11 @@ export default function CandidateProfilePage() {
   const handleLanguageChange = async (lang: Language) => {
     if (lang === currentLang) return;
     
-    // Switch immediately if data is already available
     if (profileByLang[lang]) {
         setCurrentLang(lang);
         return;
     }
     
-    // If no Vietnamese profile exists to translate from, do nothing.
     if (!profileByLang.vi) return;
 
     setIsTranslating(true);
@@ -524,7 +542,7 @@ export default function CandidateProfilePage() {
             ...prev,
             [lang]: translatedProfile,
         }));
-        setCurrentLang(lang); // Switch to the new language after successful translation
+        setCurrentLang(lang);
 
     } catch (error) {
         console.error("Translation failed:", error);
@@ -549,7 +567,6 @@ export default function CandidateProfilePage() {
         return baseProfile;
     }
 
-    // Deep merge translated fields into the base profile
     const mergeDeep = (target: any, source: any): any => {
         const output = { ...target };
         if (isObject(target) && isObject(source)) {
@@ -572,7 +589,7 @@ export default function CandidateProfilePage() {
                             return item;
                         });
                     }
-                } else if (source[key] !== undefined && source[key] !== null) { // Only overwrite if source has a value
+                } else if (source[key] !== undefined && source[key] !== null) {
                     Object.assign(output, { [key]: source[key] });
                 }
             });
@@ -1008,7 +1025,7 @@ export default function CandidateProfilePage() {
               <Label>Ngành nghề mong muốn</Label>
               <Select value={tempCandidate.desiredIndustry} onValueChange={value => {
                 handleTempChange('desiredIndustry', value);
-                handleTempChange('aspirations', 'desiredJobDetail', ''); // Reset job detail when industry changes
+                handleTempChange('aspirations', 'desiredJobDetail', '');
               }} disabled={!tempCandidate.aspirations?.desiredVisaType}>
                 <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
                 <SelectContent>
@@ -1258,8 +1275,9 @@ export default function CandidateProfilePage() {
             <Input id="zalo" value={tempCandidate.personalInfo.zalo || ''} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value)} />
         </div>
          <div className="space-y-2">
-            <Label htmlFor="messenger">Messenger (Link hoặc ID)</Label>
-            <Input id="messenger" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
+            <Label htmlFor="messenger">Facebook Messenger</Label>
+            <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc nhập username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
+            <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
         </div>
          <div className="space-y-2">
             <Label htmlFor="line">Line (Link hoặc ID)</Label>
@@ -1372,7 +1390,6 @@ export default function CandidateProfilePage() {
                         <DialogTitle>Cập nhật ảnh hình thể</DialogTitle>
                         <DialogDescription>Tải lên các ảnh theo yêu cầu để hoàn thiện hồ sơ.</DialogDescription>
                     </DialogHeader>
-                    {/* Add management UI here if needed */}
                 </DialogContent>
              </Dialog>
         </CardHeader>
@@ -1643,7 +1660,6 @@ export default function CandidateProfilePage() {
               </div>
             </CardHeader>
             <CardContent className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                 
                 <Card>
@@ -1766,7 +1782,6 @@ export default function CandidateProfilePage() {
                 </Card>
               </div>
 
-              {/* Right Column */}
               <div className="lg:col-span-1 space-y-6">
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
@@ -1954,3 +1969,6 @@ export default function CandidateProfilePage() {
 
 
 
+
+
+    
