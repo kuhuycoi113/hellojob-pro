@@ -79,18 +79,25 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
     if (!value) return '';
     const cleanValue = value.replace(/\D/g, '');
 
-    if (country === '+84') { // Vietnam
-        if (cleanValue.length <= 3) return cleanValue;
-        if (cleanValue.length <= 6) return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3)}`;
-        if (cleanValue.length <= 10) return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3, 6)} ${cleanValue.slice(6)}`;
-        return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3, 6)} ${cleanValue.slice(6, 10)}`;
+    if (country === '+84') { // Vietnam (10 digits total)
+        if (cleanValue.startsWith('0')) {
+            const mobilePart = cleanValue.substring(1);
+            if (mobilePart.length === 0) return '(0)';
+            if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
+            if (mobilePart.length <= 6) return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3)}`;
+            return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
+        }
+        return cleanValue.slice(0,10);
     }
 
-    if (country === '+81') { // Japan
-        if (cleanValue.length <= 3) return cleanValue;
-        if (cleanValue.length <= 7) return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3)}`;
-        if (cleanValue.length <= 11) return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3, 7)} ${cleanValue.slice(7)}`;
-        return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3, 7)} ${cleanValue.slice(7, 11)}`;
+    if (country === '+81') { // Japan (11 digits total starting with 0)
+        if (cleanValue.startsWith('0')) {
+             const mobilePart = cleanValue.substring(1);
+             if (mobilePart.length <= 4) return `0${mobilePart}`;
+             if (mobilePart.length <= 8) return `0${mobilePart.slice(0,4)}-${mobilePart.slice(4)}`;
+             return `0${mobilePart.slice(0,4)}-${mobilePart.slice(4,8)}-${mobilePart.slice(8,12)}`;
+        }
+        return cleanValue.slice(0,11);
     }
 
     return cleanValue;
@@ -266,7 +273,7 @@ const renderLevel1Edit = (
                                 <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
                             </SelectContent>
                             </Select>
-                            <Input id="phone" type="tel" placeholder="(0) 901 234 567" className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
+                            <Input id="phone" type="tel" placeholder="(0) 901 234 567" className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/[^0-9]/g, ''))} />
                         </div>
                     </div>
                     <div className="space-y-2">
@@ -326,7 +333,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                     about: '',
                     education: [],
                     experience: [],
-                    personalInfo: { birthYear: 2000, gender: '', phone: '' },
+                    personalInfo: { birthYear: 2000, gender: '', phone: '', japaneseProficiency: '', englishProficiency: '' },
                     skills: [],
                     interests: [],
                     certifications: [],
@@ -404,3 +411,5 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </Dialog>
     );
 }
+
+    
