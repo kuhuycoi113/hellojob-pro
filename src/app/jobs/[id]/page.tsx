@@ -68,7 +68,10 @@ const convertToVnd = (jpyValue?: string) => {
 
 const HydrationSafeDate = ({ dateString }: { dateString: string }) => {
     const [formattedDate, setFormattedDate] = useState('');
+    const [isClient, setIsClient] = useState(false);
+
     useEffect(() => {
+        setIsClient(true);
         // postedTime is in 'HH:mm DD/MM/YYYY' format
         const parts = dateString.split(' ');
         if (parts.length === 2) {
@@ -87,7 +90,7 @@ const HydrationSafeDate = ({ dateString }: { dateString: string }) => {
 
     return (
         <span>
-            {timePart} {formattedDate}
+            {timePart} {isClient ? formattedDate : ''}
         </span>
     );
 };
