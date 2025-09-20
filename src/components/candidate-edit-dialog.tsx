@@ -75,6 +75,9 @@ const parseLineInput = (input: string): string => {
     return input.trim();
 };
 
+const japaneseLevels = ["JLPT N5", "JLPT N4", "JLPT N3", "JLPT N2", "JLPT N1", "Kaiwa N5", "Kaiwa N4", "Kaiwa N3", "Kaiwa N2", "Kaiwa N1", "Trình độ tương đương N5", "Trình độ tương đương N4", "Trình độ tương đương N3", "Trình độ tương đương N2", "Trình độ tương đương N1"];
+
+
 const renderLevel1Edit = (
     tempCandidate: EnrichedCandidateProfile,
     handleTempChange: (
@@ -153,8 +156,16 @@ const renderLevel1Edit = (
                 </Select>
                 </div>
                 <div className="space-y-2">
-                    <Label>Ngôn ngữ</Label>
-                    <Input id="language" placeholder="VD: Tiếng Nhật N3" value={tempCandidate.personalInfo.language} onChange={e => handleTempChange('personalInfo', 'language', e.target.value)} />
+                    <Label htmlFor="language">Ngôn ngữ</Label>
+                    <Select value={tempCandidate.personalInfo.language || ''} onValueChange={value => handleTempChange('personalInfo', 'language', value)}>
+                        <SelectTrigger id="language">
+                            <SelectValue placeholder="Chọn trình độ tiếng Nhật" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Không yêu cầu">Không yêu cầu</SelectItem>
+                            {japaneseLevels.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className="space-y-2">
                 <div className="flex justify-between items-center">
