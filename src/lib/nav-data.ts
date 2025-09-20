@@ -51,6 +51,6 @@ export const mobileFooterLinks = [
   { href: '/roadmap', label: 'Lộ trình', icon: Compass },
   { href: '/ai-profile', label: 'Hồ sơ AI', icon: Sparkles },
   { href: '/handbook', label: 'Cẩm nang', icon: LifeBuoy },
+  { href: '/consultant-profile', label: 'Tư vấn viên', icon: UserSearch },
   { href: '/about', label: 'Giới thiệu', icon: Info },
-  { href: '/my-jobs', label: 'Việc của tôi', icon: Briefcase },
 ];

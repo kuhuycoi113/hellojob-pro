@@ -65,10 +65,9 @@ export function MobileSecondaryHeader() {
                             <span className="text-center leading-tight">{label}</span>
                         </div>
                     ) : (
-                       <>
-                        <Icon className={cn("h-5 w-5 mr-2", isActive ? "text-primary" : "text-muted-foreground")} />
+                       
                         <span className="text-center leading-tight">{label}</span>
-                       </>
+                       
                     )}
                     </Link>
                 )
