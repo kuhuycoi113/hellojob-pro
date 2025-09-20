@@ -317,7 +317,8 @@ const EditDialog = ({
   onSave,
   renderContent,
   description,
-  candidate
+  candidate,
+  dialogId,
 }: {
   children: React.ReactNode;
   title: string;
@@ -331,6 +332,7 @@ const EditDialog = ({
   ) => React.ReactNode;
   description?: string;
   candidate: EnrichedCandidateProfile;
+  dialogId?: string;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile>(candidate);
@@ -406,7 +408,7 @@ const EditDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px]" id={dialogId}>
         <DialogHeader>
           <DialogTitle className="font-headline text-2xl">{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
@@ -1312,60 +1314,60 @@ export default function CandidateProfilePage() {
             </SelectContent>
           </Select>
         </div>
-      </div>
-      <div className="mt-6 pt-6 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="phone">Số điện thoại</Label>
-          <div className="flex items-center">
-            <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-              <SelectTrigger className="w-[100px] rounded-r-none">
-                <SelectValue>
-                  <div className="flex items-center gap-2">
-                    {phoneCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
-                    {phoneCountry}
-                  </div>
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
-                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
-              </SelectContent>
-            </Select>
-            <Input id="phone" type="tel" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
-          </div>
-        </div>
-        <div className="space-y-2">
-            <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
-            <div className="flex items-center relative">
-                 <Select value={zaloCountry} onValueChange={setZaloCountry}>
+        <div className="md:col-span-2 mt-6 pt-6 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+                <Label htmlFor="phone">Số điện thoại</Label>
+                <div className="flex items-center">
+                    <Select value={phoneCountry} onValueChange={setPhoneCountry}>
                     <SelectTrigger className="w-[100px] rounded-r-none">
-                       <SelectValue>
-                         <div className="flex items-center gap-2">
-                           {zaloCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
-                           {zaloCountry}
-                         </div>
-                       </SelectValue>
+                        <SelectValue>
+                        <div className="flex items-center gap-2">
+                            {phoneCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
+                            {phoneCountry}
+                        </div>
+                        </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                         <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
-                         <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
+                        <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
+                        <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
                     </SelectContent>
-                </Select>
-                <Input id="zalo" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.zalo || ''} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value)} />
-                <Label htmlFor="zalo-qr-upload" className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
-                    <QrCode className="h-5 w-5"/>
-                </Label>
-                <Input id="zalo-qr-upload" type="file" className="sr-only" accept="image/*" />
+                    </Select>
+                    <Input id="phone" type="tel" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
+                </div>
             </div>
-        </div>
-        <div className="space-y-2">
-            <Label htmlFor="messenger">Facebook Messenger</Label>
-            <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc nhập username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
-            <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
-        </div>
-        <div className="space-y-2">
-            <Label htmlFor="line">Line (Link hồ sơ)</Label>
-            <Input id="line" placeholder="Dán link Line của bạn vào đây" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
+            <div className="space-y-2">
+                <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
+                <div className="flex items-center relative">
+                    <Select value={zaloCountry} onValueChange={setZaloCountry}>
+                        <SelectTrigger className="w-[100px] rounded-r-none">
+                        <SelectValue>
+                            <div className="flex items-center gap-2">
+                            {zaloCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
+                            {zaloCountry}
+                            </div>
+                        </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
+                            <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Input id="zalo" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.zalo || ''} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value)} />
+                    <Label htmlFor="zalo-qr-upload" className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
+                        <QrCode className="h-5 w-5"/>
+                    </Label>
+                    <Input id="zalo-qr-upload" type="file" className="sr-only" accept="image/*" />
+                </div>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="messenger">Facebook Messenger</Label>
+                <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc nhập username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
+                <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="line">Line (Link hồ sơ)</Label>
+                <Input id="line" placeholder="Dán link Line của bạn vào đây" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
+            </div>
         </div>
       </div>
     </div>
@@ -1380,6 +1382,7 @@ export default function CandidateProfilePage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                  <EditDialog
+                    dialogId="DIENTHONGTINCANHAN01"
                     title="Chỉnh sửa Thông tin Cá nhân"
                     onSave={handleSave}
                     renderContent={renderLevel1Edit}
@@ -1886,6 +1889,7 @@ export default function CandidateProfilePage() {
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><UserCog className="mr-3 text-primary"/> {t.personalInfo}</CardTitle>
                     <EditDialog
+                        dialogId="DIENTHONGTINCANHAN01"
                         title="Chỉnh sửa Thông tin cá nhân"
                         onSave={handleSave}
                         renderContent={renderLevel1Edit}
@@ -2077,3 +2081,5 @@ export default function CandidateProfilePage() {
 
 
       
+
+    
