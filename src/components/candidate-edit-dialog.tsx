@@ -313,7 +313,10 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
             if (!prev) return null;
             const newCandidate = { ...prev };
 
-            if (section === 'personalInfo' || section === 'aspirations') {
+            if (section === 'name') {
+                 const [field, value] = args;
+                 newCandidate.name = value;
+            } else if (section === 'personalInfo' || section === 'aspirations') {
                 const [field, value] = args;
                 if (section === 'personalInfo' && field === 'messenger') {
                      newCandidate[section] = { ...newCandidate[section]!, [field]: parseMessengerInput(value) };
@@ -325,9 +328,6 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                      // @ts-ignore
                      newCandidate[section] = { ...newCandidate[section], [field]: value };
                 }
-            } else if (section === 'name') {
-                 const [value] = args;
-                 newCandidate.name = value;
             } else {
                 const [value] = args;
                  // @ts-ignore
