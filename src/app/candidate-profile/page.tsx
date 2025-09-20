@@ -85,7 +85,8 @@ const translations = {
         weight: "Cân nặng",
         tattoo: "Hình xăm",
         hepatitisB: "Viêm gan B",
-        language: "Ngôn ngữ",
+        japaneseProficiency: "Năng lực tiếng Nhật",
+        englishProficiency: "Năng lực tiếng Anh",
         documentsSection: "Hồ sơ/Giấy tờ",
         vietnamDocs: "Giấy tờ Việt Nam",
         japanDocs: "Giấy tờ Nhật Bản",
@@ -122,7 +123,8 @@ const translations = {
         weight: "体重",
         tattoo: "刺青",
         hepatitisB: "B型肝炎",
-        language: "言語",
+        japaneseProficiency: "日本語能力",
+        englishProficiency: "英語能力",
         documentsSection: "書類・証明書",
         vietnamDocs: "ベトナムの書類",
         japanDocs: "日本の書類",
@@ -159,7 +161,8 @@ const translations = {
         weight: "Weight",
         tattoo: "Tattoo Status",
         hepatitisB: "Hepatitis B",
-        language: "Language",
+        japaneseProficiency: "Japanese Proficiency",
+        englishProficiency: "English Proficiency",
         documentsSection: "Documents & Paperwork",
         vietnameseDocs: "Vietnamese Documents",
         japanDocs: "Japanese Documents",
@@ -207,7 +210,8 @@ const emptyCandidate: EnrichedCandidateProfile = {
       birthYear: 2000,
       gender: 'Nữ',
       phone: '0901234567',
-      language: 'Tiếng Nhật N3, Tiếng Anh giao tiếp',
+      japaneseProficiency: 'Tiếng Nhật N3',
+      englishProficiency: 'Giao tiếp cơ bản',
       dateOfBirth: '2000-05-15',
       height: '160',
       weight: '50',
@@ -1714,7 +1718,8 @@ export default function CandidateProfilePage() {
                     <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight} kg</p>
                     <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus}</p>
                     <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus}</p>
-                    <p><strong>{t.language}:</strong> {candidate.personalInfo.language}</p>
+                    <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency}</p>
+                    <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency}</p>
                   </CardContent>
                   <CardContent>
                     <div className="space-y-2">

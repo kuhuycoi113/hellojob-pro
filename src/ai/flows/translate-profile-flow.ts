@@ -36,7 +36,8 @@ const TranslatableCandidateProfileSchema = CandidateProfileSchema.partial().pick
     })).optional(),
     personalInfo: z.object({
         gender: z.string().optional(),
-        language: z.string().optional(),
+        japaneseProficiency: z.string().optional(),
+        englishProficiency: z.string().optional(),
         tattooStatus: z.string().optional(),
         hepatitisBStatus: z.string().optional(),
     }).optional(),
