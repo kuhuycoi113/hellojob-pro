@@ -12,12 +12,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { format } from "date-fns";
 import { vi } from 'date-fns/locale';
-import { CalendarIcon, Info, QrCode } from 'lucide-react';
+import { CalendarIcon, Info, QrCode, UploadCloud, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { JpFlagIcon, VnFlagIcon } from './custom-icons';
 import type { CandidateProfile } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Badge } from './ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
+
 
 type EnrichedCandidateProfile = CandidateProfile & { avatarUrl?: string };
 
@@ -81,9 +84,10 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 
     if (country === '+84') { // Vietnam (10 digits total)
         if (!cleanValue.startsWith('0')) return cleanValue.slice(0,9);
+        if (cleanValue.length === 0) return '';
+        if (cleanValue.length === 1) return '(0)';
 
         const mobilePart = cleanValue.substring(1);
-        if (mobilePart.length === 0) return '(0)';
         if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
         if (mobilePart.length <= 6) return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3)}`;
         return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
@@ -91,11 +95,12 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 
     if (country === '+81') { // Japan (11 digits total starting with 0)
         if (!cleanValue.startsWith('0')) return cleanValue.slice(0,10);
+        if (cleanValue.length === 0) return '';
+        if (cleanValue.length === 1) return '(0)';
         
         const mobilePart = cleanValue.substring(1); 
-        if (mobilePart.length === 0) return '(0)';
         if (mobilePart.length <= 2) return `(0)${mobilePart}`;
-        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2)}`;
+        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2, 6)}`;
         return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2,6)} ${mobilePart.slice(6,10)}`;
     }
 
@@ -117,7 +122,8 @@ const renderLevel1Edit = (
     phoneCountry: string,
     setPhoneCountry: (value: string) => void,
     zaloCountry: string,
-    setZaloCountry: (value: string) => void
+    setZaloCountry: (value: string) => void,
+    onQrClick: () => void
 ) => {
     const height = parseInt(tempCandidate.personalInfo?.height || '160', 10);
     const weight = parseInt(tempCandidate.personalInfo?.weight || '50', 10);
@@ -272,7 +278,7 @@ const renderLevel1Edit = (
                                 <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
                             </SelectContent>
                             </Select>
-                            <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/[^0-9]/g, ''))} />
+                            <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
                         </div>
                     </div>
                     <div className="space-y-2">
@@ -293,10 +299,9 @@ const renderLevel1Edit = (
                                 </SelectContent>
                             </Select>
                             <Input id="zalo" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
-                            <Label htmlFor="zalo-qr-upload" className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
+                            <div onClick={onQrClick} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                 <QrCode className="h-5 w-5"/>
-                            </Label>
-                            <Input id="zalo-qr-upload" type="file" className="sr-only" accept="image/*" />
+                            </div>
                         </div>
                     </div>
                     <div className="space-y-2">
@@ -315,9 +320,12 @@ const renderLevel1Edit = (
 };
 
 export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditProfileDialogProps) {
+    const { toast } = useToast();
     const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile | null>(null);
     const [phoneCountry, setPhoneCountry] = useState('+84');
     const [zaloCountry, setZaloCountry] = useState('+84');
+    const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
+    const [qrImagePreview, setQrImagePreview] = useState<string | null>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -386,30 +394,114 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         });
     };
 
+    const handleZaloQrUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                setQrImagePreview(event.target?.result as string);
+                
+                // --- SIMULATION of QR Code scan ---
+                setTimeout(() => {
+                    const mockPhoneNumber = '0912345678';
+                    handleTempChange('personalInfo', 'zalo', mockPhoneNumber);
+                    toast({
+                        title: "Quét QR thành công (mô phỏng)",
+                        description: `Số Zalo đã được cập nhật thành: ${mockPhoneNumber}`,
+                    });
+                    setIsQrDialogOpen(false);
+                    setQrImagePreview(null); // Reset preview
+                }, 1500); // Simulate processing time
+                // --- END SIMULATION ---
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     if (!tempCandidate) return null;
 
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px]" id="DIENTHONGTINCANHAN01">
-                <DialogHeader>
-                    <DialogTitle className="font-headline text-2xl">Chỉnh sửa Thông tin Cá nhân</DialogTitle>
-                    <DialogDescription>Cập nhật thông tin của bạn để nhà tuyển dụng có thể liên hệ.</DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
-                    {renderLevel1Edit(tempCandidate, handleTempChange as any, phoneCountry, setPhoneCountry, zaloCountry, setZaloCountry)}
-                </div>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="outline">Hủy</Button>
-                    </DialogClose>
-                    <Button type="button" onClick={handleSave} className="bg-primary text-white">
-                        Lưu thay đổi
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <>
+            <Dialog open={isOpen} onOpenChange={onOpenChange}>
+                <DialogContent className="sm:max-w-[600px]" id="DIENTHONGTINCANHAN01">
+                    <DialogHeader>
+                        <DialogTitle className="font-headline text-2xl">Chỉnh sửa Thông tin Cá nhân</DialogTitle>
+                        <DialogDescription>Cập nhật thông tin của bạn để nhà tuyển dụng có thể liên hệ.</DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
+                        {renderLevel1Edit(
+                            tempCandidate, 
+                            handleTempChange as any, 
+                            phoneCountry, setPhoneCountry, 
+                            zaloCountry, setZaloCountry,
+                            () => setIsQrDialogOpen(true)
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">Hủy</Button>
+                        </DialogClose>
+                        <Button type="button" onClick={handleSave} className="bg-primary text-white">
+                            Lưu thay đổi
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
+                <DialogContent className="sm:max-w-xl">
+                    <DialogHeader>
+                        <DialogTitle className="font-headline text-2xl">Tải lên mã QR Zalo</DialogTitle>
+                        <DialogDescription>
+                            Tải lên ảnh mã QR của bạn để tự động điền số điện thoại Zalo.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 space-y-6">
+                        <Label
+                            htmlFor="zalo-qr-file-input"
+                            className="relative flex flex-col items-center justify-center w-full h-64 px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer border-border hover:border-primary transition-colors bg-secondary/50"
+                        >
+                            {qrImagePreview ? (
+                                <Image
+                                    src={qrImagePreview}
+                                    alt="Xem trước QR"
+                                    fill
+                                    className="object-contain rounded-md"
+                                />
+                            ) : (
+                                <div className="space-y-2 text-center">
+                                    <UploadCloud className="w-12 h-12 mx-auto text-muted-foreground" />
+                                    <p className="font-semibold text-foreground">
+                                    Nhấp hoặc kéo thả file vào đây
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">PNG, JPG</p>
+                                </div>
+                            )}
+                            <Input
+                                id="zalo-qr-file-input"
+                                type="file"
+                                className="sr-only"
+                                accept="image/png, image/jpeg"
+                                onChange={handleZaloQrUpload}
+                            />
+                        </Label>
+                        
+                        <div className="space-y-3">
+                             <h4 className="font-semibold text-center">Các bước lấy mã QR trên Zalo</h4>
+                             {/* Placeholder for instruction images */}
+                             <div className="p-8 text-center bg-gray-100 rounded-md">
+                                <p className="text-sm text-gray-500">Khu vực hiển thị ảnh hướng dẫn sẽ được thêm vào sau.</p>
+                             </div>
+                        </div>
+
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }
+
+    
 
     
 
