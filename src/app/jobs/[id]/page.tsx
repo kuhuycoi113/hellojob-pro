@@ -32,6 +32,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
+import { EditProfileDialog } from '@/components/candidate-edit-dialog';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -119,6 +120,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
     const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
     const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
+    const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
 
     useEffect(() => {
         if (job) {
@@ -214,7 +216,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
     const handleConfirmUpdateProfile = () => {
         setIsProfileIncompleteAlertOpen(false);
-        router.push('/candidate-profile?openDialog=DIENTHONGTINCANHAN01');
+        setIsProfileEditDialogOpen(true);
     }
 
     const handleShare = async () => {
@@ -522,6 +524,17 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <EditProfileDialog 
+                isOpen={isProfileEditDialogOpen} 
+                onOpenChange={setIsProfileEditDialogOpen} 
+                onSaveSuccess={() => {
+                    toast({
+                        title: 'Cập nhật thành công!',
+                        description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
+                        className: 'bg-green-500 text-white'
+                    });
+                }}
+            />
         </div>
     );
 }

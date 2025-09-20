@@ -35,6 +35,7 @@ import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from '@/compon
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { CandidateProfile } from '@/ai/schemas';
+import { EditProfileDialog } from './candidate-edit-dialog';
 
 
 const formatCurrency = (value?: string) => {
@@ -98,6 +99,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
   const [isConsultantPopoverOpen, setIsConsultantPopoverOpen] = useState(false);
   const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
+  const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
 
   useEffect(() => {
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -163,7 +165,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   const handleConfirmUpdateProfile = () => {
     setIsProfileIncompleteAlertOpen(false);
-    router.push('/candidate-profile?openDialog=DIENTHONGTINCANHAN01');
+    setIsProfileEditDialogOpen(true);
   };
   
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -304,6 +306,17 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <EditProfileDialog 
+                isOpen={isProfileEditDialogOpen} 
+                onOpenChange={setIsProfileEditDialogOpen} 
+                onSaveSuccess={() => {
+                    toast({
+                        title: 'Cập nhật thành công!',
+                        description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
+                        className: 'bg-green-500 text-white'
+                    });
+                }}
+            />
         </>
      );
   }
@@ -439,6 +452,17 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
+         <EditProfileDialog 
+            isOpen={isProfileEditDialogOpen} 
+            onOpenChange={setIsProfileEditDialogOpen} 
+            onSaveSuccess={() => {
+                toast({
+                    title: 'Cập nhật thành công!',
+                    description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
+                    className: 'bg-green-500 text-white'
+                });
+            }}
+        />
     </>
   );
 };
