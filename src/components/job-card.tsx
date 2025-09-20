@@ -33,6 +33,8 @@ import { AuthDialog } from './auth-dialog';
 import { ContactButtons } from './contact-buttons';
 import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from '@/components/ui/popover';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
+import { CandidateProfile } from '@/ai/schemas';
 
 
 const formatCurrency = (value?: string) => {
@@ -73,11 +75,25 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
     }
 };
 
+const validateProfileForApplication = (profile: CandidateProfile): boolean => {
+    if (!profile || !profile.personalInfo) return false;
+
+    const { name, personalInfo } = profile;
+    const { gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = personalInfo;
+
+    const hasRequiredPersonalInfo = name && gender && height && weight && tattooStatus && hepatitisBStatus;
+    const hasContactInfo = phone || zalo || messenger || line;
+
+    return !!hasRequiredPersonalInfo && !!hasContactInfo;
+};
+
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
   const { isLoggedIn } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   const [isSaved, setIsSaved] = useState(false);
+  const [hasApplied, setHasApplied] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
   const [isConsultantPopoverOpen, setIsConsultantPopoverOpen] = useState(false);
@@ -85,6 +101,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   useEffect(() => {
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     setIsSaved(savedJobs.includes(job.id));
+    const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+    setHasApplied(appliedJobs.includes(job.id));
   }, [job.id]);
 
   const handleSaveJob = (e: React.MouseEvent) => {
@@ -108,15 +126,44 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const handleApplyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01: Start of apply functionality
+    // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01 & UNGTUYEN-L05: Start of apply functionality
     if (!isLoggedIn) {
         sessionStorage.setItem('postLoginRedirect', `/jobs/${job.id}`);
         setIsConfirmLoginOpen(true);
     } else {
-        // Logic for logged in user to apply
-        console.log("Applying for job...");
+        const profileRaw = localStorage.getItem('generatedCandidateProfile');
+        if (profileRaw) {
+            const profile: CandidateProfile = JSON.parse(profileRaw);
+            if (validateProfileForApplication(profile)) {
+                // Mark as applied
+                const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+                appliedJobs.push(job.id);
+                localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
+                setHasApplied(true);
+                toast({
+                    title: 'Ứng tuyển thành công!',
+                    description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
+                    className: 'bg-green-500 text-white'
+                });
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Hồ sơ chưa hoàn thiện',
+                    description: 'Vui lòng cập nhật đủ thông tin cá nhân và ít nhất một phương thức liên lạc để ứng tuyển.',
+                    duration: 5000,
+                    action: <Button variant="outline" size="sm" onClick={() => router.push('/candidate-profile')}>Cập nhật hồ sơ</Button>,
+                });
+            }
+        } else {
+             toast({
+                variant: 'destructive',
+                title: 'Không tìm thấy hồ sơ',
+                description: 'Vui lòng tạo hồ sơ để có thể ứng tuyển.',
+                 action: <Button variant="outline" size="sm" onClick={() => router.push('/ai-profile')}>Tạo hồ sơ</Button>,
+            });
+        }
     }
-    // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01: End of apply functionality
+    // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01 & UNGTUYEN-L05: End of apply functionality
   };
   
   const handleConfirmLogin = () => {
@@ -132,6 +179,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     logInteraction(job, 'view');
     router.push(`/jobs/${job.id}`);
   };
+
+  const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
 
   if (variant === 'list-item') {
      return (
@@ -214,7 +263,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                         <Bookmark className={cn("mr-2 h-5 w-5", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                                         Lưu
                                     </Button>
-                                    {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>}
+                                    {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                                 </div>
                             </div>
                         </div>
@@ -338,7 +387,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 </Link>
                                 <ContactButtons contact={job.recruiter as any} />
                             </div>
-                            <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển</Button>
+                            <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
                         </div>
                         {showPostedTime && (
                              <p className="mt-1 text-right text-xs">

@@ -91,6 +91,18 @@ const HydrationSafeDate = ({ dateString }: { dateString: string }) => {
     );
 };
 
+const validateProfileForApplication = (profile: CandidateProfile): boolean => {
+    if (!profile || !profile.personalInfo) return false;
+
+    const { name, personalInfo } = profile;
+    const { gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = personalInfo;
+
+    const hasRequiredPersonalInfo = name && gender && height && weight && tattooStatus && hepatitisBStatus;
+    const hasContactInfo = phone || zalo || messenger || line;
+
+    return !!hasRequiredPersonalInfo && !!hasContactInfo;
+};
+
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
@@ -99,6 +111,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const { role, isLoggedIn } = useAuth();
     const job = jobData.find(j => j.id === resolvedParams.id);
     const [isSaved, setIsSaved] = useState(false);
+    const [hasApplied, setHasApplied] = useState(false);
     const [profileSuggestions, setProfileSuggestions] = useState<Job[]>([]);
     const [behavioralSuggestions, setBehavioralSuggestions] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -110,6 +123,8 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         if (job) {
             const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
             setIsSaved(savedJobs.includes(job.id));
+            const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+            setHasApplied(appliedJobs.includes(job.id));
         }
 
         const fetchSuggestions = async () => {
@@ -169,8 +184,36 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             sessionStorage.setItem('postLoginRedirect', `/jobs/${job.id}`);
             setIsConfirmLoginOpen(true);
         } else {
-            // Logic for logged in user to apply
-            console.log("Applying for job...");
+            const profileRaw = localStorage.getItem('generatedCandidateProfile');
+            if (profileRaw) {
+                const profile: CandidateProfile = JSON.parse(profileRaw);
+                if (validateProfileForApplication(profile)) {
+                     const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+                     appliedJobs.push(job.id);
+                     localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
+                     setHasApplied(true);
+                     toast({
+                         title: 'Ứng tuyển thành công!',
+                         description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
+                         className: 'bg-green-500 text-white'
+                     });
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Hồ sơ chưa hoàn thiện',
+                        description: 'Vui lòng cập nhật đủ thông tin cá nhân và ít nhất một phương thức liên lạc để ứng tuyển.',
+                        duration: 5000,
+                        action: <Button variant="outline" size="sm" onClick={() => router.push('/candidate-profile')}>Cập nhật hồ sơ</Button>,
+                    });
+                }
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy hồ sơ',
+                    description: 'Vui lòng tạo hồ sơ để có thể ứng tuyển.',
+                    action: <Button variant="outline" size="sm" onClick={() => router.push('/ai-profile')}>Tạo hồ sơ</Button>,
+                });
+            }
         }
     };
     
@@ -214,6 +257,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     };
 
     const assignedConsultant = job.recruiter;
+    const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay';
 
     const RequirementItem = ({ icon: Icon, label, value, className }: { icon: React.ElementType, label: string, value?: string | number, className?: string }) => {
         if (!value) return null;
@@ -257,7 +301,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                         <Bookmark className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
                                         {isSaved ? 'Việc đã lưu' : 'Lưu việc làm'}
                                     </Button>
-                                    <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white" onClick={handleApplyClick}>Ứng tuyển ngay</Button>
+                                    <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
                                 </div>
                             </CardContent>
                         </Card>
