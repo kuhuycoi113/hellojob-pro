@@ -16,13 +16,13 @@ export default function HomePage() {
     if (filters.industry && filters.industry !== 'all') query.set('industry', filters.industry);
     
     // Handle location which can be an array
-    if (Array.isArray(filters.location)) {
+    if (Array.isArray(filters.location) && filters.location.length > 0) {
         filters.location.forEach(loc => query.append('location', loc));
-    } else if (filters.location && filters.location !== 'all') {
+    } else if (typeof filters.location === 'string' && filters.location && filters.location !== 'all') {
         query.append('location', filters.location);
     }
     
-    router.push(`/jobs?${query.toString()}`);
+    router.push(`/job-search?${query.toString()}`);
   };
 
   // Dummy filter state and handler for SearchModule on homepage
