@@ -1,3 +1,4 @@
+
 import { consultants } from './consultant-data';
 import type { User } from './chat-data';
 import { industriesByJobType } from './industry-data';
@@ -151,7 +152,7 @@ const generateUniqueJobId = (index: number): string => {
     const newId = prefix + deterministicPart;
     
     if (existingJobIds.has(newId)) {
-        return generateUniqueJobId(index + 2000); 
+        return generateUniqueJobId(index + 3000); 
     }
     
     existingJobIds.add(newId);
@@ -178,12 +179,10 @@ const createJobList = (): Job[] => {
             if (!industries) continue;
             
             for (const industry of industries) {
-                // Use a copy of keywords to avoid infinite loop if keywords is empty
                 const keywords = industry.keywords && industry.keywords.length > 0 ? [...industry.keywords] : [industry.name];
                 
-                // Create 2 jobs for each industry to have some variety
-                for (let i = 0; i < 2; i++) {
-                    const keyword = getRandomItem(keywords, jobIndex);
+                // MAIN CHANGE HERE: Loop through every keyword instead of just creating 2 jobs
+                for (const keyword of keywords) {
                     const location = getRandomItem(locations, jobIndex);
                     const gender = getRandomItem(['Nam', 'Nữ', 'Cả nam và nữ'], jobIndex) as 'Nam' | 'Nữ' | 'Cả nam và nữ';
                     const quantity = (jobIndex % 10) + 1;
@@ -234,14 +233,12 @@ const createJobList = (): Job[] => {
                     const selectedConditionsCount = Math.floor(Math.random() * 2) + 2; 
                     const specialConditions = shuffledConditions.slice(0, selectedConditionsCount).map(c => c.name).join(', ');
 
-                    // Logic to add other skill requirements
                     const shuffledOtherSkills = [...otherSkills].sort(() => 0.5 - Math.random());
-                    const selectedOtherSkillsCount = Math.floor(Math.random() * 2) + 1; // 1 to 2 skills
+                    const selectedOtherSkillsCount = Math.floor(Math.random() * 2) + 1;
                     const selectedOtherSkills = shuffledOtherSkills.slice(0, selectedOtherSkillsCount);
                     
                     const otherSkillsText = selectedOtherSkills.map(s => `<li>${s.name}</li>`).join('');
                     const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
-
 
                     const job: Job = {
                         id: generateUniqueJobId(jobIndex),
@@ -264,7 +261,7 @@ const createJobList = (): Job[] => {
                         status: jobIndex % 10 === 0 ? 'Tạm dừng' : 'Đang tuyển',
                         interviewDate: interviewDate.toISOString().split('T')[0],
                         interviewRounds: (jobIndex % 3) + 1,
-                        netFee: isTTS ? `${80 + (jobIndex % 30)}tr` : undefined,
+                        netFee: isTTS ? `${(100 + (jobIndex % 50)) * 1000000}` : undefined,
                         target: `${(jobIndex % 5) + 1}tr`,
                         backFee: `${(jobIndex % 5) + 1}tr`,
                         tags: [industry.name, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],

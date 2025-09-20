@@ -1,3 +1,4 @@
+
 // src/lib/visa-data.ts
 
 const createSlug = (str: string) => {
