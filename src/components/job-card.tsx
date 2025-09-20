@@ -97,6 +97,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
   const [isConsultantPopoverOpen, setIsConsultantPopoverOpen] = useState(false);
+  const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
 
   useEffect(() => {
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -126,7 +127,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const handleApplyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01 & UNGTUYEN-L05: Start of apply functionality
+    // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01 & UNGTUYEN-L05 & UNGTUYEN-L06: Start of apply functionality
     if (!isLoggedIn) {
         sessionStorage.setItem('postLoginRedirect', `/jobs/${job.id}`);
         setIsConfirmLoginOpen(true);
@@ -146,29 +147,23 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     className: 'bg-green-500 text-white'
                 });
             } else {
-                toast({
-                    variant: 'destructive',
-                    title: 'Hồ sơ chưa hoàn thiện',
-                    description: 'Vui lòng cập nhật đủ thông tin cá nhân và ít nhất một phương thức liên lạc để ứng tuyển.',
-                    duration: 5000,
-                    action: <Button variant="outline" size="sm" onClick={() => router.push('/candidate-profile')}>Cập nhật hồ sơ</Button>,
-                });
+                setIsProfileIncompleteAlertOpen(true);
             }
         } else {
-             toast({
-                variant: 'destructive',
-                title: 'Không tìm thấy hồ sơ',
-                description: 'Vui lòng tạo hồ sơ để có thể ứng tuyển.',
-                 action: <Button variant="outline" size="sm" onClick={() => router.push('/ai-profile')}>Tạo hồ sơ</Button>,
-            });
+             setIsProfileIncompleteAlertOpen(true);
         }
     }
-    // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01 & UNGTUYEN-L05: End of apply functionality
+    // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01 & UNGTUYEN-L05 & UNGTUYEN-L06: End of apply functionality
   };
   
   const handleConfirmLogin = () => {
     setIsConfirmLoginOpen(false);
     setIsAuthDialogOpen(true);
+  };
+
+  const handleConfirmUpdateProfile = () => {
+    setIsProfileIncompleteAlertOpen(false);
+    router.push('/candidate-profile?openDialog=DIENTHONGTINCANHAN01');
   };
   
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -278,7 +273,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     )}
                 </div>
             </div>
-             <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+            <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
             <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
@@ -288,10 +283,24 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel>Từ chối</AlertDialogCancel>
+                    <AlertDialogCancel>Để sau</AlertDialogCancel>
                     <AlertDialogAction onClick={handleConfirmLogin}>
                         Đồng ý
                     </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+             <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Để sau</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -409,10 +418,24 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                 </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                <AlertDialogCancel>Từ chối</AlertDialogCancel>
+                <AlertDialogCancel>Để sau</AlertDialogCancel>
                 <AlertDialogAction onClick={handleConfirmLogin}>
                     Đồng ý
                 </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+        <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Để sau</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

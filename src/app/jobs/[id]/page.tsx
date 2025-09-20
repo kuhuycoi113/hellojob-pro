@@ -118,6 +118,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
     const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
+    const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
 
     useEffect(() => {
         if (job) {
@@ -198,21 +199,10 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                          className: 'bg-green-500 text-white'
                      });
                 } else {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Hồ sơ chưa hoàn thiện',
-                        description: 'Vui lòng cập nhật đủ thông tin cá nhân và ít nhất một phương thức liên lạc để ứng tuyển.',
-                        duration: 5000,
-                        action: <Button variant="outline" size="sm" onClick={() => router.push('/candidate-profile')}>Cập nhật hồ sơ</Button>,
-                    });
+                    setIsProfileIncompleteAlertOpen(true);
                 }
             } else {
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy hồ sơ',
-                    description: 'Vui lòng tạo hồ sơ để có thể ứng tuyển.',
-                    action: <Button variant="outline" size="sm" onClick={() => router.push('/ai-profile')}>Tạo hồ sơ</Button>,
-                });
+                 setIsProfileIncompleteAlertOpen(true);
             }
         }
     };
@@ -221,6 +211,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         setIsConfirmLoginOpen(false);
         setIsAuthDialogOpen(true);
     };
+
+    const handleConfirmUpdateProfile = () => {
+        setIsProfileIncompleteAlertOpen(false);
+        router.push('/candidate-profile?openDialog=DIENTHONGTINCANHAN01');
+    }
 
     const handleShare = async () => {
         const shareUrl = `https://vi.hellojob.jp/jobs/${job.id}`;
@@ -506,10 +501,24 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel>Từ chối</AlertDialogCancel>
+                    <AlertDialogCancel>Để sau</AlertDialogCancel>
                     <AlertDialogAction onClick={handleConfirmLogin}>
                         Đồng ý
                     </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Để sau</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
