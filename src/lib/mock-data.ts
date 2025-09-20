@@ -2,7 +2,7 @@
 import { consultants } from './consultant-data';
 import type { User } from './chat-data';
 import { industriesByJobType } from './industry-data';
-import { japanJobTypes, visaDetailsByVisaType } from './visa-data';
+import { japanJobTypes, visaDetailsByVisaType, allSpecialConditions } from './visa-data';
 
 export interface Job {
     id: string;
@@ -161,13 +161,15 @@ const createJobList = (): Job[] => {
                     keywords.push(industry.name);
                 }
 
-                for (const keyword of keywords) {
+                // Create 2 jobs for each keyword to ensure coverage
+                for (let i=0; i < 2; i++) {
+                    const keyword = getRandomItem(keywords, jobIndex); // Still get random keyword to vary titles
                     const location = getRandomItem(locations, jobIndex);
                     const gender = getRandomItem(['Nam', 'Nữ', 'Cả nam và nữ'], jobIndex) as 'Nam' | 'Nữ' | 'Cả nam và nữ';
                     const quantity = (jobIndex % 10) + 1;
                     const languageRequirement = getRandomItem(languageLevels, jobIndex);
                     
-                    const title = `${keyword}, ${location}, tuyển ${quantity} ${gender}, ${languageRequirement}`;
+                    const title = `${keyword}, ${location}, tuyển ${quantity} ${gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender}`;
                     
                     const findMatchingConsultant = () => {
                         const lowerCaseIndustry = industry.name.toLowerCase();
@@ -201,6 +203,17 @@ const createJobList = (): Job[] => {
                     } else if (imageCase === 2) {
                         jobImages.push({ src: getRandomItem(workImagePlaceholders, jobIndex), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
                     }
+                    
+                    // Logic to add special conditions
+                    const applicableConditions = allSpecialConditions.filter(cond => {
+                        const visaDetails = Object.keys(visaDetailsByVisaType).flatMap(key => visaDetailsByVisaType[key]);
+                        const detailObj = visaDetails.find(d => d.name === detail.name);
+                        return detailObj; // for now, let's assume all are applicable. A more complex logic can be added later.
+                    }).map(c => c.name);
+
+                    const shuffledConditions = [...applicableConditions].sort(() => 0.5 - Math.random());
+                    const selectedConditionsCount = Math.floor(Math.random() * 2) + 2; // 2 to 3 conditions
+                    const specialConditions = shuffledConditions.slice(0, selectedConditionsCount).join(', ');
 
                     const job: Job = {
                         id: generateUniqueJobId(jobIndex),
@@ -246,10 +259,7 @@ const createJobList = (): Job[] => {
                         tattooRequirement: getRandomItem(tattooOptions, jobIndex),
                         hepatitisBRequirement: getRandomItem(hepBOptions, jobIndex),
                         interviewFormat: 'Phỏng vấn Online',
-                        specialConditions: Array.from(new Set([
-                            getRandomItem(specialConditionsList, jobIndex),
-                            getRandomItem(specialConditionsList, jobIndex + 1),
-                        ])).join(', '),
+                        specialConditions: specialConditions,
                         details: {
                             description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản. Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p><ul><li>Chi tiết công việc: ${keyword}.</li><li>Môi trường làm việc sạch sẽ, hiện đại.</li></ul>`,
                             requirements: `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`,
