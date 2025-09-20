@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
@@ -66,34 +65,19 @@ const convertToVnd = (jpyValue?: string) => {
     return `≈ ${vndValue.toLocaleString('vi-VN')} VNĐ`;
 };
 
-const HydrationSafeDate = ({ dateString }: { dateString: string }) => {
-    const [formattedDate, setFormattedDate] = useState('');
-    const [isClient, setIsClient] = useState(false);
+const formatPostedTime = (dateString: string) => {
+    if (!dateString) return '';
+    const parts = dateString.split(' ');
+    if (parts.length < 2) return dateString;
+    const [time, datePart] = parts;
+    const [day, month, year] = datePart.split('/');
+    // Consistent date format for new Date()
+    const isoDateString = `${year}-${month}-${day}`;
+    const date = new Date(isoDateString);
+    if (isNaN(date.getTime())) return dateString;
+    return `${time} ${date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+}
 
-    useEffect(() => {
-        setIsClient(true);
-        // postedTime is in 'HH:mm DD/MM/YYYY' format
-        const parts = dateString.split(' ');
-        if (parts.length === 2) {
-            const time = parts[0];
-            const dateParts = parts[1].split('/');
-            if (dateParts.length === 3) {
-                 // Format to a string that new Date() can parse reliably
-                const isoDateString = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-                const date = new Date(isoDateString);
-                setFormattedDate(date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
-            }
-        }
-    }, [dateString]);
-    
-    const timePart = dateString.split(' ')[0];
-
-    return (
-        <span>
-            {timePart} {isClient ? formattedDate : ''}
-        </span>
-    );
-};
 
 const validateProfileForApplication = (profile: CandidateProfile): boolean => {
     if (!profile || !profile.personalInfo) return false;
@@ -277,7 +261,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             <div className="container mx-auto px-4 md:px-6 py-12">
                 <div className="mb-6">
                     <Button asChild variant="outline" size="sm">
-                        <Link href="/jobs"><ArrowLeft className="mr-2 h-4 w-4" />Quay lại trang Việc làm</Link>
+                        <Link href="/job-search"><ArrowLeft className="mr-2 h-4 w-4" />Quay lại trang Việc làm</Link>
                     </Button>
                 </div>
                 <div className="grid lg:grid-cols-3 gap-8 items-start">
@@ -292,7 +276,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 </p>
                                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
                                     <p className="flex items-center gap-2"><MapPin className="h-4 w-4"/> {job.workLocation}</p>
-                                    <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4"/> <span className="text-primary">Đăng lúc:</span> <HydrationSafeDate dateString={job.postedTime} /></p>
+                                    <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4"/> <span className="text-primary">Đăng lúc:</span> {formatPostedTime(job.postedTime)}</p>
                                 </div>
                             </CardHeader>
                             <CardContent>
@@ -541,3 +525,5 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 }
+
+    
