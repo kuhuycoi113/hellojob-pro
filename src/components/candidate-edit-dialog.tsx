@@ -75,9 +75,199 @@ const parseLineInput = (input: string): string => {
     return input.trim();
 };
 
+const renderLevel1Edit = (
+    tempCandidate: EnrichedCandidateProfile,
+    handleTempChange: (
+        section: keyof EnrichedCandidateProfile | 'personalInfo',
+        field: string,
+        value: any
+    ) => void,
+    phoneCountry: string,
+    setPhoneCountry: (value: string) => void,
+    zaloCountry: string,
+    setZaloCountry: (value: string) => void
+) => {
+    const height = parseInt(tempCandidate.personalInfo?.height || '160', 10);
+    const weight = parseInt(tempCandidate.personalInfo?.weight || '50', 10);
+
+    return (
+        <div className="space-y-4">
+            <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle className="font-bold">Lưu ý quan trọng</AlertTitle>
+                <AlertDescription>
+                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên lạc (Zalo, SĐT...) để có thể sử dụng nút 
+                    <Badge className="mx-1 bg-accent-orange text-white align-middle">Ứng tuyển</Badge> 
+                    trên các tin tuyển dụng.
+                </AlertDescription>
+            </Alert>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                <div className="space-y-2">
+                <Label>Họ và tên</Label>
+                {/* @ts-ignore */}
+                <Input value={tempCandidate.name} onChange={e => handleTempChange('name', 'name', e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                <Label>Ngày sinh</Label>
+                <Popover>
+                    <PopoverTrigger asChild>
+                    <Button
+                        variant={"outline"}
+                        className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
+                        )}
+                    >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {tempCandidate.personalInfo.dateOfBirth ? (
+                        format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
+                        ) : (
+                        <span>Chọn ngày sinh</span>
+                        )}
+                    </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                    <Calendar
+                        mode="single"
+                        locale={vi}
+                        selected={tempCandidate.personalInfo.dateOfBirth ? new Date(tempCandidate.personalInfo.dateOfBirth) : undefined}
+                        onSelect={(date) => handleTempChange('personalInfo', 'dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '')}
+                        initialFocus
+                        captionLayout="dropdown-buttons"
+                        fromYear={1950}
+                        toYear={new Date().getFullYear() - 16}
+                    />
+                    </PopoverContent>
+                </Popover>
+                </div>
+                <div className="space-y-2">
+                <Label>Giới tính</Label>
+                <Select value={tempCandidate.personalInfo.gender || ''} onValueChange={value => handleTempChange('personalInfo', 'gender', value)}>
+                    <SelectTrigger><SelectValue placeholder="Chọn giới tính" /></SelectTrigger>
+                    <SelectContent>
+                    <SelectItem value="Nam">Nam</SelectItem>
+                    <SelectItem value="Nữ">Nữ</SelectItem>
+                    <SelectItem value="Khác">Khác</SelectItem>
+                    </SelectContent>
+                </Select>
+                </div>
+                <div className="space-y-2">
+                    <Label>Ngôn ngữ</Label>
+                    <Input id="language" placeholder="VD: Tiếng Nhật N3" value={tempCandidate.personalInfo.language} onChange={e => handleTempChange('personalInfo', 'language', e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                    <Label>Chiều cao (cm)</Label>
+                    <span className="text-sm font-semibold text-primary">{height} cm</span>
+                </div>
+                <Slider
+                    value={[height]}
+                    onValueChange={([value]) => handleTempChange('personalInfo', 'height', String(value))}
+                    min={140}
+                    max={205}
+                    step={1}
+                />
+                </div>
+                <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                        <Label>Cân nặng (kg)</Label>
+                        <span className="text-sm font-semibold text-primary">{weight} kg</span>
+                    </div>
+                    <Slider
+                        value={[weight]}
+                        onValueChange={([value]) => handleTempChange('personalInfo', 'weight', String(value))}
+                        min={40}
+                        max={120}
+                        step={1}
+                    />
+                </div>
+                <div className="space-y-2">
+                <Label>Hình xăm</Label>
+                <Select value={tempCandidate.personalInfo.tattooStatus || ''} onValueChange={value => handleTempChange('personalInfo', 'tattooStatus', value)}>
+                    <SelectTrigger><SelectValue placeholder="Chọn tình trạng hình xăm" /></SelectTrigger>
+                    <SelectContent>
+                    <SelectItem value="Không có">Không có</SelectItem>
+                    <SelectItem value="Có xăm nhỏ (kín)">Có xăm nhỏ (kín)</SelectItem>
+                    <SelectItem value="Có xăm to (lộ)">Có xăm to (lộ)</SelectItem>
+                    </SelectContent>
+                </Select>
+                </div>
+                <div className="space-y-2">
+                <Label>Viêm gan B</Label>
+                <Select value={tempCandidate.personalInfo.hepatitisBStatus || ''} onValueChange={value => handleTempChange('personalInfo', 'hepatitisBStatus', value)}>
+                    <SelectTrigger><SelectValue placeholder="Chọn tình trạng viêm gan B" /></SelectTrigger>
+                    <SelectContent>
+                    <SelectItem value="Không viêm gan B">Không viêm gan B</SelectItem>
+                    <SelectItem value="Viêm gan B thể tĩnh">Viêm gan B thể tĩnh</SelectItem>
+                    <SelectItem value="Viêm gan B thể động">Viêm gan B thể động</SelectItem>
+                    </SelectContent>
+                </Select>
+                </div>
+                <div className="md:col-span-2 mt-6 pt-6 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="phone">Số điện thoại</Label>
+                        <div className="flex items-center">
+                            <Select value={phoneCountry} onValueChange={setPhoneCountry}>
+                            <SelectTrigger className="w-[100px] rounded-r-none">
+                                <SelectValue>
+                                <div className="flex items-center gap-2">
+                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
+                                    {phoneCountry}
+                                </div>
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
+                                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
+                            </SelectContent>
+                            </Select>
+                            <Input id="phone" type="tel" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
+                        <div className="flex items-center relative">
+                            <Select value={zaloCountry} onValueChange={setZaloCountry}>
+                                <SelectTrigger className="w-[100px] rounded-r-none">
+                                <SelectValue>
+                                    <div className="flex items-center gap-2">
+                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
+                                    {zaloCountry}
+                                    </div>
+                                </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
+                                    <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Input id="zalo" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.zalo || ''} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value)} />
+                            <Label htmlFor="zalo-qr-upload" className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
+                                <QrCode className="h-5 w-5"/>
+                            </Label>
+                            <Input id="zalo-qr-upload" type="file" className="sr-only" accept="image/*" />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="messenger">Facebook Messenger</Label>
+                        <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc nhập username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
+                        <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="line">Line (Link hồ sơ)</Label>
+                        <Input id="line" placeholder="Dán link Line của bạn vào đây" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditProfileDialogProps) {
     const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile | null>(null);
+    const [phoneCountry, setPhoneCountry] = useState('+84');
+    const [zaloCountry, setZaloCountry] = useState('+84');
 
     useEffect(() => {
         if (isOpen) {
@@ -148,193 +338,6 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         });
     };
 
-    const renderLevel1Edit = (
-        tempCandidate: EnrichedCandidateProfile,
-        handleTempChange: (
-            section: keyof EnrichedCandidateProfile | 'personalInfo',
-            field: string,
-            value: any
-        ) => void
-    ) => {
-        const [phoneCountry, setPhoneCountry] = useState('+84');
-        const [zaloCountry, setZaloCountry] = useState('+84');
-        const height = parseInt(tempCandidate.personalInfo?.height || '160', 10);
-        const weight = parseInt(tempCandidate.personalInfo?.weight || '50', 10);
-
-        return (
-            <div className="space-y-4">
-                <Alert>
-                    <Info className="h-4 w-4" />
-                    <AlertTitle className="font-bold">Lưu ý quan trọng</AlertTitle>
-                    <AlertDescription>
-                        Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên lạc (Zalo, SĐT...) để có thể sử dụng nút 
-                        <Badge className="mx-1 bg-accent-orange text-white align-middle">Ứng tuyển</Badge> 
-                        trên các tin tuyển dụng.
-                    </AlertDescription>
-                </Alert>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                    <div className="space-y-2">
-                    <Label>Họ và tên</Label>
-                    {/* @ts-ignore */}
-                    <Input value={tempCandidate.name} onChange={e => handleTempChange('name', 'name', e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                    <Label>Ngày sinh</Label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                        <Button
-                            variant={"outline"}
-                            className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
-                            )}
-                        >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {tempCandidate.personalInfo.dateOfBirth ? (
-                            format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
-                            ) : (
-                            <span>Chọn ngày sinh</span>
-                            )}
-                        </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                        <Calendar
-                            mode="single"
-                            locale={vi}
-                            selected={tempCandidate.personalInfo.dateOfBirth ? new Date(tempCandidate.personalInfo.dateOfBirth) : undefined}
-                            onSelect={(date) => handleTempChange('personalInfo', 'dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '')}
-                            initialFocus
-                            captionLayout="dropdown-buttons"
-                            fromYear={1950}
-                            toYear={new Date().getFullYear() - 16}
-                        />
-                        </PopoverContent>
-                    </Popover>
-                    </div>
-                    <div className="space-y-2">
-                    <Label>Giới tính</Label>
-                    <Select value={tempCandidate.personalInfo.gender || ''} onValueChange={value => handleTempChange('personalInfo', 'gender', value)}>
-                        <SelectTrigger><SelectValue placeholder="Chọn giới tính" /></SelectTrigger>
-                        <SelectContent>
-                        <SelectItem value="Nam">Nam</SelectItem>
-                        <SelectItem value="Nữ">Nữ</SelectItem>
-                        <SelectItem value="Khác">Khác</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Ngôn ngữ</Label>
-                        <Input id="language" placeholder="VD: Tiếng Nhật N3" value={tempCandidate.personalInfo.language} onChange={e => handleTempChange('personalInfo', 'language', e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                        <Label>Chiều cao (cm)</Label>
-                        <span className="text-sm font-semibold text-primary">{height} cm</span>
-                    </div>
-                    <Slider
-                        value={[height]}
-                        onValueChange={([value]) => handleTempChange('personalInfo', 'height', String(value))}
-                        min={140}
-                        max={205}
-                        step={1}
-                    />
-                    </div>
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                            <Label>Cân nặng (kg)</Label>
-                            <span className="text-sm font-semibold text-primary">{weight} kg</span>
-                        </div>
-                        <Slider
-                            value={[weight]}
-                            onValueChange={([value]) => handleTempChange('personalInfo', 'weight', String(value))}
-                            min={40}
-                            max={120}
-                            step={1}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                    <Label>Hình xăm</Label>
-                    <Select value={tempCandidate.personalInfo.tattooStatus || ''} onValueChange={value => handleTempChange('personalInfo', 'tattooStatus', value)}>
-                        <SelectTrigger><SelectValue placeholder="Chọn tình trạng hình xăm" /></SelectTrigger>
-                        <SelectContent>
-                        <SelectItem value="Không có">Không có</SelectItem>
-                        <SelectItem value="Có xăm nhỏ (kín)">Có xăm nhỏ (kín)</SelectItem>
-                        <SelectItem value="Có xăm to (lộ)">Có xăm to (lộ)</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    </div>
-                    <div className="space-y-2">
-                    <Label>Viêm gan B</Label>
-                    <Select value={tempCandidate.personalInfo.hepatitisBStatus || ''} onValueChange={value => handleTempChange('personalInfo', 'hepatitisBStatus', value)}>
-                        <SelectTrigger><SelectValue placeholder="Chọn tình trạng viêm gan B" /></SelectTrigger>
-                        <SelectContent>
-                        <SelectItem value="Không viêm gan B">Không viêm gan B</SelectItem>
-                        <SelectItem value="Viêm gan B thể tĩnh">Viêm gan B thể tĩnh</SelectItem>
-                        <SelectItem value="Viêm gan B thể động">Viêm gan B thể động</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    </div>
-                    <div className="md:col-span-2 mt-6 pt-6 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="phone">Số điện thoại</Label>
-                            <div className="flex items-center">
-                                <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-                                <SelectTrigger className="w-[100px] rounded-r-none">
-                                    <SelectValue>
-                                    <div className="flex items-center gap-2">
-                                        {phoneCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
-                                        {phoneCountry}
-                                    </div>
-                                    </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
-                                    <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
-                                </SelectContent>
-                                </Select>
-                                <Input id="phone" type="tel" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
-                            <div className="flex items-center relative">
-                                <Select value={zaloCountry} onValueChange={setZaloCountry}>
-                                    <SelectTrigger className="w-[100px] rounded-r-none">
-                                    <SelectValue>
-                                        <div className="flex items-center gap-2">
-                                        {zaloCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
-                                        {zaloCountry}
-                                        </div>
-                                    </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
-                                        <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <Input id="zalo" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.zalo || ''} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value)} />
-                                <Label htmlFor="zalo-qr-upload" className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
-                                    <QrCode className="h-5 w-5"/>
-                                </Label>
-                                <Input id="zalo-qr-upload" type="file" className="sr-only" accept="image/*" />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="messenger">Facebook Messenger</Label>
-                            <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc nhập username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
-                            <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="line">Line (Link hồ sơ)</Label>
-                            <Input id="line" placeholder="Dán link Line của bạn vào đây" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
     if (!tempCandidate) return null;
 
     return (
@@ -345,7 +348,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                     <DialogDescription>Cập nhật thông tin của bạn để nhà tuyển dụng có thể liên hệ.</DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
-                    {renderLevel1Edit(tempCandidate, handleTempChange as any)}
+                    {renderLevel1Edit(tempCandidate, handleTempChange as any, phoneCountry, setPhoneCountry, zaloCountry, setZaloCountry)}
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
@@ -359,4 +362,3 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </Dialog>
     );
 }
-
