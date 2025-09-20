@@ -80,24 +80,23 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
     const cleanValue = value.replace(/\D/g, '');
 
     if (country === '+84') { // Vietnam (10 digits total)
-        if (cleanValue.startsWith('0')) {
-            const mobilePart = cleanValue.substring(1);
-            if (mobilePart.length === 0) return '(0)';
-            if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
-            if (mobilePart.length <= 6) return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3)}`;
-            return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
-        }
-        return cleanValue.slice(0,10);
+        if (!cleanValue.startsWith('0')) return cleanValue.slice(0,9);
+
+        const mobilePart = cleanValue.substring(1);
+        if (mobilePart.length === 0) return '(0)';
+        if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
+        if (mobilePart.length <= 6) return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3)}`;
+        return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
     }
 
     if (country === '+81') { // Japan (11 digits total starting with 0)
-        if (cleanValue.startsWith('0')) {
-             const mobilePart = cleanValue.substring(1);
-             if (mobilePart.length <= 4) return `0${mobilePart}`;
-             if (mobilePart.length <= 8) return `0${mobilePart.slice(0,4)}-${mobilePart.slice(4)}`;
-             return `0${mobilePart.slice(0,4)}-${mobilePart.slice(4,8)}-${mobilePart.slice(8,12)}`;
-        }
-        return cleanValue.slice(0,11);
+        if (!cleanValue.startsWith('0')) return cleanValue.slice(0,10);
+        
+        const mobilePart = cleanValue.substring(1); 
+        if (mobilePart.length === 0) return '(0)';
+        if (mobilePart.length <= 2) return `(0)${mobilePart}`;
+        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2)}`;
+        return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2,6)} ${mobilePart.slice(6,10)}`;
     }
 
     return cleanValue;
@@ -273,7 +272,7 @@ const renderLevel1Edit = (
                                 <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
                             </SelectContent>
                             </Select>
-                            <Input id="phone" type="tel" placeholder="(0) 901 234 567" className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/[^0-9]/g, ''))} />
+                            <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/[^0-9]/g, ''))} />
                         </div>
                     </div>
                     <div className="space-y-2">
@@ -293,7 +292,7 @@ const renderLevel1Edit = (
                                     <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Input id="zalo" placeholder="(0) 901 234 567" className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
+                            <Input id="zalo" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
                             <Label htmlFor="zalo-qr-upload" className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                 <QrCode className="h-5 w-5"/>
                             </Label>
@@ -411,5 +410,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </Dialog>
     );
 }
+
+    
 
     
