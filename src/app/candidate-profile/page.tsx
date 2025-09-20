@@ -1499,6 +1499,36 @@ export default function CandidateProfilePage() {
     return phone; // Fallback
   }
 
+  const PersonalInfoCard = () => (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="font-headline text-xl flex items-center"><UserCog className="mr-3 text-primary"/> {t.personalInfo}</CardTitle>
+        <Button variant="ghost" size="icon" onClick={() => setIsProfileEditDialogOpen(true)}>
+            <Edit className="h-4 w-4"/>
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-3 text-sm">
+        <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : 'Chưa cập nhật'}</p>
+        <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender}</p>
+        <p><strong>{t.height}:</strong> {candidate.personalInfo.height} cm</p>
+        <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight} kg</p>
+        <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus}</p>
+        <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus}</p>
+        <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency}</p>
+        <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency}</p>
+      </CardContent>
+      <CardContent>
+        <div className="space-y-2">
+            {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Phone className="mr-2"/>{formatPhoneNumber(candidate.personalInfo.phone)}</Link></Button>}
+            {candidate.personalInfo.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${candidate.personalInfo.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.messenger}</Link></Button>}
+            {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(candidate.personalInfo.zalo)}</Link></Button>}
+            {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+
   return (
     <div className="bg-secondary">
       <div className="container mx-auto px-4 md:px-6 py-12">
@@ -1580,6 +1610,12 @@ export default function CandidateProfilePage() {
                  </div>
               </div>
             </CardHeader>
+            
+            {/* Mobile Personal Info Card */}
+            <div className="p-6 pt-0 lg:hidden">
+              <PersonalInfoCard />
+            </div>
+
             <CardContent className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
                 
@@ -1704,33 +1740,10 @@ export default function CandidateProfilePage() {
               </div>
 
               <div className="lg:col-span-1 space-y-6">
-                 <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><UserCog className="mr-3 text-primary"/> {t.personalInfo}</CardTitle>
-                    <Button variant="ghost" size="icon" onClick={() => setIsProfileEditDialogOpen(true)}>
-                        <Edit className="h-4 w-4"/>
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="space-y-3 text-sm">
-                    <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : 'Chưa cập nhật'}</p>
-                    <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender}</p>
-                    <p><strong>{t.height}:</strong> {candidate.personalInfo.height} cm</p>
-                    <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight} kg</p>
-                    <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus}</p>
-                    <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus}</p>
-                    <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency}</p>
-                    <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency}</p>
-                  </CardContent>
-                  <CardContent>
-                    <div className="space-y-2">
-                        {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Phone className="mr-2"/>{formatPhoneNumber(candidate.personalInfo.phone)}</Link></Button>}
-                        {candidate.personalInfo.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${candidate.personalInfo.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.messenger}</Link></Button>}
-                        {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(candidate.personalInfo.zalo)}</Link></Button>}
-                        {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
-                    </div>
-                  </CardContent>
-                </Card>
-
+                {/* Desktop Personal Info Card */}
+                 <div className="hidden lg:block">
+                  <PersonalInfoCard />
+                </div>
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><Target className="mr-3 text-primary"/> {t.aspirations}</CardTitle>
