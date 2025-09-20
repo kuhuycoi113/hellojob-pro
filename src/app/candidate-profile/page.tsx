@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon, Ruler } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon, Ruler, QrCode } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -259,31 +259,51 @@ const commonInterests = ['Cơ khí', 'Điện tử', 'IT', 'Logistics', 'Dệt m
 const allIndustries = Object.values(industriesByJobType).flat().filter((v,i,a)=>a.findIndex(t=>(t.name === v.name))===i);
 
 const parseMessengerInput = (input: string): string => {
-  if (!input) return '';
-  const trimmedInput = input.trim();
-  try {
-    // If it's a full URL, try to parse it
-    if (trimmedInput.startsWith('http') || trimmedInput.startsWith('www.')) {
-      const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
-      // Handle facebook.com/profile.php?id=...
-      if (url.hostname.includes('facebook.com') && url.pathname.includes('/profile.php')) {
-        const id = url.searchParams.get('id');
-        if (id) return id;
-      }
-      // Handle facebook.com/username or m.me/username
-      const pathParts = url.pathname.split('/').filter(Boolean);
-      if (pathParts.length > 0) {
-        // The last part of the path is a good candidate for the username/id
-        return pathParts[pathParts.length - 1];
-      }
+    if (!input) return '';
+    const trimmedInput = input.trim();
+    try {
+        if (trimmedInput.startsWith('http') || trimmedInput.startsWith('www.')) {
+            const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
+            
+            if (url.hostname.includes('facebook.com') || url.hostname.includes('m.facebook.com')) {
+                if (url.pathname.includes('profile.php')) {
+                    const id = url.searchParams.get('id');
+                    if (id) return id;
+                }
+                const pathParts = url.pathname.split('/').filter(Boolean);
+                if (pathParts.length > 0) {
+                    const lastPart = pathParts[pathParts.length - 1];
+                    // Avoid returning generic paths
+                    if (lastPart !== 'profile.php' && lastPart !== 'home.php') {
+                        return lastPart;
+                    }
+                }
+            }
+             if (url.hostname.includes('m.me')) {
+                const pathParts = url.pathname.split('/').filter(Boolean);
+                if (pathParts.length > 0) {
+                     return pathParts[pathParts.length - 1];
+                }
+            }
+        }
+    } catch (error) {
+        console.warn("Could not parse input as URL, treating as username:", error);
     }
-  } catch (error) {
-    // If URL parsing fails, it's probably not a URL, so treat it as a plain username
-    console.warn("Could not parse input as URL, treating as username:", error);
-  }
-  // Fallback: treat the input as a plain username/id
-  return trimmedInput;
+    // Fallback: remove any potential URL parts and treat as username
+    return trimmedInput.split('/').pop() || trimmedInput;
 };
+
+const parseZaloInput = (input: string): string => {
+    if (!input) return '';
+    const trimmedInput = input.trim();
+    if (trimmedInput.includes('zalo.me/')) {
+        const parts = trimmedInput.split('/');
+        return parts.pop() || '';
+    }
+    // Keep only numbers
+    return trimmedInput.replace(/\D/g, '');
+};
+
 
 const EditDialog = ({
   children,
@@ -332,6 +352,8 @@ const EditDialog = ({
         
         if (section === 'personalInfo' && field === 'messenger') {
              newCandidate[section] = { ...newCandidate[section], [field]: parseMessengerInput(value) };
+        } else if (section === 'personalInfo' && field === 'zalo') {
+            newCandidate[section] = { ...newCandidate[section], [field]: parseZaloInput(value) };
         } else {
              // @ts-ignore
              newCandidate[section] = { ...newCandidate[section], [field]: value };
@@ -1164,6 +1186,8 @@ export default function CandidateProfilePage() {
   }
 
   const renderLevel1Edit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
+    const [phoneCountry, setPhoneCountry] = useState('+84');
+    const [zaloCountry, setZaloCountry] = useState('+84');
     const height = parseInt(tempCandidate.personalInfo?.height || '160', 10);
     const weight = parseInt(tempCandidate.personalInfo?.weight || '50', 10);
 
@@ -1175,8 +1199,17 @@ export default function CandidateProfilePage() {
           <Input value={tempCandidate.name} onChange={e => handleTempChange('name', e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label>Số điện thoại Việt Nam</Label>
-          <Input type="tel" pattern="(0[35789])([0-9]{8})" title="Vui lòng nhập số điện thoại di động hợp lệ của Việt Nam." value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value)} />
+          <Label htmlFor="phone">Số điện thoại</Label>
+          <div className="flex items-center gap-2">
+            <Select value={phoneCountry} onValueChange={setPhoneCountry}>
+              <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="+84">VN</SelectItem>
+                <SelectItem value="+81">JP</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input id="phone" type="tel" pattern="[0-9\s]*" title="Vui lòng chỉ nhập số" value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
+          </div>
         </div>
         <div className="space-y-2">
           <Label>Ngày sinh</Label>
@@ -1270,16 +1303,29 @@ export default function CandidateProfilePage() {
             </SelectContent>
           </Select>
         </div>
-         <div className="space-y-2">
+        <div className="space-y-2">
             <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
-            <Input id="zalo" value={tempCandidate.personalInfo.zalo || ''} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value)} />
+            <div className="flex items-center relative">
+                 <Select value={zaloCountry} onValueChange={setZaloCountry}>
+                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="+84">VN</SelectItem>
+                        <SelectItem value="+81">JP</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Input id="zalo" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.zalo || ''} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value)} />
+                <Label htmlFor="zalo-qr-upload" className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
+                    <QrCode className="h-5 w-5"/>
+                </Label>
+                <Input id="zalo-qr-upload" type="file" className="sr-only" accept="image/*" />
+            </div>
         </div>
-         <div className="space-y-2">
+        <div className="space-y-2">
             <Label htmlFor="messenger">Facebook Messenger</Label>
             <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc nhập username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
             <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
         </div>
-         <div className="space-y-2">
+        <div className="space-y-2">
             <Label htmlFor="line">Line (Link hoặc ID)</Label>
             <Input id="line" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
         </div>
@@ -1578,6 +1624,18 @@ export default function CandidateProfilePage() {
 
   const editButtonText = isNewProfile ? 'Tạo hồ sơ' : 'Sửa hồ sơ';
 
+  const formatPhoneNumber = (phone: string | undefined): string => {
+    if (!phone) return 'Chưa cập nhật';
+    // Simple formatter, can be improved
+    if (phone.length === 10) { // VN Mobile
+        return `${phone.slice(0, 4)} ${phone.slice(4, 7)} ${phone.slice(7)}`;
+    }
+    if (phone.length === 11 && (phone.startsWith('0') || phone.startsWith('81'))) { // JP Mobile
+         return `${phone.slice(0, 3)} ${phone.slice(3, 7)} ${phone.slice(7)}`;
+    }
+    return phone;
+  }
+
   return (
     <div className="bg-secondary">
       <div className="container mx-auto px-4 md:px-6 py-12">
@@ -1806,9 +1864,9 @@ export default function CandidateProfilePage() {
                   </CardContent>
                   <CardContent>
                     <div className="space-y-2">
-                        {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Phone className="mr-2"/>{candidate.personalInfo.phone}</Link></Button>}
+                        {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Phone className="mr-2"/>{formatPhoneNumber(candidate.personalInfo.phone)}</Link></Button>}
                         {candidate.personalInfo.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${candidate.personalInfo.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.messenger}</Link></Button>}
-                        {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.zalo}</Link></Button>}
+                        {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(candidate.personalInfo.zalo)}</Link></Button>}
                         {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${candidate.personalInfo.line}`} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
                     </div>
                   </CardContent>
