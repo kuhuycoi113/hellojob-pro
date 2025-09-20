@@ -66,9 +66,9 @@ function JobsPageContent() {
                                     </div>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                         {jobs.map(job => (
-                                            <JobCard key={job.id} job={job} variant="list-item" showApplyButtons={true} />
+                                            <JobCard key={job.id} job={job} variant="grid-item" showApplyButtons={true} />
                                         ))}
                                     </div>
                                 </CardContent>
