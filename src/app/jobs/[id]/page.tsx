@@ -510,7 +510,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
+             <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
