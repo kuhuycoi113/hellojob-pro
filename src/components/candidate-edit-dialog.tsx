@@ -75,6 +75,28 @@ const parseLineInput = (input: string): string => {
     return input.trim();
 };
 
+const formatPhoneNumberInput = (value: string, country: string): string => {
+    if (!value) return '';
+    const cleanValue = value.replace(/\D/g, '');
+
+    if (country === '+84') { // Vietnam
+        if (cleanValue.length <= 3) return cleanValue;
+        if (cleanValue.length <= 6) return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3)}`;
+        if (cleanValue.length <= 10) return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3, 6)} ${cleanValue.slice(6)}`;
+        return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3, 6)} ${cleanValue.slice(6, 10)}`;
+    }
+
+    if (country === '+81') { // Japan
+        if (cleanValue.length <= 3) return cleanValue;
+        if (cleanValue.length <= 7) return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3)}`;
+        if (cleanValue.length <= 11) return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3, 7)} ${cleanValue.slice(7)}`;
+        return `${cleanValue.slice(0, 3)} ${cleanValue.slice(3, 7)} ${cleanValue.slice(7, 11)}`;
+    }
+
+    return cleanValue;
+};
+
+
 const japaneseLevels = ["JLPT N5", "JLPT N4", "JLPT N3", "JLPT N2", "JLPT N1", "Kaiwa N5", "Kaiwa N4", "Kaiwa N3", "Kaiwa N2", "Kaiwa N1", "Trình độ tương đương N5", "Trình độ tương đương N4", "Trình độ tương đương N3", "Trình độ tương đương N2", "Trình độ tương đương N1"];
 
 
@@ -108,8 +130,7 @@ const renderLevel1Edit = (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 <div className="space-y-2">
                 <Label>Họ và tên</Label>
-                {/* @ts-ignore */}
-                <Input value={tempCandidate.name} onChange={e => handleTempChange('name', 'name', e.target.value)} />
+                <Input value={tempCandidate.name} onChange={(e) => handleTempChange('name' as any, 'name' as any, e.target.value)} />
                 </div>
                 <div className="space-y-2">
                 <Label>Ngày sinh</Label>
@@ -233,7 +254,7 @@ const renderLevel1Edit = (
                                 <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
                             </SelectContent>
                             </Select>
-                            <Input id="phone" type="tel" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.phone} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
+                            <Input id="phone" type="tel" placeholder="(0) 901 234 567" className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
                         </div>
                     </div>
                     <div className="space-y-2">
@@ -253,7 +274,7 @@ const renderLevel1Edit = (
                                     <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Input id="zalo" placeholder="901 234 567" className="rounded-l-none" value={tempCandidate.personalInfo.zalo || ''} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value)} />
+                            <Input id="zalo" placeholder="(0) 901 234 567" className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
                             <Label htmlFor="zalo-qr-upload" className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                 <QrCode className="h-5 w-5"/>
                             </Label>
@@ -322,7 +343,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     ) => {
         setTempCandidate(prev => {
             if (!prev) return null;
-            const newCandidate = { ...prev };
+            const newCandidate = JSON.parse(JSON.stringify(prev)); // Deep copy
 
             if (section === 'name') {
                  const [field, value] = args;
@@ -336,7 +357,6 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                 } else if (section === 'personalInfo' && field === 'line') {
                      newCandidate[section] = { ...newCandidate[section]!, [field]: parseLineInput(value) };
                 } else {
-                     // @ts-ignore
                      newCandidate[section] = { ...newCandidate[section], [field]: value };
                 }
             } else {
