@@ -13,13 +13,15 @@ import React, { type ReactNode } from 'react';
 function LayoutManager({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const isCallPage = pathname.startsWith('/video-call') || pathname.startsWith('/voice-call');
+    const isPartnerPage = pathname.startsWith('/partner');
+
 
     return (
         <>
-            {!isCallPage && <Header />}
+            {!isCallPage && !isPartnerPage && <Header />}
             <main className="min-h-screen">{children}</main>
-            {!isCallPage && <Footer />}
-            {!isCallPage && <FloatingChatWidget />}
+            {!isCallPage && !isPartnerPage && <Footer />}
+            {!isCallPage && !isPartnerPage && <FloatingChatWidget />}
             <Toaster />
         </>
     );
@@ -38,4 +40,3 @@ export function RootProvider({
         </ChatProvider>
     );
 }
-

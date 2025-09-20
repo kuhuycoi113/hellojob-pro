@@ -1,4 +1,3 @@
-
 import { consultants } from './consultant-data';
 import type { User } from './chat-data';
 import { industriesByJobType } from './industry-data';
@@ -210,18 +209,22 @@ const createJobList = (): Job[] => {
                     const interviewDate = new Date(postedDate);
                     interviewDate.setDate(interviewDate.getDate() + (jobIndex % 60) + 1);
 
-                    const imageCase = jobIndex % 4;
+                    const imageCase = jobIndex % 5; // Expanded to 5 cases
                     let jobImages = [];
-                    if (imageCase === 0) {
+                    if (imageCase === 0) { // Don hang + Viec lam + KTX
                         jobImages.push({ src: getRandomItem(jobOrderImages, jobIndex), alt: 'Ảnh đơn hàng', dataAiHint: 'job order form' });
                         jobImages.push({ src: getRandomItem(workImagePlaceholders, jobIndex), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
                         jobImages.push({ src: getRandomItem(dormitoryImages, jobIndex), alt: 'Ảnh ký túc xá', dataAiHint: 'dormitory room' });
-                    } else if (imageCase === 1) {
+                    } else if (imageCase === 1) { // Viec lam + KTX
                         jobImages.push({ src: getRandomItem(workImagePlaceholders, jobIndex), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
                         jobImages.push({ src: getRandomItem(dormitoryImages, jobIndex), alt: 'Ảnh ký túc xá', dataAiHint: 'dormitory room' });
-                    } else if (imageCase === 2) {
+                    } else if (imageCase === 2) { // Chi Viec lam
                         jobImages.push({ src: getRandomItem(workImagePlaceholders, jobIndex), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
+                    } else if (imageCase === 3) { // Chi Don hang
+                         jobImages.push({ src: getRandomItem(jobOrderImages, jobIndex), alt: 'Ảnh đơn hàng', dataAiHint: 'job order form' });
                     }
+                    // Case 4: No images
+
                     
                     const detailSlug = detail.slug;
                     const applicableConditions = allSpecialConditions.filter(cond => {
@@ -290,7 +293,7 @@ const createJobList = (): Job[] => {
                             description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản. Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p><ul><li>Chi tiết công việc: ${keyword}.</li><li>Môi trường làm việc sạch sẽ, hiện đại.</li></ul>`,
                             requirements: `${requirementsBase}<ul>${otherSkillsText}</ul>`,
                             benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li><li>Thưởng 1-2 lần/năm tùy theo kết quả kinh doanh.</li></ul>`,
-                            videoUrl: jobIndex % 5 === 0 ? getRandomItem(jobVideos, jobIndex) : undefined,
+                            videoUrl: (jobIndex % 5 === 0 && imageCase > 1) ? getRandomItem(jobVideos, jobIndex) : undefined, // Add video only on some cases
                             images: jobImages,
                         }
                     };
