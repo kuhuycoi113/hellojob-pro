@@ -50,7 +50,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
 
   const handleVisaDetailChange = (value: string) => {
     const newFilters: Partial<SearchFilters> = { visaDetail: value };
-    const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key] || []).some(detail => detail.slug === value));
+    const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
     
     if (parentType && filters.visa !== parentType) {
         newFilters.visa = parentType;
@@ -73,7 +73,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
     }
     if (type === 'visaDetail') {
       for (const key in visaDetailsByVisaType) {
-        const detail = (visaDetailsByVisaType[key] || []).find(d => d.slug === slug);
+        const detail = (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).find(d => d.slug === slug);
         if (detail) return detail.name;
       }
     }
@@ -179,7 +179,7 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                         </div>
                         <div className="space-y-2 flex-1">
                             <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                            <Select onValueChange={(value) => onFilterChange({ industry: value })} value={filters.industry}>
+                            <Select onValueChange={(value) => onFilterChange({ industry: value, jobDetail: '' })} value={filters.industry}>
                                 <SelectTrigger id="search-industry">
                                     <SelectValue placeholder="Tất cả ngành nghề" />
                                 </SelectTrigger>

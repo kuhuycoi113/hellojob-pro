@@ -21,6 +21,7 @@ import {
 
 export const mainNavLinks = [
   { href: '/', label: 'Trang chủ', icon: Home, mobile: true },
+  { href: '/jobs', label: 'Việc làm' },
   { href: '/roadmap', label: 'Lộ trình' },
   {
     href: '/ai-profile',
@@ -46,6 +47,7 @@ export const quickAccessLinks = [
 
 // Re-ordered to a stable, logical order to fix hydration errors.
 export const mobileFooterLinks = [
+  { href: '/jobs', label: 'Việc làm', icon: Briefcase },
   { href: '/roadmap', label: 'Lộ trình', icon: Compass },
   { href: '/ai-profile', label: 'Hồ sơ AI', icon: Sparkles },
   { href: '/handbook', label: 'Cẩm nang', icon: LifeBuoy },

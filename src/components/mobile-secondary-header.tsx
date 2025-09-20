@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -55,8 +56,8 @@ export function MobileSecondaryHeader() {
                 
                 return (
                     <Link href={href} key={href} className={cn(
-                        "flex flex-col items-center justify-center text-sm text-muted-foreground hover:text-primary transition-colors flex-shrink-0 w-auto px-4 py-2 rounded-md",
-                        isActive ? 'text-primary font-bold' : ''
+                        "flex items-center justify-center text-sm text-muted-foreground hover:text-primary transition-colors flex-shrink-0 w-auto px-4 py-2 rounded-md",
+                        isActive ? 'text-primary font-bold bg-primary/10' : ''
                     )}>
                     {isAiProfile ? (
                         <div className="flex items-center gap-1">
@@ -64,7 +65,10 @@ export function MobileSecondaryHeader() {
                             <span className="text-center leading-tight">{label}</span>
                         </div>
                     ) : (
+                       <>
+                        <Icon className={cn("h-5 w-5 mr-2", isActive ? "text-primary" : "text-muted-foreground")} />
                         <span className="text-center leading-tight">{label}</span>
+                       </>
                     )}
                     </Link>
                 )
