@@ -133,7 +133,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                     </div>
                 )}
                 
-                <div className={cn(
+                <div id="TIMKIEM01" className={cn(
                     "p-4 md:p-6",
                     isSearchExpanded ? "block" : "hidden md:block"
                 )}>
@@ -177,7 +177,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                             <Label htmlFor="search-location" className="text-foreground text-sm">Địa điểm làm việc</Label>
                             <Select onValueChange={(value) => handleFilterChange('location', value === 'all' ? [] : [value])} value={Array.isArray(filters.location) ? filters.location[0] || 'all' : 'all'}>
                                 <SelectTrigger id="search-location">
-                                <SelectValue placeholder="Tất cả địa điểm" />
+                                <SelectValue placeholder="Tất cả Nhật Bản" />
                                 </SelectTrigger>
                                 <SelectContent className="max-h-[300px]">
                                     <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
