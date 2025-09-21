@@ -96,10 +96,10 @@ const EmptyProfileView = () => {
     
           localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
           setIsDialogOpen(false);
-          router.push('/my-jobs?highlight=suggested');
+          router.push('/ho-so-cua-toi?highlight=suggested');
         } else {
           sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
-          sessionStorage.setItem('postLoginRedirect', '/my-jobs?highlight=suggested');
+          sessionStorage.setItem('postLoginRedirect', '/ho-so-cua-toi?highlight=suggested');
           setIsDialogOpen(false);
           setIsConfirmLoginOpen(true);
         }
@@ -114,9 +114,9 @@ const EmptyProfileView = () => {
         setIsCreateDetailOpen(false);
         setIsDialogOpen(false);
         if (method === 'ai') {
-            router.push('/ai-profile');
+            router.push('/tao-ho-so-ai');
         } else {
-            router.push('/register');
+            router.push('/dang-ky');
         }
     };
     
@@ -790,7 +790,7 @@ const LoggedInView = () => {
                        ) : (
                            <div className="text-center py-8 text-muted-foreground">
                              <p>Hãy xem và lưu một vài công việc để chúng tôi có thể gợi ý tốt hơn cho bạn!</p>
-                             <Button asChild variant="link" className="mt-2"><Link href="/jobs">Bắt đầu tìm kiếm</Link></Button>
+                             <Button asChild variant="link" className="mt-2"><Link href="/viec-lam">Bắt đầu tìm kiếm</Link></Button>
                            </div>
                        )}
                     </AccordionContent>
@@ -1312,3 +1312,4 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
