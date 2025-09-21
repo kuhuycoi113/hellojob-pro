@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const AiProfileClientPage = dynamic(() => import('./client.tsx'), {
+const AiProfileClientPage = dynamic(() => import('@/app/ai-profile/client'), {
   ssr: false,
   loading: () => (
     <div className="bg-secondary flex-grow">
