@@ -116,7 +116,7 @@ export default function MatchingCandidatesPage({ params }: { params: { id: strin
             <div className="container mx-auto px-4 md:px-6 py-8">
                 <div className="mb-6">
                     <Button asChild variant="outline" size="sm">
-                        <Link href="/doi-tac/bang-dieu-khien"><ArrowLeft className="mr-2 h-4 w-4" />Quay lại Bảng điều khiển</Link>
+                        <Link href="/doi-tac"><ArrowLeft className="mr-2 h-4 w-4" />Quay lại Bảng điều khiển</Link>
                     </Button>
                 </div>
 
