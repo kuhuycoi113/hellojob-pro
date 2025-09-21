@@ -36,6 +36,7 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from './candidate-edit-dialog';
+import type { SearchFilters } from './job-search/search-results';
 
 
 const formatCurrency = (value?: string) => {
@@ -89,7 +90,7 @@ const validateProfileForApplication = (profile: CandidateProfile): boolean => {
 };
 
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = false }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean }) => {
+export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = false, appliedFilters }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters }) => {
   const { isLoggedIn } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -181,6 +182,16 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
 
+  const shouldShowFee = () => {
+    if (!job.netFee && !job.netFeeNoTicket) return false;
+    
+    if (job.visaDetail === 'Đặc định đầu Việt' && appliedFilters) {
+        return !!appliedFilters.netFee || !!appliedFilters.netFeeNoTicket;
+    }
+
+    return true; // For all other cases, show if data exists
+  };
+
   if (variant === 'list-item') {
      return (
         <>
@@ -200,7 +211,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         
                         <div className="flex flex-grow flex-col">
                             <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
-                            <div className="mb-2 flex flex-wrap items-center gap-2">
+                             <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
                                 {job.visaDetail && (
                                     <Badge
                                         variant="outline"
@@ -215,6 +226,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 )}
                                 {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
                                 <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
+                                {shouldShowFee() && job.netFee && (
+                                    <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">Phí có vé: ${formatCurrency(job.netFee)}</Badge>
+                                )}
+                                {shouldShowFee() && job.netFeeNoTicket && (
+                                    <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">Phí không vé: ${formatCurrency(job.netFeeNoTicket)}</Badge>
+                                )}
                             </div>
                             <div className="text-sm text-muted-foreground">
                                 <p className="flex items-center gap-1.5">
