@@ -33,8 +33,15 @@ export default function HomePage() {
             const visaSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
             if(visaSlug) query.set('loai-visa', visaSlug);
         }
+        if (criteria?.gender) {
+            query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
+        }
+        if (criteria?.sortBy) {
+            query.set('sap-xep', 'salary_desc');
+        }
+
         // If there's a text query but AI returns no specific criteria, pass the raw query for keyword matching.
-        if (!criteria?.industry && !criteria?.workLocation && !criteria?.visaType) {
+        if (!criteria?.industry && !criteria?.workLocation && !criteria?.visaType && !criteria.gender && !criteria.sortBy) {
              query.set('q', filters.q);
         }
 
@@ -78,5 +85,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-    

@@ -2,16 +2,14 @@
 'use server';
 /**
  * @fileOverview An AI flow to recommend jobs to candidates based on a query.
- * It extracts structured criteria from the user's query, filters the job list,
- * and returns the top 10 results sorted by date and salary.
+ * It extracts structured criteria from the user's query.
  *
  * - recommendJobs - A function that handles the job recommendation process.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import {jobData, Job} from '@/lib/mock-data';
-import { JobSearchCriteriaSchema, JobRecommendationResponseSchema, type JobRecommendationResponse } from '@/ai/schemas/recommend-jobs-schema';
+import {JobSearchCriteriaSchema} from '@/ai/schemas/recommend-jobs-schema';
 
 export async function recommendJobs(query: string): Promise<JobSearchCriteriaSchema | null> {
   return recommendJobsFlow(query);

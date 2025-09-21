@@ -9,7 +9,7 @@ import { Job, jobData } from '@/lib/mock-data';
 import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/location-data';
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
-import { industriesByJobType, type Industry } from '@/lib/industry-data';
+import { industriesByJobType, type Industry, allIndustries } from '@/lib/industry-data';
 import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts } from '@/lib/visa-data';
 import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 
@@ -166,8 +166,6 @@ const parsePhysicalRequirement = (reqStr?: string): [number, number] => {
     return [0, Infinity];
 };
 
-
-const allIndustries: Industry[] = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
 const tattooRequirements = [
     { name: "Không yêu cầu", slug: "all" },
@@ -730,7 +728,13 @@ export default function JobSearchPageContent() {
                  const visaSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
                  if(visaSlug) query.set(keyMap['visa'], visaSlug);
             }
-             if (!criteria?.industry && !criteria?.workLocation && !criteria?.visaType) {
+             if (criteria?.gender) {
+                query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
+            }
+            if (criteria?.sortBy) {
+                query.set('sap-xep', 'salary_desc');
+            }
+            if (!criteria?.industry && !criteria?.workLocation && !criteria?.visaType && !criteria.gender && !criteria.sortBy) {
                 query.set('q', filters.q);
             }
         } else {
@@ -767,5 +771,3 @@ export default function JobSearchPageContent() {
         </div>
     );
 }
-
-    
