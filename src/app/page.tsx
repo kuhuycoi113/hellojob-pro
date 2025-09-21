@@ -11,10 +11,10 @@ import type { SearchFilters } from '@/components/job-search/search-results';
 export default function HomePage() {
   const router = useRouter();
 
-  const handleSearch = (filters: SearchFilters) => {
+  const handleSearch = (filters: Partial<SearchFilters>) => {
     const query = new URLSearchParams();
     if (filters.q) query.set('q', filters.q);
-    if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
+    if (filters.visaDetail && filters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
     if (filters.industry && filters.industry !== 'all') query.set('nganh-nghe', filters.industry);
     
     // Handle location which can be an array

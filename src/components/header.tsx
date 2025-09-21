@@ -84,14 +84,18 @@ const SearchDialog = () => {
     };
 
     const handleVisaDetailChange = (value: string) => {
-        const newFilters: Partial<SearchFilters> = { visaDetail: value };
-        const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
-        if (parentType) {
-            newFilters.visa = parentType;
-            newFilters.industry = ''; // Reset industry
-             const industries = industriesByJobType[parentType as keyof typeof industriesByJobType] || [];
-             setAvailableIndustries(industries);
+        const newFilters: Partial<SearchFilters> = { visaDetail: value === 'all' ? '' : value };
+        
+        if (value && value !== 'all') {
+            const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
+            if (parentType && filters.visa !== parentType) {
+                newFilters.visa = parentType;
+                newFilters.industry = ''; // Reset industry
+                 const industries = industriesByJobType[parentType as keyof typeof industriesByJobType] || [];
+                 setAvailableIndustries(industries);
+            }
         } else {
+            newFilters.visa = '';
             setAvailableIndustries(Object.values(industriesByJobType).flat());
         }
         onFilterChange(newFilters);
@@ -104,13 +108,13 @@ const SearchDialog = () => {
     const handleSearch = () => {
         const query = new URLSearchParams();
         if (filters.q) query.set('q', filters.q);
-        if (filters.visaDetail) query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
-        if (filters.industry) query.set('nganh-nghe', filters.industry);
-        if (filters.location && filters.location.length > 0) {
+        if (filters.visaDetail && filters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
+        if (filters.industry && filters.industry !== 'all') query.set('nganh-nghe', filters.industry);
+        if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
             filters.location.forEach(loc => query.append('dia-diem', loc));
         }
         setIsSearchDialogOpen(false);
-        router.push(`/tim-viec-lam?${'q'}=${query.toString()}`);
+        router.push(`/tim-viec-lam?${query.toString()}`);
     }
 
     return (
@@ -142,10 +146,10 @@ const SearchDialog = () => {
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                          <div className="space-y-2">
                             <Label>Chi tiết loại hình visa</Label>
-                            <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail}>
-                                <SelectTrigger><SelectValue placeholder="Tất cả loại hình" /></SelectTrigger>
+                            <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail || 'all'}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Tất cả loại hình</SelectItem>
+                                    <SelectItem value="all">Tất cả loại hình</SelectItem>
                                     {japanJobTypes.map(type => (
                                         <SelectGroup key={type.slug}>
                                             <SelectLabel>{type.name}</SelectLabel>
@@ -159,10 +163,10 @@ const SearchDialog = () => {
                         </div>
                         <div className="space-y-2">
                             <Label>Ngành nghề</Label>
-                            <Select onValueChange={(value) => handleFilterChange('industry', value)} value={filters.industry}>
-                                <SelectTrigger><SelectValue placeholder="Tất cả ngành nghề" /></SelectTrigger>
+                            <Select onValueChange={(value) => handleFilterChange('industry', value === 'all' ? '' : value)} value={filters.industry || 'all'}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
-                                     <SelectItem value="">Tất cả ngành nghề</SelectItem>
+                                     <SelectItem value="all">Tất cả ngành nghề</SelectItem>
                                     {availableIndustries.map((industry) => (
                                         <SelectItem key={industry.slug} value={industry.slug}>
                                             {industry.name}
