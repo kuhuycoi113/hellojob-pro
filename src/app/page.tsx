@@ -33,7 +33,7 @@ export default function HomePage() {
             const visaSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
             if(visaSlug) query.set('loai-visa', visaSlug);
         }
-        // If there's a text query but AI returns no criteria, pass the raw query.
+        // If there's a text query but AI returns no specific criteria, pass the raw query for keyword matching.
         if (!criteria?.industry && !criteria?.workLocation && !criteria?.visaType) {
              query.set('q', filters.q);
         }

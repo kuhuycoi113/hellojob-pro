@@ -491,7 +491,7 @@ export default function JobSearchPageContent() {
 
 
         const count = jobData.filter(job => {
-             let queryMatch = true;
+            let queryMatch = true;
             if (q) {
                 const lowerQ = q.toLowerCase();
                 queryMatch = job.id.toLowerCase().includes(lowerQ) ||
@@ -729,6 +729,9 @@ export default function JobSearchPageContent() {
             if (criteria?.visaType) {
                  const visaSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
                  if(visaSlug) query.set(keyMap['visa'], visaSlug);
+            }
+             if (!criteria?.industry && !criteria?.workLocation && !criteria?.visaType) {
+                query.set('q', filters.q);
             }
         } else {
             if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set(keyMap['visaDetail'], filters.visaDetail);
