@@ -53,7 +53,7 @@ import { mainNavLinks, quickAccessLinks, mobileFooterLinks } from '@/lib/nav-dat
 import { useAuth, type Role } from '@/contexts/AuthContext';
 import { Industry, industriesByJobType, allIndustries } from '@/lib/industry-data';
 import { AuthDialog } from './auth-dialog';
-import { locations, allJapanLocations } from '@/lib/location-data';
+import { locations, allJapanLocations, japanRegions } from '@/lib/location-data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileSecondaryHeader } from './mobile-secondary-header';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from './ui/select';
@@ -156,8 +156,10 @@ const SearchDialog = () => {
         if (!filters.q) {
             if (filters.visaDetail && filters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
             if (filters.industry && filters.industry !== 'all') query.set('nganh-nghe', filters.industry);
-            if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
+             if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
                 filters.location.forEach(loc => query.append('dia-diem', loc));
+            } else if (typeof filters.location === 'string' && filters.location && filters.location !== 'all') {
+                query.append('dia-diem', filters.location);
             }
         }
         
@@ -192,7 +194,7 @@ const SearchDialog = () => {
                             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                         />
                     </div>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                          <div className="space-y-2">
                             <Label>Chi tiết loại hình visa</Label>
                             <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail || 'all'}>
@@ -220,6 +222,24 @@ const SearchDialog = () => {
                                         <SelectItem key={industry.slug} value={industry.slug}>
                                             {industry.name}
                                         </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Địa điểm làm việc</Label>
+                            <Select onValueChange={(value) => handleFilterChange('location', value === 'all' ? [] : [value])} value={Array.isArray(filters.location) ? (filters.location[0] || 'all') : 'all'}>
+                                <SelectTrigger><SelectValue placeholder="Tất cả Nhật Bản"/></SelectTrigger>
+                                 <SelectContent className="max-h-[300px]">
+                                    <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                                    {japanRegions.map((region) => (
+                                        <SelectGroup key={region.slug}>
+                                            <SelectLabel>{region.name}</SelectLabel>
+                                            {region.slug !== 'hokkaido' && region.slug !== 'okinawa' && (
+                                              <SelectItem value={region.slug}>Toàn bộ vùng {region.name}</SelectItem>
+                                            )}
+                                            {region.prefectures.map(p => <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>)}
+                                        </SelectGroup>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -838,3 +858,4 @@ const LoggedOutContent = () => {
     </>
   );
 }
+
