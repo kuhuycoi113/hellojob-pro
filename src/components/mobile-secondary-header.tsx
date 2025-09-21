@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import Link from 'next/link';
@@ -18,6 +17,11 @@ export function MobileSecondaryHeader() {
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const isMobile = useIsMobile();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
 
   useEffect(() => {
@@ -25,7 +29,7 @@ export function MobileSecondaryHeader() {
   }, [pathname]);
 
   useEffect(() => {
-    if (!isMobile) {
+    if (!isClient || !isMobile) {
       setShowNav(true);
       return;
     }
@@ -41,7 +45,13 @@ export function MobileSecondaryHeader() {
 
     window.addEventListener('scroll', controlNavbar);
     return () => window.removeEventListener('scroll', controlNavbar);
-  }, [isMobile, lastScrollY]);
+  }, [isClient, isMobile, lastScrollY]);
+
+  if (!isClient) {
+    return (
+        <header className="md:hidden sticky top-16 z-30 w-full bg-background/95 h-14 border-b" />
+    )
+  }
 
   return (
     <header className={cn(
@@ -50,7 +60,7 @@ export function MobileSecondaryHeader() {
     )}>
        <div className="w-full overflow-x-auto whitespace-nowrap no-scrollbar">
           <div className="flex items-center h-14 px-2">
-            {mobileFooterLinks.map(({ href, icon: Icon, label }) => {
+            {mobileFooterLinks.map(({ href, label }) => {
                 const isActive = (href !== '/' && activePath.startsWith(href)) || (href === '/' && activePath === '/');
                 const isAiProfile = href === '/ai-profile';
                 
@@ -77,3 +87,5 @@ export function MobileSecondaryHeader() {
     </header>
   );
 }
+
+    

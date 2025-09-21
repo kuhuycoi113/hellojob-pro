@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import Link from 'next/link';
@@ -94,7 +93,7 @@ export function Header() {
   }, []);
   
   useEffect(() => {
-    if (!isMobile) {
+    if (!isClient || !isMobile) {
       setShowNav(true);
       return;
     }
@@ -113,7 +112,7 @@ export function Header() {
     return () => {
       window.removeEventListener('scroll', controlNavbar);
     };
-  }, [isMobile, lastScrollY]);
+  }, [isClient, isMobile, lastScrollY]);
 
 
   const handleCreateProfileRedirect = () => {
@@ -538,7 +537,7 @@ const LoggedOutContent = () => {
     <>
     <div className={cn(
         "sticky top-0 z-50 w-full transition-transform duration-300",
-        !showNav && isMobile && "-translate-y-full"
+        isClient && !showNav && isMobile && "-translate-y-full"
     )}>
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
@@ -578,46 +577,48 @@ const LoggedOutContent = () => {
                                 </DialogContent>
                             </Dialog>
                             <Button asChild>
-                                <Link href="/my-jobs">
-                                Trang việc làm
+                                <Link href="/partner/dashboard">
+                                Nhà tuyển dụng
                                 </Link>
                             </Button>
                             <MainMenu />
                         </>
                     )}
                 </div>
-                <div className="md:hidden flex items-center gap-2">
-                    {isClient && !isLoggedIn && (
-                        <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
-                    )}
-                    <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-                        <DialogTrigger asChild>
-                            <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" size="sm">Tạo</Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-2xl">
-                            {renderDialogContent()}
-                        </DialogContent>
-                    </Dialog>
-                    <Button asChild variant="default" size="sm">
-                        <Link href="/my-jobs">Việc</Link>
-                    </Button>
-                    <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                        <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <Menu />
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent className="flex flex-col p-0">
-                            <SheetHeader className="p-4 border-b">
-                                <SheetTitle><Logo /></SheetTitle>
-                            </SheetHeader>
-                            {isLoggedIn ? <LoggedInContent /> : <LoggedOutContent />}
-                        </SheetContent>
-                    </Sheet>
-                </div>
+                {isClient && isMobile && (
+                    <div className="md:hidden flex items-center gap-2">
+                        {!isLoggedIn && (
+                            <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
+                        )}
+                        <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                            <DialogTrigger asChild>
+                                <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" size="sm">Tạo</Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-2xl">
+                                {renderDialogContent()}
+                            </DialogContent>
+                        </Dialog>
+                        <Button asChild variant="default" size="sm">
+                            <Link href="/my-jobs">Việc</Link>
+                        </Button>
+                        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                            <SheetTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                    <Menu />
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent className="flex flex-col p-0">
+                                <SheetHeader className="p-4 border-b">
+                                    <SheetTitle><Logo /></SheetTitle>
+                                </SheetHeader>
+                                {isLoggedIn ? <LoggedInContent /> : <LoggedOutContent />}
+                            </SheetContent>
+                        </Sheet>
+                    </div>
+                )}
             </div>
         </header>
-        <MobileSecondaryHeader />
+        {isClient && isMobile && <MobileSecondaryHeader />}
     </div>
      <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
         <AlertDialogContent>
@@ -663,11 +664,5 @@ const LoggedOutContent = () => {
     </>
   );
 }
-
-
-
-
-
-    
 
     
