@@ -117,7 +117,7 @@ const SearchDialog = () => {
         <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
             <DialogTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
-                    <Search className="h-5 w-5" />
+                    <Image src="/img/search02.png" alt="Search Icon" width={20} height={20} />
                     <span className="sr-only">Tìm kiếm</span>
                 </Button>
             </DialogTrigger>
@@ -776,6 +776,7 @@ const LoggedOutContent = () => {
     </>
   );
 }
+
 
 
 
