@@ -146,16 +146,14 @@ const generateUniqueJobId = (index: number): string => {
         num = Math.floor(num / chars.length);
     }
 
-    const creationDate = new Date();
-    creationDate.setDate(creationDate.getDate() - (index % 30)); 
-    const year = creationDate.getFullYear().toString().slice(-2);
-    const month = (creationDate.getMonth() + 1).toString().padStart(2, '0');
-    const prefix = year + month;
+    // Static prefix for consistent ID generation
+    const prefix = "2408"; 
 
     const newId = prefix + deterministicPart;
     
     if (existingJobIds.has(newId)) {
-        return generateUniqueJobId(index + 3000); 
+        // If collision happens (unlikely with this large pool), increment index and retry
+        return generateUniqueJobId(index + jobData.length + 1); 
     }
     
     existingJobIds.add(newId);
