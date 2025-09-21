@@ -54,6 +54,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     let conversation = conversations.find(c => c.participants.some(p => p.id === targetUser.id));
     
     if (!conversation) {
+        // Use the target user (consultant) as the sender of the initial message
         const initialMessage = `Chào bạn, tôi là ${targetUser.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`;
         
         conversation = {
@@ -62,7 +63,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
             messages: [
                 {
                     id: `msg-${Date.now()}`,
-                    sender: helloJobBot, // The first message is always from the bot system
+                    sender: targetUser, // The sender is now the consultant
                     text: initialMessage,
                     timestamp: new Date().toISOString()
                 }
@@ -104,83 +105,16 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         conversations[convoIndex] = updatedConversation;
     }
 
-    if (text) {
-        // Simple greeting detection
-        const lowerCaseText = text.toLowerCase().trim();
-        const greetings = ['chào', 'hello', 'hi', 'xin chào'];
-        if (greetings.some(greeting => lowerCaseText.startsWith(greeting))) {
-            const greetingResponse: Message = {
-                id: `msg-greeting-${Date.now()}`,
-                sender: helloJobBot,
-                text: 'Chào bạn, HelloJob có thể giúp gì cho bạn hôm nay?',
-                timestamp: new Date().toISOString(),
-                 suggestedReplies: ["Tôi muốn tìm việc", "Tôi cần tư vấn", "Tôi muốn xem lại hồ sơ"]
-            };
-            setActiveConversation(prev => prev ? { ...prev, messages: [...prev.messages, greetingResponse] } : null);
-            return;
-        }
+    // AI logic is removed. The conversation now waits for a real person to reply.
 
-
-        const loadingMessage: Message = {
-            id: `msg-loading-${Date.now()}`,
-            sender: helloJobBot,
-            text: '...',
-            isLoading: true,
-            timestamp: new Date().toISOString(),
-        };
-        setActiveConversation(prev => prev ? { ...prev, messages: [...prev.messages, loadingMessage] } : null);
-
-        try {
-            const aiResult = await recommendJobs(text);
-            const aiResponseMessage: Message = {
-                id: `msg-ai-${Date.now()}`,
-                sender: helloJobBot,
-                text: aiResult.message,
-                recommendations: aiResult.recommendations,
-                suggestedReplies: aiResult.suggestedReplies || [],
-                timestamp: new Date().toISOString(),
-            };
-
-            setActiveConversation(prev => {
-                if (!prev) return null;
-                const filteredMessages = prev.messages.filter(m => !m.isLoading);
-                const newMessages = [...filteredMessages, aiResponseMessage];
-                const newConvo = { ...prev, messages: newMessages };
-                
-                const idx = conversations.findIndex(c => c.id === newConvo.id);
-                if (idx !== -1) conversations[idx] = newConvo;
-
-                return newConvo;
-            });
-
-        } catch (error) {
-             console.error("AI Recommendation Error:", error);
-             const errorMessage: Message = {
-                id: `msg-error-${Date.now()}`,
-                sender: helloJobBot,
-                text: 'Rất tiếc, đã có lỗi xảy ra khi tìm kiếm việc làm. Bạn có muốn kết nối với một tư vấn viên không?',
-                timestamp: new Date().toISOString(),
-             };
-             setActiveConversation(prev => {
-                if (!prev) return null;
-                const filteredMessages = prev.messages.filter(m => !m.isLoading);
-                const newMessages = [...filteredMessages, errorMessage];
-                const newConvo = { ...prev, messages: newMessages };
-                
-                const idx = conversations.findIndex(c => c.id === newConvo.id);
-                if (idx !== -1) conversations[idx] = newConvo;
-
-                return newConvo;
-            });
-        }
-    } else if (attachment) {
-        // Simulate human consultant response for file uploads
+    if (attachment) {
+        // Simulate human consultant response for file uploads for demo purposes
         setTimeout(() => {
             const responseText = `Đã nhận được tệp: ${attachment.fileName}`;
 
             const consultantResponse: Message = {
                 id: `msg-${Date.now() + 1}`,
-                sender: helloJobBot,
+                sender: assignedConsultant || helloJobBot,
                 text: responseText,
                 timestamp: new Date().toISOString(),
             };
