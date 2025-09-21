@@ -42,12 +42,12 @@ export function Footer() {
           <div>
             <h4 className="font-bold mb-4">Liên hệ</h4>
             <p className="text-sm text-muted-foreground">
-              HelloJob JSC<br />
-              Email: contact@hellojob.vn<br />
-              Hotline: 1900 1234
+              Công ty cổ phần HelloJob<br />
+              Email: chairman@hellojob.jp<br />
+              Hotline: (+84) 038 666 7 999
             </p>
             <div className="mt-4 flex gap-4 items-center">
-              <Link href="http://online.gov.vn/Home/WebDetails/80054" target="_blank" rel="noopener noreferrer">
+              <Link href="http://online.gov.vn/Home/WebDetails/80054" target="_blank" rel="noopener noreferrer" className="inline-block">
                 <Image 
                   src="/img/DADANGKYBCT.png"
                   alt="Đã đăng ký Bộ Công Thương"
