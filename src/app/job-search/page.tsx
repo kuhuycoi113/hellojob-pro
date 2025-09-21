@@ -43,6 +43,7 @@ const initialSearchFilters: SearchFilters = {
     visionRequirement: 'all',
     dominantHand: '',
     otherSkillRequirement: [],
+    companyArrivalTime: '',
 };
 
 // Helper function to escape regex special characters
@@ -58,7 +59,7 @@ const createSlug = (str: string) => {
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/đ/g, "d")
         .replace(/\s+/g, '-')
-        .replace(/[^\w\-.]+/g, '');
+        .replace(/[^\w\-]+/g, '');
 };
 
 
@@ -199,7 +200,7 @@ function JobSearchPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement, specialConditions
+            otherSkillRequirement, specialConditions, companyArrivalTime,
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -334,8 +335,12 @@ function JobSearchPageContent() {
                  return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
             });
 
+            // Assuming job.companyArrivalTime exists in the future
+            // @ts-ignore
+            const companyArrivalTimeMatch = !companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === companyArrivalTime);
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch;
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && companyArrivalTimeMatch;
         });
 
         // Sorting logic
@@ -379,7 +384,7 @@ function JobSearchPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement, specialConditions
+            otherSkillRequirement, specialConditions, companyArrivalTime,
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -508,7 +513,10 @@ function JobSearchPageContent() {
                  return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
             });
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch;
+             // @ts-ignore
+            const companyArrivalTimeMatch = !companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === companyArrivalTime);
+
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && companyArrivalTimeMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -551,6 +559,12 @@ function JobSearchPageContent() {
                 newFilters['dominantHand'] = value;
             } else if (key === 'sl') {
                 newFilters['quantity'] = value;
+            } else if (key === 'thoidiem') {
+                // Convert slug back to display value
+                const parts = value.split('-');
+                if (parts.length === 3 && parts[0] === 'thang') {
+                     newFilters['companyArrivalTime'] = `Tháng ${parts[1]}/${parts[2]}`;
+                }
             }
              else {
                  // @ts-ignore
@@ -606,6 +620,9 @@ function JobSearchPageContent() {
                         query.set('hand', String(value));
                     } else if (key === 'quantity') {
                         query.set('sl', String(value));
+                    } else if (key === 'companyArrivalTime' && typeof value === 'string') {
+                        const slug = value.toLowerCase().replace('tháng ', 'thang-').replace('/', '-');
+                        query.set('thoidiem', slug);
                     }
                     else {
                         query.set(key, String(value));
