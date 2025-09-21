@@ -32,6 +32,7 @@ const initialSearchFilters: SearchFilters = {
     annualBonus: '',
     specialConditions: [],
     languageRequirement: '',
+    englishRequirement: '',
     educationRequirement: '',
     yearsOfExperience: '',
     tattooRequirement: '',
@@ -140,6 +141,21 @@ const languageLevels = [
     { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
 ];
 
+const englishLevels = [
+    { name: 'TOEIC 900+', slug: 'toeic-900' },
+    { name: 'TOEIC 800+', slug: 'toeic-800' },
+    { name: 'TOEIC 700+', slug: 'toeic-700' },
+    { name: 'TOEIC 600+', slug: 'toeic-600' },
+    { name: 'TOEIC 500+', slug: 'toeic-500' },
+    { name: 'IELTS 7.0+', slug: 'ielts-7.0' },
+    { name: 'IELTS 6.0+', slug: 'ielts-6.0' },
+    { name: 'IELTS 5.0+', slug: 'ielts-5.0' },
+    { name: 'Giao tiếp tốt', slug: 'giao-tiep-tot' },
+    { name: 'Giao tiếp cơ bản', slug: 'giao-tiep-co-ban' },
+    { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
+];
+
+
 const educationLevels = [
     { name: "Tất cả", slug: "all" },
     { name: "Không yêu cầu", slug: "khong-yeu-cau" },
@@ -201,7 +217,7 @@ function JobSearchPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement, specialConditions, companyArrivalTime, workShift,
+            otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement,
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -311,8 +327,8 @@ function JobSearchPageContent() {
             let weightMatch = true;
             if (weight) {
                 const [jobMinWeight, jobMaxWeight] = parsePhysicalRequirement(job.weightRequirement);
-                const [filterMinWeight, filterMaxWeight] = weight;
-                weightMatch = filterMinWeight <= jobMaxWeight && filterMaxWeight >= jobMinWeight;
+                const [filterMinWeight, filterMaxHeight] = weight;
+                weightMatch = filterMinWeight <= jobMaxWeight && filterMaxHeight >= jobMinWeight;
             }
 
             const visionMatch = !visionRequirement || visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
@@ -322,6 +338,8 @@ function JobSearchPageContent() {
 
             const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
             const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
+            
+            const englishReqMatch = !englishRequirement || englishRequirement === 'all' || !job.languageRequirement || createSlug(job.languageRequirement).includes(englishRequirement);
 
             const educationReqMatch = !eduReqName || eduReqName === 'Tất cả' || !job.educationRequirement || job.educationRequirement === eduReqName;
 
@@ -341,7 +359,7 @@ function JobSearchPageContent() {
             const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(workShift));
 
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch;
         });
 
         // Sorting logic
@@ -385,7 +403,7 @@ function JobSearchPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement, specialConditions, companyArrivalTime, workShift,
+            otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement,
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -489,8 +507,8 @@ function JobSearchPageContent() {
             let weightMatch = true;
             if (weight) {
                 const [jobMinWeight, jobMaxWeight] = parsePhysicalRequirement(job.weightRequirement);
-                const [filterMinWeight, filterMaxWeight] = weight;
-                weightMatch = filterMinWeight <= jobMaxWeight && filterMaxWeight >= jobMinWeight;
+                const [filterMinWeight, filterMaxHeight] = weight;
+                weightMatch = filterMinWeight <= jobMaxWeight && filterMaxHeight >= jobMinWeight;
             }
 
             const visionMatch = !visionRequirement || visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(visionRequirement);
@@ -500,6 +518,8 @@ function JobSearchPageContent() {
 
             const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
             const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
+            
+            const englishReqMatch = !englishRequirement || englishRequirement === 'all' || !job.languageRequirement || createSlug(job.languageRequirement).includes(englishRequirement);
 
             const educationReqMatch = !eduReqName || eduReqName === 'Tất cả' || !job.educationRequirement || job.educationRequirement === eduReqName;
 
@@ -518,7 +538,7 @@ function JobSearchPageContent() {
              
              const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(workShift));
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -555,6 +575,8 @@ function JobSearchPageContent() {
                 newFilters['tattooRequirement'] = value;
             } else if (key === 'lang') {
                 newFilters['languageRequirement'] = value;
+            } else if (key === 'eng') {
+                newFilters['englishRequirement'] = value;
             } else if (key === 'edu') {
                 newFilters['educationRequirement'] = value;
             } else if (key === 'hand') {
@@ -621,6 +643,8 @@ function JobSearchPageContent() {
                         query.set('tattoo', String(value));
                     } else if (key === 'languageRequirement') {
                         query.set('lang', String(value));
+                    } else if (key === 'englishRequirement') {
+                        query.set('eng', String(value));
                     } else if (key === 'educationRequirement') {
                         query.set('edu', String(value));
                     } else if (key === 'dominantHand') {

@@ -62,11 +62,19 @@ const languageLevels = [
     { name: "Không yêu cầu", slug: "khong-yeu-cau" },
 ];
 const englishLevels = [
-    "TOEIC 900", "TOEIC 800", "TOEIC 700", "TOEIC 600", "TOEIC 500", "TOEIC 400",
-    "IELTS 9.0", "IELTS 8.0", "IELTS 7.0", "IELTS 6.0", "IELTS 5.0", "IELTS 4.0",
-    "Giao tiếp IELTS 9.0", "Giao tiếp IELTS 8.0", "Giao tiếp IELTS 7.0", "Giao tiếp IELTS 6.0", "Giao tiếp IELTS 5.0", "Giao tiếp IELTS 4.0",
-    "Trình độ tương đương 9.0", "Trình độ tương đương 8.0", "Trình độ tương đương 7.0", "Trình độ tương đương 6.0", "Trình độ tương đương 5.0", "Trình độ tương đương 4.0"
+    { name: 'TOEIC 900+', slug: 'toeic-900' },
+    { name: 'TOEIC 800+', slug: 'toeic-800' },
+    { name: 'TOEIC 700+', slug: 'toeic-700' },
+    { name: 'TOEIC 600+', slug: 'toeic-600' },
+    { name: 'TOEIC 500+', slug: 'toeic-500' },
+    { name: 'IELTS 7.0+', slug: 'ielts-7.0' },
+    { name: 'IELTS 6.0+', slug: 'ielts-6.0' },
+    { name: 'IELTS 5.0+', slug: 'ielts-5.0' },
+    { name: 'Giao tiếp tốt', slug: 'giao-tiep-tot' },
+    { name: 'Giao tiếp cơ bản', slug: 'giao-tiep-co-ban' },
+    { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
 ];
+
 const educationLevels = [
     { name: "Tất cả", slug: "all" },
     { name: "Không yêu cầu", slug: "khong-yeu-cau" },
@@ -417,8 +425,10 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
 
             const arrivalTimeMatch = !filtersToApply.companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === filtersToApply.companyArrivalTime);
             const workShiftMatch = !filters.workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(filters.workShift));
+            
+            const englishRequirementMatch = !filters.englishRequirement || filters.englishRequirement === 'all' || !job.languageRequirement || createSlug(job.languageRequirement).includes(filters.englishRequirement);
 
-            return visaMatch && industryMatch && jobDetailMatch && expReqMatch && yearsOfExperienceMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch;
+            return visaMatch && industryMatch && jobDetailMatch && expReqMatch && yearsOfExperienceMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishRequirementMatch;
         });
 
         // Count jobs in the pre-filtered list
@@ -1063,10 +1073,11 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 {showEnglishLevelFilter && (
                                  <div className="space-y-2">
                                     <Label className="font-semibold">Trình độ tiếng Anh</Label>
-                                    <Select>
-                                        <SelectTrigger className="mt-2"><SelectValue placeholder="Chọn trình độ" /></SelectTrigger>
+                                    <Select value={filters.englishRequirement} onValueChange={(value) => onFilterChange({ englishRequirement: value })}>
+                                        <SelectTrigger className={cn(filters.englishRequirement && filters.englishRequirement !== 'all' && "text-primary")}><SelectValue placeholder="Chọn trình độ" /></SelectTrigger>
                                         <SelectContent>
-                                            {englishLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                             <SelectItem value="all">Tất cả</SelectItem>
+                                            {englishLevels.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
