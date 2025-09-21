@@ -1,10 +1,9 @@
-
 'use client';
 
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const AiProfileClientPage = dynamic(() => import('@/app/tao-ho-so-ai/client'), {
+const AiProfileClientPage = dynamic(() => import('./client'), {
   ssr: false,
   loading: () => (
     <div className="bg-secondary flex-grow">
