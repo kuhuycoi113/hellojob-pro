@@ -51,10 +51,10 @@ export function Footer() {
                 <Image 
                   src="/img/DADANGKYBCT.png"
                   alt="Đã đăng ký Bộ Công Thương"
-                  width={150}
-                  height={56}
+                  width={200}
+                  height={75}
                   data-ai-hint="ministry of industry and trade logo"
-                  className="w-36 h-auto"
+                  className="w-48 h-auto"
                 />
               </Link>
             </div>
