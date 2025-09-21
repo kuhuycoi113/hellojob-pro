@@ -3,7 +3,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat, ChevronRight } from 'lucide-react';
+import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat, ChevronRight, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useState, useEffect } from 'react';
@@ -56,14 +56,129 @@ import { AuthDialog } from './auth-dialog';
 import { locations } from '@/lib/location-data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileSecondaryHeader } from './mobile-secondary-header';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from './ui/select';
 import { Label } from './ui/label';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { Input } from './ui/input';
+import { type SearchFilters } from './job-search/search-results';
 
 
 export const Logo = ({ className }: { className?: string }) => (
     <Image src="/img/HJPNG.png" alt="HelloJob Logo" width={120} height={40} className={cn("h-10 w-auto", className)} priority />
 );
+
+const SearchDialog = () => {
+    const router = useRouter();
+    const [filters, setFilters] = useState<Partial<SearchFilters>>({
+        q: '',
+        visaDetail: '',
+        industry: '',
+        location: [],
+    });
+    const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(Object.values(industriesByJobType).flat());
+    const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
+
+    const handleFilterChange = (field: keyof typeof filters, value: any) => {
+        setFilters(prev => ({...prev, [field]: value}));
+    };
+
+    const handleVisaDetailChange = (value: string) => {
+        const newFilters: Partial<SearchFilters> = { visaDetail: value };
+        const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
+        if (parentType) {
+            newFilters.visa = parentType;
+            newFilters.industry = ''; // Reset industry
+             const industries = industriesByJobType[parentType as keyof typeof industriesByJobType] || [];
+             setAvailableIndustries(industries);
+        } else {
+            setAvailableIndustries(Object.values(industriesByJobType).flat());
+        }
+        onFilterChange(newFilters);
+    };
+
+    const onFilterChange = (newFilters: Partial<SearchFilters>) => {
+        setFilters(prev => ({...prev, ...newFilters}));
+    };
+    
+    const handleSearch = () => {
+        const query = new URLSearchParams();
+        if (filters.q) query.set('q', filters.q);
+        if (filters.visaDetail) query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
+        if (filters.industry) query.set('nganh-nghe', filters.industry);
+        if (filters.location && filters.location.length > 0) {
+            filters.location.forEach(loc => query.append('dia-diem', loc));
+        }
+        setIsSearchDialogOpen(false);
+        router.push(`/tim-viec-lam?${query.toString()}`);
+    }
+
+    return (
+        <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
+            <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
+                    <Search className="h-5 w-5" />
+                    <span className="sr-only">Tìm kiếm</span>
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-xl">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-2xl">Tìm kiếm việc làm</DialogTitle>
+                    <DialogDescription>
+                        Nhập từ khóa, hoặc sử dụng bộ lọc để tìm cơ hội phù hợp nhất.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input 
+                            placeholder="Nhập chức danh, kỹ năng, hoặc tên công ty..." 
+                            className="pl-10 h-12 text-base"
+                            value={filters.q}
+                            onChange={(e) => handleFilterChange('q', e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                        />
+                    </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                         <div className="space-y-2">
+                            <Label>Chi tiết loại hình visa</Label>
+                            <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail}>
+                                <SelectTrigger><SelectValue placeholder="Tất cả loại hình" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="">Tất cả loại hình</SelectItem>
+                                    {japanJobTypes.map(type => (
+                                        <SelectGroup key={type.slug}>
+                                            <SelectLabel>{type.name}</SelectLabel>
+                                            {(visaDetailsByVisaType[type.slug] || []).map(detail => (
+                                                <SelectItem key={detail.slug} value={detail.slug}>{detail.name}</SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Ngành nghề</Label>
+                            <Select onValueChange={(value) => handleFilterChange('industry', value)} value={filters.industry}>
+                                <SelectTrigger><SelectValue placeholder="Tất cả ngành nghề" /></SelectTrigger>
+                                <SelectContent>
+                                     <SelectItem value="">Tất cả ngành nghề</SelectItem>
+                                    {availableIndustries.map((industry) => (
+                                        <SelectItem key={industry.slug} value={industry.slug}>
+                                            {industry.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button onClick={handleSearch} className="w-full sm:w-auto">Tìm kiếm</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 export function Header() {
   const pathname = usePathname();
@@ -556,9 +671,9 @@ const LoggedOutContent = () => {
                 ))}
                 </nav>
                 <div className="hidden md:flex items-center gap-2">
-                    
                     {isClient && (
                         <>
+                            <SearchDialog />
                             {isLoggedIn ? (
                                 <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
@@ -589,6 +704,7 @@ const LoggedOutContent = () => {
                 </div>
                 {isClient && isMobile && (
                     <div className="flex items-center gap-2">
+                        <SearchDialog />
                         {!isLoggedIn && (
                             <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
                         )}
@@ -600,9 +716,6 @@ const LoggedOutContent = () => {
                                 {renderDialogContent()}
                             </DialogContent>
                         </Dialog>
-                        <Button asChild variant="default" size="sm">
-                            <Link href="/viec-lam-cua-toi">Việc</Link>
-                        </Button>
                         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="ghost" size="icon">
@@ -668,4 +781,3 @@ const LoggedOutContent = () => {
 }
 
 
-    

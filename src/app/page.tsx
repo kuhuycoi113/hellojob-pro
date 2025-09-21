@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -12,6 +13,7 @@ export default function HomePage() {
 
   const handleSearch = (filters: SearchFilters) => {
     const query = new URLSearchParams();
+    if (filters.q) query.set('q', filters.q);
     if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
     if (filters.industry && filters.industry !== 'all') query.set('nganh-nghe', filters.industry);
     
@@ -25,8 +27,8 @@ export default function HomePage() {
     router.push(`/tim-viec-lam?${query.toString()}`);
   };
 
-  // Dummy filter state and handler for SearchModule on homepage
-  const [homeFilters, setHomeFilters] = React.useState<SearchFilters>({
+  const [homeFilters, setHomeFilters] = React.useState<Partial<SearchFilters>>({
+    q: '',
     visa: '', 
     visaDetail: '', 
     industry: '', 

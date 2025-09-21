@@ -13,24 +13,29 @@ import { industriesByJobType, type Industry } from "@/lib/industry-data";
 import { japanRegions, allJapanLocations } from '@/lib/location-data';
 import type { SearchFilters } from './search-results';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { Input } from '../ui/input';
+import { useRouter } from 'next/navigation';
 
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
 type SearchModuleProps = {
     onSearch: (filters: SearchFilters) => void;
-    filters: SearchFilters;
+    filters: Partial<SearchFilters>;
     onFilterChange: (newFilters: Partial<SearchFilters>) => void;
     showHero?: boolean;
 }
 
-export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = false }: SearchModuleProps) => {
+export const SearchModule = ({ onSearch, showHero = false, filters: initialFilters, onFilterChange: setFilters }: SearchModuleProps) => {
+  const [filters, setInternalFilters] = useState(initialFilters);
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
   const [isSearchExpanded, setIsSearchExpanded] = useState(showHero);
 
   useEffect(() => {
-    // On mobile, if we are not showing the hero (i.e., we are on the results page),
-    // the search bar should be collapsed by default.
+    setInternalFilters(initialFilters);
+  }, [initialFilters]);
+
+  useEffect(() => {
     if (!showHero && window.innerWidth < 768) {
       setIsSearchExpanded(false);
     } else {
@@ -47,6 +52,10 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
     const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
     setAvailableIndustries(uniqueIndustries);
   }, [filters.visa, filters.visaDetail]);
+  
+  const handleFilterChange = (field: keyof typeof filters, value: any) => {
+    setFilters(prev => ({...prev, [field]: value}));
+  };
 
   const handleVisaDetailChange = (value: string) => {
     const newFilters: Partial<SearchFilters> = { visaDetail: value };
@@ -56,68 +65,31 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
         newFilters.visa = parentType;
         newFilters.industry = ''; // Also reset industry if visa type changes
     }
-    onFilterChange(newFilters);
+    setFilters(newFilters);
   }
   
   const handleSearchClick = () => {
-    onSearch(filters);
+    onSearch(filters as SearchFilters);
      if (window.innerWidth < 768) { // md breakpoint
       setIsSearchExpanded(false);
     }
   }
 
-  const getFilterName = (slug: string, type: 'visa' | 'visaDetail' | 'industry' | 'location'): string => {
-    if (!slug || slug === 'all' || slug === 'all-details') return '';
-    if (type === 'visa') {
-      return japanJobTypes.find(j => j.slug === slug)?.name || slug;
-    }
-    if (type === 'visaDetail') {
-      for (const key in visaDetailsByVisaType) {
-        const detail = (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).find(d => d.slug === slug);
-        if (detail) return detail.name;
-      }
-    }
-    if (type === 'industry') {
-      return allIndustries.find(i => i.slug === slug)?.name || slug;
-    }
-    // For location, find from japanRegions
-    const region = japanRegions.find(r => r.slug === slug);
-    if (region) return region.name;
-    const prefecture = allJapanLocations.find(p => p.slug === slug);
-    if (prefecture) return prefecture.name;
-
-    return slug;
-  }
-
-  const searchSummaryParts = [
-    getFilterName(filters.visaDetail, 'visaDetail') || getFilterName(filters.visa, 'visa'),
-    getFilterName(filters.industry, 'industry'),
-  ].filter(Boolean);
-
-  const locationFilters = Array.isArray(filters.location) ? filters.location.filter(l => l !== 'all') : [];
-  
-  if (locationFilters.length > 0) {
-      if(locationFilters.length <= 2) {
-          searchSummaryParts.push(...locationFilters.map(l => getFilterName(l, 'location')));
-      } else {
-          searchSummaryParts.push(`${locationFilters.length} địa điểm`);
-      }
-  }
-
-  let searchSummary = searchSummaryParts.join(' / ');
-  if (searchSummary.length > 40) {
-      searchSummary = searchSummaryParts.slice(0, 2).join(' / ') + ` + ${searchSummaryParts.length - 2} khác...`;
-  }
-
+  const searchSummary = [
+    filters.visaDetail,
+    filters.industry,
+    Array.isArray(filters.location) ? filters.location.join(', ') : filters.location,
+    filters.q
+  ].filter(Boolean).join(' / ');
 
   return (
     <section className={cn(
         "w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white transition-all duration-500",
-        showHero ? "pt-20 md:pt-28 pb-10" : "py-8"
+        showHero ? "pt-20 md:pt-28 pb-10" : "py-4"
     )}>
-      {showHero && (
-        <div className="container mx-auto px-4 md:px-6">
-            <div className="max-w-4xl mx-auto text-center">
+        {showHero && (
+            <div className="container mx-auto px-4 md:px-6">
+              <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4 whitespace-nowrap">
                     <span className="md:hidden">Việc làm Nhật Bản</span>
                     <span className="hidden md:inline">Tìm việc làm tại Nhật Bản</span>
@@ -128,15 +100,14 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                  <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-white/80 hidden md:block">
                  Nhanh tay khám phá trải nghiệm Shopping công việc từ Thực tập sinh, Kỹ năng đặc định đến Kỹ sư tri thức trong Thế giới việc làm tại Nhật Bản cùng HelloJob ngay thôi nào.
                 </p>
+              </div>
             </div>
-        </div>
-      )}
+        )}
         <div className={cn(
             "container mx-auto px-4 md:px-6 relative z-10",
         )}>
             <Card className="max-w-6xl mx-auto shadow-2xl">
-                 {/* Mobile Collapsed View */}
-                {!showHero && (
+                 {!showHero && (
                     <div className="md:hidden p-2">
                         <Button 
                             variant="ghost" 
@@ -152,20 +123,41 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                     </div>
                 )}
                 
-                {/* Full Search View (Desktop always, Mobile when expanded) */}
                 <div className={cn(
                     "p-4 md:p-6",
                     isSearchExpanded ? "block" : "hidden md:block"
                 )}>
-                    <div className="grid grid-cols-1 md:flex gap-4 items-end">
-                        <div className="space-y-2 flex-1">
-                            <Label htmlFor="search-type" className="text-foreground">Chi tiết loại hình visa</Label>
-                            <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail}>
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                        <div className="space-y-2 md:col-span-8">
+                            {showHero && <Label htmlFor="main-search-input" className="text-foreground">Bạn muốn tìm việc gì?</Label>}
+                             <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input 
+                                    id="main-search-input"
+                                    placeholder="Nhập chức danh, kỹ năng, hoặc tên công ty..." 
+                                    className="pl-10 h-12 text-base bg-secondary/50"
+                                    value={filters.q || ''}
+                                    onChange={(e) => handleFilterChange('q', e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearchClick()}
+                                />
+                            </div>
+                        </div>
+                         <div className="space-y-2 md:col-span-4">
+                             {showHero && <Label className="text-transparent hidden md:block">Tìm kiếm</Label>}
+                            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg h-12" onClick={handleSearchClick}>
+                                <Search className="mr-2 h-5 w-5" /> Tìm kiếm
+                            </Button>
+                        </div>
+                    </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end mt-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="search-type" className="text-foreground text-sm">Chi tiết loại hình visa</Label>
+                            <Select onValueChange={(value) => handleFilterChange('visaDetail', value)} value={filters.visaDetail || ''}>
                                 <SelectTrigger id="search-type">
                                 <SelectValue placeholder="Tất cả loại hình" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                <SelectItem value="all-details">Tất cả loại hình</SelectItem>
+                                <SelectItem value="">Tất cả loại hình</SelectItem>
                                  {japanJobTypes.map(type => (
                                     <SelectGroup key={type.slug}>
                                         <SelectLabel>{type.name}</SelectLabel>
@@ -177,14 +169,14 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="space-y-2 flex-1">
-                            <Label htmlFor="search-industry" className="text-foreground">Ngành nghề</Label>
-                            <Select onValueChange={(value) => onFilterChange({ industry: value, jobDetail: '' })} value={filters.industry}>
+                        <div className="space-y-2">
+                            <Label htmlFor="search-industry" className="text-foreground text-sm">Ngành nghề</Label>
+                            <Select onValueChange={(value) => handleFilterChange('industry', value)} value={filters.industry || ''}>
                                 <SelectTrigger id="search-industry">
                                     <SelectValue placeholder="Tất cả ngành nghề" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Tất cả ngành nghề</SelectItem>
+                                    <SelectItem value="">Tất cả ngành nghề</SelectItem>
                                     {availableIndustries.map((industry) => (
                                         <SelectItem key={industry.slug} value={industry.slug}>
                                             {industry.name}
@@ -193,9 +185,9 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                                 </SelectContent>
                             </Select>
                         </div>
-                         <div className="space-y-2 flex-1">
-                            <Label htmlFor="search-location" className="text-foreground">Địa điểm làm việc</Label>
-                            <Select onValueChange={(value) => onFilterChange({ location: value === 'all' ? [] : [value] })} value={Array.isArray(filters.location) ? filters.location[0] : filters.location}>
+                         <div className="space-y-2">
+                            <Label htmlFor="search-location" className="text-foreground text-sm">Địa điểm làm việc</Label>
+                            <Select onValueChange={(value) => handleFilterChange('location', value === 'all' ? [] : [value])} value={Array.isArray(filters.location) ? filters.location[0] : filters.location}>
                                 <SelectTrigger id="search-location">
                                 <SelectValue placeholder="Tất cả địa điểm" />
                                 </SelectTrigger>
@@ -212,12 +204,6 @@ export const SearchModule = ({ onSearch, filters, onFilterChange, showHero = fal
                                     ))}
                                 </SelectContent>
                             </Select>
-                        </div>
-                         <div className="space-y-2">
-                            <Label className="text-transparent hidden md:block">Tìm kiếm</Label>
-                            <Button size="lg" className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white text-lg" onClick={handleSearchClick}>
-                                <Search className="mr-2 h-5 w-5" /> Tìm kiếm
-                            </Button>
                         </div>
                     </div>
                 </div>
