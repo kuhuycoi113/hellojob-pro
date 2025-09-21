@@ -101,7 +101,7 @@ export function ContactButtons({ contact, showChatText = false }: ContactButtons
                         </Button>
                     </div>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-2">
+                <PopoverContent id="LIENHETOMOBILE01" className="w-auto p-2">
                     <div className="flex gap-2">
                         <Button size="icon" className="h-16 w-16 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
                             <MessageSquare className="h-8 w-8"/>
