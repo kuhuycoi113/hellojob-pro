@@ -1,3 +1,4 @@
+
 import { consultants } from './consultant-data';
 import type { User } from './chat-data';
 import { industriesByJobType } from './industry-data';
@@ -319,4 +320,161 @@ const createJobList = (): Job[] => {
     return jobs;
 };
 
-export const jobData: Job[] = createJobList();
+const createJobsForLocations = (locations: string[], count: number, startIndex: number): Job[] => {
+    const jobs: Job[] = [];
+    for (let i = 0; i < count; i++) {
+        const jobIndex = startIndex + i;
+        const location = getRandomItem(locations, jobIndex);
+
+        // Reuse the same logic from createJobList, just force the location
+        const visaType = getRandomItem(japanJobTypes, jobIndex);
+        const details = visaDetailsByVisaType[visaType.slug];
+        if (!details) continue;
+        const detail = getRandomItem(details, jobIndex);
+
+        const industries = industriesByJobType[visaType.slug];
+        if (!industries) continue;
+        const industry = getRandomItem(industries, jobIndex);
+
+        const keywords = industry.keywords && industry.keywords.length > 0 ? [...industry.keywords] : [industry.name];
+        const keyword = getRandomItem(keywords, jobIndex);
+
+        const gender = getRandomItem(['Nam', 'Nữ', 'Cả nam và nữ'], jobIndex) as 'Nam' | 'Nữ' | 'Cả nam và nữ';
+        const quantity = (jobIndex % 10) + 1;
+        const languageRequirement = getRandomItem(languageLevels, jobIndex);
+        
+        const title = `${keyword}, ${location}, tuyển ${quantity} ${gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender}`;
+        
+        const findMatchingConsultant = () => {
+            const lowerCaseIndustry = industry.name.toLowerCase();
+            const lowerCaseVisaType = visaType.name.toLowerCase();
+            const expertConsultants = consultants.filter(c => {
+                const expertise = c.mainExpertise?.toLowerCase() || '';
+                return expertise.includes(lowerCaseIndustry) || expertise.includes(lowerCaseVisaType);
+            });
+            return expertConsultants.length > 0 ? getRandomItem(expertConsultants, jobIndex) : getRandomItem(consultants, jobIndex);
+        };
+        
+        const assignedConsultant = findMatchingConsultant();
+        
+        const isTTS = visaType.name.includes('Thực tập sinh');
+        const isEngineer = visaType.name.includes('Kỹ sư');
+
+        const postedDate = new Date();
+        postedDate.setDate(postedDate.getDate() - (jobIndex % 30));
+        const interviewDate = new Date(postedDate);
+        interviewDate.setDate(interviewDate.getDate() + (jobIndex % 60) + 1);
+
+        const imageCase = jobIndex % 5;
+        let jobImages = [];
+        if (imageCase === 0) {
+            jobImages.push({ src: getRandomItem(jobOrderImages, jobIndex), alt: 'Ảnh đơn hàng', dataAiHint: 'job order form' });
+            jobImages.push({ src: getRandomItem(workImagePlaceholders, jobIndex), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
+            jobImages.push({ src: getRandomItem(dormitoryImages, jobIndex), alt: 'Ảnh ký túc xá', dataAiHint: 'dormitory room' });
+        } else if (imageCase === 1) {
+            jobImages.push({ src: getRandomItem(workImagePlaceholders, jobIndex), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
+            jobImages.push({ src: getRandomItem(dormitoryImages, jobIndex), alt: 'Ảnh ký túc xá', dataAiHint: 'dormitory room' });
+        } else if (imageCase === 2) {
+            jobImages.push({ src: getRandomItem(workImagePlaceholders, jobIndex), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
+        } else if (imageCase === 3) {
+            jobImages.push({ src: getRandomItem(jobOrderImages, jobIndex), alt: 'Ảnh đơn hàng', dataAiHint: 'job order form' });
+        }
+
+        const detailSlug = detail.slug;
+        const applicableConditions = allSpecialConditions.filter(cond => {
+            const conditionList = conditionsByVisaDetail[detailSlug as keyof typeof conditionsByVisaDetail];
+            return conditionList ? conditionList.includes(cond.name) : false;
+        });
+
+        const selectedConditionsCount = 2 + (jobIndex % 2);
+        const startIndexCond = jobIndex % (applicableConditions.length > 0 ? applicableConditions.length : 1);
+        const selectedConditions = [];
+        if (applicableConditions.length > 0) {
+            for (let j = 0; j < selectedConditionsCount; j++) {
+                selectedConditions.push(applicableConditions[(startIndexCond + j) % applicableConditions.length]);
+            }
+        }
+        const specialConditions = selectedConditions.map(c => c.name).join(', ');
+
+        const selectedOtherSkillsCount = 1 + (jobIndex % 2);
+        const otherSkillsStartIndex = jobIndex % (otherSkills.length > 0 ? otherSkills.length : 1);
+        const selectedOtherSkills = [];
+        if (otherSkills.length > 0) {
+            for (let j = 0; j < selectedOtherSkillsCount; j++) {
+                selectedOtherSkills.push(otherSkills[(otherSkillsStartIndex + j) % otherSkills.length]);
+            }
+        }
+        
+        const otherSkillsText = selectedOtherSkills.map(s => `<li>${s.name}</li>`).join('');
+        const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
+
+        const job: Job = {
+            id: generateUniqueJobId(jobIndex),
+            isRecording: jobIndex % 5 === 0,
+            image: { src: getRandomItem(workImagePlaceholders, jobIndex), type: 'thucte' },
+            likes: `${(jobIndex * 7) % 10}k${(jobIndex * 3) % 10}`,
+            salary: {
+                actual: `${(12 + (jobIndex % 10)) * 10000}`,
+                basic: `${(18 + (jobIndex % 12)) * 10000}`,
+                annualIncome: isTTS ? undefined : `Khoảng ${(250 + jobIndex % 100)} vạn Yên`,
+                annualBonus: isTTS ? undefined : (jobIndex % 3 === 0 ? 'Có (1-2 lần/năm)' : 'Không có')
+            },
+            title: title,
+            recruiter: {
+                id: assignedConsultant.id,
+                name: assignedConsultant.name,
+                avatar: assignedConsultant.avatarUrl,
+                company: 'HelloJob'
+            },
+            status: jobIndex % 10 === 0 ? 'Tạm dừng' : 'Đang tuyển',
+            interviewDate: interviewDate.toISOString().split('T')[0],
+            interviewRounds: (jobIndex % 3) + 1,
+            netFee: isTTS ? `${(100 + (jobIndex % 50)) * 1000000}` : undefined,
+            target: `${(jobIndex % 5) + 1}tr`,
+            backFee: `${(jobIndex % 5) + 1}tr`,
+            tags: [industry.name, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
+            postedTime: `10:00 ${postedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`,
+            visaType: visaType.name,
+            visaDetail: detail.name,
+            industry: industry.name,
+            workLocation: location,
+            interviewLocation: getRandomItem(interviewLocations, jobIndex),
+            gender: gender,
+            quantity: quantity,
+            ageRequirement: `${18 + (jobIndex % 5)}-${35 + (jobIndex % 15)}`,
+            languageRequirement: languageRequirement,
+            educationRequirement: isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : getRandomItem(educationLevels, jobIndex),
+            experienceRequirement: jobIndex % 3 === 0 ? 'Không yêu cầu kinh nghiệm' : `Kinh nghiệm ngành ${industry.name} là một lợi thế`,
+            yearsOfExperience: jobIndex % 3 === 0 ? 'Không yêu cầu' : '1-2 năm',
+            heightRequirement: `Trên ${150 + (jobIndex % 15)} cm`,
+            weightRequirement: `Trên ${40 + (jobIndex % 10)} kg`,
+            visionRequirement: 'Thị lực tốt, không mù màu',
+            tattooRequirement: getRandomItem(tattooOptions, jobIndex),
+            hepatitisBRequirement: getRandomItem(hepBOptions, jobIndex),
+            interviewFormat: 'Phỏng vấn Online',
+            specialConditions: specialConditions,
+            otherSkillRequirement: selectedOtherSkills.map(s => s.slug),
+            details: {
+                description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản. Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p><ul><li>Chi tiết công việc: ${keyword}.</li><li>Môi trường làm việc sạch sẽ, hiện đại.</li></ul>`,
+                requirements: `${requirementsBase}<ul>${otherSkillsText}</ul>`,
+                benefits: `<ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li><li>Thưởng 1-2 lần/năm tùy theo kết quả kinh doanh.</li></ul>`,
+                videoUrl: (jobIndex % 5 === 0 && imageCase > 1) ? getRandomItem(jobVideos, jobIndex) : undefined,
+                images: jobImages,
+            }
+        };
+        jobs.push(job);
+    }
+    return jobs;
+}
+
+const initialJobs = createJobList();
+const shikokuPrefectures = ['Tokushima', 'Kagawa', 'Ehime', 'Kochi'];
+const okinawaPrefecture = ['Okinawa'];
+
+const shikokuJobs = createJobsForLocations(shikokuPrefectures, 30, initialJobs.length);
+const okinawaJobs = createJobsForLocations(okinawaPrefecture, 20, initialJobs.length + 30);
+
+
+export const jobData: Job[] = [...initialJobs, ...shikokuJobs, ...okinawaJobs];
+
+    
