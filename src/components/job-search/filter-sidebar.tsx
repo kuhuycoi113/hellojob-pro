@@ -856,7 +856,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                     type="text" 
                                                     placeholder="VD: 1,000" 
                                                     onChange={(e) => handleSalaryInputChange(e, 'hourlySalary', 15000, onFilterChange)}
-                                                    value={getDisplayValue(filters.hourlySalary)} 
+                                                    value={getDisplayValue(filters.hourlySalary || '')} 
                                                 />
                                                 <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary, 'VD: 1,000', JPY_VND_RATE, 'trăm nghìn VNĐ')}</p>
                                             </div>
@@ -870,7 +870,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                         type="text" 
                                                         placeholder="VD: 3,000,000" 
                                                         onChange={(e) => handleSalaryInputChange(e, 'annualIncome', 30000000, onFilterChange)}
-                                                        value={getDisplayValue(filters.annualIncome)} 
+                                                        value={getDisplayValue(filters.annualIncome || '')} 
                                                     />
                                                         <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualIncome, 'VD: 3,000,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
                                                 </div>
@@ -881,7 +881,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                         type="text" 
                                                         placeholder="VD: 500,000" 
                                                         onChange={(e) => handleSalaryInputChange(e, 'annualBonus', 5000000, onFilterChange)}
-                                                        value={getDisplayValue(filters.annualBonus)} 
+                                                        value={getDisplayValue(filters.annualBonus || '')} 
                                                     />
                                                         <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualBonus, 'VD: 500,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
                                                 </div>
@@ -907,7 +907,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                             type="text" 
                                             placeholder={getFeePlaceholder()}
                                             onChange={(e) => handleSalaryInputChange(e, 'netFee', null, onFilterChange)}
-                                            value={getDisplayValue(filters.netFee)} 
+                                            value={getDisplayValue(filters.netFee || '')} 
                                         />
                                         <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
                                     </div>
