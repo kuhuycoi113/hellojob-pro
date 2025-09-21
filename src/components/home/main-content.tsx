@@ -143,7 +143,7 @@ export const MainContent = () => (
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-stretch">
             {featuredEmployers.map(emp => (
-              <Link href={`/nha-tuyen-dung/${'emp.id'}`} key={emp.id} className="flex justify-center items-center bg-white">
+              <Link href={`/nha-tuyen-dung/${emp.id}`} key={emp.id} className="flex justify-center items-center bg-white">
                 <Image src={emp.logo} alt={emp.name} width={150} height={50} className="grayscale hover:grayscale-0 transition-all duration-300" data-ai-hint={emp.dataAiHint}/>
               </Link>
             ))}

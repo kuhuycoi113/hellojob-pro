@@ -13,6 +13,7 @@ import { locations } from "@/lib/location-data";
 import { JobCard } from "../job-card";
 
 export type SearchFilters = {
+    q?: string;
     visa: string;
     visaDetail: string;
     industry: string;
