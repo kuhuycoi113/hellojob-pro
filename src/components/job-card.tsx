@@ -223,7 +223,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 </p>
                             </div>
                             
-                            <div className="mt-auto flex items-end justify-between pt-2">
+                            <div className="mt-auto flex flex-wrap items-end justify-between gap-y-2 pt-2">
                                 <div className="flex items-center gap-1">
                                     <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
                                         <PopoverTrigger asChild>
@@ -254,7 +254,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             </div>
                                         </PopoverContent>
                                     </Popover>
-
                                     <ContactButtons contact={job.recruiter as any} showChatText={true} />
                                 </div>
                                 {isClient && <div className="flex items-center gap-2">
