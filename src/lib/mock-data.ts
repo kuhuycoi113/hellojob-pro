@@ -195,7 +195,7 @@ const createJobList = (): Job[] => {
                     
                     const assignedConsultant = findMatchingConsultant();
                     
-                    const postedDate = new Date();
+                    const postedDate = new Date(2024, 7, 1); // A fixed start date
                     postedDate.setDate(postedDate.getDate() - (jobIndex % 30));
                     const interviewDate = new Date(postedDate);
                     interviewDate.setDate(interviewDate.getDate() + (jobIndex % 60) + 1);
@@ -251,17 +251,17 @@ const createJobList = (): Job[] => {
                     const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
                     if (feeVisas.includes(detail.slug) && (jobIndex % 5 < 4)) { // 80% have fees
                         if (detail.slug === 'dac-dinh-dau-viet') {
-                            netFee = String(Math.floor(1500 + (Math.random() * 1000))); // 1500-2500
-                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1))); // 80-90% of netFee
+                            netFee = String(1500 + ((jobIndex * 101) % 1000)); // 1500-2500
+                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) ))); // 80-90% of netFee
                         } else if (detail.slug === 'dac-dinh-di-moi' || detail.slug === 'ky-su-tri-thuc-dau-viet') {
-                            netFee = String(Math.floor(2500 + (Math.random() * 1300))); // 2500-3800
-                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
+                            netFee = String(2500 + ((jobIndex * 101) % 1300)); // 2500-3800
+                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
                         } else if (detail.slug === 'thuc-tap-sinh-1-nam') {
-                            netFee = String(Math.floor(1000 + (Math.random() * 400))); // 1000-1400
-                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
+                            netFee = String(1000 + ((jobIndex * 101) % 400)); // 1000-1400
+                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
                         } else { // TTS 3 năm
-                            netFee = String(Math.floor(3000 + (Math.random() * 600))); // 3000-3600
-                             netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
+                            netFee = String(3000 + ((jobIndex * 101) % 600)); // 3000-3600
+                             netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
                         }
                     }
 
@@ -368,7 +368,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             const isTTS = visaType.name.includes('Thực tập sinh');
             const isEngineer = visaType.name.includes('Kỹ sư');
     
-            const postedDate = new Date();
+            const postedDate = new Date(2024, 7, 1);
             postedDate.setDate(postedDate.getDate() - (jobIndex % 30));
             const interviewDate = new Date(postedDate);
             interviewDate.setDate(interviewDate.getDate() + (jobIndex % 60) + 1);
@@ -422,17 +422,17 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
             if (feeVisas.includes(detail.slug) && (jobIndex % 5 < 4)) { // 80% have fees
                 if (detail.slug === 'dac-dinh-dau-viet') {
-                    netFee = String(Math.floor(1500 + (Math.random() * 1000))); // 1500-2500
-                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1))); // 80-90% of netFee
+                    netFee = String(1500 + ((jobIndex * 101) % 1000));
+                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
                 } else if (detail.slug === 'dac-dinh-di-moi' || detail.slug === 'ky-su-tri-thuc-dau-viet') {
-                    netFee = String(Math.floor(2500 + (Math.random() * 1300))); // 2500-3800
-                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
+                    netFee = String(2500 + ((jobIndex * 101) % 1300));
+                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
                 } else if (detail.slug === 'thuc-tap-sinh-1-nam') {
-                    netFee = String(Math.floor(1000 + (Math.random() * 400))); // 1000-1400
-                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
+                    netFee = String(1000 + ((jobIndex * 101) % 400));
+                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
                 } else if (detail.slug === 'thuc-tap-sinh-3-nam') { // TTS 3 năm
-                    netFee = String(Math.floor(3000 + (Math.random() * 600))); // 3000-3600
-                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
+                    netFee = String(3000 + ((jobIndex * 101) % 600));
+                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
                 }
             }
 
@@ -516,5 +516,6 @@ missingPrefectures.forEach((prefecture, i) => {
 
 export const jobData: Job[] = [...initialJobs, ...newlyAddedJobs];
     
+
 
 
