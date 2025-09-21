@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
@@ -10,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType, type Industry } from '@/lib/industry-data';
 import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts } from '@/lib/visa-data';
+import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 
 
 const initialSearchFilters: SearchFilters = {
@@ -489,7 +491,7 @@ export default function JobSearchPageContent() {
 
 
         const count = jobData.filter(job => {
-            let queryMatch = true;
+             let queryMatch = true;
             if (q) {
                 const lowerQ = q.toLowerCase();
                 queryMatch = job.id.toLowerCase().includes(lowerQ) ||
@@ -498,7 +500,7 @@ export default function JobSearchPageContent() {
                              job.recruiter.company.toLowerCase().includes(lowerQ) ||
                              job.details.description.toLowerCase().includes(lowerQ);
             }
-            
+
             let visaMatch = true;
             if (visaDetail && visaDetail !== 'all-details') {
                 const targetVisaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name;
@@ -717,16 +719,27 @@ export default function JobSearchPageContent() {
         }
     }, [router, runFilter, countStagedResults, searchParams]);
     
-    const handleNewSearch = (filters: SearchFilters) => {
+    const handleNewSearch = async (filters: SearchFilters) => {
         const query = new URLSearchParams();
-        if (filters.q) query.set('q', filters.q);
-        if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set(keyMap['visaDetail'], filters.visaDetail);
-        if (filters.industry && filters.industry !== 'all') query.set(keyMap['industry'], filters.industry);
-        if (Array.isArray(filters.location) && filters.location.length > 0 && !filters.location.includes('all')) {
-            filters.location.forEach(loc => query.append(keyMap['location'], loc));
-        } else if (typeof filters.location === 'string' && filters.location && filters.location !== 'all') {
-            query.append(keyMap['location'], filters.location);
+        
+        if (filters.q) {
+            const criteria = await recommendJobs(filters.q);
+            if (criteria?.industry) query.set(keyMap['industry'], allIndustries.find(i => i.name === criteria.industry)?.slug || '');
+            if (criteria?.workLocation) query.set(keyMap['location'], allJapanLocations.find(l => l.name === criteria.workLocation)?.slug || '');
+            if (criteria?.visaType) {
+                 const visaSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
+                 if(visaSlug) query.set(keyMap['visa'], visaSlug);
+            }
+        } else {
+            if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set(keyMap['visaDetail'], filters.visaDetail);
+            if (filters.industry && filters.industry !== 'all') query.set(keyMap['industry'], filters.industry);
+            if (Array.isArray(filters.location) && filters.location.length > 0 && !filters.location.includes('all')) {
+                filters.location.forEach(loc => query.append(keyMap['location'], loc));
+            } else if (typeof filters.location === 'string' && filters.location && filters.location !== 'all') {
+                query.append(keyMap['location'], filters.location);
+            }
         }
+        
         router.push(`/tim-viec-lam?${query.toString()}`);
     }
 
@@ -751,3 +764,5 @@ export default function JobSearchPageContent() {
         </div>
     );
 }
+
+    

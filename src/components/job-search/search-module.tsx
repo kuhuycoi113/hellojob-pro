@@ -15,6 +15,8 @@ import type { SearchFilters } from './search-results';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Input } from '../ui/input';
 import { useRouter } from 'next/navigation';
+import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
+import { Loader2 } from 'lucide-react';
 
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
@@ -30,6 +32,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
   const [filters, setInternalFilters] = useState(initialFilters);
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
   const [isSearchExpanded, setIsSearchExpanded] = useState(showHero);
+  const [isAiSearching, setIsAiSearching] = useState(false);
 
   useEffect(() => {
     setInternalFilters(initialFilters);
@@ -77,15 +80,38 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
     setParentFilters(updatedFilters);
   }
   
-  const handleSearchClick = () => {
-    onSearch(filters);
+  const handleSearchClick = async () => {
+    if (filters.q) {
+        setIsAiSearching(true);
+        try {
+            const criteria = await recommendJobs(filters.q);
+            // Merge AI criteria with existing filter selections
+            // AI criteria take precedence if they exist
+            const combinedFilters = {
+                ...filters,
+                visaType: criteria?.visaType || filters.visa,
+                industry: criteria?.industry ? allIndustries.find(i => i.name === criteria.industry)?.slug : filters.industry,
+                location: criteria?.workLocation ? [allJapanLocations.find(l => l.name === criteria.workLocation)?.slug || ''] : filters.location,
+                gender: criteria?.gender ? (criteria.gender === 'Nam' ? 'nam' : 'nu') : filters.gender,
+            };
+            onSearch(combinedFilters);
+        } catch (error) {
+            console.error("AI search failed, falling back to simple search:", error);
+            onSearch(filters); // Fallback to non-AI search on error
+        } finally {
+            setIsAiSearching(false);
+        }
+    } else {
+        onSearch(filters);
+    }
+    
      if (window.innerWidth < 768) { // md breakpoint
       setIsSearchExpanded(false);
     }
   }
 
   const searchSummary = [
-    (visaDetailsByVisaType[filters.visa as keyof typeof visaDetailsByVisaType] || []).find(d => d.slug === filters.visaDetail)?.name,
+    (Object.values(visaDetailsByVisaType).flat().find(d => d.slug === filters.visaDetail))?.name,
     (allIndustries.find(i => i.slug === filters.industry))?.name,
     Array.isArray(filters.location) && filters.location.length > 0
         ? filters.location.map(locSlug => allJapanLocations.find(l => l.slug === locSlug)?.name).filter(Boolean).join(', ')
@@ -145,7 +171,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                 <Input 
                                     id="main-search-input"
-                                    placeholder="Nhập chức danh, kỹ năng, hoặc tên công ty..." 
+                                    placeholder="Nhập chức danh, kỹ năng, hoặc 'Cơ khí Aichi'..." 
                                     className="pl-10 h-12 text-base bg-secondary/50"
                                     value={filters.q || ''}
                                     onChange={(e) => handleFilterChange('q', e.target.value)}
@@ -155,8 +181,13 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                         </div>
                          <div className="space-y-2 md:col-span-4">
                              {showHero && <Label className="text-transparent hidden md:block">Tìm kiếm</Label>}
-                            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg h-12" onClick={handleSearchClick}>
-                                <Search className="mr-2 h-5 w-5" /> Tìm kiếm
+                            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg h-12" onClick={handleSearchClick} disabled={isAiSearching}>
+                                {isAiSearching ? (
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                ) : (
+                                    <Search className="mr-2 h-5 w-5" />
+                                )}
+                                 Tìm kiếm
                             </Button>
                         </div>
                     </div>
@@ -223,3 +254,5 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
     </section>
   );
 }
+
+    
