@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { cn } from '@/lib/utils';
@@ -22,11 +21,12 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
   const { assignedConsultant, sendMessage } = useChat();
   const isCurrentUser = message.sender.id === currentUser.id;
   
-  // Determine which user to display for non-current-user messages
   // If the message is from the bot, display the assigned consultant's info instead.
   const displayUser = !isCurrentUser 
     ? (message.sender.isBot ? (assignedConsultant || message.sender) : message.sender)
     : message.sender;
+    
+  const isWelcomeMessage = message.id === 'msg-bot-welcome';
 
   const recommendedJobs = message.recommendations
     ? message.recommendations
@@ -48,7 +48,6 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
             </Avatar>
             <div className="flex flex-col">
                  <p className="text-xs text-muted-foreground mb-1 ml-3">
-                    {/* CHATNAME2 */}
                     <Link href={`/tu-van-vien/${displayUser.id}`} className="hover:underline hover:text-primary">
                         Tư vấn viên {displayUser.name}
                     </Link>
@@ -65,19 +64,15 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
   return (
     <div className={cn('flex items-start gap-2', isCurrentUser ? 'justify-end' : 'justify-start')}>
       {!isCurrentUser && (
-        <>
-            {/* CHATAVATAR2 */}
-            <Avatar className="h-8 w-8 flex-shrink-0">
+        <Avatar id="AVATARCHAT01" className="h-8 w-8 flex-shrink-0">
             <AvatarImage src={displayUser.avatarUrl || undefined} alt={displayUser.name} />
             <AvatarFallback>{displayUser.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-        </>
+        </Avatar>
       )}
       <div className="flex flex-col gap-1 items-start" style={{ maxWidth: 'calc(100% - 40px)' }}>
-        {/* CHATNAME2 */}
         {!isCurrentUser && (
             <p className="text-xs text-muted-foreground ml-3">
-                <Link href={`/tu-van-vien/${displayUser.id}`} className="hover:underline hover:text-primary">
+                <Link id="TUVANVIENCHAT01" href={`/tu-van-vien/${displayUser.id}`} className="hover:underline hover:text-primary">
                     Tư vấn viên {displayUser.name}
                 </Link>
             </p>
@@ -104,7 +99,7 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
                     : 'bg-background rounded-bl-none border'
                 )}
             >
-                <p className="text-sm whitespace-pre-line">{message.text}</p>
+                <p id={isWelcomeMessage ? "CAUCHAOCHAT01" : undefined} className="text-sm whitespace-pre-line">{message.text}</p>
             </div>
         )}
 

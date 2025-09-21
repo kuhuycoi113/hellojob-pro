@@ -142,8 +142,7 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
         {/* Header */}
         <header className="flex items-center gap-3 p-3 border-b bg-primary text-primary-foreground shadow-md flex-shrink-0">
           <div className="flex-shrink-0">
-             {/* CHATAVATAR1 */}
-             <Avatar className="h-10 w-10 border-2 border-white bg-white">
+             <Avatar id="AVATARHELLOJOB01" className="h-10 w-10 border-2 border-white bg-white">
                 <AvatarImage src="/img/favi2.png" alt="HelloJob AI" />
                 <AvatarFallback>HJ</AvatarFallback>
               </Avatar>
@@ -151,8 +150,7 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
 
           <div>
              <div className="flex items-center gap-2">
-                 {/* CHATNAME1 */}
-                 <p className="text-sm font-bold font-headline leading-tight">HelloJob</p>
+                 <p id="HELLOJOBNAME01" className="text-sm font-bold font-headline leading-tight">HelloJob</p>
                  <div className="w-2 h-2 rounded-full bg-green-400"></div>
              </div>
             <p className="text-xs text-primary-foreground/80 font-semibold">Đang hoạt động</p>

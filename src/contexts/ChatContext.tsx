@@ -35,6 +35,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [assignedConsultant, setAssignedConsultant] = useState<User | null>(null);
 
   useEffect(() => {
+    // Assign a random consultant on initial load if one isn't already assigned
     const consultantId = localStorage.getItem('assignedConsultantId');
     let consultant = null;
     if (consultantId) {
@@ -46,15 +47,29 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         localStorage.setItem('assignedConsultantId', consultant.id);
     }
     setAssignedConsultant(consultant);
+
+    // Initialize the default conversation with the bot/assigned consultant
+     const botConversation = conversations.find(c => c.id === 'convo-bot-hellojob');
+     if (botConversation && consultant && botConversation.messages.length === 0) {
+       botConversation.messages.push({
+         id: 'msg-bot-welcome',
+         sender: consultant,
+         text: `Chào bạn, tôi là ${consultant.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`,
+         timestamp: new Date().toISOString(),
+       });
+     }
+
   }, []);
 
   const openChat = (user?: User) => {
-    let targetUser = user || assignedConsultant || helloJobBot;
+    // If a specific user (consultant) is provided, open chat with them.
+    // Otherwise, default to the globally assigned consultant or the bot.
+    const targetUser = user || assignedConsultant || helloJobBot;
     
     let conversation = conversations.find(c => c.participants.some(p => p.id === targetUser.id));
     
+    // If no conversation exists for this target user, create a new one.
     if (!conversation) {
-        // Use the target user (consultant) as the sender of the initial message
         const initialMessage = `Chào bạn, tôi là ${targetUser.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`;
         
         conversation = {
@@ -63,12 +78,13 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
             messages: [
                 {
                     id: `msg-${Date.now()}`,
-                    sender: targetUser, // The sender is now the consultant
+                    sender: targetUser,
                     text: initialMessage,
                     timestamp: new Date().toISOString()
                 }
             ]
         }
+        // Add the new conversation to the list if it's not already there
         if (!conversations.some(c => c.id === conversation!.id)) {
             conversations.push(conversation);
         }
@@ -80,7 +96,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
   const closeChat = () => {
     setIsChatOpen(false);
-    setActiveConversation(null);
+    // We don't nullify activeConversation so the state is preserved if the user re-opens
   };
 
   const sendMessage = async (text: string, attachment?: Attachment) => {
@@ -106,32 +122,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     }
 
     // AI logic is removed. The conversation now waits for a real person to reply.
-
-    if (attachment) {
-        // Simulate human consultant response for file uploads for demo purposes
-        setTimeout(() => {
-            const responseText = `Đã nhận được tệp: ${attachment.fileName}`;
-
-            const consultantResponse: Message = {
-                id: `msg-${Date.now() + 1}`,
-                sender: assignedConsultant || helloJobBot,
-                text: responseText,
-                timestamp: new Date().toISOString(),
-            };
-            
-            setActiveConversation(prev => {
-                if (!prev) return null;
-                const latestMessages = [...prev.messages, consultantResponse];
-                const latestConvo = { ...prev, messages: latestMessages };
-                
-                const idx = conversations.findIndex(c => c.id === latestConvo.id);
-                if(idx !== -1) conversations[idx] = latestConvo;
-
-                return latestConvo;
-            });
-
-        }, 1500);
-    }
   };
 
   const value = {
