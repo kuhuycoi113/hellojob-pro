@@ -283,10 +283,10 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                     </Dialog>
                     <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
                         <DialogTrigger asChild>
-                           <Button>
+                            <Button>
                                 <Briefcase className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ chi tiết
-                           </Button>
+                            </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-xl">
                             <DialogHeader>
@@ -303,9 +303,6 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                                     <h3 className="font-bold text-base mb-1">Thủ công</h3>
                                     <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
                                 </Card>
-                            </div>
-                            <div className="mt-4 text-center">
-                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -781,7 +778,3 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 }
-
-    
-
-    
