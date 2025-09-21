@@ -400,7 +400,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     </div>
 
                     <div className="mt-auto">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                              <div className="flex items-center gap-1">
                                 <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                                     <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
