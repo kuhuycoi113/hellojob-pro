@@ -76,7 +76,7 @@ const SearchDialog = () => {
         industry: '',
         location: [],
     });
-    const allIndustries = [...new Set(Object.values(industriesByJobType).flat())];
+    const allIndustries = Array.from(new Map(Object.values(industriesByJobType).flat().map(item => [item.slug, item])).values());
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
 
@@ -85,7 +85,7 @@ const SearchDialog = () => {
     };
 
     const handleVisaDetailChange = (value: string) => {
-        const newFilters: Partial<SearchFilters> = { visaDetail: value === 'all-details' ? '' : value };
+        const newFilters: Partial<SearchFilters> = { visaDetail: value === 'all' ? '' : value };
         
         const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
         if (parentType && filters.visa !== parentType) {
@@ -94,7 +94,7 @@ const SearchDialog = () => {
             const industries = industriesByJobType[parentType as keyof typeof industriesByJobType] || [];
             const uniqueIndustries = Array.from(new Map(industries.map(item => [item.slug, item])).values());
             setAvailableIndustries(uniqueIndustries);
-        } else if (!value || value === 'all-details') {
+        } else if (!value || value === 'all') {
             newFilters.visa = '';
             setAvailableIndustries(allIndustries);
         }
@@ -104,7 +104,7 @@ const SearchDialog = () => {
     const handleSearch = () => {
         const query = new URLSearchParams();
         if (filters.q) query.set('q', filters.q);
-        if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
+        if (filters.visaDetail && filters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
         if (filters.industry && filters.industry !== 'all') query.set('nganh-nghe', filters.industry);
         if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
             filters.location.forEach(loc => query.append('dia-diem', loc));
@@ -142,10 +142,10 @@ const SearchDialog = () => {
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                          <div className="space-y-2">
                             <Label>Chi tiết loại hình visa</Label>
-                            <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail || 'all-details'}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
+                            <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail || 'all'}>
+                                <SelectTrigger><SelectValue placeholder="Tất cả loại hình" /></SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all-details">Tất cả loại hình</SelectItem>
+                                    <SelectItem value="all">Tất cả loại hình</SelectItem>
                                     {japanJobTypes.map(type => (
                                         <SelectGroup key={type.slug}>
                                             <SelectLabel>{type.name}</SelectLabel>
@@ -160,7 +160,7 @@ const SearchDialog = () => {
                         <div className="space-y-2">
                             <Label>Ngành nghề</Label>
                             <Select onValueChange={(value) => handleFilterChange('industry', value === 'all' ? '' : value)} value={filters.industry || 'all'}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectTrigger><SelectValue placeholder="Tất cả ngành nghề"/></SelectTrigger>
                                 <SelectContent>
                                      <SelectItem value="all">Tất cả ngành nghề</SelectItem>
                                     {availableIndustries.map((industry) => (
@@ -776,4 +776,5 @@ const LoggedOutContent = () => {
     </>
   );
 }
+
 
