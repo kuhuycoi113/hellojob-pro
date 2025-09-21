@@ -608,6 +608,13 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
     const shouldShowLươngGiờ = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(activeFilters.visaDetail || "");
     const shouldShowLươngNăm = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(activeFilters.visaDetail || "");
     const shouldShowTabs = shouldShowLươngGiờ || shouldShowLươngNăm;
+
+    const getFeePlaceholder = () => {
+        const visaDetail = filters.visaDetail;
+        if (visaDetail === 'thuc-tap-sinh-1-nam') return "0 đến 1400$";
+        if (visaDetail === 'dac-dinh-dau-viet') return "0 đến 2500$";
+        return "0 đến 3800$";
+    };
     
     return (
         <div className="md:col-span-1 lg:col-span-1 h-full flex flex-col">
@@ -914,7 +921,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                             id="net-fee-no-ticket-usd"
                                             type="text"
                                             placeholder={getFeePlaceholder()}
-                                            onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', null, onFilterChange)}
+                                            onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 4000, onFilterChange)}
                                             value={getDisplayValue(filters.netFeeNoTicket || '')}
                                         />
                                         <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFeeNoTicket, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
@@ -925,7 +932,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                             id="net-fee-usd" 
                                             type="text" 
                                             placeholder={getFeePlaceholder()}
-                                            onChange={(e) => handleSalaryInputChange(e, 'netFee', null, onFilterChange)}
+                                            onChange={(e) => handleSalaryInputChange(e, 'netFee', 4000, onFilterChange)}
                                             value={getDisplayValue(filters.netFee || '')} 
                                         />
                                         <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
