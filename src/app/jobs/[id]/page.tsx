@@ -7,7 +7,7 @@ import { jobData, type Job } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn } from 'lucide-react';
+import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -108,6 +108,32 @@ const CTAForGuest = ({ title, icon: Icon, onLoginClick }: { title: string, icon:
         </Card>
     </section>
 );
+
+const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.ElementType }) => {
+    const router = useRouter();
+    return (
+        <section>
+            <h2 className="text-2xl font-bold font-headline mb-6"><Icon className="inline-block mr-3 text-primary h-7 w-7" />{title}</h2>
+            <Card className="text-center py-12 px-6 shadow-lg">
+                <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
+                    <UserPlus className="h-10 w-10 text-primary" />
+                </div>
+                <p className="font-semibold text-lg">Hoàn thiện hồ sơ để xem gợi ý</p>
+                <p className="text-muted-foreground mt-2 mb-6">Hồ sơ của bạn chưa có thông tin. Hãy tạo hồ sơ để HelloJob AI có thể gợi ý những việc làm phù hợp nhất.</p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button onClick={() => router.push('/ai-profile')}>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Tạo hồ sơ nhanh bằng AI
+                    </Button>
+                     <Button variant="outline" onClick={() => router.push('/candidate-profile')}>
+                        <Briefcase className="mr-2 h-4 w-4" />
+                        Tới trang hồ sơ
+                    </Button>
+                </div>
+            </Card>
+        </section>
+    )
+};
 
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -485,7 +511,13 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         )}
                     </section>
                     
-                    {isLoggedIn ? (
+                    {role === 'guest' && (
+                        <CTAForGuest title="Gợi ý cho bạn" icon={Star} onLoginClick={() => setIsAuthDialogOpen(true)} />
+                    )}
+                    {role === 'candidate-empty-profile' && (
+                        <CTAForEmptyProfile title="Gợi ý cho bạn" icon={Star} />
+                    )}
+                    {role === 'candidate' && (
                         <section>
                             <h2 className="text-2xl font-bold font-headline mb-6"><Star className="inline-block mr-3 text-primary h-7 w-7"/>Gợi ý cho bạn</h2>
                             {isLoading ? (
@@ -500,8 +532,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 <p className="text-muted-foreground">Không có gợi ý nào dựa trên hồ sơ của bạn. Hãy cập nhật hồ sơ để nhận gợi ý tốt hơn.</p>
                             )}
                         </section>
-                    ) : (
-                         <CTAForGuest title="Gợi ý cho bạn" icon={Star} onLoginClick={() => setIsAuthDialogOpen(true)} />
                     )}
 
                     {role === 'candidate' && (
