@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
@@ -7,7 +6,7 @@ import { jobData, type Job } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus } from 'lucide-react';
+import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -33,6 +32,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 import { EditProfileDialog } from '@/components/candidate-edit-dialog';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { Industry, industriesByJobType } from '@/lib/industry-data';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -111,6 +113,119 @@ const CTAForGuest = ({ title, icon: Icon, onLoginClick }: { title: string, icon:
 
 const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.ElementType }) => {
     const router = useRouter();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [profileCreationStep, setProfileCreationStep] = useState(1);
+    const [selectedVisa, setSelectedVisa] = useState<{name: string, slug: string} | null>(null);
+    const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
+    const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
+    const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+    const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
+    const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+    const { isLoggedIn } = useAuth();
+
+    const handleCreateProfileRedirect = () => {
+        const preferences = {
+          desiredVisaType: selectedVisa?.name || undefined,
+          desiredVisaDetail: selectedVisaDetail || undefined,
+          desiredIndustry: selectedIndustry?.name || undefined,
+          desiredLocation: selectedRegion || undefined,
+        };
+    
+        if (isLoggedIn) {
+          const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
+          let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
+          
+          const updatedAspirations = { ...profile.aspirations };
+          if (preferences.desiredVisaType) updatedAspirations.desiredVisaType = preferences.desiredVisaType;
+          if (preferences.desiredVisaDetail) updatedAspirations.desiredVisaDetail = preferences.desiredVisaDetail;
+          if (preferences.desiredLocation) updatedAspirations.desiredLocation = preferences.desiredLocation;
+
+          profile = {
+            ...profile,
+            aspirations: updatedAspirations,
+          };
+          if (preferences.desiredIndustry) profile.desiredIndustry = preferences.desiredIndustry;
+    
+          localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+          setIsDialogOpen(false);
+          router.push('/my-jobs?highlight=suggested');
+        } else {
+          sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
+          sessionStorage.setItem('postLoginRedirect', '/my-jobs?highlight=suggested');
+          setIsDialogOpen(false);
+          setIsConfirmLoginOpen(true);
+        }
+      };
+    
+    const handleConfirmLogin = () => {
+        setIsConfirmLoginOpen(false);
+        setIsAuthDialogOpen(true);
+    };
+    
+    const handleCreateDetailedProfile = (method: 'ai' | 'manual') => {
+        setIsCreateDetailOpen(false);
+        setIsDialogOpen(false);
+        if (method === 'ai') {
+            router.push('/ai-profile');
+        } else {
+            router.push('/candidate-profile');
+        }
+    };
+    
+    const FirstStepDialog = () => (
+        <>
+            <h2 className="text-2xl font-headline text-center mb-2">Chọn phương thức tạo hồ sơ</h2>
+            <p className="text-center text-muted-foreground mb-6">Bạn muốn tạo hồ sơ để làm gì?</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                    <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
+                    <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
+                </Card>
+                <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                    <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
+                    <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
+                </Card>
+            </div>
+        </>
+    );
+
+    const QuickCreateStepDialog = () => (
+        <>
+            <h2 className="text-2xl font-headline text-center mb-2">Chọn loại hình lao động</h2>
+            <p className="text-center text-muted-foreground mb-6">Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center ...">
+                    <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
+                    <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
+                </Button>
+                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center ...">
+                    <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
+                    <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
+                </Button>
+                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center ...">
+                    <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
+                    <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
+                </Button>
+            </div>
+            <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
+        </>
+    );
+    
+    // ... Other dialog step components would go here ...
+    const renderDialogContent = () => {
+        switch(profileCreationStep) {
+            case 1: return <FirstStepDialog />;
+            // Add other cases here later
+            default: return <FirstStepDialog />;
+        }
+    }
+
     return (
         <section>
             <h2 className="text-2xl font-bold font-headline mb-6"><Icon className="inline-block mr-3 text-primary h-7 w-7" />{title}</h2>
@@ -118,19 +233,60 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                 <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
                     <UserPlus className="h-10 w-10 text-primary" />
                 </div>
-                <p className="font-semibold text-lg">Hoàn thiện hồ sơ để xem gợi ý</p>
-                <p className="text-muted-foreground mt-2 mb-6">Hồ sơ của bạn chưa có thông tin. Hãy tạo hồ sơ để HelloJob AI có thể gợi ý những việc làm phù hợp nhất.</p>
+                <p className="font-semibold text-lg">Tạo hồ sơ để được hiển thị việc làm phù hợp</p>
+                <p className="text-muted-foreground mt-2 mb-6">Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button onClick={() => router.push('/ai-profile')}>
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        Tạo hồ sơ nhanh bằng AI
-                    </Button>
-                     <Button variant="outline" onClick={() => router.push('/candidate-profile')}>
-                        <Briefcase className="mr-2 h-4 w-4" />
-                        Tới trang hồ sơ
-                    </Button>
+                    <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                                <Sparkles className="mr-2 h-4 w-4" />
+                                Tạo hồ sơ nhanh
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-2xl">
+                           {renderDialogContent()}
+                        </DialogContent>
+                    </Dialog>
+                    <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
+                        <DialogTrigger asChild>
+                           <Button>
+                                <Briefcase className="mr-2 h-4 w-4" />
+                                Tạo hồ sơ chi tiết
+                           </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-xl">
+                            <h2 className="text-2xl font-headline text-center mb-2">Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                                <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary ...">
+                                    <Sparkles className="h-8 w-8 text-primary mx-auto mb-2" />
+                                    <h3 className="font-bold text-base mb-1">Dùng AI</h3>
+                                    <p className="text-muted-foreground text-xs">Tải lên CV, AI sẽ tự động điền thông tin.</p>
+                                </Card>
+                                <Card onClick={() => handleCreateDetailedProfile('manual')} className="text-center p-4 hover:shadow-lg hover:border-primary ...">
+                                    <Pencil className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                                    <h3 className="font-bold text-base mb-1">Thủ công</h3>
+                                    <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
+                                </Card>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </Card>
+            <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+             <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Bạn cần có tài khoản để lưu các lựa chọn và xem việc làm phù hợp. Đi đến trang đăng ký/đăng nhập?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Từ chối</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </section>
     )
 };
@@ -586,3 +742,5 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 }
+
+    
