@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useCallback, useRef, useState, useEffect } from "react";
@@ -42,6 +41,7 @@ export type SearchFilters = {
     visionRequirement?: string;
     dominantHand?: string;
     otherSkillRequirement?: string[];
+    companyArrivalTime?: string;
 }
 
 export const experienceYears: { name: string; slug: string }[] = [

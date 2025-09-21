@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
@@ -1143,7 +1142,8 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 {showArrivalTimeFilter && (
                                 <div className="space-y-2">
                                     <Label>Yêu cầu thời điểm về công ty</Label>
-                                    <Select><SelectTrigger><SelectValue placeholder="Chọn thời điểm" /></SelectTrigger>
+                                    <Select value={filters.companyArrivalTime} onValueChange={(value) => onFilterChange({ companyArrivalTime: value })}>
+                                        <SelectTrigger id="company-arrival-time"><SelectValue placeholder="Chọn thời điểm" /></SelectTrigger>
                                         <SelectContent>
                                             {getFutureMonths().map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
                                         </SelectContent>
