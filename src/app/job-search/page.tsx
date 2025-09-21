@@ -36,11 +36,11 @@ const initialSearchFilters: SearchFilters = {
     yearsOfExperience: '',
     tattooRequirement: '',
     hepatitisBRequirement: '',
-    visionRequirement: 'all',
+    netFee: '',
     quantity: '',
     interviewRounds: '',
     interviewDate: '',
-    netFee: '',
+    visionRequirement: 'all',
     dominantHand: '',
     otherSkillRequirement: [],
 };
@@ -240,7 +240,7 @@ function JobSearchPageContent() {
 
             const industryMatch = !industry || industry === 'all' || (job.industry && job.industry === industryName);
 
-            const jobDetailMatch = !jobDetail || (job.title && createSlug(job.title).includes(jobDetail)) || (job.details.description && createSlug(job.details.description).includes(jobDetail));
+            const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && createSlug(job.title).includes(jobDetail)) || (job.details.description && createSlug(job.details.description).includes(jobDetail));
             
             const expReqMatch = !expReqSlug || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(expReqSlug);
             
@@ -419,7 +419,7 @@ function JobSearchPageContent() {
             }
             const industryMatch = !industry || industry === 'all' || (job.industry && job.industry === industryName);
 
-            const jobDetailMatch = !jobDetail || (job.title && createSlug(job.title).includes(jobDetail)) || (job.details.description && createSlug(job.details.description).includes(jobDetail));
+            const jobDetailMatch = !jobDetail || jobDetail === 'all-details' || (job.title && createSlug(job.title).includes(jobDetail)) || (job.details.description && createSlug(job.details.description).includes(jobDetail));
 
             const expReqMatch = !expReqSlug || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(expReqSlug);
             
