@@ -58,7 +58,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
   };
 
   const handleVisaDetailChange = (value: string) => {
-    const newFilters: Partial<SearchFilters> = { visaDetail: value };
+    const newFilters: Partial<SearchFilters> = { visaDetail: value === 'all' ? '' : value };
     const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
     
     if (parentType && filters.visa !== parentType) {
@@ -152,12 +152,12 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end mt-4">
                         <div className="space-y-2">
                             <Label htmlFor="search-type" className="text-foreground text-sm">Chi tiết loại hình visa</Label>
-                            <Select onValueChange={(value) => handleFilterChange('visaDetail', value)} value={filters.visaDetail || ''}>
+                            <Select onValueChange={(value) => handleVisaDetailChange(value)} value={filters.visaDetail || 'all'}>
                                 <SelectTrigger id="search-type">
                                 <SelectValue placeholder="Tất cả loại hình" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                <SelectItem value="">Tất cả loại hình</SelectItem>
+                                <SelectItem value="all">Tất cả loại hình</SelectItem>
                                  {japanJobTypes.map(type => (
                                     <SelectGroup key={type.slug}>
                                         <SelectLabel>{type.name}</SelectLabel>
@@ -171,12 +171,12 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="search-industry" className="text-foreground text-sm">Ngành nghề</Label>
-                            <Select onValueChange={(value) => handleFilterChange('industry', value)} value={filters.industry || ''}>
+                            <Select onValueChange={(value) => handleFilterChange('industry', value)} value={filters.industry || 'all'}>
                                 <SelectTrigger id="search-industry">
                                     <SelectValue placeholder="Tất cả ngành nghề" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Tất cả ngành nghề</SelectItem>
+                                    <SelectItem value="all">Tất cả ngành nghề</SelectItem>
                                     {availableIndustries.map((industry) => (
                                         <SelectItem key={industry.slug} value={industry.slug}>
                                             {industry.name}
@@ -187,7 +187,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                         </div>
                          <div className="space-y-2">
                             <Label htmlFor="search-location" className="text-foreground text-sm">Địa điểm làm việc</Label>
-                            <Select onValueChange={(value) => handleFilterChange('location', value === 'all' ? [] : [value])} value={Array.isArray(filters.location) ? filters.location[0] : filters.location}>
+                            <Select onValueChange={(value) => handleFilterChange('location', value === 'all' ? [] : [value])} value={Array.isArray(filters.location) ? filters.location[0] || 'all' : 'all'}>
                                 <SelectTrigger id="search-location">
                                 <SelectValue placeholder="Tất cả địa điểm" />
                                 </SelectTrigger>
