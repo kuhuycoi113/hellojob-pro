@@ -45,6 +45,9 @@ export function ContactButtons({ contact, showChatText = false }: ContactButtons
       e.stopPropagation();
   }
 
+  if (!isClient) {
+    return null; // Render nothing on the server and during initial client render
+  }
 
   return (
     <>
