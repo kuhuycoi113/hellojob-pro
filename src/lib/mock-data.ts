@@ -204,8 +204,6 @@ const createJobList = (): Job[] => {
                     
                     const assignedConsultant = findMatchingConsultant();
                     
-                    const isTTS = visaType.name.includes('Thực tập sinh');
-                    
                     const postedDate = new Date();
                     postedDate.setDate(postedDate.getDate() - (jobIndex % 30));
                     const interviewDate = new Date(postedDate);
@@ -258,20 +256,25 @@ const createJobList = (): Job[] => {
                     
                     let netFee;
                     let netFeeNoTicket;
-
-                    const feeVisas = ['dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
-                    if (isTTS || (feeVisas.includes(detail.slug) && (jobIndex % 5 < 4))) { // Apply 80% rule for fee-based visas
-                        if (isTTS) {
-                            netFee = `${(100 + (jobIndex % 50)) * 1000000}`;
-                        } else if (detail.slug === 'dac-dinh-dau-viet') {
-                            netFee = `${Math.floor(1000 + (jobIndex % 1500)) * 100000}`; // Random fee up to 2500 USD in JPY
-                            netFeeNoTicket = `${Math.floor(800 + (jobIndex % 1200)) * 100000}`; // Lower fee without ticket
-                        } else { // 'dac-dinh-di-moi' and 'ky-su-tri-thuc-dau-viet'
-                            netFee = `${Math.floor(1000 + (jobIndex % 2800)) * 100000}`; // Random fee up to 3800 USD in JPY
-                            netFeeNoTicket = `${Math.floor(800 + (jobIndex % 2500)) * 100000}`;
+                    
+                    const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
+                    if (feeVisas.includes(detail.slug) && (jobIndex % 5 < 4)) { // 80% have fees
+                        if (detail.slug === 'dac-dinh-dau-viet') {
+                            netFee = String(Math.floor(1500 + (Math.random() * 1000))); // 1500-2500
+                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1))); // 80-90% of netFee
+                        } else if (detail.slug === 'dac-dinh-di-moi' || detail.slug === 'ky-su-tri-thuc-dau-viet') {
+                            netFee = String(Math.floor(2500 + (Math.random() * 1300))); // 2500-3800
+                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
+                        } else if (detail.slug === 'thuc-tap-sinh-1-nam') {
+                            netFee = String(Math.floor(1000 + (Math.random() * 400))); // 1000-1400
+                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
+                        } else { // TTS 3 năm
+                            netFee = String(Math.floor(3000 + (Math.random() * 600))); // 3000-3600
+                             netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
                         }
                     }
 
+                    const isTTS = visaType.slug === 'thuc-tap-sinh-ky-nang';
 
                     const job: Job = {
                         id: generateUniqueJobId(jobIndex),
@@ -425,18 +428,23 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             let netFee;
             let netFeeNoTicket;
 
-            const feeVisas = ['dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
-            if (isTTS || (feeVisas.includes(detail.slug) && (jobIndex % 5 < 4))) { // Apply 80% rule
-                if (isTTS) {
-                    netFee = `${(100 + (jobIndex % 50)) * 1000000}`;
-                } else if (detail.slug === 'dac-dinh-dau-viet') {
-                    netFee = `${Math.floor(1000 + (jobIndex % 1500)) * 100000}`;
-                    netFeeNoTicket = `${Math.floor(800 + (jobIndex % 1200)) * 100000}`;
-                } else { // 'dac-dinh-di-moi' and 'ky-su-tri-thuc-dau-viet'
-                    netFee = `${Math.floor(1000 + (jobIndex % 2800)) * 100000}`;
-                    netFeeNoTicket = `${Math.floor(800 + (jobIndex % 2500)) * 100000}`;
+            const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
+            if (feeVisas.includes(detail.slug) && (jobIndex % 5 < 4)) { // 80% have fees
+                if (detail.slug === 'dac-dinh-dau-viet') {
+                    netFee = String(Math.floor(1500 + (Math.random() * 1000))); // 1500-2500
+                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1))); // 80-90% of netFee
+                } else if (detail.slug === 'dac-dinh-di-moi' || detail.slug === 'ky-su-tri-thuc-dau-viet') {
+                    netFee = String(Math.floor(2500 + (Math.random() * 1300))); // 2500-3800
+                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
+                } else if (detail.slug === 'thuc-tap-sinh-1-nam') {
+                    netFee = String(Math.floor(1000 + (Math.random() * 400))); // 1000-1400
+                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
+                } else if (detail.slug === 'thuc-tap-sinh-3-nam') { // TTS 3 năm
+                    netFee = String(Math.floor(3000 + (Math.random() * 600))); // 3000-3600
+                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + Math.random() * 0.1)));
                 }
             }
+
 
             const job: Job = {
                 id: generateUniqueJobId(jobIndex),
