@@ -104,15 +104,15 @@ const interviewRoundsOptions = [
     { name: "5 vòng", slug: "5-vong" }
 ];
 const workShifts = [
-    "Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)",
-    "Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)",
-    "Ca đêm (thường 24:00-08:00)",
-    "Ca luân phiên (chia ca sáng, chiều và đêm; luân phiên tuần tháng)",
-    "Ca 2-2-3 (làm 2 ngày, nghỉ 2 ngày, làm 3 ngày và lặp lại)",
-    "Ca 4-3-3 (làm 4 ngày, nghỉ 3 ngày và tiếp tục 3 ngày nghỉ)",
-    "Nghỉ thứ 7, Chủ Nhật",
-    "Nghỉ định kỳ trong tuần",
-    "Khác"
+    { name: "Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)", slug: "ca-ngay" },
+    { name: "Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)", slug: "ca-chieu-toi" },
+    { name: "Ca đêm (thường 24:00-08:00)", slug: "ca-dem" },
+    { name: "Ca luân phiên (chia ca sáng, chiều và đêm; luân phiên tuần tháng)", slug: "ca-luan-phien" },
+    { name: "Ca 2-2-3 (làm 2 ngày, nghỉ 2 ngày, làm 3 ngày và lặp lại)", slug: "ca-2-2-3" },
+    { name: "Ca 4-3-3 (làm 4 ngày, nghỉ 3 ngày và tiếp tục 3 ngày nghỉ)", slug: "ca-4-3-3" },
+    { name: "Nghỉ thứ 7, Chủ Nhật", slug: "nghi-t7-cn" },
+    { name: "Nghỉ định kỳ trong tuần", slug: "nghi-dinh-ky" },
+    { name: "Khác", slug: "khac" }
 ];
 const ginouExpiryOptions = [
     "Trên 4,5 năm", "Trên 4 năm", "Trên 3,5 năm", "Trên 3 năm", "Trên 2,5 năm", "Trên 2 năm", "Trên 1,5 năm", "Trên 1 năm", "Trên 0,5 năm"
@@ -406,8 +406,8 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
             let weightMatch = true;
             if (filtersToApply.weight) {
                 const [jobMinWeight, jobMaxWeight] = parsePhysicalRequirement(job.weightRequirement);
-                const [filterMinWeight, filterMaxWeight] = filtersToApply.weight;
-                weightMatch = filterMinWeight <= jobMaxWeight && filterMaxWeight >= jobMinWeight;
+                const [filterMinWeight, filterMaxHeight] = filtersToApply.weight;
+                weightMatch = filterMinWeight <= jobMaxWeight && filterMaxHeight >= jobMinWeight;
             }
             const visionMatch = !filtersToApply.visionRequirement || filtersToApply.visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(filtersToApply.visionRequirement);
             const tattooReqName = tattooRequirements.find(t => t.slug === filtersToApply.tattooRequirement)?.name;
@@ -424,7 +424,9 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                  return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
             });
 
-            return visaMatch && industryMatch && jobDetailMatch && expReqMatch && yearsOfExperienceMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch;
+            const workShiftMatch = !filters.workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(filters.workShift));
+
+            return visaMatch && industryMatch && jobDetailMatch && expReqMatch && yearsOfExperienceMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && workShiftMatch;
         });
 
         // Count jobs in the pre-filtered list
@@ -617,7 +619,6 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
     };
     
     const showEducationFilter = useMemo(() => {
-        const visasToShow = ['ky-su-tri-thuc-dau-viet', 'ky-su-tri-thuc-dau-nhat'];
         const parentVisaSlug = activeFilters.visa || Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === activeFilters.visaDetail));
         
         return parentVisaSlug === 'ky-su-tri-thuc' || !activeFilters.visaDetail;
@@ -1152,9 +1153,12 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 )}
                                 <div className="space-y-2">
                                     <Label>Ca làm việc</Label>
-                                    <Select><SelectTrigger><SelectValue placeholder="Chọn ca làm việc" /></SelectTrigger>
+                                     <Select value={filters.workShift} onValueChange={(value) => onFilterChange({ workShift: value })}>
+                                        <SelectTrigger className={cn(filters.workShift && 'text-primary')}>
+                                            <SelectValue placeholder="Chọn ca làm việc" />
+                                        </SelectTrigger>
                                         <SelectContent>
-                                            {workShifts.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                            {workShifts.map(shift => <SelectItem key={shift.slug} value={shift.slug}>{shift.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>

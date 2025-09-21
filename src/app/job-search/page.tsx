@@ -44,6 +44,7 @@ const initialSearchFilters: SearchFilters = {
     dominantHand: '',
     otherSkillRequirement: [],
     companyArrivalTime: '',
+    workShift: '',
 };
 
 // Helper function to escape regex special characters
@@ -180,7 +181,17 @@ const otherSkills = [
     { name: "Đọc được bản vẽ kỹ thuật", slug: "doc-duoc-ban-ve-ky-thuat" },
     { name: "Có bằng thi công nội thất", slug: "co-bang-thi-cong-noi-that" }
 ];
-
+const workShifts = [
+    { name: "Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)", slug: "ca-ngay" },
+    { name: "Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)", slug: "ca-chieu-toi" },
+    { name: "Ca đêm (thường 24:00-08:00)", slug: "ca-dem" },
+    { name: "Ca luân phiên (chia ca sáng, chiều và đêm; luân phiên tuần tháng)", slug: "ca-luan-phien" },
+    { name: "Ca 2-2-3 (làm 2 ngày, nghỉ 2 ngày, làm 3 ngày và lặp lại)", slug: "ca-2-2-3" },
+    { name: "Ca 4-3-3 (làm 4 ngày, nghỉ 3 ngày và tiếp tục 3 ngày nghỉ)", slug: "ca-4-3-3" },
+    { name: "Nghỉ thứ 7, Chủ Nhật", slug: "nghi-t7-cn" },
+    { name: "Nghỉ định kỳ trong tuần", slug: "nghi-dinh-ky" },
+    { name: "Khác", slug: "khac" }
+];
 
 
 function JobSearchPageContent() {
@@ -200,7 +211,7 @@ function JobSearchPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement, specialConditions, companyArrivalTime,
+            otherSkillRequirement, specialConditions, companyArrivalTime, workShift,
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -336,11 +347,12 @@ function JobSearchPageContent() {
             });
 
             // Assuming job.companyArrivalTime exists in the future
-            // @ts-ignore
-            const companyArrivalTimeMatch = !companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === companyArrivalTime);
+            const arrivalTimeMatch = !companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === companyArrivalTime);
+            
+            const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(workShift);
 
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && companyArrivalTimeMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch;
         });
 
         // Sorting logic
@@ -384,7 +396,7 @@ function JobSearchPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement, specialConditions, companyArrivalTime,
+            otherSkillRequirement, specialConditions, companyArrivalTime, workShift,
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -513,10 +525,11 @@ function JobSearchPageContent() {
                  return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
             });
 
-             // @ts-ignore
-            const companyArrivalTimeMatch = !companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === companyArrivalTime);
+             const arrivalTimeMatch = !companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === companyArrivalTime);
+             
+             const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(workShift);
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && companyArrivalTimeMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -564,6 +577,11 @@ function JobSearchPageContent() {
                 const parts = value.split('-');
                 if (parts.length === 3 && parts[0] === 'thang') {
                      newFilters['companyArrivalTime'] = `Tháng ${parts[1]}/${parts[2]}`;
+                }
+            } else if (key === 'ca') {
+                const workShiftName = workShifts.find(w => w.slug === value)?.name;
+                if (workShiftName) {
+                     newFilters['workShift'] = workShiftName;
                 }
             }
              else {
@@ -623,6 +641,11 @@ function JobSearchPageContent() {
                     } else if (key === 'companyArrivalTime' && typeof value === 'string') {
                         const slug = value.toLowerCase().replace('tháng ', 'thang-').replace('/', '-');
                         query.set('thoidiem', slug);
+                    } else if (key === 'workShift' && typeof value === 'string') {
+                        const slug = workShifts.find(w => w.name === value)?.slug;
+                        if (slug) {
+                            query.set('ca', slug);
+                        }
                     }
                     else {
                         query.set(key, String(value));
