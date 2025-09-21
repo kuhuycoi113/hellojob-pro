@@ -111,9 +111,9 @@ function JobsPageContent() {
                         {Object.entries(jobGroups).map(([title, jobs]) => {
                             if (jobs.length === 0) return null;
 
-                            const isSuggestionModule = title === 'Có thể bạn quan tâm' || title === 'Gợi ý cho bạn';
+                            const isProfileSuggestionModule = title === 'Gợi ý cho bạn';
 
-                            if (isSuggestionModule && !isLoggedIn) {
+                            if (isProfileSuggestionModule && !isLoggedIn) {
                                 return <CTAForGuest key={title} title={title} />;
                             }
                             
@@ -123,7 +123,7 @@ function JobsPageContent() {
                                 link = '/job-search?sortBy=salary_desc';
                             } else if (title === 'Việc làm phí thấp') {
                                 link = '/job-search?sortBy=fee_asc';
-                            } else if (isSuggestionModule) {
+                            } else if (isProfileSuggestionModule || title === 'Có thể bạn quan tâm') {
                                 link = '/my-jobs';
                             }
 

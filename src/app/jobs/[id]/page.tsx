@@ -138,12 +138,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         }
 
         const fetchSuggestions = async () => {
-            if (!isLoggedIn) {
-                setIsLoading(false);
-                setIsLoadingBehavioral(false);
-                return;
-            };
-
             setIsLoading(true);
             setIsLoadingBehavioral(true);
             try {
@@ -152,17 +146,15 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 
                 const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
 
-                // Fetch profile-based suggestions
-                if (profile) {
+                // Fetch profile-based suggestions only if logged in
+                if (isLoggedIn && profile) {
                     const profileResults = await matchJobsToProfile(profile, 'related');
                     setProfileSuggestions(profileResults.map(r => r.job).filter(j => j.id !== resolvedParams.id).slice(0, 4));
                 }
 
-                // Fetch behavior-based suggestions if signals exist
-                if (behavioralSignals.length > 0) {
-                    const behavioralResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
-                    setBehavioralSuggestions(behavioralResults.filter(r => r.job.id !== resolvedParams.id).slice(0, 4));
-                }
+                // Fetch behavior-based suggestions for all users
+                const behavioralResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
+                setBehavioralSuggestions(behavioralResults.filter(r => r.job.id !== resolvedParams.id).slice(0, 4));
 
             } catch (error) {
                 console.error("Failed to fetch job suggestions:", error);
@@ -476,45 +468,40 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 </div>
                  {/* Suggestions Section */}
                 <div className="mt-16 pt-12 border-t space-y-12">
-                     {isLoggedIn ? (
-                        <>
-                             <section id="behavioral-suggestions">
-                                <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
-                                {isLoadingBehavioral ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
-                                    </div>
-                                ) : behavioralSuggestions.length > 0 ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        {behavioralSuggestions.map((item) => (
-                                            <JobCard key={item.job.id} job={item.job} />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="text-muted-foreground">Không có gợi ý nào. Hãy xem thêm các công việc khác để chúng tôi hiểu bạn hơn!</p>
-                                )}
-                            </section>
-                            
-                            <section>
-                                <h2 className="text-2xl font-bold font-headline mb-6"><Star className="inline-block mr-3 text-primary h-7 w-7"/>Gợi ý cho bạn</h2>
-                                {isLoading ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
-                                    </div>
-                                ) : profileSuggestions.length > 0 ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        {profileSuggestions.map((job) => <JobCard key={job.id} job={job} />)}
-                                    </div>
-                                ) : (
-                                    <p className="text-muted-foreground">Không có gợi ý nào dựa trên hồ sơ của bạn. Hãy cập nhật hồ sơ để nhận gợi ý tốt hơn.</p>
-                                )}
-                            </section>
-                        </>
+                     <section id="behavioral-suggestions">
+                        <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
+                        {isLoadingBehavioral ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
+                            </div>
+                        ) : behavioralSuggestions.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {behavioralSuggestions.map((item) => (
+                                    <JobCard key={item.job.id} job={item.job} />
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-muted-foreground">Không có gợi ý nào. Hãy xem thêm các công việc khác để chúng tôi hiểu bạn hơn!</p>
+                        )}
+                    </section>
+                    
+                    {isLoggedIn ? (
+                        <section>
+                            <h2 className="text-2xl font-bold font-headline mb-6"><Star className="inline-block mr-3 text-primary h-7 w-7"/>Gợi ý cho bạn</h2>
+                            {isLoading ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
+                                </div>
+                            ) : profileSuggestions.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {profileSuggestions.map((job) => <JobCard key={job.id} job={job} />)}
+                                </div>
+                            ) : (
+                                <p className="text-muted-foreground">Không có gợi ý nào dựa trên hồ sơ của bạn. Hãy cập nhật hồ sơ để nhận gợi ý tốt hơn.</p>
+                            )}
+                        </section>
                     ) : (
-                         <>
-                            <CTAForGuest title="Có thể bạn quan tâm" icon={BrainCircuit} onLoginClick={() => setIsAuthDialogOpen(true)} />
-                            <CTAForGuest title="Gợi ý cho bạn" icon={Star} onLoginClick={() => setIsAuthDialogOpen(true)} />
-                         </>
+                         <CTAForGuest title="Gợi ý cho bạn" icon={Star} onLoginClick={() => setIsAuthDialogOpen(true)} />
                     )}
 
                     {role === 'candidate' && (
