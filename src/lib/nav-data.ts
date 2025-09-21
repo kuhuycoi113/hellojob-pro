@@ -17,6 +17,7 @@ import {
   Home,
   Briefcase,
   UserSearch,
+  Building,
 } from 'lucide-react';
 
 export const mainNavLinks = [
@@ -36,7 +37,7 @@ export const mainNavLinks = [
 export const quickAccessLinks = [
   { href: '/roadmap', label: 'Lộ trình', icon: Compass },
   { href: '/consultant-profile', label: 'Tư vấn viên', icon: UserSearch },
-  { href: '/post-job', label: 'Đăng tuyển dụng', icon: PlusCircle },
+  { href: '/partner/dashboard', label: 'Nhà tuyển dụng', icon: Building },
   { href: '/dashboard', label: 'Dữ liệu & Báo cáo', icon: FileText },
   { href: '/franchise', label: 'Đối tác tại Nhật', icon: Handshake },
   { href: '/my-jobs', label: 'Việc của tôi', icon: Briefcase },
