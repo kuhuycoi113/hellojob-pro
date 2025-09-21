@@ -829,3 +829,5 @@ export const industryGroups = {
   'Ngoài trời': ['Xây dựng', 'Nông nghiệp', 'Ngư nghiệp'],
   'Dịch vụ & Chăm sóc con người': ['Điều dưỡng', 'Nhà hàng', 'Vận tải', 'Lưu trú, khách sạn', 'Vệ sinh toà nhà', 'Hàng không'],
 };
+
+export const allIndustries = Array.from(new Map(Object.values(industriesByJobType).flat().map(item => [item.slug, item])).values());
