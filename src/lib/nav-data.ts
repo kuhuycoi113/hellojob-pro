@@ -37,7 +37,7 @@ export const mainNavLinks = [
 export const quickAccessLinks = [
   { href: '/lo-trinh', label: 'Lộ trình', icon: Compass },
   { href: '/tu-van-vien', label: 'Tư vấn viên', icon: UserSearch },
-  { href: '/doi-tac/bang-dieu-khien', label: 'Nhà tuyển dụng', icon: Building },
+  { href: '/doi-tac', label: 'Nhà tuyển dụng', icon: Building },
   { href: '/bang-dieu-khien', label: 'Dữ liệu & Báo cáo', icon: FileText },
   { href: '/nhuong-quyen', label: 'Đối tác tại Nhật', icon: Handshake },
   { href: '/viec-lam-cua-toi', label: 'Việc của tôi', icon: Briefcase },

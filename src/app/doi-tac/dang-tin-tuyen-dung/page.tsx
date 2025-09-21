@@ -239,7 +239,7 @@ export default function PartnerPostJobPage() {
       className: "bg-green-500 text-white"
     });
     setTimeout(() => {
-      router.push('/doi-tac/bang-dieu-khien');
+      router.push('/doi-tac');
     }, 1500);
   }
 
