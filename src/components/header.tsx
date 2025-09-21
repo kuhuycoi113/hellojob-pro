@@ -3,7 +3,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat, ChevronRight, Search } from 'lucide-react';
+import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat, ChevronRight, Search, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useState, useEffect } from 'react';
@@ -52,9 +52,9 @@ import Image from 'next/image';
 import { useChat } from '@/contexts/ChatContext';
 import { mainNavLinks, quickAccessLinks, mobileFooterLinks } from '@/lib/nav-data';
 import { useAuth, type Role } from '@/contexts/AuthContext';
-import { Industry, industriesByJobType } from '@/lib/industry-data';
+import { Industry, industriesByJobType, allIndustries } from '@/lib/industry-data';
 import { AuthDialog } from './auth-dialog';
-import { locations } from '@/lib/location-data';
+import { locations, allJapanLocations } from '@/lib/location-data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileSecondaryHeader } from './mobile-secondary-header';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from './ui/select';
@@ -62,6 +62,7 @@ import { Label } from './ui/label';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Input } from './ui/input';
 import type { SearchFilters } from './job-search/search-results';
+import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 
 
 export const Logo = ({ className }: { className?: string }) => (
@@ -76,7 +77,7 @@ const SearchDialog = () => {
         industry: '',
         location: [],
     });
-    const allIndustries = Array.from(new Map(Object.values(industriesByJobType).flat().map(item => [item.slug, item])).values());
+    const [isSearching, setIsSearching] = useState(false);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
 
@@ -101,22 +102,63 @@ const SearchDialog = () => {
         setFilters(prev => ({ ...prev, ...newFilters }));
     };
     
-    const handleSearch = () => {
+    const handleSearch = async () => {
+        setIsSearching(true);
         const query = new URLSearchParams();
-        if (filters.q) query.set('q', filters.q);
-        if (filters.visaDetail && filters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
-        if (filters.industry && filters.industry !== 'all') query.set('nganh-nghe', filters.industry);
-        if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
-            filters.location.forEach(loc => query.append('dia-diem', loc));
+
+        if (filters.q) {
+            try {
+                const criteria = await recommendJobs(filters.q);
+                if (criteria) {
+                    if (criteria.industry) {
+                        const industrySlug = allIndustries.find(i => i.name === criteria.industry)?.slug;
+                        if (industrySlug) query.set('nganh-nghe', industrySlug);
+                    }
+                    if (criteria.workLocation) {
+                        const locationSlug = allJapanLocations.find(l => l.name === criteria.workLocation)?.slug;
+                        if (locationSlug) query.set('dia-diem', locationSlug);
+                    }
+                    if (criteria.visaType) {
+                        const visaSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
+                        if(visaSlug) query.set('loai-visa', visaSlug);
+                    }
+                    if (criteria.gender) {
+                        query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
+                    }
+                    if (criteria.sortBy) {
+                        query.set('sap-xep', 'salary_desc');
+                    }
+                    // If AI returns nothing, fall back to raw query
+                    if (query.toString() === '') {
+                        query.set('q', filters.q);
+                    }
+                } else {
+                     query.set('q', filters.q);
+                }
+            } catch (error) {
+                console.error("AI search failed, falling back to keyword search:", error);
+                query.set('q', filters.q);
+            }
         }
+
+        // Add other filters if they are set, but only if there's no text query
+        if (!filters.q) {
+            if (filters.visaDetail && filters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
+            if (filters.industry && filters.industry !== 'all') query.set('nganh-nghe', filters.industry);
+            if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
+                filters.location.forEach(loc => query.append('dia-diem', loc));
+            }
+        }
+        
         setIsSearchDialogOpen(false);
+        setIsSearching(false);
         router.push(`/tim-viec-lam?${query.toString()}`);
     }
 
     return (
         <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
+                 <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
                     <Image src="/img/search02.png" alt="Search Icon" width={20} height={20} />
                     <span className="sr-only">Tìm kiếm</span>
                 </Button>
@@ -174,7 +216,10 @@ const SearchDialog = () => {
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button onClick={handleSearch} className="w-full sm:w-auto">Tìm kiếm</Button>
+                    <Button onClick={handleSearch} className="w-full sm:w-auto" disabled={isSearching}>
+                        {isSearching && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Tìm kiếm
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -776,6 +821,7 @@ const LoggedOutContent = () => {
     </>
   );
 }
+
 
 
 
