@@ -20,13 +20,13 @@ import { useRouter } from 'next/navigation';
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
 type SearchModuleProps = {
-    onSearch: (filters: SearchFilters) => void;
+    onSearch: (filters: Partial<SearchFilters>) => void;
     filters: Partial<SearchFilters>;
     onFilterChange: (newFilters: Partial<SearchFilters>) => void;
     showHero?: boolean;
 }
 
-export const SearchModule = ({ onSearch, showHero = false, filters: initialFilters, onFilterChange: setFilters }: SearchModuleProps) => {
+export const SearchModule = ({ onSearch, showHero = false, filters: initialFilters, onFilterChange: setParentFilters }: SearchModuleProps) => {
   const [filters, setInternalFilters] = useState(initialFilters);
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
   const [isSearchExpanded, setIsSearchExpanded] = useState(showHero);
@@ -54,31 +54,42 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
   }, [filters.visa, filters.visaDetail]);
   
   const handleFilterChange = (field: keyof typeof filters, value: any) => {
-    setFilters(prev => ({...prev, [field]: value}));
+    const newFilters = {...filters, [field]: value};
+    setInternalFilters(newFilters);
+    setParentFilters(newFilters);
   };
 
   const handleVisaDetailChange = (value: string) => {
     const newFilters: Partial<SearchFilters> = { visaDetail: value === 'all' ? '' : value };
-    const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
+    const parentTypeSlug = Object.keys(visaDetailsByVisaType).find(key => 
+        (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value)
+    );
     
-    if (parentType && filters.visa !== parentType) {
-        newFilters.visa = parentType;
+    if (parentTypeSlug && filters.visa !== parentTypeSlug) {
+        newFilters.visa = parentTypeSlug;
         newFilters.industry = ''; // Also reset industry if visa type changes
+    } else if (!value || value === 'all') {
+        newFilters.visa = ''; // Clear visa type if no detail is selected
     }
-    setFilters(newFilters);
+
+    const updatedFilters = { ...filters, ...newFilters };
+    setInternalFilters(updatedFilters);
+    setParentFilters(updatedFilters);
   }
   
   const handleSearchClick = () => {
-    onSearch(filters as SearchFilters);
+    onSearch(filters);
      if (window.innerWidth < 768) { // md breakpoint
       setIsSearchExpanded(false);
     }
   }
 
   const searchSummary = [
-    filters.visaDetail,
-    filters.industry,
-    Array.isArray(filters.location) ? filters.location.join(', ') : filters.location,
+    (visaDetailsByVisaType[filters.visa as keyof typeof visaDetailsByVisaType] || []).find(d => d.slug === filters.visaDetail)?.name,
+    (allIndustries.find(i => i.slug === filters.industry))?.name,
+    Array.isArray(filters.location) && filters.location.length > 0
+        ? filters.location.map(locSlug => allJapanLocations.find(l => l.slug === locSlug)?.name).filter(Boolean).join(', ')
+        : null,
     filters.q
   ].filter(Boolean).join(' / ');
 
@@ -171,7 +182,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="search-industry" className="text-foreground text-sm">Ngành nghề</Label>
-                            <Select onValueChange={(value) => handleFilterChange('industry', value)} value={filters.industry || 'all'}>
+                            <Select onValueChange={(value) => handleFilterChange('industry', value === 'all' ? '' : value)} value={filters.industry || 'all'}>
                                 <SelectTrigger id="search-industry">
                                     <SelectValue placeholder="Tất cả ngành nghề" />
                                 </SelectTrigger>
