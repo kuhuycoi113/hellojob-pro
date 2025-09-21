@@ -739,6 +739,9 @@ const LoggedOutContent = () => {
                                     {renderDialogContent()}
                                 </DialogContent>
                             </Dialog>
+                             <Button asChild>
+                                <Link href="/viec-lam-cua-toi">Trang việc làm</Link>
+                            </Button>
                            
                             <MainMenu />
                         </>
@@ -758,6 +761,9 @@ const LoggedOutContent = () => {
                                 {renderDialogContent()}
                             </DialogContent>
                         </Dialog>
+                        <Button asChild variant="default" size="sm">
+                            <Link href="/viec-lam-cua-toi">Việc</Link>
+                        </Button>
                         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="ghost" size="icon">
@@ -821,6 +827,7 @@ const LoggedOutContent = () => {
     </>
   );
 }
+
 
 
 
