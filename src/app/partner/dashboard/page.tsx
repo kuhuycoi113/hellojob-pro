@@ -27,7 +27,7 @@ export default function PartnerDashboardPage() {
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold font-headline">Bảng điều khiển</h1>
                 <Button asChild>
-                    <Link href="/partner/post-job"><PlusCircle/> Đăng tin tuyển dụng mới</Link>
+                    <Link href="/doi-tac/dang-tin-tuyen-dung"><PlusCircle/> Đăng tin tuyển dụng mới</Link>
                 </Button>
             </div>
             
@@ -66,7 +66,7 @@ export default function PartnerDashboardPage() {
                             {postedJobs.map((job) => (
                                 <TableRow key={job.id}>
                                     <TableCell className="font-medium">
-                                        <Link href={`/partner/jobs/${job.id}`} className="hover:text-primary">
+                                        <Link href={`/doi-tac/viec-lam/${job.id}`} className="hover:text-primary">
                                             {job.title}
                                         </Link>
                                     </TableCell>
@@ -86,7 +86,7 @@ export default function PartnerDashboardPage() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem asChild>
-                                                   <Link href={`/partner/jobs/${job.id}`} className="flex items-center w-full cursor-pointer">
+                                                   <Link href={`/doi-tac/viec-lam/${job.id}`} className="flex items-center w-full cursor-pointer">
                                                       <Eye className="mr-2 h-4 w-4"/>Xem ứng viên
                                                    </Link>
                                                 </DropdownMenuItem>

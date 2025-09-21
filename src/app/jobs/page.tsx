@@ -30,14 +30,14 @@ function JobsPageContent() {
 
     const handleSearch = (filters: SearchFilters) => {
         const query = new URLSearchParams();
-        if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('visaDetail', filters.visaDetail);
-        if (filters.industry && filters.industry !== 'all') query.set('industry', filters.industry);
+        if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
+        if (filters.industry && filters.industry !== 'all') query.set('nganh-nghe', filters.industry);
         if (Array.isArray(filters.location) && filters.location.length > 0 && !filters.location.includes('all')) {
-            filters.location.forEach(loc => query.append('location', loc));
+            filters.location.forEach(loc => query.append('dia-diem', loc));
         } else if (typeof filters.location === 'string' && filters.location && filters.location !== 'all') {
-            query.append('location', filters.location);
+            query.append('dia-diem', filters.location);
         }
-        router.push(`/job-search?${query.toString()}`);
+        router.push(`/tim-viec-lam?${query.toString()}`);
     };
 
     const handleFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
@@ -118,13 +118,13 @@ function JobsPageContent() {
                             }
                             
                             const visaDetailSlug = title.toLowerCase().replace(/ /g, '-');
-                            let link = `/job-search?visaDetail=${encodeURIComponent(visaDetailSlug)}`;
+                            let link = `/tim-viec-lam?chi-tiet-loai-hinh-visa=${encodeURIComponent(visaDetailSlug)}`;
                             if (title === 'Việc làm lương cao') {
-                                link = '/job-search?sortBy=salary_desc';
+                                link = '/tim-viec-lam?sap-xep=salary_desc';
                             } else if (title === 'Việc làm phí thấp') {
-                                link = '/job-search?sortBy=fee_asc';
+                                link = '/tim-viec-lam?sap-xep=fee_asc';
                             } else if (isProfileSuggestionModule || title === 'Có thể bạn quan tâm') {
-                                link = '/my-jobs';
+                                link = '/viec-lam-cua-toi';
                             }
 
                             return (

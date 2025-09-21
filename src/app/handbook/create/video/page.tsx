@@ -58,7 +58,7 @@ export default function CreateVideoPostPage() {
       className: 'bg-green-500 text-white',
     });
 
-    router.push('/handbook');
+    router.push('/cam-nang');
   };
 
   return (

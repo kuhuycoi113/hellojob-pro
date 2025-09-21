@@ -9,25 +9,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Static pages
   const staticRoutes = [
     '',
-    '/roadmap',
-    '/career-orientation',
+    '/lo-trinh',
+    '/career-orientation', // This route seems not to be translated, keeping it as is.
     '/career-orientation/holland',
     '/career-orientation/disc',
     '/career-orientation/mbti',
-    '/ai-profile',
-    '/learn',
-    '/handbook',
-    '/about',
-    '/candidate-profile',
-    '/employers',
-    '/franchise',
-    '/post-job',
-    '/dashboard',
-    '/feedback',
-    '/premium',
-    '/referral',
-    '/jobs',
-    '/chat',
+    '/tao-ho-so-ai',
+    '/hoc-tap',
+    '/cam-nang',
+    '/gioi-thieu',
+    '/ho-so-cua-toi',
+    '/nha-tuyen-dung',
+    '/nhuong-quyen',
+    '/dang-tin-tuyen-dung',
+    '/bang-dieu-khien',
+    '/gop-y',
+    '/nang-cap-premium',
+    '/gioi-thieu-ban-be',
+    '/viec-lam',
+    '/tim-viec-lam',
+    '/chat', // Assuming /chat is a valid route not needing translation
   ].map((route) => ({
     url: `${siteUrl}${route}`,
     lastModified: new Date(),
@@ -37,7 +38,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Dynamic handbook articles
   const handbookRoutes = articles.map((article) => ({
-    url: `${siteUrl}/handbook/${article.slug}`,
+    url: `${siteUrl}/cam-nang/${article.slug}`,
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.7,
@@ -45,7 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Dynamic job pages
   const jobRoutes = jobData.map((job) => ({
-      url: `${siteUrl}/jobs/${job.id}`,
+      url: `${siteUrl}/viec-lam/${job.id}`,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
       priority: 0.9,

@@ -8,12 +8,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 const PartnerHeader = () => (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-            <Link href="/partner/dashboard" className="flex items-center gap-2">
+            <Link href="/doi-tac/bang-dieu-khien" className="flex items-center gap-2">
                 <span className="font-semibold text-lg">Partner Portal</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6 text-sm">
-                <Link href="/partner/dashboard" className="font-medium hover:text-primary transition-colors flex items-center gap-2"><LayoutDashboard/> Bảng điều khiển</Link>
-                <Link href="/partner/post-job" className="font-medium hover:text-primary transition-colors flex items-center gap-2"><PlusCircle/> Đăng tin mới</Link>
+                <Link href="/doi-tac/bang-dieu-khien" className="font-medium hover:text-primary transition-colors flex items-center gap-2"><LayoutDashboard/> Bảng điều khiển</Link>
+                <Link href="/doi-tac/dang-tin-tuyen-dung" className="font-medium hover:text-primary transition-colors flex items-center gap-2"><PlusCircle/> Đăng tin mới</Link>
             </nav>
             <div className="flex items-center gap-4">
                  <Button variant="ghost" size="icon">

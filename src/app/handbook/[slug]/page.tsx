@@ -36,28 +36,28 @@ const ShareDialogContent = () => (
         </DialogDescription>
     </DialogHeader>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
-        <Link href="/handbook/create/post">
+        <Link href="/cam-nang/create/post">
             <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full">
                 <FileText className="h-12 w-12 text-blue-500 mx-auto mb-4" />
                 <h3 className="font-bold text-xl mb-2">Đăng nội dung dạng chữ</h3>
                 <p className="text-muted-foreground text-sm">Chia sẻ một câu chuyện, mẹo nhỏ, hoặc một câu hỏi.</p>
             </Card>
         </Link>
-        <Link href="/handbook/create/image">
+        <Link href="/cam-nang/create/image">
             <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full">
                 <ImageIcon className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
                 <h3 className="font-bold text-xl mb-2">Đăng bài viết dạng ảnh</h3>
                 <p className="text-muted-foreground text-sm">Tạo một bài viết với hình ảnh minh hoạ trực quan.</p>
             </Card>
         </Link>
-        <Link href="/handbook/create/video-short">
+        <Link href="/cam-nang/create/video-short">
             <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full">
                 <Smartphone className="h-12 w-12 text-green-500 mx-auto mb-4" />
                 <h3 className="font-bold text-xl mb-2">Đăng video ngắn</h3>
                 <p className="text-muted-foreground text-sm">Chia sẻ một khoảnh khắc hoặc hướng dẫn nhanh.</p>
             </Card>
         </Link>
-        <Link href="/handbook/create/video">
+        <Link href="/cam-nang/create/video">
             <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full">
                 <Video className="h-12 w-12 text-red-500 mx-auto mb-4" />
                 <h3 className="font-bold text-xl mb-2">Đăng video dài</h3>
@@ -96,7 +96,7 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
     return (
         <Card 
             className="hidden md:flex p-4 gap-4 transition-shadow hover:shadow-md cursor-pointer" 
-            onClick={() => router.push(`/jobs/${job.id}`)}
+            onClick={() => router.push(`/viec-lam/${job.id}`)}
         >
             <div className="relative w-48 h-auto flex-shrink-0">
                 <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
@@ -115,7 +115,7 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
                 </div>
                 <div className="mt-auto flex justify-between items-end">
                     <div className="flex items-center gap-2">
-                         <Link href={`/consultant-profile/${job.recruiter.id}`} onClick={(e) => e.stopPropagation()}>
+                         <Link href={`/tu-van-vien/${job.recruiter.id}`} onClick={(e) => e.stopPropagation()}>
                             <Avatar className="h-9 w-9">
                                 <AvatarImage src={job.recruiter.avatar} />
                                 <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
@@ -129,7 +129,7 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
                              <Bookmark className={cn("mr-2 h-4 w-4", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                              Lưu
                          </Button>
-                         <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/jobs/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
+                         <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/viec-lam/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
                        </div>
                         <p className="text-xs text-muted-foreground mt-1">
                             <span className="text-primary">Đăng lúc:</span> {job.postedTime.split(' ')[1]}
@@ -279,13 +279,13 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {hotJobs.slice(0,2).map(job => (
-                        <Link href="/jobs" key={job.id} className="group block">
+                        <Link href="/viec-lam" key={job.id} className="group block">
                            <p className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-2">{job.title}</p>
                            <p className="text-xs text-muted-foreground">{job.recruiter.company}</p>
                         </Link>
                       ))}
                        <Button asChild variant="outline" size="sm" className="w-full">
-                         <Link href="/jobs">Xem thêm việc làm <ChevronRight /></Link>
+                         <Link href="/viec-lam">Xem thêm việc làm <ChevronRight /></Link>
                       </Button>
                     </CardContent>
                  </Card>
@@ -351,7 +351,7 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
               <h3 className="text-lg font-bold mb-4 text-accent flex items-center"><FileText className="mr-2"/>Bài viết liên quan</h3>
               <div className="space-y-6">
                 {otherArticles.map(other => (
-                  <Link href={`/handbook/${other.slug}`} key={other.slug} className="group block">
+                  <Link href={`/cam-nang/${other.slug}`} key={other.slug} className="group block">
                       <Card className="overflow-hidden hover:shadow-lg transition-shadow">
                         <div className="relative aspect-video w-full">
                           <Image src={other.image} alt={other.title} fill className="object-cover transition-transform duration-300 group-hover:scale-105" data-ai-hint={other.dataAiHint} />
@@ -372,6 +372,3 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
     </div>
   );
 }
-
-
-

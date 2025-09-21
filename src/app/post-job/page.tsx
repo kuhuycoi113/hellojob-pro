@@ -1,5 +1,5 @@
 // This file is deprecated and will be removed.
-// The new job posting page is located at /partner/post-job
+// The new job posting page is located at /doi-tac/dang-tin-tuyen-dung
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 export default function DeprecatedPostJobPage() {
     const router = useRouter();
     useEffect(() => {
-        router.replace('/partner/post-job');
+        router.replace('/doi-tac/dang-tin-tuyen-dung');
     }, [router]);
 
     return (

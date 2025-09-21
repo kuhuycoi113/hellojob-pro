@@ -47,40 +47,39 @@ const initialSearchFilters: SearchFilters = {
     workShift: '',
 };
 
-// SEO-TU-KHOA-01: Key mapping for URL parameters
 const keyMap: { [key: string]: string } = {
-    visa: 'loai-visa',
-    visaDetail: 'chi-tiet-loai-hinh-visa',
-    industry: 'nganh-nghe',
-    location: 'dia-diem',
-    interviewLocation: 'dia-diem-phong-van',
-    jobDetail: 'chi-tiet-cong-viec',
-    gender: 'gioi-tinh',
-    age: 'do-tuoi',
-    height: 'chieu-cao',
-    weight: 'can-nang',
-    basicSalary: 'luong-co-ban',
-    netSalary: 'luong-thuc-linh',
-    hourlySalary: 'luong-gio',
-    annualIncome: 'thu-nhap-nam',
-    annualBonus: 'thuong-nam',
-    specialConditions: 'dieu-kien-dac-biet',
-    languageRequirement: 'yeu-cau-tieng-nhat',
-    englishRequirement: 'yeu-cau-tieng-anh',
-    educationRequirement: 'hoc-van',
-    experienceRequirement: 'yeu-cau-kinh-nghiem',
-    yearsOfExperience: 'so-nam-kinh-nghiem',
-    tattooRequirement: 'hinh-xam',
-    netFee: 'muc-phi',
-    quantity: 'so-luong',
-    interviewRounds: 'so-vong-phong-van',
-    interviewDate: 'ngay-phong-van',
-    visionRequirement: 'yeu-cau-thi-luc',
-    dominantHand: 'tay-thuan',
-    otherSkillRequirement: 'yeu-cau-ky-nang-khac',
-    companyArrivalTime: 'thoi-diem-ve-cong-ty',
-    workShift: 'ca-lam-viec',
-    sortBy: 'sap-xep',
+  visa: 'loai-visa',
+  visaDetail: 'chi-tiet-loai-hinh-visa',
+  industry: 'nganh-nghe',
+  location: 'dia-diem',
+  interviewLocation: 'dia-diem-phong-van',
+  jobDetail: 'chi-tiet-cong-viec',
+  gender: 'gioi-tinh',
+  age: 'do-tuoi',
+  height: 'chieu-cao',
+  weight: 'can-nang',
+  basicSalary: 'luong-co-ban',
+  netSalary: 'luong-thuc-linh',
+  hourlySalary: 'luong-gio',
+  annualIncome: 'thu-nhap-nam',
+  annualBonus: 'thuong-nam',
+  specialConditions: 'dieu-kien-dac-biet',
+  languageRequirement: 'yeu-cau-tieng-nhat',
+  englishRequirement: 'yeu-cau-tieng-anh',
+  educationRequirement: 'hoc-van',
+  experienceRequirement: 'yeu-cau-kinh-nghiem',
+  yearsOfExperience: 'so-nam-kinh-nghiem',
+  tattooRequirement: 'hinh-xam',
+  netFee: 'muc-phi',
+  quantity: 'so-luong',
+  interviewRounds: 'so-vong-phong-van',
+  interviewDate: 'ngay-phong-van',
+  visionRequirement: 'yeu-cau-thi-luc',
+  dominantHand: 'tay-thuan',
+  otherSkillRequirement: 'yeu-cau-ky-nang-khac',
+  companyArrivalTime: 'thoi-diem-ve-cong-ty',
+  workShift: 'ca-lam-viec',
+  sortBy: 'sap-xep',
 };
 
 const reverseKeyMap: { [key: string]: string } = Object.fromEntries(
@@ -662,7 +661,7 @@ function JobSearchPageContent() {
         if (sortBy !== 'newest') {
             query.set(keyMap['sortBy'], sortBy);
         }
-        router.push(`/job-search?${query.toString()}`);
+        router.push(`/tim-viec-lam?${query.toString()}`);
     }, [stagedFilters, sortBy, router]);
 
     const handleSortChange = (value: string) => {
@@ -673,7 +672,7 @@ function JobSearchPageContent() {
         } else {
             query.set(keyMap['sortBy'], value);
         }
-        router.push(`/job-search?${query.toString()}`);
+        router.push(`/tim-viec-lam?${query.toString()}`);
     };
   
     const handleResetFilters = useCallback(() => {
@@ -681,7 +680,7 @@ function JobSearchPageContent() {
         setSortBy('newest');
         countStagedResults(initialSearchFilters);
         if (searchParams.toString() !== '') {
-            router.push('/job-search');
+            router.push('/tim-viec-lam');
         } else {
              runFilter(initialSearchFilters, 'newest');
         }
@@ -696,7 +695,7 @@ function JobSearchPageContent() {
         } else if (typeof filters.location === 'string' && filters.location && filters.location !== 'all') {
             query.append(keyMap['location'], filters.location);
         }
-        router.push(`/job-search?${query.toString()}`);
+        router.push(`/tim-viec-lam?${query.toString()}`);
     }
 
     return (

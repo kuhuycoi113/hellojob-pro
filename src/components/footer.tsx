@@ -23,20 +23,20 @@ export function Footer() {
           <div>
             <h4 className="font-bold mb-4">Dành cho ứng viên</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/register" className="hover:text-primary">Đăng ký hồ sơ</Link></li>
-              <li><Link href="/candidate-profile" className="hover:text-primary">Hồ sơ của tôi</Link></li>
-              <li><Link href="/roadmap" className="hover:text-primary">Lộ trình sự nghiệp</Link></li>
-              <li><Link href="/learn" className="hover:text-primary">Khóa học online</Link></li>
-              <li><Link href="/consultant-profile" className="hover:text-primary">Tư vấn viên</Link></li>
+              <li><Link href="/dang-ky" className="hover:text-primary">Đăng ký hồ sơ</Link></li>
+              <li><Link href="/ho-so-cua-toi" className="hover:text-primary">Hồ sơ của tôi</Link></li>
+              <li><Link href="/lo-trinh" className="hover:text-primary">Lộ trình sự nghiệp</Link></li>
+              <li><Link href="/hoc-tap" className="hover:text-primary">Khóa học online</Link></li>
+              <li><Link href="/tu-van-vien" className="hover:text-primary">Tư vấn viên</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold mb-4">Dành cho nhà tuyển dụng</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/post-job" className="hover:text-primary">Đăng tin tuyển dụng</Link></li>
-              <li><Link href="/employers" className="hover:text-primary">Danh sách công ty</Link></li>
-              <li><Link href="/dashboard" className="hover:text-primary">Báo cáo dữ liệu</Link></li>
-              <li><Link href="/franchise" className="hover:text-primary">Đối tác tại Nhật</Link></li>
+              <li><Link href="/doi-tac/dang-tin-tuyen-dung" className="hover:text-primary">Đăng tin tuyển dụng</Link></li>
+              <li><Link href="/nha-tuyen-dung" className="hover:text-primary">Danh sách công ty</Link></li>
+              <li><Link href="/bang-dieu-khien" className="hover:text-primary">Báo cáo dữ liệu</Link></li>
+              <li><Link href="/nhuong-quyen" className="hover:text-primary">Đối tác tại Nhật</Link></li>
             </ul>
           </div>
           <div>

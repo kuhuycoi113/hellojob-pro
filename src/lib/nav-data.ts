@@ -22,36 +22,36 @@ import {
 
 export const mainNavLinks = [
   { href: '/', label: 'Trang chủ', icon: Home, mobile: true },
-  { href: '/jobs', label: 'Việc làm' },
-  { href: '/roadmap', label: 'Lộ trình' },
+  { href: '/viec-lam', label: 'Việc làm' },
+  { href: '/lo-trinh', label: 'Lộ trình' },
   {
-    href: '/ai-profile',
+    href: '/tao-ho-so-ai',
     label: 'Tạo hồ sơ AI',
     icon: Sparkles,
     mobile: true,
   },
-  { href: '/handbook', label: 'Cẩm nang', icon: LifeBuoy, mobile: true },
-  { href: '/about', label: 'Giới thiệu' },
+  { href: '/cam-nang', label: 'Cẩm nang', icon: LifeBuoy, mobile: true },
+  { href: '/gioi-thieu', label: 'Giới thiệu' },
 ];
 
 export const quickAccessLinks = [
-  { href: '/roadmap', label: 'Lộ trình', icon: Compass },
-  { href: '/consultant-profile', label: 'Tư vấn viên', icon: UserSearch },
-  { href: '/partner/dashboard', label: 'Nhà tuyển dụng', icon: Building },
-  { href: '/dashboard', label: 'Dữ liệu & Báo cáo', icon: FileText },
-  { href: '/franchise', label: 'Đối tác tại Nhật', icon: Handshake },
-  { href: '/my-jobs', label: 'Việc của tôi', icon: Briefcase },
-  { href: '/feedback', label: 'Góp ý', icon: MessageSquareWarning },
-  { href: '/premium', label: 'Nâng cấp Premium', icon: Gem },
-  { href: '/referral', label: 'Giới thiệu bạn bè', icon: UserPlus },
+  { href: '/lo-trinh', label: 'Lộ trình', icon: Compass },
+  { href: '/tu-van-vien', label: 'Tư vấn viên', icon: UserSearch },
+  { href: '/doi-tac/bang-dieu-khien', label: 'Nhà tuyển dụng', icon: Building },
+  { href: '/bang-dieu-khien', label: 'Dữ liệu & Báo cáo', icon: FileText },
+  { href: '/nhuong-quyen', label: 'Đối tác tại Nhật', icon: Handshake },
+  { href: '/viec-lam-cua-toi', label: 'Việc của tôi', icon: Briefcase },
+  { href: '/gop-y', label: 'Góp ý', icon: MessageSquareWarning },
+  { href: '/nang-cap-premium', label: 'Nâng cấp Premium', icon: Gem },
+  { href: '/gioi-thieu-ban-be', label: 'Giới thiệu bạn bè', icon: UserPlus },
 ];
 
 // Re-ordered to a stable, logical order to fix hydration errors.
 export const mobileFooterLinks = [
-  { href: '/jobs', label: 'Việc làm', icon: Briefcase },
-  { href: '/roadmap', label: 'Lộ trình', icon: Compass },
-  { href: '/ai-profile', label: 'Hồ sơ AI', icon: Sparkles },
-  { href: '/handbook', label: 'Cẩm nang', icon: LifeBuoy },
-  { href: '/consultant-profile', label: 'Tư vấn viên', icon: UserSearch },
-  { href: '/about', label: 'Giới thiệu', icon: Info },
+  { href: '/viec-lam', label: 'Việc làm', icon: Briefcase },
+  { href: '/lo-trinh', label: 'Lộ trình', icon: Compass },
+  { href: '/tao-ho-so-ai', label: 'Hồ sơ AI', icon: Sparkles },
+  { href: '/cam-nang', label: 'Cẩm nang', icon: LifeBuoy },
+  { href: '/tu-van-vien', label: 'Tư vấn viên', icon: UserSearch },
+  { href: '/gioi-thieu', label: 'Giới thiệu', icon: Info },
 ];

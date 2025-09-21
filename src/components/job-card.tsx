@@ -133,7 +133,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     e.preventDefault();
     // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01 & UNGTUYEN-L05 & UNGTUYEN-L06: Start of apply functionality
     if (!isLoggedIn) {
-        sessionStorage.setItem('postLoginRedirect', `/jobs/${job.id}`);
+        sessionStorage.setItem('postLoginRedirect', `/viec-lam/${job.id}`);
         setIsConfirmLoginOpen(true);
     } else {
         const profileRaw = localStorage.getItem('generatedCandidateProfile');
@@ -176,7 +176,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       return;
     }
     logInteraction(job, 'view');
-    router.push(`/jobs/${job.id}`);
+    router.push(`/viec-lam/${job.id}`);
   };
 
   const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
@@ -228,7 +228,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
                                         <PopoverTrigger asChild>
                                             <div onMouseEnter={() => setIsConsultantPopoverOpen(true)} onMouseLeave={() => setIsConsultantPopoverOpen(false)}>
-                                                <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                                                <Link href={`/tu-van-vien/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                                                     <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
                                                         <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                                                         <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
@@ -248,7 +248,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                     {job.recruiter.mainExpertise}
                                                 </p>
                                                 <Button asChild size="sm" variant="link" className="h-auto p-0">
-                                                    <Link href={`/consultant-profile/${job.recruiter.id}`}>Xem hồ sơ</Link>
+                                                    <Link href={`/tu-van-vien/${job.recruiter.id}`}>Xem hồ sơ</Link>
                                                 </Button>
                                                 </div>
                                             </div>
@@ -324,7 +324,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   if (variant === 'chat') {
     return (
-        <div onClick={() => router.push(`/jobs/${job.id}`)} className="block w-full cursor-pointer">
+        <div onClick={() => router.push(`/viec-lam/${job.id}`)} className="block w-full cursor-pointer">
             <Card className="flex items-start p-3 gap-3 hover:bg-secondary/50 transition-colors">
                 <div className="relative w-20 h-20 flex-shrink-0">
                     <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
@@ -402,7 +402,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     <div className="mt-auto">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                              <div className="flex items-center gap-1">
-                                <Link href={`/consultant-profile/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                                <Link href={`/tu-van-vien/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                                     <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
                                         <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
                                         <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>

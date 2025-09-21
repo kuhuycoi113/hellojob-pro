@@ -17,7 +17,7 @@ const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[
 
     return (
         <Card className="shadow-xl text-center p-6 flex flex-col h-full transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
-            <Link href={`/consultant-profile/${consultant.id}`} className="block h-full flex flex-col flex-grow">
+            <Link href={`/tu-van-vien/${consultant.id}`} className="block h-full flex flex-col flex-grow">
                 <Avatar className="h-24 w-24 mx-auto border-4 border-primary shadow-lg">
                     <AvatarImage src={consultant.avatarUrl} alt={consultant.name} data-ai-hint={consultant.dataAiHint} />
                     <AvatarFallback>{consultant.name.charAt(0)}</AvatarFallback>

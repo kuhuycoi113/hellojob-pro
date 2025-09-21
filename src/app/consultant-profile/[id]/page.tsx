@@ -215,7 +215,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl text-primary flex items-center justify-between">
                         <span>Việc làm phụ trách</span>
-                        <Button variant="link" asChild><Link href="/jobs">Xem tất cả <ChevronRight className="h-4 w-4"/></Link></Button>
+                        <Button variant="link" asChild><Link href="/viec-lam">Xem tất cả <ChevronRight className="h-4 w-4"/></Link></Button>
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">

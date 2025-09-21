@@ -149,10 +149,10 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
     
           localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
           setIsDialogOpen(false);
-          router.push('/my-jobs?highlight=suggested');
+          router.push('/viec-lam-cua-toi?highlight=suggested');
         } else {
           sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
-          sessionStorage.setItem('postLoginRedirect', '/my-jobs?highlight=suggested');
+          sessionStorage.setItem('postLoginRedirect', '/viec-lam-cua-toi?highlight=suggested');
           setIsDialogOpen(false);
           setIsConfirmLoginOpen(true);
         }
@@ -167,10 +167,10 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
         setIsCreateDetailOpen(false);
         setIsDialogOpen(false);
         if (method === 'ai') {
-            router.push('/ai-profile');
+            router.push('/tao-ho-so-ai');
         } else {
             // UNGTUYEN-L06: Redirect to candidate-profile instead of register
-            router.push('/candidate-profile');
+            router.push('/ho-so-cua-toi');
         }
     };
     
@@ -408,7 +408,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
     const handleApplyClick = () => {
         if (!isLoggedIn) {
-            sessionStorage.setItem('postLoginRedirect', `/jobs/${job.id}`);
+            sessionStorage.setItem('postLoginRedirect', `/viec-lam/${job.id}`);
             setIsConfirmLoginOpen(true);
         } else {
             const profileRaw = localStorage.getItem('generatedCandidateProfile');
@@ -444,7 +444,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     }
 
     const handleShare = async () => {
-        const shareUrl = `https://vi.hellojob.jp/jobs/${job.id}`;
+        const shareUrl = `https://vi.hellojob.jp/viec-lam/${job.id}`;
         const shareData = {
           title: job.title,
           text: `Hãy xem công việc này trên HelloJob: ${job.title}`,
@@ -498,7 +498,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             <div className="container mx-auto px-4 md:px-6 py-12">
                 <div className="mb-6">
                     <Button asChild variant="outline" size="sm">
-                        <Link href="/job-search"><ArrowLeft className="mr-2 h-4 w-4" />Quay lại trang Việc làm</Link>
+                        <Link href="/tim-viec-lam"><ArrowLeft className="mr-2 h-4 w-4" />Quay lại trang Việc làm</Link>
                     </Button>
                 </div>
                 <div className="grid lg:grid-cols-3 gap-8 items-start">
@@ -646,7 +646,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             onClick={(e) => {
                                 // Only navigate if the click is directly on the card and not on an interactive element inside
                                 if ((e.target as HTMLElement).closest('a, button')) return;
-                                router.push(`/consultant-profile/${assignedConsultant.id}`);
+                                router.push(`/tu-van-vien/${assignedConsultant.id}`);
                             }}
                         >
                             <CardHeader>
@@ -655,7 +655,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <div onClick={(e) => e.stopPropagation()}>
-                                        <Link href={`/consultant-profile/${assignedConsultant.id}`} >
+                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`} >
                                             <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
                                                 <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
                                                 <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
@@ -664,7 +664,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     </div>
                                     <div>
                                         <div onClick={(e) => e.stopPropagation()}>
-                                            <Link href={`/consultant-profile/${assignedConsultant.id}`} >
+                                            <Link href={`/tu-van-vien/${assignedConsultant.id}`} >
                                                 <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
                                             </Link>
                                         </div>

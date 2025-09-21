@@ -195,7 +195,7 @@ export default function AiProfileClientPage() {
     const handleProceed = () => {
         if (analysisResult) {
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(analysisResult));
-            router.push('/candidate-profile');
+            router.push('/ho-so-cua-toi');
         }
     };
 
@@ -318,7 +318,7 @@ export default function AiProfileClientPage() {
                                         <h4 className="font-bold text-sm mt-2">Mô tả bằng giọng nói</h4>
                                         <p className="text-xs text-muted-foreground">Nói các chi tiết như loại visa, ngành nghề, nguyện vọng</p>
                                     </Card>
-                                    <Card className="text-center p-4 cursor-pointer hover:shadow-md transition-all duration-300 hover:-translate-y-1" onClick={() => router.push('/register')}>
+                                    <Card className="text-center p-4 cursor-pointer hover:shadow-md transition-all duration-300 hover:-translate-y-1" onClick={() => router.push('/dang-ky')}>
                                         <Pencil className="h-8 w-8 text-primary mx-auto"/>
                                         <h4 className="font-bold text-sm mt-2">Nhập liệu thủ công</h4>
                                         <p className="text-xs text-muted-foreground">Tự điền vào biểu mẫu chi tiết của chúng tôi.</p>

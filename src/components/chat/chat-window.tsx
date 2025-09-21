@@ -49,7 +49,7 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
   const handleVideoCallClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     const isMobile = window.innerWidth < 768;
     if (isMobile) {
-        router.push(`/video-call?redirect=${encodeURIComponent(pathname)}`);
+        router.push(`/goi-video?redirect=${encodeURIComponent(pathname)}`);
     } else {
       e.preventDefault();
       setIsVideoCallDialogOpen(true);
@@ -59,7 +59,7 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
   const handleVoiceCallClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     const isMobile = window.innerWidth < 768;
     if (isMobile) {
-        router.push(`/voice-call?redirect=${encodeURIComponent(pathname)}`);
+        router.push(`/goi-thoai?redirect=${encodeURIComponent(pathname)}`);
     } else {
       e.preventDefault();
       setIsVoiceCallDialogOpen(true);

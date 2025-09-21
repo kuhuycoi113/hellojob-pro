@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 
 const ArticleCard = ({ article, className }: { article: HandbookArticle, className?: string }) => (
-  <Link href={`/handbook/${article.slug}`} className={cn("group block", className)}>
+  <Link href={`/cam-nang/${article.slug}`} className={cn("group block", className)}>
     <Card className="flex flex-col h-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1.5 rounded-xl">
       <CardHeader className="p-0">
         <div className="relative aspect-video">
@@ -57,7 +57,7 @@ const ArticleCard = ({ article, className }: { article: HandbookArticle, classNa
 );
 
 const PostCard = ({ article }: { article: HandbookArticle }) => (
-  <Link href={`/handbook/${article.slug}`} className="group block">
+  <Link href={`/cam-nang/${article.slug}`} className="group block">
     <Card className="overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 rounded-xl">
        <CardContent className="p-5">
          <Badge className={cn("mb-3 w-fit", 
@@ -72,7 +72,7 @@ const PostCard = ({ article }: { article: HandbookArticle }) => (
 )
 
 const VideoCard = ({ article }: { article: HandbookArticle }) => (
-  <Link href={`/handbook/${article.slug}`} className="group block">
+  <Link href={`/cam-nang/${article.slug}`} className="group block">
       <Card className="relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 aspect-[9/16]">
           <Image
             src={article.image}
@@ -92,7 +92,7 @@ const VideoCard = ({ article }: { article: HandbookArticle }) => (
 );
 
 const ImageStoryCard = ({ article }: { article: HandbookArticle }) => (
-  <Link href={`/handbook/${article.slug}`} className="group block">
+  <Link href={`/cam-nang/${article.slug}`} className="group block">
     <Card className="relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 aspect-w-1 aspect-h-1">
         <Image
           src={article.image}
@@ -119,28 +119,28 @@ const ShareDialogContent = () => (
         </DialogDescription>
     </DialogHeader>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
-        <Link href="/handbook/create/post">
+        <Link href="/cam-nang/create/post">
             <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full">
                 <FileText className="h-12 w-12 text-blue-500 mx-auto mb-4" />
                 <h3 className="font-bold text-xl mb-2">Đăng nội dung dạng chữ</h3>
                 <p className="text-muted-foreground text-sm">Chia sẻ một câu chuyện, mẹo nhỏ, hoặc một câu hỏi.</p>
             </Card>
         </Link>
-        <Link href="/handbook/create/image">
+        <Link href="/cam-nang/create/image">
             <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full">
                 <ImageIcon className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
                 <h3 className="font-bold text-xl mb-2">Đăng bài viết dạng ảnh</h3>
                 <p className="text-muted-foreground text-sm">Tạo một bài viết với hình ảnh minh hoạ trực quan.</p>
             </Card>
         </Link>
-        <Link href="/handbook/create/video-short">
+        <Link href="/cam-nang/create/video-short">
             <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full">
                 <Smartphone className="h-12 w-12 text-green-500 mx-auto mb-4" />
                 <h3 className="font-bold text-xl mb-2">Đăng video ngắn</h3>
                 <p className="text-muted-foreground text-sm">Chia sẻ một khoảnh khắc hoặc hướng dẫn nhanh.</p>
             </Card>
         </Link>
-        <Link href="/handbook/create/video">
+        <Link href="/cam-nang/create/video">
             <Card className="text-center p-6 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full">
                 <Video className="h-12 w-12 text-red-500 mx-auto mb-4" />
                 <h3 className="font-bold text-xl mb-2">Đăng video dài</h3>
@@ -217,7 +217,7 @@ export default function HandbookPage() {
             <main className="lg:col-span-8 space-y-16">
                 {/* Featured Article */}
                 <section>
-                    <Link href={`/handbook/${featuredArticle.slug}`} className="group">
+                    <Link href={`/cam-nang/${featuredArticle.slug}`} className="group">
                         <Card className="overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-2xl">
                             <div className="grid md:grid-cols-2">
                                 <div className="relative min-h-[300px] md:min-h-full">

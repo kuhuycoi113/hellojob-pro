@@ -40,7 +40,7 @@ export function CandidatesTable() {
           {candidates.map((candidate) => (
             <TableRow key={candidate.id} className="hover:bg-secondary/50">
               <TableCell className="font-medium">
-                <Link href="/candidate-profile" className="hover:underline text-primary">
+                <Link href="/ho-so-cua-toi" className="hover:underline text-primary">
                     {candidate.name}
                 </Link>
               </TableCell>

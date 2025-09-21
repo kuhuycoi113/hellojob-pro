@@ -1336,7 +1336,7 @@ export default function CandidateProfilePage() {
     };
 
     const handleGetShareLink = () => {
-        const link = `${window.location.origin}/candidate-profile/public/${candidate?.name.toLowerCase().replace(/\s/g, '-')}`;
+        const link = `${window.location.origin}/ho-so-cua-toi/public/${candidate?.name.toLowerCase().replace(/\s/g, '-')}`;
         navigator.clipboard.writeText(link);
         toast({
             title: "Đã sao chép đường dẫn!",

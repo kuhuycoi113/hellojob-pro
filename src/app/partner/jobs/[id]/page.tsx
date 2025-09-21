@@ -67,7 +67,7 @@ const CandidateCard = ({ candidate, isLocked, onUnlock }: { candidate: typeof mo
     }
     
     return (
-         <Link href={`/partner/candidate/${candidate.id}`} className="block">
+         <Link href={`/doi-tac/ung-vien/${candidate.id}`} className="block">
             <Card className="shadow-lg transition-all hover:border-primary">
                {cardContent}
             </Card>
@@ -89,8 +89,7 @@ const JobDetailSection = ({ title, children, icon: Icon }: { title: string, chil
 
 
 export default function MatchingCandidatesPage({ params }: { params: { id: string } }) {
-    const resolvedParams = use(params);
-    const job = jobData.find(j => j.id === resolvedParams.id);
+    const job = jobData.find(j => j.id === params.id);
     const [isPaymentDialogOpen, setPaymentDialogOpen] = useState(false);
     const [isConsultantDialogOpen, setConsultantDialogOpen] = useState(false);
     const [unlocked, setUnlocked] = useState(false);
@@ -115,7 +114,7 @@ export default function MatchingCandidatesPage({ params }: { params: { id: strin
             <div className="container mx-auto px-4 md:px-6 py-8">
                 <div className="mb-6">
                     <Button asChild variant="outline" size="sm">
-                        <Link href="/partner/dashboard"><ArrowLeft className="mr-2 h-4 w-4" />Quay lại Bảng điều khiển</Link>
+                        <Link href="/doi-tac/bang-dieu-khien"><ArrowLeft className="mr-2 h-4 w-4" />Quay lại Bảng điều khiển</Link>
                     </Button>
                 </div>
 

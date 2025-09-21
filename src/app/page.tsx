@@ -12,17 +12,17 @@ export default function HomePage() {
 
   const handleSearch = (filters: SearchFilters) => {
     const query = new URLSearchParams();
-    if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('visaDetail', filters.visaDetail);
-    if (filters.industry && filters.industry !== 'all') query.set('industry', filters.industry);
+    if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
+    if (filters.industry && filters.industry !== 'all') query.set('nganh-nghe', filters.industry);
     
     // Handle location which can be an array
-    if (Array.isArray(filters.location) && filters.location.length > 0) {
-        filters.location.forEach(loc => query.append('location', loc));
+    if (Array.isArray(filters.location) && filters.location.length > 0 && !filters.location.includes('all')) {
+        filters.location.forEach(loc => query.append('dia-diem', loc));
     } else if (typeof filters.location === 'string' && filters.location && filters.location !== 'all') {
-        query.append('location', filters.location);
+        query.append('dia-diem', filters.location);
     }
     
-    router.push(`/job-search?${query.toString()}`);
+    router.push(`/tim-viec-lam?${query.toString()}`);
   };
 
   // Dummy filter state and handler for SearchModule on homepage

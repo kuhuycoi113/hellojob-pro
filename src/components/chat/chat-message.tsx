@@ -49,7 +49,7 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
             <div className="flex flex-col">
                  <p className="text-xs text-muted-foreground mb-1 ml-3">
                     {/* CHATNAME2 */}
-                    <Link href={`/consultant-profile/${displayUser.id}`} className="hover:underline hover:text-primary">
+                    <Link href={`/tu-van-vien/${displayUser.id}`} className="hover:underline hover:text-primary">
                         Tư vấn viên {displayUser.name}
                     </Link>
                 </p>
@@ -77,7 +77,7 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
         {/* CHATNAME2 */}
         {!isCurrentUser && (
             <p className="text-xs text-muted-foreground ml-3">
-                <Link href={`/consultant-profile/${displayUser.id}`} className="hover:underline hover:text-primary">
+                <Link href={`/tu-van-vien/${displayUser.id}`} className="hover:underline hover:text-primary">
                     Tư vấn viên {displayUser.name}
                 </Link>
             </p>

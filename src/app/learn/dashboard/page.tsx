@@ -180,7 +180,7 @@ export default function InstructorDashboardPage() {
                         </p>
                     </div>
                      <Button asChild>
-                        <Link href="/learn/create/course"><BookOpen className="mr-2"/>Quản lý khoá học</Link>
+                        <Link href="/hoc-tap/create/course"><BookOpen className="mr-2"/>Quản lý khoá học</Link>
                     </Button>
                 </div>
                 

@@ -115,12 +115,12 @@ export const MainContent = () => (
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                     <Button asChild size="lg" className="bg-accent-green hover:bg-accent-green/90 text-white">
-                      <Link href="/roadmap">
+                      <Link href="/lo-trinh">
                         <TrendingUp /> Xem ngay lộ trình
                       </Link>
                     </Button>
                     <Button asChild size="lg" className="bg-accent hover:bg-accent/90">
-                        <Link href="/handbook/ginou-2-lao-dong-lanh-nghe">
+                        <Link href="/cam-nang/ginou-2-lao-dong-lanh-nghe">
                            <BookCopy /> Xem ngay bài viết
                         </Link>
                     </Button>
@@ -142,7 +142,7 @@ export const MainContent = () => (
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-stretch">
             {featuredEmployers.map(emp => (
-              <Link href={`/employers/${'emp.id'}`} key={emp.id} className="flex justify-center items-center bg-white">
+              <Link href={`/nha-tuyen-dung/${'emp.id'}`} key={emp.id} className="flex justify-center items-center bg-white">
                 <Image src={emp.logo} alt={emp.name} width={150} height={50} className="grayscale hover:grayscale-0 transition-all duration-300" data-ai-hint={emp.dataAiHint}/>
               </Link>
             ))}
@@ -163,7 +163,7 @@ export const MainContent = () => (
             {featuredCourses.map(course => (
               <Card key={course.id} className="flex flex-col overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
                 <CardHeader className="p-0">
-                   <Link href={`/learn/${course.id}`} className="block">
+                   <Link href={`/hoc-tap/${course.id}`} className="block">
                       <Image
                         src={course.image}
                         alt={course.title}
@@ -176,12 +176,12 @@ export const MainContent = () => (
                 </CardHeader>
                 <CardContent className="p-6 flex-grow">
                   <p className="text-sm font-bold mb-2 text-primary">{course.category}</p>
-                  <Link href={`/learn/${course.id}`}>
+                  <Link href={`/hoc-tap/${course.id}`}>
                       <CardTitle className="font-headline text-xl mb-2 h-14 group-hover:text-primary transition-colors">{course.title}</CardTitle>
                   </Link>
                 </CardContent>
                 <CardFooter className="p-6 pt-0 mt-auto">
-                   <Link href={`/learn/${course.id}`} className="font-bold text-primary hover:underline flex items-center">
+                   <Link href={`/hoc-tap/${course.id}`} className="font-bold text-primary hover:underline flex items-center">
                     Tìm hiểu thêm <ArrowRight className="ml-2" />
                   </Link>
                 </CardFooter>
@@ -190,7 +190,7 @@ export const MainContent = () => (
           </div>
            <div className="text-center mt-16">
             <Button asChild size="lg">
-              <Link href="/learn">Khám phá tất cả khóa học <BookOpen /></Link>
+              <Link href="/hoc-tap">Khám phá tất cả khóa học <BookOpen /></Link>
             </Button>
           </div>
         </div>
@@ -206,7 +206,7 @@ export const MainContent = () => (
                 Hợp tác cùng HelloJob để tiếp cận nguồn ứng viên dồi dào, chất lượng cao và tối ưu hóa quy trình tuyển dụng Kỹ năng Đặc định.
               </p>
               <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                <Link href="/franchise">Tìm hiểu về Mô hình Đối tác</Link>
+                <Link href="/nhuong-quyen">Tìm hiểu về Mô hình Đối tác</Link>
               </Button>
             </div>
              <div className="md:w-1/2 flex justify-center">

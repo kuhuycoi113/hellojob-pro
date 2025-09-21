@@ -56,7 +56,7 @@ export default function CreateTextPostPage() {
       className: 'bg-green-500 text-white',
     });
 
-    router.push('/handbook');
+    router.push('/cam-nang');
   };
 
   return (

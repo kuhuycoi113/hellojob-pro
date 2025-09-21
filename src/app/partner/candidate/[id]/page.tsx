@@ -97,16 +97,15 @@ const MediaCarousel = ({ items, title, icon: Icon }: { items: MediaItem[], title
 
 
 export default function PartnerCandidateDetailPage({ params }: { params: { id: string } }) {
-  const resolvedParams = use(params);
   const [candidate, setCandidate] = useState<EnrichedCandidateProfile | null>(null);
 
   useEffect(() => {
-    // In a real app, you would fetch candidate data using resolvedParams.id
+    // In a real app, you would fetch candidate data using params.id
     // For this demo, we'll use the mock data.
-    if (resolvedParams.id) {
+    if (params.id) {
        setCandidate(mockCandidateData);
     }
-  }, [resolvedParams.id]);
+  }, [params.id]);
   
   if (!candidate) {
       return (
