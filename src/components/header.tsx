@@ -122,7 +122,7 @@ const SearchDialog = () => {
                         const visaSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
                         if(visaSlug) query.set('loai-visa', visaSlug);
                     }
-                    if (criteria.gender) {
+                     if (criteria.gender) {
                         query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
                     }
                     if (criteria.sortBy) {
@@ -159,7 +159,7 @@ const SearchDialog = () => {
         <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
             <DialogTrigger asChild>
                  <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
-                    <Image src="/img/search02.png" alt="Search Icon" width={20} height={20} />
+                    <Search className="h-5 w-5" />
                     <span className="sr-only">Tìm kiếm</span>
                 </Button>
             </DialogTrigger>
@@ -821,6 +821,7 @@ const LoggedOutContent = () => {
     </>
   );
 }
+
 
 
 
