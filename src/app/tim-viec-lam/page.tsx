@@ -8,10 +8,7 @@ import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
 type SearchParams = {
-  q?: string;
-  'chi-tiet-loai-hinh-visa'?: string;
-  'nganh-nghe'?: string;
-  'dia-diem'?: string | string[];
+  [key: string]: string | string[] | undefined;
 };
 
 const allIndustries = Object.values(industriesByJobType).flat();
@@ -24,10 +21,12 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const siteName = 'HelloJob';
   const baseUrl = 'https://vi.hellojob.jp';
 
-  const q = searchParams.q || '';
-  const visaDetailSlug = searchParams['chi-tiet-loai-hinh-visa'];
-  const industrySlug = searchParams['nganh-nghe'];
-  const locationSlug = searchParams['dia-diem'];
+  const q = searchParams.q as string || '';
+  const visaDetailSlug = searchParams['chi-tiet-loai-hinh-visa'] as string;
+  const industrySlug = searchParams['nganh-nghe'] as string;
+  const locationParam = searchParams['dia-diem'];
+
+  const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
 
   let titleParts: string[] = [];
   if (q) titleParts.push(`"${q}"`);
@@ -47,7 +46,6 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const industryName = industrySlug ? getNameFromSlug(industrySlug, allIndustries) : undefined;
   if (industryName) titleParts.push(industryName);
 
-  const locations = Array.isArray(locationSlug) ? locationSlug : (locationSlug ? [locationSlug] : []);
   if (locations.length > 0) {
       const locationNames = locations.map(slug => {
           const region = japanRegions.find(r => r.slug === slug);
