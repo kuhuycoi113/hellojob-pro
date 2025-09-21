@@ -7,7 +7,7 @@ import { jobData, type Job } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2 } from 'lucide-react';
+import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,7 +19,7 @@ import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
 import type { CandidateProfile } from '@/ai/schemas';
 import { JobCard } from '@/components/job-card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/components/../contexts/AuthContext';
 import { AuthDialog } from '@/components/auth-dialog';
 import {
   AlertDialog,
@@ -92,6 +92,23 @@ const validateProfileForApplication = (profile: CandidateProfile): boolean => {
     return !!hasRequiredPersonalInfo && !!hasContactInfo;
 };
 
+const CTAForGuest = ({ title, icon: Icon, onLoginClick }: { title: string, icon: React.ElementType, onLoginClick: () => void }) => (
+    <section>
+        <h2 className="text-2xl font-bold font-headline mb-6"><Icon className="inline-block mr-3 text-primary h-7 w-7"/>{title}</h2>
+        <Card className="text-center py-12 px-6 shadow-lg">
+             <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
+                <Briefcase className="h-10 w-10 text-primary"/>
+            </div>
+            <p className="font-semibold text-lg">Xem gợi ý việc làm dành riêng cho bạn</p>
+            <p className="text-muted-foreground mt-2 mb-6">Đăng nhập hoặc tạo hồ sơ để nhận được những gợi ý phù hợp nhất từ HelloJob AI.</p>
+            <Button onClick={onLoginClick}>
+                <LogIn className="mr-2 h-4 w-4" />
+                Đăng nhập / Đăng ký
+            </Button>
+        </Card>
+    </section>
+);
+
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
@@ -121,6 +138,12 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         }
 
         const fetchSuggestions = async () => {
+            if (!isLoggedIn) {
+                setIsLoading(false);
+                setIsLoadingBehavioral(false);
+                return;
+            };
+
             setIsLoading(true);
             setIsLoadingBehavioral(true);
             try {
@@ -151,7 +174,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
         fetchSuggestions();
 
-    }, [job, resolvedParams.id]);
+    }, [job, resolvedParams.id, isLoggedIn]);
 
 
     if (!job) {
@@ -453,37 +476,46 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 </div>
                  {/* Suggestions Section */}
                 <div className="mt-16 pt-12 border-t space-y-12">
-                    <section id="behavioral-suggestions">
-                        <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
-                        {isLoadingBehavioral ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                 {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
-                            </div>
-                        ) : behavioralSuggestions.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {behavioralSuggestions.map((item) => (
-                                    <JobCard key={item.job.id} job={item.job} />
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-muted-foreground">Không có gợi ý nào. Hãy xem thêm các công việc khác để chúng tôi hiểu bạn hơn!</p>
-                        )}
-                    </section>
-                    
-                    <section>
-                        <h2 className="text-2xl font-bold font-headline mb-6"><Star className="inline-block mr-3 text-primary h-7 w-7"/>Gợi ý cho bạn</h2>
-                        {isLoading ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
-                            </div>
-                        ) : profileSuggestions.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {profileSuggestions.map((job) => <JobCard key={job.id} job={job} />)}
-                            </div>
-                        ) : (
-                             <p className="text-muted-foreground">Không có gợi ý nào dựa trên hồ sơ của bạn. Hãy cập nhật hồ sơ để nhận gợi ý tốt hơn.</p>
-                        )}
-                    </section>
+                     {isLoggedIn ? (
+                        <>
+                             <section id="behavioral-suggestions">
+                                <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
+                                {isLoadingBehavioral ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
+                                    </div>
+                                ) : behavioralSuggestions.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {behavioralSuggestions.map((item) => (
+                                            <JobCard key={item.job.id} job={item.job} />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-muted-foreground">Không có gợi ý nào. Hãy xem thêm các công việc khác để chúng tôi hiểu bạn hơn!</p>
+                                )}
+                            </section>
+                            
+                            <section>
+                                <h2 className="text-2xl font-bold font-headline mb-6"><Star className="inline-block mr-3 text-primary h-7 w-7"/>Gợi ý cho bạn</h2>
+                                {isLoading ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
+                                    </div>
+                                ) : profileSuggestions.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {profileSuggestions.map((job) => <JobCard key={job.id} job={job} />)}
+                                    </div>
+                                ) : (
+                                    <p className="text-muted-foreground">Không có gợi ý nào dựa trên hồ sơ của bạn. Hãy cập nhật hồ sơ để nhận gợi ý tốt hơn.</p>
+                                )}
+                            </section>
+                        </>
+                    ) : (
+                         <>
+                            <CTAForGuest title="Có thể bạn quan tâm" icon={BrainCircuit} onLoginClick={() => setIsAuthDialogOpen(true)} />
+                            <CTAForGuest title="Gợi ý cho bạn" icon={Star} onLoginClick={() => setIsAuthDialogOpen(true)} />
+                         </>
+                    )}
 
                     {role === 'candidate' && (
                         <section id="VL001">
