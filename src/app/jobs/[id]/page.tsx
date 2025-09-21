@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 import { EditProfileDialog } from '@/components/candidate-edit-dialog';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 
@@ -175,8 +175,12 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
     
     const FirstStepDialog = () => (
         <>
-            <h2 className="text-2xl font-headline text-center mb-2">Chọn phương thức tạo hồ sơ</h2>
-            <p className="text-center text-muted-foreground mb-6">Bạn muốn tạo hồ sơ để làm gì?</p>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
+                <DialogDescription className="text-center">
+                    Bạn muốn tạo hồ sơ để làm gì?
+                </DialogDescription>
+            </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
                     <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
@@ -194,20 +198,24 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
 
     const QuickCreateStepDialog = () => (
         <>
-            <h2 className="text-2xl font-headline text-center mb-2">Chọn loại hình lao động</h2>
-            <p className="text-center text-muted-foreground mb-6">Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.</p>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
+                <DialogDescription className="text-center">
+                Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
+                </DialogDescription>
+            </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center ...">
+                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                     <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
                     <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
                     <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
                 </Button>
-                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center ...">
+                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                     <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                     <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
                     <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
                 </Button>
-                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center ...">
+                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                     <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
                     <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
                     <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
@@ -216,11 +224,37 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
             <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
         </>
     );
+
+    const VisaDetailStepDialog = () => {
+        if (!selectedVisa) return null;
+        const options = visaDetailsByVisaType[selectedVisa.slug] || [];
+        
+        return (
+            <>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisa.name}</DialogTitle>
+                <DialogDescription className="text-center">
+                Chọn loại hình chi tiết để tiếp tục.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                {options.map(option => (
+                    <Button key={option.name} onClick={() => { setSelectedVisaDetail(option.name); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <h3 className="font-bold text-base mb-1">{option.name}</h3>
+                        <p className="text-muted-foreground text-xs">{option.slug}</p>
+                    </Button>
+                ))}
+            </div>
+            <Button variant="link" onClick={() => setProfileCreationStep(2)} className="mt-4 mx-auto block">Quay lại</Button>
+            </>
+        )
+    };
     
-    // ... Other dialog step components would go here ...
     const renderDialogContent = () => {
         switch(profileCreationStep) {
             case 1: return <FirstStepDialog />;
+            case 2: return <QuickCreateStepDialog />;
+            case 3: return <VisaDetailStepDialog />;
             // Add other cases here later
             default: return <FirstStepDialog />;
         }
@@ -238,7 +272,7 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
-                            <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
@@ -255,18 +289,23 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                            </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-xl">
-                            <h2 className="text-2xl font-headline text-center mb-2">Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</h2>
+                            <DialogHeader>
+                                <DialogTitle className="text-2xl font-headline text-center">Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</DialogTitle>
+                            </DialogHeader>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                                <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary ...">
+                                <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
                                     <Sparkles className="h-8 w-8 text-primary mx-auto mb-2" />
                                     <h3 className="font-bold text-base mb-1">Dùng AI</h3>
                                     <p className="text-muted-foreground text-xs">Tải lên CV, AI sẽ tự động điền thông tin.</p>
                                 </Card>
-                                <Card onClick={() => handleCreateDetailedProfile('manual')} className="text-center p-4 hover:shadow-lg hover:border-primary ...">
+                                <Card onClick={() => handleCreateDetailedProfile('manual')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
                                     <Pencil className="h-8 w-8 text-green-500 mx-auto mb-2" />
                                     <h3 className="font-bold text-base mb-1">Thủ công</h3>
                                     <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
                                 </Card>
+                            </div>
+                            <div className="mt-4 text-center">
+                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -742,5 +781,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 }
+
+    
 
     
