@@ -135,30 +135,23 @@ const jobOrderImages = [
     "/img/donhang2.jpg"
 ];
 
-const existingJobIds = new Set<string>();
-
 const generateUniqueJobId = (index: number): string => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let deterministicPart = '';
     let num = index;
-    for (let i = 0; i < 4; i++) {
+
+    // Increase the length of the deterministic part to 6 characters for more uniqueness
+    for (let i = 0; i < 6; i++) {
         deterministicPart += chars[num % chars.length];
         num = Math.floor(num / chars.length);
     }
 
-    // Static prefix for consistent ID generation
-    const prefix = "2408"; 
+    const prefix = "2408"; // Static prefix
 
-    const newId = prefix + deterministicPart + "AAAA"; // Make it longer and more unique to avoid previous collisions
-    
-    if (existingJobIds.has(newId)) {
-        // If collision happens, increment index and retry
-        return generateUniqueJobId(index + 1000); 
-    }
-    
-    existingJobIds.add(newId);
-    return newId;
+    // The function is now fully deterministic based on the index
+    return prefix + deterministicPart;
 };
+
 
 const getRandomItem = <T>(arr: T[], index: number): T => {
     if (!arr || arr.length === 0) {
@@ -243,8 +236,8 @@ const createJobList = (): Job[] => {
                     const otherSkillsStartIndex = jobIndex % (otherSkills.length > 0 ? otherSkills.length : 1);
                     const selectedOtherSkills = [];
                     if (otherSkills.length > 0) {
-                        for (let i = 0; i < selectedOtherSkillsCount; i++) {
-                            selectedOtherSkills.push(otherSkills[(otherSkillsStartIndex + i) % otherSkills.length]);
+                        for (let j = 0; j < selectedOtherSkillsCount; j++) {
+                            selectedOtherSkills.push(otherSkills[(otherSkillsStartIndex + j) % otherSkills.length]);
                         }
                     }
                     
@@ -272,7 +265,7 @@ const createJobList = (): Job[] => {
                         }
                     }
 
-                    const isTTS = visaType.slug === 'thuc-tap-sinh-ky-nang';
+                    const isTTS = visaType.name.includes('Thực tập sinh');
 
                     const job: Job = {
                         id: generateUniqueJobId(jobIndex),
