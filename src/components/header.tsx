@@ -559,20 +559,16 @@ const LoggedOutContent = () => {
                     {isClient && (
                         <>
                             {isLoggedIn ? (
-                                <>
                                 <Link href="/candidate-profile" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
                                         <AvatarImage src={"https://placehold.co/100x100.png" || undefined} alt="User Avatar" data-ai-hint="user avatar" />
                                         <AvatarFallback>A</AvatarFallback>
                                     </Avatar>
                                 </Link>
-                                 <Button asChild>
-                                    <Link href="/my-jobs">Trang việc làm</Link>
-                                </Button>
-                                </>
                             ): (
                                 <Button onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập / Đăng ký</Button>
                             )}
+
                             <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                                 <DialogTrigger asChild>
                                     <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
@@ -581,6 +577,10 @@ const LoggedOutContent = () => {
                                     {renderDialogContent()}
                                 </DialogContent>
                             </Dialog>
+
+                             <Button asChild>
+                                <Link href="/my-jobs">Trang việc làm</Link>
+                            </Button>
                            
                             <MainMenu />
                         </>
@@ -669,3 +669,4 @@ const LoggedOutContent = () => {
     
 
     
+
