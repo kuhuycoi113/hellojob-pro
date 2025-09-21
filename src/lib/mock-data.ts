@@ -1,4 +1,5 @@
 
+
 import { consultants } from './consultant-data';
 import type { User } from './chat-data';
 import { industriesByJobType } from './industry-data';
@@ -58,10 +59,10 @@ export interface Job {
     weightRequirement?: string;
     visionRequirement?: string;
     tattooRequirement?: string;
-    hepatitisBRequirement?: string;
     interviewFormat?: string;
     specialConditions?: string;
     otherSkillRequirement?: string[]; // Added this for filtering
+    companyArrivalTime?: string;
     details: {
         description: string;
         requirements: string;
@@ -77,7 +78,6 @@ const interviewLocations = ['Hà Nội', 'TP.HCM', 'Đà Nẵng', 'Online', 'T�
 const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon", "Không yêu cầu"];
 const languageLevels = ['N1', 'N2', 'N3', 'N4', 'N5', 'Không yêu cầu'];
 const tattooOptions = ["Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
-const hepBOptions = ["Không nhận viêm gan B", "Nhận viêm gan B (thể tĩnh)"];
 
 const otherSkills = [
     { name: "Có bằng lái xe AT", slug: "co-bang-lai-xe-at" },
@@ -301,7 +301,6 @@ const createJobList = (): Job[] => {
                         weightRequirement: `Trên ${40 + (jobIndex % 10)} kg`,
                         visionRequirement: 'Thị lực tốt, không mù màu',
                         tattooRequirement: getRandomItem(tattooOptions, jobIndex),
-                        hepatitisBRequirement: getRandomItem(hepBOptions, jobIndex),
                         interviewFormat: 'Phỏng vấn Online',
                         specialConditions: specialConditions,
                         otherSkillRequirement: selectedOtherSkills.map(s => s.slug),
@@ -451,7 +450,6 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 weightRequirement: `Trên ${40 + (jobIndex % 10)} kg`,
                 visionRequirement: 'Thị lực tốt, không mù màu',
                 tattooRequirement: getRandomItem(tattooOptions, jobIndex),
-                hepatitisBRequirement: getRandomItem(hepBOptions, jobIndex),
                 interviewFormat: 'Phỏng vấn Online',
                 specialConditions: specialConditions,
                 otherSkillRequirement: selectedOtherSkills.map(s => s.slug),

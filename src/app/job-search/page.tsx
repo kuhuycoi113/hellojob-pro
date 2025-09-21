@@ -36,7 +36,6 @@ const initialSearchFilters: SearchFilters = {
     educationRequirement: '',
     yearsOfExperience: '',
     tattooRequirement: '',
-    hepatitisBRequirement: '',
     netFee: '',
     quantity: '',
     interviewRounds: '',
@@ -72,7 +71,6 @@ const keyMap: { [key: string]: string } = {
     experienceRequirement: 'yeu-cau-kinh-nghiem',
     yearsOfExperience: 'so-nam-kinh-nghiem',
     tattooRequirement: 'hinh-xam',
-    hepatitisBRequirement: 'viem-gan-b',
     netFee: 'muc-phi',
     quantity: 'so-luong',
     interviewRounds: 'so-vong-phong-van',
@@ -259,7 +257,7 @@ function JobSearchPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement, hepatitisBRequirement
+            otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -378,10 +376,6 @@ function JobSearchPageContent() {
             const tattooReqName = tattooRequirements.find(t => t.slug === tattooRequirement)?.name;
             const tattooMatch = !tattooRequirement || tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
 
-            const hepBReqName = hepBOptions.find(t => createSlug(t) === hepatitisBRequirement)?.name;
-            const hepBMatch = !hepatitisBRequirement || !job.hepatitisBRequirement || job.hepatitisBRequirement === hepBReqName;
-
-
             const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
             const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
             
@@ -405,7 +399,7 @@ function JobSearchPageContent() {
             const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(workShift));
 
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch && hepBMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch;
         });
 
         // Sorting logic
@@ -449,7 +443,7 @@ function JobSearchPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement, hepatitisBRequirement
+            otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -562,9 +556,6 @@ function JobSearchPageContent() {
             const tattooReqName = tattooRequirements.find(t => t.slug === tattooRequirement)?.name;
             const tattooMatch = !tattooRequirement || tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
             
-            const hepBReqName = hepBOptions.find(t => createSlug(t) === hepatitisBRequirement)?.name;
-            const hepBMatch = !hepatitisBRequirement || !job.hepatitisBRequirement || job.hepatitisBRequirement === hepBReqName;
-
             const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
             const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
             
@@ -587,7 +578,7 @@ function JobSearchPageContent() {
              
              const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(workShift));
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && hepBMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch;
         }).length;
         setStagedResultCount(count);
     }, []);

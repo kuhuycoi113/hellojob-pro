@@ -40,7 +40,6 @@ type JobData = {
   notes: string;
   specialConditions: string[];
   tattooRequirement: string;
-  hepatitisBRequirement: string;
   educationRequirement: string;
   experienceRequirement: string;
   yearsOfExperience: string;
@@ -120,7 +119,6 @@ export default function PartnerPostJobPage() {
     notes: '',
     specialConditions: [],
     tattooRequirement: '',
-    hepatitisBRequirement: '',
     educationRequirement: '',
     experienceRequirement: '',
     yearsOfExperience: '',
@@ -689,22 +687,7 @@ export default function PartnerPostJobPage() {
                             </Select>
                         </div>
                      )}
-                      {visibleFields.has('hepatitisBRequirement') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="hepatitis-b-requirement">Viêm gan B</Label>
-                           <Select value={jobData.hepatitisBRequirement} onValueChange={(value) => handleInputChange('hepatitisBRequirement', value)}>
-                                <SelectTrigger id="hepatitis-b-requirement">
-                                    <SelectValue placeholder="Chọn yêu cầu về viêm gan B" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Không nhận viêm gan B">Không nhận viêm gan B</SelectItem>
-                                    <SelectItem value="Nhận viêm gan B (thể tĩnh)">Nhận viêm gan B (thể tĩnh)</SelectItem>
-                                    <SelectItem value="Nhận viêm gan B (thể động)">Nhận viêm gan B (thể động)</SelectItem>
-                                    <SelectItem value="Không yêu cầu">Không yêu cầu</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                     )}
+                      
                      {visibleFields.has('languageRequirement') && (
                       <div className="space-y-2">
                         <Label htmlFor="language-requirement">Yêu cầu ngoại ngữ</Label>
