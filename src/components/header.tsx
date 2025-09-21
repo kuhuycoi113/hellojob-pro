@@ -121,7 +121,7 @@ const SearchDialog = () => {
                     <span className="sr-only">Tìm kiếm</span>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
+            <DialogContent className="sm:max-w-xl" id="TIMKIEM02">
                 <DialogHeader>
                     <DialogTitle className="font-headline text-2xl">Tìm kiếm việc làm</DialogTitle>
                     <DialogDescription>
@@ -776,5 +776,6 @@ const LoggedOutContent = () => {
     </>
   );
 }
+
 
 
