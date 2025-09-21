@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { guestUser, loggedInUser, setCurrentUser } from '@/lib/chat-data';
+import * as chatData from '@/lib/chat-data';
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
 
@@ -31,11 +31,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const isLoggedIn = role !== 'guest';
 
   const setRole = (newRole: Role) => {
-    // Mutate the currentUser from chat-data based on the role
     if (newRole === 'guest') {
-        setCurrentUser(guestUser);
+        chatData.setCurrentUser(chatData.guestUser);
     } else { // 'candidate' or 'candidate-empty-profile'
-        setCurrentUser(loggedInUser);
+        chatData.setCurrentUser(chatData.loggedInUser);
     }
     setInternalRole(newRole);
   };

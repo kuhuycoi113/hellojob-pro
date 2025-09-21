@@ -13,7 +13,7 @@ import React, { type ReactNode } from 'react';
 function LayoutManager({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
-    const isPartnerPage = pathname.startsWith('/doi-tac');
+    const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
 
 
     return (
