@@ -33,7 +33,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose
+  DialogClose,
+  DialogFooter
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -60,7 +61,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGr
 import { Label } from './ui/label';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Input } from './ui/input';
-import { type SearchFilters } from './job-search/search-results';
+import type { SearchFilters } from './job-search/search-results';
 
 
 export const Logo = ({ className }: { className?: string }) => (
@@ -109,7 +110,7 @@ const SearchDialog = () => {
             filters.location.forEach(loc => query.append('dia-diem', loc));
         }
         setIsSearchDialogOpen(false);
-        router.push(`/tim-viec-lam?${query.toString()}`);
+        router.push(`/tim-viec-lam?${'q'}=${query.toString()}`);
     }
 
     return (
@@ -693,10 +694,6 @@ const LoggedOutContent = () => {
                                     {renderDialogContent()}
                                 </DialogContent>
                             </Dialog>
-
-                             <Button asChild>
-                                <Link href="/viec-lam-cua-toi">Trang việc làm</Link>
-                            </Button>
                            
                             <MainMenu />
                         </>
@@ -779,5 +776,3 @@ const LoggedOutContent = () => {
     </>
   );
 }
-
-
