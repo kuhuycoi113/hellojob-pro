@@ -47,14 +47,16 @@ export function Footer() {
               Hotline: 1900 1234
             </p>
             <div className="mt-4">
-              <Image 
-                src="/img/DADANGKYBCT.png"
-                alt="Đã đăng ký Bộ Công Thương"
-                width={200}
-                height={75}
-                data-ai-hint="ministry of industry and trade logo"
-                className="w-48 h-auto"
-              />
+              <Link href="http://online.gov.vn/Home/WebDetails/80054" target="_blank" rel="noopener noreferrer">
+                <Image 
+                  src="/img/DADANGKYBCT.png"
+                  alt="Đã đăng ký Bộ Công Thương"
+                  width={200}
+                  height={75}
+                  data-ai-hint="ministry of industry and trade logo"
+                  className="w-48 h-auto"
+                />
+              </Link>
             </div>
           </div>
         </div>
