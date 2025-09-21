@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
@@ -36,6 +37,7 @@ const initialSearchFilters: SearchFilters = {
     yearsOfExperience: '',
     tattooRequirement: '',
     netFee: '',
+    netFeeNoTicket: '',
     quantity: '',
     interviewRounds: '',
     interviewDate: '',
@@ -253,7 +255,7 @@ function JobSearchPageContent() {
     
     const runFilter = useCallback((filtersToApply: SearchFilters, sortOption: string) => {
         const { 
-            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
+            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, netFeeNoTicket, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
             otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement
@@ -267,6 +269,7 @@ function JobSearchPageContent() {
         const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
 
         const feeLimit = parseSalary(netFee);
+        const feeNoTicketLimit = parseSalary(netFeeNoTicket);
         const roundsSlug = interviewRounds;
         const roundsToMatch = roundsSlug ? parseInt(roundsSlug.split('-')[0], 10) : null;
         
@@ -320,7 +323,9 @@ function JobSearchPageContent() {
 
             const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
 
-            const feeMatch = feeLimit === null || !job.netFee || (parseSalary(job.netFee) || 0) <= feeLimit;
+            const feeWithTicketMatch = feeLimit === null || (job.netFee && (parseSalary(job.netFee) ?? Infinity) <= feeLimit);
+            const feeNoTicketMatch = feeNoTicketLimit === null || (job.netFeeNoTicket && (parseSalary(job.netFeeNoTicket) ?? Infinity) <= feeNoTicketLimit);
+            const feeMatch = feeWithTicketMatch && feeNoTicketMatch;
 
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
 
@@ -401,7 +406,6 @@ function JobSearchPageContent() {
             return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch;
         });
 
-        // Sorting logic
         results.sort((a, b) => {
             switch (sortOption) {
                 case 'newest':
@@ -439,7 +443,7 @@ function JobSearchPageContent() {
 
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
         const { 
-            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
+            visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, netFeeNoTicket, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
             otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement
@@ -449,6 +453,7 @@ function JobSearchPageContent() {
         const industryName = industryObject?.name || industry;
         
         const feeLimit = parseSalary(netFee);
+        const feeNoTicketLimit = parseSalary(netFeeNoTicket);
         
         const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
         const interviewLocationName = allInterviewLocations.find(l => l.slug === interviewLocation)?.name;
@@ -502,7 +507,11 @@ function JobSearchPageContent() {
             }
             const interviewLocationMatch = !interviewLocationName || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocationName.toLowerCase()));
             const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
-            const feeMatch = feeLimit === null || !job.netFee || (parseSalary(job.netFee) || 0) <= feeLimit;
+
+            const feeWithTicketMatch = feeLimit === null || (job.netFee && (parseSalary(job.netFee) ?? Infinity) <= feeLimit);
+            const feeNoTicketMatch = feeNoTicketLimit === null || (job.netFeeNoTicket && (parseSalary(job.netFeeNoTicket) ?? Infinity) <= feeNoTicketLimit);
+            const feeMatch = feeWithTicketMatch && feeNoTicketMatch;
+
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
             const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDate && job.interviewDate <= interviewDate);
 
@@ -629,7 +638,7 @@ function JobSearchPageContent() {
     const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
       setStagedFilters(prev => {
           const updated = {...prev, ...newFilters};
-          countStagedResults(updated); // Đếm lại kết quả với bộ lọc mới
+          countStagedResults(updated);
           return updated;
       });
     }, [countStagedResults]);
@@ -732,4 +741,3 @@ export default function JobSearchPage() {
   );
 }
 
-    

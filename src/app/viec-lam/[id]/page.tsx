@@ -49,8 +49,10 @@ const JobDetailSection = ({ title, children, icon: Icon }: { title: string, chil
 );
 
 const JPY_VND_RATE = 180; // Example rate
+const USD_VND_RATE = 26300; // Example rate
 
-const formatCurrency = (value?: string, currency: 'JPY' | 'VND' = 'JPY') => {
+
+const formatCurrency = (value?: string, currency: 'JPY' | 'VND' | 'USD' = 'JPY') => {
     if (!value) return 'N/A';
     const numericValue = parseInt(value.replace(/[^0-9]/g, ''), 10);
     if (isNaN(numericValue)) return value;
@@ -58,16 +60,23 @@ const formatCurrency = (value?: string, currency: 'JPY' | 'VND' = 'JPY') => {
     if (currency === 'VND') {
         return `${numericValue.toLocaleString('vi-VN')} VNĐ`;
     }
+     if (currency === 'USD') {
+        return `${numericValue.toLocaleString('en-US')} USD`;
+    }
     return `${numericValue.toLocaleString('ja-JP')} yên`;
 };
 
-const convertToVnd = (jpyValue?: string) => {
-    if (!jpyValue) return null;
-    const numericValue = parseInt(jpyValue.replace(/[^0-9]/g, ''), 10);
+
+const convertCurrency = (value?: string, from: 'JPY' | 'USD' = 'JPY') => {
+    if (!value) return null;
+    const numericValue = parseInt(value.replace(/[^0-9]/g, ''), 10);
     if (isNaN(numericValue)) return null;
-    const vndValue = numericValue * JPY_VND_RATE;
+
+    const rate = from === 'JPY' ? JPY_VND_RATE : USD_VND_RATE;
+    const vndValue = numericValue * rate;
     return `≈ ${vndValue.toLocaleString('vi-VN')} VNĐ`;
 };
+
 
 const formatPostedTime = (dateString: string) => {
     if (!dateString) return '';
@@ -170,7 +179,6 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
         if (method === 'ai') {
             router.push('/tao-ho-so-ai');
         } else {
-            // UNGTUYEN-L06: Redirect to candidate-profile instead of register
             router.push('/ho-so-cua-toi');
         }
     };
@@ -189,7 +197,7 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                     <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
                     <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
                 </Card>
-                <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                 <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
                     <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
                     <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
                     <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
@@ -257,7 +265,6 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
-            // Add other cases here later
             default: return <FirstStepDialog />;
         }
     }
@@ -366,13 +373,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 
                 const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
 
-                // Fetch profile-based suggestions only if logged in
                 if (isLoggedIn && profile) {
                     const profileResults = await matchJobsToProfile(profile, 'related');
                     setProfileSuggestions(profileResults.map(r => r.job).filter(j => j.id !== resolvedParams.id).slice(0, 4));
                 }
 
-                // Fetch behavior-based suggestions for all users
                 const behavioralResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
                 setBehavioralSuggestions(behavioralResults.filter(r => r.job.id !== resolvedParams.id).slice(0, 4));
 
@@ -462,18 +467,14 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           try {
             await navigator.share(shareData);
           } catch (err: any) {
-             // Check if the error is an AbortError, which occurs when the user cancels the share dialog.
             if (err.name === 'AbortError') {
-                // Silently ignore user cancellation
                 console.log('Share cancelled by user.');
             } else {
-                // For other errors (like PermissionDenied), fall back to copying the link.
                 console.error("Error sharing:", err);
                 copyLink();
             }
           }
         } else {
-          // Fallback for desktop or browsers that don't support the API
           copyLink();
         }
     };
@@ -550,7 +551,8 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageRequirement}/>
                                 <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={job.interviewDate}/>
                                 <RequirementItem icon={ClipboardCheck} label="Số vòng" value={`${job.interviewRounds} vòng`}/>
-                                <RequirementItem icon={Wallet} label="Mức phí" value={job.netFee}/>
+                                {job.netFeeNoTicket && <RequirementItem icon={Wallet} label="Phí không vé" value={`${formatCurrency(job.netFeeNoTicket, 'USD')} (${convertCurrency(job.netFeeNoTicket, 'USD')})`} />}
+                                {job.netFee && <RequirementItem icon={Wallet} label={job.netFeeNoTicket ? "Phí trọn gói (gồm vé)" : "Mức phí"} value={`${formatCurrency(job.netFee, 'USD')} (${convertCurrency(job.netFee, 'USD')})`}/>}
                                 <RequirementItem icon={Star} label="Điều kiện đặc biệt" value={job.specialConditions}/>
                             </CardContent>
                         </Card>
@@ -627,11 +629,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                <div className="space-y-2">
                                     <p className="text-sm text-muted-foreground">Lương cơ bản</p>
                                     <p className="text-2xl font-bold text-accent-green">{formatCurrency(job.salary.basic, 'JPY')}</p>
-                                    {job.salary.basic && <p className="text-xs text-muted-foreground">{convertToVnd(job.salary.basic)}</p>}
+                                    {job.salary.basic && <p className="text-xs text-muted-foreground">{convertCurrency(job.salary.basic, 'JPY')}</p>}
                                     {job.salary.actual && (
                                         <div className="pt-2">
                                             <p className="font-semibold text-muted-foreground">Thực lĩnh: ~{formatCurrency(job.salary.actual, 'JPY')}</p>
-                                            {job.salary.actual && <p className="text-xs text-muted-foreground">{convertToVnd(job.salary.actual)}</p>}
+                                            {job.salary.actual && <p className="text-xs text-muted-foreground">{convertCurrency(job.salary.actual, 'JPY')}</p>}
                                         </div>
                                     )}
                                </div>
@@ -645,7 +647,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             id="MDTVV01"
                             className="shadow-lg group hover:shadow-xl hover:border-primary transition-all cursor-pointer"
                             onClick={(e) => {
-                                // Only navigate if the click is directly on the card and not on an interactive element inside
                                 if ((e.target as HTMLElement).closest('a, button')) return;
                                 router.push(`/tu-van-vien/${assignedConsultant.id}`);
                             }}
@@ -686,7 +687,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         </Card>
                     </aside>
                 </div>
-                 {/* Suggestions Section */}
                 <div className="mt-16 pt-12 border-t space-y-12">
                      <section id="behavioral-suggestions">
                         <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
@@ -730,7 +730,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
                     {role === 'candidate' && (
                         <section id="VL001">
-                            {/* This is the empty module for future design */}
                         </section>
                     )}
                 </div>
