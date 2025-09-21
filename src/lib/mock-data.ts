@@ -232,13 +232,26 @@ const createJobList = (): Job[] => {
                         return conditionList ? conditionList.includes(cond.name) : false;
                     });
 
-                    const shuffledConditions = [...applicableConditions].sort(() => 0.5 - Math.random());
-                    const selectedConditionsCount = Math.floor(Math.random() * 2) + 2; 
-                    const specialConditions = shuffledConditions.slice(0, selectedConditionsCount).map(c => c.name).join(', ');
+                    // Deterministic selection instead of random shuffle
+                    const selectedConditionsCount = 2 + (jobIndex % 2); // Select 2 or 3 conditions
+                    const startIndex = jobIndex % (applicableConditions.length > 0 ? applicableConditions.length : 1);
+                    const selectedConditions = [];
+                    if (applicableConditions.length > 0) {
+                        for (let i = 0; i < selectedConditionsCount; i++) {
+                            selectedConditions.push(applicableConditions[(startIndex + i) % applicableConditions.length]);
+                        }
+                    }
+                    const specialConditions = selectedConditions.map(c => c.name).join(', ');
 
-                    const shuffledOtherSkills = [...otherSkills].sort(() => 0.5 - Math.random());
-                    const selectedOtherSkillsCount = Math.floor(Math.random() * 2) + 1;
-                    const selectedOtherSkills = shuffledOtherSkills.slice(0, selectedOtherSkillsCount);
+                    // Deterministic selection for other skills
+                    const selectedOtherSkillsCount = 1 + (jobIndex % 2); // Select 1 or 2 skills
+                    const otherSkillsStartIndex = jobIndex % (otherSkills.length > 0 ? otherSkills.length : 1);
+                    const selectedOtherSkills = [];
+                    if (otherSkills.length > 0) {
+                        for (let i = 0; i < selectedOtherSkillsCount; i++) {
+                            selectedOtherSkills.push(otherSkills[(otherSkillsStartIndex + i) % otherSkills.length]);
+                        }
+                    }
                     
                     const otherSkillsText = selectedOtherSkills.map(s => `<li>${s.name}</li>`).join('');
                     const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
