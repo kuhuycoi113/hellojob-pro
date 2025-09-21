@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -62,7 +63,7 @@ export function MobileSecondaryHeader() {
           <div className="flex items-center h-14 px-2">
             {mobileFooterLinks.map(({ href, label }) => {
                 const isActive = (href !== '/' && activePath.startsWith(href)) || (href === '/' && activePath === '/');
-                const isAiProfile = href === '/ai-profile';
+                const isAiProfile = href === '/tao-ho-so-ai';
                 
                 return (
                     <Link href={href} key={href} className={cn(
@@ -87,5 +88,3 @@ export function MobileSecondaryHeader() {
     </header>
   );
 }
-
-    
