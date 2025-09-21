@@ -6,7 +6,7 @@ import { jobData, type Job } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat } from 'lucide-react';
+import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -169,6 +169,7 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
         if (method === 'ai') {
             router.push('/ai-profile');
         } else {
+            // UNGTUYEN-L06: Redirect to candidate-profile instead of register
             router.push('/candidate-profile');
         }
     };
@@ -283,8 +284,8 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                     </Dialog>
                     <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
                         <DialogTrigger asChild>
-                            <Button>
-                                <Briefcase className="mr-2 h-4 w-4" />
+                             <Button>
+                                <PlusCircle className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ chi tiết
                             </Button>
                         </DialogTrigger>
