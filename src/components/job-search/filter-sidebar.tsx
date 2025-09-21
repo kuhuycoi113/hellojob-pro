@@ -26,6 +26,8 @@ import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const createSlug = (str: string) => {
     if (!str) return '';
@@ -317,6 +319,8 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isFlexibleDate, setIsFlexibleDate] = useState(false);
+    const isMobile = useIsMobile();
+    const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     
     const { jobCountsByRegion, jobCountsByPrefecture } = useMemo(() => {
         const countsByPrefecture: { [key: string]: number } = {};
@@ -793,33 +797,61 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Phỏng vấn từ giờ đến</Label>
-                                     <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant={"outline"}
-                                                className={cn(
-                                                    "w-full justify-start text-left font-normal",
-                                                    !filters.interviewDate && "text-muted-foreground",
-                                                    filters.interviewDate && filters.interviewDate !== 'flexible' && "text-primary"
-                                                )}
-                                                disabled={isFlexibleDate}
-                                            >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                {filters.interviewDate && filters.interviewDate !== 'flexible' ? format(new Date(filters.interviewDate), "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <CalendarComponent
-                                                mode="single"
-                                                selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? new Date(filters.interviewDate) : undefined}
-                                                onSelect={handleDateSelect}
-                                                fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
-                                                toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
-                                                locale={vi}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
+                                    {isMobile ? (
+                                        <Sheet open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                                            <SheetTrigger asChild>
+                                                <Button
+                                                    variant={"outline"}
+                                                    className={cn("w-full justify-start text-left font-normal", !filters.interviewDate && "text-muted-foreground", filters.interviewDate && filters.interviewDate !== 'flexible' && "text-primary")}
+                                                    disabled={isFlexibleDate}
+                                                >
+                                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                                    {filters.interviewDate && filters.interviewDate !== 'flexible' ? format(new Date(filters.interviewDate), "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
+                                                </Button>
+                                            </SheetTrigger>
+                                            <SheetContent side="bottom" className="h-auto">
+                                                <SheetHeader>
+                                                    <SheetTitle>Chọn ngày phỏng vấn</SheetTitle>
+                                                </SheetHeader>
+                                                <CalendarComponent
+                                                    mode="single"
+                                                    selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? new Date(filters.interviewDate) : undefined}
+                                                    onSelect={(date) => {
+                                                        handleDateSelect(date);
+                                                        setIsDatePickerOpen(false);
+                                                    }}
+                                                    fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
+                                                    toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
+                                                    locale={vi}
+                                                    initialFocus
+                                                />
+                                            </SheetContent>
+                                        </Sheet>
+                                    ) : (
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant={"outline"}
+                                                    className={cn("w-full justify-start text-left font-normal", !filters.interviewDate && "text-muted-foreground", filters.interviewDate && filters.interviewDate !== 'flexible' && "text-primary")}
+                                                    disabled={isFlexibleDate}
+                                                >
+                                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                                    {filters.interviewDate && filters.interviewDate !== 'flexible' ? format(new Date(filters.interviewDate), "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0">
+                                                <CalendarComponent
+                                                    mode="single"
+                                                    selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? new Date(filters.interviewDate) : undefined}
+                                                    onSelect={handleDateSelect}
+                                                    fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
+                                                    toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
+                                                    locale={vi}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    )}
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     <Checkbox id="flexible-date" checked={isFlexibleDate} onCheckedChange={handleFlexibleDateChange} />
