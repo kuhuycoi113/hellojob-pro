@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from '@/components/ui/popover';
 import { MessageSquare, Phone } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -85,23 +85,25 @@ export function ContactButtons({ contact, showChatText = false }: ContactButtons
         {/* Mobile Buttons */}
          <div className="md:hidden">
             <Popover>
-                <PopoverTrigger asChild>
-                    <div id="MB4NUT01" className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                        <Button size="icon" variant="default" className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90">
-                            <MessageSquare className="h-4 w-4"/>
-                        </Button>
-                         <Button size="icon" variant="outline" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
-                            <Image src="/img/Mess.svg" alt="Messenger" width={18} height={18} />
-                        </Button>
-                         <Button size="icon" variant="outline" className="h-8 w-8 border-blue-500 hover:bg-blue-50">
-                            <Image src="/img/Zalo.svg" alt="Zalo" width={18} height={18} />
-                        </Button>
-                         <Button size="icon" variant="outline" className="h-8 w-8 border-green-500 hover:bg-green-50">
-                            <Image src="/img/phone.svg" alt="Phone" width={18} height={18} />
-                        </Button>
-                    </div>
-                </PopoverTrigger>
-                <PopoverContent id="LIENHETOMOBILE01" className="w-auto p-2">
+                <PopoverAnchor asChild>
+                    <PopoverTrigger asChild>
+                        <div id="MB4NUT01" className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                            <Button size="icon" variant="default" className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90">
+                                <MessageSquare className="h-4 w-4"/>
+                            </Button>
+                            <Button size="icon" variant="outline" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
+                                <Image src="/img/Mess.svg" alt="Messenger" width={18} height={18} />
+                            </Button>
+                            <Button size="icon" variant="outline" className="h-8 w-8 border-blue-500 hover:bg-blue-50">
+                                <Image src="/img/Zalo.svg" alt="Zalo" width={18} height={18} />
+                            </Button>
+                            <Button size="icon" variant="outline" className="h-8 w-8 border-green-500 hover:bg-green-50">
+                                <Image src="/img/phone.svg" alt="Phone" width={18} height={18} />
+                            </Button>
+                        </div>
+                    </PopoverTrigger>
+                </PopoverAnchor>
+                <PopoverContent id="LIENHETOMOBILE01" className="w-auto p-2" onClick={(e) => e.stopPropagation()}>
                     <div className="flex gap-2">
                         <Button size="icon" className="h-16 w-16 bg-primary hover:bg-primary/90" onClick={handleChatClick}>
                             <MessageSquare className="h-8 w-8"/>
