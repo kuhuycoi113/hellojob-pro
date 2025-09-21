@@ -9,7 +9,7 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { industriesByJobType, type Industry } from "@/lib/industry-data";
+import { industriesByJobType, type Industry, allIndustries } from "@/lib/industry-data";
 import { japanRegions, allJapanLocations } from '@/lib/location-data';
 import type { SearchFilters } from './search-results';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
@@ -17,9 +17,6 @@ import { Input } from '../ui/input';
 import { useRouter } from 'next/navigation';
 import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 import { Loader2 } from 'lucide-react';
-
-
-const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
 
 type SearchModuleProps = {
     onSearch: (filters: Partial<SearchFilters>) => void;
@@ -32,7 +29,6 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
   const [filters, setInternalFilters] = useState(initialFilters);
   const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
   const [isSearchExpanded, setIsSearchExpanded] = useState(showHero);
-  const [isAiSearching, setIsAiSearching] = useState(false);
 
   useEffect(() => {
     setInternalFilters(initialFilters);
@@ -80,32 +76,9 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
     setParentFilters(updatedFilters);
   }
   
-  const handleSearchClick = async () => {
-    if (filters.q) {
-        setIsAiSearching(true);
-        try {
-            const criteria = await recommendJobs(filters.q);
-            // Merge AI criteria with existing filter selections
-            // AI criteria take precedence if they exist
-            const combinedFilters = {
-                ...filters,
-                visaType: criteria?.visaType || filters.visa,
-                industry: criteria?.industry ? allIndustries.find(i => i.name === criteria.industry)?.slug : filters.industry,
-                location: criteria?.workLocation ? [allJapanLocations.find(l => l.name === criteria.workLocation)?.slug || ''] : filters.location,
-                gender: criteria?.gender ? (criteria.gender === 'Nam' ? 'nam' : 'nu') : filters.gender,
-            };
-            onSearch(combinedFilters);
-        } catch (error) {
-            console.error("AI search failed, falling back to simple search:", error);
-            onSearch(filters); // Fallback to non-AI search on error
-        } finally {
-            setIsAiSearching(false);
-        }
-    } else {
-        onSearch(filters);
-    }
-    
-     if (window.innerWidth < 768) { // md breakpoint
+  const handleSearchClick = () => {
+    onSearch(filters);
+    if (window.innerWidth < 768) { // md breakpoint
       setIsSearchExpanded(false);
     }
   }
@@ -164,35 +137,8 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                     "p-4 md:p-6",
                     isSearchExpanded ? "block" : "hidden md:block"
                 )}>
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                        <div className="space-y-2 md:col-span-8">
-                            {showHero && <Label htmlFor="main-search-input" className="text-foreground">Bạn muốn tìm việc gì?</Label>}
-                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                <Input 
-                                    id="main-search-input"
-                                    placeholder="Nhập chức danh, kỹ năng, hoặc 'Cơ khí Aichi'..." 
-                                    className="pl-10 h-12 text-base bg-secondary/50"
-                                    value={filters.q || ''}
-                                    onChange={(e) => handleFilterChange('q', e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleSearchClick()}
-                                />
-                            </div>
-                        </div>
-                         <div className="space-y-2 md:col-span-4">
-                             {showHero && <Label className="text-transparent hidden md:block">Tìm kiếm</Label>}
-                            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg h-12" onClick={handleSearchClick} disabled={isAiSearching}>
-                                {isAiSearching ? (
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                ) : (
-                                    <Search className="mr-2 h-5 w-5" />
-                                )}
-                                 Tìm kiếm
-                            </Button>
-                        </div>
-                    </div>
-                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end mt-4">
-                        <div className="space-y-2">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                        <div className="space-y-2 lg:col-span-1">
                             <Label htmlFor="search-type" className="text-foreground text-sm">Chi tiết loại hình visa</Label>
                             <Select onValueChange={(value) => handleVisaDetailChange(value)} value={filters.visaDetail || 'all'}>
                                 <SelectTrigger id="search-type">
@@ -211,7 +157,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2 lg:col-span-1">
                             <Label htmlFor="search-industry" className="text-foreground text-sm">Ngành nghề</Label>
                             <Select onValueChange={(value) => handleFilterChange('industry', value === 'all' ? '' : value)} value={filters.industry || 'all'}>
                                 <SelectTrigger id="search-industry">
@@ -227,7 +173,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                                 </SelectContent>
                             </Select>
                         </div>
-                         <div className="space-y-2">
+                         <div className="space-y-2 lg:col-span-1">
                             <Label htmlFor="search-location" className="text-foreground text-sm">Địa điểm làm việc</Label>
                             <Select onValueChange={(value) => handleFilterChange('location', value === 'all' ? [] : [value])} value={Array.isArray(filters.location) ? filters.location[0] || 'all' : 'all'}>
                                 <SelectTrigger id="search-location">
@@ -247,6 +193,11 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                                 </SelectContent>
                             </Select>
                         </div>
+                         <div className="space-y-2 lg:col-span-1">
+                            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-lg h-10" onClick={handleSearchClick}>
+                                <Search className="mr-2 h-5 w-5" /> Tìm kiếm
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </Card>
@@ -254,5 +205,3 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
     </section>
   );
 }
-
-    
