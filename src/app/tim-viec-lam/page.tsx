@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
@@ -71,6 +70,7 @@ const keyMap: { [key: string]: string } = {
   yearsOfExperience: 'so-nam-kinh-nghiem',
   tattooRequirement: 'hinh-xam',
   netFee: 'muc-phi',
+  netFeeNoTicket: 'muc-phi-khong-ve',
   quantity: 'so-luong',
   interviewRounds: 'so-vong-phong-van',
   interviewDate: 'ngay-phong-van',
@@ -731,3 +731,5 @@ export default function JobSearchPage() {
     </Suspense>
   );
 }
+
+    
