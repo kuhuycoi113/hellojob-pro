@@ -40,11 +40,21 @@ export type Conversation = {
   messages: Message[];
 };
 
-export const currentUser: User = {
+// Define different user personas for testing
+export const loggedInUser: User = {
   id: 'user-0',
   name: 'Lê Ngọc Hân',
   avatarUrl: 'https://placehold.co/100x100.png?text=Me',
 };
+
+export const guestUser: User = {
+  id: 'user-guest-123', // A different ID for the guest
+  name: 'Khách',
+  avatarUrl: 'https://placehold.co/100x100.png?text=G',
+};
+
+// This will be the actively used user object, mutated by AuthContext
+export let currentUser: User = guestUser;
 
 // AI Bot persona
 export const helloJobBot: User = {

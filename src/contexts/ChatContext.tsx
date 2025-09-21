@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { Conversation, Message, User, conversations, currentUser, helloJobBot, Attachment } from '@/lib/chat-data';
 import { consultants } from "@/lib/consultant-data";
 import { recommendJobs, type JobRecommendationResponse } from '@/ai/flows/recommend-jobs-flow';
+import { useAuth } from './AuthContext';
 
 interface ChatContextType {
   isChatOpen: boolean;
@@ -30,45 +31,41 @@ interface ChatProviderProps {
 }
 
 export const ChatProvider = ({ children }: ChatProviderProps) => {
+  const { role } = useAuth();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
   const [assignedConsultant, setAssignedConsultant] = useState<User | null>(null);
 
   useEffect(() => {
-    // Assign a random consultant on initial load if one isn't already assigned
-    const consultantId = localStorage.getItem('assignedConsultantId');
-    let consultant = null;
-    if (consultantId) {
-        consultant = consultants.find(c => c.id === consultantId) || null;
-    }
-    
-    if (!consultant) {
-        consultant = consultants[Math.floor(Math.random() * consultants.length)];
-        localStorage.setItem('assignedConsultantId', consultant.id);
-    }
+    // Predictable random assignment based on user ID
+    // This ensures a user always gets the same consultant, but different users get different ones.
+    const userIdNumber = parseInt(currentUser.id.replace(/[^0-9]/g, ''), 10) || 0;
+    const consultantIndex = userIdNumber % consultants.length;
+    const consultant = consultants[consultantIndex];
     setAssignedConsultant(consultant);
 
-    // Initialize the default conversation with the bot/assigned consultant
-     const botConversation = conversations.find(c => c.id === 'convo-bot-hellojob');
-     if (botConversation && consultant && botConversation.messages.length === 0) {
-       botConversation.messages.push({
-         id: 'msg-bot-welcome',
-         sender: consultant,
-         text: `Chào bạn, tôi là ${consultant.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`,
-         timestamp: new Date().toISOString(),
-       });
-     }
-
-  }, []);
+    const botConversation = conversations.find(c => c.id === 'convo-bot-hellojob');
+    if (botConversation) {
+        // Clear previous welcome messages to regenerate with the correct consultant
+        botConversation.messages = botConversation.messages.filter(m => m.id !== 'msg-bot-welcome');
+        
+        // Add the new welcome message if it doesn't exist
+        if (botConversation.messages.length === 0) {
+            botConversation.messages.push({
+                id: 'msg-bot-welcome',
+                sender: consultant,
+                text: `Chào bạn, tôi là ${consultant.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`,
+                timestamp: new Date().toISOString(),
+            });
+        }
+    }
+  }, [role]); // Rerun this logic when the role (and thus currentUser) changes
 
   const openChat = (user?: User) => {
-    // If a specific user (consultant) is provided, open chat with them.
-    // Otherwise, default to the globally assigned consultant or the bot.
     const targetUser = user || assignedConsultant || helloJobBot;
     
     let conversation = conversations.find(c => c.participants.some(p => p.id === targetUser.id));
     
-    // If no conversation exists for this target user, create a new one.
     if (!conversation) {
         const initialMessage = `Chào bạn, tôi là ${targetUser.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`;
         
@@ -84,7 +81,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
                 }
             ]
         }
-        // Add the new conversation to the list if it's not already there
         if (!conversations.some(c => c.id === conversation!.id)) {
             conversations.push(conversation);
         }
@@ -96,7 +92,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
   const closeChat = () => {
     setIsChatOpen(false);
-    // We don't nullify activeConversation so the state is preserved if the user re-opens
   };
 
   const sendMessage = async (text: string, attachment?: Attachment) => {
@@ -120,8 +115,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     if(convoIndex !== -1) {
         conversations[convoIndex] = updatedConversation;
     }
-
-    // AI logic is removed. The conversation now waits for a real person to reply.
   };
 
   const value = {

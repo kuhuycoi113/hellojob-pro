@@ -12,8 +12,8 @@ import React, { type ReactNode } from 'react';
 
 function LayoutManager({ children }: { children: ReactNode }) {
     const pathname = usePathname();
-    const isCallPage = pathname.startsWith('/video-call') || pathname.startsWith('/voice-call');
-    const isPartnerPage = pathname.startsWith('/partner');
+    const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
+    const isPartnerPage = pathname.startsWith('/doi-tac');
 
 
     return (
@@ -33,10 +33,10 @@ export function RootProvider({
     children: React.ReactNode;
 }) {
     return (
-        <ChatProvider>
-            <AuthProvider>
+        <AuthProvider>
+            <ChatProvider>
                 <LayoutManager>{children}</LayoutManager>
-            </AuthProvider>
-        </ChatProvider>
+            </ChatProvider>
+        </AuthProvider>
     );
 }

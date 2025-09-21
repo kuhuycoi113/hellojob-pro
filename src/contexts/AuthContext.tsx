@@ -1,8 +1,8 @@
 
-
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import * as chatData from '@/lib/chat-data';
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
 
@@ -27,8 +27,19 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [role, setRole] = useState<Role>('guest');
+  const [role, setInternalRole] = useState<Role>('guest');
   const isLoggedIn = role !== 'guest';
+
+  const setRole = (newRole: Role) => {
+    // Mutate the exported currentUser from chat-data based on the role
+    if (newRole === 'guest') {
+        chatData.currentUser = chatData.guestUser;
+    } else { // 'candidate' or 'candidate-empty-profile'
+        chatData.currentUser = chatData.loggedInUser;
+    }
+    setInternalRole(newRole);
+  };
+
 
   useEffect(() => {
     const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
