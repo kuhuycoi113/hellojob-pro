@@ -141,7 +141,7 @@ const generateUniqueJobId = (index: number): string => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let deterministicPart = '';
     let num = index;
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 4; i++) {
         deterministicPart += chars[num % chars.length];
         num = Math.floor(num / chars.length);
     }
@@ -149,11 +149,11 @@ const generateUniqueJobId = (index: number): string => {
     // Static prefix for consistent ID generation
     const prefix = "2408"; 
 
-    const newId = prefix + deterministicPart;
+    const newId = prefix + deterministicPart + "AAAA"; // Make it longer and more unique to avoid previous collisions
     
     if (existingJobIds.has(newId)) {
-        // If collision happens (unlikely with this large pool), increment index and retry
-        return generateUniqueJobId(index + jobData.length + 1); 
+        // If collision happens, increment index and retry
+        return generateUniqueJobId(index + 1000); 
     }
     
     existingJobIds.add(newId);
@@ -523,4 +523,5 @@ missingPrefectures.forEach((prefecture, i) => {
 
 export const jobData: Job[] = [...initialJobs, ...newlyAddedJobs];
     
+
 
