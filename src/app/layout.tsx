@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 const siteConfig = {
   name: "HelloJob",
-  url: "https://hellojob.vn", // Replace with your actual domain
+  url: "https://vi.hellojob.jp", // Replace with your actual domain
   description: "Nền tảng việc làm và phát triển sự nghiệp tại Nhật Bản. Tìm kiếm việc làm Kỹ năng đặc định (Tokutei Ginou), Thực tập sinh, Kỹ sư. Xây dựng lộ trình sự nghiệp (SWR) bền vững.",
   ogImage: "/metadata/opengraph-image.jpg",
 };
@@ -98,4 +98,3 @@ export default function RootLayout({
     </html>
   );
 }
-
