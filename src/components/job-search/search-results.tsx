@@ -31,6 +31,7 @@ export type SearchFilters = {
     interviewDate?: string;
     specialConditions?: string[];
     languageRequirement?: string;
+    englishRequirement?: string; // Added this line
     educationRequirement?: string;
     yearsOfExperience?: string;
     tattooRequirement?: string;
@@ -193,3 +194,5 @@ export const SearchResults = ({ jobs, filters, appliedFilters, onFilterChange, a
      </div>
     )
   };
+
+    
