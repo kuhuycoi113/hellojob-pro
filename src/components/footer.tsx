@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -47,7 +48,7 @@ export function Footer() {
             </p>
             <div className="mt-4">
               <Image 
-                src="https://picsum.photos/seed/bocongthuong/600/225"
+                src="/img/DADANGKYBCT.png"
                 alt="Đã đăng ký Bộ Công Thương"
                 width={200}
                 height={75}
