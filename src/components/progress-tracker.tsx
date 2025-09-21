@@ -22,14 +22,14 @@ import { Button } from './ui/button';
 
 
 const steps = [
-  { text: 'Tìm hiểu các đơn hàng', icon: Search, href: '/jobs' },
-  { text: 'Đăng ký ứng tuyển', icon: FileSignature, href: '/candidate-profile' },
-  { text: 'Đào tạo phỏng vấn', icon: Mic, href: '/learn' },
+  { text: 'Tìm hiểu các đơn hàng', icon: Search, href: '/viec-lam' },
+  { text: 'Đăng ký ứng tuyển', icon: FileSignature, href: '/ho-so-cua-toi' },
+  { text: 'Đào tạo phỏng vấn', icon: Mic, href: '/hoc-tap' },
   { text: 'Phỏng vấn đơn hàng', icon: Users, href: '#' },
-  { text: 'Đào tạo sau trúng tuyển', icon: School, href: '/learn' },
+  { text: 'Đào tạo sau trúng tuyển', icon: School, href: '/hoc-tap' },
   { text: 'Xử lý hồ sơ xin visa', icon: FileText, href: '#' },
   { text: 'Vào công ty làm việc', icon: Building, href: '#' },
-  { text: 'Đào tạo & Thăng tiến', icon: TrendingUp, href: '/roadmap' },
+  { text: 'Đào tạo & Thăng tiến', icon: TrendingUp, href: '/lo-trinh' },
 ];
 
 export const ProgressTracker = () => {

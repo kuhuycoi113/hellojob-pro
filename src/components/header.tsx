@@ -142,10 +142,10 @@ export function Header() {
 
       localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
       setIsDialogOpen(false);
-      router.push('/my-jobs?highlight=suggested');
+      router.push('/viec-lam-cua-toi?highlight=suggested');
     } else {
       sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
-      sessionStorage.setItem('postLoginRedirect', '/my-jobs?highlight=suggested');
+      sessionStorage.setItem('postLoginRedirect', '/viec-lam-cua-toi?highlight=suggested');
       setIsDialogOpen(false);
       setIsConfirmLoginOpen(true);
     }
@@ -160,9 +160,9 @@ export function Header() {
         setIsCreateDetailOpen(false);
         setIsDialogOpen(false);
         if (method === 'ai') {
-            router.push('/ai-profile');
+            router.push('/tao-ho-so-ai');
         } else {
-            router.push('/register');
+            router.push('/dang-ky');
         }
     };
 
@@ -176,7 +176,7 @@ export function Header() {
       )}
        onClick={onClick}
     >
-      {Icon && <Icon className={cn("h-5 w-5", href === '/ai-profile' && 'text-accent-orange')} />}
+      {Icon && <Icon className={cn("h-5 w-5", href === '/tao-ho-so-ai' && 'text-accent-orange')} />}
       {label}
     </Link>
   );
@@ -364,7 +364,7 @@ export function Header() {
         {isLoggedIn ? (
           <DropdownMenuItem asChild>
             <Link
-              href="/candidate-profile"
+              href="/ho-so-cua-toi"
               className="block hover:bg-accent rounded-md p-2 cursor-pointer"
             >
               <div className="flex items-center gap-3">
@@ -459,7 +459,7 @@ export function Header() {
   const LoggedInContent = () => (
     <>
        <div className="p-4">
-            <Link href="/candidate-profile" className="block" >
+            <Link href="/ho-so-cua-toi" className="block" >
             <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary hover:bg-accent/20">
                 <Avatar className="h-12 w-12">
                 <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
@@ -484,7 +484,7 @@ export function Header() {
                 return (
                 <Link 
                     key={link.href}
-                    id={link.href === '/roadmap' ? 'MMN01' : undefined}
+                    id={link.href === '/lo-trinh' ? 'MMN01' : undefined}
                     href={link.href}
                     
                     className={cn("flex flex-col items-center justify-start p-2 h-24 cursor-pointer rounded-md hover:bg-accent/80", isActive ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary")}>
@@ -516,7 +516,7 @@ const LoggedOutContent = () => {
                     return (
                     <Link 
                         key={link.href}
-                        id={link.href === '/roadmap' ? 'MMN01' : undefined}
+                        id={link.href === '/lo-trinh' ? 'MMN01' : undefined}
                         href={link.href}
                         className={cn("flex flex-col items-center justify-start p-2 h-24 cursor-pointer rounded-md hover:bg-accent/80", isActive ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary")}>
                         <div className={cn("h-10 flex items-center justify-center", isActive ? "text-primary" : "text-muted-foreground")}>
@@ -551,7 +551,7 @@ const LoggedOutContent = () => {
                         key={link.href} 
                         href={link.href}
                         label={link.label}
-                        icon={link.href === '/ai-profile' ? Sparkles : undefined}
+                        icon={link.href === '/tao-ho-so-ai' ? Sparkles : undefined}
                     />
                 ))}
                 </nav>
@@ -560,7 +560,7 @@ const LoggedOutContent = () => {
                     {isClient && (
                         <>
                             {isLoggedIn ? (
-                                <Link href="/candidate-profile" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
                                         <AvatarImage src={"https://placehold.co/100x100.png" || undefined} alt="User Avatar" data-ai-hint="user avatar" />
                                         <AvatarFallback>A</AvatarFallback>
@@ -580,7 +580,7 @@ const LoggedOutContent = () => {
                             </Dialog>
 
                              <Button asChild>
-                                <Link href="/my-jobs">Trang việc làm</Link>
+                                <Link href="/viec-lam-cua-toi">Trang việc làm</Link>
                             </Button>
                            
                             <MainMenu />
@@ -601,7 +601,7 @@ const LoggedOutContent = () => {
                             </DialogContent>
                         </Dialog>
                         <Button asChild variant="default" size="sm">
-                            <Link href="/my-jobs">Việc</Link>
+                            <Link href="/viec-lam-cua-toi">Việc</Link>
                         </Button>
                         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                             <SheetTrigger asChild>
@@ -666,8 +666,3 @@ const LoggedOutContent = () => {
     </>
   );
 }
-
-    
-
-    
-
