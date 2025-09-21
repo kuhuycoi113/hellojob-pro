@@ -9,7 +9,7 @@ const Logo = () => (
 
 export function Footer() {
   return (
-    <footer className="bg-secondary text-secondary-foreground hidden md:block">
+    <footer className="bg-secondary text-secondary-foreground">
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
@@ -46,15 +46,15 @@ export function Footer() {
               Email: contact@hellojob.vn<br />
               Hotline: 1900 1234
             </p>
-            <div className="mt-4">
+            <div className="mt-4 flex gap-4 items-center">
               <Link href="http://online.gov.vn/Home/WebDetails/80054" target="_blank" rel="noopener noreferrer">
                 <Image 
                   src="/img/DADANGKYBCT.png"
                   alt="Đã đăng ký Bộ Công Thương"
-                  width={200}
-                  height={75}
+                  width={150}
+                  height={56}
                   data-ai-hint="ministry of industry and trade logo"
-                  className="w-48 h-auto"
+                  className="w-36 h-auto"
                 />
               </Link>
             </div>
