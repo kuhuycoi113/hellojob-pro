@@ -34,7 +34,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-  DialogFooter
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -76,9 +76,8 @@ const SearchDialog = () => {
         industry: '',
         location: [],
     });
-    const allIndustries = Object.values(industriesByJobType).flat();
-    const uniqueIndustries = Array.from(new Map(allIndustries.map(item => [item['slug'], item])).values());
-    const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(uniqueIndustries);
+    const allIndustries = [...new Set(Object.values(industriesByJobType).flat())];
+    const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
     const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
 
     const handleFilterChange = (field: keyof typeof filters, value: any) => {
@@ -97,7 +96,7 @@ const SearchDialog = () => {
             setAvailableIndustries(uniqueIndustries);
         } else if (!value || value === 'all-details') {
             newFilters.visa = '';
-            setAvailableIndustries(uniqueIndustries);
+            setAvailableIndustries(allIndustries);
         }
         setFilters(prev => ({ ...prev, ...newFilters }));
     };
