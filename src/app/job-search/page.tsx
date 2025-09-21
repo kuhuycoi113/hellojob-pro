@@ -48,6 +48,48 @@ const initialSearchFilters: SearchFilters = {
     workShift: '',
 };
 
+// SEO-TU-KHOA-01: Key mapping for URL parameters
+const keyMap: { [key: string]: string } = {
+    visa: 'loai-visa',
+    visaDetail: 'chi-tiet-loai-hinh-visa',
+    industry: 'nganh-nghe',
+    location: 'dia-diem',
+    interviewLocation: 'dia-diem-phong-van',
+    jobDetail: 'chi-tiet-cong-viec',
+    gender: 'gioi-tinh',
+    age: 'do-tuoi',
+    height: 'chieu-cao',
+    weight: 'can-nang',
+    basicSalary: 'luong-co-ban',
+    netSalary: 'luong-thuc-linh',
+    hourlySalary: 'luong-gio',
+    annualIncome: 'thu-nhap-nam',
+    annualBonus: 'thuong-nam',
+    specialConditions: 'dieu-kien-dac-biet',
+    languageRequirement: 'yeu-cau-tieng-nhat',
+    englishRequirement: 'yeu-cau-tieng-anh',
+    educationRequirement: 'hoc-van',
+    experienceRequirement: 'yeu-cau-kinh-nghiem',
+    yearsOfExperience: 'so-nam-kinh-nghiem',
+    tattooRequirement: 'hinh-xam',
+    hepatitisBRequirement: 'viem-gan-b',
+    netFee: 'muc-phi',
+    quantity: 'so-luong',
+    interviewRounds: 'so-vong-phong-van',
+    interviewDate: 'ngay-phong-van',
+    visionRequirement: 'yeu-cau-thi-luc',
+    dominantHand: 'tay-thuan',
+    otherSkillRequirement: 'yeu-cau-ky-nang-khac',
+    companyArrivalTime: 'thoi-diem-ve-cong-ty',
+    workShift: 'ca-lam-viec',
+    sortBy: 'sap-xep',
+};
+
+const reverseKeyMap: { [key: string]: string } = Object.fromEntries(
+  Object.entries(keyMap).map(([key, value]) => [value, key])
+);
+
+
 // Helper function to escape regex special characters
 function escapeRegExp(string: string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
@@ -217,7 +259,7 @@ function JobSearchPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement,
+            otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement, hepatitisBRequirement
         } = filtersToApply;
         
         const visaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === visaDetail)?.name || visaDetail;
@@ -336,6 +378,10 @@ function JobSearchPageContent() {
             const tattooReqName = tattooRequirements.find(t => t.slug === tattooRequirement)?.name;
             const tattooMatch = !tattooRequirement || tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
 
+            const hepBReqName = hepBOptions.find(t => createSlug(t) === hepatitisBRequirement)?.name;
+            const hepBMatch = !hepatitisBRequirement || !job.hepatitisBRequirement || job.hepatitisBRequirement === hepBReqName;
+
+
             const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
             const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
             
@@ -359,7 +405,7 @@ function JobSearchPageContent() {
             const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(workShift));
 
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch && hepBMatch;
         });
 
         // Sorting logic
@@ -403,7 +449,7 @@ function JobSearchPageContent() {
             visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, interviewRounds, interviewDate,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-            otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement,
+            otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement, hepatitisBRequirement
         } = filtersToCount;
         
         const industryObject = allIndustries.find(i => i.slug === industry);
@@ -515,6 +561,9 @@ function JobSearchPageContent() {
             
             const tattooReqName = tattooRequirements.find(t => t.slug === tattooRequirement)?.name;
             const tattooMatch = !tattooRequirement || tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
+            
+            const hepBReqName = hepBOptions.find(t => createSlug(t) === hepatitisBRequirement)?.name;
+            const hepBMatch = !hepatitisBRequirement || !job.hepatitisBRequirement || job.hepatitisBRequirement === hepBReqName;
 
             const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
             const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
@@ -538,7 +587,7 @@ function JobSearchPageContent() {
              
              const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(workShift));
 
-            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch;
+            return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && hepBMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishReqMatch;
         }).length;
         setStagedResultCount(count);
     }, []);
@@ -546,58 +595,35 @@ function JobSearchPageContent() {
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters, location: [], specialConditions: [] };
         let hasSortBy = false;
+
         for (const [key, value] of searchParams.entries()) {
-             if (key === 'sortBy') {
+            const internalKey = reverseKeyMap[key] || key;
+            if (internalKey === 'sortBy') {
                 setSortBy(value);
                 hasSortBy = true;
-             } else if (key === 'location' || key === 'os') {
-                const targetKey = key === 'os' ? 'otherSkillRequirement' : key;
-                const currentValues = newFilters[targetKey] || [];
+            } else if (internalKey === 'location' || internalKey === 'otherSkillRequirement') {
+                const currentValues = newFilters[internalKey as 'location' | 'otherSkillRequirement'] || [];
                 // @ts-ignore
-                newFilters[targetKey] = [...currentValues, value];
-            } else if (key === 'age' || key === 'height' || key === 'weight') {
+                newFilters[internalKey as 'location' | 'otherSkillRequirement'] = [...currentValues, value];
+            } else if (internalKey === 'age' || internalKey === 'height' || internalKey === 'weight') {
                 const values = searchParams.getAll(key);
                 if (values.length === 2) {
                      // @ts-ignore
-                    newFilters[key] = [parseInt(values[0], 10), parseInt(values[1], 10)];
+                    newFilters[internalKey] = [parseInt(values[0], 10), parseInt(values[1], 10)];
                 }
-            } else if (key === 'dk') {
+            } else if (internalKey === 'specialConditions') {
                 const currentConditions = newFilters.specialConditions || [];
                 const conditionName = allSpecialConditions.find(c => c.slug === value)?.name;
                 if (conditionName) {
                     newFilters.specialConditions = [...currentConditions, conditionName];
                 }
-            } else if (key === 'yoe') {
+            } else if (key === 'yoe') { // Legacy key support
                 newFilters['yearsOfExperience'] = value;
-            } else if (key === 'expReq') {
-                newFilters['experienceRequirement'] = value;
-            } else if (key === 'tattoo') {
-                newFilters['tattooRequirement'] = value;
-            } else if (key === 'lang') {
-                newFilters['languageRequirement'] = value;
-            } else if (key === 'eng') {
-                newFilters['englishRequirement'] = value;
-            } else if (key === 'edu') {
-                newFilters['educationRequirement'] = value;
-            } else if (key === 'hand') {
-                newFilters['dominantHand'] = value;
-            } else if (key === 'sl') {
-                newFilters['quantity'] = value;
-            } else if (key === 'thoidiem') {
-                // Convert slug back to display value
-                const parts = value.split('-');
-                if (parts.length === 3 && parts[0] === 'thang') {
-                     newFilters['companyArrivalTime'] = `Tháng ${parts[1]}/${parts[2]}`;
-                }
-            } else if (key === 'ca') {
-                const workShiftName = workShifts.find(w => w.slug === value)?.name;
-                if (workShiftName) {
-                     newFilters['workShift'] = workShiftName;
-                }
-            }
-             else {
-                 // @ts-ignore
-                newFilters[key] = value;
+            } else {
+                 if (internalKey in newFilters) {
+                    // @ts-ignore
+                    newFilters[internalKey] = value;
+                 }
             }
         }
         if (!hasSortBy) {
@@ -605,7 +631,7 @@ function JobSearchPageContent() {
         }
         setAppliedFilters(newFilters);
         setStagedFilters(newFilters);
-        runFilter(newFilters, hasSortBy ? searchParams.get('sortBy')! : 'newest');
+        runFilter(newFilters, hasSortBy ? searchParams.get('sap-xep')! : 'newest');
         countStagedResults(newFilters);
         
     }, [searchParams, runFilter, countStagedResults]);
@@ -621,53 +647,29 @@ function JobSearchPageContent() {
     const handleApplyFilters = useCallback(() => {
         const query = new URLSearchParams();
         Object.entries(stagedFilters).forEach(([key, value]) => {
+             const urlKey = keyMap[key] || key;
             if (value && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
-                 if (key !== 'visa' && !(Array.isArray(value) && value.includes('all'))) {
+                if (key !== 'visa' && !(Array.isArray(value) && value.includes('all'))) {
                     if (Array.isArray(value)) {
                         if (key === 'specialConditions') {
                             value.forEach(item => {
                                 const conditionSlug = allSpecialConditions.find(c => c.name === item)?.slug;
                                 if (conditionSlug) {
-                                    query.append('dk', conditionSlug);
+                                    query.append(urlKey, conditionSlug);
                                 }
                             });
                         } else {
-                            const paramKey = key === 'otherSkillRequirement' ? 'os' : key;
-                            value.forEach(item => query.append(paramKey, String(item)));
+                            value.forEach(item => query.append(urlKey, String(item)));
                         }
-                    } else if (key === 'yearsOfExperience') {
-                        query.set('yoe', String(value));
-                    } else if (key === 'experienceRequirement') {
-                        query.set('expReq', String(value));
-                    } else if (key === 'tattooRequirement') {
-                        query.set('tattoo', String(value));
-                    } else if (key === 'languageRequirement') {
-                        query.set('lang', String(value));
-                    } else if (key === 'englishRequirement') {
-                        query.set('eng', String(value));
-                    } else if (key === 'educationRequirement') {
-                        query.set('edu', String(value));
-                    } else if (key === 'dominantHand') {
-                        query.set('hand', String(value));
-                    } else if (key === 'quantity') {
-                        query.set('sl', String(value));
-                    } else if (key === 'companyArrivalTime' && typeof value === 'string') {
-                        const slug = value.toLowerCase().replace('tháng ', 'thang-').replace('/', '-');
-                        query.set('thoidiem', slug);
-                    } else if (key === 'workShift' && typeof value === 'string') {
-                        const slug = workShifts.find(w => w.name === value)?.slug;
-                        if (slug) {
-                            query.set('ca', slug);
-                        }
+                    } else {
+                        query.set(urlKey, String(value));
                     }
-                    else {
-                        query.set(key, String(value));
-                    }
-                 }
+                }
             }
         });
+
         if (sortBy !== 'newest') {
-            query.set('sortBy', sortBy);
+            query.set(keyMap['sortBy'], sortBy);
         }
         router.push(`/job-search?${query.toString()}`);
     }, [stagedFilters, sortBy, router]);
@@ -676,9 +678,9 @@ function JobSearchPageContent() {
         setSortBy(value);
         const query = new URLSearchParams(searchParams.toString());
         if (value === 'newest') {
-            query.delete('sortBy');
+            query.delete(keyMap['sortBy']);
         } else {
-            query.set('sortBy', value);
+            query.set(keyMap['sortBy'], value);
         }
         router.push(`/job-search?${query.toString()}`);
     };
@@ -696,12 +698,12 @@ function JobSearchPageContent() {
     
     const handleNewSearch = (filters: SearchFilters) => {
         const query = new URLSearchParams();
-        if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set('visaDetail', filters.visaDetail);
-        if (filters.industry && filters.industry !== 'all') query.set('industry', filters.industry);
+        if (filters.visaDetail && filters.visaDetail !== 'all-details') query.set(keyMap['visaDetail'], filters.visaDetail);
+        if (filters.industry && filters.industry !== 'all') query.set(keyMap['industry'], filters.industry);
         if (Array.isArray(filters.location) && filters.location.length > 0 && !filters.location.includes('all')) {
-            filters.location.forEach(loc => query.append('location', loc));
+            filters.location.forEach(loc => query.append(keyMap['location'], loc));
         } else if (typeof filters.location === 'string' && filters.location && filters.location !== 'all') {
-            query.append('location', filters.location);
+            query.append(keyMap['location'], filters.location);
         }
         router.push(`/job-search?${query.toString()}`);
     }
