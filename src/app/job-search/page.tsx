@@ -10,7 +10,7 @@ import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/locat
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType, type Industry } from '@/lib/industry-data';
-import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions } from '@/lib/visa-data';
+import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts } from '@/lib/visa-data';
 
 
 const initialSearchFilters: SearchFilters = {
@@ -181,17 +181,7 @@ const otherSkills = [
     { name: "Đọc được bản vẽ kỹ thuật", slug: "doc-duoc-ban-ve-ky-thuat" },
     { name: "Có bằng thi công nội thất", slug: "co-bang-thi-cong-noi-that" }
 ];
-const workShifts = [
-    { name: "Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)", slug: "ca-ngay" },
-    { name: "Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)", slug: "ca-chieu-toi" },
-    { name: "Ca đêm (thường 24:00-08:00)", slug: "ca-dem" },
-    { name: "Ca luân phiên (chia ca sáng, chiều và đêm; luân phiên tuần tháng)", slug: "ca-luan-phien" },
-    { name: "Ca 2-2-3 (làm 2 ngày, nghỉ 2 ngày, làm 3 ngày và lặp lại)", slug: "ca-2-2-3" },
-    { name: "Ca 4-3-3 (làm 4 ngày, nghỉ 3 ngày và tiếp tục 3 ngày nghỉ)", slug: "ca-4-3-3" },
-    { name: "Nghỉ thứ 7, Chủ Nhật", slug: "nghi-t7-cn" },
-    { name: "Nghỉ định kỳ trong tuần", slug: "nghi-dinh-ky" },
-    { name: "Khác", slug: "khac" }
-];
+
 
 
 function JobSearchPageContent() {
@@ -346,10 +336,9 @@ function JobSearchPageContent() {
                  return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
             });
 
-            // Assuming job.companyArrivalTime exists in the future
             const arrivalTimeMatch = !companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === companyArrivalTime);
             
-            const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(workShift);
+            const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(workShift));
 
 
             return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch;
@@ -527,7 +516,7 @@ function JobSearchPageContent() {
 
              const arrivalTimeMatch = !companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === companyArrivalTime);
              
-             const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(workShift);
+             const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(workShift));
 
             return visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch;
         }).length;

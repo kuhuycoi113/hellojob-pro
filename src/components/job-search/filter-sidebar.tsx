@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
@@ -23,7 +24,7 @@ import { format, startOfTomorrow, parse } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
-import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { japanJobTypes, visaDetailsByVisaType, workShifts } from '@/lib/visa-data';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -103,17 +104,7 @@ const interviewRoundsOptions = [
     { name: "4 vòng", slug: "4-vong" },
     { name: "5 vòng", slug: "5-vong" }
 ];
-const workShifts = [
-    { name: "Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)", slug: "ca-ngay" },
-    { name: "Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)", slug: "ca-chieu-toi" },
-    { name: "Ca đêm (thường 24:00-08:00)", slug: "ca-dem" },
-    { name: "Ca luân phiên (chia ca sáng, chiều và đêm; luân phiên tuần tháng)", slug: "ca-luan-phien" },
-    { name: "Ca 2-2-3 (làm 2 ngày, nghỉ 2 ngày, làm 3 ngày và lặp lại)", slug: "ca-2-2-3" },
-    { name: "Ca 4-3-3 (làm 4 ngày, nghỉ 3 ngày và tiếp tục 3 ngày nghỉ)", slug: "ca-4-3-3" },
-    { name: "Nghỉ thứ 7, Chủ Nhật", slug: "nghi-t7-cn" },
-    { name: "Nghỉ định kỳ trong tuần", slug: "nghi-dinh-ky" },
-    { name: "Khác", slug: "khac" }
-];
+
 const ginouExpiryOptions = [
     "Trên 4,5 năm", "Trên 4 năm", "Trên 3,5 năm", "Trên 3 năm", "Trên 2,5 năm", "Trên 2 năm", "Trên 1,5 năm", "Trên 1 năm", "Trên 0,5 năm"
 ];
@@ -424,9 +415,10 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                  return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
             });
 
+            const arrivalTimeMatch = !filtersToApply.companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === filtersToApply.companyArrivalTime);
             const workShiftMatch = !filters.workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(filters.workShift));
 
-            return visaMatch && industryMatch && jobDetailMatch && expReqMatch && yearsOfExperienceMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && workShiftMatch;
+            return visaMatch && industryMatch && jobDetailMatch && expReqMatch && yearsOfExperienceMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch;
         });
 
         // Count jobs in the pre-filtered list
@@ -1144,7 +1136,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 <div className="space-y-2">
                                     <Label>Yêu cầu thời điểm về công ty</Label>
                                     <Select value={filters.companyArrivalTime} onValueChange={(value) => onFilterChange({ companyArrivalTime: value })}>
-                                        <SelectTrigger id="company-arrival-time"><SelectValue placeholder="Chọn thời điểm" /></SelectTrigger>
+                                        <SelectTrigger id="company-arrival-time" className={cn(filters.companyArrivalTime && "text-primary")}><SelectValue placeholder="Chọn thời điểm" /></SelectTrigger>
                                         <SelectContent>
                                             {getFutureMonths().map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
                                         </SelectContent>
@@ -1158,7 +1150,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                             <SelectValue placeholder="Chọn ca làm việc" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {workShifts.map(shift => <SelectItem key={shift.slug} value={shift.slug}>{shift.name}</SelectItem>)}
+                                            {workShifts.map(shift => <SelectItem key={shift.slug} value={shift.name}>{shift.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>

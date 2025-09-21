@@ -1,4 +1,3 @@
-
 // src/lib/visa-data.ts
 
 const createSlug = (str: string) => {
@@ -58,3 +57,15 @@ export const conditionsByVisaDetail: { [key: string]: string[] } = {
 };
 
 export const allSpecialConditions = [...new Set(Object.values(conditionsByVisaDetail).flat())].map(name => ({ name, slug: createSlug(name) }));
+
+export const workShifts = [
+    { name: "Ca ngày (thường 08:00-17:00 hoặc 09:00-18:00)", slug: "ca-ngay" },
+    { name: "Ca chiều/tối (thường 16:00-24:00 hoặc 17:00-01:00)", slug: "ca-chieu-toi" },
+    { name: "Ca đêm (thường 24:00-08:00)", slug: "ca-dem" },
+    { name: "Ca luân phiên (chia ca sáng, chiều và đêm; luân phiên tuần tháng)", slug: "ca-luan-phien" },
+    { name: "Ca 2-2-3 (làm 2 ngày, nghỉ 2 ngày, làm 3 ngày và lặp lại)", slug: "ca-2-2-3" },
+    { name: "Ca 4-3-3 (làm 4 ngày, nghỉ 3 ngày và tiếp tục 3 ngày nghỉ)", slug: "ca-4-3-3" },
+    { name: "Nghỉ thứ 7, Chủ Nhật", slug: "nghi-t7-cn" },
+    { name: "Nghỉ định kỳ trong tuần", slug: "nghi-dinh-ky" },
+    { name: "Khác", slug: "khac" }
+];
