@@ -116,8 +116,7 @@ const EmptyProfileView = () => {
         if (method === 'ai') {
             router.push('/tao-ho-so-ai');
         } else {
-            // UNGTUYEN-L06: Redirect to candidate-profile instead of register
-            router.push('/ho-so-cua-toi');
+            router.push('/dang-ky');
         }
     };
     
@@ -1314,3 +1313,4 @@ export default function MyJobsDashboardPage() {
     )
 }
 
+    
