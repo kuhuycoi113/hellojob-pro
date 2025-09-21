@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import type { Conversation } from '@/lib/chat-data';
-import { currentUser } from '@/lib/chat-data';
+import { getCurrentUser } from '@/lib/chat-data';
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -18,6 +18,7 @@ export function ConversationList({
   selectedConversation,
   onSelectConversation,
 }: ConversationListProps) {
+  const currentUser = getCurrentUser();
   return (
     <div className="flex flex-col h-full">
       <header className="p-4 border-b">

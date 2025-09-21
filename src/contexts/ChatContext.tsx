@@ -2,10 +2,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { Conversation, Message, User, conversations, currentUser, helloJobBot, Attachment } from '@/lib/chat-data';
+import { Conversation, Message, User, conversations, getCurrentUser, helloJobBot, Attachment } from '@/lib/chat-data';
 import { consultants } from "@/lib/consultant-data";
 import { recommendJobs, type JobRecommendationResponse } from '@/ai/flows/recommend-jobs-flow';
-import { useAuth } from './AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ChatContextType {
   isChatOpen: boolean;
@@ -37,6 +37,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [assignedConsultant, setAssignedConsultant] = useState<User | null>(null);
 
   useEffect(() => {
+    const currentUser = getCurrentUser();
     // Predictable random assignment based on user ID
     // This ensures a user always gets the same consultant, but different users get different ones.
     const userIdNumber = parseInt(currentUser.id.replace(/[^0-9]/g, ''), 10) || 0;
@@ -62,6 +63,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   }, [role]); // Rerun this logic when the role (and thus currentUser) changes
 
   const openChat = (user?: User) => {
+    const currentUser = getCurrentUser();
     const targetUser = user || assignedConsultant || helloJobBot;
     
     let conversation = conversations.find(c => c.participants.some(p => p.id === targetUser.id));
@@ -96,6 +98,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
   const sendMessage = async (text: string, attachment?: Attachment) => {
     if (!activeConversation) return;
+    const currentUser = getCurrentUser();
 
     const newMessage: Message = {
       id: `msg-${Date.now()}`,

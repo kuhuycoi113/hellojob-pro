@@ -53,8 +53,17 @@ export const guestUser: User = {
   avatarUrl: 'https://placehold.co/100x100.png?text=G',
 };
 
-// This will be the actively used user object, mutated by AuthContext
-export let currentUser: User = guestUser;
+// This will be the actively used user object. It is not exported directly.
+let currentUser: User = guestUser;
+
+// Export a function to get the current user
+export const getCurrentUser = (): User => currentUser;
+
+// Export a function to set the current user
+export const setCurrentUser = (user: User): void => {
+  currentUser = user;
+};
+
 
 // AI Bot persona
 export const helloJobBot: User = {

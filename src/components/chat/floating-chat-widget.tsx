@@ -7,7 +7,7 @@ import { MessageSquare, X } from 'lucide-react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { ChatWindow } from './chat-window';
-import { conversations, helloJobBot, currentUser } from '@/lib/chat-data';
+import { conversations, helloJobBot, getCurrentUser } from '@/lib/chat-data';
 
 export function FloatingChatWidget() {
   const { isChatOpen, openChat, closeChat, activeConversation } = useChat();
