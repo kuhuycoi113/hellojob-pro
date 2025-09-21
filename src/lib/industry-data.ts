@@ -8,7 +8,7 @@ export type Industry = {
 
 export const industriesByJobType: { [key: string]: Industry[] } = {
     'thuc-tap-sinh-ky-nang': [
-      { name: 'Ngư nghiệp', slug: 'ngu-nghiep-tts', keywords: [
+      { name: 'Ngư nghiệp', slug: 'ngu-nghiep', keywords: [
           'Câu cá ngừ cần và dây',
           'Câu mực',
           'Câu tôm, cua bằng lồng',
@@ -20,7 +20,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Đặt lưới đánh cá',
           'Nuôi sò điệp'
       ] },
-      { name: 'Nông nghiệp', slug: 'nong-nghiep-tts', keywords: [
+      { name: 'Nông nghiệp', slug: 'nong-nghiep', keywords: [
           'Chăn nuôi bò',
           'Chăn nuôi bò sữa',
           'Chăn nuôi gà',
@@ -40,7 +40,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Trồng rau củ',
           'Trồng trọt nhà kính'
       ] },
-      { name: 'Thực phẩm', slug: 'thuc-pham-tts', keywords: [
+      { name: 'Thực phẩm', slug: 'thuc-pham', keywords: [
           'Bánh gạo',
           'Bánh kẹo',
           'Bánh ngọt',
@@ -93,7 +93,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Thuỷ sản ủ muối',
           'Thuỷ sản xông khói'
       ] },
-      { name: 'Sản xuất, dịch vụ tổng hợp', slug: 'san-xuat-dich-vu-tong-hop-tts', keywords: [
+      { name: 'Sản xuất, dịch vụ tổng hợp', slug: 'san-xuat-dich-vu-tong-hop', keywords: [
           '(Khách sạn) Tiếp khách, quản lý vệ sinh',
           'Bảo dưỡng ô tô',
           'Bảo trì đường sắt',
@@ -144,7 +144,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Vệ sinh toà nhà',
           'Vệ sinh văn phòng'
       ] },
-      { name: 'Cơ khí, kim loại', slug: 'co-khi-kim-loai-tts', keywords: [
+      { name: 'Cơ khí, kim loại', slug: 'co-khi-kim-loai', keywords: [
           'Bản mạch in',
           'Bảo trì máy móc',
           'Chế tạo kim loại tấm',
@@ -214,7 +214,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Vận hành robot',
           'Xử lý điện hóa nhôm'
       ] },
-      { name: 'Xây dựng', slug: 'xay-dung-tts', keywords: [
+      { name: 'Xây dựng', slug: 'xay-dung', keywords: [
           'Bê tông',
           'Buộc thép',
           'Chống thấm',
@@ -273,7 +273,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Trát vữa',
           'Xây dựng tổng hợp'
       ] },
-      { name: 'May mặc', slug: 'may-mac-tts', keywords: [
+      { name: 'May mặc', slug: 'may-mac', keywords: [
           'Chăn ga gối đệm',
           'Công việc trước kéo sợi',
           'Công việc trước khi dệt',
@@ -303,11 +303,11 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
       ] }
     ],
     'ky-nang-dac-dinh': [
-      { name: 'Ngư nghiệp', slug: 'ngu-nghiep-tokutei', keywords: [
+      { name: 'Ngư nghiệp', slug: 'ngu-nghiep', keywords: [
           'Nuôi trồng thủy sản',
           'Đánh bắt cá'
       ] },
-      { name: 'Nông nghiệp', slug: 'nong-nghiep-tokutei', keywords: [
+      { name: 'Nông nghiệp', slug: 'nong-nghiep', keywords: [
           'Chăn nuôi bò',
           'Chăn nuôi bò sữa',
           'Chăn nuôi gà',
@@ -319,7 +319,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Trồng rau củ quả trong nhà kính',
           'Trồng rau củ quả ngoài trời'
       ] },
-      { name: 'Nhà hàng', slug: 'nha-hang-tokutei', keywords: [
+      { name: 'Nhà hàng', slug: 'nha-hang', keywords: [
           'Chạy bàn',
           'Mua hàng',
           'Nấu bếp',
@@ -329,7 +329,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Rửa bát',
           'Thu ngân'
       ] },
-      { name: 'Thực phẩm', slug: 'thuc-pham-tokutei', keywords: [
+      { name: 'Thực phẩm', slug: 'thuc-pham', keywords: [
           'Bánh gạo',
           'Bánh kẹo',
           'Bánh ngọt',
@@ -382,7 +382,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Thuỷ sản ủ muối',
           'Thuỷ sản xông khói'
       ] },
-      { name: 'Sản xuất, dịch vụ tổng hợp', slug: 'san-xuat-dich-vu-tong-hop-tokutei', keywords: [
+      { name: 'Sản xuất, dịch vụ tổng hợp', slug: 'san-xuat-dich-vu-tong-hop', keywords: [
           'Bảo dưỡng ô tô',
           'Công việc cưa gỗ',
           'Đóng gói',
@@ -420,7 +420,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Trộn và cán cao su',
           'Vật liệu composite nhiều lớp'
       ] },
-      { name: 'Điện, điện tử', slug: 'dien-dien-tu-tokutei', keywords: [
+      { name: 'Điện, điện tử', slug: 'dien-dien-tu', keywords: [
           'Bản mạch in',
           'Cuộn dây máy điện quay',
           'Điện',
@@ -440,12 +440,12 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Thi công điện',
           'Thiết kế bảng mạch in'
       ] },
-      { name: 'Chế tạo Vật liệu', slug: 'che-tao-vat-lieu-tokutei', keywords: [
+      { name: 'Chế tạo Vật liệu', slug: 'che-tao-vat-lieu', keywords: [
           'Xử lý nhiệt bề mặt',
           'Xử lý nhiệt một phần',
           'Xử lý nhiệt tổng thể'
       ] },
-      { name: 'Cơ khí, chế tạo máy', slug: 'co-khi-che-tao-may-tokutei', keywords: [
+      { name: 'Cơ khí, chế tạo máy', slug: 'co-khi-che-tao-may', keywords: [
           'Bảo trì máy móc',
           'Chế tạo kim loại tấm',
           'Chế tạo máy',
@@ -499,19 +499,19 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Vận hành robot',
           'Xử lý điện hóa nhôm'
       ] },
-      { name: 'Ô tô', slug: 'o-to-tokutei', keywords: [
+      { name: 'Ô tô', slug: 'o-to', keywords: [
           'Bảo dưỡng ô tô',
           'Kiểm tra linh kiện ô tô',
           'Lắp ráp linh kiện ô tô',
           'Linh kiện ô tô',
           'Sửa chữa ô tô'
       ] },
-      { name: 'Hàng không', slug: 'hang-khong-tokutei', keywords: [
+      { name: 'Hàng không', slug: 'hang-khong', keywords: [
           'hàng không',
           'sân bay',
           'bốc dỡ'
       ] },
-      { name: 'Vận tải', slug: 'van-tai-tokutei', keywords: [
+      { name: 'Vận tải', slug: 'van-tai', keywords: [
           'Hậu cần vận tải',
           'Lái xe',
           'Lái xe buýt',
@@ -520,7 +520,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Quản lý kho vận tải',
           'Thực tập lái xe'
       ] },
-      { name: 'Xây dựng', slug: 'xay-dung-tokutei', keywords: [
+      { name: 'Xây dựng', slug: 'xay-dung', keywords: [
           'Bê tông',
           'Buộc thép',
           'Chống thấm',
@@ -579,36 +579,36 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Trát vữa',
           'Xây dựng tổng hợp'
       ] },
-      { name: 'Vệ sinh toà nhà', slug: 've-sinh-toa-nha-tokutei', keywords: [
+      { name: 'Vệ sinh toà nhà', slug: 've-sinh-toa-nha', keywords: [
           'Buồng phòng khách sạn',
           'Vệ sinh toà nhà'
       ] },
-      { name: 'Lưu trú, khách sạn', slug: 'luu-tru-khach-san-tokutei', keywords: [
+      { name: 'Lưu trú, khách sạn', slug: 'luu-tru-khach-san', keywords: [
           '(Khách sạn) Tiếp khách, quản lý vệ sinh',
           'Hành lý khách sạn',
           'Lễ tân khách sạn',
           'Lưu trú khách sạn',
           'Quản lý khách sạn'
       ] },
-      { name: 'Điều dưỡng', slug: 'dieu-duong-tokutei', keywords: [
+      { name: 'Điều dưỡng', slug: 'dieu-duong', keywords: [
           'điều dưỡng',
           'chăm sóc người già',
           'hộ lý'
       ] }
     ],
     'ky-su-tri-thuc': [
-      { name: "Nông lâm ngư nghiệp", slug: "nong-lam-ngu-nghiep-ks", keywords: [
+      { name: "Nông lâm ngư nghiệp", slug: "nong-lam-ngu-nghiep", keywords: [
           "Chăn nuôi",
           "Công nghệ nông, lâm, ngư nghiệp",
           "Công nhân chăn nuôi đặc khu",
           "Công nhân Nông, Lâm, Ngư nghiệp",
           "Công nhân trồng trọt đặc khu"
       ] },
-      { name: "Thực phẩm", slug: "thuc-pham-ks", keywords: [
+      { name: "Thực phẩm", slug: "thuc-pham", keywords: [
           "thực phẩm",
           "đồ uống"
       ] },
-      { name: "Sản xuất, chế tạo, công nghệ", slug: "san-xuat-cong-nghe-ks", keywords: [
+      { name: "Sản xuất, chế tạo, công nghệ", slug: "san-xuat-cong-nghe", keywords: [
           "Công nghệ môi trường",
           "Công nghệ sản xuất",
           "Công nhân sản xuất, gia công sản phẩm (trừ kim loại, máy móc)",
@@ -628,7 +628,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Sản xuất sản phẩm cho nước ngoài",
           "Thiết kế thời trang"
       ] },
-      { name: "Cơ khí, máy móc", slug: "co-khi-may-moc-ks", keywords: [
+      { name: "Cơ khí, máy móc", slug: "co-khi-may-moc", keywords: [
           "Bảo trì hệ thống điện",
           "Bảo trì máy móc",
           "Chế tạo máy",
@@ -658,18 +658,18 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Vận hành robot",
           "Viễn thông"
       ] },
-      { name: "Công nghệ ô tô", slug: "cong-nghe-o-to-ks", keywords: [
+      { name: "Công nghệ ô tô", slug: "cong-nghe-o-to", keywords: [
           "ô tô",
           "thiết kế ô tô"
       ] },
-      { name: "Vận chuyển hàng hóa", slug: "van-chuyen-hang-hoa-ks", keywords: [
+      { name: "Vận chuyển hàng hóa", slug: "van-chuyen-hang-hoa", keywords: [
           "Đại lý thủ tục hàng hải",
           "Quản lý dọn dẹp",
           "Quản lý đóng gói",
           "Quản lý vận chuyển",
           "Quản lý vận chuyển, dọn dẹp, đóng gói"
       ] },
-      { name: "Xây dựng", slug: "xay-dung-ks", keywords: [
+      { name: "Xây dựng", slug: "xay-dung", keywords: [
           "Cầu đường",
           "Công nghệ xây dựng của nước ngoài",
           "Công nhân kết cấu xây dựng",
@@ -690,12 +690,12 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Trắc địa, khảo sát",
           "Xây dựng dân dụng"
       ] },
-      { name: "Khách sạn, lưu trú", slug: "khach-san-luu-tru-ks", keywords: [
+      { name: "Khách sạn, lưu trú", slug: "khach-san-luu-tru", keywords: [
           "Dịch vụ khách sạn",
           "Khu nghỉ dưỡng",
           "Lễ tân khách sạn"
       ] },
-      { name: "Y tế, điều dưỡng", slug: "y-te-dieu-duong-ks", keywords: [
+      { name: "Y tế, điều dưỡng", slug: "y-te-dieu-duong", keywords: [
           "Bác sĩ",
           "Bác sĩ chỉnh thị lực",
           "Chuyên viên phục hình",
@@ -717,7 +717,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Y tá sức khoẻ cộng đồng",
           "Y tế lâm sàng"
       ] },
-      { name: "Kinh doanh, kinh tế", slug: "kinh-doanh-kinh-te-ks", keywords: [
+      { name: "Kinh doanh, kinh tế", slug: "kinh-doanh-kinh-te", keywords: [
           "Bán hàng miễn thuế",
           "Dịch vụ bán hàng",
           "Dịch vụ khách hàng tổng hợp",
@@ -732,14 +732,14 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Thương mại nước ngoài",
           "Tiếp thị (sales) doanh nghiệp"
       ] },
-      { name: "Tài chính, kế toán, bảo hiểm", slug: "tai-chinh-ke-toan-ks", keywords: [
+      { name: "Tài chính, kế toán, bảo hiểm", slug: "tai-chinh-ke-toan-bao-hiem", keywords: [
           "Kế toán công chứng",
           "Kế toán công chứng nước ngoài",
           "Kế toán thuế",
           "Tài chính, bảo hiểm",
           "Tư vấn bảo hiểm xã hội"
       ] },
-      { name: "Báo chí, truyền thông, marketing", slug: "bao-chi-marketing-ks", keywords: [
+      { name: "Báo chí, truyền thông, marketing", slug: "bao-chi-truyen-thong-marketing", keywords: [
           "Báo chí",
           "Biên tập",
           "Digital Marketing",
@@ -749,7 +749,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Truyền thông",
           "Viết quảng cáo"
       ] },
-      { name: "Công nghệ thông tin", slug: "it-ks", keywords: [
+      { name: "Công nghệ thông tin", slug: "it", keywords: [
           "Công nghệ thông tin",
           "IT",
           "lập trình",
@@ -769,12 +769,12 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Trí tuệ nhân tạo",
           "Vận hành web thương mại điện tử"
       ] },
-      { name: "Nghiên cứu, phân tích", slug: "nghien-cuu-phan-tich-ks", keywords: [
+      { name: "Nghiên cứu, phân tích", slug: "nghien-cuu-phan-tich", keywords: [
           "Khảo sát đất đai, nhà ở",
           "Nghiên cứu",
           "Nghiên cứu thị trường"
       ] },
-      { name: "Giáo dục, đào tạo", slug: "giao-duc-dao-tao-ks", keywords: [
+      { name: "Giáo dục, đào tạo", slug: "giao-duc-dao-tao", keywords: [
           "Giảng dạy có chứng chỉ",
           "Giảng dạy đại học",
           "Giảng dạy ngoài cơ sở giáo dục",
@@ -785,26 +785,26 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Hướng dẫn nghiên cứu",
           "Hướng dẫn thể thao"
       ] },
-      { name: "Hành chính, văn phòng", slug: "hanh-chinh-van-phong-ks", keywords: [
+      { name: "Hành chính, văn phòng", slug: "hanh-chinh-van-phong", keywords: [
           "Biên dịch, phiên dịch",
           "Nhân viên văn phòng"
       ] },
-      { name: "Pháp lý", slug: "phap-ly-ks", keywords: [
+      { name: "Pháp lý", slug: "phap-ly", keywords: [
           "pháp lý",
           "luật sư"
       ] },
-      { name: "Nghệ thuật, nghệ sĩ", slug: "nghe-thuat-ks", keywords: [
+      { name: "Nghệ thuật, nghệ sĩ", slug: "nghe-thuat", keywords: [
           "Mỹ thuật gia",
           "nhiếp ảnh gia",
           "Nhà văn",
           "Nhạc sĩ",
           "nghệ sĩ sân khấu"
       ] },
-      { name: "Thể dục thể thao", slug: "the-thao-ks", keywords: [
+      { name: "Thể dục thể thao", slug: "the-thao", keywords: [
           "Vận động viên chuyên nghiệp",
           "Vận động viên nghiệp dư"
       ] },
-      { name: "Nghề có kỹ năng chuyên nghiệp", slug: "nghe-chuyen-nghiep-ks", keywords: [
+      { name: "Nghề có kỹ năng chuyên nghiệp", slug: "nghe-chuyen-nghiep", keywords: [
           "Công chức",
           "Giúp việc gia đình đặc khu",
           "Huấn luyện động vật",
@@ -815,7 +815,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Nhân viên tôn giáo",
           "Phi công"
       ] },
-      { name: "Việc làm bán chuyên nghiệp", slug: "viec-lam-ban-chuyen-nghiep-ks", keywords: [
+      { name: "Việc làm bán chuyên nghiệp", slug: "viec-lam-ban-chuyen-nghiep", keywords: [
           "Công việc mùa hè",
           "Lao động kỳ nghỉ",
           "Sinh viên thực tập",
