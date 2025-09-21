@@ -45,6 +45,16 @@ export function Footer() {
               Email: contact@hellojob.vn<br />
               Hotline: 1900 1234
             </p>
+            <div className="mt-4">
+              <Image 
+                src="https://picsum.photos/seed/bocongthuong/600/225"
+                alt="Đã đăng ký Bộ Công Thương"
+                width={200}
+                height={75}
+                data-ai-hint="ministry of industry and trade logo"
+                className="w-48 h-auto"
+              />
+            </div>
           </div>
         </div>
         <div className="mt-8 border-t pt-4 text-center text-sm text-muted-foreground">
