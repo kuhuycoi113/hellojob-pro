@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useCallback, useRef, useState, useEffect } from "react";
@@ -37,6 +36,7 @@ export type SearchFilters = {
     yearsOfExperience?: string;
     tattooRequirement?: string;
     netFee?: string;
+    netFeeNoTicket?: string;
     quantity?: string;
     interviewRounds?: string;
     visionRequirement?: string;
@@ -59,7 +59,7 @@ export const experienceYears: { name: string; slug: string }[] = [
     { name: '2,5 - 3 năm', slug: '2.5-3-nam' },
     { name: '3 - 3,5 năm', slug: '3-3.5-nam' },
     { name: '3,5 - 4 năm', slug: '3.5-4-nam' },
-    { name: '4 - 4,5 năm', slug: '4-4.5-nam' },
+    { name: '4 - 4,5 năm', slug: '4.5-4-nam' },
     { name: '4,5 - 5 năm', slug: '4.5-5-nam' },
     { name: 'Trên 5 năm', slug: 'tren-5-nam' }
 ];
@@ -194,5 +194,3 @@ export const SearchResults = ({ jobs, filters, appliedFilters, onFilterChange, a
      </div>
     )
   };
-
-    

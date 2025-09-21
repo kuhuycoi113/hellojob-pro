@@ -594,32 +594,11 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         )
     }
     
-    const getFeePlaceholder = () => {
-        switch (filters.visaDetail) {
-            case 'thuc-tap-sinh-1-nam':
-                return "1000";
-            case 'dac-dinh-dau-viet':
-                return "1600";
-            default:
-                return "3000";
-        }
-    };
-    
-    const getFeeLabel = () => {
-        switch (filters.visaDetail) {
-            case 'thuc-tap-sinh-3-nam':
-            case 'thuc-tap-sinh-1-nam':
-                return 'Phí và học phí tối đa';
-            case 'dac-dinh-dau-viet':
-                return 'Phí và vé máy bay tối đa';
-            case 'dac-dinh-di-moi':
-            case 'ky-su-tri-thuc-dau-viet':
-                return 'Phí, học phí và vé tối đa';
-            default:
-                return 'Phí tối đa (USD)';
-        }
-    };
-    
+    const showFeeFilter = useMemo(() => {
+        const visasToShowFee = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
+        return !!activeFilters.visaDetail && visasToShowFee.includes(activeFilters.visaDetail);
+    }, [activeFilters.visaDetail]);
+
     const showEducationFilter = useMemo(() => {
         const parentVisaSlug = activeFilters.visa || Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === activeFilters.visaDetail));
         
@@ -630,11 +609,6 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
     const shouldShowLươngNăm = !["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam"].includes(activeFilters.visaDetail || "");
     const shouldShowTabs = shouldShowLươngGiờ || shouldShowLươngNăm;
     
-    const showFeeFilter = useMemo(() => {
-        const visasToShowFee = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
-        return !!activeFilters.visaDetail && visasToShowFee.includes(activeFilters.visaDetail);
-    }, [activeFilters.visaDetail]);
-
     return (
         <div className="md:col-span-1 lg:col-span-1 h-full flex flex-col">
             <Card className="flex-grow flex flex-col">
@@ -935,7 +909,18 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 </AccordionTrigger>
                                 <AccordionContent className="space-y-4 pt-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="net-fee-usd">{getFeeLabel()}</Label>
+                                        <Label htmlFor="net-fee-no-ticket-usd">Mức phí không vé tối đa (USD)</Label>
+                                        <Input
+                                            id="net-fee-no-ticket-usd"
+                                            type="text"
+                                            placeholder={getFeePlaceholder()}
+                                            onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', null, onFilterChange)}
+                                            value={getDisplayValue(filters.netFeeNoTicket || '')}
+                                        />
+                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFeeNoTicket, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="net-fee-usd">Phí và vé máy bay tối đa (USD)</Label>
                                         <Input 
                                             id="net-fee-usd" 
                                             type="text" 
