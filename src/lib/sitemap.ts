@@ -5,7 +5,7 @@ import { articles } from '@/lib/handbook-data';
 import { jobData } from '@/lib/mock-data';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = 'https://hellojob.vn'; // Replace with your actual domain
+  const siteUrl = 'https://vi.hellojob.jp'; // Replace with your actual domain
 
   // Static pages
   const staticRoutes = [

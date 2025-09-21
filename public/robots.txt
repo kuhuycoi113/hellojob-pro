@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://vi.hellojob.jp/sitemap.xml
