@@ -1,5 +1,4 @@
 
-
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
@@ -58,7 +57,6 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
       if (locationNames) titleParts.push(`tại ${locationNames}`);
   }
 
-
   const title = titleParts.length > 0
     ? `Việc làm ${titleParts.join(' ')} | ${siteName}`
     : `Tìm kiếm việc làm tại Nhật Bản | ${siteName}`;
@@ -67,7 +65,15 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     ? `Khám phá các cơ hội việc làm ${titleParts.join(' ')} tại Nhật Bản. Hàng ngàn đơn hàng Kỹ năng đặc định, Thực tập sinh, Kỹ sư đang chờ bạn ứng tuyển trên HelloJob.`
     : 'Tìm kiếm hàng ngàn cơ hội việc làm tại Nhật Bản. HelloJob là nền tảng giúp bạn tìm kiếm việc làm theo ngành nghề, địa điểm và loại visa phù hợp nhất.';
   
-  const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(searchParams as Record<string, string>).toString()}`;
+  // Safely construct URLSearchParams
+  const cleanSearchParams: { [key: string]: string | string[] } = {};
+  if (q) cleanSearchParams.q = q;
+  if (visaDetailSlug) cleanSearchParams['chi-tiet-loai-hinh-visa'] = visaDetailSlug;
+  if (industrySlug) cleanSearchParams['nganh-nghe'] = industrySlug;
+  if (locations.length > 0) cleanSearchParams['dia-diem'] = locations;
+  
+  const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams).toString()}`;
+
 
   return {
     title,
