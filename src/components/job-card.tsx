@@ -93,6 +93,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const { isLoggedIn } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [hasApplied, setHasApplied] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
@@ -102,6 +103,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     setIsSaved(savedJobs.includes(job.id));
     const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
@@ -191,9 +193,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                             <span>{job.id}</span>
                             </div>
-                            <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white md:hidden" onClick={handleSaveJob}>
+                            {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white md:hidden" onClick={handleSaveJob}>
                                 <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
-                            </Button>
+                            </Button>}
                         </div>
                         
                         <div className="flex flex-grow flex-col">
@@ -255,13 +257,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
                                     <ContactButtons contact={job.recruiter as any} showChatText={true} />
                                 </div>
-                                <div className="flex items-center gap-2">
+                                {isClient && <div className="flex items-center gap-2">
                                     <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                                         <Bookmark className={cn("mr-2 h-5 w-5", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                                         Lưu
                                     </Button>
                                     {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
-                                </div>
+                                </div>}
                             </div>
                         </div>
                     </div>
@@ -371,9 +373,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                         <span>{job.id}</span>
                       </div>
-                      <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
+                      {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
                         <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
-                      </Button>
+                      </Button>}
                 </div>
                 <div className="flex flex-grow flex-col p-3">
                     <h3 className="mb-2 h-10 text-sm font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
@@ -409,7 +411,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 </Link>
                                 <ContactButtons contact={job.recruiter as any} />
                             </div>
-                            <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
+                            {isClient && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                         </div>
                         {showPostedTime && (
                              <p className="mt-1 text-right text-xs">

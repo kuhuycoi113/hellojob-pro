@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
@@ -98,6 +99,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const { toast } = useToast();
     const { role, isLoggedIn } = useAuth();
     const job = jobData.find(j => j.id === resolvedParams.id);
+    const [isClient, setIsClient] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const [hasApplied, setHasApplied] = useState(false);
     const [profileSuggestions, setProfileSuggestions] = useState<Job[]>([]);
@@ -110,6 +112,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
 
     useEffect(() => {
+        setIsClient(true);
         if (job) {
             const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
             setIsSaved(savedJobs.includes(job.id));
@@ -280,13 +283,20 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="flex flex-col sm:flex-row gap-4">
-                                    <Button size="lg" variant="outline" className={cn("w-full sm:w-auto", isSaved && "border-accent-orange text-accent-orange bg-accent-orange/5")} onClick={handleSaveJob}>
-                                        <Bookmark className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
-                                        {isSaved ? 'Việc đã lưu' : 'Lưu việc làm'}
-                                    </Button>
-                                    <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
-                                </div>
+                                {isClient ? (
+                                    <div className="flex flex-col sm:flex-row gap-4">
+                                        <Button size="lg" variant="outline" className={cn("w-full sm:w-auto", isSaved && "border-accent-orange text-accent-orange bg-accent-orange/5")} onClick={handleSaveJob}>
+                                            <Bookmark className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
+                                            {isSaved ? 'Việc đã lưu' : 'Lưu việc làm'}
+                                        </Button>
+                                        <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col sm:flex-row gap-4">
+                                        <Skeleton className="h-11 w-full sm:w-40" />
+                                        <Skeleton className="h-11 w-full sm:w-40" />
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
 
@@ -432,9 +442,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 </div>
                             </CardContent>
                             <div className="border-t p-4 flex justify-center">
-                                <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                    <Share2 className="mr-2 h-4 w-4"/>Chia sẻ thông tin việc làm này
-                                </Button>
+                                {isClient ? (
+                                    <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
+                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ thông tin việc làm này
+                                    </Button>
+                                ) : <Skeleton className="h-8 w-48" />}
                             </div>
                         </Card>
                     </aside>
@@ -525,5 +537,3 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 }
-
-    
