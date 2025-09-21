@@ -309,12 +309,15 @@ const EmptyProfileView = () => {
 
     return (
         <>
-            <div className="text-center md:text-left mb-8">
-                <h1 className="text-3xl font-bold font-headline">Tạo hồ sơ để được hiển thị việc làm phù hợp</h1>
-                <p className="text-muted-foreground mt-1">
+            <div className="text-center mb-8 flex flex-col items-center">
+                <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
+                    <UserPlus className="h-10 w-10 text-primary" />
+                </div>
+                <h1 className="text-2xl font-bold font-headline">Tạo hồ sơ để được hiển thị việc làm phù hợp</h1>
+                <p className="text-muted-foreground mt-1 max-w-xl">
                     Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.
                 </p>
-                <div className="mt-6 flex flex-wrap gap-4">
+                <div className="mt-6 flex flex-wrap gap-4 justify-center">
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
                            <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
