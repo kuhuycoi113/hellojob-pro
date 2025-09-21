@@ -30,6 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/viec-lam',
     '/tim-viec-lam',
     '/chat', // Assuming /chat is a valid route not needing translation
+    '/viec-lam-cua-toi'
   ].map((route) => ({
     url: `${siteUrl}${route}`,
     lastModified: new Date(),
