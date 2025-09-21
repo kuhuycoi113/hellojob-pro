@@ -17,7 +17,7 @@ export function Footer() {
               <Logo />
             </Link>
             <p className="text-sm text-muted-foreground">
-              Giải pháp nhân lực toàn diện cho các khu công nghiệp tại Việt Nam.
+              Giải pháp dịch chuyển lao động toàn cầu
             </p>
           </div>
           <div>
