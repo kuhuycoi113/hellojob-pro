@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import Link from 'next/link';
@@ -109,32 +108,44 @@ const SearchDialog = () => {
         if (filters.q) {
             try {
                 const criteria = await recommendJobs(filters.q);
+                let criteriaFound = false;
                 if (criteria) {
                     if (criteria.industry) {
                         const industrySlug = allIndustries.find(i => i.name === criteria.industry)?.slug;
-                        if (industrySlug) query.set('nganh-nghe', industrySlug);
+                        if (industrySlug) {
+                            query.set('nganh-nghe', industrySlug);
+                            criteriaFound = true;
+                        }
                     }
                     if (criteria.workLocation) {
                         const locationSlug = allJapanLocations.find(l => l.name === criteria.workLocation)?.slug;
-                        if (locationSlug) query.set('dia-diem', locationSlug);
+                        if (locationSlug) {
+                            query.set('dia-diem', locationSlug);
+                            criteriaFound = true;
+                        }
                     }
                     if (criteria.visaType) {
                         const visaSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
-                        if(visaSlug) query.set('loai-visa', visaSlug);
+                        if(visaSlug) {
+                            query.set('loai-visa', visaSlug);
+                            criteriaFound = true;
+                        }
                     }
                      if (criteria.gender) {
                         query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
+                        criteriaFound = true;
                     }
                     if (criteria.sortBy) {
                         query.set('sap-xep', 'salary_desc');
+                        criteriaFound = true;
                     }
-                    // If AI returns nothing, fall back to raw query
-                    if (query.toString() === '') {
-                        query.set('q', filters.q);
-                    }
-                } else {
-                     query.set('q', filters.q);
                 }
+                
+                // If AI didn't find any specific criteria, fall back to a raw text search
+                if (!criteriaFound) {
+                    query.set('q', filters.q);
+                }
+
             } catch (error) {
                 console.error("AI search failed, falling back to keyword search:", error);
                 query.set('q', filters.q);
@@ -827,10 +838,3 @@ const LoggedOutContent = () => {
     </>
   );
 }
-
-
-
-
-
-
-
