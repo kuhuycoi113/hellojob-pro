@@ -217,8 +217,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
           feeLabel = 'Phí không vé';
       }
 
-      const shouldShowBasedOnFilter = !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket);
-
       if (!feeLabel || feeValue === undefined) {
           return { shouldShow: isControlledVisa, text: `${feeLabel || 'Phí'}: Không rõ` };
       }
@@ -233,6 +231,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   };
 
   const feeInfo = getFeeDisplayInfo();
+  const feeFilterIsActive = !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket);
 
   if (variant === 'list-item') {
      return (
@@ -268,7 +267,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 )}
                                 {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
                                 <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
-                                {feeInfo.shouldShow && (
+                                {feeFilterIsActive && feeInfo.shouldShow && (
                                     <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
                                         {feeInfo.text}
                                     </Badge>
