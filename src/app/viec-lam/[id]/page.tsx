@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 import { EditProfileDialog } from '@/components/candidate-edit-dialog';
+import type { SearchFilters } from '@/components/job-search/search-results';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
@@ -397,6 +398,65 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     if (!job) {
         notFound();
     }
+
+    const getJobPostingStructuredData = () => {
+        const [time, datePart] = job.postedTime.split(' ');
+        const [day, month, year] = datePart.split('/');
+        const isoDate = new Date(`${year}-${month}-${day}`).toISOString();
+
+        const expiryDate = new Date(isoDate);
+        expiryDate.setDate(expiryDate.getDate() + 30);
+        
+        const salary = job.salary.basic ? parseInt(job.salary.basic.replace(/[^0-9]/g, '')) : undefined;
+
+        const combinedDescription = `
+            ${job.details.description.replace(/<[^>]*>?/gm, '')}
+            Yêu cầu:
+            ${job.details.requirements.replace(/<[^>]*>?/gm, '')}
+            Quyền lợi:
+            ${job.details.benefits.replace(/<[^>]*>?/gm, '')}
+        `;
+
+        const structuredData = {
+            "@context": "https://schema.org/",
+            "@type": "JobPosting",
+            "title": job.title,
+            "description": combinedDescription,
+            "identifier": {
+                "@type": "PropertyValue",
+                "name": "HelloJob ID",
+                "value": job.id
+            },
+            "datePosted": isoDate,
+            "validThrough": expiryDate.toISOString(),
+            "employmentType": "FULL_TIME", // Assuming full time, can be made dynamic
+            "hiringOrganization": {
+                "@type": "Organization",
+                "name": "HelloJob (Qua công ty phái cử)",
+                "sameAs": "https://vi.hellojob.jp",
+            },
+            "jobLocation": {
+                "@type": "Place",
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": job.workLocation,
+                    "addressCountry": "JP"
+                }
+            },
+            ...(salary && {
+                "baseSalary": {
+                    "@type": "MonetaryAmount",
+                    "currency": "JPY",
+                    "value": {
+                        "@type": "QuantitativeValue",
+                        "value": salary,
+                        "unitText": "MONTH"
+                    }
+                }
+            })
+        };
+        return JSON.stringify(structuredData);
+    };
     
     const handleSaveJob = () => {
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -448,7 +508,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         setIsProfileIncompleteAlertOpen(false);
         setIsProfileEditDialogOpen(true);
     }
-
+    
     const handleShare = async () => {
         const shareUrl = `https://vi.hellojob.jp/viec-lam/${job.id}`;
         const shareData = {
@@ -497,6 +557,10 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
     return (
         <div className="bg-secondary">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: getJobPostingStructuredData() }}
+            />
             <div className="container mx-auto px-4 md:px-6 py-12">
                 <div className="mb-6">
                     <Button asChild variant="outline" size="sm">
@@ -659,7 +723,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     <div onClick={(e) => e.stopPropagation()}>
                                         <Link href={`/tu-van-vien/${assignedConsultant.id}`} >
                                             <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
-                                                <AvatarImage src={assignedConsultant.avatar} alt={assignedConsultant.name} />
+                                                <AvatarImage src={assignedConsultant.avatarUrl} alt={assignedConsultant.name} />
                                                 <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
                                             </Avatar>
                                         </Link>
@@ -674,7 +738,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <ContactButtons contact={assignedConsultant} showChatText={true} />
+                                    <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
                                 </div>
                             </CardContent>
                             <div className="border-t p-4 flex justify-center">
