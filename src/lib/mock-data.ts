@@ -245,23 +245,28 @@ const createJobList = (): Job[] => {
                     const isEngineer = visaType.name.includes('Kỹ sư');
                     const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
                     
-                    let netFee;
-                    let netFeeNoTicket;
+                    let netFee: string | undefined = undefined;
+                    let netFeeNoTicket: string | undefined = undefined;
                     
                     const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
                     if (feeVisas.includes(detail.slug) && (jobIndex % 5 < 4)) { // 80% have fees
+                        let feeWithTicketValue;
                         if (detail.slug === 'dac-dinh-dau-viet') {
-                            netFee = String(1500 + ((jobIndex * 101) % 1000)); // 1500-2500
-                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) ))); // 80-90% of netFee
+                            feeWithTicketValue = 1500 + ((jobIndex * 101) % 1000); // 1500-2500
                         } else if (detail.slug === 'dac-dinh-di-moi' || detail.slug === 'ky-su-tri-thuc-dau-viet') {
-                            netFee = String(2500 + ((jobIndex * 101) % 1300)); // 2500-3800
-                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
+                            feeWithTicketValue = 2500 + ((jobIndex * 101) % 1300); // 2500-3800
                         } else if (detail.slug === 'thuc-tap-sinh-1-nam') {
-                            netFee = String(1000 + ((jobIndex * 101) % 400)); // 1000-1400
-                            netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
+                            feeWithTicketValue = 1000 + ((jobIndex * 101) % 400); // 1000-1400
                         } else { // TTS 3 năm
-                            netFee = String(3000 + ((jobIndex * 101) % 600)); // 3000-3600
-                             netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
+                            feeWithTicketValue = 3000 + ((jobIndex * 101) % 600); // 3000-3600
+                        }
+                        
+                        const feeNoTicketValue = Math.floor(feeWithTicketValue * (0.8 + ((jobIndex % 10) / 100)));
+
+                        if (jobIndex % 2 === 0) { // Even index gets fee with ticket
+                            netFee = String(feeWithTicketValue);
+                        } else { // Odd index gets fee without ticket
+                            netFeeNoTicket = String(feeNoTicketValue);
                         }
                     }
 
@@ -416,23 +421,28 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             const otherSkillsText = selectedOtherSkills.map(s => `<li>${s.name}</li>`).join('');
             const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
     
-            let netFee;
-            let netFeeNoTicket;
+            let netFee: string | undefined = undefined;
+            let netFeeNoTicket: string | undefined = undefined;
 
             const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
             if (feeVisas.includes(detail.slug) && (jobIndex % 5 < 4)) { // 80% have fees
+                let feeWithTicketValue;
                 if (detail.slug === 'dac-dinh-dau-viet') {
-                    netFee = String(1500 + ((jobIndex * 101) % 1000));
-                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
+                    feeWithTicketValue = 1500 + ((jobIndex * 101) % 1000);
                 } else if (detail.slug === 'dac-dinh-di-moi' || detail.slug === 'ky-su-tri-thuc-dau-viet') {
-                    netFee = String(2500 + ((jobIndex * 101) % 1300));
-                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
+                    feeWithTicketValue = 2500 + ((jobIndex * 101) % 1300);
                 } else if (detail.slug === 'thuc-tap-sinh-1-nam') {
-                    netFee = String(1000 + ((jobIndex * 101) % 400));
-                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
-                } else if (detail.slug === 'thuc-tap-sinh-3-nam') { // TTS 3 năm
-                    netFee = String(3000 + ((jobIndex * 101) % 600));
-                    netFeeNoTicket = String(Math.floor(Number(netFee) * (0.8 + ((jobIndex % 10)/100) )));
+                    feeWithTicketValue = 1000 + ((jobIndex * 101) % 400);
+                } else { // TTS 3 năm
+                    feeWithTicketValue = 3000 + ((jobIndex * 101) % 600);
+                }
+                
+                const feeNoTicketValue = Math.floor(feeWithTicketValue * (0.8 + ((jobIndex % 10) / 100)));
+
+                if (jobIndex % 2 === 0) { // Even index gets fee with ticket
+                    netFee = String(feeWithTicketValue);
+                } else { // Odd index gets fee without ticket
+                    netFeeNoTicket = String(feeNoTicketValue);
                 }
             }
 
@@ -522,3 +532,5 @@ export const jobData: Job[] = [...initialJobs, ...newlyAddedJobs];
 
 
   
+
+    
