@@ -51,7 +51,7 @@ import Image from 'next/image';
 import { useChat } from '@/contexts/ChatContext';
 import { mainNavLinks, quickAccessLinks, mobileFooterLinks } from '@/lib/nav-data';
 import { useAuth, type Role } from '@/contexts/AuthContext';
-import { Industry, allIndustries } from '@/lib/industry-data';
+import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { AuthDialog } from './auth-dialog';
 import { locations, allJapanLocations, japanRegions } from '@/lib/location-data';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -105,34 +105,17 @@ const SearchDialog = () => {
         setIsSearching(true);
         const query = new URLSearchParams();
         
-        let finalFilters: Partial<SearchFilters> = {
-            visaDetail: filters.visaDetail,
-            industry: filters.industry,
-            location: filters.location,
-        };
+        let finalFilters: Partial<SearchFilters> = { ...filters };
 
         if (filters.q) {
             try {
                 const criteria = await recommendJobs(filters.q);
                 if (criteria) {
-                    if (criteria.industry) {
-                        const industrySlug = allIndustries.find(i => i.name === criteria.industry)?.slug;
-                        if(industrySlug) finalFilters.industry = industrySlug;
-                    }
-                    if (criteria.workLocation) {
-                        const locationSlug = allJapanLocations.find(l => l.name === criteria.workLocation)?.slug;
-                        if(locationSlug) finalFilters.location = [locationSlug];
-                    }
-                    if (criteria.visaDetail) {
-                        const visaDetailSlug = Object.values(visaDetailsByVisaType).flat().find(v => v.name === criteria.visaDetail)?.slug;
-                        if (visaDetailSlug) finalFilters.visaDetail = visaDetailSlug;
-                    }
-                    if (criteria.gender) {
-                       query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
-                    }
-                    if (criteria.sortBy) {
-                        query.set('sap-xep', 'salary_desc');
-                    }
+                    finalFilters.industry = allIndustries.find(i => i.name === criteria.industry)?.slug || finalFilters.industry;
+                    finalFilters.location = allJapanLocations.find(l => l.name === criteria.workLocation)?.slug ? [allJapanLocations.find(l => l.name === criteria.workLocation)!.slug] : finalFilters.location;
+                    finalFilters.visaDetail = Object.values(visaDetailsByVisaType).flat().find(v => v.name === criteria.visaDetail)?.slug || finalFilters.visaDetail;
+                    if(criteria.gender) query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
+                    if(criteria.sortBy) query.set('sap-xep', 'salary_desc');
                 } else {
                      query.set('q', filters.q);
                 }
@@ -843,3 +826,5 @@ const LoggedOutContent = () => {
     </>
   );
 }
+
+    
