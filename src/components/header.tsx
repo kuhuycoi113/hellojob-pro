@@ -115,7 +115,6 @@ const SearchDialog = () => {
             try {
                 const criteria = await recommendJobs(filters.q);
                 if (criteria) {
-                    // AI results take precedence over selected filters for the same category
                     if (criteria.industry) {
                         const industrySlug = allIndustries.find(i => i.name === criteria.industry)?.slug;
                         if(industrySlug) finalFilters.industry = industrySlug;
@@ -125,9 +124,11 @@ const SearchDialog = () => {
                         if(locationSlug) finalFilters.location = [locationSlug];
                     }
                     if (criteria.visaType) {
-                        const visaSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
-                        const firstDetailSlug = visaSlug ? (visaDetailsByVisaType[visaSlug] || [])[0]?.slug : undefined;
-                        if(firstDetailSlug) finalFilters.visaDetail = firstDetailSlug;
+                         const visaTypeSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
+                         const visaDetail = Object.values(visaDetailsByVisaType).flat().find(v => v.name === criteria.visaType);
+                         if (visaDetail) {
+                            finalFilters.visaDetail = visaDetail.slug;
+                         }
                     }
                     if (criteria.gender) {
                        query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
@@ -144,7 +145,6 @@ const SearchDialog = () => {
             }
         }
         
-        // Append all final filters to the query
         if (finalFilters.visaDetail && finalFilters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', finalFilters.visaDetail);
         if (finalFilters.industry && finalFilters.industry !== 'all') query.set('nganh-nghe', finalFilters.industry);
         if (Array.isArray(finalFilters.location) && finalFilters.location.length > 0) {
