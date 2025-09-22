@@ -104,65 +104,59 @@ const SearchDialog = () => {
     const handleSearch = async () => {
         setIsSearching(true);
         const query = new URLSearchParams();
+        
+        let finalFilters = {
+            visaDetail: filters.visaDetail,
+            industry: filters.industry,
+            location: filters.location,
+            gender: undefined as string | undefined,
+            sortBy: undefined as string | undefined,
+        };
 
         if (filters.q) {
             try {
                 const criteria = await recommendJobs(filters.q);
-                let criteriaFound = false;
                 if (criteria) {
+                    // AI results take precedence over selected filters for the same category
                     if (criteria.industry) {
                         const industrySlug = allIndustries.find(i => i.name === criteria.industry)?.slug;
-                        if (industrySlug) {
-                            query.set('nganh-nghe', industrySlug);
-                            criteriaFound = true;
-                        }
+                        if(industrySlug) finalFilters.industry = industrySlug;
                     }
                     if (criteria.workLocation) {
                         const locationSlug = allJapanLocations.find(l => l.name === criteria.workLocation)?.slug;
-                        if (locationSlug) {
-                            query.set('dia-diem', locationSlug);
-                            criteriaFound = true;
-                        }
+                        if(locationSlug) finalFilters.location = [locationSlug];
                     }
                     if (criteria.visaType) {
                         const visaSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
-                        if(visaSlug) {
-                            query.set('loai-visa', visaSlug);
-                            criteriaFound = true;
-                        }
+                        const firstDetailSlug = visaSlug ? (visaDetailsByVisaType[visaSlug] || [])[0]?.slug : undefined;
+                        if(firstDetailSlug) finalFilters.visaDetail = firstDetailSlug;
                     }
-                     if (criteria.gender) {
-                        query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
-                        criteriaFound = true;
+                    if (criteria.gender) {
+                        finalFilters.gender = criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu';
                     }
                     if (criteria.sortBy) {
-                        query.set('sap-xep', 'salary_desc');
-                        criteriaFound = true;
+                        finalFilters.sortBy = 'salary_desc';
                     }
+                } else {
+                     query.set('q', filters.q);
                 }
-                
-                // If AI didn't find any specific criteria, fall back to a raw text search
-                if (!criteriaFound) {
-                    query.set('q', filters.q);
-                }
-
             } catch (error) {
                 console.error("AI search failed, falling back to keyword search:", error);
                 query.set('q', filters.q);
             }
         }
-
-        // Add other filters if they are set, but only if there's no text query
-        if (!filters.q) {
-            if (filters.visaDetail && filters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', filters.visaDetail);
-            if (filters.industry && filters.industry !== 'all') query.set('nganh-nghe', filters.industry);
-             if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
-                filters.location.forEach(loc => query.append('dia-diem', loc));
-            } else if (typeof filters.location === 'string' && filters.location && filters.location !== 'all') {
-                query.append('dia-diem', filters.location);
-            }
-        }
         
+        // Append all final filters to the query
+        if (finalFilters.visaDetail && finalFilters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', finalFilters.visaDetail);
+        if (finalFilters.industry && finalFilters.industry !== 'all') query.set('nganh-nghe', finalFilters.industry);
+        if (Array.isArray(finalFilters.location)) {
+            finalFilters.location.forEach(loc => query.append('dia-diem', loc));
+        } else if (finalFilters.location && finalFilters.location !== 'all') {
+            query.append('dia-diem', finalFilters.location);
+        }
+        if (finalFilters.gender) query.set('gioi-tinh', finalFilters.gender);
+        if (finalFilters.sortBy) query.set('sap-xep', finalFilters.sortBy);
+
         setIsSearchDialogOpen(false);
         setIsSearching(false);
         router.push(`/tim-viec-lam?${query.toString()}`);
@@ -858,4 +852,3 @@ const LoggedOutContent = () => {
     </>
   );
 }
-
