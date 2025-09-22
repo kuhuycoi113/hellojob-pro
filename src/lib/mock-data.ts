@@ -26,7 +26,7 @@ export interface Job {
     recruiter: {
       id: string; // Add recruiter ID
       name: string;
-      avatar: string;
+      avatarUrl: string; // Changed from avatar
       company: string;
       mainExpertise?: string;
     };
@@ -282,7 +282,7 @@ const createJobList = (): Job[] => {
                         recruiter: {
                             id: assignedConsultant.id,
                             name: assignedConsultant.name,
-                            avatar: assignedConsultant.avatarUrl,
+                            avatarUrl: assignedConsultant.avatarUrl,
                             company: 'HelloJob'
                         },
                         status: jobIndex % 10 === 0 ? 'Tạm dừng' : 'Đang tuyển',
@@ -452,7 +452,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 recruiter: {
                     id: assignedConsultant.id,
                     name: assignedConsultant.name,
-                    avatar: assignedConsultant.avatarUrl,
+                    avatarUrl: assignedConsultant.avatarUrl,
                     company: 'HelloJob'
                 },
                 status: jobIndex % 10 === 0 ? 'Tạm dừng' : 'Đang tuyển',
@@ -519,3 +519,6 @@ export const jobData: Job[] = [...initialJobs, ...newlyAddedJobs];
 
 
 
+
+
+  

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ import { Job } from '@/lib/mock-data';
 type ContactPerson = {
     id: string;
     name: string;
-    avatar: string;
+    avatarUrl: string;
 };
 
 interface ContactButtonsProps {
@@ -131,3 +132,5 @@ export function ContactButtons({ contact, job, showChatText = false }: ContactBu
     </>
   );
 }
+
+  

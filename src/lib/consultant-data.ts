@@ -1,4 +1,5 @@
 
+
 import type { User } from './chat-data';
 
 export const consultants: User[] = [
@@ -6,7 +7,6 @@ export const consultants: User[] = [
     id: 'le-xuan-long',
     name: 'Lê Xuân Long',
     avatarUrl: '/img/long.jpg',
-    avatar: '/img/long.jpg',
     dataAiHint: 'professional man portrait',
     experience: '2 năm',
     mainExpertise: 'Tư vấn việc làm Kỹ năng đặc định (Tokutei)',
@@ -17,7 +17,6 @@ export const consultants: User[] = [
     id: 'nguyen-thi-phuong-loan',
     name: 'Nguyễn Thị Phương Loan',
     avatarUrl: '/img/TVV002.jpg',
-    avatar: '/img/TVV002.jpg',
     dataAiHint: 'professional woman portrait',
     experience: '2 năm',
     mainExpertise: 'Tư vấn Đặc định và Kỹ sư, tri thức',
@@ -28,7 +27,6 @@ export const consultants: User[] = [
     id: 'nguyen-thi-ngoc-oanh',
     name: 'Nguyễn Thị Ngọc Oanh',
     avatarUrl: '/img/TVV003.png',
-    avatar: '/img/TVV003.png',
     dataAiHint: 'professional woman portrait',
     experience: '5 năm',
     mainExpertise: 'Tư vấn Tokutei Vận tải, Xây dựng, Thực phẩm',
@@ -39,7 +37,6 @@ export const consultants: User[] = [
     id: 'pham-thi-ha',
     name: 'Phạm Thị Hà',
     avatarUrl: '/img/TVV004.png',
-    avatar: '/img/TVV004.png',
     dataAiHint: 'professional woman portrait',
     experience: '4 năm',
     mainExpertise: 'Tư vấn Nhà hàng, Cơ khí, Điều dưỡng, Nông nghiệp',
@@ -50,7 +47,6 @@ export const consultants: User[] = [
     id: 'dao-quang-minh',
     name: 'Đào Quang Minh',
     avatarUrl: '/img/TVV005.jpg',
-    avatar: '/img/TVV005.jpg',
     dataAiHint: 'male consultant portrait',
     experience: '1 năm',
     mainExpertise: 'Tư vấn Công xưởng và Ngoài trời',
@@ -61,7 +57,6 @@ export const consultants: User[] = [
     id: 'nguyen-thi-thu-trang',
     name: 'Nguyễn Thị Thu Trang',
     avatarUrl: '/img/TVV006.jpg',
-    avatar: '/img/TVV006.jpg',
     dataAiHint: 'female consultant smiling',
     experience: '2 năm',
     mainExpertise: 'Tư vấn Thực tập sinh kỹ năng và Đặc định',
@@ -69,3 +64,6 @@ export const consultants: User[] = [
     strengths: ['Nhiệt tình', 'Am hiểu ngành', 'Hỗ trợ nhanh'],
   },
 ];
+
+
+  
