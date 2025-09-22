@@ -1,5 +1,4 @@
 
-
 import { consultants } from './consultant-data';
 import type { User } from './chat-data';
 import { industriesByJobType } from './industry-data';
