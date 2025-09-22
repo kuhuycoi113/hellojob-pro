@@ -340,7 +340,7 @@ export default function JobSearchPageContent() {
 
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
 
-            const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDate && job.interviewDate <= interviewDate);
+            const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDateOffset && (new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000) <= new Date(interviewDate).getTime());
             
             const jobBasicSalary = parseSalary(job.salary.basic);
             const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);
@@ -421,7 +421,7 @@ export default function JobSearchPageContent() {
         results.sort((a, b) => {
             switch (sortOption) {
                 case 'newest':
-                    return new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime();
+                    return b.postedTimeOffset - a.postedTimeOffset;
                 case 'salary_desc':
                     return (parseSalary(b.salary.basic) ?? 0) - (parseSalary(a.salary.basic) ?? 0);
                 case 'salary_asc':
@@ -435,9 +435,9 @@ export default function JobSearchPageContent() {
                 case 'fee_desc':
                     return (parseSalary(b.netFee) ?? -1) - (parseSalary(a.netFee) ?? -1);
                 case 'interview_date_asc':
-                    return new Date(a.interviewDate).getTime() - new Date(b.interviewDate).getTime();
+                    return a.interviewDateOffset - b.interviewDateOffset;
                 case 'interview_date_desc':
-                    return new Date(b.interviewDate).getTime() - new Date(a.interviewDate).getTime();
+                    return b.interviewDateOffset - a.interviewDateOffset;
                 case 'has_image':
                     return (b.details.images && b.details.images.length > 0 ? 1 : 0) - (a.details.images && a.details.images.length > 0 ? 1 : 0);
                 case 'has_video':
@@ -535,7 +535,7 @@ export default function JobSearchPageContent() {
             const feeMatch = feeWithTicketMatch && feeNoTicketMatch;
 
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
-            const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDate && job.interviewDate <= interviewDate);
+            const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDateOffset && (new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000) <= new Date(interviewDate).getTime());
 
             const jobBasicSalary = parseSalary(job.salary.basic);
             const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);
