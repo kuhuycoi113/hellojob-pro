@@ -105,12 +105,10 @@ const SearchDialog = () => {
         setIsSearching(true);
         const query = new URLSearchParams();
         
-        let finalFilters = {
+        const finalFilters: Partial<SearchFilters> = {
             visaDetail: filters.visaDetail,
             industry: filters.industry,
             location: filters.location,
-            gender: undefined as string | undefined,
-            sortBy: undefined as string | undefined,
         };
 
         if (filters.q) {
@@ -132,10 +130,10 @@ const SearchDialog = () => {
                         if(firstDetailSlug) finalFilters.visaDetail = firstDetailSlug;
                     }
                     if (criteria.gender) {
-                        finalFilters.gender = criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu';
+                       query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
                     }
                     if (criteria.sortBy) {
-                        finalFilters.sortBy = 'salary_desc';
+                        query.set('sap-xep', 'salary_desc');
                     }
                 } else {
                      query.set('q', filters.q);
@@ -149,14 +147,10 @@ const SearchDialog = () => {
         // Append all final filters to the query
         if (finalFilters.visaDetail && finalFilters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', finalFilters.visaDetail);
         if (finalFilters.industry && finalFilters.industry !== 'all') query.set('nganh-nghe', finalFilters.industry);
-        if (Array.isArray(finalFilters.location)) {
+        if (Array.isArray(finalFilters.location) && finalFilters.location.length > 0) {
             finalFilters.location.forEach(loc => query.append('dia-diem', loc));
-        } else if (finalFilters.location && finalFilters.location !== 'all') {
-            query.append('dia-diem', finalFilters.location);
         }
-        if (finalFilters.gender) query.set('gioi-tinh', finalFilters.gender);
-        if (finalFilters.sortBy) query.set('sap-xep', finalFilters.sortBy);
-
+        
         setIsSearchDialogOpen(false);
         setIsSearching(false);
         router.push(`/tim-viec-lam?${query.toString()}`);
