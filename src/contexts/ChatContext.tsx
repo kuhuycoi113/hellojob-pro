@@ -6,12 +6,13 @@ import { Conversation, Message, User, conversations, getCurrentUser, helloJobBot
 import { consultants } from "@/lib/consultant-data";
 import { recommendJobs, type JobRecommendationResponse } from '@/ai/flows/recommend-jobs-flow';
 import { useAuth } from '@/contexts/AuthContext';
+import { Job } from '@/lib/mock-data';
 
 interface ChatContextType {
   isChatOpen: boolean;
   activeConversation: Conversation | null;
   assignedConsultant: User | null;
-  openChat: (user?: User) => void;
+  openChat: (user?: User, job?: Job, initialMessage?: string) => void;
   closeChat: () => void;
   sendMessage: (text: string, attachment?: Attachment) => void;
 }
@@ -62,14 +63,14 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     }
   }, [role]); // Rerun this logic when the role (and thus currentUser) changes
 
-  const openChat = (user?: User) => {
+  const openChat = (user?: User, job?: Job, initialMessage?: string) => {
     const currentUser = getCurrentUser();
     const targetUser = user || assignedConsultant || helloJobBot;
     
     let conversation = conversations.find(c => c.participants.some(p => p.id === targetUser.id));
     
     if (!conversation) {
-        const initialMessage = `Chào bạn, tôi là ${targetUser.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`;
+        const initialBotMessage = `Chào bạn, tôi là ${targetUser.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`;
         
         conversation = {
             id: `convo-${targetUser.id}`,
@@ -78,7 +79,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
                 {
                     id: `msg-${Date.now()}`,
                     sender: targetUser,
-                    text: initialMessage,
+                    text: initialBotMessage,
                     timestamp: new Date().toISOString()
                 }
             ]
@@ -86,6 +87,26 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         if (!conversations.some(c => c.id === conversation!.id)) {
             conversations.push(conversation);
         }
+    }
+
+    // If a job is passed, send the job card and initial message
+    if (job) {
+        const jobMessage: Message = {
+            id: `msg-job-${Date.now()}`,
+            sender: currentUser,
+            text: '',
+            timestamp: new Date().toISOString(),
+            job: job, // Attach the job object
+        };
+
+        const textMessage: Message = {
+            id: `msg-text-${Date.now()}`,
+            sender: currentUser,
+            text: initialMessage || 'Cho mình hỏi về việc làm này.',
+            timestamp: new Date().toISOString(),
+        };
+        
+        conversation.messages.push(jobMessage, textMessage);
     }
     
     setActiveConversation(conversation);

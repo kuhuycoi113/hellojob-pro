@@ -3,6 +3,7 @@
 
 import { JobRecommendationResponse } from "@/ai/schemas/recommend-jobs-schema";
 import { consultants } from "./consultant-data";
+import { Job } from "./mock-data";
 
 export type User = {
   id: string;
@@ -32,6 +33,7 @@ export type Message = {
   recommendations?: JobRecommendationResponse['recommendations'];
   suggestedReplies?: string[];
   attachment?: Attachment;
+  job?: Job; // Add job property
 };
 
 export type Conversation = {

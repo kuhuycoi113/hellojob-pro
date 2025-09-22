@@ -77,6 +77,13 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
                 </Link>
             </p>
         )}
+        
+        {/* Render job card if attached to message */}
+        {message.job && (
+            <div className="w-full max-w-xs md:max-w-sm flex-shrink-0">
+                <JobCard job={message.job} variant="chat" />
+            </div>
+        )}
 
         {message.attachment ? (
              <div className={cn(
@@ -91,16 +98,19 @@ export function ChatMessage({ message, currentUser }: ChatMessageProps) {
                 )}
              </div>
         ) : (
-            <div
-                className={cn(
-                'max-w-xs md:max-w-md lg:max-w-lg rounded-2xl px-4 py-2 w-fit',
-                isCurrentUser
-                    ? 'bg-primary text-primary-foreground rounded-br-none self-end'
-                    : 'bg-background rounded-bl-none border'
-                )}
-            >
-                <p id={isWelcomeMessage ? "CAUCHAOCHAT01" : undefined} className="text-sm whitespace-pre-line">{message.text}</p>
-            </div>
+            // Only render text if it's not empty
+            message.text && (
+                <div
+                    className={cn(
+                    'max-w-xs md:max-w-md lg:max-w-lg rounded-2xl px-4 py-2 w-fit',
+                    isCurrentUser
+                        ? 'bg-primary text-primary-foreground rounded-br-none self-end'
+                        : 'bg-background rounded-bl-none border'
+                    )}
+                >
+                    <p id={isWelcomeMessage ? "CAUCHAOCHAT01" : undefined} className="text-sm whitespace-pre-line">{message.text}</p>
+                </div>
+            )
         )}
 
         {recommendedJobs.length > 0 && (

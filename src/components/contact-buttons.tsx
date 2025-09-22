@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useChat } from '@/contexts/ChatContext';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
+import { Job } from '@/lib/mock-data';
 
 
 // Define a more generic type for the contact person
@@ -20,10 +21,11 @@ type ContactPerson = {
 
 interface ContactButtonsProps {
     contact: ContactPerson;
+    job?: Job; // Make job optional
     showChatText?: boolean; // New prop to control text visibility
 }
 
-export function ContactButtons({ contact, showChatText = false }: ContactButtonsProps) {
+export function ContactButtons({ contact, job, showChatText = false }: ContactButtonsProps) {
   const { openChat } = useChat();
   const [isClient, setIsClient] = useState(false);
 
@@ -33,8 +35,7 @@ export function ContactButtons({ contact, showChatText = false }: ContactButtons
 
   const handleChatClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // Prevent card's onClick from firing
-    // @ts-ignore
-    openChat(contact);
+    openChat(contact as any, job, job ? "Cho mình hỏi về việc làm này." : undefined);
   };
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -88,7 +89,7 @@ export function ContactButtons({ contact, showChatText = false }: ContactButtons
                 <PopoverAnchor asChild>
                     <PopoverTrigger asChild>
                         <div id="MB4NUT01" className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                            <Button size="icon" variant="default" className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90">
+                            <Button size="icon" variant="default" className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleChatClick}>
                                 <MessageSquare className="h-4 w-4"/>
                             </Button>
                             <Button size="icon" variant="outline" className="h-8 w-8 border-purple-500 hover:bg-purple-50">
