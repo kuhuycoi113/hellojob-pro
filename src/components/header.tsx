@@ -718,7 +718,6 @@ const LoggedOutContent = () => {
                 <div className="hidden md:flex items-center gap-2">
                     {isClient && (
                         <>
-                            <SearchDialog />
                             {isLoggedIn ? (
                                 <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
@@ -748,7 +747,6 @@ const LoggedOutContent = () => {
                 </div>
                 {isClient && isMobile && (
                     <div className="flex items-center gap-2">
-                        <SearchDialog />
                         {!isLoggedIn && (
                             <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
                         )}
@@ -826,5 +824,3 @@ const LoggedOutContent = () => {
     </>
   );
 }
-
-    
