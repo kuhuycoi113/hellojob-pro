@@ -3,7 +3,7 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
-import { jobData, type Job } from '@/lib/mock-data';
+import { jobData, type Job, publicFeeLimits } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -104,6 +104,15 @@ const validateProfileForApplication = (profile: CandidateProfile): boolean => {
 
     return !!hasRequiredPersonalInfo && !!hasContactInfo;
 };
+
+// List of visa details that have special fee handling
+const controlledFeeVisas = [
+  'Thực tập sinh 3 năm',
+  'Thực tập sinh 1 năm',
+  'Đặc định đầu Việt',
+  'Đặc định đi mới',
+  'Kỹ sư, tri thức đầu Việt'
+];
 
 const CTAForGuest = ({ title, icon: Icon, onLoginClick }: { title: string, icon: React.ElementType, onLoginClick: () => void }) => (
     <section>
@@ -541,8 +550,28 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
     const assignedConsultant = job.recruiter;
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay';
+    
+    const getFeeDisplay = (feeValue: string | undefined, feeLabel: string) => {
+        const feeLimit = publicFeeLimits[job.visaDetail as keyof typeof publicFeeLimits];
+        const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
 
-    const RequirementItem = ({ icon: Icon, label, value, className }: { icon: React.ElementType, label: string, value?: string | number, className?: string }) => {
+        if (!feeValue) {
+            return isControlled ? "Không rõ" : null;
+        }
+
+        const numericFee = parseInt(feeValue);
+        if (isControlled && numericFee > feeLimit) {
+            return "Không rõ";
+        }
+        
+        return `${formatCurrency(feeValue, 'USD')} (${convertCurrency(feeValue, 'USD')})`;
+    };
+
+    const feeWithTuitionDisplay = getFeeDisplay("Phí và vé và học phí", job.netFeeWithTuition);
+    const feeDisplay = getFeeDisplay(job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé", job.netFee);
+    const feeNoTicketDisplay = getFeeDisplay("Phí không vé", job.netFeeNoTicket);
+
+    const RequirementItem = ({ icon: Icon, label, value, className }: { icon: React.ElementType, label: string, value?: string | number | null, className?: string }) => {
         if (!value) return null;
         return (
             <div className={cn("flex items-start gap-3", className)}>
@@ -615,8 +644,9 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageRequirement}/>
                                 <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={job.interviewDate}/>
                                 <RequirementItem icon={ClipboardCheck} label="Số vòng" value={`${job.interviewRounds} vòng`}/>
-                                {job.netFeeNoTicket && <RequirementItem icon={Wallet} label="Phí không vé" value={`${formatCurrency(job.netFeeNoTicket, 'USD')} (${convertCurrency(job.netFeeNoTicket, 'USD')})`} />}
-                                {job.netFee && <RequirementItem icon={Wallet} label={job.netFeeNoTicket ? "Phí trọn gói (gồm vé)" : "Mức phí"} value={`${formatCurrency(job.netFee, 'USD')} (${convertCurrency(job.netFee, 'USD')})`}/>}
+                                <RequirementItem icon={Wallet} label="Phí và vé và học phí" value={feeWithTuitionDisplay} />
+                                <RequirementItem icon={Wallet} label={job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé"} value={feeDisplay} />
+                                <RequirementItem icon={Wallet} label="Phí không vé" value={feeNoTicketDisplay} />
                                 <RequirementItem icon={Star} label="Điều kiện đặc biệt" value={job.specialConditions}/>
                             </CardContent>
                         </Card>

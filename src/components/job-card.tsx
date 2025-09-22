@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark, Phone, LogIn, Star, FileText } from 'lucide-react';
-import { Job } from '@/lib/mock-data';
+import { Job, publicFeeLimits } from '@/lib/mock-data';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -88,6 +87,15 @@ const validateProfileForApplication = (profile: CandidateProfile): boolean => {
 
     return !!hasRequiredPersonalInfo && !!hasContactInfo;
 };
+
+// List of visa details that have special fee handling
+const controlledFeeVisas = [
+  'Thực tập sinh 3 năm',
+  'Thực tập sinh 1 năm',
+  'Đặc định đầu Việt',
+  'Đặc định đi mới',
+  'Kỹ sư, tri thức đầu Việt'
+];
 
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = false, appliedFilters }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters }) => {
@@ -182,15 +190,41 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
 
-  const shouldShowFee = () => {
-    if (!job.netFee && !job.netFeeNoTicket) return false;
-    
-    if (job.visaDetail === 'Đặc định đầu Việt' && appliedFilters) {
-        return !!appliedFilters.netFee || !!appliedFilters.netFeeNoTicket;
-    }
+  const getFeeDisplayInfo = () => {
+      const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
+      const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
+      const isControlledVisa = controlledFeeVisas.includes(visaDetail || '');
+      
+      let feeValue: number | undefined;
+      let feeLabel: string | undefined;
 
-    return true; // For all other cases, show if data exists
+      if (netFeeWithTuition) {
+          feeValue = parseInt(netFeeWithTuition);
+          feeLabel = 'Phí và vé và học phí';
+      } else if (netFee) {
+          feeValue = parseInt(netFee);
+          feeLabel = (visaDetail?.includes('Thực tập sinh')) ? 'Phí và vé không học phí' : 'Phí có vé';
+      } else if (netFeeNoTicket) {
+          feeValue = parseInt(netFeeNoTicket);
+          feeLabel = 'Phí không vé';
+      }
+
+      const shouldShowBasedOnFilter = !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket);
+
+      if (!feeLabel || feeValue === undefined) {
+          return { shouldShow: isControlledVisa, text: `${feeLabel || 'Phí'}: Không rõ` };
+      }
+      
+      if (isControlledVisa) {
+          if (feeValue > feeLimit) {
+              return { shouldShow: true, text: `${feeLabel}: Không rõ` };
+          }
+      }
+
+      return { shouldShow: true, text: `${feeLabel}: $${formatCurrency(String(feeValue))}` };
   };
+
+  const feeInfo = getFeeDisplayInfo();
 
   if (variant === 'list-item') {
      return (
@@ -226,11 +260,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 )}
                                 {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
                                 <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
-                                {shouldShowFee() && job.netFee && (
-                                    <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">Phí có vé: ${formatCurrency(job.netFee)}</Badge>
-                                )}
-                                {shouldShowFee() && job.netFeeNoTicket && (
-                                    <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">Phí không vé: ${formatCurrency(job.netFeeNoTicket)}</Badge>
+                                {feeInfo.shouldShow && (
+                                    <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
+                                        {feeInfo.text}
+                                    </Badge>
                                 )}
                             </div>
                             <div className="text-sm text-muted-foreground">
@@ -402,7 +435,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             className={cn("px-1.5 py-0 text-xs", {
                                 "border-accent-green/70 bg-green-50 text-accent-green": job.visaType?.includes("Thực tập sinh"),
                                 "border-accent-blue/70 bg-blue-50 text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
-                                "border-accent-orange/70 bg-orange-50 text-accent-orange": job.visaType?.includes("Kỹ sư, tri thức"),
+                                "border-accent-orange/70 bg-orange-50 text-orange-500": job.visaType?.includes("Kỹ sư, tri thức"),
                             })}
                         >
                             {job.visaDetail}

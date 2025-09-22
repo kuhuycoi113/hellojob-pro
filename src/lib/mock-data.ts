@@ -32,8 +32,9 @@ export interface Job {
     status: 'Đang tuyển' | 'Tạm dừng';
     interviewDate: string;
     interviewRounds: number;
-    netFee?: string; // This will now represent "Phí có vé"
-    netFeeNoTicket?: string; // New field for "Phí không vé"
+    netFee?: string; // "Phí và vé không học phí" (TTS) hoặc "Phí có vé" (DD)
+    netFeeNoTicket?: string; // "Phí không vé" (DD)
+    netFeeWithTuition?: string; // "Phí và vé và học phí" (TTS)
     target: string;
     backFee?: string;
     tags: string[];
@@ -78,6 +79,23 @@ const interviewLocations = ['Hà Nội', 'TP.HCM', 'Đà Nẵng', 'Online', 'T�
 const educationLevels = ["Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon", "Không yêu cầu"];
 const languageLevels = ['N1', 'N2', 'N3', 'N4', 'N5', 'Không yêu cầu'];
 const tattooOptions = ["Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "Nhận cả xăm to (lộ)"];
+
+// Fee limits
+export const feeLimits: { [key: string]: number } = {
+  'Thực tập sinh 3 năm': 4200,
+  'Thực tập sinh 1 năm': 1800,
+  'Đặc định đầu Việt': 3000,
+  'Đặc định đi mới': 4200,
+  'Kỹ sư, tri thức đầu Việt': 3800,
+};
+
+export const publicFeeLimits: { [key: string]: number } = {
+  'Thực tập sinh 3 năm': 3800,
+  'Thực tập sinh 1 năm': 1500,
+  'Đặc định đầu Việt': 2500,
+  'Đặc định đi mới': 3800,
+  'Kỹ sư, tri thức đầu Việt': 3800,
+};
 
 const otherSkills = [
     { name: "Có bằng lái xe AT", slug: "co-bang-lai-xe-at" },
@@ -246,26 +264,24 @@ const createJobList = (): Job[] => {
                     
                     let netFee: string | undefined = undefined;
                     let netFeeNoTicket: string | undefined = undefined;
-                    
-                    const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
-                    if (feeVisas.includes(detail.slug) && (jobIndex % 5 < 4)) { // 80% have fees
-                        let feeWithTicketValue;
-                        if (detail.slug === 'dac-dinh-dau-viet') {
-                            feeWithTicketValue = 1500 + ((jobIndex * 101) % 1000); // 1500-2500
-                        } else if (detail.slug === 'dac-dinh-di-moi' || detail.slug === 'ky-su-tri-thuc-dau-viet') {
-                            feeWithTicketValue = 2500 + ((jobIndex * 101) % 1300); // 2500-3800
-                        } else if (detail.slug === 'thuc-tap-sinh-1-nam') {
-                            feeWithTicketValue = 1000 + ((jobIndex * 101) % 400); // 1000-1400
-                        } else { // TTS 3 năm
-                            feeWithTicketValue = 3000 + ((jobIndex * 101) % 600); // 3000-3600
-                        }
-                        
-                        const feeNoTicketValue = Math.floor(feeWithTicketValue * (0.8 + ((jobIndex % 10) / 100)));
+                    let netFeeWithTuition: string | undefined = undefined;
 
-                        if (jobIndex % 2 === 0) { // Even index gets fee with ticket
-                            netFee = String(feeWithTicketValue);
-                        } else { // Odd index gets fee without ticket
-                            netFeeNoTicket = String(feeNoTicketValue);
+                    const maxFee = feeLimits[detail.name];
+                    if (maxFee !== undefined && jobIndex % 5 < 4) { // 80% have fees
+                        const feeValue = 1000 + Math.floor(((jobIndex * 137) % (maxFee - 1000)));
+
+                        if (['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm'].includes(detail.name)) {
+                            if (jobIndex % 2 === 0) { // Phí và vé và học phí
+                                netFeeWithTuition = String(feeValue);
+                            } else { // Phí và vé không học phí
+                                netFee = String(feeValue);
+                            }
+                        } else {
+                            if (jobIndex % 2 === 0) { // Phí có vé
+                                netFee = String(feeValue);
+                            } else { // Phí không vé
+                                netFeeNoTicket = String(feeValue);
+                            }
                         }
                     }
 
@@ -292,8 +308,9 @@ const createJobList = (): Job[] => {
                         status: jobIndex % 10 === 0 ? 'Tạm dừng' : 'Đang tuyển',
                         interviewDate: interviewDate.toISOString().split('T')[0],
                         interviewRounds: (jobIndex % 3) + 1,
-                        netFee: netFee,
-                        netFeeNoTicket: netFeeNoTicket,
+                        netFee,
+                        netFeeNoTicket,
+                        netFeeWithTuition,
                         target: `${(jobIndex % 5) + 1}tr`,
                         backFee: `${(jobIndex % 5) + 1}tr`,
                         tags: [industry.name, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
@@ -422,26 +439,24 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
     
             let netFee: string | undefined = undefined;
             let netFeeNoTicket: string | undefined = undefined;
+            let netFeeWithTuition: string | undefined = undefined;
 
-            const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
-            if (feeVisas.includes(detail.slug) && (jobIndex % 5 < 4)) { // 80% have fees
-                let feeWithTicketValue;
-                if (detail.slug === 'dac-dinh-dau-viet') {
-                    feeWithTicketValue = 1500 + ((jobIndex * 101) % 1000);
-                } else if (detail.slug === 'dac-dinh-di-moi' || detail.slug === 'ky-su-tri-thuc-dau-viet') {
-                    feeWithTicketValue = 2500 + ((jobIndex * 101) % 1300);
-                } else if (detail.slug === 'thuc-tap-sinh-1-nam') {
-                    feeWithTicketValue = 1000 + ((jobIndex * 101) % 400);
-                } else { // TTS 3 năm
-                    feeWithTicketValue = 3000 + ((jobIndex * 101) % 600);
-                }
-                
-                const feeNoTicketValue = Math.floor(feeWithTicketValue * (0.8 + ((jobIndex % 10) / 100)));
+            const maxFee = feeLimits[detail.name];
+            if (maxFee !== undefined && jobIndex % 5 < 4) { // 80% have fees
+                const feeValue = 1000 + Math.floor(((jobIndex * 137) % (maxFee - 1000)));
 
-                if (jobIndex % 2 === 0) { // Even index gets fee with ticket
-                    netFee = String(feeWithTicketValue);
-                } else { // Odd index gets fee without ticket
-                    netFeeNoTicket = String(feeNoTicketValue);
+                if (['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm'].includes(detail.name)) {
+                    if (jobIndex % 2 === 0) { // Phí và vé và học phí
+                        netFeeWithTuition = String(feeValue);
+                    } else { // Phí và vé không học phí
+                        netFee = String(feeValue);
+                    }
+                } else {
+                    if (jobIndex % 2 === 0) { // Phí có vé
+                        netFee = String(feeValue);
+                    } else { // Phí không vé
+                        netFeeNoTicket = String(feeValue);
+                    }
                 }
             }
 
@@ -467,8 +482,9 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 status: jobIndex % 10 === 0 ? 'Tạm dừng' : 'Đang tuyển',
                 interviewDate: interviewDate.toISOString().split('T')[0],
                 interviewRounds: (jobIndex % 3) + 1,
-                netFee: netFee,
-                netFeeNoTicket: netFeeNoTicket,
+                netFee,
+                netFeeNoTicket,
+                netFeeWithTuition,
                 target: `${(jobIndex % 5) + 1}tr`,
                 backFee: `${(jobIndex % 5) + 1}tr`,
                 tags: [industry.name, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
@@ -524,12 +540,4 @@ missingPrefectures.forEach((prefecture, i) => {
 });
 
 export const jobData: Job[] = [...initialJobs, ...newlyAddedJobs];
-    
-
-
-
-
-
-  
-
     
