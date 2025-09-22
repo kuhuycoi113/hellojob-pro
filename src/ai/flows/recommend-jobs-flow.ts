@@ -41,6 +41,7 @@ const recommendJobsFlow = ai.defineFlow(
         - "Top 10 việc lương cao nhất" -> { sortBy: "salary", limit: 10 }
         - "Việc làm tại aichi" -> { workLocation: "Aichi" }
         - "Đặc định đầu Nhật" -> { visaDetail: "Đặc định đầu Nhật" }
+        - "Đặc định" -> { visaType: "Kỹ năng đặc định" }
         
         Nếu người dùng không nói rõ, hãy để trống trường đó.
 
