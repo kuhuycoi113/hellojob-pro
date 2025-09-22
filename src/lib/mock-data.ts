@@ -144,7 +144,7 @@ const dormitoryImages = [
 const jobVideos = [
     "https://www.youtube.com/embed/Zdo4UksgTn8",
     "https://www.youtube.com/embed/LbfuxUIFmLc",
-    "https://www.youtube.com/embed/jGEMuHjF6vU"
+    "https://www.youtube.com/embed/jGEMuHjFmLc"
 ];
 
 const jobOrderImages = [
@@ -266,25 +266,26 @@ const createJobList = (): Job[] => {
                     let netFeeNoTicket: string | undefined = undefined;
                     let netFeeWithTuition: string | undefined = undefined;
 
-                    const maxFee = feeLimits[detail.name];
-                    if (maxFee !== undefined && jobIndex % 5 < 4) { // 80% have fees
+                    const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
+                    if (feeVisas.includes(detail.slug) && jobIndex % 5 < 4) { // 80% have fees
+                        const maxFee = feeLimits[detail.name];
                         const feeValue = 1000 + Math.floor(((jobIndex * 137) % (maxFee - 1000)));
 
-                        if (['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm'].includes(detail.name)) {
+                        if (['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam'].includes(detail.slug)) {
                             if (jobIndex % 2 === 0) { // Phí và vé và học phí
                                 netFeeWithTuition = String(feeValue);
                             } else { // Phí và vé không học phí
                                 netFee = String(feeValue);
                             }
                         } else {
-                            if (jobIndex % 2 === 0) { // Phí có vé
+                           if (jobIndex % 2 === 0) { // Phí có vé
                                 netFee = String(feeValue);
                             } else { // Phí không vé
                                 netFeeNoTicket = String(feeValue);
                             }
                         }
                     }
-
+                    
                     const isTTS = visaType.name.includes('Thực tập sinh');
 
                     const job: Job = {
@@ -389,7 +390,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             const isTTS = visaType.name.includes('Thực tập sinh');
             const isEngineer = visaType.name.includes('Kỹ sư');
     
-            const postedDate = new Date(2024, 7, 1);
+            const postedDate = new Date(2024, 7, 1); // A fixed start date
             postedDate.setDate(postedDate.getDate() - (jobIndex % 30));
             const interviewDate = new Date(postedDate);
             interviewDate.setDate(interviewDate.getDate() + (jobIndex % 60) + 1);
@@ -441,18 +442,19 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             let netFeeNoTicket: string | undefined = undefined;
             let netFeeWithTuition: string | undefined = undefined;
 
-            const maxFee = feeLimits[detail.name];
-            if (maxFee !== undefined && jobIndex % 5 < 4) { // 80% have fees
+            const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
+            if (feeVisas.includes(detail.slug) && jobIndex % 5 < 4) { // 80% have fees
+                const maxFee = feeLimits[detail.name];
                 const feeValue = 1000 + Math.floor(((jobIndex * 137) % (maxFee - 1000)));
 
-                if (['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm'].includes(detail.name)) {
+                if (['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam'].includes(detail.slug)) {
                     if (jobIndex % 2 === 0) { // Phí và vé và học phí
                         netFeeWithTuition = String(feeValue);
                     } else { // Phí và vé không học phí
                         netFee = String(feeValue);
                     }
                 } else {
-                    if (jobIndex % 2 === 0) { // Phí có vé
+                   if (jobIndex % 2 === 0) { // Phí có vé
                         netFee = String(feeValue);
                     } else { // Phí không vé
                         netFeeNoTicket = String(feeValue);
