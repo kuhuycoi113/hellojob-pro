@@ -341,7 +341,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   if (variant === 'chat') {
     return (
-        <div onClick={() => router.push(`/viec-lam/${job.id}`)} className="block w-full cursor-pointer">
+        <div id="HIENTHIVIEC03" onClick={() => router.push(`/viec-lam/${job.id}`)} className="block w-full cursor-pointer">
             <Card className="flex items-start p-3 gap-3 hover:bg-secondary/50 transition-colors">
                 <div className="relative w-20 h-20 flex-shrink-0">
                     <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
