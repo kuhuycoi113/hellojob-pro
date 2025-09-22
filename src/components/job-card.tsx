@@ -247,7 +247,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             <div onMouseEnter={() => setIsConsultantPopoverOpen(true)} onMouseLeave={() => setIsConsultantPopoverOpen(false)}>
                                                 <Link href={`/tu-van-vien/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                                                     <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
-                                                        <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                                        <AvatarImage src={job.recruiter.avatarUrl} alt={job.recruiter.name} />
                                                         <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                                                     </Avatar>
                                                 </Link>
@@ -256,7 +256,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                         <PopoverContent className="w-80" side="top" align="start">
                                             <div className="flex gap-4">
                                             <Avatar className="h-16 w-16">
-                                                    <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                                    <AvatarImage src={job.recruiter.avatarUrl} alt={job.recruiter.name} />
                                                     <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                                                 </Avatar>
                                                 <div className="space-y-1">
@@ -421,7 +421,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                              <div className="flex items-center gap-1">
                                 <Link href={`/tu-van-vien/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                                     <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
-                                        <AvatarImage src={job.recruiter.avatar} alt={job.recruiter.name} />
+                                        <AvatarImage src={job.recruiter.avatarUrl} alt={job.recruiter.name} />
                                         <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                 </Link>
