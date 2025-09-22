@@ -110,6 +110,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const [isConsultantPopoverOpen, setIsConsultantPopoverOpen] = useState(false);
   const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
   const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
+  const [postedTime, setPostedTime] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -117,7 +118,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     setIsSaved(savedJobs.includes(job.id));
     const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
     setHasApplied(appliedJobs.includes(job.id));
-  }, [job.id]);
+
+    // Safely calculate postedTime on the client to avoid hydration mismatch
+    const today = new Date();
+    const postedDate = new Date(today);
+    postedDate.setDate(today.getDate() + job.postedTimeOffset);
+    setPostedTime(`10:00 ${postedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`);
+
+  }, [job.id, job.postedTimeOffset]);
 
   const handleSaveJob = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -320,7 +328,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <div className="w-full px-3 pb-1">
                             <p className="flex items-center justify-end gap-1.5 text-right w-full" style={{ fontSize: '11px', color: '#9B999A' }}>
                                 <span className='text-primary'>Đăng lúc:</span>
-                                <span>{job.postedTime.split(' ')[1]}</span>
+                                <span>{postedTime ? postedTime.split(' ')[1] : '...'}</span>
                             </p>
                         </div>
                     )}
@@ -465,7 +473,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         {showPostedTime && (
                              <p className="mt-1 text-right text-xs">
                                 <span className='text-primary'>Đăng lúc:</span>
-                                <span className='text-muted-foreground'> {job.postedTime.split(' ')[1]}</span>
+                                <span className='text-muted-foreground'> {postedTime ? postedTime.split(' ')[1] : '...'}</span>
                             </p>
                         )}
                     </div>
