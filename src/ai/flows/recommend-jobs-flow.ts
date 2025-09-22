@@ -11,7 +11,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 import {JobSearchCriteriaSchema} from '@/ai/schemas/recommend-jobs-schema';
 
-export async function recommendJobs(query: string): Promise<JobSearchCriteriaSchema | null> {
+export async function recommendJobs(query: string): Promise<z.infer<typeof JobSearchCriteriaSchema> | null> {
   return recommendJobsFlow(query);
 }
 
@@ -36,9 +36,11 @@ const recommendJobsFlow = ai.defineFlow(
         
         Ví dụ:
         - "Tìm việc đặc định thực phẩm ở aichi" -> { visaType: "Kỹ năng đặc định", industry: "Thực phẩm", workLocation: "Aichi" }
-        - "Em muốn tìm đơn hàng cơ khí đi mới cho nam" -> { industry: "Cơ khí", visaType: "Kỹ năng đặc định", gender: "Nam" }
+        - "Em muốn tìm đơn hàng cơ khí đi mới cho nam" -> { industry: "Cơ khí", visaDetail: "Đặc định đi mới", gender: "Nam" }
         - "Có đơn nào cho nữ ở Osaka không ạ" -> { gender: "Nữ", workLocation: "Osaka" }
         - "Top 10 việc lương cao nhất" -> { sortBy: "salary", limit: 10 }
+        - "Việc làm tại aichi" -> { workLocation: "Aichi" }
+        - "Đặc định đầu Nhật" -> { visaDetail: "Đặc định đầu Nhật" }
         
         Nếu người dùng không nói rõ, hãy để trống trường đó.
 

@@ -6,6 +6,7 @@ export const JobSearchCriteriaSchema = z.object({
   industry: z.string().optional().describe('Ngành nghề mà người dùng muốn tìm, ví dụ: "Cơ khí", "Thực phẩm".'),
   workLocation: z.string().optional().describe('Địa điểm làm việc mong muốn, ví dụ: "Tokyo", "Aichi".'),
   visaType: z.string().optional().describe('Loại hình visa, ví dụ: "Thực tập sinh", "Kỹ năng đặc định", "Kỹ sư".'),
+  visaDetail: z.string().optional().describe('Chi tiết loại hình visa, ví dụ: "Đặc định đầu Nhật", "Thực tập sinh 3 năm".'),
   gender: z.string().optional().describe('Yêu cầu về giới tính, là "Nam" hoặc "Nữ".'),
   sortBy: z.string().optional().describe('Tiêu chí sắp xếp, ví dụ: "lương cao nhất", "mới nhất".'),
   limit: z.number().optional().describe('Số lượng kết quả mong muốn, ví dụ: 10.'),

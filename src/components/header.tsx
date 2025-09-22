@@ -51,7 +51,7 @@ import Image from 'next/image';
 import { useChat } from '@/contexts/ChatContext';
 import { mainNavLinks, quickAccessLinks, mobileFooterLinks } from '@/lib/nav-data';
 import { useAuth, type Role } from '@/contexts/AuthContext';
-import { Industry, industriesByJobType, allIndustries } from '@/lib/industry-data';
+import { Industry, allIndustries } from '@/lib/industry-data';
 import { AuthDialog } from './auth-dialog';
 import { locations, allJapanLocations, japanRegions } from '@/lib/location-data';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -105,7 +105,7 @@ const SearchDialog = () => {
         setIsSearching(true);
         const query = new URLSearchParams();
         
-        const finalFilters: Partial<SearchFilters> = {
+        let finalFilters: Partial<SearchFilters> = {
             visaDetail: filters.visaDetail,
             industry: filters.industry,
             location: filters.location,
@@ -123,12 +123,9 @@ const SearchDialog = () => {
                         const locationSlug = allJapanLocations.find(l => l.name === criteria.workLocation)?.slug;
                         if(locationSlug) finalFilters.location = [locationSlug];
                     }
-                    if (criteria.visaType) {
-                         const visaTypeSlug = japanJobTypes.find(v => v.name === criteria.visaType)?.slug;
-                         const visaDetail = Object.values(visaDetailsByVisaType).flat().find(v => v.name === criteria.visaType);
-                         if (visaDetail) {
-                            finalFilters.visaDetail = visaDetail.slug;
-                         }
+                    if (criteria.visaDetail) {
+                        const visaDetailSlug = Object.values(visaDetailsByVisaType).flat().find(v => v.name === criteria.visaDetail)?.slug;
+                        if (visaDetailSlug) finalFilters.visaDetail = visaDetailSlug;
                     }
                     if (criteria.gender) {
                        query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
