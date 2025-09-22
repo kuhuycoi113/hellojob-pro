@@ -30,7 +30,7 @@ export interface Job {
       mainExpertise?: string;
     };
     status: 'Đang tuyển' | 'Tạm dừng';
-    interviewDate: string;
+    interviewDateOffset: number; // Offset from today in days
     interviewRounds: number;
     netFee?: string; // "Phí và vé không học phí" (TTS) hoặc "Phí có vé" (DD)
     netFeeNoTicket?: string; // "Phí không vé" (DD)
@@ -42,7 +42,7 @@ export interface Job {
         count: number;
         avatars: string[];
     };
-    postedTime: string;
+    postedTimeOffset: number; // Offset from today in days
     // New detailed fields based on your schema
     visaType?: string;
     visaDetail?: string;
@@ -211,11 +211,6 @@ const createJobList = (): Job[] => {
                     };
                     
                     const assignedConsultant = findMatchingConsultant();
-                    
-                    const postedDate = new Date(2024, 7, 1); // A fixed start date
-                    postedDate.setDate(postedDate.getDate() - (jobIndex % 30));
-                    const interviewDate = new Date(postedDate);
-                    interviewDate.setDate(interviewDate.getDate() + (jobIndex % 60) + 1);
 
                     const imageCase = jobIndex % 5;
                     let jobImages = [];
@@ -307,7 +302,8 @@ const createJobList = (): Job[] => {
                             company: 'HelloJob'
                         },
                         status: jobIndex % 10 === 0 ? 'Tạm dừng' : 'Đang tuyển',
-                        interviewDate: interviewDate.toISOString().split('T')[0],
+                        postedTimeOffset: -(jobIndex % 30),
+                        interviewDateOffset: (jobIndex % 60) + 1,
                         interviewRounds: (jobIndex % 3) + 1,
                         netFee,
                         netFeeNoTicket,
@@ -315,7 +311,6 @@ const createJobList = (): Job[] => {
                         target: `${(jobIndex % 5) + 1}tr`,
                         backFee: `${(jobIndex % 5) + 1}tr`,
                         tags: [industry.name, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
-                        postedTime: `10:00 ${postedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`,
                         visaType: visaType.name,
                         visaDetail: detail.name,
                         industry: industry.name,
@@ -389,11 +384,6 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             
             const isTTS = visaType.name.includes('Thực tập sinh');
             const isEngineer = visaType.name.includes('Kỹ sư');
-    
-            const postedDate = new Date(2024, 7, 1); // A fixed start date
-            postedDate.setDate(postedDate.getDate() - (jobIndex % 30));
-            const interviewDate = new Date(postedDate);
-            interviewDate.setDate(interviewDate.getDate() + (jobIndex % 60) + 1);
     
             const imageCase = jobIndex % 5;
             let jobImages = [];
@@ -482,7 +472,8 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                     company: 'HelloJob'
                 },
                 status: jobIndex % 10 === 0 ? 'Tạm dừng' : 'Đang tuyển',
-                interviewDate: interviewDate.toISOString().split('T')[0],
+                postedTimeOffset: -(jobIndex % 30),
+                interviewDateOffset: (jobIndex % 60) + 1,
                 interviewRounds: (jobIndex % 3) + 1,
                 netFee,
                 netFeeNoTicket,
@@ -490,7 +481,6 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 target: `${(jobIndex % 5) + 1}tr`,
                 backFee: `${(jobIndex % 5) + 1}tr`,
                 tags: [industry.name, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
-                postedTime: `10:00 ${postedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`,
                 visaType: visaType.name,
                 visaDetail: detail.name,
                 industry: industry.name,

@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
@@ -77,21 +76,6 @@ const convertCurrency = (value?: string, from: 'JPY' | 'USD' = 'JPY') => {
     const vndValue = numericValue * rate;
     return `≈ ${vndValue.toLocaleString('vi-VN')} VNĐ`;
 };
-
-
-const formatPostedTime = (dateString: string) => {
-    if (!dateString) return '';
-    const parts = dateString.split(' ');
-    if (parts.length < 2) return dateString;
-    const [time, datePart] = parts;
-    const [day, month, year] = datePart.split('/');
-    // Consistent date format for new Date()
-    const isoDateString = `${year}-${month}-${day}`;
-    const date = new Date(isoDateString);
-    if (isNaN(date.getTime())) return dateString;
-    return `${time} ${date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
-}
-
 
 const validateProfileForApplication = (profile: CandidateProfile): boolean => {
     if (!profile || !profile.personalInfo) return false;
@@ -364,6 +348,8 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
     const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
+    const [postedTime, setPostedTime] = useState<string | null>(null);
+    const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
     useEffect(() => {
         setIsClient(true);
@@ -372,6 +358,17 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             setIsSaved(savedJobs.includes(job.id));
             const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
             setHasApplied(appliedJobs.includes(job.id));
+
+            // Safely calculate dates on the client
+            const today = new Date();
+            const postedDate = new Date(today);
+            postedDate.setDate(today.getDate() + job.postedTimeOffset);
+            setPostedTime(`10:00 ${postedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`);
+
+            const interviewFullDate = new Date(today);
+            interviewFullDate.setDate(today.getDate() + job.interviewDateOffset);
+            setInterviewDate(interviewFullDate.toISOString().split('T')[0]);
+
         }
 
         const fetchSuggestions = async () => {
@@ -409,10 +406,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     }
 
     const getJobPostingStructuredData = () => {
-        const [time, datePart] = job.postedTime.split(' ');
-        const [day, month, year] = datePart.split('/');
-        const isoDate = new Date(`${year}-${month}-${day}`).toISOString();
-
+        const today = new Date();
+        const postedDate = new Date(today);
+        postedDate.setDate(today.getDate() + job.postedTimeOffset);
+        const isoDate = postedDate.toISOString();
+    
         const expiryDate = new Date(isoDate);
         expiryDate.setDate(expiryDate.getDate() + 30);
         
@@ -567,9 +565,9 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         return `${formatCurrency(feeValue, 'USD')} (${convertCurrency(feeValue, 'USD')})`;
     };
 
-    const feeWithTuitionDisplay = getFeeDisplay("Phí và vé và học phí", job.netFeeWithTuition);
-    const feeDisplay = getFeeDisplay(job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé", job.netFee);
-    const feeNoTicketDisplay = getFeeDisplay("Phí không vé", job.netFeeNoTicket);
+    const feeWithTuitionDisplay = getFeeDisplay(job.netFeeWithTuition, "Phí và vé và học phí");
+    const feeDisplay = getFeeDisplay(job.netFee, job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé");
+    const feeNoTicketDisplay = getFeeDisplay(job.netFeeNoTicket, "Phí không vé");
 
     const RequirementItem = ({ icon: Icon, label, value, className }: { icon: React.ElementType, label: string, value?: string | number | null, className?: string }) => {
         if (!value) return null;
@@ -608,7 +606,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 </p>
                                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
                                     <p className="flex items-center gap-2"><MapPin className="h-4 w-4"/> {job.workLocation}</p>
-                                    <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4"/> <span className="text-primary">Đăng lúc:</span> {formatPostedTime(job.postedTime)}</p>
+                                    <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4"/> <span className="text-primary">Đăng lúc:</span> {postedTime || "Đang tải..."}</p>
                                 </div>
                             </CardHeader>
                             <CardContent>
@@ -642,7 +640,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                 <RequirementItem icon={Users} label="Số lượng" value={`${job.quantity} người`}/>
                                 <RequirementItem icon={Cake} label="Yêu cầu tuổi" value={job.ageRequirement}/>
                                 <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageRequirement}/>
-                                <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={job.interviewDate}/>
+                                <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={interviewDate ? new Date(interviewDate).toLocaleDateString('vi-VN') : 'Linh hoạt'}/>
                                 <RequirementItem icon={ClipboardCheck} label="Số vòng" value={`${job.interviewRounds} vòng`}/>
                                 <RequirementItem icon={Wallet} label="Phí và vé và học phí" value={feeWithTuitionDisplay} />
                                 <RequirementItem icon={Wallet} label={job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé"} value={feeDisplay} />
