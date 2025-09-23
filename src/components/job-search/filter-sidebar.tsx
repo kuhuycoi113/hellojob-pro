@@ -534,6 +534,18 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         if (visaDetail === 'dac-dinh-dau-viet') return "0 đến 2500$";
         return "0 đến 3800$";
     };
+
+    const getFutureMonths = () => {
+        const months = [];
+        const today = new Date();
+        for (let i = 1; i <= 12; i++) { // next 12 months
+            const futureDate = new Date(today.getFullYear(), today.getMonth() + i, 1);
+            const month = futureDate.getMonth() + 1;
+            const year = futureDate.getFullYear();
+            months.push(`Tháng ${month}/${year}`);
+        }
+        return months;
+    };
     
     return (
         <div className="md:col-span-1 lg:col-span-1 h-full flex flex-col">
