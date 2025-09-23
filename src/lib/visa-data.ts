@@ -134,3 +134,12 @@ export const englishLevels = [
     { name: 'Giao tiếp cơ bản', slug: 'giao-tiep-co-ban' },
     { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
 ];
+
+export const visionRequirements = [
+    { name: "Không yêu cầu", slug: "all" },
+    { name: "Yêu cầu thị lực tốt", slug: "yeu-cau-thi-luc-tot" },
+    { name: "Không mù màu", slug: "khong-mu-mau" },
+    { name: "20/20", slug: "20-20" },
+    { name: "10/10", slug: "10-10" },
+    { name: "8/10", slug: "8-10" }
+];

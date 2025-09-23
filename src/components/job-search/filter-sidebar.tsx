@@ -24,7 +24,7 @@ import { format, startOfTomorrow, parse } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
-import { japanJobTypes, visaDetailsByVisaType, workShifts, allSpecialConditions, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels } from '@/lib/visa-data';
+import { japanJobTypes, visaDetailsByVisaType, workShifts, allSpecialConditions, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, visionRequirements } from '@/lib/visa-data';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
