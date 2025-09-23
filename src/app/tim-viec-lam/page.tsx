@@ -87,6 +87,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const basicSalary = searchParams['luong-co-ban'] as string;
   const hourlySalary = searchParams['luong-gio'] as string;
   const annualIncome = searchParams['thu-nhap-nam'] as string;
+  const annualBonus = searchParams['thuong-nam'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -194,6 +195,11 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     const formattedSalary = parseInt(annualIncome, 10).toLocaleString('ja-JP');
     titleParts.push(`thu nhập năm từ ${formattedSalary} yên`);
   }
+  
+  if (annualBonus) {
+    const formattedBonus = parseInt(annualBonus, 10).toLocaleString('ja-JP');
+    titleParts.push(`thưởng năm từ ${formattedBonus} yên`);
+  }
 
 
   if (locations.length > 0) {
@@ -241,6 +247,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (basicSalary) cleanSearchParams['luong-co-ban'] = basicSalary;
   if (hourlySalary) cleanSearchParams['luong-gio'] = hourlySalary;
   if (annualIncome) cleanSearchParams['thu-nhap-nam'] = annualIncome;
+  if (annualBonus) cleanSearchParams['thuong-nam'] = annualBonus;
 
 
   
