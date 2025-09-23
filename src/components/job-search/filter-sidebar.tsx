@@ -26,7 +26,7 @@ import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
 import { japanJobTypes, visaDetailsByVisaType, workShifts } from '@/lib/visa-data';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const createSlug = (str: string) => {
@@ -372,7 +372,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
             const quantityMatch = !filtersToApply.quantity || job.quantity >= parseInt(filtersToApply.quantity, 10);
             const feeMatch = feeLimit === null || !job.netFee || (parseSalary(job.netFee) || 0) <= feeLimit;
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
-            const interviewDateMatch = !filtersToApply.interviewDate || filtersToApply.interviewDate === 'flexible' || (job.interviewDate && job.interviewDate <= filtersToApply.interviewDate);
+            const interviewDateMatch = !filtersToApply.interviewDate || filtersToApply.interviewDate === 'flexible' || (job.interviewDateOffset && (new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000) <= new Date(filtersToApply.interviewDate).getTime());
             const jobBasicSalary = parseSalary(job.salary.basic);
             const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);
             const jobNetSalary = parseSalary(job.salary.actual);
@@ -594,10 +594,16 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         )
     }
     
-    const showFeeFilter = useMemo(() => {
-        const visasToShowFee = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
+    const showTtsFeeFilter = useMemo(() => {
+        const visasToShowFee = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam'];
         return !!activeFilters.visaDetail && visasToShowFee.includes(activeFilters.visaDetail);
     }, [activeFilters.visaDetail]);
+
+    const showDdKsFeeFilter = useMemo(() => {
+        const visasToShowFee = ['dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
+        return !!activeFilters.visaDetail && visasToShowFee.includes(activeFilters.visaDetail);
+    }, [activeFilters.visaDetail]);
+
 
     const showEducationFilter = useMemo(() => {
         const parentVisaSlug = activeFilters.visa || Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === activeFilters.visaDetail));
@@ -611,7 +617,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
 
     const getFeePlaceholder = () => {
         const visaDetail = filters.visaDetail;
-        if (visaDetail === 'thuc-tap-sinh-1-nam') return "0 đến 1400$";
+        if (visaDetail === 'thuc-tap-sinh-1-nam') return "0 đến 1500$";
         if (visaDetail === 'dac-dinh-dau-viet') return "0 đến 2500$";
         return "0 đến 3800$";
     };
@@ -909,34 +915,64 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                             </AccordionContent>
                         </AccordionItem>
                         
-                        {showFeeFilter && (
+                        {(showTtsFeeFilter || showDdKsFeeFilter) && (
                             <AccordionItem value="netFee">
                                 <AccordionTrigger className="text-base font-semibold">
                                     <span className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-red-500"/>Mức phí</span>
                                 </AccordionTrigger>
                                 <AccordionContent className="space-y-4 pt-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="net-fee-no-ticket-usd">Mức phí không vé tối đa (USD)</Label>
-                                        <Input
-                                            id="net-fee-no-ticket-usd"
-                                            type="text"
-                                            placeholder={getFeePlaceholder()}
-                                            onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 4000, onFilterChange)}
-                                            value={getDisplayValue(filters.netFeeNoTicket || '')}
-                                        />
-                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFeeNoTicket, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="net-fee-usd">Phí và vé máy bay tối đa (USD)</Label>
-                                        <Input 
-                                            id="net-fee-usd" 
-                                            type="text" 
-                                            placeholder={getFeePlaceholder()}
-                                            onChange={(e) => handleSalaryInputChange(e, 'netFee', 4000, onFilterChange)}
-                                            value={getDisplayValue(filters.netFee || '')} 
-                                        />
-                                        <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
-                                    </div>
+                                    {showTtsFeeFilter && (
+                                        <>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="net-fee-with-tuition-usd">Phí và vé và học phí (USD)</Label>
+                                                <Input
+                                                    id="net-fee-with-tuition-usd"
+                                                    type="text"
+                                                    placeholder={getFeePlaceholder()}
+                                                    onChange={(e) => handleSalaryInputChange(e, 'netFee', 4200, onFilterChange)} // Assuming netFee maps to this for now
+                                                    value={getDisplayValue(filters.netFee)}
+                                                />
+                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="net-fee-no-tuition-usd">Phí và vé không học phí (USD)</Label>
+                                                <Input 
+                                                    id="net-fee-no-tuition-usd" 
+                                                    type="text" 
+                                                    placeholder={getFeePlaceholder()}
+                                                    onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 4200, onFilterChange)} // Assuming netFeeNoTicket maps to this
+                                                    value={getDisplayValue(filters.netFeeNoTicket)} 
+                                                />
+                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFeeNoTicket, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
+                                            </div>
+                                        </>
+                                    )}
+                                    {showDdKsFeeFilter && (
+                                         <>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="net-fee-with-ticket-usd">Phí có vé (USD)</Label>
+                                                <Input
+                                                    id="net-fee-with-ticket-usd"
+                                                    type="text"
+                                                    placeholder={getFeePlaceholder()}
+                                                    onChange={(e) => handleSalaryInputChange(e, 'netFee', 4200, onFilterChange)}
+                                                    value={getDisplayValue(filters.netFee)}
+                                                />
+                                                 <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="net-fee-no-ticket-usd">Phí không vé (USD)</Label>
+                                                <Input 
+                                                    id="net-fee-no-ticket-usd" 
+                                                    type="text" 
+                                                    placeholder={getFeePlaceholder()}
+                                                    onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 4200, onFilterChange)}
+                                                    value={getDisplayValue(filters.netFeeNoTicket)}
+                                                />
+                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFeeNoTicket, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
+                                            </div>
+                                        </>
+                                    )}
                                 </AccordionContent>
                             </AccordionItem>
                         )}
