@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Job } from '@/lib/mock-data';
-import type { SearchFilters } from './job-search/search-results';
+import type { SearchFilters } from './search-results';
 
 interface JsonLdScriptProps {
     job?: Job;
