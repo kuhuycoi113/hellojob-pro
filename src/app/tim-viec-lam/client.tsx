@@ -1,16 +1,15 @@
 
-
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { SearchResults, type SearchFilters, experienceYears } from '@/components/job-search/search-results';
+import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
 import { Job, jobData } from '@/lib/mock-data';
 import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/location-data';
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType, type Industry, allIndustries } from '@/lib/industry-data';
-import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels } from '@/lib/visa-data';
+import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, experienceYears } from '@/lib/visa-data';
 import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 import { JsonLdScript } from '@/components/json-ld-script';
 

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements, visionRequirements } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements, visionRequirements, experienceYears } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -16,6 +16,15 @@ const allIndustries = Object.values(industriesByJobType).flat();
 const getNameFromSlug = (slug: string, data: { name: string; slug: string }[]): string | undefined => {
   return data.find(item => item.slug === slug)?.name;
 };
+
+const formatCmToMeter = (cm: string): string => {
+    const num = parseInt(cm.replace('cm', '').trim(), 10);
+    if (isNaN(num)) return cm;
+    const meters = Math.floor(num / 100);
+    const centimeters = num % 100;
+    return `${meters}m${centimeters < 10 ? '0' : ''}${centimeters}`;
+}
+
 
 const sortSlugToNameMap: { [key: string]: string } = {
     'moi-nhat': 'Mới nhất',
@@ -56,6 +65,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const ageParam = searchParams['do-tuoi'];
   const heightParam = searchParams['chieu-cao'];
   const weightParam = searchParams['can-nang'];
+  const experienceSlug = searchParams['so-nam-kinh-nghiem'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -129,7 +139,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (heights.length === 2 && heights[0] && heights[1]) {
     const heightFrom = heights[0].replace('cm','');
     const heightTo = heights[1].replace('cm','');
-    titleParts.push(`chiều cao từ ${Math.floor(parseInt(heightFrom)/100)}m${parseInt(heightFrom)%100} đến ${Math.floor(parseInt(heightTo)/100)}m${parseInt(heightTo)%100}`);
+    titleParts.push(`chiều cao từ ${formatCmToMeter(heightFrom)} đến ${formatCmToMeter(heightTo)}`);
   }
 
   if (weights.length === 2 && weights[0] && weights[1]) {
@@ -137,6 +147,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     const weightTo = weights[1].replace('kg','');
     titleParts.push(`cân nặng từ ${weightFrom}kg đến ${weightTo}kg`);
   }
+  
+  const experienceName = experienceSlug ? getNameFromSlug(experienceSlug, experienceYears) : undefined;
+  if (experienceName && experienceName !== "Không yêu cầu") titleParts.push(`kinh nghiệm ${experienceName.toLowerCase()}`);
 
 
   if (locations.length > 0) {
@@ -178,6 +191,8 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (ages.length > 0) cleanSearchParams['do-tuoi'] = ages;
   if (heights.length > 0) cleanSearchParams['chieu-cao'] = heights;
   if (weights.length > 0) cleanSearchParams['can-nang'] = weights;
+  if (experienceSlug) cleanSearchParams['so-nam-kinh-nghiem'] = experienceSlug;
+
 
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
