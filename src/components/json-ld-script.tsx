@@ -63,6 +63,12 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 }
             }
 
+            let qualifications = job.visaDetail || '';
+            if (job.ginouExpiryRequirement) {
+                qualifications += `. Yêu cầu ứng viên có visa Kỹ năng đặc định với thời hạn còn lại ${job.ginouExpiryRequirement.toLowerCase()}.`;
+            }
+
+
             const data = {
                 "@context": "https://schema.org/",
                 "@type": "JobPosting",
@@ -89,7 +95,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                         "addressCountry": "JP"
                     }
                 },
-                ...(job.visaDetail && { "qualifications": job.visaDetail }),
+                ...(qualifications && { "qualifications": qualifications }),
                 ...(industryData && {
                     "industry": {
                         "@type": "DefinedTerm",
@@ -152,5 +158,3 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
         />
     );
 };
-
-    

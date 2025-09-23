@@ -51,6 +51,18 @@ const interviewRoundsOptions = [
     { name: "5 vòng", slug: "5-vong" }
 ];
 
+const ginouExpiryOptions = [
+    { name: "Trên 4,5 năm", slug: "tren-4-5-nam" },
+    { name: "Trên 4 năm", slug: "tren-4-nam" },
+    { name: "Trên 3,5 năm", slug: "tren-3-5-nam" },
+    { name: "Trên 3 năm", slug: "tren-3-nam" },
+    { name: "Trên 2,5 năm", slug: "tren-2-5-nam" },
+    { name: "Trên 2 năm", slug: "tren-2-nam" },
+    { name: "Trên 1,5 năm", slug: "tren-1-5-nam" },
+    { name: "Trên 1 năm", slug: "tren-1-nam" },
+    { name: "Trên 0,5 năm", slug: "tren-0-5-nam" }
+];
+
 
 const sortSlugToNameMap: { [key: string]: string } = {
     'moi-nhat': 'Mới nhất',
@@ -104,6 +116,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const jobDetailSlug = searchParams['chi-tiet-cong-viec'] as string;
   const netFee = searchParams['muc-phi'] as string;
   const netFeeNoTicket = searchParams['muc-phi-khong-ve'] as string;
+  const ginouExpirySlug = searchParams['han-ginou'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -247,6 +260,12 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
         titleParts.push(`phỏng vấn ${roundsName}`);
     }
   }
+  
+  const ginouExpiryName = ginouExpirySlug ? getNameFromSlug(ginouExpirySlug, ginouExpiryOptions) : undefined;
+    if (ginouExpiryName) {
+        titleParts.push(`yêu cầu hạn Ginou ${ginouExpiryName.toLowerCase()}`);
+    }
+
 
   const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
   const interviewLocationName = interviewLocationSlug ? getNameFromSlug(interviewLocationSlug, allInterviewLocations) : undefined;
@@ -307,6 +326,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (interviewDate) cleanSearchParams['ngay-phong-van'] = interviewDate;
   if (interviewRoundsSlug) cleanSearchParams['so-vong-phong-van'] = interviewRoundsSlug;
   if (jobDetailSlug) cleanSearchParams['chi-tiet-cong-viec'] = jobDetailSlug;
+  if (ginouExpirySlug) cleanSearchParams['han-ginou'] = ginouExpirySlug;
 
 
 
@@ -347,5 +367,3 @@ export default function JobSearchPage({ searchParams }: { searchParams: SearchPa
     </Suspense>
   );
 }
-
-    
