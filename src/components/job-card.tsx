@@ -202,7 +202,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
       const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
       const isControlledVisa = controlledFeeVisas.includes(visaDetail || '');
-      
+
+      const visasForVnd = ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đi mới', 'Kỹ sư, tri thức đầu Việt'];
+      const visasForUsd = ['Đặc định đầu Việt'];
+
       let feeValue: number | undefined;
       let feeLabel: string | undefined;
 
@@ -216,19 +219,34 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
           feeValue = parseInt(netFeeNoTicket);
           feeLabel = 'Phí không vé';
       }
-
+      
       if (!feeLabel || feeValue === undefined) {
           return { shouldShow: isControlledVisa, text: `${feeLabel || 'Phí'}: Không rõ` };
       }
       
-      if (isControlledVisa) {
-          if (feeValue > feeLimit) {
-              return { shouldShow: true, text: `${feeLabel}: Không rõ` };
-          }
+      if (isControlledVisa && feeValue > feeLimit) {
+          return { shouldShow: true, text: `${feeLabel}: Không rõ` };
       }
 
+      if (visasForVnd.includes(visaDetail || '')) {
+          const USD_VND_RATE = 26300;
+          const vndValue = feeValue * USD_VND_RATE;
+          const valueInMillions = vndValue / 1000000;
+          const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1
+          });
+          return { shouldShow: true, text: `Phí: ~${formattedVnd.replace('.',',')}tr` };
+      }
+      
+      if (visasForUsd.includes(visaDetail || '')) {
+         return { shouldShow: true, text: `${feeLabel}: $${formatCurrency(String(feeValue))}` };
+      }
+
+      // Default fallback for other controlled visas or if logic doesn't match
       return { shouldShow: true, text: `${feeLabel}: $${formatCurrency(String(feeValue))}` };
   };
+
 
   const feeInfo = getFeeDisplayInfo();
   const feeFilterIsActive = !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket);
