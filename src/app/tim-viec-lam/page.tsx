@@ -81,8 +81,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const ageParam = searchParams['do-tuoi'];
   const heightParam = searchParams['chieu-cao'];
   const weightParam = searchParams['can-nang'];
-  const experienceSlug = searchParams['so-nam-kinh-nghiem'] as string;
   const experienceRequirementSlug = searchParams['yeu-cau-kinh-nghiem'] as string;
+  const experienceSlug = searchParams['so-nam-kinh-nghiem'] as string;
+  const netSalary = searchParams['luong-thuc-linh'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -171,6 +172,11 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const experienceName = experienceSlug ? getNameFromSlug(experienceSlug, experienceYears) : undefined;
   if (experienceName && experienceName !== "Không yêu cầu") titleParts.push(`kinh nghiệm ${experienceName.toLowerCase()}`);
 
+  if (netSalary) {
+    const formattedSalary = parseInt(netSalary, 10).toLocaleString('ja-JP');
+    titleParts.push(`thực lĩnh từ ${formattedSalary} yên`);
+  }
+
 
   if (locations.length > 0) {
       const locationNames = locations.map(slug => {
@@ -213,6 +219,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (weights.length > 0) cleanSearchParams['can-nang'] = weights;
   if (experienceSlug) cleanSearchParams['so-nam-kinh-nghiem'] = experienceSlug;
   if (experienceRequirementSlug) cleanSearchParams['yeu-cau-kinh-nghiem'] = experienceRequirementSlug;
+  if (netSalary) cleanSearchParams['luong-thuc-linh'] = netSalary;
 
 
   
