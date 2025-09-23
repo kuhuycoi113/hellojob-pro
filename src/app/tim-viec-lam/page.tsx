@@ -1,10 +1,9 @@
 
-
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements, visionRequirements } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -52,6 +51,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const languageSlug = searchParams['yeu-cau-tieng-nhat'] as string;
   const englishSlug = searchParams['yeu-cau-tieng-anh'] as string;
   const tattooSlug = searchParams['hinh-xam'] as string;
+  const visionSlug = searchParams['yeu-cau-thi-luc'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -96,16 +96,19 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (dominantHandName && dominantHandName !== "Tất cả") titleParts.push(`yêu cầu ${dominantHandName}`);
 
   const educationName = educationSlug ? getNameFromSlug(educationSlug, educationLevels) : undefined;
-  if (educationName && educationName !== "Tất cả") titleParts.push(`yêu cầu ${educationName}`);
+  if (educationName && educationName !== "Tất cả" && educationName !== "Không yêu cầu") titleParts.push(`yêu cầu ${educationName}`);
   
   const languageName = languageSlug ? getNameFromSlug(languageSlug, languageLevels) : undefined;
-  if (languageName) titleParts.push(`yêu cầu Tiếng Nhật ${languageName}`);
+  if (languageName && languageName !== "Không yêu cầu") titleParts.push(`yêu cầu Tiếng Nhật ${languageName}`);
   
   const englishName = englishSlug ? getNameFromSlug(englishSlug, englishLevels) : undefined;
-  if (englishName) titleParts.push(`yêu cầu Tiếng Anh ${englishName}`);
+  if (englishName && englishName !== "Không yêu cầu") titleParts.push(`yêu cầu Tiếng Anh ${englishName}`);
   
   const tattooName = tattooSlug ? getNameFromSlug(tattooSlug, tattooRequirements) : undefined;
-  if (tattooName && tattooName !== "Không yêu cầu") titleParts.push(`yêu cầu ${tattooName}`);
+  if (tattooName && tattooName !== "Không yêu cầu") titleParts.push(`${tattooName}`);
+  
+  const visionName = visionSlug ? getNameFromSlug(visionSlug, visionRequirements) : undefined;
+  if (visionName && visionName !== "Không yêu cầu") titleParts.push(`yêu cầu ${visionName}`);
 
 
   if (locations.length > 0) {
@@ -142,6 +145,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (languageSlug) cleanSearchParams['yeu-cau-tieng-nhat'] = languageSlug;
   if (englishSlug) cleanSearchParams['yeu-cau-tieng-anh'] = englishSlug;
   if (tattooSlug) cleanSearchParams['hinh-xam'] = tattooSlug;
+  if (visionSlug) cleanSearchParams['yeu-cau-thi-luc'] = visionSlug;
 
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
