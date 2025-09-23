@@ -6,6 +6,7 @@ import { type Metadata } from 'next';
 import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements, visionRequirements, experienceYears } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
+import { format, isValid, parse } from 'date-fns';
 
 type SearchParams = {
   [key: string]: string | string[] | undefined;
@@ -88,6 +89,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const hourlySalary = searchParams['luong-gio'] as string;
   const annualIncome = searchParams['thu-nhap-nam'] as string;
   const annualBonus = searchParams['thuong-nam'] as string;
+  const interviewDate = searchParams['ngay-phong-van'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -201,6 +203,17 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     titleParts.push(`thưởng năm từ ${formattedBonus} yên`);
   }
 
+  if (interviewDate) {
+    if (interviewDate === 'flexible') {
+        titleParts.push('phỏng vấn linh hoạt');
+    } else {
+        const parsedDate = parse(interviewDate, 'yyyy-MM-dd', new Date());
+        if (isValid(parsedDate)) {
+            titleParts.push(`phỏng vấn đến ngày ${format(parsedDate, 'dd/MM/yyyy')}`);
+        }
+    }
+  }
+
 
   if (locations.length > 0) {
       const locationNames = locations.map(slug => {
@@ -248,6 +261,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (hourlySalary) cleanSearchParams['luong-gio'] = hourlySalary;
   if (annualIncome) cleanSearchParams['thu-nhap-nam'] = annualIncome;
   if (annualBonus) cleanSearchParams['thuong-nam'] = annualBonus;
+  if (interviewDate) cleanSearchParams['ngay-phong-van'] = interviewDate;
 
 
   
@@ -287,3 +301,5 @@ export default function JobSearchPage({ searchParams }: { searchParams: SearchPa
     </Suspense>
   );
 }
+
+    
