@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -46,6 +46,8 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const quantity = searchParams['so-luong'] as string;
   const workShiftSlug = searchParams['ca-lam-viec'] as string;
   const otherSkillParam = searchParams['yeu-cau-ky-nang-khac'];
+  const dominantHandSlug = searchParams['tay-thuan'] as string;
+
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
   const specialConditionSlugs = Array.isArray(specialConditionsParam) ? specialConditionsParam : (specialConditionsParam ? [specialConditionsParam] : []);
@@ -85,6 +87,10 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const otherSkillNames = otherSkillSlugs.map(slug => getNameFromSlug(slug, otherSkills)).filter(Boolean).join(', ');
   if (otherSkillNames) titleParts.push(`yêu cầu ${otherSkillNames}`);
 
+  const dominantHandName = dominantHandSlug ? getNameFromSlug(dominantHandSlug, dominantHands) : undefined;
+  if (dominantHandName) titleParts.push(`yêu cầu ${dominantHandName}`);
+
+
   if (locations.length > 0) {
       const locationNames = locations.map(slug => {
           const region = japanRegions.find(r => r.slug === slug);
@@ -114,6 +120,8 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (quantity) cleanSearchParams['so-luong'] = quantity;
   if (workShiftSlug) cleanSearchParams['ca-lam-viec'] = workShiftSlug;
   if (otherSkillSlugs.length > 0) cleanSearchParams['yeu-cau-ky-nang-khac'] = otherSkillSlugs;
+  if (dominantHandSlug) cleanSearchParams['tay-thuan'] = dominantHandSlug;
+
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
 

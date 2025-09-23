@@ -94,3 +94,10 @@ export const otherSkills = [
     { name: "Đọc được bản vẽ kỹ thuật", slug: "doc-duoc-ban-ve-ky-thuat" },
     { name: "Có bằng thi công nội thất", slug: "co-bang-thi-cong-noi-that" }
 ];
+
+export const dominantHands = [
+    { name: "Tất cả", slug: "all" },
+    { name: "Tay phải", slug: "tay-phai" },
+    { name: "Tay trái", slug: "tay-trai" },
+    { name: "Cả hai tay", slug: "ca-hai-tay" },
+];
