@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Job } from '@/lib/mock-data';
+import type { SearchFilters } from './job-search/search-results';
 
 interface JsonLdScriptProps {
     job?: Job;
@@ -11,9 +12,10 @@ interface JsonLdScriptProps {
         title: string;
         description: string;
     }
+    appliedFilters?: SearchFilters;
 }
 
-export const JsonLdScript = ({ job, jobList, pageMetadata }: JsonLdScriptProps) => {
+export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: JsonLdScriptProps) => {
     const [structuredData, setStructuredData] = useState<string | null>(null);
 
     useEffect(() => {
@@ -102,7 +104,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata }: JsonLdScriptProps) 
              setStructuredData(JSON.stringify(getItemListStructuredData(jobList, pageMetadata)));
         }
 
-    }, [job, jobList, pageMetadata]);
+    }, [job, jobList, pageMetadata, appliedFilters]);
 
     if (!structuredData) {
         return null;

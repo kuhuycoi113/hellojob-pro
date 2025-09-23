@@ -787,6 +787,7 @@ export default function JobSearchPageContent() {
             <JsonLdScript 
                 jobList={filteredJobs} 
                 pageMetadata={{ title: pageTitle, description: pageDescription }} 
+                appliedFilters={appliedFilters}
             />
             <SearchModule 
                 onSearch={handleNewSearch} 

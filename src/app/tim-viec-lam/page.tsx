@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { visaDetailsByVisaType } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -41,9 +41,12 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const visaDetailSlug = searchParams['chi-tiet-loai-hinh-visa'] as string;
   const industrySlug = searchParams['nganh-nghe'] as string;
   const locationParam = searchParams['dia-diem'];
+  const specialConditionsParam = searchParams['dieu-kien-dac-biet'];
   const sortBySlug = searchParams['sap-xep'] as string;
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
+  const specialConditionSlugs = Array.isArray(specialConditionsParam) ? specialConditionsParam : (specialConditionsParam ? [specialConditionsParam] : []);
+
 
   let titleParts: string[] = [];
   
@@ -66,6 +69,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 
   const industryName = industrySlug ? getNameFromSlug(industrySlug, allIndustries) : undefined;
   if (industryName) titleParts.push(industryName);
+  
+  const specialConditionNames = specialConditionSlugs.map(slug => getNameFromSlug(slug, allSpecialConditions)).filter(Boolean).join(', ');
+  if (specialConditionNames) titleParts.push(specialConditionNames);
 
   if (locations.length > 0) {
       const locationNames = locations.map(slug => {
@@ -91,6 +97,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (visaDetailSlug) cleanSearchParams['chi-tiet-loai-hinh-visa'] = visaDetailSlug;
   if (industrySlug) cleanSearchParams['nganh-nghe'] = industrySlug;
   if (locations.length > 0) cleanSearchParams['dia-diem'] = locations;
+  if (specialConditionSlugs.length > 0) cleanSearchParams['dieu-kien-dac-biet'] = specialConditionSlugs;
   if (sortBySlug) cleanSearchParams['sap-xep'] = sortBySlug;
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams).toString()}`;
