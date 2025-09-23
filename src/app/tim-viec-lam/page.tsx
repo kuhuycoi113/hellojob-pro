@@ -210,7 +210,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   
   if (annualBonus) {
     const formattedBonus = parseInt(annualBonus, 10).toLocaleString('ja-JP');
-    titleParts.push(`thưởng năm từ ${formattedBonus} yên`);
+    titleParts.push(`có thưởng năm từ ${formattedBonus} yên`);
   }
 
   if (interviewDate) {
