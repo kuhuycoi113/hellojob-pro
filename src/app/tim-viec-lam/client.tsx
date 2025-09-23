@@ -238,7 +238,7 @@ const dominantHands = [
 
 
 
-function JobSearchPageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+export default function JobSearchPageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
     const router = useRouter();
     const readOnlySearchParams = useSearchParams();
 
