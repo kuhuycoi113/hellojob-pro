@@ -26,7 +26,7 @@ import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
 import { japanJobTypes, visaDetailsByVisaType, workShifts } from '@/lib/visa-data';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
-import { useIsMobile } from '@/hooks/use-is-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const createSlug = (str: string) => {
