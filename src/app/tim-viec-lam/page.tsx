@@ -1,9 +1,10 @@
 
+
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -49,6 +50,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const dominantHandSlug = searchParams['tay-thuan'] as string;
   const educationSlug = searchParams['hoc-van'] as string;
   const languageSlug = searchParams['yeu-cau-tieng-nhat'] as string;
+  const englishSlug = searchParams['yeu-cau-tieng-anh'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -97,6 +99,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   
   const languageName = languageSlug ? getNameFromSlug(languageSlug, languageLevels) : undefined;
   if (languageName) titleParts.push(`yêu cầu Tiếng Nhật ${languageName}`);
+  
+  const englishName = englishSlug ? getNameFromSlug(englishSlug, englishLevels) : undefined;
+  if (englishName) titleParts.push(`yêu cầu Tiếng Anh ${englishName}`);
 
 
   if (locations.length > 0) {
@@ -131,6 +136,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (dominantHandSlug) cleanSearchParams['tay-thuan'] = dominantHandSlug;
   if (educationSlug) cleanSearchParams['hoc-van'] = educationSlug;
   if (languageSlug) cleanSearchParams['yeu-cau-tieng-nhat'] = languageSlug;
+  if (englishSlug) cleanSearchParams['yeu-cau-tieng-anh'] = englishSlug;
 
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;

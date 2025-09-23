@@ -120,3 +120,17 @@ export const languageLevels = [
     { name: 'N5', slug: 'n5' },
     { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
 ];
+
+export const englishLevels = [
+    { name: 'TOEIC 900+', slug: 'toeic-900' },
+    { name: 'TOEIC 800+', slug: 'toeic-800' },
+    { name: 'TOEIC 700+', slug: 'toeic-700' },
+    { name: 'TOEIC 600+', slug: 'toeic-600' },
+    { name: 'TOEIC 500+', slug: 'toeic-500' },
+    { name: 'IELTS 7.0+', slug: 'ielts-7.0' },
+    { name: 'IELTS 6.0+', slug: 'ielts-6.0' },
+    { name: 'IELTS 5.0+', slug: 'ielts-5.0' },
+    { name: 'Giao tiếp tốt', slug: 'giao-tiep-tot' },
+    { name: 'Giao tiếp cơ bản', slug: 'giao-tiep-co-ban' },
+    { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
+];
