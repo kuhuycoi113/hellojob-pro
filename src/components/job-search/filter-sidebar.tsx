@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
@@ -141,12 +140,11 @@ const getConvertedValue = (value: string | undefined, placeholder: string, rate:
     const num = Number(numericString.replace(/[^0-9]/g, ''));
     
     if (isNaN(num)) return `≈ 0 ${unit}`;
+    if (num === 0) {
+        return '≈ 0 VNĐ';
+    }
 
     const convertedValue = num * rate;
-    
-    if (num === 0) {
-        return `≈ 0 ${unit}`;
-    }
 
     if (unit === 'triệu VNĐ') {
         const valueInMillions = convertedValue / 1000000;
