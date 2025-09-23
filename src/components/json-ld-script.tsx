@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import type { Job } from '@/lib/mock-data';
 import type { SearchFilters } from './search-results';
+import { allIndustries } from '@/lib/industry-data';
 
 interface JsonLdScriptProps {
     job?: Job;
@@ -38,6 +39,8 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 ${job.details.benefits.replace(/<[^>]*>?/gm, '')}
             `;
 
+            const industryData = allIndustries.find(ind => ind.name === job.industry);
+
             const data = {
                 "@context": "https://schema.org/",
                 "@type": "JobPosting",
@@ -65,6 +68,14 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                     }
                 },
                 ...(job.visaDetail && { "qualifications": job.visaDetail }),
+                ...(industryData && {
+                    "industry": {
+                        "@type": "DefinedTerm",
+                        "name": industryData.name,
+                        "termCode": industryData.termCode,
+                        "inDefinedTermSet": "https://www.naics.com/search/"
+                    }
+                }),
                 ...(salary && {
                     "baseSalary": {
                         "@type": "MonetaryAmount",

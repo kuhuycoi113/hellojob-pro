@@ -3,12 +3,13 @@
 export type Industry = {
     name: string;
     slug: string;
+    termCode: string; // Add NAICS code for structured data
     keywords: string[];
 };
 
 export const industriesByJobType: { [key: string]: Industry[] } = {
     'thuc-tap-sinh-ky-nang': [
-      { name: 'Ngư nghiệp', slug: 'ngu-nghiep', keywords: [
+      { name: 'Ngư nghiệp', slug: 'ngu-nghiep', termCode: '11411', keywords: [
           'Câu cá ngừ cần và dây',
           'Câu mực',
           'Câu tôm, cua bằng lồng',
@@ -20,7 +21,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Đặt lưới đánh cá',
           'Nuôi sò điệp'
       ] },
-      { name: 'Nông nghiệp', slug: 'nong-nghiep', keywords: [
+      { name: 'Nông nghiệp', slug: 'nong-nghiep', termCode: '111', keywords: [
           'Chăn nuôi bò',
           'Chăn nuôi bò sữa',
           'Chăn nuôi gà',
@@ -40,7 +41,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Trồng rau củ',
           'Trồng trọt nhà kính'
       ] },
-      { name: 'Thực phẩm', slug: 'thuc-pham', keywords: [
+      { name: 'Thực phẩm', slug: 'thuc-pham', termCode: '311', keywords: [
           'Bánh gạo',
           'Bánh kẹo',
           'Bánh ngọt',
@@ -93,7 +94,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Thuỷ sản ủ muối',
           'Thuỷ sản xông khói'
       ] },
-      { name: 'Sản xuất, dịch vụ tổng hợp', slug: 'san-xuat-dich-vu-tong-hop', keywords: [
+      { name: 'Sản xuất, dịch vụ tổng hợp', slug: 'san-xuat-dich-vu-tong-hop', termCode: '3261', keywords: [
           '(Khách sạn) Tiếp khách, quản lý vệ sinh',
           'Bảo dưỡng ô tô',
           'Bảo trì đường sắt',
@@ -144,7 +145,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Vệ sinh toà nhà',
           'Vệ sinh văn phòng'
       ] },
-      { name: 'Cơ khí, kim loại', slug: 'co-khi-kim-loai', keywords: [
+      { name: 'Cơ khí, kim loại', slug: 'co-khi-kim-loai', termCode: '332710', keywords: [
           'Bản mạch in',
           'Bảo trì máy móc',
           'Chế tạo kim loại tấm',
@@ -214,7 +215,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Vận hành robot',
           'Xử lý điện hóa nhôm'
       ] },
-      { name: 'Xây dựng', slug: 'xay-dung', keywords: [
+      { name: 'Xây dựng', slug: 'xay-dung', termCode: '23', keywords: [
           'Bê tông',
           'Buộc thép',
           'Chống thấm',
@@ -273,7 +274,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Trát vữa',
           'Xây dựng tổng hợp'
       ] },
-      { name: 'May mặc', slug: 'may-mac', keywords: [
+      { name: 'May mặc', slug: 'may-mac', termCode: '315', keywords: [
           'Chăn ga gối đệm',
           'Công việc trước kéo sợi',
           'Công việc trước khi dệt',
@@ -303,11 +304,11 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
       ] }
     ],
     'ky-nang-dac-dinh': [
-      { name: 'Ngư nghiệp', slug: 'ngu-nghiep', keywords: [
+      { name: 'Ngư nghiệp', slug: 'ngu-nghiep', termCode: '11411', keywords: [
           'Nuôi trồng thủy sản',
           'Đánh bắt cá'
       ] },
-      { name: 'Nông nghiệp', slug: 'nong-nghiep', keywords: [
+      { name: 'Nông nghiệp', slug: 'nong-nghiep', termCode: '111', keywords: [
           'Chăn nuôi bò',
           'Chăn nuôi bò sữa',
           'Chăn nuôi gà',
@@ -319,7 +320,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Trồng rau củ quả trong nhà kính',
           'Trồng rau củ quả ngoài trời'
       ] },
-      { name: 'Nhà hàng', slug: 'nha-hang', keywords: [
+      { name: 'Nhà hàng', slug: 'nha-hang', termCode: '722511', keywords: [
           'Chạy bàn',
           'Mua hàng',
           'Nấu bếp',
@@ -329,7 +330,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Rửa bát',
           'Thu ngân'
       ] },
-      { name: 'Thực phẩm', slug: 'thuc-pham', keywords: [
+      { name: 'Thực phẩm', slug: 'thuc-pham', termCode: '311', keywords: [
           'Bánh gạo',
           'Bánh kẹo',
           'Bánh ngọt',
@@ -382,7 +383,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Thuỷ sản ủ muối',
           'Thuỷ sản xông khói'
       ] },
-      { name: 'Sản xuất, dịch vụ tổng hợp', slug: 'san-xuat-dich-vu-tong-hop', keywords: [
+      { name: 'Sản xuất, dịch vụ tổng hợp', slug: 'san-xuat-dich-vu-tong-hop', termCode: '3261', keywords: [
           'Bảo dưỡng ô tô',
           'Công việc cưa gỗ',
           'Đóng gói',
@@ -420,7 +421,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Trộn và cán cao su',
           'Vật liệu composite nhiều lớp'
       ] },
-      { name: 'Điện, điện tử', slug: 'dien-dien-tu', keywords: [
+      { name: 'Điện, điện tử', slug: 'dien-dien-tu', termCode: '33441', keywords: [
           'Bản mạch in',
           'Cuộn dây máy điện quay',
           'Điện',
@@ -440,12 +441,12 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Thi công điện',
           'Thiết kế bảng mạch in'
       ] },
-      { name: 'Chế tạo Vật liệu', slug: 'che-tao-vat-lieu', keywords: [
+      { name: 'Chế tạo Vật liệu', slug: 'che-tao-vat-lieu', termCode: '33281', keywords: [
           'Xử lý nhiệt bề mặt',
           'Xử lý nhiệt một phần',
           'Xử lý nhiệt tổng thể'
       ] },
-      { name: 'Cơ khí, chế tạo máy', slug: 'co-khi-che-tao-may', keywords: [
+      { name: 'Cơ khí, chế tạo máy', slug: 'co-khi-che-tao-may', termCode: '332710', keywords: [
           'Bảo trì máy móc',
           'Chế tạo kim loại tấm',
           'Chế tạo máy',
@@ -499,19 +500,19 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Vận hành robot',
           'Xử lý điện hóa nhôm'
       ] },
-      { name: 'Ô tô', slug: 'o-to', keywords: [
+      { name: 'Ô tô', slug: 'o-to', termCode: '3363', keywords: [
           'Bảo dưỡng ô tô',
           'Kiểm tra linh kiện ô tô',
           'Lắp ráp linh kiện ô tô',
           'Linh kiện ô tô',
           'Sửa chữa ô tô'
       ] },
-      { name: 'Hàng không', slug: 'hang-khong', keywords: [
+      { name: 'Hàng không', slug: 'hang-khong', termCode: '4881', keywords: [
           'hàng không',
           'sân bay',
           'bốc dỡ'
       ] },
-      { name: 'Vận tải', slug: 'van-tai', keywords: [
+      { name: 'Vận tải', slug: 'van-tai', termCode: '484', keywords: [
           'Hậu cần vận tải',
           'Lái xe',
           'Lái xe buýt',
@@ -520,7 +521,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Quản lý kho vận tải',
           'Thực tập lái xe'
       ] },
-      { name: 'Xây dựng', slug: 'xay-dung', keywords: [
+      { name: 'Xây dựng', slug: 'xay-dung', termCode: '23', keywords: [
           'Bê tông',
           'Buộc thép',
           'Chống thấm',
@@ -579,36 +580,36 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           'Trát vữa',
           'Xây dựng tổng hợp'
       ] },
-      { name: 'Vệ sinh toà nhà', slug: 've-sinh-toa-nha', keywords: [
+      { name: 'Vệ sinh toà nhà', slug: 've-sinh-toa-nha', termCode: '561720', keywords: [
           'Buồng phòng khách sạn',
           'Vệ sinh toà nhà'
       ] },
-      { name: 'Lưu trú, khách sạn', slug: 'luu-tru-khach-san', keywords: [
+      { name: 'Lưu trú, khách sạn', slug: 'luu-tru-khach-san', termCode: '721110', keywords: [
           '(Khách sạn) Tiếp khách, quản lý vệ sinh',
           'Hành lý khách sạn',
           'Lễ tân khách sạn',
           'Lưu trú khách sạn',
           'Quản lý khách sạn'
       ] },
-      { name: 'Điều dưỡng', slug: 'dieu-duong', keywords: [
+      { name: 'Điều dưỡng', slug: 'dieu-duong', termCode: '623110', keywords: [
           'điều dưỡng',
           'chăm sóc người già',
           'hộ lý'
       ] }
     ],
     'ky-su-tri-thuc': [
-      { name: "Nông lâm ngư nghiệp", slug: "nong-lam-ngu-nghiep", keywords: [
+      { name: "Nông lâm ngư nghiệp", slug: "nong-lam-ngu-nghiep", termCode: '11', keywords: [
           "Chăn nuôi",
           "Công nghệ nông, lâm, ngư nghiệp",
           "Công nhân chăn nuôi đặc khu",
           "Công nhân Nông, Lâm, Ngư nghiệp",
           "Công nhân trồng trọt đặc khu"
       ] },
-      { name: "Thực phẩm", slug: "thuc-pham", keywords: [
+      { name: "Thực phẩm", slug: "thuc-pham", termCode: '311', keywords: [
           "thực phẩm",
           "đồ uống"
       ] },
-      { name: "Sản xuất, chế tạo, công nghệ", slug: "san-xuat-cong-nghe", keywords: [
+      { name: "Sản xuất, chế tạo, công nghệ", slug: "san-xuat-cong-nghe", termCode: '31-33', keywords: [
           "Công nghệ môi trường",
           "Công nghệ sản xuất",
           "Công nhân sản xuất, gia công sản phẩm (trừ kim loại, máy móc)",
@@ -628,7 +629,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Sản xuất sản phẩm cho nước ngoài",
           "Thiết kế thời trang"
       ] },
-      { name: "Cơ khí, máy móc", slug: "co-khi-may-moc", keywords: [
+      { name: "Cơ khí, máy móc", slug: "co-khi-may-moc", termCode: '332710', keywords: [
           "Bảo trì hệ thống điện",
           "Bảo trì máy móc",
           "Chế tạo máy",
@@ -658,18 +659,18 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Vận hành robot",
           "Viễn thông"
       ] },
-      { name: "Công nghệ ô tô", slug: "cong-nghe-o-to", keywords: [
+      { name: "Công nghệ ô tô", slug: "cong-nghe-o-to", termCode: '81111', keywords: [
           "ô tô",
           "thiết kế ô tô"
       ] },
-      { name: "Vận chuyển hàng hóa", slug: "van-chuyen-hang-hoa", keywords: [
+      { name: "Vận chuyển hàng hóa", slug: "van-chuyen-hang-hoa", termCode: '488510', keywords: [
           "Đại lý thủ tục hàng hải",
           "Quản lý dọn dẹp",
           "Quản lý đóng gói",
           "Quản lý vận chuyển",
           "Quản lý vận chuyển, dọn dẹp, đóng gói"
       ] },
-      { name: "Xây dựng", slug: "xay-dung", keywords: [
+      { name: "Xây dựng", slug: "xay-dung", termCode: '23', keywords: [
           "Cầu đường",
           "Công nghệ xây dựng của nước ngoài",
           "Công nhân kết cấu xây dựng",
@@ -690,12 +691,12 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Trắc địa, khảo sát",
           "Xây dựng dân dụng"
       ] },
-      { name: "Khách sạn, lưu trú", slug: "khach-san-luu-tru", keywords: [
+      { name: "Khách sạn, lưu trú", slug: "khach-san-luu-tru", termCode: '721110', keywords: [
           "Dịch vụ khách sạn",
           "Khu nghỉ dưỡng",
           "Lễ tân khách sạn"
       ] },
-      { name: "Y tế, điều dưỡng", slug: "y-te-dieu-duong", keywords: [
+      { name: "Y tế, điều dưỡng", slug: "y-te-dieu-duong", termCode: '62', keywords: [
           "Bác sĩ",
           "Bác sĩ chỉnh thị lực",
           "Chuyên viên phục hình",
@@ -717,7 +718,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Y tá sức khoẻ cộng đồng",
           "Y tế lâm sàng"
       ] },
-      { name: "Kinh doanh, kinh tế", slug: "kinh-doanh-kinh-te", keywords: [
+      { name: "Kinh doanh, kinh tế", slug: "kinh-doanh-kinh-te", termCode: '541611', keywords: [
           "Bán hàng miễn thuế",
           "Dịch vụ bán hàng",
           "Dịch vụ khách hàng tổng hợp",
@@ -732,14 +733,14 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Thương mại nước ngoài",
           "Tiếp thị (sales) doanh nghiệp"
       ] },
-      { name: "Tài chính, kế toán, bảo hiểm", slug: "tai-chinh-ke-toan-bao-hiem", keywords: [
+      { name: "Tài chính, kế toán, bảo hiểm", slug: "tai-chinh-ke-toan-bao-hiem", termCode: '52', keywords: [
           "Kế toán công chứng",
           "Kế toán công chứng nước ngoài",
           "Kế toán thuế",
           "Tài chính, bảo hiểm",
           "Tư vấn bảo hiểm xã hội"
       ] },
-      { name: "Báo chí, truyền thông, marketing", slug: "bao-chi-truyen-thong-marketing", keywords: [
+      { name: "Báo chí, truyền thông, marketing", slug: "bao-chi-truyen-thong-marketing", termCode: '51', keywords: [
           "Báo chí",
           "Biên tập",
           "Digital Marketing",
@@ -749,7 +750,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Truyền thông",
           "Viết quảng cáo"
       ] },
-      { name: "Công nghệ thông tin", slug: "it", keywords: [
+      { name: "Công nghệ thông tin", slug: "it", termCode: '541511', keywords: [
           "Công nghệ thông tin",
           "IT",
           "lập trình",
@@ -769,12 +770,12 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Trí tuệ nhân tạo",
           "Vận hành web thương mại điện tử"
       ] },
-      { name: "Nghiên cứu, phân tích", slug: "nghien-cuu-phan-tich", keywords: [
+      { name: "Nghiên cứu, phân tích", slug: "nghien-cuu-phan-tich", termCode: '5417', keywords: [
           "Khảo sát đất đai, nhà ở",
           "Nghiên cứu",
           "Nghiên cứu thị trường"
       ] },
-      { name: "Giáo dục, đào tạo", slug: "giao-duc-dao-tao", keywords: [
+      { name: "Giáo dục, đào tạo", slug: "giao-duc-dao-tao", termCode: '61', keywords: [
           "Giảng dạy có chứng chỉ",
           "Giảng dạy đại học",
           "Giảng dạy ngoài cơ sở giáo dục",
@@ -785,26 +786,26 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Hướng dẫn nghiên cứu",
           "Hướng dẫn thể thao"
       ] },
-      { name: "Hành chính, văn phòng", slug: "hanh-chinh-van-phong", keywords: [
+      { name: "Hành chính, văn phòng", slug: "hanh-chinh-van-phong", termCode: '561110', keywords: [
           "Biên dịch, phiên dịch",
           "Nhân viên văn phòng"
       ] },
-      { name: "Pháp lý", slug: "phap-ly", keywords: [
+      { name: "Pháp lý", slug: "phap-ly", termCode: '5411', keywords: [
           "pháp lý",
           "luật sư"
       ] },
-      { name: "Nghệ thuật, nghệ sĩ", slug: "nghe-thuat", keywords: [
+      { name: "Nghệ thuật, nghệ sĩ", slug: "nghe-thuat", termCode: '711510', keywords: [
           "Mỹ thuật gia",
           "nhiếp ảnh gia",
           "Nhà văn",
           "Nhạc sĩ",
           "nghệ sĩ sân khấu"
       ] },
-      { name: "Thể dục thể thao", slug: "the-thao", keywords: [
+      { name: "Thể dục thể thao", slug: "the-thao", termCode: '71121', keywords: [
           "Vận động viên chuyên nghiệp",
           "Vận động viên nghiệp dư"
       ] },
-      { name: "Nghề có kỹ năng chuyên nghiệp", slug: "nghe-chuyen-nghiep", keywords: [
+      { name: "Nghề có kỹ năng chuyên nghiệp", slug: "nghe-chuyen-nghiep", termCode: '812990', keywords: [
           "Công chức",
           "Giúp việc gia đình đặc khu",
           "Huấn luyện động vật",
@@ -815,7 +816,7 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
           "Nhân viên tôn giáo",
           "Phi công"
       ] },
-      { name: "Việc làm bán chuyên nghiệp", slug: "viec-lam-ban-chuyen-nghiep", keywords: [
+      { name: "Việc làm bán chuyên nghiệp", slug: "viec-lam-ban-chuyen-nghiep", termCode: '611630', keywords: [
           "Công việc mùa hè",
           "Lao động kỳ nghỉ",
           "Sinh viên thực tập",
