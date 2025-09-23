@@ -97,6 +97,35 @@ const controlledFeeVisas = [
   'Đặc định đầu Việt'
 ];
 
+const JPY_VND_RATE = 180; // Example rate
+const USD_VND_RATE = 26300; // Example rate
+
+const visasForVndDisplay = [
+    'Thực tập sinh 3 năm',
+    'Thực tập sinh 1 năm',
+    'Đặc định đi mới',
+    'Kỹ sư, tri thức đầu Việt',
+];
+
+const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): string => {
+    if (!salaryValue) return 'N/A';
+
+    const numericValue = parseInt(salaryValue.replace(/[^0-9]/g, ''), 10);
+    if (isNaN(numericValue)) return salaryValue;
+
+    if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
+        const vndValue = numericValue * JPY_VND_RATE;
+        const valueInMillions = vndValue / 1000000;
+        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        });
+        return `~${formattedVnd.replace('.',',')}tr VNĐ`;
+    }
+    
+    return `${formatCurrency(salaryValue)} JPY`;
+};
+
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = false, appliedFilters }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters }) => {
   const { isLoggedIn } = useAuth();
@@ -197,7 +226,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   };
 
   const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
-
+  
   const getFeeDisplayInfo = () => {
       const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
       const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
@@ -228,8 +257,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
           return { shouldShow: true, text: `${feeLabel}: Không rõ` };
       }
 
-      if (visasForVnd.includes(visaDetail || '')) {
-          const USD_VND_RATE = 26300;
+      if (visaDetail && visasForVnd.includes(visaDetail)) {
           const vndValue = feeValue * USD_VND_RATE;
           const valueInMillions = vndValue / 1000000;
           const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
@@ -239,7 +267,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
           return { shouldShow: true, text: `Phí: ~${formattedVnd.replace('.',',')}tr` };
       }
       
-      if (visasForUsd.includes(visaDetail || '')) {
+      if (visaDetail && visasForUsd.includes(visaDetail)) {
          return { shouldShow: true, text: `${feeLabel}: $${formatCurrency(String(feeValue))}` };
       }
 
@@ -283,8 +311,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                         {job.visaDetail}
                                     </Badge>
                                 )}
-                                {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)} JPY</Badge>}
-                                <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)} JPY</Badge>
+                                {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
+                                <Badge variant="secondary" className="text-xs">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
                                 {feeFilterIsActive && feeInfo.shouldShow && (
                                     <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
                                         {feeInfo.text}
@@ -422,12 +450,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                          {job.salary.actual && (
                             <span className="flex items-center gap-1 text-green-600">
                                 <DollarSign className="h-3 w-3 flex-shrink-0" />
-                                Thực lĩnh: ~{formatCurrency(job.salary.actual)} JPY
+                                Thực lĩnh: ~{formatSalaryForDisplay(job.salary.actual, job.visaDetail)}
                             </span>
                         )}
                         <span className="flex items-center gap-1 text-muted-foreground">
                             <DollarSign className="h-3 w-3 flex-shrink-0" />
-                            Lương: {formatCurrency(job.salary.basic)} JPY
+                            Lương: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}
                         </span>
                     </div>
                 </div>
@@ -466,8 +494,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             {job.visaDetail}
                         </Badge>
                         )}
-                        {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)} JPY</Badge>}
-                        <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatCurrency(job.salary.basic)} JPY</Badge>
+                        {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
+                        <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
                     </div>
                      <div className="mb-3 flex items-center gap-1 text-xs text-muted-foreground">
                         <MapPin className="h-3 w-3 flex-shrink-0" />
