@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { allSpecialConditions, visaDetailsByVisaType, workShifts } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -45,9 +45,11 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const sortBySlug = searchParams['sap-xep'] as string;
   const quantity = searchParams['so-luong'] as string;
   const workShiftSlug = searchParams['ca-lam-viec'] as string;
+  const otherSkillParam = searchParams['yeu-cau-ky-nang-khac'];
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
   const specialConditionSlugs = Array.isArray(specialConditionsParam) ? specialConditionsParam : (specialConditionsParam ? [specialConditionsParam] : []);
+  const otherSkillSlugs = Array.isArray(otherSkillParam) ? otherSkillParam : (otherSkillParam ? [otherSkillParam] : []);
 
 
   let titleParts: string[] = [];
@@ -80,6 +82,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 
   if (quantity) titleParts.push(`tuyển từ ${quantity} người`);
 
+  const otherSkillNames = otherSkillSlugs.map(slug => getNameFromSlug(slug, otherSkills)).filter(Boolean).join(', ');
+  if (otherSkillNames) titleParts.push(`yêu cầu ${otherSkillNames}`);
+
   if (locations.length > 0) {
       const locationNames = locations.map(slug => {
           const region = japanRegions.find(r => r.slug === slug);
@@ -108,6 +113,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (sortBySlug) cleanSearchParams['sap-xep'] = sortBySlug;
   if (quantity) cleanSearchParams['so-luong'] = quantity;
   if (workShiftSlug) cleanSearchParams['ca-lam-viec'] = workShiftSlug;
+  if (otherSkillSlugs.length > 0) cleanSearchParams['yeu-cau-ky-nang-khac'] = otherSkillSlugs;
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
 
@@ -132,14 +138,16 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 }
 
 
-export default function JobSearchPage() {
+export default function JobSearchPage({ searchParams }: { searchParams: SearchParams }) {
+  // Pass searchParams to client component to avoid re-reading them,
+  // this is important for structured data generation on the client.
   return (
     <Suspense fallback={
         <div className="flex h-screen items-center justify-center bg-secondary">
             <Loader2 className="h-16 w-16 animate-spin text-primary"/>
         </div>
     }>
-        <JobSearchPageContent />
+        <JobSearchPageContent searchParams={searchParams} />
     </Suspense>
   );
 }

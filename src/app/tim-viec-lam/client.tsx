@@ -9,7 +9,7 @@ import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/locat
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType, type Industry, allIndustries } from '@/lib/industry-data';
-import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts } from '@/lib/visa-data';
+import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts, otherSkills } from '@/lib/visa-data';
 import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 import { JsonLdScript } from '@/components/json-ld-script';
 
@@ -235,36 +235,12 @@ const dominantHands = [
     { name: "Cả hai tay", slug: "ca-hai-tay" },
 ];
 
-const otherSkills = [
-    { name: "Có bằng lái xe AT", slug: "co-bang-lai-xe-at" },
-    { name: "Có bằng lái xe MT", slug: "co-bang-lai-xe-mt" },
-    { name: "Có bằng lái xe tải cỡ nhỏ", slug: "co-bang-lai-xe-tai-co-nho" },
-    { name: "Có bằng lái xe tải cỡ trung", slug: "co-bang-lai-xe-tai-co-trung" },
-    { name: "Có bằng lái xe tải cỡ lớn", slug: "co-bang-lai-xe-tai-co-lon" },
-    { name: "Có bằng lái xe buýt cỡ trung", slug: "co-bang-lai-xe-buyt-co-trung" },
-    { name: "Có bằng lái xe buýt cỡ lớn", slug: "co-bang-lai-xe-buyt-co-lon" },
-    { name: "Lái được máy xúc, máy đào", slug: "lai-duoc-may-xuc-may-dao" },
-    { name: "Lái được xe nâng", slug: "lai-duoc-xe-nang" },
-    { name: "Có bằng cầu", slug: "co-bang-cau" },
-    { name: "Vận hành máy CNC", slug: "van-hanh-may-cnc" },
-    { name: "Có bằng tiện, mài", slug: "co-bang-tien-mai" },
-    { name: "Có bằng hàn", slug: "co-bang-han" },
-    { name: "Có bằng cắt", slug: "co-bang-cat" },
-    { name: "Có bằng gia công kim loại", slug: "co-bang-gia-cong-kim-loai" },
-    { name: "Làm được giàn giáo", slug: "lam-duoc-gian-giao" },
-    { name: "Thi công nội thất", slug: "thi-cong-noi-that" },
-    { name: "Quản lý thi công xây dựng", slug: "quan-ly-thi-cong-xay-dung" },
-    { name: "Quản lý khối lượng xây dựng", slug: "quan-ly-khoi-luong-xay-dung" },
-    { name: "Thiết kế BIM xây dựng", slug: "thiet-ke-bim-xay-dung" },
-    { name: "Đọc được bản vẽ kỹ thuật", slug: "doc-duoc-ban-ve-ky-thuat" },
-    { name: "Có bằng thi công nội thất", slug: "co-bang-thi-cong-noi-that" }
-];
 
 
 
-export default function JobSearchPageContent() {
+function JobSearchPageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
     const router = useRouter();
-    const searchParams = useSearchParams();
+    const readOnlySearchParams = useSearchParams();
 
     const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(initialSearchFilters);
     const [stagedFilters, setStagedFilters] = useState<SearchFilters>(initialSearchFilters);
@@ -636,19 +612,19 @@ export default function JobSearchPageContent() {
     }, []);
 
     useEffect(() => {
-        const newFilters: SearchFilters = { ...initialSearchFilters, location: [], specialConditions: [] };
+        const newFilters: SearchFilters = { ...initialSearchFilters, location: [], specialConditions: [], otherSkillRequirement: [] };
         let sortOption = 'newest';
 
-        for (const [key, value] of searchParams.entries()) {
+        for (const [key, value] of readOnlySearchParams.entries()) {
             const internalKey = reverseKeyMap[key] || key;
             if (internalKey === 'sortBy') {
                 sortOption = reverseSortOptionMap[value] || 'newest';
             } else if (internalKey === 'location' || internalKey === 'otherSkillRequirement') {
                 const currentValues = newFilters[internalKey as 'location' | 'otherSkillRequirement'] || [];
-                // @ts-ignore
+                 // @ts-ignore
                 newFilters[internalKey as 'location' | 'otherSkillRequirement'] = [...currentValues, value];
             } else if (internalKey === 'age' || internalKey === 'height' || internalKey === 'weight') {
-                const values = searchParams.getAll(key);
+                const values = readOnlySearchParams.getAll(key);
                 if (values.length === 2) {
                      // @ts-ignore
                     newFilters[internalKey] = [parseInt(values[0], 10), parseInt(values[1], 10)];
@@ -675,7 +651,7 @@ export default function JobSearchPageContent() {
         runFilter(newFilters, sortOption);
         countStagedResults(newFilters);
         
-    }, [searchParams, runFilter, countStagedResults]);
+    }, [readOnlySearchParams, runFilter, countStagedResults]);
     
     const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
       setStagedFilters(prev => {
@@ -717,7 +693,7 @@ export default function JobSearchPageContent() {
 
     const handleSortChange = (value: string) => {
         setSortBy(value);
-        const query = new URLSearchParams(searchParams.toString());
+        const query = new URLSearchParams(readOnlySearchParams.toString());
         if (value === 'newest') {
             query.delete(keyMap['sortBy']);
         } else {
@@ -730,12 +706,12 @@ export default function JobSearchPageContent() {
         setStagedFilters(initialSearchFilters);
         setSortBy('newest');
         countStagedResults(initialSearchFilters);
-        if (searchParams.toString() !== '') {
+        if (readOnlySearchParams.toString() !== '') {
             router.push('/tim-viec-lam');
         } else {
              runFilter(initialSearchFilters, 'newest');
         }
-    }, [router, runFilter, countStagedResults, searchParams]);
+    }, [router, runFilter, countStagedResults, readOnlySearchParams]);
     
     const handleNewSearch = async (filters: SearchFilters) => {
         const query = new URLSearchParams();
