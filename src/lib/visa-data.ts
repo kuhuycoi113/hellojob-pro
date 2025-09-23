@@ -69,3 +69,28 @@ export const workShifts = [
     { name: "Nghỉ định kỳ trong tuần", slug: "nghi-dinh-ky" },
     { name: "Khác", slug: "khac" }
 ];
+
+export const otherSkills = [
+    { name: "Có bằng lái xe AT", slug: "co-bang-lai-xe-at" },
+    { name: "Có bằng lái xe MT", slug: "co-bang-lai-xe-mt" },
+    { name: "Có bằng lái xe tải cỡ nhỏ", slug: "co-bang-lai-xe-tai-co-nho" },
+    { name: "Có bằng lái xe tải cỡ trung", slug: "co-bang-lai-xe-tai-co-trung" },
+    { name: "Có bằng lái xe tải cỡ lớn", slug: "co-bang-lai-xe-tai-co-lon" },
+    { name: "Có bằng lái xe buýt cỡ trung", slug: "co-bang-lai-xe-buyt-co-trung" },
+    { name: "Có bằng lái xe buýt cỡ lớn", slug: "co-bang-lai-xe-buyt-co-lon" },
+    { name: "Lái được máy xúc, máy đào", slug: "lai-duoc-may-xuc-may-dao" },
+    { name: "Lái được xe nâng", slug: "lai-duoc-xe-nang" },
+    { name: "Có bằng cầu", slug: "co-bang-cau" },
+    { name: "Vận hành máy CNC", slug: "van-hanh-may-cnc" },
+    { name: "Có bằng tiện, mài", slug: "co-bang-tien-mai" },
+    { name: "Có bằng hàn", slug: "co-bang-han" },
+    { name: "Có bằng cắt", slug: "co-bang-cat" },
+    { name: "Có bằng gia công kim loại", slug: "co-bang-gia-cong-kim-loai" },
+    { name: "Làm được giàn giáo", slug: "lam-duoc-gian-giao" },
+    { name: "Thi công nội thất", slug: "thi-cong-noi-that" },
+    { name: "Quản lý thi công xây dựng", slug: "quan-ly-thi-cong-xay-dung" },
+    { name: "Quản lý khối lượng xây dựng", slug: "quan-ly-khoi-luong-xay-dung" },
+    { name: "Thiết kế BIM xây dựng", slug: "thiet-ke-bim-xay-dung" },
+    { name: "Đọc được bản vẽ kỹ thuật", slug: "doc-duoc-ban-ve-ky-thuat" },
+    { name: "Có bằng thi công nội thất", slug: "co-bang-thi-cong-noi-that" }
+];
