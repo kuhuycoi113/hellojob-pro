@@ -12,9 +12,25 @@ type SearchParams = {
 };
 
 const allIndustries = Object.values(industriesByJobType).flat();
+const allJobDetailsForExperience = [...new Set(Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords).filter(Boolean))];
 
-const getNameFromSlug = (slug: string, data: { name: string; slug: string }[]): string | undefined => {
-  return data.find(item => item.slug === slug)?.name;
+
+const createSlug = (str: string) => {
+    if (!str) return '';
+    return str
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '');
+};
+
+const getNameFromSlug = (slug: string, data: { name: string; slug: string }[] | string[]): string | undefined => {
+  if (typeof data[0] === 'string') {
+    return (data as string[]).find(item => createSlug(item) === slug);
+  }
+  return (data as { name: string; slug: string }[]).find(item => item.slug === slug)?.name;
 };
 
 const formatCmToMeter = (cm: string): string => {
@@ -66,6 +82,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const heightParam = searchParams['chieu-cao'];
   const weightParam = searchParams['can-nang'];
   const experienceSlug = searchParams['so-nam-kinh-nghiem'] as string;
+  const experienceRequirementSlug = searchParams['yeu-cau-kinh-nghiem'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -148,6 +165,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     titleParts.push(`cân nặng từ ${weightFrom}kg đến ${weightTo}kg`);
   }
   
+  const experienceRequirementName = experienceRequirementSlug ? getNameFromSlug(experienceRequirementSlug, allJobDetailsForExperience) : undefined;
+  if (experienceRequirementName) titleParts.push(`kinh nghiệm ${experienceRequirementName}`);
+
   const experienceName = experienceSlug ? getNameFromSlug(experienceSlug, experienceYears) : undefined;
   if (experienceName && experienceName !== "Không yêu cầu") titleParts.push(`kinh nghiệm ${experienceName.toLowerCase()}`);
 
@@ -192,6 +212,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (heights.length > 0) cleanSearchParams['chieu-cao'] = heights;
   if (weights.length > 0) cleanSearchParams['can-nang'] = weights;
   if (experienceSlug) cleanSearchParams['so-nam-kinh-nghiem'] = experienceSlug;
+  if (experienceRequirementSlug) cleanSearchParams['yeu-cau-kinh-nghiem'] = experienceRequirementSlug;
 
 
   
