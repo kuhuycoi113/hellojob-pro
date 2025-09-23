@@ -233,6 +233,18 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
     const isMobile = useIsMobile();
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     
+    const getFutureMonths = () => {
+        const months = [];
+        const today = new Date();
+        for (let i = 1; i <= 12; i++) { // next 12 months
+            const futureDate = new Date(today.getFullYear(), today.getMonth() + i, 1);
+            const month = futureDate.getMonth() + 1;
+            const year = futureDate.getFullYear();
+            months.push(`Tháng ${month}/${year}`);
+        }
+        return months;
+    };
+    
     const { jobCountsByRegion, jobCountsByPrefecture } = useMemo(() => {
         const countsByPrefecture: { [key: string]: number } = {};
         const countsByRegion: { [key: string]: number } = {};
@@ -535,18 +547,6 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         return "0 đến 3800$";
     };
 
-    const getFutureMonths = () => {
-        const months = [];
-        const today = new Date();
-        for (let i = 1; i <= 12; i++) { // next 12 months
-            const futureDate = new Date(today.getFullYear(), today.getMonth() + i, 1);
-            const month = futureDate.getMonth() + 1;
-            const year = futureDate.getFullYear();
-            months.push(`Tháng ${month}/${year}`);
-        }
-        return months;
-    };
-    
     return (
         <div className="md:col-span-1 lg:col-span-1 h-full flex flex-col">
             <Card className="flex-grow flex flex-col">
@@ -864,11 +864,11 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                 <Input 
                                                     id="net-fee-no-tuition-usd" 
                                                     type="text" 
-                                                    placeholder={getFeePlaceholder()}
-                                                    onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 4200, onFilterChange)} // Assuming netFeeNoTicket maps to this
+                                                    placeholder="0 đến 3600$"
+                                                    onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 3600, onFilterChange)} // Assuming netFeeNoTicket maps to this
                                                     value={getDisplayValue(filters.netFeeNoTicket)} 
                                                 />
-                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFeeNoTicket, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
+                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFeeNoTicket, '0 đến 3600$', USD_VND_RATE, 'triệu VNĐ')}</p>
                                             </div>
                                         </>
                                     )}
