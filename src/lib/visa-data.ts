@@ -143,3 +143,10 @@ export const visionRequirements = [
     { name: "10/10", slug: "10-10" },
     { name: "8/10", slug: "8-10" }
 ];
+
+export const tattooRequirements = [
+    { name: "Không yêu cầu", slug: "all" },
+    { name: "Không nhận hình xăm", slug: "khong-nhan-hinh-xam" },
+    { name: "Nhận xăm nhỏ (kín)", slug: "nhan-xam-nho-kin" },
+    { name: "Nhận cả xăm to (lộ)", slug: "nhan-ca-xam-to-lo" },
+];

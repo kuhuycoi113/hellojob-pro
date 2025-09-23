@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -51,6 +51,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const educationSlug = searchParams['hoc-van'] as string;
   const languageSlug = searchParams['yeu-cau-tieng-nhat'] as string;
   const englishSlug = searchParams['yeu-cau-tieng-anh'] as string;
+  const tattooSlug = searchParams['hinh-xam'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -92,7 +93,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (otherSkillNames) titleParts.push(`yêu cầu ${otherSkillNames}`);
 
   const dominantHandName = dominantHandSlug ? getNameFromSlug(dominantHandSlug, dominantHands) : undefined;
-  if (dominantHandName) titleParts.push(`yêu cầu ${dominantHandName}`);
+  if (dominantHandName && dominantHandName !== "Tất cả") titleParts.push(`yêu cầu ${dominantHandName}`);
 
   const educationName = educationSlug ? getNameFromSlug(educationSlug, educationLevels) : undefined;
   if (educationName && educationName !== "Tất cả") titleParts.push(`yêu cầu ${educationName}`);
@@ -102,6 +103,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   
   const englishName = englishSlug ? getNameFromSlug(englishSlug, englishLevels) : undefined;
   if (englishName) titleParts.push(`yêu cầu Tiếng Anh ${englishName}`);
+  
+  const tattooName = tattooSlug ? getNameFromSlug(tattooSlug, tattooRequirements) : undefined;
+  if (tattooName && tattooName !== "Không yêu cầu") titleParts.push(`yêu cầu ${tattooName}`);
 
 
   if (locations.length > 0) {
@@ -137,6 +141,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (educationSlug) cleanSearchParams['hoc-van'] = educationSlug;
   if (languageSlug) cleanSearchParams['yeu-cau-tieng-nhat'] = languageSlug;
   if (englishSlug) cleanSearchParams['yeu-cau-tieng-anh'] = englishSlug;
+  if (tattooSlug) cleanSearchParams['hinh-xam'] = tattooSlug;
 
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
