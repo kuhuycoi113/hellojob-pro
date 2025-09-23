@@ -36,6 +36,7 @@ import type { SearchFilters } from '@/components/job-search/search-results';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
+import { JsonLdScript } from '@/components/json-ld-script';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -404,66 +405,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     if (!job) {
         notFound();
     }
-
-    const getJobPostingStructuredData = () => {
-        const today = new Date();
-        const postedDate = new Date(today);
-        postedDate.setDate(today.getDate() + job.postedTimeOffset);
-        const isoDate = postedDate.toISOString();
-    
-        const expiryDate = new Date(isoDate);
-        expiryDate.setDate(expiryDate.getDate() + 30);
-        
-        const salary = job.salary.basic ? parseInt(job.salary.basic.replace(/[^0-9]/g, '')) : undefined;
-
-        const combinedDescription = `
-            ${job.details.description.replace(/<[^>]*>?/gm, '')}
-            Yêu cầu:
-            ${job.details.requirements.replace(/<[^>]*>?/gm, '')}
-            Quyền lợi:
-            ${job.details.benefits.replace(/<[^>]*>?/gm, '')}
-        `;
-
-        const structuredData = {
-            "@context": "https://schema.org/",
-            "@type": "JobPosting",
-            "title": job.title,
-            "description": combinedDescription,
-            "identifier": {
-                "@type": "PropertyValue",
-                "name": "HelloJob ID",
-                "value": job.id
-            },
-            "datePosted": isoDate,
-            "validThrough": expiryDate.toISOString(),
-            "employmentType": "FULL_TIME", // Assuming full time, can be made dynamic
-            "hiringOrganization": {
-                "@type": "Organization",
-                "name": "HelloJob (Qua công ty phái cử)",
-                "sameAs": "https://vi.hellojob.jp",
-            },
-            "jobLocation": {
-                "@type": "Place",
-                "address": {
-                    "@type": "PostalAddress",
-                    "addressLocality": job.workLocation,
-                    "addressCountry": "JP"
-                }
-            },
-            ...(salary && {
-                "baseSalary": {
-                    "@type": "MonetaryAmount",
-                    "currency": "JPY",
-                    "value": {
-                        "@type": "QuantitativeValue",
-                        "value": salary,
-                        "unitText": "MONTH"
-                    }
-                }
-            })
-        };
-        return JSON.stringify(structuredData);
-    };
     
     const handleSaveJob = () => {
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -475,6 +416,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             savedJobs.push(job.id);
             localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
             setIsSaved(true);
+            logInteraction(job, 'save'); // CANHANHOA01: Log save interaction
         }
         window.dispatchEvent(new Event('storage'));
     };
@@ -584,10 +526,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
     return (
         <div className="bg-secondary">
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: getJobPostingStructuredData() }}
-            />
+            {job && <JsonLdScript job={job} />}
             <div className="container mx-auto px-4 md:px-6 py-12">
                 <div className="mb-6">
                     <Button asChild variant="outline" size="sm">
