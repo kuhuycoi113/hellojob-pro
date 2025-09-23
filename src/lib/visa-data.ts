@@ -101,3 +101,13 @@ export const dominantHands = [
     { name: "Tay trái", slug: "tay-trai" },
     { name: "Cả hai tay", slug: "ca-hai-tay" },
 ];
+
+export const educationLevels = [
+    { name: "Tất cả", slug: "all" },
+    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
+    { name: "Tốt nghiệp THPT", slug: "tot-nghiep-thpt" },
+    { name: "Tốt nghiệp Trung cấp", slug: "tot-nghiep-trung-cap" },
+    { name: "Tốt nghiệp Cao đẳng", slug: "tot-nghiep-cao-dang" },
+    { name: "Tốt nghiệp Đại học", slug: "tot-nghiep-dai-hoc" },
+    { name: "Tốt nghiệp Senmon", slug: "tot-nghiep-senmon" },
+];

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -47,6 +47,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const workShiftSlug = searchParams['ca-lam-viec'] as string;
   const otherSkillParam = searchParams['yeu-cau-ky-nang-khac'];
   const dominantHandSlug = searchParams['tay-thuan'] as string;
+  const educationSlug = searchParams['hoc-van'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -90,6 +91,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const dominantHandName = dominantHandSlug ? getNameFromSlug(dominantHandSlug, dominantHands) : undefined;
   if (dominantHandName) titleParts.push(`yêu cầu ${dominantHandName}`);
 
+  const educationName = educationSlug ? getNameFromSlug(educationSlug, educationLevels) : undefined;
+  if (educationName && educationName !== "Tất cả") titleParts.push(`yêu cầu ${educationName}`);
+
 
   if (locations.length > 0) {
       const locationNames = locations.map(slug => {
@@ -121,6 +125,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (workShiftSlug) cleanSearchParams['ca-lam-viec'] = workShiftSlug;
   if (otherSkillSlugs.length > 0) cleanSearchParams['yeu-cau-ky-nang-khac'] = otherSkillSlugs;
   if (dominantHandSlug) cleanSearchParams['tay-thuan'] = dominantHandSlug;
+  if (educationSlug) cleanSearchParams['hoc-van'] = educationSlug;
 
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
