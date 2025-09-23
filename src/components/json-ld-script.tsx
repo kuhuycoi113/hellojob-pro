@@ -63,6 +63,60 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 }
             }
 
+            const getEnglishQualification = () => {
+                if (!job.languageRequirement || !job.languageRequirement.toLowerCase().includes('tiếng anh')) {
+                    return undefined;
+                }
+
+                const competency: any[] = [];
+                let description = '';
+
+                if (job.languageRequirement.includes('TOEIC 900')) description = "TOEIC score of 900 or higher.";
+                else if (job.languageRequirement.includes('TOEIC 800')) description = "TOEIC score of 800 or higher.";
+                else if (job.languageRequirement.includes('TOEIC 700')) description = "TOEIC score of 700 or higher.";
+                else if (job.languageRequirement.includes('TOEIC 600')) description = "TOEIC score of 600 or higher.";
+                else if (job.languageRequirement.includes('TOEIC 500')) description = "TOEIC score of 500 or higher.";
+                else if (job.languageRequirement.includes('IELTS 7.0')) description = "IELTS score of 7.0 or higher.";
+                else if (job.languageRequirement.includes('IELTS 6.0')) description = "IELTS score of 6.0 or higher.";
+                else if (job.languageRequirement.includes('IELTS 5.0')) description = "IELTS score of 5.0 or higher.";
+                else if (job.languageRequirement.includes('Giao tiếp tốt')) description = "Proficient in conversational English.";
+                else if (job.languageRequirement.includes('Giao tiếp cơ bản')) description = "Basic conversational English skills.";
+                else return undefined; // No specific requirement matched
+
+                competency.push({
+                    "@type": "DefinedTerm",
+                    "name": "English Language",
+                    "description": description
+                });
+
+                if (job.languageRequirement.includes('TOEIC')) {
+                    competency.push({
+                        "@type": "DefinedTerm",
+                        "name": "TOEIC (Test of English for International Communication)",
+                        "termCode": "TOEIC",
+                        "inDefinedTermSet": "https://www.ets.org/toeic.html"
+                    });
+                } else if (job.languageRequirement.includes('IELTS')) {
+                    competency.push({
+                        "@type": "DefinedTerm",
+                        "name": "IELTS (International English Language Testing System)",
+                        "termCode": "IELTS",
+                        "inDefinedTermSet": "https://www.ielts.org/"
+                    });
+                }
+                
+                return {
+                    "@type": "EducationalOccupationalCredential",
+                    "credentialCategory": {
+                      "@type": "DefinedTerm",
+                      "termCode": "CERTIFICATE",
+                      "inDefinedTermSet": "https://o-net.org/data/t2_15_1.html",
+                      "name": "Certification"
+                    },
+                    "competencyRequired": competency
+                };
+            }
+
             let qualifications = job.visaDetail || '';
             if (job.ginouExpiryRequirement) {
                 qualifications += `. Yêu cầu ứng viên có visa Kỹ năng đặc định với thời hạn còn lại ${job.ginouExpiryRequirement.toLowerCase()}.`;
@@ -107,7 +161,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                         "addressCountry": "JP"
                     }
                 },
-                ...(qualifications && { "qualifications": qualifications }),
+                ...(qualifications && !getEnglishQualification() && { "qualifications": qualifications }),
                 ...(industryData && {
                     "industry": {
                         "@type": "DefinedTerm",
@@ -128,7 +182,8 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                     }
                 }),
                 ...(getApplicantLocationRequirements() && { "applicantLocationRequirements": getApplicantLocationRequirements() }),
-                ...(getJobStartDate() && { "jobStartDate": getJobStartDate() })
+                ...(getJobStartDate() && { "jobStartDate": getJobStartDate() }),
+                ...(getEnglishQualification() && { "educationRequirements": getEnglishQualification() })
             };
             return data;
         };
