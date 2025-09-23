@@ -92,9 +92,9 @@ const validateProfileForApplication = (profile: CandidateProfile): boolean => {
 const controlledFeeVisas = [
   'Thực tập sinh 3 năm',
   'Thực tập sinh 1 năm',
-  'Đặc định đầu Việt',
   'Đặc định đi mới',
-  'Kỹ sư, tri thức đầu Việt'
+  'Kỹ sư, tri thức đầu Việt',
+  'Đặc định đầu Việt'
 ];
 
 
@@ -283,8 +283,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                         {job.visaDetail}
                                     </Badge>
                                 )}
-                                {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
-                                <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
+                                {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)} JPY</Badge>}
+                                <Badge variant="secondary" className="text-xs">Cơ bản: {formatCurrency(job.salary.basic)} JPY</Badge>
                                 {feeFilterIsActive && feeInfo.shouldShow && (
                                     <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
                                         {feeInfo.text}
@@ -422,12 +422,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                          {job.salary.actual && (
                             <span className="flex items-center gap-1 text-green-600">
                                 <DollarSign className="h-3 w-3 flex-shrink-0" />
-                                Thực lĩnh: ~{formatCurrency(job.salary.actual)}
+                                Thực lĩnh: ~{formatCurrency(job.salary.actual)} JPY
                             </span>
                         )}
                         <span className="flex items-center gap-1 text-muted-foreground">
                             <DollarSign className="h-3 w-3 flex-shrink-0" />
-                            Lương: {formatCurrency(job.salary.basic)}
+                            Lương: {formatCurrency(job.salary.basic)} JPY
                         </span>
                     </div>
                 </div>
@@ -466,8 +466,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             {job.visaDetail}
                         </Badge>
                         )}
-                        {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)}</Badge>}
-                        <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatCurrency(job.salary.basic)}</Badge>
+                        {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatCurrency(job.salary.actual)} JPY</Badge>}
+                        <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatCurrency(job.salary.basic)} JPY</Badge>
                     </div>
                      <div className="mb-3 flex items-center gap-1 text-xs text-muted-foreground">
                         <MapPin className="h-3 w-3 flex-shrink-0" />
