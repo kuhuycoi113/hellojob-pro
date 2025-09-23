@@ -64,6 +64,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                         "addressCountry": "JP"
                     }
                 },
+                ...(job.visaDetail && { "qualifications": job.visaDetail }),
                 ...(salary && {
                     "baseSalary": {
                         "@type": "MonetaryAmount",
