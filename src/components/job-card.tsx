@@ -116,11 +116,17 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
     if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
         const vndValue = numericValue * JPY_VND_RATE;
         const valueInMillions = vndValue / 1000000;
+        
+        // Check if it's a whole number
+        if (valueInMillions % 1 === 0) {
+            return `${valueInMillions.toLocaleString('vi-VN')}tr`;
+        }
+        
         const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
             minimumFractionDigits: 1,
             maximumFractionDigits: 1
         });
-        return `~${formattedVnd.replace('.',',')}tr VNĐ`;
+        return `${formattedVnd.replace('.',',')}tr`;
     }
     
     return `${formatCurrency(salaryValue)} JPY`;
@@ -231,8 +237,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
       const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
       const isControlledVisa = controlledFeeVisas.includes(visaDetail || '');
-
-      const visasForVnd = ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đi mới', 'Kỹ sư, tri thức đầu Việt'];
+      
+      const visasForVnd = [
+          'Thực tập sinh 3 năm',
+          'Thực tập sinh 1 năm',
+          'Đặc định đi mới',
+          'Kỹ sư, tri thức đầu Việt'
+      ];
       const visasForUsd = ['Đặc định đầu Việt'];
 
       let feeValue: number | undefined;
@@ -260,15 +271,20 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       if (visaDetail && visasForVnd.includes(visaDetail)) {
           const vndValue = feeValue * USD_VND_RATE;
           const valueInMillions = vndValue / 1000000;
-          const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
-              minimumFractionDigits: 1,
-              maximumFractionDigits: 1
-          });
-          return { shouldShow: true, text: `Phí: ~${formattedVnd.replace('.',',')}tr` };
+          let formattedVnd: string;
+          if (valueInMillions % 1 === 0) {
+              formattedVnd = valueInMillions.toLocaleString('vi-VN');
+          } else {
+              formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1
+              });
+          }
+          return { shouldShow: true, text: `Phí: ${formattedVnd.replace('.',',')}tr` };
       }
       
       if (visaDetail && visasForUsd.includes(visaDetail)) {
-         return { shouldShow: true, text: `${feeLabel}: $${formatCurrency(String(feeValue))}` };
+         return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
       }
 
       // Default fallback for other controlled visas or if logic doesn't match
@@ -450,7 +466,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                          {job.salary.actual && (
                             <span className="flex items-center gap-1 text-green-600">
                                 <DollarSign className="h-3 w-3 flex-shrink-0" />
-                                Thực lĩnh: ~{formatSalaryForDisplay(job.salary.actual, job.visaDetail)}
+                                Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}
                             </span>
                         )}
                         <span className="flex items-center gap-1 text-muted-foreground">
