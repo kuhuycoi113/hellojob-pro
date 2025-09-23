@@ -29,7 +29,8 @@ const createSlug = (str: string) => {
 
 const getNameFromSlug = (slug: string, data: { name: string; slug: string }[] | string[]): string | undefined => {
   if (typeof data[0] === 'string') {
-    return (data as string[]).find(item => createSlug(item) === slug);
+    const allKeywords = Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords);
+    return allKeywords.find(item => createSlug(item) === slug);
   }
   return (data as { name: string; slug: string }[]).find(item => item.slug === slug)?.name;
 };
@@ -100,6 +101,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const annualBonus = searchParams['thuong-nam'] as string;
   const interviewDate = searchParams['ngay-phong-van'] as string;
   const interviewRoundsSlug = searchParams['so-vong-phong-van'] as string;
+  const jobDetailSlug = searchParams['chi-tiet-cong-viec'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -131,6 +133,10 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 
   const industryName = industrySlug ? getNameFromSlug(industrySlug, allIndustries) : undefined;
   if (industryName) titleParts.push(industryName);
+
+  const allKeywords = Object.values(industriesByJobType).flat().flatMap(ind => ind.keywords);
+  const jobDetailName = jobDetailSlug ? allKeywords.find(keyword => createSlug(keyword) === jobDetailSlug) : undefined;
+  if (jobDetailName) titleParts.push(jobDetailName);
   
   const specialConditionNames = specialConditionSlugs.map(slug => getNameFromSlug(slug, allSpecialConditions)).filter(Boolean).join(', ');
   if (specialConditionNames) titleParts.push(specialConditionNames);
@@ -287,6 +293,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (annualBonus) cleanSearchParams['thuong-nam'] = annualBonus;
   if (interviewDate) cleanSearchParams['ngay-phong-van'] = interviewDate;
   if (interviewRoundsSlug) cleanSearchParams['so-vong-phong-van'] = interviewRoundsSlug;
+  if (jobDetailSlug) cleanSearchParams['chi-tiet-cong-viec'] = jobDetailSlug;
 
 
 
