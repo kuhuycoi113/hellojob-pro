@@ -111,3 +111,12 @@ export const educationLevels = [
     { name: "Tốt nghiệp Đại học", slug: "tot-nghiep-dai-hoc" },
     { name: "Tốt nghiệp Senmon", slug: "tot-nghiep-senmon" },
 ];
+
+export const languageLevels = [
+    { name: 'N1', slug: 'n1' },
+    { name: 'N2', slug: 'n2' },
+    { name: 'N3', slug: 'n3' },
+    { name: 'N4', slug: 'n4' },
+    { name: 'N5', slug: 'n5' },
+    { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
+];

@@ -24,7 +24,7 @@ import { format, startOfTomorrow, parse } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
-import { japanJobTypes, visaDetailsByVisaType, workShifts } from '@/lib/visa-data';
+import { japanJobTypes, visaDetailsByVisaType, workShifts, allSpecialConditions, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels } from '@/lib/visa-data';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -51,59 +51,12 @@ const conditionsByVisaDetail: { [key: string]: string[] } = {
   'ky-su-tri-thuc-dau-viet': ['Tuyển gấp', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại', 'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Nhận nhiều loại bằng', 'Nhận bằng Senmon', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Nợ phí', 'Phí mềm', 'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Bay nhanh', 'Trình cục sớm', 'Có bảng lương'],
 };
 
-export const allSpecialConditions = [...new Set(Object.values(conditionsByVisaDetail).flat())].map(name => ({ name, slug: createSlug(name) }));
-
-const languageLevels = [
-    { name: "N1", slug: "n1" },
-    { name: "N2", slug: "n2" },
-    { name: "N3", slug: "n3" },
-    { name: "N4", slug: "n4" },
-    { name: "N5", slug: "n5" },
-    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
-];
-const englishLevels = [
-    { name: 'TOEIC 900+', slug: 'toeic-900' },
-    { name: 'TOEIC 800+', slug: 'toeic-800' },
-    { name: 'TOEIC 700+', slug: 'toeic-700' },
-    { name: 'TOEIC 600+', slug: 'toeic-600' },
-    { name: 'TOEIC 500+', slug: 'toeic-500' },
-    { name: 'IELTS 7.0+', slug: 'ielts-7.0' },
-    { name: 'IELTS 6.0+', slug: 'ielts-6.0' },
-    { name: 'IELTS 5.0+', slug: 'ielts-5.0' },
-    { name: 'Giao tiếp tốt', slug: 'giao-tiep-tot' },
-    { name: 'Giao tiếp cơ bản', slug: 'giao-tiep-co-ban' },
-    { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
-];
-
-const educationLevels = [
-    { name: "Tất cả", slug: "all" },
-    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
-    { name: "Tốt nghiệp THPT", slug: "tot-nghiep-thpt" },
-    { name: "Tốt nghiệp Trung cấp", slug: "tot-nghiep-trung-cap" },
-    { name: "Tốt nghiệp Cao đẳng", slug: "tot-nghiep-cao-dang" },
-    { name: "Tốt nghiệp Đại học", slug: "tot-nghiep-dai-hoc" },
-    { name: "Tốt nghiệp Senmon", slug: "tot-nghiep-senmon" },
-];
-const visionRequirements = [
-    { name: "Tất cả", slug: "all" },
-    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
-    { name: "Yêu cầu thị lực tốt", slug: "yeu-cau-thi-luc-tot" },
-    { name: "Không mù màu", slug: "khong-mu-mau" }
-];
 const tattooRequirements = [
     { name: "Không yêu cầu", slug: "all" },
     { name: "Không nhận hình xăm", slug: "khong-nhan-hinh-xam" },
     { name: "Nhận xăm nhỏ (kín)", slug: "nhan-xam-nho-kin" },
     { name: "Nhận cả xăm to (lộ)", slug: "nhan-ca-xam-to-lo" },
 ];
-
-const dominantHands = [
-    { name: "Tất cả", slug: "all" },
-    { name: "Tay phải", slug: "tay-phai" },
-    { name: "Tay trái", slug: "tay-trai" },
-    { name: "Cả hai tay", slug: "ca-hai-tay" },
-];
-
 
 const interviewRoundsOptions = [
     { name: "1 vòng", slug: "1-vong" },
@@ -116,42 +69,6 @@ const interviewRoundsOptions = [
 const ginouExpiryOptions = [
     "Trên 4,5 năm", "Trên 4 năm", "Trên 3,5 năm", "Trên 3 năm", "Trên 2,5 năm", "Trên 2 năm", "Trên 1,5 năm", "Trên 1 năm", "Trên 0,5 năm"
 ];
-const otherSkills = [
-    { name: "Có bằng lái xe AT", slug: "co-bang-lai-xe-at" },
-    { name: "Có bằng lái xe MT", slug: "co-bang-lai-xe-mt" },
-    { name: "Có bằng lái xe tải cỡ nhỏ", slug: "co-bang-lai-xe-tai-co-nho" },
-    { name: "Có bằng lái xe tải cỡ trung", slug: "co-bang-lai-xe-tai-co-trung" },
-    { name: "Có bằng lái xe tải cỡ lớn", slug: "co-bang-lai-xe-tai-co-lon" },
-    { name: "Có bằng lái xe buýt cỡ trung", slug: "co-bang-lai-xe-buyt-co-trung" },
-    { name: "Có bằng lái xe buýt cỡ lớn", slug: "co-bang-lai-xe-buyt-co-lon" },
-    { name: "Lái được máy xúc, máy đào", slug: "lai-duoc-may-xuc-may-dao" },
-    { name: "Lái được xe nâng", slug: "lai-duoc-xe-nang" },
-    { name: "Có bằng cầu", slug: "co-bang-cau" },
-    { name: "Vận hành máy CNC", slug: "van-hanh-may-cnc" },
-    { name: "Có bằng tiện, mài", slug: "co-bang-tien-mai" },
-    { name: "Có bằng hàn", slug: "co-bang-han" },
-    { name: "Có bằng cắt", slug: "co-bang-cat" },
-    { name: "Có bằng gia công kim loại", slug: "co-bang-gia-cong-kim-loai" },
-    { name: "Làm được giàn giáo", slug: "lam-duoc-gian-giao" },
-    { name: "Thi công nội thất", slug: "thi-cong-noi-that" },
-    { name: "Quản lý thi công xây dựng", slug: "quan-ly-thi-cong-xay-dung" },
-    { name: "Quản lý khối lượng xây dựng", slug: "quan-ly-khoi-luong-xay-dung" },
-    { name: "Thiết kế BIM xây dựng", slug: "thiet-ke-bim-xay-dung" },
-    { name: "Đọc được bản vẽ kỹ thuật", slug: "doc-duoc-ban-ve-ky-thuat" },
-    { name: "Có bằng thi công nội thất", slug: "co-bang-thi-cong-noi-that" }
-];
-
-const getFutureMonths = () => {
-    const months = [];
-    const today = new Date();
-    for (let i = 1; i <= 12; i++) { // next 12 months
-        const futureDate = new Date(today.getFullYear(), today.getMonth() + i, 1);
-        const month = futureDate.getMonth() + 1;
-        const year = futureDate.getFullYear();
-        months.push(`Tháng ${month}/${year}`);
-    }
-    return months;
-};
 
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);

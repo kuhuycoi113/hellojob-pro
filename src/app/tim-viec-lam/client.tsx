@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
@@ -9,7 +10,7 @@ import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/locat
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType, type Industry, allIndustries } from '@/lib/industry-data';
-import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts, otherSkills } from '@/lib/visa-data';
+import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels } from '@/lib/visa-data';
 import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 import { JsonLdScript } from '@/components/json-ld-script';
 
@@ -193,50 +194,6 @@ const tattooRequirements = [
     { name: "Nhận xăm nhỏ (kín)", slug: "nhan-xam-nho-kin" },
     { name: "Nhận cả xăm to (lộ)", slug: "nhan-ca-xam-to-lo" },
 ];
-
-const languageLevels = [
-    { name: 'N1', slug: 'n1' },
-    { name: 'N2', slug: 'n2' },
-    { name: 'N3', slug: 'n3' },
-    { name: 'N4', slug: 'n4' },
-    { name: 'N5', slug: 'n5' },
-    { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
-];
-
-const englishLevels = [
-    { name: 'TOEIC 900+', slug: 'toeic-900' },
-    { name: 'TOEIC 800+', slug: 'toeic-800' },
-    { name: 'TOEIC 700+', slug: 'toeic-700' },
-    { name: 'TOEIC 600+', slug: 'toeic-600' },
-    { name: 'TOEIC 500+', slug: 'toeic-500' },
-    { name: 'IELTS 7.0+', slug: 'ielts-7.0' },
-    { name: 'IELTS 6.0+', slug: 'ielts-6.0' },
-    { name: 'IELTS 5.0+', slug: 'ielts-5.0' },
-    { name: 'Giao tiếp tốt', slug: 'giao-tiep-tot' },
-    { name: 'Giao tiếp cơ bản', slug: 'giao-tiep-co-ban' },
-    { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
-];
-
-
-const educationLevels = [
-    { name: "Tất cả", slug: "all" },
-    { name: "Không yêu cầu", slug: "khong-yeu-cau" },
-    { name: "Tốt nghiệp THPT", slug: "tot-nghiep-thpt" },
-    { name: "Tốt nghiệp Trung cấp", slug: "tot-nghiep-trung-cap" },
-    { name: "Tốt nghiệp Cao đẳng", slug: "tot-nghiep-cao-dang" },
-    { name: "Tốt nghiệp Đại học", slug: "tot-nghiep-dai-hoc" },
-    { name: "Tốt nghiệp Senmon", slug: "tot-nghiep-senmon" },
-];
-
-const dominantHands = [
-    { name: "Tất cả", slug: "all" },
-    { name: "Tay phải", slug: "tay-phai" },
-    { name: "Tay trái", slug: "tay-trai" },
-    { name: "Cả hai tay", slug: "ca-hai-tay" },
-];
-
-
-
 
 export default function JobSearchPageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
     const router = useRouter();
