@@ -54,12 +54,14 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const visionSlug = searchParams['yeu-cau-thi-luc'] as string;
   const genderSlug = searchParams['gioi-tinh'] as string;
   const ageParam = searchParams['do-tuoi'];
+  const heightParam = searchParams['chieu-cao'];
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
   const specialConditionSlugs = Array.isArray(specialConditionsParam) ? specialConditionsParam : (specialConditionsParam ? [specialConditionsParam] : []);
   const otherSkillSlugs = Array.isArray(otherSkillParam) ? otherSkillParam : (otherSkillParam ? [otherSkillParam] : []);
   const ages = Array.isArray(ageParam) ? ageParam : (ageParam ? [ageParam] : []);
+  const heights = Array.isArray(heightParam) ? heightParam : (heightParam ? [heightParam] : []);
 
 
   let titleParts: string[] = [];
@@ -121,6 +123,10 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (ages.length === 2 && ages[0] && ages[1]) {
     titleParts.push(`tuổi từ ${ages[0]} đến ${ages[1]}`);
   }
+  
+  if (heights.length === 2 && heights[0] && heights[1]) {
+    titleParts.push(`chiều cao từ ${heights[0]}cm đến ${heights[1]}cm`);
+  }
 
 
   if (locations.length > 0) {
@@ -160,6 +166,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (visionSlug) cleanSearchParams['yeu-cau-thi-luc'] = visionSlug;
   if (genderSlug) cleanSearchParams['gioi-tinh'] = genderSlug;
   if (ages.length > 0) cleanSearchParams['do-tuoi'] = ages;
+  if (heights.length > 0) cleanSearchParams['chieu-cao'] = heights;
 
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
