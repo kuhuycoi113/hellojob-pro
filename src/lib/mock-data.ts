@@ -531,5 +531,14 @@ missingPrefectures.forEach((prefecture, i) => {
     currentIndex += numJobsToCreate;
 });
 
+// List of visa details that have special fee handling
+export const controlledFeeVisas = [
+  'Thực tập sinh 3 năm',
+  'Thực tập sinh 1 năm',
+  'Đặc định đi mới',
+  'Kỹ sư, tri thức đầu Việt',
+  'Đặc định đầu Việt'
+];
+
 export const jobData: Job[] = [...initialJobs, ...newlyAddedJobs];
     
