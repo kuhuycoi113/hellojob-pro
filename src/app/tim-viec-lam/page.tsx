@@ -42,6 +42,14 @@ const formatCmToMeter = (cm: string): string => {
     return `${meters}m${centimeters < 10 ? '0' : ''}${centimeters}`;
 }
 
+const interviewRoundsOptions = [
+    { name: "1 vòng", slug: "1-vong" },
+    { name: "2 vòng", slug: "2-vong" },
+    { name: "3 vòng", slug: "3-vong" },
+    { name: "4 vòng", slug: "4-vong" },
+    { name: "5 vòng", slug: "5-vong" }
+];
+
 
 const sortSlugToNameMap: { [key: string]: string } = {
     'moi-nhat': 'Mới nhất',
@@ -90,6 +98,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const annualIncome = searchParams['thu-nhap-nam'] as string;
   const annualBonus = searchParams['thuong-nam'] as string;
   const interviewDate = searchParams['ngay-phong-van'] as string;
+  const interviewRoundsSlug = searchParams['so-vong-phong-van'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -214,6 +223,13 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     }
   }
 
+  if (interviewRoundsSlug) {
+    const roundsName = getNameFromSlug(interviewRoundsSlug, interviewRoundsOptions);
+    if (roundsName) {
+        titleParts.push(`phỏng vấn ${roundsName}`);
+    }
+  }
+
 
   if (locations.length > 0) {
       const locationNames = locations.map(slug => {
@@ -262,6 +278,8 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (annualIncome) cleanSearchParams['thu-nhap-nam'] = annualIncome;
   if (annualBonus) cleanSearchParams['thuong-nam'] = annualBonus;
   if (interviewDate) cleanSearchParams['ngay-phong-van'] = interviewDate;
+  if (interviewRoundsSlug) cleanSearchParams['so-vong-phong-van'] = interviewRoundsSlug;
+
 
 
   
@@ -301,6 +319,3 @@ export default function JobSearchPage({ searchParams }: { searchParams: SearchPa
     </Suspense>
   );
 }
-
-    
-
