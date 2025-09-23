@@ -205,7 +205,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 
   if (interviewDate) {
     if (interviewDate === 'flexible') {
-        titleParts.push('phỏng vấn linh hoạt');
+        titleParts.push('ngày phỏng vấn linh hoạt');
     } else {
         const parsedDate = parse(interviewDate, 'yyyy-MM-dd', new Date());
         if (isValid(parsedDate)) {
@@ -303,3 +303,4 @@ export default function JobSearchPage({ searchParams }: { searchParams: SearchPa
 }
 
     
+
