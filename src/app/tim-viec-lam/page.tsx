@@ -17,6 +17,22 @@ const getNameFromSlug = (slug: string, data: { name: string; slug: string }[]): 
   return data.find(item => item.slug === slug)?.name;
 };
 
+const sortSlugToNameMap: { [key: string]: string } = {
+    'moi-nhat': 'Mới nhất',
+    'luong-co-ban-cao-den-thap': 'Lương cao nhất',
+    'luong-co-ban-thap-den-cao': 'Lương thấp nhất',
+    'thuc-linh-cao-den-thap': 'Thực lĩnh cao nhất',
+    'thuc-linh-thap-den-cao': 'Thực lĩnh thấp nhất',
+    'phi-thap-den-cao': 'Phí thấp nhất',
+    'phi-cao-den-thap': 'Phí cao nhất',
+    'phong-van-gan-nhat': 'Phỏng vấn gần nhất',
+    'phong-van-xa-nhat': 'Phỏng vấn xa nhất',
+    'uu-tien-co-anh': 'Ưu tiên có ảnh',
+    'uu-tien-co-video': 'Ưu tiên có video',
+    'hot-nhat': 'Hot nhất',
+    'nhieu-nguoi-ung-tuyen': 'Nhiều người ứng tuyển',
+};
+
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const siteName = 'HelloJob';
   const baseUrl = 'https://vi.hellojob.jp';
@@ -25,10 +41,15 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const visaDetailSlug = searchParams['chi-tiet-loai-hinh-visa'] as string;
   const industrySlug = searchParams['nganh-nghe'] as string;
   const locationParam = searchParams['dia-diem'];
+  const sortBySlug = searchParams['sap-xep'] as string;
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
 
   let titleParts: string[] = [];
+  
+  const sortName = sortBySlug ? sortSlugToNameMap[sortBySlug] : undefined;
+  if (sortName) titleParts.push(sortName);
+  
   if (q) titleParts.push(`"${q}"`);
 
   let visaDetailName: string | undefined;
@@ -55,12 +76,13 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
       if (locationNames) titleParts.push(`tại ${locationNames}`);
   }
 
+  const baseTitle = "Việc làm";
   const title = titleParts.length > 0
-    ? `Việc làm ${titleParts.join(' ')} | ${siteName}`
+    ? `${baseTitle} ${titleParts.join(' ')} | ${siteName}`
     : `Tìm kiếm việc làm tại Nhật Bản | ${siteName}`;
 
   const description = titleParts.length > 0
-    ? `Khám phá các cơ hội việc làm ${titleParts.join(' ')} tại Nhật Bản. Hàng ngàn đơn hàng Kỹ năng đặc định, Thực tập sinh, Kỹ sư đang chờ bạn ứng tuyển trên HelloJob.`
+    ? `Danh sách việc làm ${titleParts.join(' ')} tại Nhật Bản. Hàng ngàn đơn hàng Kỹ năng đặc định, Thực tập sinh, Kỹ sư đang chờ bạn ứng tuyển trên HelloJob.`
     : 'Tìm kiếm hàng ngàn cơ hội việc làm tại Nhật Bản. HelloJob là nền tảng giúp bạn tìm kiếm việc làm theo ngành nghề, địa điểm và loại visa phù hợp nhất.';
   
   // Safely construct URLSearchParams
@@ -69,6 +91,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (visaDetailSlug) cleanSearchParams['chi-tiet-loai-hinh-visa'] = visaDetailSlug;
   if (industrySlug) cleanSearchParams['nganh-nghe'] = industrySlug;
   if (locations.length > 0) cleanSearchParams['dia-diem'] = locations;
+  if (sortBySlug) cleanSearchParams['sap-xep'] = sortBySlug;
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams).toString()}`;
 

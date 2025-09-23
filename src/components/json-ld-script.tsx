@@ -5,16 +5,19 @@ import { useState, useEffect } from 'react';
 import type { Job } from '@/lib/mock-data';
 
 interface JsonLdScriptProps {
-    job: Job;
+    job?: Job;
+    jobList?: Job[];
+    pageMetadata?: {
+        title: string;
+        description: string;
+    }
 }
 
-export const JsonLdScript = ({ job }: JsonLdScriptProps) => {
+export const JsonLdScript = ({ job, jobList, pageMetadata }: JsonLdScriptProps) => {
     const [structuredData, setStructuredData] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!job) return;
-
-        const getJobPostingStructuredData = () => {
+        const getJobPostingStructuredData = (job: Job) => {
             const today = new Date();
             const postedDate = new Date(today);
             postedDate.setDate(today.getDate() + job.postedTimeOffset);
@@ -71,12 +74,35 @@ export const JsonLdScript = ({ job }: JsonLdScriptProps) => {
                     }
                 })
             };
-            return JSON.stringify(data);
+            return data;
         };
         
-        setStructuredData(getJobPostingStructuredData());
+        const getItemListStructuredData = (jobs: Job[], metadata: { title: string, description: string }) => {
+            return {
+                "@context": "https://schema.org",
+                "@type": "ItemList",
+                "name": metadata.title,
+                "description": metadata.description,
+                "numberOfItems": jobs.length,
+                "itemListElement": jobs.map((job, index) => ({
+                    "@type": "ListItem",
+                    "position": index + 1,
+                    "item": {
+                        "@type": "JobPosting",
+                        "url": `https://vi.hellojob.jp/viec-lam/${job.id}`,
+                        "title": job.title
+                    }
+                }))
+            };
+        };
 
-    }, [job]);
+        if (job) {
+             setStructuredData(JSON.stringify(getJobPostingStructuredData(job)));
+        } else if (jobList && pageMetadata) {
+             setStructuredData(JSON.stringify(getItemListStructuredData(jobList, pageMetadata)));
+        }
+
+    }, [job, jobList, pageMetadata]);
 
     if (!structuredData) {
         return null;

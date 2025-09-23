@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
@@ -12,6 +11,7 @@ import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType, type Industry, allIndustries } from '@/lib/industry-data';
 import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts } from '@/lib/visa-data';
 import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
+import { JsonLdScript } from '@/components/json-ld-script';
 
 
 const initialSearchFilters: SearchFilters = {
@@ -89,6 +89,26 @@ const keyMap: { [key: string]: string } = {
 
 const reverseKeyMap: { [key: string]: string } = Object.fromEntries(
   Object.entries(keyMap).map(([key, value]) => [value, key])
+);
+
+const sortOptionMap: { [key: string]: string } = {
+  newest: 'moi-nhat',
+  salary_desc: 'luong-co-ban-cao-den-thap',
+  salary_asc: 'luong-co-ban-thap-den-cao',
+  net_salary_desc: 'thuc-linh-cao-den-thap',
+  net_salary_asc: 'thuc-linh-thap-den-cao',
+  fee_asc: 'phi-thap-den-cao',
+  fee_desc: 'phi-cao-den-thap',
+  interview_date_asc: 'phong-van-gan-nhat',
+  interview_date_desc: 'phong-van-xa-nhat',
+  has_image: 'uu-tien-co-anh',
+  has_video: 'uu-tien-co-video',
+  hot: 'hot-nhat',
+  most_applicants: 'nhieu-nguoi-ung-tuyen',
+};
+
+const reverseSortOptionMap: { [key: string]: string } = Object.fromEntries(
+    Object.entries(sortOptionMap).map(([key, value]) => [value, key])
 );
 
 
@@ -252,6 +272,8 @@ export default function JobSearchPageContent() {
     
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
     const [stagedResultCount, setStagedResultCount] = useState<number>(jobData.length);
+    const [pageTitle, setPageTitle] = useState("Tìm kiếm việc làm tại Nhật Bản");
+    const [pageDescription, setPageDescription] = useState("Tìm kiếm hàng ngàn cơ hội việc làm tại Nhật Bản.");
 
     
     const runFilter = useCallback((filtersToApply: SearchFilters, sortOption: string) => {
@@ -615,13 +637,12 @@ export default function JobSearchPageContent() {
 
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters, location: [], specialConditions: [] };
-        let hasSortBy = false;
+        let sortOption = 'newest';
 
         for (const [key, value] of searchParams.entries()) {
             const internalKey = reverseKeyMap[key] || key;
             if (internalKey === 'sortBy') {
-                setSortBy(value);
-                hasSortBy = true;
+                sortOption = reverseSortOptionMap[value] || 'newest';
             } else if (internalKey === 'location' || internalKey === 'otherSkillRequirement') {
                 const currentValues = newFilters[internalKey as 'location' | 'otherSkillRequirement'] || [];
                 // @ts-ignore
@@ -647,12 +668,11 @@ export default function JobSearchPageContent() {
                  }
             }
         }
-        if (!hasSortBy) {
-            setSortBy('newest'); // default sort
-        }
+        
+        setSortBy(sortOption);
         setAppliedFilters(newFilters);
         setStagedFilters(newFilters);
-        runFilter(newFilters, hasSortBy ? searchParams.get('sap-xep')! : 'newest');
+        runFilter(newFilters, sortOption);
         countStagedResults(newFilters);
         
     }, [searchParams, runFilter, countStagedResults]);
@@ -690,7 +710,7 @@ export default function JobSearchPageContent() {
         });
 
         if (sortBy !== 'newest') {
-            query.set(keyMap['sortBy'], sortBy);
+            query.set(keyMap['sortBy'], sortOptionMap[sortBy]);
         }
         router.push(`/tim-viec-lam?${query.toString()}`);
     }, [stagedFilters, sortBy, router]);
@@ -701,7 +721,7 @@ export default function JobSearchPageContent() {
         if (value === 'newest') {
             query.delete(keyMap['sortBy']);
         } else {
-            query.set(keyMap['sortBy'], value);
+            query.set(keyMap['sortBy'], sortOptionMap[value]);
         }
         router.push(`/tim-viec-lam?${query.toString()}`);
     };
@@ -732,7 +752,7 @@ export default function JobSearchPageContent() {
                 query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
             }
             if (criteria?.sortBy) {
-                query.set('sap-xep', 'salary_desc');
+                query.set('sap-xep', sortOptionMap['salary_desc']);
             }
             if (!criteria?.industry && !criteria?.workLocation && !criteria?.visaType && !criteria.gender && !criteria.sortBy) {
                 query.set('q', filters.q);
@@ -750,8 +770,24 @@ export default function JobSearchPageContent() {
         router.push(`/tim-viec-lam?${query.toString()}`);
     }
 
+    // This effect runs once when the component mounts to set the initial document title
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            document.title = pageTitle;
+            const descEl = document.querySelector('meta[name="description"]');
+            if(descEl) {
+                descEl.setAttribute('content', pageDescription);
+            }
+        }
+    }, [pageTitle, pageDescription]);
+
+
     return (
         <div className="flex flex-col">
+            <JsonLdScript 
+                jobList={filteredJobs} 
+                pageMetadata={{ title: pageTitle, description: pageDescription }} 
+            />
             <SearchModule 
                 onSearch={handleNewSearch} 
                 filters={stagedFilters}
