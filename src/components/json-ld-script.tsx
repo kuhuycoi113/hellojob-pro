@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import type { Job } from '@/lib/mock-data';
 import type { SearchFilters } from './search-results';
 import { allIndustries } from '@/lib/industry-data';
+import { publicFeeLimits, controlledFeeVisas } from '@/lib/mock-data';
 
 interface JsonLdScriptProps {
     job?: Job;
@@ -40,6 +41,27 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
             `;
 
             const industryData = allIndustries.find(ind => ind.name === job.industry);
+
+            const getApplicantLocationRequirements = () => {
+                if (!controlledFeeVisas.includes(job.visaDetail || '')) {
+                    return undefined;
+                }
+                const feeLimit = publicFeeLimits[job.visaDetail as keyof typeof publicFeeLimits];
+                let feeValue : number | undefined;
+                
+                if (job.netFee) feeValue = parseInt(job.netFee);
+                else if (job.netFeeNoTicket) feeValue = parseInt(job.netFeeNoTicket);
+                else if (job.netFeeWithTuition) feeValue = parseInt(job.netFeeWithTuition);
+
+                if (feeValue === undefined || feeValue > feeLimit) {
+                    return undefined;
+                }
+                
+                return {
+                    "@type": "LocationFeatureSpecification",
+                    "description": `Yêu cầu chi phí dịch vụ cho ứng viên tại Việt Nam: Khoảng ${feeValue.toLocaleString('en-US')} USD.`
+                }
+            }
 
             const data = {
                 "@context": "https://schema.org/",
@@ -86,7 +108,8 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                             "unitText": "MONTH"
                         }
                     }
-                })
+                }),
+                ...(getApplicantLocationRequirements() && { "applicantLocationRequirements": getApplicantLocationRequirements() })
             };
             return data;
         };
@@ -129,3 +152,5 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
         />
     );
 };
+
+    

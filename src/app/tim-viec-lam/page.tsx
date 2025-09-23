@@ -102,6 +102,8 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const interviewDate = searchParams['ngay-phong-van'] as string;
   const interviewRoundsSlug = searchParams['so-vong-phong-van'] as string;
   const jobDetailSlug = searchParams['chi-tiet-cong-viec'] as string;
+  const netFee = searchParams['muc-phi'] as string;
+  const netFeeNoTicket = searchParams['muc-phi-khong-ve'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -218,6 +220,15 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     const formattedBonus = parseInt(annualBonus, 10).toLocaleString('ja-JP');
     titleParts.push(`có thưởng năm từ ${formattedBonus} yên`);
   }
+  
+  if (netFee) {
+      const formattedFee = parseInt(netFee, 10).toLocaleString('en-US');
+      titleParts.push(`phí dưới ${formattedFee} USD`);
+  }
+  if (netFeeNoTicket) {
+      const formattedFee = parseInt(netFeeNoTicket, 10).toLocaleString('en-US');
+      titleParts.push(`phí không vé dưới ${formattedFee} USD`);
+  }
 
   if (interviewDate) {
     if (interviewDate === 'flexible') {
@@ -291,6 +302,8 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (hourlySalary) cleanSearchParams['luong-gio'] = hourlySalary;
   if (annualIncome) cleanSearchParams['thu-nhap-nam'] = annualIncome;
   if (annualBonus) cleanSearchParams['thuong-nam'] = annualBonus;
+  if (netFee) cleanSearchParams['muc-phi'] = netFee;
+  if (netFeeNoTicket) cleanSearchParams['muc-phi-khong-ve'] = netFeeNoTicket;
   if (interviewDate) cleanSearchParams['ngay-phong-van'] = interviewDate;
   if (interviewRoundsSlug) cleanSearchParams['so-vong-phong-van'] = interviewRoundsSlug;
   if (jobDetailSlug) cleanSearchParams['chi-tiet-cong-viec'] = jobDetailSlug;
@@ -334,3 +347,5 @@ export default function JobSearchPage({ searchParams }: { searchParams: SearchPa
     </Suspense>
   );
 }
+
+    
