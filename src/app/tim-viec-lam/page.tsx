@@ -52,6 +52,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const englishSlug = searchParams['yeu-cau-tieng-anh'] as string;
   const tattooSlug = searchParams['hinh-xam'] as string;
   const visionSlug = searchParams['yeu-cau-thi-luc'] as string;
+  const genderSlug = searchParams['gioi-tinh'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -105,10 +106,15 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (englishName && englishName !== "Không yêu cầu") titleParts.push(`yêu cầu Tiếng Anh ${englishName}`);
   
   const tattooName = tattooSlug ? getNameFromSlug(tattooSlug, tattooRequirements) : undefined;
-  if (tattooName && tattooName !== "Không yêu cầu") titleParts.push(`${tattooName}`);
+  if (tattooName && tattooName !== "Không yêu cầu" && tattooName !== "Tất cả") titleParts.push(tattooName);
   
   const visionName = visionSlug ? getNameFromSlug(visionSlug, visionRequirements) : undefined;
-  if (visionName && visionName !== "Không yêu cầu") titleParts.push(`yêu cầu ${visionName}`);
+  if (visionName && visionName !== "Không yêu cầu" && visionName !== "Tất cả") titleParts.push(`yêu cầu ${visionName}`);
+  
+  if (genderSlug) {
+    if (genderSlug === 'nam') titleParts.push('cho Nam');
+    if (genderSlug === 'nu') titleParts.push('cho Nữ');
+  }
 
 
   if (locations.length > 0) {
@@ -146,6 +152,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (englishSlug) cleanSearchParams['yeu-cau-tieng-anh'] = englishSlug;
   if (tattooSlug) cleanSearchParams['hinh-xam'] = tattooSlug;
   if (visionSlug) cleanSearchParams['yeu-cau-thi-luc'] = visionSlug;
+  if (genderSlug) cleanSearchParams['gioi-tinh'] = genderSlug;
 
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
