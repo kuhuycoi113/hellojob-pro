@@ -20,10 +20,10 @@ const createSlug = (str: string) => {
     return str
         .toLowerCase()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[\u0000-\u036f]/g, "")
         .replace(/đ/g, "d")
         .replace(/\s+/g, '-')
-        .replace(/[^\w\-]+/g, '');
+        .replace(/[^\w\-.]+/g, '');
 };
 
 const getNameFromSlug = (slug: string, data: { name: string; slug: string }[] | string[]): string | undefined => {
@@ -86,6 +86,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const netSalary = searchParams['luong-thuc-linh'] as string;
   const basicSalary = searchParams['luong-co-ban'] as string;
   const hourlySalary = searchParams['luong-gio'] as string;
+  const annualIncome = searchParams['thu-nhap-nam'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -188,6 +189,11 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     const formattedSalary = parseInt(hourlySalary, 10).toLocaleString('ja-JP');
     titleParts.push(`lương giờ từ ${formattedSalary} yên`);
   }
+  
+  if (annualIncome) {
+    const formattedSalary = parseInt(annualIncome, 10).toLocaleString('ja-JP');
+    titleParts.push(`thu nhập năm từ ${formattedSalary} yên`);
+  }
 
 
   if (locations.length > 0) {
@@ -234,6 +240,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (netSalary) cleanSearchParams['luong-thuc-linh'] = netSalary;
   if (basicSalary) cleanSearchParams['luong-co-ban'] = basicSalary;
   if (hourlySalary) cleanSearchParams['luong-gio'] = hourlySalary;
+  if (annualIncome) cleanSearchParams['thu-nhap-nam'] = annualIncome;
 
 
   
