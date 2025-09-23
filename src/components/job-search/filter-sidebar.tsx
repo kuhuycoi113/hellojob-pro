@@ -150,10 +150,15 @@ const getConvertedValue = (value: string | undefined, placeholder: string, rate:
 
     if (unit === 'triệu VNĐ') {
         const valueInMillions = convertedValue / 1000000;
-        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1
-        });
+        const formattingOptions: Intl.NumberFormatOptions = {
+            maximumFractionDigits: 1,
+        };
+        if (valueInMillions % 1 === 0) {
+            formattingOptions.minimumFractionDigits = 0;
+        } else {
+            formattingOptions.minimumFractionDigits = 1;
+        }
+        const formattedVnd = valueInMillions.toLocaleString('vi-VN', formattingOptions);
         return `≈ ${formattedVnd.replace('.',',')} triệu VNĐ`;
     }
     
