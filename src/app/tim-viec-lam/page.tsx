@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
 import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements, visionRequirements, experienceYears } from '@/lib/visa-data';
-import { allJapanLocations, japanRegions } from '@/lib/location-data';
+import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 import { format, isValid, parse } from 'date-fns';
 
@@ -75,6 +75,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const visaDetailSlug = searchParams['chi-tiet-loai-hinh-visa'] as string;
   const industrySlug = searchParams['nganh-nghe'] as string;
   const locationParam = searchParams['dia-diem'];
+  const interviewLocationSlug = searchParams['dia-diem-phong-van'] as string;
   const specialConditionsParam = searchParams['dieu-kien-dac-biet'];
   const sortBySlug = searchParams['sap-xep'] as string;
   const quantity = searchParams['so-luong'] as string;
@@ -230,6 +231,12 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     }
   }
 
+  const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
+  const interviewLocationName = interviewLocationSlug ? getNameFromSlug(interviewLocationSlug, allInterviewLocations) : undefined;
+  if (interviewLocationName) {
+    titleParts.push(`phỏng vấn tại ${interviewLocationName}`);
+  }
+
 
   if (locations.length > 0) {
       const locationNames = locations.map(slug => {
@@ -255,6 +262,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (visaDetailSlug) cleanSearchParams['chi-tiet-loai-hinh-visa'] = visaDetailSlug;
   if (industrySlug) cleanSearchParams['nganh-nghe'] = industrySlug;
   if (locations.length > 0) cleanSearchParams['dia-diem'] = locations;
+  if (interviewLocationSlug) cleanSearchParams['dia-diem-phong-van'] = interviewLocationSlug;
   if (specialConditionSlugs.length > 0) cleanSearchParams['dieu-kien-dac-biet'] = specialConditionSlugs;
   if (sortBySlug) cleanSearchParams['sap-xep'] = sortBySlug;
   if (quantity) cleanSearchParams['so-luong'] = quantity;
