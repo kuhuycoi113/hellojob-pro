@@ -53,11 +53,13 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const tattooSlug = searchParams['hinh-xam'] as string;
   const visionSlug = searchParams['yeu-cau-thi-luc'] as string;
   const genderSlug = searchParams['gioi-tinh'] as string;
+  const ageParam = searchParams['do-tuoi'];
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
   const specialConditionSlugs = Array.isArray(specialConditionsParam) ? specialConditionsParam : (specialConditionsParam ? [specialConditionsParam] : []);
   const otherSkillSlugs = Array.isArray(otherSkillParam) ? otherSkillParam : (otherSkillParam ? [otherSkillParam] : []);
+  const ages = Array.isArray(ageParam) ? ageParam : (ageParam ? [ageParam] : []);
 
 
   let titleParts: string[] = [];
@@ -116,6 +118,10 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     if (genderSlug === 'nu') titleParts.push('cho Nữ');
   }
 
+  if (ages.length === 2 && ages[0] && ages[1]) {
+    titleParts.push(`tuổi từ ${ages[0]} đến ${ages[1]}`);
+  }
+
 
   if (locations.length > 0) {
       const locationNames = locations.map(slug => {
@@ -153,6 +159,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (tattooSlug) cleanSearchParams['hinh-xam'] = tattooSlug;
   if (visionSlug) cleanSearchParams['yeu-cau-thi-luc'] = visionSlug;
   if (genderSlug) cleanSearchParams['gioi-tinh'] = genderSlug;
+  if (ages.length > 0) cleanSearchParams['do-tuoi'] = ages;
 
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
