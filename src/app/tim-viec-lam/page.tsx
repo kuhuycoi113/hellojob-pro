@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -48,6 +48,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const otherSkillParam = searchParams['yeu-cau-ky-nang-khac'];
   const dominantHandSlug = searchParams['tay-thuan'] as string;
   const educationSlug = searchParams['hoc-van'] as string;
+  const languageSlug = searchParams['yeu-cau-tieng-nhat'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -93,6 +94,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 
   const educationName = educationSlug ? getNameFromSlug(educationSlug, educationLevels) : undefined;
   if (educationName && educationName !== "Tất cả") titleParts.push(`yêu cầu ${educationName}`);
+  
+  const languageName = languageSlug ? getNameFromSlug(languageSlug, languageLevels) : undefined;
+  if (languageName) titleParts.push(`yêu cầu Tiếng Nhật ${languageName}`);
 
 
   if (locations.length > 0) {
@@ -126,6 +130,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (otherSkillSlugs.length > 0) cleanSearchParams['yeu-cau-ky-nang-khac'] = otherSkillSlugs;
   if (dominantHandSlug) cleanSearchParams['tay-thuan'] = dominantHandSlug;
   if (educationSlug) cleanSearchParams['hoc-van'] = educationSlug;
+  if (languageSlug) cleanSearchParams['yeu-cau-tieng-nhat'] = languageSlug;
 
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
