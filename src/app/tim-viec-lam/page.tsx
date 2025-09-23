@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { allSpecialConditions, visaDetailsByVisaType } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType, workShifts } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 
@@ -44,6 +44,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const specialConditionsParam = searchParams['dieu-kien-dac-biet'];
   const sortBySlug = searchParams['sap-xep'] as string;
   const quantity = searchParams['so-luong'] as string;
+  const workShiftSlug = searchParams['ca-lam-viec'] as string;
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
   const specialConditionSlugs = Array.isArray(specialConditionsParam) ? specialConditionsParam : (specialConditionsParam ? [specialConditionsParam] : []);
@@ -73,6 +74,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   
   const specialConditionNames = specialConditionSlugs.map(slug => getNameFromSlug(slug, allSpecialConditions)).filter(Boolean).join(', ');
   if (specialConditionNames) titleParts.push(specialConditionNames);
+  
+  const workShiftName = workShiftSlug ? getNameFromSlug(workShiftSlug, workShifts) : undefined;
+  if (workShiftName) titleParts.push(workShiftName);
 
   if (quantity) titleParts.push(`tuyển từ ${quantity} người`);
 
@@ -103,6 +107,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (specialConditionSlugs.length > 0) cleanSearchParams['dieu-kien-dac-biet'] = specialConditionSlugs;
   if (sortBySlug) cleanSearchParams['sap-xep'] = sortBySlug;
   if (quantity) cleanSearchParams['so-luong'] = quantity;
+  if (workShiftSlug) cleanSearchParams['ca-lam-viec'] = workShiftSlug;
   
   const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
 
