@@ -68,6 +68,18 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 qualifications += `. Yêu cầu ứng viên có visa Kỹ năng đặc định với thời hạn còn lại ${job.ginouExpiryRequirement.toLowerCase()}.`;
             }
 
+            const getJobStartDate = () => {
+                if (!job.companyArrivalTime) return undefined;
+                // Parse "Tháng MM/YYYY"
+                const parts = job.companyArrivalTime.match(/(\d+)\/(\d+)/);
+                if (parts && parts.length === 3) {
+                    const month = parts[1].padStart(2, '0');
+                    const year = parts[2];
+                    return `${year}-${month}-01`;
+                }
+                return undefined;
+            }
+
 
             const data = {
                 "@context": "https://schema.org/",
@@ -115,7 +127,8 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                         }
                     }
                 }),
-                ...(getApplicantLocationRequirements() && { "applicantLocationRequirements": getApplicantLocationRequirements() })
+                ...(getApplicantLocationRequirements() && { "applicantLocationRequirements": getApplicantLocationRequirements() }),
+                ...(getJobStartDate() && { "jobStartDate": getJobStartDate() })
             };
             return data;
         };

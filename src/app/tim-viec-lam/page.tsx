@@ -117,6 +117,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const netFee = searchParams['muc-phi'] as string;
   const netFeeNoTicket = searchParams['muc-phi-khong-ve'] as string;
   const ginouExpirySlug = searchParams['han-ginou'] as string;
+  const companyArrivalTime = searchParams['thoi-diem-ve-cong-ty'] as string;
 
 
   const locations = Array.isArray(locationParam) ? locationParam : (locationParam ? [locationParam] : []);
@@ -265,6 +266,11 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     if (ginouExpiryName) {
         titleParts.push(`yêu cầu hạn Ginou ${ginouExpiryName.toLowerCase()}`);
     }
+  
+  if (companyArrivalTime) {
+      const formattedDate = companyArrivalTime.replace(/-/g, '/').replace('Thang ', 'Tháng ');
+      titleParts.push(`yêu cầu thời điểm về công ty vào ${formattedDate}`);
+  }
 
 
   const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
@@ -327,6 +333,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (interviewRoundsSlug) cleanSearchParams['so-vong-phong-van'] = interviewRoundsSlug;
   if (jobDetailSlug) cleanSearchParams['chi-tiet-cong-viec'] = jobDetailSlug;
   if (ginouExpirySlug) cleanSearchParams['han-ginou'] = ginouExpirySlug;
+  if (companyArrivalTime) cleanSearchParams['thoi-diem-ve-cong-ty'] = companyArrivalTime;
 
 
 
