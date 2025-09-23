@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useCallback, useRef, useState, useEffect } from "react";
@@ -172,7 +171,7 @@ export const SearchResults = ({ jobs, filters, appliedFilters, onFilterChange, a
                     {jobs.length > 0 ? (
                         <div className="grid grid-cols-1 gap-4">
                         {jobs.slice(0, visibleJobsCount).map((job, index) => {
-                            const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} />;
+                            const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} />;
                             if (index === visibleJobsCount - 1) {
                                 return <div ref={lastJobElementRef} key={job.id}>{card}</div>
                             }

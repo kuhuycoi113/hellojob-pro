@@ -117,7 +117,6 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
         const vndValue = numericValue * JPY_VND_RATE;
         const valueInMillions = vndValue / 1000000;
         
-        // Check if it's a whole number
         if (valueInMillions % 1 === 0) {
             return `${valueInMillions.toLocaleString('vi-VN')}tr`;
         }
@@ -133,7 +132,7 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 };
 
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = false, appliedFilters }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters }) => {
+export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = false, appliedFilters, isSearchPage = false }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean }) => {
   const { isLoggedIn } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -238,12 +237,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
       const isControlledVisa = controlledFeeVisas.includes(visaDetail || '');
       
-      const visasForVnd = [
-          'Thực tập sinh 3 năm',
-          'Thực tập sinh 1 năm',
-          'Đặc định đi mới',
-          'Kỹ sư, tri thức đầu Việt'
-      ];
       const visasForUsd = ['Đặc định đầu Việt'];
 
       let feeValue: number | undefined;
@@ -261,18 +254,19 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       }
       
       if (!feeLabel || feeValue === undefined) {
-          return { shouldShow: isControlledVisa, text: `${feeLabel || 'Phí'}: Không rõ` };
+          return { shouldShow: isControlledVisa, text: `Phí: Không rõ` };
       }
       
       if (isControlledVisa && feeValue > feeLimit) {
-          return { shouldShow: true, text: `${feeLabel}: Không rõ` };
+          return { shouldShow: true, text: `Phí: Không rõ` };
       }
 
-      if (visaDetail && visasForVnd.includes(visaDetail)) {
+      if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
           const vndValue = feeValue * USD_VND_RATE;
           const valueInMillions = vndValue / 1000000;
           let formattedVnd: string;
-          if (valueInMillions % 1 === 0) {
+          // Apply rounding only on search page
+          if (isSearchPage && valueInMillions % 1 === 0) {
               formattedVnd = valueInMillions.toLocaleString('vi-VN');
           } else {
               formattedVnd = valueInMillions.toLocaleString('vi-VN', {
@@ -288,7 +282,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       }
 
       // Default fallback for other controlled visas or if logic doesn't match
-      return { shouldShow: true, text: `${feeLabel}: $${formatCurrency(String(feeValue))}` };
+      return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
   };
 
 
