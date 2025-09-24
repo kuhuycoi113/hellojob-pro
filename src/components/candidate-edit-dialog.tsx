@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import { vi } from 'date-fns/locale';
 import { CalendarIcon, Info, QrCode, UploadCloud, Image as ImageIcon, Phone, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { JpFlagIcon, VnFlagIcon } from './custom-icons';
+import { JpFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon } from './custom-icons';
 import type { CandidateProfile } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Badge } from './ui/badge';
@@ -87,7 +87,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
     if (country === '+84') { // Vietnam (10 digits total)
         if (!cleanValue.startsWith('0')) return cleanValue.slice(0,9);
         if (cleanValue.length === 0) return '';
-        if (cleanValue.length === 1) return '(0)';
+        if (cleanValue.length === 1) return `(0)`;
 
         const mobilePart = cleanValue.substring(1);
         if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
@@ -98,7 +98,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
     if (country === '+81') { // Japan (11 digits total starting with 0)
         if (!cleanValue.startsWith('0')) return cleanValue.slice(0,10);
         if (cleanValue.length === 0) return '';
-        if (cleanValue.length === 1) return '(0)';
+        if (cleanValue.length === 1) return `(0)`;
         
         const mobilePart = cleanValue.substring(1); 
         if (mobilePart.length <= 2) return `(0)${mobilePart}`;
@@ -307,7 +307,7 @@ const renderLevel1Edit = (
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="zalo" className="flex items-center gap-2">
-                             <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
+                             <ZaloIcon />
                              Zalo (Số điện thoại)
                         </Label>
                         <div className="flex items-center relative">
@@ -333,7 +333,7 @@ const renderLevel1Edit = (
                     </div>
                     <div className="space-y-2">
                          <Label htmlFor="messenger" className="flex items-center gap-2">
-                            <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
+                            <MessengerIcon />
                             Facebook Messenger
                         </Label>
                         <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc nhập username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
@@ -341,7 +341,7 @@ const renderLevel1Edit = (
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="line" className="flex items-center gap-2">
-                            <Image src="/img/Line.svg" alt="Line" width={20} height={20} />
+                            <LineIcon />
                             Line (Link hồ sơ)
                         </Label>
                         <Input id="line" placeholder="Dán link Line của bạn vào đây" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
@@ -458,7 +458,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     return (
         <>
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-3xl" id="DIENTHONGTINCANHAN01">
+                <DialogContent className="sm:max-w-4xl" id="DIENTHONGTINCANHAN01">
                     <DialogHeader>
                         <DialogTitle className="font-headline text-2xl">Chỉnh sửa Thông tin Cá nhân</DialogTitle>
                         <DialogDescription>Cập nhật thông tin của bạn để nhà tuyển dụng có thể liên hệ.</DialogDescription>
@@ -538,3 +538,4 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </>
     );
 }
+
