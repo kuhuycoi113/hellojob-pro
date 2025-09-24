@@ -72,7 +72,6 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
     const router = useRouter();
     const [isSaved, setIsSaved] = useState(false);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
-    const [postedDate, setPostedDate] = useState<string | null>(null);
 
     useEffect(() => {
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -82,13 +81,7 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
         const fullInterviewDate = new Date(today);
         fullInterviewDate.setDate(today.getDate() + job.interviewDateOffset);
         setInterviewDate(fullInterviewDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'}));
-
-        const fullPostedDate = new Date(today);
-        fullPostedDate.setDate(today.getDate() + job.postedTimeOffset);
-        setPostedDate(fullPostedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'}));
-
-
-    }, [job.id, job.interviewDateOffset, job.postedTimeOffset]);
+    }, [job.id, job.interviewDateOffset]);
 
 
     const handleSaveJob = (e: React.MouseEvent) => {
@@ -151,9 +144,6 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
                          </Button>
                          <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/viec-lam/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            <span className="text-primary">Đăng lúc:</span> {postedDate || '...'}
-                        </p>
                     </div>
                 </div>
             </div>
