@@ -6,7 +6,7 @@ import { jobData, type Job, publicFeeLimits } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle } from 'lucide-react';
+import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle, MoreHorizontal } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -30,6 +30,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from '@/hooks/use-toast';
 import { EditProfileDialog } from '@/components/candidate-edit-dialog';
 import type { SearchFilters } from '@/components/job-search/search-results';
@@ -707,23 +714,26 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
                                 </div>
                             </CardContent>
-                             <div className="border-t p-4 flex flex-col items-center gap-4">
-                                <div className="flex justify-center gap-2">
-                                   <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
-                                      <Link href="/tu-van-vien">Xem tư vấn viên khác</Link>
-                                   </Button>
-                                   <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
-                                      <Link href={`/tu-van-vien/${assignedConsultant.id}`}>Xem hồ sơ chi tiết</Link>
-                                   </Button>
-                                </div>
-                                <div className="flex justify-center gap-2">
-                                     <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                        <Share2 className="mr-2 h-4 w-4" /> Chia sẻ việc làm
-                                    </Button>
-                                    <Button variant="ghost" className="text-muted-foreground text-sm">
-                                        <Share2 className="mr-2 h-4 w-4" /> Chia sẻ tư vấn viên
-                                    </Button>
-                                </div>
+                             <div className="border-t p-4 flex flex-col items-center gap-2">
+                                <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
+                                   <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4"/>Xem hồ sơ chi tiết</Link>
+                                </Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="sm" className="text-muted-foreground">
+                                            <MoreHorizontal className="mr-2 h-4 w-4" />
+                                            Hành động khác
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                         <DropdownMenuItem onSelect={handleShare}><Share2 className="mr-2 h-4 w-4"/>Chia sẻ việc làm</DropdownMenuItem>
+                                         <DropdownMenuItem><Share2 className="mr-2 h-4 w-4"/>Chia sẻ tư vấn viên</DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4"/>Xem các tư vấn viên khác</Link>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </Card>
                     </aside>
