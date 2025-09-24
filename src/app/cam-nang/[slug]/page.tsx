@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -107,8 +106,12 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
   const [isSaved, setIsSaved] = useState(false);
   const [interviewDate, setInterviewDate] = useState<string | null>(null);
   const [postedTime, setPostedTime] = useState<string | null>(null);
+  const [badgeClassName, setBadgeClassName] = useState<string>('opacity-0');
+  const [isClient, setIsClient] = useState(false);
+
 
   useEffect(() => {
+    setIsClient(true);
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     setIsSaved(savedJobs.includes(job.id));
     
@@ -121,7 +124,29 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
     postedDate.setDate(today.getDate() + job.postedTimeOffset);
     setPostedTime(`10:00 ${postedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`);
 
-  }, [job.id, job.interviewDateOffset, job.postedTimeOffset]);
+    let classes = 'transition-opacity opacity-100 ';
+    if (job.visaDetail === 'Thực tập sinh 1 năm') {
+      classes += 'border-accent-green/70 bg-green-50 text-[#BDCF58]';
+    } else if (job.visaDetail === 'Thực tập sinh 3 Go') {
+      classes += 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
+    } else if (job.visaDetail === 'Đặc định đầu Nhật') {
+      classes += 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
+    } else if (job.visaDetail === 'Đặc định đi mới') {
+      classes += 'text-[#40B5E4]';
+    } else if (job.visaDetail === 'Kỹ sư, tri thức đầu Việt') {
+      classes += 'border-accent-orange/70 bg-orange-50 text-[#F2B92A]';
+    } else if (job.visaDetail === 'Kỹ sư, tri thức đầu Nhật') {
+      classes += 'border-accent-orange/70 bg-orange-50 text-[#F7B102]';
+    } else if (job.visaType?.includes("Thực tập sinh")) {
+      classes += "border-accent-green/70 bg-green-50 text-accent-green";
+    } else if (job.visaType?.includes("Kỹ năng đặc định")) {
+      classes += "border-accent-blue/70 bg-blue-50 text-accent-blue";
+    } else if (job.visaType?.includes("Kỹ sư, tri thức")) {
+      classes += "border-accent-orange/70 bg-orange-50 text-orange-500";
+    }
+    setBadgeClassName(classes);
+
+  }, [job.id, job.interviewDateOffset, job.postedTimeOffset, job.visaDetail, job.visaType]);
 
 
   const handleSaveJob = (e: React.MouseEvent) => {
@@ -159,7 +184,14 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
                 <div className="flex flex-grow flex-col">
                     <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
                     <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-                        {job.visaDetail && <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>}
+                        {isClient && job.visaDetail && (
+                            <Badge
+                                variant="outline"
+                                className={cn("px-1.5 py-0 text-xs", badgeClassName)}
+                            >
+                                {job.visaDetail}
+                            </Badge>
+                        )}
                         {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
                         <Badge variant="secondary">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
                     </div>
@@ -437,3 +469,5 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
     </div>
   );
 }
+
+    
