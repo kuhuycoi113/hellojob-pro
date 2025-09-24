@@ -12,7 +12,6 @@ import { articles, type HandbookArticle } from '@/lib/handbook-data';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { jobData, Job } from '@/lib/mock-data';
-import { JobCard } from '@/components/job-card';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -103,10 +102,11 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 };
 
 
-const ConsultantJobCard = ({ job, showRecruiterName = true }: { job: Job, showRecruiterName?: boolean }) => {
+const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = false }: { job: Job, showRecruiterName?: boolean, showPostedTime?: boolean }) => {
   const router = useRouter();
   const [isSaved, setIsSaved] = useState(false);
   const [interviewDate, setInterviewDate] = useState<string | null>(null);
+  const [postedTime, setPostedTime] = useState<string | null>(null);
 
   useEffect(() => {
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -117,7 +117,11 @@ const ConsultantJobCard = ({ job, showRecruiterName = true }: { job: Job, showRe
     fullInterviewDate.setDate(today.getDate() + job.interviewDateOffset);
     setInterviewDate(fullInterviewDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
     
-  }, [job.id, job.interviewDateOffset]);
+     const postedDate = new Date(today);
+    postedDate.setDate(today.getDate() + job.postedTimeOffset);
+    setPostedTime(`10:00 ${postedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`);
+
+  }, [job.id, job.interviewDateOffset, job.postedTimeOffset]);
 
 
   const handleSaveJob = (e: React.MouseEvent) => {
@@ -189,6 +193,11 @@ const ConsultantJobCard = ({ job, showRecruiterName = true }: { job: Job, showRe
                          <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/viec-lam/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
                        </div>
                     </div>
+                     {showPostedTime && (
+                        <p className="text-right text-xs text-muted-foreground mt-1">
+                            <span>Đăng lúc:</span> {postedTime ? postedTime.split(' ')[1] : '...'}
+                        </p>
+                    )}
                 </div>
             </div>
         </div>
@@ -384,7 +393,7 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
                 </h2>
                 <div className="space-y-4">
                     {hotJobs.map(job => (
-                        <ConsultantJobCard key={job.id} job={job} showRecruiterName={false} />
+                        <ConsultantJobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} />
                     ))}
                 </div>
             </section>
