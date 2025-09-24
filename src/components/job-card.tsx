@@ -261,7 +261,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const getFeeDisplayInfo = () => {
       const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
       const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
-      const isControlledVisa = controlledFeeVisas.includes(visaDetail || '');
+      const isControlled = controlledFeeVisas.includes(visaDetail || '');
       
       const visasForUsd = ['Đặc định đầu Việt'];
 
