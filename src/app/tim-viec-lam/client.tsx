@@ -1,15 +1,16 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
+import { SearchResults, type SearchFilters, experienceYears } from '@/components/job-search/search-results';
 import { Job, jobData } from '@/lib/mock-data';
 import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/location-data';
 import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType, type Industry, allIndustries } from '@/lib/industry-data';
-import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, experienceYears } from '@/lib/visa-data';
+import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements, visionRequirements } from '@/lib/visa-data';
 import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 import { JsonLdScript } from '@/components/json-ld-script';
 
@@ -43,6 +44,7 @@ const initialSearchFilters: SearchFilters = {
     quantity: '',
     interviewRounds: '',
     interviewDate: '',
+    interviewDateType: 'until',
     visionRequirement: 'all',
     dominantHand: '',
     otherSkillRequirement: [],
@@ -79,6 +81,7 @@ const keyMap: { [key: string]: string } = {
   quantity: 'so-luong',
   interviewRounds: 'so-vong-phong-van',
   interviewDate: 'ngay-phong-van',
+  interviewDateType: 'loai-ngay-phong-van',
   visionRequirement: 'yeu-cau-thi-luc',
   dominantHand: 'tay-thuan',
   otherSkillRequirement: 'yeu-cau-ky-nang-khac',
@@ -210,7 +213,7 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
     
     const runFilter = useCallback((filtersToApply: SearchFilters, sortOption: string) => {
         const { 
-            q, visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, netFeeNoTicket, interviewRounds, interviewDate,
+            q, visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, netFeeNoTicket, interviewRounds, interviewDate, interviewDateType,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
             otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement
@@ -287,14 +290,28 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
             const interviewLocationMatch = !interviewLocationName || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocationName.toLowerCase()));
 
             const quantityMatch = !quantity || job.quantity >= parseInt(quantity, 10);
-            
+
             const feeWithTicketMatch = feeLimit === null || (job.netFee && (parseSalary(job.netFee) ?? Infinity) <= feeLimit);
             const feeNoTicketMatch = feeNoTicketLimit === null || (job.netFeeNoTicket && (parseSalary(job.netFeeNoTicket) ?? Infinity) <= feeNoTicketLimit);
             const feeMatch = feeWithTicketMatch && feeNoTicketMatch;
 
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
 
-            const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDateOffset && (new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000) <= new Date(interviewDate).getTime());
+            let interviewDateMatch = true;
+            if (interviewDate && interviewDate !== 'flexible') {
+                const selectedDate = new Date(interviewDate).getTime();
+                const jobDate = new Date(new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000).setHours(0,0,0,0);
+                if(interviewDateType === 'until') {
+                    interviewDateMatch = jobDate <= selectedDate;
+                } else if(interviewDateType === 'exact') {
+                    interviewDateMatch = jobDate === selectedDate;
+                } else if (interviewDateType === 'from') {
+                    interviewDateMatch = jobDate >= selectedDate;
+                }
+            } else if (interviewDate && interviewDate === 'flexible') {
+                // This logic might need refinement based on how flexible date is stored
+                interviewDateMatch = true; 
+            }
             
             const jobBasicSalary = parseSalary(job.salary.basic);
             const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);
@@ -344,7 +361,7 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
             
             const tattooReqName = tattooRequirements.find(t => t.slug === tattooRequirement)?.name;
             const tattooMatch = !tattooRequirement || tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
-
+            
             const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
             const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
             
@@ -409,7 +426,7 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
 
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
         const { 
-            q, visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, netFeeNoTicket, interviewRounds, interviewDate,
+            q, visa, visaDetail, industry, location, jobDetail, interviewLocation, quantity, netFee, netFeeNoTicket, interviewRounds, interviewDate, interviewDateType,
             basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
             age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
             otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement
@@ -489,7 +506,21 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
             const feeMatch = feeWithTicketMatch && feeNoTicketMatch;
 
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
-            const interviewDateMatch = !interviewDate || interviewDate === 'flexible' || (job.interviewDateOffset && (new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000) <= new Date(interviewDate).getTime());
+            
+            let interviewDateMatch = true;
+            if (interviewDate && interviewDate !== 'flexible') {
+                const selectedDate = new Date(interviewDate).getTime();
+                const jobDate = new Date(new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000).setHours(0,0,0,0);
+                if(interviewDateType === 'until') {
+                    interviewDateMatch = jobDate <= selectedDate;
+                } else if(interviewDateType === 'exact') {
+                    interviewDateMatch = jobDate === selectedDate;
+                } else if (interviewDateType === 'from') {
+                    interviewDateMatch = jobDate >= selectedDate;
+                }
+            } else if (interviewDate && interviewDate === 'flexible') {
+                 interviewDateMatch = true; 
+            }
 
             const jobBasicSalary = parseSalary(job.salary.basic);
             const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);

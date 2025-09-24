@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
@@ -254,7 +255,6 @@ MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply, onReset, resultCount }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
-    const [isFlexibleDate, setIsFlexibleDate] = useState(false);
     const isMobile = useIsMobile();
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     
@@ -323,7 +323,20 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
             const feeMatch = feeLimit === null || !job.netFee || (parseSalary(job.netFee) || 0) <= feeLimit;
             const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
             
-            const interviewDateMatch = !filtersToApply.interviewDate || filtersToApply.interviewDate === 'flexible' || (job.interviewDateOffset && (new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000) <= new Date(filtersToApply.interviewDate).getTime());
+            let interviewDateMatch = true;
+            if (filtersToApply.interviewDate && filtersToApply.interviewDate !== 'flexible') {
+                const selectedDate = new Date(filtersToApply.interviewDate).getTime();
+                const jobDate = new Date(new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000).setHours(0,0,0,0);
+                if(filtersToApply.interviewDateType === 'until') {
+                    interviewDateMatch = jobDate <= selectedDate;
+                } else if(filtersToApply.interviewDateType === 'exact') {
+                    interviewDateMatch = jobDate === selectedDate;
+                } else if (filtersToApply.interviewDateType === 'from') {
+                    interviewDateMatch = jobDate >= selectedDate;
+                }
+            } else if (filtersToApply.interviewDate && filtersToApply.interviewDate === 'flexible') {
+                 interviewDateMatch = true; 
+            }
             
             const jobBasicSalary = parseSalary(job.salary.basic);
             const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);
@@ -462,14 +475,6 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
 
     }, [filters.visa, filters.visaDetail, filters.industry]);
 
-    useEffect(() => {
-        if (filters.interviewDate === 'flexible') {
-            setIsFlexibleDate(true);
-        } else {
-            setIsFlexibleDate(false);
-        }
-    }, [filters.interviewDate]);
-
     const handleDateSelect = (date: Date | undefined) => {
         onFilterChange({ interviewDate: date ? format(date, 'yyyy-MM-dd') : '' });
     };
@@ -569,6 +574,9 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         if (visaDetail === 'dac-dinh-dau-viet') return "0 đến 2500$";
         return "0 đến 3800$";
     };
+    
+    const isFlexibleDateChecked = filters.interviewDate === 'flexible';
+
 
     return (
         <div className="md:col-span-1 lg:col-span-1 h-full flex flex-col">
@@ -734,11 +742,11 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Ngày phỏng vấn</Label>
-                                    <Tabs defaultValue={filters.interviewDateType || 'until'} onValueChange={(value) => onFilterChange({ interviewDateType: value as any })} className="w-full">
+                                    <Tabs value={filters.interviewDateType || 'until'} onValueChange={(value) => onFilterChange({ interviewDateType: value as any })} className="w-full">
                                         <TabsList className="grid w-full h-auto grid-cols-3">
                                             <TabsTrigger value="until" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-yellow")}>Đến ngày</TabsTrigger>
-                                            <TabsTrigger value="exact" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-blue")}>Đúng ngày</TabsTrigger>
-                                            <TabsTrigger value="from" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-green")}>Từ ngày</TabsTrigger>
+                                            <TabsTrigger value="exact" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-green")}>Đúng ngày</TabsTrigger>
+                                            <TabsTrigger value="from" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-blue")}>Từ ngày</TabsTrigger>
                                         </TabsList>
                                     </Tabs>
                                     <div className='flex gap-2 items-center pt-2'>
@@ -748,7 +756,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                     <Button
                                                         variant={"outline"}
                                                         className={cn("w-full justify-start text-left font-normal", !filters.interviewDate && "text-muted-foreground", filters.interviewDate && filters.interviewDate !== 'flexible' && "text-primary")}
-                                                        disabled={isFlexibleDate}
+                                                        disabled={isFlexibleDateChecked}
                                                     >
                                                         <CalendarIcon className="mr-2 h-4 w-4" />
                                                         {filters.interviewDate && filters.interviewDate !== 'flexible' ? format(new Date(filters.interviewDate), "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
@@ -778,7 +786,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                     <Button
                                                         variant={"outline"}
                                                         className={cn("w-full justify-start text-left font-normal", !filters.interviewDate && "text-muted-foreground", filters.interviewDate && filters.interviewDate !== 'flexible' && "text-primary")}
-                                                        disabled={isFlexibleDate}
+                                                        disabled={isFlexibleDateChecked}
                                                     >
                                                         <CalendarIcon className="mr-2 h-4 w-4" />
                                                         {filters.interviewDate && filters.interviewDate !== 'flexible' ? format(new Date(filters.interviewDate), "dd/MM/yyyy", { locale: vi }) : "Chọn ngày"}
@@ -800,7 +808,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <Checkbox id="flexible-date" checked={isFlexibleDate} onCheckedChange={handleFlexibleDateChange} />
+                                    <Checkbox id="flexible-date" checked={isFlexibleDateChecked} onCheckedChange={handleFlexibleDateChange} />
                                     <label
                                         htmlFor="flexible-date"
                                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -819,9 +827,9 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 {shouldShowTabs ? (
                                     <Tabs defaultValue="basic">
                                         <TabsList className={cn("grid w-full h-auto data-[state=active]:bg-accent-yellow", (shouldShowLươngGiờ && shouldShowLươngNăm) ? "grid-cols-3" : "grid-cols-2")}>
-                                            <TabsTrigger value="basic" className="text-xs data-[state=active]:bg-accent-yellow">Lương tháng</TabsTrigger>
-                                            {shouldShowLươngGiờ && <TabsTrigger value="hourly" className="text-xs data-[state=active]:bg-accent-yellow">Lương giờ</TabsTrigger>}
-                                            {shouldShowLươngNăm && <TabsTrigger value="yearly" className="text-xs data-[state=active]:bg-accent-yellow">Lương năm</TabsTrigger>}
+                                            <TabsTrigger value="basic" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-yellow")}>Lương tháng</TabsTrigger>
+                                            {shouldShowLươngGiờ && <TabsTrigger value="hourly" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-yellow")}>Lương giờ</TabsTrigger>}
+                                            {shouldShowLươngNăm && <TabsTrigger value="yearly" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-yellow")}>Lương năm</TabsTrigger>}
                                         </TabsList>
                                         <TabsContent value="basic" className="pt-4">
                                             <MonthlySalaryContent filters={filters} onFilterChange={onFilterChange} />
