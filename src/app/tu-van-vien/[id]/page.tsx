@@ -124,7 +124,7 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
     fullInterviewDate.setDate(today.getDate() + job.interviewDateOffset);
     setInterviewDate(fullInterviewDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
     
-     const postedDate = new Date(today);
+    const postedDate = new Date(today);
     postedDate.setDate(today.getDate() + job.postedTimeOffset);
     setPostedTime(`10:00 ${postedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`);
 
