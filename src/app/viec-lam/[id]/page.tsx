@@ -229,7 +229,7 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
             <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
         </>
     );
-
+    
     const VisaDetailStepDialog = () => {
         if (!selectedVisa) return null;
         const options = visaDetailsByVisaType[selectedVisa.slug] || [];
@@ -354,6 +354,8 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
+    const appliedFilters = {};
+
 
     useEffect(() => {
         setIsClient(true);
@@ -461,7 +463,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const handleConfirmUpdateProfile = () => {
         setIsProfileIncompleteAlertOpen(false);
         setIsProfileEditDialogOpen(true);
-    }
+    };
     
     const handleShare = async () => {
         const shareUrl = `https://vi.hellojob.jp/viec-lam/${job.id}`;
@@ -708,6 +710,12 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                              <div className="border-t p-4 flex flex-col sm:flex-row justify-center items-center gap-4">
                                 <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
                                     <Link href={`/tu-van-vien/${assignedConsultant.id}`}>Xem hồ sơ chi tiết</Link>
+                                </Button>
+                                <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
+                                    <Share2 className="mr-2 h-4 w-4" /> Chia sẻ việc làm
+                                </Button>
+                                <Button variant="ghost" className="text-muted-foreground text-sm">
+                                    <Share2 className="mr-2 h-4 w-4" /> Chia sẻ tư vấn viên
                                 </Button>
                             </div>
                         </Card>
