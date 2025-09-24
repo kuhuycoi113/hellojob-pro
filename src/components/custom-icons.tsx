@@ -1,6 +1,7 @@
 
 
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export const ZaloIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg viewBox="0 0 262 263" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -40,11 +41,8 @@ export const PdfIcon = ({className, ...props}: React.SVGProps<SVGSVGElement>) =>
     </svg>
 );
 
-export const VnFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" {...props}>
-    <rect fill="#da251d" width="900" height="600"/>
-    <path fill="#ff0" d="m450 152l-117.6 362.4l307.7-224H142.3l307.7 224z"/>
-  </svg>
+export const VnFlagIcon = (props: React.SVGProps<SVGSVGElement> & { width?: number, height?: number }) => (
+  <Image src="/img/vietnamflag.png" alt="Vietnam Flag" width={props.width || 20} height={props.height || 20} className={props.className} />
 );
 
 export const JpFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
