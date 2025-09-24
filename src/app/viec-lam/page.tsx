@@ -1,8 +1,9 @@
 
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
-import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
+import JobSearchPageContent from '@/app/tim-viec-lam/client';
+
 
 type SearchParams = {
   [key: string]: string | string[] | undefined;
