@@ -20,6 +20,8 @@ import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Badge } from './ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 
 type EnrichedCandidateProfile = CandidateProfile & { avatarUrl?: string };
@@ -122,10 +124,50 @@ const renderLevel1Edit = (
     setPhoneCountry: (value: string) => void,
     zaloCountry: string,
     setZaloCountry: (value: string) => void,
-    onQrClick: () => void
+    onQrClick: () => void,
+    isMobile: boolean,
+    isDatePickerOpen: boolean,
+    setIsDatePickerOpen: (open: boolean) => void
 ) => {
     const height = parseInt(tempCandidate.personalInfo?.height || '160', 10);
     const weight = parseInt(tempCandidate.personalInfo?.weight || '50', 10);
+
+    const handleDateSelect = (date: Date | undefined) => {
+        handleTempChange('personalInfo', 'dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '');
+    };
+
+    const DatePickerTrigger = () => (
+         <Button
+            variant={"outline"}
+            className={cn(
+            "w-full justify-start text-left font-normal",
+            !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
+            )}
+        >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {tempCandidate.personalInfo.dateOfBirth ? (
+            format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
+            ) : (
+            <span>Chọn ngày sinh</span>
+            )}
+        </Button>
+    )
+
+    const CalendarComponent = () => (
+         <Calendar
+            mode="single"
+            locale={vi}
+            selected={tempCandidate.personalInfo.dateOfBirth ? new Date(tempCandidate.personalInfo.dateOfBirth) : undefined}
+            onSelect={(date) => {
+                handleDateSelect(date);
+                if (isMobile) setIsDatePickerOpen(false); // Close sheet on select
+            }}
+            initialFocus
+            captionLayout="dropdown-buttons"
+            fromYear={1950}
+            toYear={new Date().getFullYear() - 16}
+        />
+    )
 
     return (
         <div className="space-y-4">
@@ -145,37 +187,29 @@ const renderLevel1Edit = (
                 <Input value={tempCandidate.name} onChange={(e) => handleTempChange('name' as any, 'name' as any, e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                <Label>Ngày sinh</Label>
-                <Popover>
-                    <PopoverTrigger asChild>
-                    <Button
-                        variant={"outline"}
-                        className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
-                        )}
-                    >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {tempCandidate.personalInfo.dateOfBirth ? (
-                        format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
-                        ) : (
-                        <span>Chọn ngày sinh</span>
-                        )}
-                    </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                    <Calendar
-                        mode="single"
-                        locale={vi}
-                        selected={tempCandidate.personalInfo.dateOfBirth ? new Date(tempCandidate.personalInfo.dateOfBirth) : undefined}
-                        onSelect={(date) => handleTempChange('personalInfo', 'dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '')}
-                        initialFocus
-                        captionLayout="dropdown-buttons"
-                        fromYear={1950}
-                        toYear={new Date().getFullYear() - 16}
-                    />
-                    </PopoverContent>
-                </Popover>
+                    <Label>Ngày sinh</Label>
+                     {isMobile ? (
+                        <Sheet open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                            <SheetTrigger asChild>
+                                <DatePickerTrigger />
+                            </SheetTrigger>
+                            <SheetContent side="bottom" className="h-auto">
+                                <SheetHeader>
+                                <SheetTitle>Chọn ngày sinh</SheetTitle>
+                                </SheetHeader>
+                                <CalendarComponent />
+                            </SheetContent>
+                        </Sheet>
+                    ) : (
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <DatePickerTrigger />
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <CalendarComponent />
+                            </PopoverContent>
+                        </Popover>
+                    )}
                 </div>
                 <div className="space-y-2">
                 <Label>Giới tính</Label>
@@ -255,14 +289,14 @@ const renderLevel1Edit = (
                             <SelectTrigger className="w-[120px] rounded-r-none">
                                 <SelectValue>
                                 <div className="flex items-center">
-                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm mr-1" /> : <JpFlagIcon className="w-3 h-3 rounded-sm mr-1" />}
+                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-3 h-3 mr-1" /> : <JpFlagIcon className="w-3 h-3 mr-1" />}
                                     {phoneCountry}
                                 </div>
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-4 h-4 rounded-sm" /> VN (+84)</div></SelectItem>
-                                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-4 h-4 rounded-sm" /> JP (+81)</div></SelectItem>
+                                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-4 h-4" /> VN (+84)</div></SelectItem>
+                                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-4 h-4" /> JP (+81)</div></SelectItem>
                             </SelectContent>
                             </Select>
                             <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
@@ -275,14 +309,14 @@ const renderLevel1Edit = (
                                 <SelectTrigger className="w-[120px] rounded-r-none">
                                 <SelectValue>
                                     <div className="flex items-center">
-                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm mr-1" /> : <JpFlagIcon className="w-3 h-3 rounded-sm mr-1" />}
+                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-3 h-3 mr-1" /> : <JpFlagIcon className="w-3 h-3 mr-1" />}
                                     {zaloCountry}
                                     </div>
                                 </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-4 h-4 rounded-sm" /> VN (+84)</div></SelectItem>
-                                    <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-4 h-4 rounded-sm" /> JP (+81)</div></SelectItem>
+                                    <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-4 h-4" /> VN (+84)</div></SelectItem>
+                                    <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-4 h-4" /> JP (+81)</div></SelectItem>
                                 </SelectContent>
                             </Select>
                             <Input id="zalo" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
@@ -313,6 +347,8 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     const [zaloCountry, setZaloCountry] = useState('+84');
     const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
     const [qrImagePreview, setQrImagePreview] = useState<string | null>(null);
+    const isMobile = useIsMobile();
+    const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -421,7 +457,10 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                             handleTempChange as any, 
                             phoneCountry, setPhoneCountry, 
                             zaloCountry, setZaloCountry,
-                            () => setIsQrDialogOpen(true)
+                            () => setIsQrDialogOpen(true),
+                            isMobile,
+                            isDatePickerOpen,
+                            setIsDatePickerOpen
                         )}
                     </div>
                     <DialogFooter>
