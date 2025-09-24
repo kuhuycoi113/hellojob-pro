@@ -1583,9 +1583,9 @@ export default function CandidateProfilePage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem onSelect={() => handleLanguageChange('vi')}><VnFlagIcon className="w-5 h-5 mr-2"/>Tiếng Việt</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleLanguageChange('ja')}><JpFlagIcon className="w-5 h-5 mr-2"/>日本語</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleLanguageChange('en')}><EnFlagIcon className="w-5 h-5 mr-2"/>English</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleLanguageChange('vi')}><VnFlagIcon className="w-4 h-4 mr-2"/>Tiếng Việt</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleLanguageChange('ja')}><JpFlagIcon className="w-4 h-4 mr-2"/>日本語</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleLanguageChange('en')}><EnFlagIcon className="w-4 h-4 mr-2"/>English</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
 
@@ -1900,4 +1900,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-

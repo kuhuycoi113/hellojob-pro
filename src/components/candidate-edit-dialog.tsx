@@ -256,14 +256,14 @@ const renderLevel1Edit = (
                             <SelectTrigger className="w-[100px] rounded-r-none">
                                 <SelectValue>
                                 <div className="flex items-center gap-2">
-                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
+                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-4 h-4 rounded-sm" /> : <JpFlagIcon className="w-4 h-4 rounded-sm" />}
                                     {phoneCountry}
                                 </div>
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
-                                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
+                                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-4 h-4 rounded-sm" /> VN (+84)</div></SelectItem>
+                                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-4 h-4 rounded-sm" /> JP (+81)</div></SelectItem>
                             </SelectContent>
                             </Select>
                             <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
@@ -276,14 +276,14 @@ const renderLevel1Edit = (
                                 <SelectTrigger className="w-[100px] rounded-r-none">
                                 <SelectValue>
                                     <div className="flex items-center gap-2">
-                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
+                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-4 h-4 rounded-sm" /> : <JpFlagIcon className="w-4 h-4 rounded-sm" />}
                                     {zaloCountry}
                                     </div>
                                 </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
-                                    <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
+                                    <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-4 h-4 rounded-sm" /> VN (+84)</div></SelectItem>
+                                    <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-4 h-4 rounded-sm" /> JP (+81)</div></SelectItem>
                                 </SelectContent>
                             </Select>
                             <Input id="zalo" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
@@ -328,7 +328,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                     about: '',
                     education: [],
                     experience: [],
-                    personalInfo: { birthYear: 2000, gender: '', phone: '', japaneseProficiency: '', englishProficiency: '' },
+                    personalInfo: { birthYear: 2000, gender: '', phone: '', japaneseProficiency: '' },
                     skills: [],
                     interests: [],
                     certifications: [],
@@ -488,3 +488,5 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </>
     );
 }
+
+    
