@@ -341,13 +341,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 {isClient && job.visaDetail && (
                                     <Badge
                                         variant="outline"
-                                        className={cn("px-1.5 py-0 text-xs", badgeClassName)}
+                                        className={badgeClassName}
                                     >
                                         {job.visaDetail}
                                     </Badge>
                                 )}
                                 {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
-                                <Badge variant="secondary" className="text-xs">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
+                                <Badge variant="secondary" className="text-xs">Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
                                 {isClient && feeFilterIsActive && feeInfo.shouldShow && (
                                     <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
                                         {feeInfo.text}
@@ -504,7 +504,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         )}
                         <span className="flex items-center gap-1 text-muted-foreground">
                             <DollarSign className="h-3 w-3 flex-shrink-0" />
-                            Lương: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}
+                            Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}
                         </span>
                     </div>
                 </div>
@@ -540,7 +540,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             </Badge>
                         )}
                         {isClient && job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
-                        {isClient && <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>}
+                        {isClient && <Badge variant="secondary" className="px-1.5 py-0 text-xs">Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>}
                     </div>
                     <div className="text-xs text-muted-foreground">
                         <p className="flex items-center gap-1.5">

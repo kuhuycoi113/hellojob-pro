@@ -193,7 +193,7 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
                             </Badge>
                         )}
                         {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
-                        <Badge variant="secondary">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
+                        <Badge variant="secondary">Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
                     </div>
                      <div className="text-xs text-muted-foreground mt-1">
                         <p className="flex items-center gap-1.5">
@@ -469,5 +469,3 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
     </div>
   );
 }
-
-    
