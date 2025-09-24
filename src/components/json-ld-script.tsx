@@ -32,13 +32,24 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
             
             const salary = job.salary.basic ? parseInt(job.salary.basic.replace(/[^0-9]/g, '')) : undefined;
 
-            const combinedDescription = `
+            let combinedDescription = `
                 ${job.details.description.replace(/<[^>]*>?/gm, '')}
                 Yêu cầu:
                 ${job.details.requirements.replace(/<[^>]*>?/gm, '')}
                 Quyền lợi:
                 ${job.details.benefits.replace(/<[^>]*>?/gm, '')}
             `;
+
+            if (job.interviewLocation) {
+                const interviewInfo = job.interviewLocation.toLowerCase().includes('online')
+                    ? `<li>Hình thức phỏng vấn: Online.</li>`
+                    : `<li>Địa điểm phỏng vấn: ${job.interviewLocation}, Việt Nam.</li>`;
+                
+                combinedDescription += `
+                    <strong>Thông tin tuyển dụng bổ sung:</strong>
+                    <ul>${interviewInfo}</ul>
+                `;
+            }
 
             const industryData = allIndustries.find(ind => ind.name === job.industry);
 
