@@ -195,7 +195,7 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
                     </div>
                      {showPostedTime && (
                         <p className="text-right text-xs text-muted-foreground mt-1">
-                            <span>Đăng lúc:</span> {postedTime ? postedTime.split(' ')[1] : '...'}
+                            <span className="text-primary">Đăng lúc:</span> {postedTime ? postedTime.split(' ')[1] : '...'}
                         </p>
                     )}
                 </div>
