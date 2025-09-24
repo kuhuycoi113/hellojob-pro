@@ -109,7 +109,6 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 
 
 const japaneseLevels = ["JLPT N5", "JLPT N4", "JLPT N3", "JLPT N2", "JLPT N1", "Kaiwa N5", "Kaiwa N4", "Kaiwa N3", "Kaiwa N2", "Kaiwa N1", "Trình độ tương đương N5", "Trình độ tương đương N4", "Trình độ tương đương N3", "Trình độ tương đương N2", "Trình độ tương đương N1"];
-const englishLevels = ["Không yêu cầu", "Giao tiếp cơ bản", "Giao tiếp tốt", "TOEIC 400+", "TOEIC 500+", "TOEIC 600+", "TOEIC 700+", "TOEIC 800+", "TOEIC 900+", "IELTS 4.0+", "IELTS 5.0+", "IELTS 6.0+", "IELTS 7.0+"];
 
 
 const renderLevel1Edit = (
@@ -198,17 +197,6 @@ const renderLevel1Edit = (
                         <SelectContent>
                             <SelectItem value="Chưa biết tiếng Nhật">Chưa biết tiếng Nhật</SelectItem>
                             {japaneseLevels.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="englishProficiency">Năng lực tiếng Anh</Label>
-                    <Select value={tempCandidate.personalInfo.englishProficiency || ''} onValueChange={value => handleTempChange('personalInfo', 'englishProficiency', value)}>
-                        <SelectTrigger id="englishProficiency">
-                            <SelectValue placeholder="Chọn trình độ tiếng Anh" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {englishLevels.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}
                         </SelectContent>
                     </Select>
                 </div>
