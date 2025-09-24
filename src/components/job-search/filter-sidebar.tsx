@@ -163,6 +163,31 @@ const getConvertedValue = (value: string | undefined, placeholder: string, rate:
     return `≈ ${convertedValue.toLocaleString('vi-VN')} VNĐ`;
 };
 
+const getConvertedFeeValue = (value: string | undefined, placeholder: string) => {
+    const numericString = value || placeholder.replace(/[^0-9]/g, '');
+    const num = Number(numericString.replace(/[^0-9]/g, ''));
+
+    if (isNaN(num)) return '≈ 0 triệu VNĐ';
+    if (num === 0) {
+        return '≈ 0 VNĐ';
+    }
+
+    const convertedValue = num * USD_VND_RATE;
+    const valueInMillions = convertedValue / 1000000;
+
+    const formattingOptions: Intl.NumberFormatOptions = {};
+    if (valueInMillions % 1 === 0) {
+        formattingOptions.maximumFractionDigits = 0;
+    } else {
+        formattingOptions.minimumFractionDigits = 1;
+        formattingOptions.maximumFractionDigits = 1;
+    }
+
+    const formattedVnd = valueInMillions.toLocaleString('vi-VN', formattingOptions);
+    return `≈ ${formattedVnd.replace('.',',')} triệu VNĐ`;
+};
+
+
 const handleSalaryInputChange = (
     e: React.ChangeEvent<HTMLInputElement>, 
     field: keyof SearchFilters,
@@ -857,7 +882,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                     onChange={(e) => handleSalaryInputChange(e, 'netFee', 4200, onFilterChange)} // Assuming netFee maps to this for now
                                                     value={getDisplayValue(filters.netFee)}
                                                 />
-                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
+                                                <p className="text-xs text-muted-foreground">{getConvertedFeeValue(filters.netFee, getFeePlaceholder())}</p>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="net-fee-no-tuition-usd">Phí và vé không học phí (USD)</Label>
@@ -868,7 +893,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                     onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 3600, onFilterChange)} // Assuming netFeeNoTicket maps to this
                                                     value={getDisplayValue(filters.netFeeNoTicket)} 
                                                 />
-                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFeeNoTicket, '0 đến 3600$', USD_VND_RATE, 'triệu VNĐ')}</p>
+                                                <p className="text-xs text-muted-foreground">{getConvertedFeeValue(filters.netFeeNoTicket, '0 đến 3600$')}</p>
                                             </div>
                                         </>
                                     )}
@@ -883,7 +908,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                     onChange={(e) => handleSalaryInputChange(e, 'netFee', 4200, onFilterChange)}
                                                     value={getDisplayValue(filters.netFee)}
                                                 />
-                                                 <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFee, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
+                                                 <p className="text-xs text-muted-foreground">{getConvertedFeeValue(filters.netFee, getFeePlaceholder())}</p>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="net-fee-no-ticket-usd">Phí không vé (USD)</Label>
@@ -894,7 +919,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                     onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 4200, onFilterChange)}
                                                     value={getDisplayValue(filters.netFeeNoTicket)}
                                                 />
-                                                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netFeeNoTicket, getFeePlaceholder(), USD_VND_RATE, 'triệu VNĐ')}</p>
+                                                <p className="text-xs text-muted-foreground">{getConvertedFeeValue(filters.netFeeNoTicket, getFeePlaceholder())}</p>
                                             </div>
                                         </>
                                     )}
