@@ -255,8 +255,8 @@ const renderLevel1Edit = (
                             <Select value={phoneCountry} onValueChange={setPhoneCountry}>
                             <SelectTrigger className="w-[100px] rounded-r-none">
                                 <SelectValue>
-                                <div className="flex items-center gap-2">
-                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm" /> : <JpFlagIcon className="w-3 h-3 rounded-sm" />}
+                                <div className="flex items-center">
+                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm mr-1" /> : <JpFlagIcon className="w-3 h-3 rounded-sm mr-1" />}
                                     {phoneCountry}
                                 </div>
                                 </SelectValue>
@@ -275,8 +275,8 @@ const renderLevel1Edit = (
                             <Select value={zaloCountry} onValueChange={setZaloCountry}>
                                 <SelectTrigger className="w-[100px] rounded-r-none">
                                 <SelectValue>
-                                    <div className="flex items-center gap-2">
-                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm" /> : <JpFlagIcon className="w-3 h-3 rounded-sm" />}
+                                    <div className="flex items-center">
+                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm mr-1" /> : <JpFlagIcon className="w-3 h-3 rounded-sm mr-1" />}
                                     {zaloCountry}
                                     </div>
                                 </SelectValue>
