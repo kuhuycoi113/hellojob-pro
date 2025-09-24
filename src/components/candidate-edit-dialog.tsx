@@ -108,7 +108,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 };
 
 
-const japaneseLevels = ["JLPT N5", "JLPT N4", "JLPT N3", "JLPT N2", "JLPT N1", "Kaiwa N5", "Kaiwa N4", "Kaiwa N3", "Kaiwa N2", "Kaiwa N1", "Trình độ tương đương N5", "Trình độ tương đương N4", "Trình độ tương đương N3", "Trình độ tương đương N2", "Trình độ tương đương N1"];
+const japaneseLevels = ["Chưa biết tiếng Nhật", "JLPT N5", "JLPT N4", "JLPT N3", "JLPT N2", "JLPT N1", "Kaiwa N5", "Kaiwa N4", "Kaiwa N3", "Kaiwa N2", "Kaiwa N1", "Trình độ tương đương N5", "Trình độ tương đương N4", "Trình độ tương đương N3", "Trình độ tương đương N2", "Trình độ tương đương N1"];
 
 
 const renderLevel1Edit = (
@@ -195,7 +195,6 @@ const renderLevel1Edit = (
                             <SelectValue placeholder="Chọn trình độ tiếng Nhật" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="Chưa biết tiếng Nhật">Chưa biết tiếng Nhật</SelectItem>
                             {japaneseLevels.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}
                         </SelectContent>
                     </Select>
@@ -253,9 +252,9 @@ const renderLevel1Edit = (
                         <Label htmlFor="phone">Số điện thoại</Label>
                         <div className="flex items-center">
                             <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-                            <SelectTrigger className="w-[100px] rounded-r-none">
+                            <SelectTrigger className="w-[120px] rounded-r-none">
                                 <SelectValue>
-                                <div className="flex items-center mr-1">
+                                <div className="flex items-center">
                                     {phoneCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm mr-1" /> : <JpFlagIcon className="w-3 h-3 rounded-sm mr-1" />}
                                     {phoneCountry}
                                 </div>
@@ -273,9 +272,9 @@ const renderLevel1Edit = (
                         <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
                         <div className="flex items-center relative">
                             <Select value={zaloCountry} onValueChange={setZaloCountry}>
-                                <SelectTrigger className="w-[100px] rounded-r-none">
+                                <SelectTrigger className="w-[120px] rounded-r-none">
                                 <SelectValue>
-                                    <div className="flex items-center mr-1">
+                                    <div className="flex items-center">
                                     {zaloCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm mr-1" /> : <JpFlagIcon className="w-3 h-3 rounded-sm mr-1" />}
                                     {zaloCountry}
                                     </div>
@@ -411,7 +410,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     return (
         <>
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-2xl" id="DIENTHONGTINCANHAN01">
+                <DialogContent className="sm:max-w-3xl" id="DIENTHONGTINCANHAN01">
                     <DialogHeader>
                         <DialogTitle className="font-headline text-2xl">Chỉnh sửa Thông tin Cá nhân</DialogTitle>
                         <DialogDescription>Cập nhật thông tin của bạn để nhà tuyển dụng có thể liên hệ.</DialogDescription>
