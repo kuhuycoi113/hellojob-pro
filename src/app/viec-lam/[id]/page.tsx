@@ -419,12 +419,14 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             savedJobs.push(job.id);
             localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
             setIsSaved(true);
-            logInteraction(job, 'save'); // CANHANHOA01: Log save interaction
+            // logInteraction(job, 'save'); // CANHANHOA01: Log save interaction
         }
         window.dispatchEvent(new Event('storage'));
     };
 
-    const handleApplyClick = () => {
+    const handleApplyClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
         if (!isLoggedIn) {
             sessionStorage.setItem('postLoginRedirect', `/viec-lam/${job.id}`);
             setIsConfirmLoginOpen(true);
@@ -711,12 +713,17 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
                                 </div>
                             </CardContent>
-                            <div className="border-t p-4 flex justify-center">
+                            <div className="border-t p-4 flex justify-center gap-2">
                                 {isClient ? (
-                                    <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ việc làm
-                                    </Button>
-                                ) : <Skeleton className="h-8 w-48" />}
+                                    <>
+                                        <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
+                                            <Share2 className="mr-2 h-4 w-4"/>Chia sẻ việc làm
+                                        </Button>
+                                        <Button variant="ghost" className="text-muted-foreground text-sm">
+                                            <Share2 className="mr-2 h-4 w-4"/>Chia sẻ tư vấn viên
+                                        </Button>
+                                    </>
+                                ) : <Skeleton className="h-8 w-full" />}
                             </div>
                         </Card>
                     </aside>
@@ -813,5 +820,3 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 }
-
-    
