@@ -40,16 +40,25 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 ${job.details.benefits.replace(/<[^>]*>?/gm, '')}
             `;
 
+            const additionalInfo = [];
             if (job.interviewLocation) {
                 const interviewInfo = job.interviewLocation.toLowerCase().includes('online')
                     ? `<li>Hình thức phỏng vấn: Online.</li>`
                     : `<li>Địa điểm phỏng vấn: ${job.interviewLocation}, Việt Nam.</li>`;
-                
-                combinedDescription += `
+                additionalInfo.push(interviewInfo);
+            }
+
+            if (job.interviewRounds) {
+                additionalInfo.push(`<li>Số vòng phỏng vấn: ${job.interviewRounds} vòng.</li>`);
+            }
+
+            if (additionalInfo.length > 0) {
+                 combinedDescription += `
                     <strong>Thông tin tuyển dụng bổ sung:</strong>
-                    <ul>${interviewInfo}</ul>
+                    <ul>${additionalInfo.join('')}</ul>
                 `;
             }
+
 
             const industryData = allIndustries.find(ind => ind.name === job.industry);
 
