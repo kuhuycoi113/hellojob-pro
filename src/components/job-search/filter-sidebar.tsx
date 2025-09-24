@@ -738,17 +738,14 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Ngày phỏng vấn</Label>
-                                    <div className='flex gap-2 items-center'>
-                                        <Select value={filters.interviewDateType || 'until'} onValueChange={(value) => onFilterChange({ interviewDateType: value as any })}>
-                                            <SelectTrigger className='w-[120px] shrink-0'>
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="until">Đến ngày</SelectItem>
-                                                <SelectItem value="exact">Đúng ngày</SelectItem>
-                                                <SelectItem value="from">Từ ngày</SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                    <Tabs value={filters.interviewDateType || 'until'} onValueChange={(value) => onFilterChange({ interviewDateType: value as any })} className="w-full">
+                                        <TabsList className="grid w-full grid-cols-3 h-auto">
+                                            <TabsTrigger value="until" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-yellow")}>Đến ngày</TabsTrigger>
+                                            <TabsTrigger value="exact" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-blue")}>Đúng ngày</TabsTrigger>
+                                            <TabsTrigger value="from" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-green")}>Từ ngày</TabsTrigger>
+                                        </TabsList>
+                                    </Tabs>
+                                    <div className='flex gap-2 items-center pt-2'>
                                         {isMobile ? (
                                             <Sheet open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
                                                 <SheetTrigger asChild>
@@ -1208,3 +1205,4 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         </div>
     );
 }
+
