@@ -63,56 +63,59 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 }
             }
 
-            const getEnglishQualification = () => {
-                if (!job.languageRequirement || !job.languageRequirement.toLowerCase().includes('tiếng anh')) {
-                    return undefined;
-                }
+            const getLanguageQualification = (langReq: string) => {
+                const isJapanese = langReq.toLowerCase().includes('tiếng nhật') || langReq.startsWith('N') || langReq.startsWith('Kaiwa') || langReq.startsWith('Trình độ');
+                const isEnglish = langReq.toLowerCase().includes('tiếng anh') || langReq.startsWith('TOEIC') || langReq.startsWith('IELTS');
+
+                if (!isJapanese && !isEnglish) return undefined;
 
                 const competency: any[] = [];
                 let description = '';
-
-                if (job.languageRequirement.includes('TOEIC 900')) description = "TOEIC score of 900 or higher.";
-                else if (job.languageRequirement.includes('TOEIC 800')) description = "TOEIC score of 800 or higher.";
-                else if (job.languageRequirement.includes('TOEIC 700')) description = "TOEIC score of 700 or higher.";
-                else if (job.languageRequirement.includes('TOEIC 600')) description = "TOEIC score of 600 or higher.";
-                else if (job.languageRequirement.includes('TOEIC 500')) description = "TOEIC score of 500 or higher.";
-                else if (job.languageRequirement.includes('IELTS 7.0')) description = "IELTS score of 7.0 or higher.";
-                else if (job.languageRequirement.includes('IELTS 6.0')) description = "IELTS score of 6.0 or higher.";
-                else if (job.languageRequirement.includes('IELTS 5.0')) description = "IELTS score of 5.0 or higher.";
-                else if (job.languageRequirement.includes('Giao tiếp tốt')) description = "Proficient in conversational English.";
-                else if (job.languageRequirement.includes('Giao tiếp cơ bản')) description = "Basic conversational English skills.";
-                else return undefined; // No specific requirement matched
-
-                competency.push({
-                    "@type": "DefinedTerm",
-                    "name": "English Language",
-                    "description": description
-                });
-
-                if (job.languageRequirement.includes('TOEIC')) {
-                    competency.push({
-                        "@type": "DefinedTerm",
-                        "name": "TOEIC (Test of English for International Communication)",
-                        "termCode": "TOEIC",
-                        "inDefinedTermSet": "https://www.ets.org/toeic.html"
-                    });
-                } else if (job.languageRequirement.includes('IELTS')) {
-                    competency.push({
-                        "@type": "DefinedTerm",
-                        "name": "IELTS (International English Language Testing System)",
-                        "termCode": "IELTS",
-                        "inDefinedTermSet": "https://www.ielts.org/"
-                    });
-                }
                 
+                if (isJapanese) {
+                    if (langReq.includes('JLPT N1')) description = "JLPT N1 or equivalent.";
+                    else if (langReq.includes('JLPT N2')) description = "JLPT N2 or equivalent.";
+                    else if (langReq.includes('JLPT N3')) description = "JLPT N3 or equivalent.";
+                    else if (langReq.includes('JLPT N4')) description = "JLPT N4 or equivalent.";
+                    else if (langReq.includes('JLPT N5')) description = "JLPT N5 or equivalent.";
+                    else if (langReq.includes('Kaiwa N1')) description = "Conversational Japanese proficiency equivalent to JLPT N1.";
+                    else if (langReq.includes('Kaiwa N2')) description = "Conversational Japanese proficiency equivalent to JLPT N2.";
+                    else if (langReq.includes('Kaiwa N3')) description = "Conversational Japanese proficiency equivalent to JLPT N3.";
+                    else if (langReq.includes('Kaiwa N4')) description = "Conversational Japanese proficiency equivalent to JLPT N4.";
+                    else if (langReq.includes('Kaiwa N5')) description = "Conversational Japanese proficiency equivalent to JLPT N5.";
+                    else if (langReq.includes('Trình độ tương đương N1')) description = "Japanese language proficiency equivalent to JLPT N1.";
+                    else if (langReq.includes('Trình độ tương đương N2')) description = "Japanese language proficiency equivalent to JLPT N2.";
+                    else if (langReq.includes('Trình độ tương đương N3')) description = "Japanese language proficiency equivalent to JLPT N3.";
+                    else if (langReq.includes('Trình độ tương đương N4')) description = "Japanese language proficiency equivalent to JLPT N4.";
+                    else if (langReq.includes('Trình độ tương đương N5')) description = "Japanese language proficiency equivalent to JLPT N5.";
+                    else return undefined;
+
+                    competency.push({ "@type": "DefinedTerm", "name": "Japanese Language", "description": description });
+                    competency.push({ "@type": "DefinedTerm", "name": "JLPT (Japanese-Language Proficiency Test)", "termCode": "JLPT", "inDefinedTermSet": "https://www.jlpt.jp/" });
+                } else if (isEnglish) {
+                    if (langReq.includes('TOEIC 900')) description = "TOEIC score of 900 or higher.";
+                    else if (langReq.includes('TOEIC 800')) description = "TOEIC score of 800 or higher.";
+                    else if (langReq.includes('TOEIC 700')) description = "TOEIC score of 700 or higher.";
+                    else if (langReq.includes('TOEIC 600')) description = "TOEIC score of 600 or higher.";
+                    else if (langReq.includes('TOEIC 500')) description = "TOEIC score of 500 or higher.";
+                    else if (langReq.includes('IELTS 7.0')) description = "IELTS score of 7.0 or higher.";
+                    else if (langReq.includes('IELTS 6.0')) description = "IELTS score of 6.0 or higher.";
+                    else if (langReq.includes('IELTS 5.0')) description = "IELTS score of 5.0 or higher.";
+                    else if (langReq.includes('Giao tiếp tốt')) description = "Proficient in conversational English.";
+                    else if (langReq.includes('Giao tiếp cơ bản')) description = "Basic conversational English skills.";
+                    else return undefined;
+
+                    competency.push({ "@type": "DefinedTerm", "name": "English Language", "description": description });
+                    if (langReq.includes('TOEIC')) {
+                        competency.push({ "@type": "DefinedTerm", "name": "TOEIC (Test of English for International Communication)", "termCode": "TOEIC", "inDefinedTermSet": "https://www.ets.org/toeic.html" });
+                    } else if (langReq.includes('IELTS')) {
+                        competency.push({ "@type": "DefinedTerm", "name": "IELTS (International English Language Testing System)", "termCode": "IELTS", "inDefinedTermSet": "https://www.ielts.org/" });
+                    }
+                }
+
                 return {
                     "@type": "EducationalOccupationalCredential",
-                    "credentialCategory": {
-                      "@type": "DefinedTerm",
-                      "termCode": "CERTIFICATE",
-                      "inDefinedTermSet": "https://o-net.org/data/t2_15_1.html",
-                      "name": "Certification"
-                    },
+                    "credentialCategory": { "@type": "DefinedTerm", "termCode": "CERTIFICATE", "inDefinedTermSet": "https://o-net.org/data/t2_15_1.html", "name": "Certification" },
                     "competencyRequired": competency
                 };
             }
@@ -124,7 +127,6 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
 
             const getJobStartDate = () => {
                 if (!job.companyArrivalTime) return undefined;
-                // Parse "Tháng MM/YYYY"
                 const parts = job.companyArrivalTime.match(/(\d+)\/(\d+)/);
                 if (parts && parts.length === 3) {
                     const month = parts[1].padStart(2, '0');
@@ -133,6 +135,8 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 }
                 return undefined;
             }
+            
+            const languageQualification = job.languageRequirement ? getLanguageQualification(job.languageRequirement) : undefined;
 
 
             const data = {
@@ -161,7 +165,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                         "addressCountry": "JP"
                     }
                 },
-                ...(qualifications && !getEnglishQualification() && { "qualifications": qualifications }),
+                ...(!languageQualification && { "qualifications": qualifications }),
                 ...(industryData && {
                     "industry": {
                         "@type": "DefinedTerm",
@@ -183,7 +187,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 }),
                 ...(getApplicantLocationRequirements() && { "applicantLocationRequirements": getApplicantLocationRequirements() }),
                 ...(getJobStartDate() && { "jobStartDate": getJobStartDate() }),
-                ...(getEnglishQualification() && { "educationRequirements": getEnglishQualification() })
+                ...(languageQualification && { "educationRequirements": languageQualification })
             };
             return data;
         };

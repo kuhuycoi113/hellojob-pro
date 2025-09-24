@@ -114,11 +114,21 @@ export const educationLevels = [
 ];
 
 export const languageLevels = [
-    { name: 'N1', slug: 'n1' },
-    { name: 'N2', slug: 'n2' },
-    { name: 'N3', slug: 'n3' },
-    { name: 'N4', slug: 'n4' },
-    { name: 'N5', slug: 'n5' },
+    { name: 'JLPT N5', slug: 'jlpt-n5' },
+    { name: 'JLPT N4', slug: 'jlpt-n4' },
+    { name: 'JLPT N3', slug: 'jlpt-n3' },
+    { name: 'JLPT N2', slug: 'jlpt-n2' },
+    { name: 'JLPT N1', slug: 'jlpt-n1' },
+    { name: 'Kaiwa N5', slug: 'kaiwa-n5' },
+    { name: 'Kaiwa N4', slug: 'kaiwa-n4' },
+    { name: 'Kaiwa N3', slug: 'kaiwa-n3' },
+    { name: 'Kaiwa N2', slug: 'kaiwa-n2' },
+    { name: 'Kaiwa N1', slug: 'kaiwa-n1' },
+    { name: 'Trình độ tương đương N5', slug: 'trinh-do-tuong-duong-n5' },
+    { name: 'Trình độ tương đương N4', slug: 'trinh-do-tuong-duong-n4' },
+    { name: 'Trình độ tương đương N3', slug: 'trinh-do-tuong-duong-n3' },
+    { name: 'Trình độ tương đương N2', slug: 'trinh-do-tuong-duong-n2' },
+    { name: 'Trình độ tương đương N1', slug: 'trinh-do-tuong-duong-n1' },
     { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
 ];
 
@@ -165,7 +175,7 @@ export const experienceYears: { name: string; slug: string }[] = [
     { name: '2,5 - 3 năm', slug: '2.5-3-nam' },
     { name: '3 - 3,5 năm', slug: '3-3.5-nam' },
     { name: '3,5 - 4 năm', slug: '3.5-4-nam' },
-    { name: '4 - 4,5 năm', slug: '4-4.5-nam' }, // Corrected slug
+    { name: '4 - 4,5 năm', slug: '4.5-5-nam' }, // Corrected slug
     { name: '4,5 - 5 năm', slug: '4.5-5-nam' },
     { name: 'Trên 5 năm', slug: 'tren-5-nam' }
 ];
