@@ -6,10 +6,22 @@ import * as chatData from '@/lib/chat-data';
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
 
+export type PostLoginAction = {
+  type: 'APPLY_JOB';
+  data: {
+    jobId: string;
+    jobTitle: string;
+  };
+} | null;
+
+
 interface AuthContextType {
   role: Role;
   isLoggedIn: boolean;
   setRole: (role: Role) => void;
+  postLoginAction: PostLoginAction;
+  setPostLoginAction: (action: PostLoginAction) => void;
+  clearPostLoginAction: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,6 +40,7 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [role, setInternalRole] = useState<Role>('guest');
+  const [postLoginAction, setPostLoginAction] = useState<PostLoginAction>(null);
   const isLoggedIn = role !== 'guest';
 
   const setRole = (newRole: Role) => {
@@ -37,6 +50,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         chatData.setCurrentUser(chatData.loggedInUser);
     }
     setInternalRole(newRole);
+  };
+  
+  const clearPostLoginAction = () => {
+    setPostLoginAction(null);
   };
 
 
@@ -86,6 +103,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     role,
     isLoggedIn,
     setRole,
+    postLoginAction,
+    setPostLoginAction,
+    clearPostLoginAction,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

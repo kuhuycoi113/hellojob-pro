@@ -133,7 +133,7 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = false, appliedFilters, isSearchPage = false }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean }) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, setPostLoginAction } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -212,16 +212,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const handleApplyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01 & UNGTUYEN-L05 & UNGTUYEN-L06: Start of apply functionality
     if (!isLoggedIn) {
-        sessionStorage.setItem('postLoginRedirect', `/viec-lam/${job.id}`);
+        setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: job.title } });
         setIsConfirmLoginOpen(true);
     } else {
         const profileRaw = localStorage.getItem('generatedCandidateProfile');
         if (profileRaw) {
             const profile: CandidateProfile = JSON.parse(profileRaw);
             if (validateProfileForApplication(profile)) {
-                // Mark as applied
                 const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
                 appliedJobs.push(job.id);
                 localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
@@ -235,10 +233,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                 setIsProfileIncompleteAlertOpen(true);
             }
         } else {
-             setIsProfileIncompleteAlertOpen(true);
+            setIsProfileIncompleteAlertOpen(true);
         }
     }
-    // CHUCNANGUNGTUYEN01 & UNGTUYEN-L01 & UNGTUYEN-L05 & UNGTUYEN-L06: End of apply functionality
   };
   
   const handleConfirmLogin = () => {

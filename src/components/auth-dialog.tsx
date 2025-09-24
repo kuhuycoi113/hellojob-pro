@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -43,7 +42,7 @@ const FacebookIcon = () => (
 
 export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
   const [authType, setAuthType] = useState<'login' | 'register'>('register');
-  const { setRole } = useAuth();
+  const { setRole, postLoginAction } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -58,13 +57,16 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
         duration: 2000,
     })
 
-    // Check for a redirect path and navigate
+    // Check if there is a pending action. If not, check for a redirect path.
+    if (postLoginAction) {
+        // The action will be handled by the listener in MyJobsDashboardPageContent
+        return;
+    }
+
     const redirectPath = sessionStorage.getItem('postLoginRedirect');
     if (redirectPath) {
         sessionStorage.removeItem('postLoginRedirect');
         router.push(redirectPath);
-    } else {
-        router.push('/ho-so-cua-toi'); // Default redirect
     }
   }
 
