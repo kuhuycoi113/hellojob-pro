@@ -11,12 +11,18 @@ import { FloatingChatWidget } from '@/components/chat/floating-chat-widget';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { validateProfileForApplication } from '@/lib/utils';
+import type { CandidateProfile } from '@/ai/schemas';
+import { EditProfileDialog } from '../candidate-edit-dialog';
+
 
 function LayoutManager({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const { toast } = useToast();
     const { isLoggedIn, postLoginAction, clearPostLoginAction } = useAuth();
     const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = useState(false);
+    const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
+    const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
@@ -28,29 +34,49 @@ function LayoutManager({ children }: { children: ReactNode }) {
     }, [isLoggedIn, postLoginAction]);
     
     const handlePostLoginApply = (apply: boolean) => {
+        setIsPostLoginApplyDialogOpen(false); // Close the first dialog
+        
         if (apply && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
             const { jobId, jobTitle } = postLoginAction.data;
-            const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-            if (!appliedJobs.includes(jobId)) {
-                appliedJobs.push(jobId);
-                localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
-                toast({
-                    title: 'Ứng tuyển thành công!',
-                    description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
-                    className: 'bg-green-500 text-white'
-                });
-                // Dispatch a storage event to notify other components (like JobCard) of the change
-                window.dispatchEvent(new Event('storage'));
+            const profileRaw = localStorage.getItem('generatedCandidateProfile');
+
+            if (profileRaw) {
+                const profile: CandidateProfile = JSON.parse(profileRaw);
+                if (validateProfileForApplication(profile)) {
+                    // Profile is valid, proceed with application
+                    const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+                    if (!appliedJobs.includes(jobId)) {
+                        appliedJobs.push(jobId);
+                        localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
+                        toast({
+                            title: 'Ứng tuyển thành công!',
+                            description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
+                            className: 'bg-green-500 text-white'
+                        });
+                        window.dispatchEvent(new Event('storage'));
+                    } else {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Bạn đã ứng tuyển công việc này',
+                            description: `Bạn đã ứng tuyển công việc "${jobTitle}" trước đó.`,
+                        });
+                    }
+                } else {
+                    // Profile is incomplete, show alert to update
+                    setIsProfileIncompleteAlertOpen(true);
+                }
             } else {
-                 toast({
-                    variant: 'destructive',
-                    title: 'Bạn đã ứng tuyển công việc này',
-                    description: `Bạn đã ứng tuyển công việc "${jobTitle}" trước đó.`,
-                });
+                // No profile found, show alert to update
+                setIsProfileIncompleteAlertOpen(true);
             }
         }
-        setIsPostLoginApplyDialogOpen(false);
+        
         clearPostLoginAction();
+    };
+
+    const handleConfirmUpdateProfile = () => {
+        setIsProfileIncompleteAlertOpen(false);
+        setIsProfileEditDialogOpen(true);
     };
 
     return (
@@ -62,7 +88,6 @@ function LayoutManager({ children }: { children: ReactNode }) {
             <Toaster />
             <AlertDialog open={isPostLoginApplyDialogOpen} onOpenChange={(open) => {
                 if (!open) {
-                    // If the dialog is closed without a choice, clear the action.
                     clearPostLoginAction();
                     setIsPostLoginApplyDialogOpen(false);
                 }
@@ -80,6 +105,31 @@ function LayoutManager({ children }: { children: ReactNode }) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Để sau</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <EditProfileDialog 
+                isOpen={isProfileEditDialogOpen} 
+                onOpenChange={setIsProfileEditDialogOpen} 
+                onSaveSuccess={() => {
+                    toast({
+                        title: 'Cập nhật thành công!',
+                        description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
+                        className: 'bg-green-500 text-white'
+                    });
+                }}
+            />
         </>
     );
 }

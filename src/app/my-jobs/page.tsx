@@ -413,7 +413,7 @@ const LoggedInView = () => {
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
-    
+
     useEffect(() => {
         // Generate dynamic chart data
         const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
