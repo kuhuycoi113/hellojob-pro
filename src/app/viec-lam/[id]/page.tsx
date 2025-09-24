@@ -217,21 +217,21 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                 </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
-                    <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
-                </Button>
-                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
-                    <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
-                </Button>
-                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
-                    <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
-                </Button>
+            <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
+                <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
+            </Button>
+            <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
+                <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
+            </Button>
+            <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
+                <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
+            </Button>
             </div>
             <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
         </>
@@ -714,26 +714,23 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
                                 </div>
                             </CardContent>
-                             <div className="border-t p-4 flex flex-col items-center gap-2">
-                                <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
-                                   <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4"/>Xem hồ sơ chi tiết</Link>
-                                </Button>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="sm" className="text-muted-foreground">
-                                            <MoreHorizontal className="mr-2 h-4 w-4" />
-                                            Hành động khác
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                         <DropdownMenuItem onSelect={handleShare}><Share2 className="mr-2 h-4 w-4"/>Chia sẻ việc làm</DropdownMenuItem>
-                                         <DropdownMenuItem><Share2 className="mr-2 h-4 w-4"/>Chia sẻ tư vấn viên</DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem asChild>
-                                            <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4"/>Xem các tư vấn viên khác</Link>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                             <div className="border-t p-4 flex flex-col items-center gap-4">
+                                <div className="flex justify-center gap-2">
+                                    <Button asChild variant="ghost" className="text-muted-foreground text-sm">
+                                        <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4"/>Xem tư vấn viên khác</Link>
+                                    </Button>
+                                    <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
+                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4"/>Xem hồ sơ chi tiết</Link>
+                                    </Button>
+                                </div>
+                                <div className="flex justify-center gap-2">
+                                    <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
+                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ việc làm
+                                    </Button>
+                                    <Button variant="ghost" className="text-muted-foreground text-sm">
+                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ tư vấn viên
+                                    </Button>
+                                </div>
                             </div>
                         </Card>
                     </aside>
