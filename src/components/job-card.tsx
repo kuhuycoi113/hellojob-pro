@@ -174,6 +174,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         classes = 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
     } else if (job.visaDetail === 'Đặc định đầu Nhật') {
         classes = 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
+    } else if (job.visaDetail === 'Đặc định đi mới') {
+        classes = 'text-[#40B5E4]';
     } else if (job.visaType?.includes("Thực tập sinh")) {
         classes = "border-accent-green/70 bg-green-50 text-accent-green";
     } else if (job.visaType?.includes("Kỹ năng đặc định")) {
@@ -336,7 +338,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 {job.visaDetail && (
                                     <Badge
                                         variant="outline"
-                                        className={cn("text-xs", badgeClassName)}
+                                        className={cn("px-1.5 py-0 text-xs", badgeClassName)}
                                     >
                                         {job.visaDetail}
                                     </Badge>
@@ -614,4 +616,3 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     </>
   );
 };
-
