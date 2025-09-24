@@ -479,8 +479,12 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         onFilterChange({ interviewDate: date ? format(date, 'yyyy-MM-dd') : '' });
     };
 
-    const handleFlexibleDateChange = (checked: boolean) => {
-        onFilterChange({ interviewDate: checked ? 'flexible' : '' });
+    const handleFlexibleDateChange = (checked: boolean | string) => {
+        if(checked) {
+            onFilterChange({ interviewDate: 'flexible' });
+        } else {
+            onFilterChange({ interviewDate: '' });
+        }
     };
 
     const handleVisaDetailChange = (value: string) => {
@@ -742,14 +746,16 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Ngày phỏng vấn</Label>
-                                    <Tabs value={filters.interviewDateType || 'until'} onValueChange={(value) => onFilterChange({ interviewDateType: value as any })} className="w-full">
-                                        <TabsList className="grid w-full h-auto grid-cols-3">
-                                            <TabsTrigger value="until" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-yellow")}>Đến ngày</TabsTrigger>
-                                            <TabsTrigger value="exact" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-green")}>Đúng ngày</TabsTrigger>
-                                            <TabsTrigger value="from" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-blue")}>Từ ngày</TabsTrigger>
-                                        </TabsList>
-                                    </Tabs>
-                                    <div className='flex gap-2 items-center pt-2'>
+                                    <div className={cn("transition-opacity", isFlexibleDateChecked && "opacity-50")}>
+                                        <Tabs value={filters.interviewDateType || 'until'} onValueChange={(value) => onFilterChange({ interviewDateType: value as any })} className="w-full">
+                                            <TabsList className="grid w-full h-auto grid-cols-3">
+                                                <TabsTrigger value="until" className="text-xs py-1 h-auto data-[state=active]:bg-accent-orange">Đến ngày</TabsTrigger>
+                                                <TabsTrigger value="exact" className="text-xs py-1 h-auto data-[state=active]:bg-accent-green">Đúng ngày</TabsTrigger>
+                                                <TabsTrigger value="from" className="text-xs py-1 h-auto data-[state=active]:bg-accent-blue">Từ ngày</TabsTrigger>
+                                            </TabsList>
+                                        </Tabs>
+                                    </div>
+                                    <div className={cn('flex gap-2 items-center pt-2', isFlexibleDateChecked && "opacity-50 pointer-events-none")}>
                                         {isMobile ? (
                                             <Sheet open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
                                                 <SheetTrigger asChild>
@@ -768,7 +774,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                     </SheetHeader>
                                                     <CalendarComponent
                                                         mode="single"
-                                                        selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? new Date(filters.interviewDate) : undefined}
+                                                        selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? parse(filters.interviewDate, 'yyyy-MM-dd', new Date()) : undefined}
                                                         onSelect={(date) => {
                                                             handleDateSelect(date);
                                                             setIsDatePickerOpen(false);
@@ -795,7 +801,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                 <PopoverContent className="w-auto p-0">
                                                     <CalendarComponent
                                                         mode="single"
-                                                        selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? new Date(filters.interviewDate) : undefined}
+                                                        selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? parse(filters.interviewDate, 'yyyy-MM-dd', new Date()) : undefined}
                                                         onSelect={handleDateSelect}
                                                         fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
                                                         toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
