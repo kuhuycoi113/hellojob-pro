@@ -189,14 +189,6 @@ const parsePhysicalRequirement = (reqStr?: string): [number, number] => {
     return [0, Infinity];
 };
 
-
-const tattooRequirements = [
-    { name: "Không yêu cầu", slug: "all" },
-    { name: "Không nhận hình xăm", slug: "khong-nhan-hinh-xam" },
-    { name: "Nhận xăm nhỏ (kín)", slug: "nhan-xam-nho-kin" },
-    { name: "Nhận cả xăm to (lộ)", slug: "nhan-ca-xam-to-lo" },
-];
-
 export default function JobSearchPageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
     const router = useRouter();
     const readOnlySearchParams = useSearchParams();
@@ -361,7 +353,7 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
             
             const tattooReqName = tattooRequirements.find(t => t.slug === tattooRequirement)?.name;
             const tattooMatch = !tattooRequirement || tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
-            
+
             const langReqName = languageLevels.find(l => l.slug === languageRequirement)?.name;
             const languageReqMatch = !languageRequirement || languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
             
