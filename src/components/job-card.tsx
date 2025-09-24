@@ -178,6 +178,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         classes += 'text-[#40B5E4]';
     } else if (job.visaDetail === 'Kỹ sư, tri thức đầu Việt') {
         classes += 'border-accent-orange/70 bg-orange-50 text-[#F2B92A]';
+    } else if (job.visaDetail === 'Kỹ sư, tri thức đầu Nhật') {
+        classes += 'border-accent-orange/70 bg-orange-50 text-[#F7B102]';
     } else if (job.visaType?.includes("Thực tập sinh")) {
         classes += "border-accent-green/70 bg-green-50 text-accent-green";
     } else if (job.visaType?.includes("Kỹ năng đặc định")) {
