@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Award, Briefcase, Handshake, MessageSquare, PieChart, Send, ShieldCheck, Sparkles, Star, Target, Users, Phone, ChevronRight, Bookmark, MapPin, DollarSign, CalendarClock, LogIn, FileText, X } from 'lucide-react';
+import { Award, Briefcase, Handshake, MessageSquare, PieChart, Send, ShieldCheck, Sparkles, Star, Target, Users, Phone, ChevronRight, Bookmark, MapPin } from 'lucide-react';
 import { MessengerIcon, ZaloIcon } from '@/components/custom-icons';
 import { ContactButtons } from '@/components/contact-buttons';
 import { consultants as consultantData } from '@/lib/consultant-data';
@@ -16,12 +16,6 @@ import Link from 'next/link';
 import { industryGroups } from '@/lib/industry-data';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { EditProfileDialog } from '@/components/candidate-edit-dialog';
-import { CandidateProfile } from '@/ai/schemas';
-import { AuthDialog } from '@/components/auth-dialog';
 
 const companyValues = [
     {
@@ -80,176 +74,143 @@ const getJobsByGroupedExpertise = (expertise: string): Job[] | null => {
     return null;
 }
 
-const formatCurrency = (value?: string) => {
-    if (!value) return 'N/A';
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
-
-const validateProfileForApplication = (profile: CandidateProfile): boolean => {
-    if (!profile || !profile.personalInfo) return false;
-    const { name, personalInfo } = profile;
-    const { gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = personalInfo;
-    const hasRequiredPersonalInfo = name && gender && height && weight && tattooStatus && hepatitisBStatus;
-    const hasContactInfo = phone || zalo || messenger || line;
-    return !!hasRequiredPersonalInfo && !!hasContactInfo;
-};
-
 const visasForVndDisplay = [
     'Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đi mới', 'Kỹ sư, tri thức đầu Việt',
 ];
 
 const JPY_VND_RATE = 180;
 
+const formatCurrency = (value?: string) => {
+    if (!value) return 'N/A';
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
 const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): string => {
     if (!salaryValue) return 'N/A';
     const numericValue = parseInt(salaryValue.replace(/[^0-9]/g, ''), 10);
     if (isNaN(numericValue)) return salaryValue;
+
     if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
         const vndValue = numericValue * JPY_VND_RATE;
         const valueInMillions = vndValue / 1000000;
-        if (valueInMillions % 1 === 0) return `${valueInMillions.toLocaleString('vi-VN')}tr`;
-        const formattedVnd = valueInMillions.toLocaleString('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        
+        if (valueInMillions % 1 === 0) {
+            return `${valueInMillions.toLocaleString('vi-VN')}tr`;
+        }
+        
+        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        });
         return `${formattedVnd.replace('.',',')}tr`;
     }
+    
     return `${formatCurrency(salaryValue)} JPY`;
 };
 
+
 const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = false }: { job: Job, showRecruiterName?: boolean, showPostedTime?: boolean }) => {
-  const { isLoggedIn } = useAuth();
   const router = useRouter();
-  const { toast } = useToast();
-  const [isClient, setIsClient] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [hasApplied, setHasApplied] = useState(false);
-  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-  const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
-  const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
-  const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
-  const [postedTime, setPostedTime] = useState<string | null>(null);
   const [interviewDate, setInterviewDate] = useState<string | null>(null);
+  const [postedTime, setPostedTime] = useState<string | null>(null);
 
   useEffect(() => {
-    setIsClient(true);
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     setIsSaved(savedJobs.includes(job.id));
-    const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-    setHasApplied(appliedJobs.includes(job.id));
-
+    
     const today = new Date();
-    const postedDate = new Date(today);
+    const fullInterviewDate = new Date(today);
+    fullInterviewDate.setDate(today.getDate() + job.interviewDateOffset);
+    setInterviewDate(fullInterviewDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+    
+     const postedDate = new Date(today);
     postedDate.setDate(today.getDate() + job.postedTimeOffset);
     setPostedTime(`10:00 ${postedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`);
 
-    const interviewFullDate = new Date(today);
-    interviewFullDate.setDate(today.getDate() + job.interviewDateOffset);
-    setInterviewDate(interviewFullDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'}));
+  }, [job.id, job.interviewDateOffset, job.postedTimeOffset]);
 
-  }, [job.id, job.postedTimeOffset, job.interviewDateOffset]);
 
   const handleSaveJob = (e: React.MouseEvent) => {
-    e.stopPropagation(); e.preventDefault();
+    e.stopPropagation();
+    e.preventDefault();
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     if (isSaved) {
-      const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
-      localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
-      setIsSaved(false);
+        const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
+        localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
+        setIsSaved(false);
     } else {
-      savedJobs.push(job.id);
-      localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
-      setIsSaved(true);
+        savedJobs.push(job.id);
+        localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+        setIsSaved(true);
     }
     window.dispatchEvent(new Event('storage'));
   };
-
-  const handleApplyClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); e.preventDefault();
-    if (!isLoggedIn) {
-        sessionStorage.setItem('postLoginRedirect', `/viec-lam/${job.id}`);
-        setIsConfirmLoginOpen(true);
-    } else {
-        const profileRaw = localStorage.getItem('generatedCandidateProfile');
-        if (profileRaw) {
-            const profile: CandidateProfile = JSON.parse(profileRaw);
-            if (validateProfileForApplication(profile)) {
-                 const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-                 appliedJobs.push(job.id);
-                 localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
-                 setHasApplied(true);
-                 toast({ title: 'Ứng tuyển thành công!', description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`, className: 'bg-green-500 text-white' });
-            } else {
-                setIsProfileIncompleteAlertOpen(true);
-            }
-        } else {
-             setIsProfileIncompleteAlertOpen(true);
-        }
-    }
-  };
   
-  const handleConfirmLogin = () => { setIsConfirmLoginOpen(false); setIsAuthDialogOpen(true); };
-  const handleConfirmUpdateProfile = () => { setIsProfileIncompleteAlertOpen(false); setIsProfileEditDialogOpen(true); };
-  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => { if ((e.target as HTMLElement).closest('a, button')) return; router.push(`/viec-lam/${job.id}`); };
-  const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('a, button')) return;
+    router.push(`/viec-lam/${job.id}`);
+  };
 
   return (
-    <>
-        <div onClick={handleCardClick} className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground">
-            <div className="p-3 hover:bg-secondary/30">
-                <div className="flex flex-col items-stretch gap-4 md:flex-row">
-                     <div className="relative h-48 w-full flex-shrink-0 md:h-full md:w-48">
-                        <Image src={job.image.src} alt={job.title} fill className="rounded-lg object-cover" />
-                        <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
-                            <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
-                            <span>{job.id}</span>
-                        </div>
-                        {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white md:hidden" onClick={handleSaveJob}><Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} /></Button>}
+    <div onClick={handleCardClick} className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground">
+        <div className="p-3 hover:bg-secondary/30">
+            <div className="flex flex-col items-stretch gap-4 md:flex-row">
+                <div className="relative h-48 w-full flex-shrink-0 md:h-auto md:w-48">
+                    <Image src={job.image.src} alt={job.title} fill className="rounded-lg object-cover" />
+                    <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
+                        <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
+                        <span>{job.id}</span>
                     </div>
-                    <div className="flex flex-grow flex-col">
-                        <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
-                         <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-                            {job.visaDetail && <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>}
-                            {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
-                            <Badge variant="secondary">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                            <p className="flex items-center gap-1.5">
-                                <span className="text-primary">Ngày phỏng vấn:</span>
-                                <span>{interviewDate || "N/A"}</span>
-                            </p>
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                            <p className="flex items-center gap-1.5">
-                                <MapPin className="h-4 w-4 flex-shrink-0" />
-                                <span>{job.workLocation}</span>
-                            </p>
-                        </div>
-                        <div className="mt-auto flex flex-wrap items-end justify-between gap-y-2 pt-2">
-                           <div className="flex items-center gap-2">
-                           </div>
-                           <div className="flex items-center gap-2">
-                            {isClient && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
-                           </div>
-                           {showPostedTime && (
-                                <p className="text-right text-xs text-muted-foreground">
-                                    <span>Đăng lúc:</span> {postedTime ? postedTime.split(' ')[1] : '...'}
-                                </p>
-                            )}
-                        </div>
+                </div>
+                <div className="flex flex-grow flex-col">
+                    <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
+                    <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        {job.visaDetail && <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>}
+                        {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
+                        <Badge variant="secondary">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
                     </div>
+                     <div className="text-xs text-muted-foreground mt-1">
+                        <p className="flex items-center gap-1.5">
+                            <span className="text-primary">Ngày phỏng vấn:</span>
+                            <span>{interviewDate || "N/A"}</span>
+                        </p>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                        <p className="flex items-center gap-1.5">
+                            <MapPin className="h-4 w-4 flex-shrink-0" />
+                            <span>{job.workLocation}</span>
+                        </p>
+                    </div>
+                    <div id="DONGLIENHEUNGTUYEN01" className="mt-auto flex flex-wrap items-end justify-between gap-y-2 pt-2">
+                       <div className="flex items-center gap-2">
+                         <Link href={`/tu-van-vien/${job.recruiter.id}`} onClick={(e) => e.stopPropagation()}>
+                            <Avatar className="h-9 w-9">
+                                <AvatarImage src={job.recruiter.avatarUrl} />
+                                <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                        </Link>
+                         <ContactButtons contact={job.recruiter as any} />
+                       </div>
+                       <div className="flex items-center gap-2">
+                         <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                             <Bookmark className={cn("mr-2 h-4 w-4", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
+                             Lưu
+                         </Button>
+                         <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/viec-lam/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
+                       </div>
+                    </div>
+                     {showPostedTime && (
+                        <p className="text-right text-[11px] text-muted-foreground mt-2">
+                            <span className="text-primary">Đăng lúc:</span> {postedTime ? postedTime.split(' ')[1] : '...'}
+                        </p>
+                    )}
                 </div>
             </div>
         </div>
-        <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-        <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
-            <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle><AlertDialogDescription>Bạn cần đăng nhập để ứng tuyển, bạn có muốn đăng nhập không?</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Để sau</AlertDialogCancel><AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
-        </AlertDialog>
-        <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
-            <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle><AlertDialogDescription>Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Để sau</AlertDialogCancel><AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
-        </AlertDialog>
-        <EditProfileDialog isOpen={isProfileEditDialogOpen} onOpenChange={setIsProfileEditDialogOpen} onSaveSuccess={() => { toast({ title: 'Cập nhật thành công!', description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.', className: 'bg-green-500 text-white' }); }} />
-    </>
-  );
-};
-
+    </div>
+  )
+}
 
 export default function ConsultantDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
@@ -266,7 +227,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
         
         if (directlyAssignedJobs.length > 0) {
             return directlyAssignedJobs
-                .sort((a, b) => b.postedTimeOffset - a.postedTimeOffset)
+                .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
                 .slice(0, 4);
         }
         
@@ -274,7 +235,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
         const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
         if (jobsByGroup) {
             return jobsByGroup
-                .sort((a, b) => b.postedTimeOffset - a.postedTimeOffset)
+                .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
                 .slice(0, 4);
         }
         
