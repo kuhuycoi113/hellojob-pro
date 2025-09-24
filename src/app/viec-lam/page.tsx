@@ -35,7 +35,7 @@ const getJobsForGroup = async (group: string): Promise<Job[]> => {
 
   if (jobGroupTitles[group]) {
     if (group === 'luong-cao') {
-      queryBody.sort = [{ 'salary.basic.keyword': { order: 'desc' } }];
+      queryBody.sort = [{ "salary.basic": { order: 'desc', "numeric_type" : "long" } }];
     } else if (group === 'phi-thap') {
       queryBody.query = {
         range: {
