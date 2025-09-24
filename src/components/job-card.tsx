@@ -338,20 +338,24 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <div className="flex flex-grow flex-col">
                             <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
                              <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                {isClient && job.visaDetail && (
-                                    <Badge
-                                        variant="outline"
-                                        className={badgeClassName}
-                                    >
-                                        {job.visaDetail}
-                                    </Badge>
-                                )}
-                                {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
-                                <Badge variant="secondary" className="text-xs">Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
-                                {isClient && feeFilterIsActive && feeInfo.shouldShow && (
-                                    <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
-                                        {feeInfo.text}
-                                    </Badge>
+                                {isClient && (
+                                    <>
+                                        {job.visaDetail && (
+                                            <Badge
+                                                variant="outline"
+                                                className={badgeClassName}
+                                            >
+                                                {job.visaDetail}
+                                            </Badge>
+                                        )}
+                                        {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
+                                        <Badge variant="secondary" className="text-xs">Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
+                                        {feeFilterIsActive && feeInfo.shouldShow && (
+                                            <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
+                                                {feeInfo.text}
+                                            </Badge>
+                                        )}
+                                    </>
                                 )}
                             </div>
                             <div className="text-sm text-muted-foreground">
@@ -531,16 +535,20 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                 <div className="flex flex-grow flex-col p-3">
                     <h3 className="mb-2 h-10 text-sm font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
                     <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-                        {isClient && job.visaDetail && (
-                            <Badge
-                                variant="outline"
-                                className={cn("px-1.5 py-0 text-xs", badgeClassName)}
-                            >
-                                {job.visaDetail}
-                            </Badge>
+                        {isClient && (
+                            <>
+                                {job.visaDetail && (
+                                    <Badge
+                                        variant="outline"
+                                        className={badgeClassName}
+                                    >
+                                        {job.visaDetail}
+                                    </Badge>
+                                )}
+                                {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
+                                <Badge variant="secondary" className="px-1.5 py-0 text-xs">Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
+                            </>
                         )}
-                        {isClient && job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
-                        {isClient && <Badge variant="secondary" className="px-1.5 py-0 text-xs">Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>}
                     </div>
                     <div className="text-xs text-muted-foreground">
                         <p className="flex items-center gap-1.5">

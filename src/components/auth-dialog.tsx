@@ -64,7 +64,7 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
         sessionStorage.removeItem('postLoginRedirect');
         router.push(redirectPath);
     } else {
-        router.push('/candidate-profile'); // Default redirect
+        router.push('/ho-so-cua-toi'); // Default redirect
     }
   }
 
