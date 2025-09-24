@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { use } from 'react';
@@ -89,7 +90,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
         
         if (directlyAssignedJobs.length > 0) {
             return directlyAssignedJobs
-                .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
+                .sort((a, b) => b.postedTimeOffset - a.postedTimeOffset)
                 .slice(0, 4);
         }
         
@@ -97,7 +98,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
         const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
         if (jobsByGroup) {
             return jobsByGroup
-                .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
+                .sort((a, b) => b.postedTimeOffset - a.postedTimeOffset)
                 .slice(0, 4);
         }
         
