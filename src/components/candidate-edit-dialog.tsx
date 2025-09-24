@@ -12,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { format } from "date-fns";
 import { vi } from 'date-fns/locale';
-import { CalendarIcon, Info, QrCode, UploadCloud, Image as ImageIcon } from 'lucide-react';
+import { CalendarIcon, Info, QrCode, UploadCloud, Image as ImageIcon, Phone, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { JpFlagIcon, VnFlagIcon } from './custom-icons';
 import type { CandidateProfile } from '@/ai/schemas';
@@ -283,40 +283,46 @@ const renderLevel1Edit = (
                 </div>
                 <div className="md:col-span-2 mt-6 pt-6 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="phone">Số điện thoại</Label>
+                        <Label htmlFor="phone" className="flex items-center gap-2">
+                             <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
+                             Số điện thoại
+                        </Label>
                         <div className="flex items-center">
                             <Select value={phoneCountry} onValueChange={setPhoneCountry}>
                             <SelectTrigger className="w-[120px] rounded-r-none">
                                 <SelectValue>
                                 <div className="flex items-center">
-                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-3 h-3 mr-1" /> : <JpFlagIcon className="w-3 h-3 mr-1" />}
+                                    <VnFlagIcon className="w-3 h-3 mr-1" />
                                     {phoneCountry}
                                 </div>
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-4 h-4" /> VN (+84)</div></SelectItem>
-                                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-4 h-4" /> JP (+81)</div></SelectItem>
+                                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon /> VN (+84)</div></SelectItem>
+                                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon /> JP (+81)</div></SelectItem>
                             </SelectContent>
                             </Select>
                             <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
+                        <Label htmlFor="zalo" className="flex items-center gap-2">
+                             <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
+                             Zalo (Số điện thoại)
+                        </Label>
                         <div className="flex items-center relative">
                             <Select value={zaloCountry} onValueChange={setZaloCountry}>
                                 <SelectTrigger className="w-[120px] rounded-r-none">
                                 <SelectValue>
                                     <div className="flex items-center">
-                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-3 h-3 mr-1" /> : <JpFlagIcon className="w-3 h-3 mr-1" />}
+                                    <VnFlagIcon className="w-3 h-3 mr-1" />
                                     {zaloCountry}
                                     </div>
                                 </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-4 h-4" /> VN (+84)</div></SelectItem>
-                                    <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-4 h-4" /> JP (+81)</div></SelectItem>
+                                    <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon /> VN (+84)</div></SelectItem>
+                                    <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon /> JP (+81)</div></SelectItem>
                                 </SelectContent>
                             </Select>
                             <Input id="zalo" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
@@ -326,12 +332,18 @@ const renderLevel1Edit = (
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="messenger">Facebook Messenger</Label>
+                         <Label htmlFor="messenger" className="flex items-center gap-2">
+                            <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
+                            Facebook Messenger
+                        </Label>
                         <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc nhập username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
                         <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="line">Line (Link hồ sơ)</Label>
+                        <Label htmlFor="line" className="flex items-center gap-2">
+                            <Image src="/img/Line.svg" alt="Line" width={20} height={20} />
+                            Line (Link hồ sơ)
+                        </Label>
                         <Input id="line" placeholder="Dán link Line của bạn vào đây" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
                     </div>
                 </div>
