@@ -125,7 +125,7 @@ const createSlug = (str: string) => {
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/đ/g, "d")
         .replace(/\s+/g, '-')
-        .replace(/[^\w\-]+/g, '');
+        .replace(/[^\w\-.]+/g, '');
 };
 
 
@@ -347,9 +347,9 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
                  return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
             });
 
-            const arrivalTimeMatch = !companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === companyArrivalTime);
+             const arrivalTimeMatch = !companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === companyArrivalTime);
              
-            const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(workShift));
+             const workShiftMatch = !workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(workShift));
 
             return keywordMatch && visaMatch && industryMatch && locationMatch && jobDetailMatch && interviewLocationMatch && quantityMatch && feeMatch && feeNoTicketMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && expReqMatch && yearsOfExperienceMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishRequirementMatch;
         });
@@ -561,4 +561,3 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
         </div>
     );
 }
-
