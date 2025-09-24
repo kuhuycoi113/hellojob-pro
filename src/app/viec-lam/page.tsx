@@ -9,14 +9,15 @@ import Link from 'next/link';
 import { JobCard } from '@/components/job-card';
 import { SearchModule } from '@/components/job-search/search-module';
 import type { Job } from '@/lib/mock-data';
-import { jobData } from '@/lib/mock-data';
+import { jobData } from '@/lib/mock-data'; // Keep for fallback/type reference
 import { useRouter } from 'next/navigation';
+import client from '@/lib/elasticsearch'; // Import the default client
 
 // Define the structure of the job object coming from Elasticsearch
 interface ElasticsearchJob {
   id: string;
   code: string;
-  visa: string; // This is the new visaDetail
+  visa: string; // This is the visaDetail
   job: string; // Part of the title
   workLocation: string;
   gender: string;
@@ -29,10 +30,38 @@ interface ElasticsearchJob {
   back: number;
   interviewDay: string;
   specialConditions: string;
+  aiContent: string;
+  i18n: {
+      aiContent: {
+          vn: string;
+      }
+  };
   career: string;
+  image: any[]; // Can be array or other types
+  video: any[];
+  salaryImages: any[];
+  filter: {
+      job: {
+          label: string;
+          value: string;
+          valueArr: number[];
+          parent: string;
+      }
+  };
   avatar: string; // This can be used as the main image
-  postedDate: number;
+  status: string;
+  postedDate: number; // Unix timestamp
+  source: string;
+  createdDate: number;
+  basicSalaryCode: string;
+  realSalaryCode: string;
+  basicSalaryHourCode: string;
+  country: string;
+  createdID: string;
   dataAnalyst: string; // Recruiter name
+  netFee?: string;
+  netFeeNoTicket?: string;
+  netFeeWithTuition?: string;
 }
 
 const jobGroupTitles: { [key: string]: string } = {
@@ -71,42 +100,49 @@ const LoadingJobGroup = () => (
 )
 
 const transformEsJobToJobCardProps = (esJob: ElasticsearchJob): Job => {
-    // Construct a title from available fields
     const constructedTitle = `${esJob.job}, ${esJob.workLocation}, tuyển ${esJob.numberRecruits} ${esJob.gender === 'Cả nam và nữ' ? 'Nam/Nữ' : esJob.gender}`;
+
+    // Calculate offset based on postedDate (assuming postedDate is a unix timestamp in seconds)
+    const postedDate = new Date(esJob.postedDate * 1000);
+    const today = new Date();
+    const timeDiff = today.getTime() - postedDate.getTime();
+    const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
 
     return {
       id: esJob.id,
       isRecording: false,
       image: {
-        src: esJob.avatar || '/img/vieclam001.webp', // Use avatar as the main image, with a fallback
+        src: esJob.avatar || '/img/vieclam001.webp',
         type: 'thucte',
       },
-      likes: '0', // Placeholder
+      likes: '0', 
       salary: {
         basic: String(esJob.basicSalary || 0),
         actual: String(esJob.realSalary || 0),
       },
       title: constructedTitle,
       recruiter: {
-        id: esJob.dataAnalyst.toLowerCase().replace(/\s/g, '-'), // Create an ID from the name
+        id: esJob.dataAnalyst.toLowerCase().replace(/\s/g, '-'),
         name: esJob.dataAnalyst,
-        avatarUrl: '/img/favi2.png', // Placeholder avatar
-        company: 'HelloJob', // Placeholder company
+        avatarUrl: '/img/favi2.png',
+        company: 'HelloJob',
       },
-      status: 'Đang tuyển', // Assuming default status
-      postedTimeOffset: 0, // Cannot be calculated from timestamp without client-side logic
-      interviewDateOffset: esJob.interviewDay === "Đủ người thì phỏng vấn" ? 999 : 10, // Placeholder
-      interviewRounds: 1, // Placeholder
+      status: esJob.status === 'CONFIRMED' ? 'Đang tuyển' : 'Tạm dừng',
+      postedTimeOffset: -daysDiff,
+      interviewDateOffset: esJob.interviewDay === "Đủ người thì phỏng vấn" ? 999 : 10,
+      interviewRounds: 1, 
       tags: [esJob.career, esJob.visa],
       visaDetail: esJob.visa,
       industry: esJob.career,
       workLocation: esJob.workLocation,
       quantity: parseInt(esJob.numberRecruits, 10) || 1,
-      // Add dummy details to satisfy the type
+      netFee: esJob.netFee,
+      netFeeNoTicket: esJob.netFeeNoTicket,
+      netFeeWithTuition: esJob.netFeeWithTuition,
       details: {
-        description: '',
-        requirements: '',
-        benefits: '',
+        description: esJob.aiContent || 'Mô tả công việc đang được cập nhật.',
+        requirements: 'Yêu cầu cụ thể đang được cập nhật.',
+        benefits: 'Quyền lợi đang được cập nhật.',
       }
     };
 };
@@ -118,12 +154,60 @@ const JobGroupSection = ({ groupKey, title }: { groupKey: string; title: string 
     useEffect(() => {
         const fetchJobs = async () => {
             setIsLoading(true);
-            // Simulate fetching data. In a real app, this would be an API call.
-            // For now, we use a slice of the mock data.
-            const startIndex = parseInt(groupKey.replace(/[^0-9]/g, '')) || 0;
-            const mockJobs = jobData.slice(startIndex * 4, (startIndex * 4) + 8);
-            setJobs(mockJobs);
-            setIsLoading(false);
+            try {
+                let queryBody: any = {
+                    size: 8,
+                    query: {
+                        bool: {
+                            must: [
+                                { term: { status: "CONFIRMED" } }
+                            ]
+                        }
+                    },
+                    sort: [
+                        { postedDate: "desc" }
+                    ]
+                };
+
+                if (groupKey === 'luong-cao') {
+                    queryBody.sort = [{ basicSalary: "desc" }];
+                } else if (groupKey === 'phi-thap') {
+                     const oneWeekAgo = Math.floor((Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000);
+                     queryBody.query.bool.must.push({
+                         range: {
+                             postedDate: {
+                                 gte: oneWeekAgo
+                             }
+                         }
+                     });
+                     queryBody.sort = [
+                        { netFeeWithTuition: { order: 'asc', missing: '_last' } },
+                        { netFee: { order: 'asc', missing: '_last' } },
+                        { netFeeNoTicket: { order: 'asc', missing: '_last' } },
+                        { postedDate: "desc" }
+                     ];
+                } else if (jobGroupTitles[groupKey]) {
+                    queryBody.query.bool.must.push({
+                        term: {
+                            "visa.keyword": jobGroupTitles[groupKey]
+                        }
+                    });
+                }
+                
+                const response = await client.search({
+                    index: 'hellojobv5-job-crawled',
+                    body: queryBody,
+                });
+
+                const fetchedJobs = response.body.hits.hits.map((hit: any) => transformEsJobToJobCardProps(hit._source as ElasticsearchJob));
+                setJobs(fetchedJobs);
+
+            } catch (error) {
+                console.error(`Failed to fetch jobs for group ${groupKey}:`, error);
+                setJobs([]); // Set to empty array on error
+            } finally {
+                setIsLoading(false);
+            }
         };
 
         fetchJobs();
@@ -180,13 +264,29 @@ export default function JobsPage() {
           </Suspense>
         <div className="w-full bg-secondary">
           <div className="container mx-auto px-4 md:px-6 py-8 space-y-12">
-            <JobGroupSection groupKey="luong-cao" title="Việc làm lương cao" />
-            <JobGroupSection groupKey="phi-thap" title="Việc làm phí thấp" />
-            <JobGroupSection groupKey="dac-dinh-dau-nhat" title="Đặc định đầu Nhật" />
-            <JobGroupSection groupKey="thuc-tap-sinh-3-nam" title="Thực tập sinh 3 năm" />
-            <JobGroupSection groupKey="ky-su-tri-thuc-dau-nhat" title="Kỹ sư, tri thức đầu Nhật" />
+            <Suspense fallback={<LoadingJobGroup />}>
+                {/* @ts-expect-error Server Component */}
+                <JobGroupSection groupKey="luong-cao" title="Việc làm lương cao" />
+            </Suspense>
+            <Suspense fallback={<LoadingJobGroup />}>
+                {/* @ts-expect-error Server Component */}
+                <JobGroupSection groupKey="phi-thap" title="Việc làm phí thấp" />
+            </Suspense>
+            <Suspense fallback={<LoadingJobGroup />}>
+                {/* @ts-expect-error Server Component */}
+                <JobGroupSection groupKey="dac-dinh-dau-nhat" title="Đặc định đầu Nhật" />
+            </Suspense>
+            <Suspense fallback={<LoadingJobGroup />}>
+                {/* @ts-expect-error Server Component */}
+                <JobGroupSection groupKey="thuc-tap-sinh-3-nam" title="Thực tập sinh 3 năm" />
+            </Suspense>
+            <Suspense fallback={<LoadingJobGroup />}>
+                {/* @ts-expect-error Server Component */}
+                <JobGroupSection groupKey="ky-su-tri-thuc-dau-nhat" title="Kỹ sư, tri thức đầu Nhật" />
+            </Suspense>
           </div>
         </div>
       </div>
     );
 }
+
