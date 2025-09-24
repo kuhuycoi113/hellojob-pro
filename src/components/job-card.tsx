@@ -146,7 +146,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
   const [postedTime, setPostedTime] = useState<string | null>(null);
   const [interviewDate, setInterviewDate] = useState<string | null>(null);
-  const [badgeClassName, setBadgeClassName] = useState<string>('');
+  const [badgeClassName, setBadgeClassName] = useState<string>('opacity-0');
 
 
   useEffect(() => {
@@ -335,10 +335,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <div className="flex flex-grow flex-col">
                             <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
                              <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                {job.visaDetail && (
+                                {isClient && job.visaDetail && (
                                     <Badge
                                         variant="outline"
-                                        className={cn("px-1.5 py-0 text-xs", badgeClassName)}
+                                        className={cn("px-1.5 py-0 text-xs transition-opacity", badgeClassName)}
                                     >
                                         {job.visaDetail}
                                     </Badge>
@@ -476,10 +476,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <FileText className="h-3 w-3 flex-shrink-0"/>
                         Mã: {job.id}
                     </p>
-                     <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Star className="h-3 w-3 flex-shrink-0"/>
-                        Visa: {job.visaDetail}
-                    </p>
+                     {isClient && job.visaDetail && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Star className="h-3 w-3 flex-shrink-0"/>
+                            Visa: {job.visaDetail}
+                        </p>
+                    )}
                     <div className="text-xs text-muted-foreground">
                         <p className="flex items-center gap-1.5">
                             <span className="text-primary">Ngày PV:</span>
@@ -526,13 +528,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                 <div className="flex flex-grow flex-col p-3">
                     <h3 className="mb-2 h-10 text-sm font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
                     <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-                        {job.visaDetail && (
-                        <Badge
-                            variant="outline"
-                            className={cn("px-1.5 py-0 text-xs", badgeClassName)}
-                        >
-                            {job.visaDetail}
-                        </Badge>
+                        {isClient && job.visaDetail && (
+                            <Badge
+                                variant="outline"
+                                className={cn("px-1.5 py-0 text-xs transition-opacity", badgeClassName)}
+                            >
+                                {job.visaDetail}
+                            </Badge>
                         )}
                         {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
                         <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
