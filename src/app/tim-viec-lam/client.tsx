@@ -486,6 +486,17 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
         }
     }, [router, runFilter, countStagedResults, readOnlySearchParams]);
     
+    const handleSortChange = (value: string) => {
+        setSortBy(value);
+        const query = new URLSearchParams(readOnlySearchParams.toString());
+        if (value === 'newest') {
+            query.delete(keyMap['sortBy']);
+        } else {
+            query.set(keyMap['sortBy'], sortOptionMap[value]);
+        }
+        router.push(`/tim-viec-lam?${query.toString()}`);
+    };
+
     const handleNewSearch = async (filters: Partial<SearchFilters>) => {
         const query = new URLSearchParams();
         
