@@ -823,9 +823,9 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 {shouldShowTabs ? (
                                     <Tabs defaultValue="basic">
                                         <TabsList className={cn("grid w-full h-auto", (shouldShowLươngGiờ && shouldShowLươngNăm) ? "grid-cols-3" : "grid-cols-2")}>
-                                            <TabsTrigger value="basic" className="text-xs data-[state=active]:bg-primary">Lương tháng</TabsTrigger>
-                                            {shouldShowLươngGiờ && <TabsTrigger value="hourly" className="text-xs data-[state=active]:bg-primary">Lương giờ</TabsTrigger>}
-                                            {shouldShowLươngNăm && <TabsTrigger value="yearly" className="text-xs data-[state=active]:bg-primary">Lương năm</TabsTrigger>}
+                                            <TabsTrigger value="basic" className="text-xs data-[state=active]:bg-accent-yellow">Lương tháng</TabsTrigger>
+                                            {shouldShowLươngGiờ && <TabsTrigger value="hourly" className="text-xs data-[state=active]:bg-accent-yellow">Lương giờ</TabsTrigger>}
+                                            {shouldShowLươngNăm && <TabsTrigger value="yearly" className="text-xs data-[state=active]:bg-accent-yellow">Lương năm</TabsTrigger>}
                                         </TabsList>
                                         <TabsContent value="basic" className="pt-4">
                                             <MonthlySalaryContent filters={filters} onFilterChange={onFilterChange} />
@@ -1206,3 +1206,4 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
     );
 }
 
+    
