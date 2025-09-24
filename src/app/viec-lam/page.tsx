@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import { type Metadata } from 'next';
 import JobSearchPageContent from '@/app/tim-viec-lam/client';
+import { searchDocuments } from '@/lib/elasticsearch';
 
 
 type SearchParams = {
@@ -19,7 +20,12 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 }
 
 // The main page is now a Server Component
-export default function JobSearchPage({ searchParams }: { searchParams: SearchParams }) {
+export default async function JobSearchPage({ searchParams }: { searchParams: SearchParams }) {
+  // Data fetching logic can now safely happen here on the server
+  // For now, we will pass searchParams and let the client component handle it with mock data
+  // to restore the previous UI and functionality.
+  // In a real server-side implementation, we would fetch from Elasticsearch here.
+
   return (
     <Suspense fallback={
         <div className="flex h-screen items-center justify-center bg-secondary">
