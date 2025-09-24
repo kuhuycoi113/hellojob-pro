@@ -10,6 +10,7 @@ import { Job, jobData } from "@/lib/mock-data";
 import { ChevronLeft, ListFilter, Loader2 } from "lucide-react";
 import { locations } from "@/lib/location-data";
 import { JobCard } from "../job-card";
+import { experienceYears } from "@/lib/visa-data";
 
 export type SearchFilters = {
     q?: string;
@@ -48,23 +49,7 @@ export type SearchFilters = {
     workShift?: string;
 }
 
-export const experienceYears: { name: string; slug: string }[] = [
-    { name: 'Không yêu cầu', slug: 'khong-yeu-cau' },
-    { name: 'Dưới 1 năm', slug: 'duoi-1-nam' },
-    { name: '1-2 năm', slug: '1-2-nam' },
-    { name: '2-3 năm', slug: '2-3-nam' },
-    { name: 'Trên 3 năm', slug: 'tren-3-nam' },
-    { name: '0,5 - 1 năm', slug: '0.5-1-nam' },
-    { name: '1 - 1,5 năm', slug: '1-1.5-nam' },
-    { name: '1,5 - 2 năm', slug: '1.5-2-nam' },
-    { name: '2 - 2,5 năm', slug: '2-2.5-nam' },
-    { name: '2,5 - 3 năm', slug: '2.5-3-nam' },
-    { name: '3 - 3,5 năm', slug: '3-3.5-nam' },
-    { name: '3,5 - 4 năm', slug: '3.5-4-nam' },
-    { name: '4 - 4,5 năm', slug: '4.5-5-nam' },
-    { name: '4,5 - 5 năm', slug: '4.5-5-nam' },
-    { name: 'Trên 5 năm', slug: 'tren-5-nam' }
-];
+export { experienceYears };
 
 type SearchResultsProps = {
     jobs: Job[];

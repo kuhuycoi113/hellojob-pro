@@ -175,7 +175,6 @@ export const experienceYears: { name: string; slug: string }[] = [
     { name: '2,5 - 3 năm', slug: '2.5-3-nam' },
     { name: '3 - 3,5 năm', slug: '3-3.5-nam' },
     { name: '3,5 - 4 năm', slug: '3.5-4-nam' },
-    { name: '4 - 4,5 năm', slug: '4.5-5-nam' }, // Corrected slug
-    { name: '4,5 - 5 năm', slug: '4.5-5-nam' },
+    { name: '4 - 4,5 năm', slug: '4.5-5-nam' },
     { name: 'Trên 5 năm', slug: 'tren-5-nam' }
 ];
