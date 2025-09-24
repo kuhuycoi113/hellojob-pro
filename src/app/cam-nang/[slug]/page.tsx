@@ -123,7 +123,7 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
                 </div>
                 <div className="text-sm text-muted-foreground mb-3">
                     <p className="flex items-center gap-1.5">
-                        <span className="text-primary font-semibold">Ngày phỏng vấn:</span>
+                        <span className="text-primary">Ngày phỏng vấn:</span>
                         <span>{interviewDate || "N/A"}</span>
                     </p>
                 </div>

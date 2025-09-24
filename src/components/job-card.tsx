@@ -335,9 +335,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     </Badge>
                                 )}
                             </div>
-                            <div className="text-sm text-muted-foreground mb-1">
+                            <div className="text-sm text-muted-foreground">
                                 <p className="flex items-center gap-1.5">
-                                    <span className="text-primary font-semibold">Ngày phỏng vấn:</span>
+                                    <span className="text-primary">Ngày phỏng vấn:</span>
                                     <span>{interviewDate || "N/A"}</span>
                                 </p>
                             </div>
@@ -464,10 +464,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <Star className="h-3 w-3 flex-shrink-0"/>
                         Visa: {job.visaDetail}
                     </p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <span className="text-primary font-semibold">Ngày PV:</span>
-                        <span>{interviewDate || "N/A"}</span>
-                    </p>
+                    <div className="text-xs text-muted-foreground">
+                        <p className="flex items-center gap-1.5">
+                            <span className="text-primary">Ngày PV:</span>
+                            <span>{interviewDate || "N/A"}</span>
+                        </p>
+                    </div>
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                         <MapPin className="h-3 w-3 flex-shrink-0" />
                         {job.workLocation}
@@ -523,13 +525,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
                         <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
                     </div>
-                    <div className="text-xs text-muted-foreground mb-2">
+                    <div className="text-xs text-muted-foreground">
                         <p className="flex items-center gap-1.5">
-                            <span className="text-primary font-semibold">Ngày phỏng vấn:</span>
+                            <span className="text-primary">Ngày phỏng vấn:</span>
                             <span>{interviewDate || "N/A"}</span>
                         </p>
                     </div>
-                     <div className="mb-3 flex items-center gap-1 text-xs text-muted-foreground">
+                     <div className="my-2 flex items-center gap-1 text-xs text-muted-foreground">
                         <MapPin className="h-3 w-3 flex-shrink-0" />
                         <span>{job.workLocation}</span>
                     </div>
