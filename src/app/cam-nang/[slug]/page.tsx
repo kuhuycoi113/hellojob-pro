@@ -243,7 +243,16 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
   }
   
   const otherArticles = articles.filter(a => a.slug !== resolvedParams.slug && a.type === 'article').slice(0, 3);
-  const hotJobs = jobData.slice(0, 3); // Demo with first 3 jobs
+  
+  // Logic to determine which jobs to show
+  const getHotJobs = () => {
+      if (article.category === "Kỹ năng đặc định" || article.category === "Kinh nghiệm phỏng vấn") {
+          return jobData.filter(job => job.visaType?.includes("Kỹ năng đặc định")).slice(0, 3);
+      }
+      return jobData.slice(0, 3);
+  }
+  const hotJobs = getHotJobs();
+
 
   const MainContent = () => {
     if (article.type === 'video' && article.videoUrl) {
