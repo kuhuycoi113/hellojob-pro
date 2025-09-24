@@ -22,7 +22,7 @@ const programDetails = {
     suitableFor: 'Thực tập sinh đã hoàn thành hợp đồng; du học sinh; hoặc người lao động mới vượt qua kỳ thi kỹ năng và tiếng Nhật.',
     pros: [
         'Mức lương tương đương hoặc cao hơn người Nhật cùng vị trí',
-        'Được phép chuyển việc trong cùng ngành nghề',
+        'Được phép chuyển việc trong cùng một ngành nghề',
         'Có cơ hội nâng cấp lên Tokutei Ginou 2 để bảo lãnh gia đình và xin vĩnh trú',
         'Nhiều lựa chọn ngành nghề đa dạng'
     ],
@@ -200,7 +200,7 @@ export default function TokuteiRoadmapPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                  {featuredJobs.map(job => (
-                    <JobCard key={job.id} job={job} variant="grid-item"/>
+                    <JobCard key={job.id} job={job} variant="grid-item" showApplyButtons={true} />
                  ))}
             </div>
             <div className="text-center mt-12">

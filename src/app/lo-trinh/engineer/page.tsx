@@ -200,7 +200,7 @@ export default function EngineerRoadmapPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                  {featuredJobs.map(job => (
-                    <JobCard key={job.id} job={job} variant="grid-item"/>
+                    <JobCard key={job.id} job={job} variant="grid-item" showApplyButtons={true}/>
                  ))}
             </div>
             <div className="text-center mt-12">
