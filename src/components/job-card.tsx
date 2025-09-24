@@ -146,6 +146,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
   const [postedTime, setPostedTime] = useState<string | null>(null);
   const [interviewDate, setInterviewDate] = useState<string | null>(null);
+  const [badgeClassName, setBadgeClassName] = useState<string>('');
 
 
   useEffect(() => {
@@ -165,7 +166,24 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     interviewFullDate.setDate(today.getDate() + job.interviewDateOffset);
     setInterviewDate(interviewFullDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'}));
 
-  }, [job.id, job.postedTimeOffset, job.interviewDateOffset]);
+    // Safely calculate badge class names on client
+    let classes = '';
+    if (job.visaDetail === 'Thực tập sinh 1 năm') {
+      classes = 'border-accent-green/70 bg-green-50 text-[#BDCF58]';
+    } else if (job.visaDetail === 'Thực tập sinh 3 Go') {
+      classes = 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
+    } else if (job.visaDetail === 'Đặc định đầu Nhật') {
+      classes = 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
+    } else if (job.visaType?.includes("Thực tập sinh")) {
+      classes = "border-accent-green/70 bg-green-50 text-accent-green";
+    } else if (job.visaType?.includes("Kỹ năng đặc định")) {
+      classes = "border-accent-blue/70 bg-blue-50 text-accent-blue";
+    } else if (job.visaType?.includes("Kỹ sư, tri thức")) {
+      classes = "border-accent-orange/70 bg-orange-50 text-orange-500";
+    }
+    setBadgeClassName(classes);
+
+  }, [job.id, job.postedTimeOffset, job.interviewDateOffset, job.visaDetail, job.visaType]);
 
   const handleSaveJob = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -318,16 +336,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 {job.visaDetail && (
                                     <Badge
                                         variant="outline"
-                                        className={cn("text-xs", 
-                                            job.visaDetail === 'Thực tập sinh 1 năm' ? 'border-accent-green/70 bg-green-50 text-[#BDCF58]' :
-                                            job.visaDetail === 'Thực tập sinh 3 Go' ? 'border-accent-green/70 bg-green-50 text-[#AFCC11]' :
-                                            job.visaDetail === 'Đặc định đầu Nhật' ? 'border-accent-blue/70 bg-blue-50 text-[#009BDA]' :
-                                            {
-                                                "border-accent-green/70 bg-green-50 text-accent-green": job.visaType?.includes("Thực tập sinh"),
-                                                "border-accent-blue/70 bg-blue-50 text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
-                                                "border-accent-orange/70 bg-orange-50 text-orange-500": job.visaType?.includes("Kỹ sư, tri thức"),
-                                            }
-                                        )}
+                                        className={cn("text-xs", badgeClassName)}
                                     >
                                         {job.visaDetail}
                                     </Badge>
@@ -518,17 +527,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         {job.visaDetail && (
                         <Badge
                             variant="outline"
-                            className={cn(
-                                "px-1.5 py-0 text-xs",
-                                job.visaDetail === 'Thực tập sinh 1 năm' ? 'border-accent-green/70 bg-green-50 text-[#BDCF58]' :
-                                job.visaDetail === 'Thực tập sinh 3 Go' ? 'border-accent-green/70 bg-green-50 text-[#AFCC11]' :
-                                job.visaDetail === 'Đặc định đầu Nhật' ? 'border-accent-blue/70 bg-blue-50 text-[#009BDA]' :
-                                {
-                                    "border-accent-green/70 bg-green-50 text-accent-green": job.visaType?.includes("Thực tập sinh"),
-                                    "border-accent-blue/70 bg-blue-50 text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
-                                    "border-accent-orange/70 bg-orange-50 text-orange-500": job.visaType?.includes("Kỹ sư, tri thức"),
-                                }
-                            )}
+                            className={cn("px-1.5 py-0 text-xs", badgeClassName)}
                         >
                             {job.visaDetail}
                         </Badge>
@@ -615,3 +614,5 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     </>
   );
 };
+
+    
