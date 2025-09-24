@@ -365,7 +365,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
             setHasApplied(appliedJobs.includes(job.id));
 
-            // Safely calculate dates on the client
+            // Safely calculate dates on the client to avoid hydration mismatch
             const today = new Date();
             const postedDate = new Date(today);
             postedDate.setDate(today.getDate() + job.postedTimeOffset);
@@ -707,16 +707,23 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
                                 </div>
                             </CardContent>
-                             <div className="border-t p-4 flex flex-col sm:flex-row justify-center items-center gap-4">
-                                <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
-                                    <Link href={`/tu-van-vien/${assignedConsultant.id}`}>Xem hồ sơ chi tiết</Link>
-                                </Button>
-                                <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                    <Share2 className="mr-2 h-4 w-4" /> Chia sẻ việc làm
-                                </Button>
-                                <Button variant="ghost" className="text-muted-foreground text-sm">
-                                    <Share2 className="mr-2 h-4 w-4" /> Chia sẻ tư vấn viên
-                                </Button>
+                             <div className="border-t p-4 flex flex-col items-center gap-4">
+                                <div className="flex justify-center gap-2">
+                                   <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
+                                      <Link href="/tu-van-vien">Xem tư vấn viên khác</Link>
+                                   </Button>
+                                   <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
+                                      <Link href={`/tu-van-vien/${assignedConsultant.id}`}>Xem hồ sơ chi tiết</Link>
+                                   </Button>
+                                </div>
+                                <div className="flex justify-center gap-2">
+                                     <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
+                                        <Share2 className="mr-2 h-4 w-4" /> Chia sẻ việc làm
+                                    </Button>
+                                    <Button variant="ghost" className="text-muted-foreground text-sm">
+                                        <Share2 className="mr-2 h-4 w-4" /> Chia sẻ tư vấn viên
+                                    </Button>
+                                </div>
                             </div>
                         </Card>
                     </aside>
