@@ -319,12 +319,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     <Badge
                                         variant="outline"
                                         className={cn("text-xs", 
-                                            job.visaDetail === 'Thực tập sinh 1 năm' && 'border-[#AFC536] text-[#BDCF58]',
-                                            job.visaDetail === 'Thực tập sinh 3 Go' && 'border-[#AFC536] text-[#AFCC11]',
-                                            !['Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'].includes(job.visaDetail) && {
-                                                "border-accent-green text-accent-green": job.visaType?.includes("Thực tập sinh"),
-                                                "border-accent-blue text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
-                                                "border-accent-orange text-orange-500": job.visaType?.includes("Kỹ sư, tri thức"),
+                                            job.visaDetail === 'Thực tập sinh 1 năm' ? 'border-accent-green/70 bg-green-50 text-[#BDCF58]' :
+                                            job.visaDetail === 'Thực tập sinh 3 Go' ? 'border-accent-green/70 bg-green-50 text-[#AFCC11]' :
+                                            job.visaDetail === 'Đặc định đầu Nhật' ? 'border-accent-blue/70 bg-blue-50 text-[#009BDA]' :
+                                            {
+                                                "border-accent-green/70 bg-green-50 text-accent-green": job.visaType?.includes("Thực tập sinh"),
+                                                "border-accent-blue/70 bg-blue-50 text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
+                                                "border-accent-orange/70 bg-orange-50 text-orange-500": job.visaType?.includes("Kỹ sư, tri thức"),
                                             }
                                         )}
                                     >
@@ -521,6 +522,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 "px-1.5 py-0 text-xs",
                                 job.visaDetail === 'Thực tập sinh 1 năm' ? 'border-accent-green/70 bg-green-50 text-[#BDCF58]' :
                                 job.visaDetail === 'Thực tập sinh 3 Go' ? 'border-accent-green/70 bg-green-50 text-[#AFCC11]' :
+                                job.visaDetail === 'Đặc định đầu Nhật' ? 'border-accent-blue/70 bg-blue-50 text-[#009BDA]' :
                                 {
                                     "border-accent-green/70 bg-green-50 text-accent-green": job.visaType?.includes("Thực tập sinh"),
                                     "border-accent-blue/70 bg-blue-50 text-accent-blue": job.visaType?.includes("Kỹ năng đặc định"),
