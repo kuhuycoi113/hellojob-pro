@@ -6,7 +6,7 @@ import { jobData, type Job, publicFeeLimits } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle, MoreHorizontal } from 'lucide-react';
+import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle, MoreHorizontal, Copy } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -361,7 +361,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
-    const appliedFilters = {};
+    const appliedFilters: Partial<SearchFilters> = {};
 
 
     useEffect(() => {
@@ -714,21 +714,21 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
                                 </div>
                             </CardContent>
-                             <div className="border-t p-4 flex flex-col items-center gap-4">
-                                <div className="flex justify-center gap-2">
-                                    <Button asChild variant="ghost" className="text-muted-foreground text-sm">
-                                        <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4"/>Xem tư vấn viên khác</Link>
-                                    </Button>
-                                    <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
-                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4"/>Xem hồ sơ chi tiết</Link>
-                                    </Button>
-                                </div>
+                             <div className="border-t p-4 flex flex-col items-center gap-2">
                                 <div className="flex justify-center gap-2">
                                     <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ việc làm
+                                        <Copy className="mr-2 h-4 w-4"/>Chia sẻ việc làm
                                     </Button>
                                     <Button variant="ghost" className="text-muted-foreground text-sm">
                                         <Share2 className="mr-2 h-4 w-4"/>Chia sẻ tư vấn viên
+                                    </Button>
+                                </div>
+                                <div className="flex justify-center gap-2">
+                                    <Button asChild variant="ghost" className="text-muted-foreground text-sm">
+                                        <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4"/>Xem các tư vấn viên khác</Link>
+                                    </Button>
+                                    <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
+                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4"/>Xem hồ sơ chi tiết</Link>
                                     </Button>
                                 </div>
                             </div>
