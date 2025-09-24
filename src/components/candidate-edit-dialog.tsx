@@ -256,7 +256,7 @@ const renderLevel1Edit = (
                             <SelectTrigger className="w-[100px] rounded-r-none">
                                 <SelectValue>
                                 <div className="flex items-center gap-2">
-                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-4 h-4 rounded-sm" /> : <JpFlagIcon className="w-4 h-4 rounded-sm" />}
+                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm" /> : <JpFlagIcon className="w-3 h-3 rounded-sm" />}
                                     {phoneCountry}
                                 </div>
                                 </SelectValue>
@@ -276,7 +276,7 @@ const renderLevel1Edit = (
                                 <SelectTrigger className="w-[100px] rounded-r-none">
                                 <SelectValue>
                                     <div className="flex items-center gap-2">
-                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-4 h-4 rounded-sm" /> : <JpFlagIcon className="w-4 h-4 rounded-sm" />}
+                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm" /> : <JpFlagIcon className="w-3 h-3 rounded-sm" />}
                                     {zaloCountry}
                                     </div>
                                 </SelectValue>
@@ -488,5 +488,3 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </>
     );
 }
-
-    
