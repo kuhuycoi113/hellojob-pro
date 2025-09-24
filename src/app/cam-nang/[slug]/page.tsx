@@ -4,7 +4,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Scroll, Timer, UserCircle, Briefcase, ChevronRight, Video, FileText, PlusCircle, ChevronDown, Newspaper, Image as ImageIcon, Smartphone, MapPin, DollarSign, Bookmark, Star } from 'lucide-react';
+import { Scroll, Timer, UserCircle, Briefcase, ChevronRight, Video, FileText, PlusCircle, ChevronDown, Newspaper, Image as ImageIcon, Smartphone, MapPin, DollarSign, Bookmark, Star, CalendarClock } from 'lucide-react';
 import Image from 'next/image';
 import { notFound, useRouter } from 'next/navigation';
 import { useEffect, useState, use } from 'react';
@@ -70,12 +70,20 @@ const ShareDialogContent = () => (
 
 const DesktopJobItem = ({ job }: { job: Job }) => {
     const router = useRouter();
-    const [isSaved, setIsSaved] = useState(false); // Local state for save button
+    const [isSaved, setIsSaved] = useState(false);
+    const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
     useEffect(() => {
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
         setIsSaved(savedJobs.includes(job.id));
-    }, [job.id]);
+
+        const today = new Date();
+        const fullInterviewDate = new Date(today);
+        fullInterviewDate.setDate(today.getDate() + job.interviewDateOffset);
+        setInterviewDate(fullInterviewDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'}));
+
+    }, [job.id, job.interviewDateOffset]);
+
 
     const handleSaveJob = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -107,11 +115,17 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
             </div>
             <div className="flex flex-col flex-grow">
                 <h4 className="font-bold text-base leading-tight mb-2 hover:text-primary line-clamp-2">{job.title}</h4>
-                <div className="flex flex-wrap gap-2 text-xs mb-3">
+                <div className="flex flex-wrap gap-2 text-xs mb-2">
                     <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>
                     {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {job.salary.actual}</Badge>}
                     <Badge variant="secondary">Cơ bản: {job.salary.basic}</Badge>
                      <Badge variant="secondary">{job.workLocation}</Badge>
+                </div>
+                <div className="text-sm text-muted-foreground mb-3">
+                    <p className="flex items-center gap-1.5">
+                        <span className="text-primary font-semibold">Ngày phỏng vấn:</span>
+                        <span>{interviewDate || "N/A"}</span>
+                    </p>
                 </div>
                 <div className="mt-auto flex justify-between items-end">
                     <div className="flex items-center gap-2">

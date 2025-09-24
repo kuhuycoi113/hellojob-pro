@@ -145,6 +145,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
   const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
   const [postedTime, setPostedTime] = useState<string | null>(null);
+  const [interviewDate, setInterviewDate] = useState<string | null>(null);
+
 
   useEffect(() => {
     setIsClient(true);
@@ -153,13 +155,17 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
     setHasApplied(appliedJobs.includes(job.id));
 
-    // Safely calculate postedTime on the client to avoid hydration mismatch
+    // Safely calculate dates on the client to avoid hydration mismatch
     const today = new Date();
     const postedDate = new Date(today);
     postedDate.setDate(today.getDate() + job.postedTimeOffset);
     setPostedTime(`10:00 ${postedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`);
 
-  }, [job.id, job.postedTimeOffset]);
+    const interviewFullDate = new Date(today);
+    interviewFullDate.setDate(today.getDate() + job.interviewDateOffset);
+    setInterviewDate(interviewFullDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'}));
+
+  }, [job.id, job.postedTimeOffset, job.interviewDateOffset]);
 
   const handleSaveJob = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -329,6 +335,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     </Badge>
                                 )}
                             </div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                                <p className="flex items-center gap-1.5">
+                                    <span className="text-primary font-semibold">Ngày phỏng vấn:</span>
+                                    <span>{interviewDate || "N/A"}</span>
+                                </p>
+                            </div>
                             <div className="text-sm text-muted-foreground">
                                 <p className="flex items-center gap-1.5">
                                     <MapPin className="h-4 w-4 flex-shrink-0" />
@@ -453,6 +465,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         Visa: {job.visaDetail}
                     </p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <span className="text-primary font-semibold">Ngày PV:</span>
+                        <span>{interviewDate || "N/A"}</span>
+                    </p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
                         <MapPin className="h-3 w-3 flex-shrink-0" />
                         {job.workLocation}
                     </p>
@@ -506,6 +522,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         )}
                         {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
                         <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
+                    </div>
+                    <div className="text-xs text-muted-foreground mb-2">
+                        <p className="flex items-center gap-1.5">
+                            <span className="text-primary font-semibold">Ngày phỏng vấn:</span>
+                            <span>{interviewDate || "N/A"}</span>
+                        </p>
                     </div>
                      <div className="mb-3 flex items-center gap-1 text-xs text-muted-foreground">
                         <MapPin className="h-3 w-3 flex-shrink-0" />

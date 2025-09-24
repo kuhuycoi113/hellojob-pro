@@ -221,7 +221,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {consultantJobs.length > 0 ? (
                         consultantJobs.map(job => (
-                            <JobCard key={job.id} job={job} showRecruiterName={false} />
+                            <JobCard key={job.id} job={job} showRecruiterName={false} variant="list-item"/>
                         ))
                     ) : (
                         <p className="text-muted-foreground col-span-2">Hiện tại tư vấn viên này chưa phụ trách công việc nào.</p>
