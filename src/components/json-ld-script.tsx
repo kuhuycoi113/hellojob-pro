@@ -51,6 +51,31 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
             if (job.interviewRounds) {
                 additionalInfo.push(`<li>Số vòng phỏng vấn: ${job.interviewRounds} vòng.</li>`);
             }
+            
+            // Structured data for special conditions
+            const jobBenefits: string[] = [];
+            const qualifications: string[] = [];
+            const specialCommitments: string[] = [];
+            let organizationName = "HelloJob (Qua công ty phái cử)";
+
+            const specialConditionList = job.specialConditions ? job.specialConditions.split(', ') : [];
+            specialConditionList.forEach(condition => {
+                const lowerCond = condition.toLowerCase();
+                if (['lương tốt', 'tăng ca', 'có thưởng', 'dễ cày tiền', 'tăng lương định kỳ', 'hỗ trợ nhà ở', 'hỗ trợ về công ty', 'cặp đôi', 'nhận visa gia đình'].some(term => lowerCond.includes(term))) {
+                    jobBenefits.push(condition);
+                } else if (['yêu cầu bằng lái', 'lái được máy', 'nhận tuổi cao', 'nhận tiếng yếu', 'nhận trái ngành', 'nhận thiếu giấy', 'nhận visa katsudo', 'không nhận visa katsudo'].some(term => lowerCond.includes(term))) {
+                    qualifications.push(condition);
+                } else if (['công ty uy tín', 'nghiệp đoàn uy tín', 'shokai uy tín', 'shien uy tín', 'công ty phái cử uy tín', 'công ty tiếp nhận uy tín'].some(term => lowerCond.includes(term))) {
+                     organizationName = `${job.recruiter.company} (${condition})`;
+                } else if (['tuyển gấp', 'bay nhanh', 'trình cục sớm'].some(term => lowerCond.includes(term))) {
+                    specialCommitments.push(condition);
+                }
+            });
+            
+             if (job.specialConditions && job.specialConditions.toLowerCase().includes('không yêu cầu kinh nghiệm')) {
+                // This is handled by experienceRequirements property, so we don't add it to other arrays.
+            }
+
 
             if (additionalInfo.length > 0) {
                  combinedDescription += `
@@ -140,9 +165,12 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 };
             }
 
-            let qualifications = job.visaDetail || '';
+            const fullQualifications = [...qualifications];
+            if (job.visaDetail) {
+                fullQualifications.push(job.visaDetail);
+            }
             if (job.ginouExpiryRequirement) {
-                qualifications += `. Yêu cầu ứng viên có visa Kỹ năng đặc định với thời hạn còn lại ${job.ginouExpiryRequirement.toLowerCase()}.`;
+                fullQualifications.push(`Yêu cầu ứng viên có visa Kỹ năng đặc định với thời hạn còn lại ${job.ginouExpiryRequirement.toLowerCase()}.`);
             }
 
             const getJobStartDate = () => {
@@ -157,6 +185,11 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
             }
             
             const languageQualification = job.languageRequirement ? getLanguageQualification(job.languageRequirement) : undefined;
+            
+            const employmentType = ['FULL_TIME'];
+            if (job.specialConditions && job.specialConditions.toLowerCase().includes('haken')) {
+                employmentType.push('CONTRACTOR');
+            }
 
 
             const data = {
@@ -171,10 +204,10 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 },
                 "datePosted": isoDate,
                 "validThrough": expiryDate.toISOString(),
-                "employmentType": "FULL_TIME", // Assuming full time, can be made dynamic
+                "employmentType": employmentType,
                 "hiringOrganization": {
                     "@type": "Organization",
-                    "name": "HelloJob (Qua công ty phái cử)",
+                    "name": organizationName,
                     "sameAs": "https://vi.hellojob.jp",
                 },
                 "jobLocation": {
@@ -185,7 +218,16 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                         "addressCountry": "JP"
                     }
                 },
-                ...(!languageQualification && { "qualifications": qualifications }),
+                ...(job.specialConditions?.toLowerCase().includes('không yêu cầu kinh nghiệm') && {
+                    "experienceRequirements": {
+                        "@type": "OccupationalExperienceRequirements",
+                        "monthsOfExperience": 0
+                    }
+                }),
+                ...(fullQualifications.length > 0 && { "qualifications": fullQualifications.join('. ') }),
+                ...(jobBenefits.length > 0 && { "jobBenefits": jobBenefits.join('. ') }),
+                ...(specialCommitments.length > 0 && { "specialCommitments": specialCommitments.join('. ') }),
+                ...(job.jobLocationType && { "jobLocationType": job.jobLocationType }),
                 ...(industryData && {
                     "industry": {
                         "@type": "DefinedTerm",
