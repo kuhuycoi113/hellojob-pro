@@ -196,7 +196,7 @@ const renderLevel1Edit = (
                             <SelectValue placeholder="Chọn trình độ tiếng Nhật" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="Không yêu cầu">Không yêu cầu</SelectItem>
+                            <SelectItem value="Chưa biết tiếng Nhật">Chưa biết tiếng Nhật</SelectItem>
                             {japaneseLevels.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}
                         </SelectContent>
                     </Select>
@@ -500,9 +500,3 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </>
     );
 }
-
-    
-
-    
-
-    
