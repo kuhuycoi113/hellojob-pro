@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { type ReactNode, useState, useEffect } from 'react';
@@ -16,17 +15,17 @@ import { useToast } from '@/hooks/use-toast';
 function LayoutManager({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const { toast } = useToast();
-    const { postLoginAction, clearPostLoginAction } = useAuth();
+    const { isLoggedIn, postLoginAction, clearPostLoginAction } = useAuth();
     const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = useState(false);
     
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
 
     useEffect(() => {
-      if (postLoginAction && postLoginAction.type === 'APPLY_JOB') {
+      if (isLoggedIn && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
         setIsPostLoginApplyDialogOpen(true);
       }
-    }, [postLoginAction]);
+    }, [isLoggedIn, postLoginAction]);
     
     const handlePostLoginApply = (apply: boolean) => {
         if (apply && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
@@ -61,7 +60,13 @@ function LayoutManager({ children }: { children: ReactNode }) {
             {!isCallPage && !isPartnerPage && <Footer />}
             {!isCallPage && !isPartnerPage && <FloatingChatWidget />}
             <Toaster />
-            <AlertDialog open={isPostLoginApplyDialogOpen} onOpenChange={setIsPostLoginApplyDialogOpen}>
+            <AlertDialog open={isPostLoginApplyDialogOpen} onOpenChange={(open) => {
+                if (!open) {
+                    // If the dialog is closed without a choice, clear the action.
+                    clearPostLoginAction();
+                    setIsPostLoginApplyDialogOpen(false);
+                }
+            }}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                     <AlertDialogTitle>Tiếp tục ứng tuyển?</AlertDialogTitle>
