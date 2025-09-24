@@ -1,14 +1,16 @@
 
-import { Suspense } from 'react';
+'use client';
+
+import { Suspense, useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Briefcase } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { SearchModule } from '@/components/job-search/search-module';
-import { searchDocuments } from '@/lib/elasticsearch';
 import type { Job } from '@/lib/mock-data';
+import { jobData } from '@/lib/mock-data';
+import { useRouter } from 'next/navigation';
 
 // Define the structure of the job object coming from Elasticsearch
 interface ElasticsearchJob {
@@ -48,52 +50,27 @@ const jobGroupTitles: { [key: string]: string } = {
   'goi-y': 'Gợi ý cho bạn',
 };
 
-const getJobsForGroup = async (group: string): Promise<ElasticsearchJob[]> => {
-  let queryBody: any = {
-    size: 8,
-    query: {
-      match_all: {},
-    },
-  };
 
-  if (jobGroupTitles[group]) {
-    if (group === 'luong-cao') {
-      queryBody.sort = [{ basicSalary: { order: 'desc' } }];
-    } else if (group === 'phi-thap') {
-      queryBody.query = {
-        range: {
-          postedDate: { // Assuming postedDate is a timestamp or date
-            gte: 'now-7d/d',
-            lte: 'now/d',
-          },
-        },
-      };
-      queryBody.sort = [{ netFee: { order: 'asc', missing: '_last' } }]; // Assuming a 'netFee' field
-    } else if (group !== 'co-the-ban-quan-tam' && group !== 'goi-y') {
-       queryBody.query = {
-        match: {
-          'visa.keyword': jobGroupTitles[group], // Use the 'visa' field from the new structure
-        },
-      };
-    }
-  }
+const LoadingJobGroup = () => (
+    <Card className="shadow-lg">
+       <CardHeader>
+           <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+       </CardHeader>
+       <CardContent>
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+               {Array.from({ length: 4 }).map((_, i) => (
+                   <div key={i} className="space-y-3">
+                       <div className="h-40 bg-gray-200 rounded-lg animate-pulse"></div>
+                       <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                       <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                   </div>
+               ))}
+           </div>
+       </CardContent>
+   </Card>
+)
 
-  try {
-    const response = await searchDocuments('hellojobv5-job-crawled', queryBody);
-    return response.body.hits.hits.map((hit: any) => hit._source as ElasticsearchJob);
-  } catch (error) {
-    console.error(`Error fetching jobs for group "${group}":`, error);
-    return [];
-  }
-};
-
-const JobGroupSection = async ({ group, title }: { group: string; title: string }) => {
-  const esJobs = await getJobsForGroup(group);
-
-  if (esJobs.length === 0) return null;
-
-  // Function to transform Elasticsearch job data to the format JobCard expects
-  const transformEsJobToJobCardProps = (esJob: ElasticsearchJob): Job => {
+const transformEsJobToJobCardProps = (esJob: ElasticsearchJob): Job => {
     // Construct a title from available fields
     const constructedTitle = `${esJob.job}, ${esJob.workLocation}, tuyển ${esJob.numberRecruits} ${esJob.gender === 'Cả nam và nữ' ? 'Nam/Nữ' : esJob.gender}`;
 
@@ -125,106 +102,91 @@ const JobGroupSection = async ({ group, title }: { group: string; title: string 
       industry: esJob.career,
       workLocation: esJob.workLocation,
       quantity: parseInt(esJob.numberRecruits, 10) || 1,
-      details: { // Add placeholder details
-          description: esJob.aiContent || 'Mô tả công việc chi tiết.',
-          requirements: 'Yêu cầu chi tiết sẽ được trao đổi khi phỏng vấn.',
-          benefits: 'Quyền lợi và chế độ đãi ngộ hấp dẫn.'
+      // Add dummy details to satisfy the type
+      details: {
+        description: '',
+        requirements: '',
+        benefits: '',
       }
     };
-  };
-
-  const jobs: Job[] = esJobs.map(transformEsJobToJobCardProps);
-
-  let link = `/tim-viec-lam?chi-tiet-loai-hinh-visa=${encodeURIComponent(group)}`;
-  if (title === 'Việc làm lương cao') {
-      link = '/tim-viec-lam?sap-xep=luong-co-ban-cao-den-thap';
-  } else if (title === 'Việc làm phí thấp') {
-      link = '/tim-viec-lam?sap-xep=phi-thap-den-cao';
-  } else if (title === 'Gợi ý cho bạn' || title === 'Có thể bạn quan tâm') {
-      link = '/viec-lam-cua-toi';
-  }
-
-  return (
-    <section>
-      <Card className="shadow-lg">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-2xl font-bold font-headline">{title}</CardTitle>
-            <Button asChild variant="link">
-              <Link href={link}>Xem tất cả</Link>
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {jobs.map(job => (
-              <JobCard key={job.id} job={job} variant="grid-item" showApplyButtons={true} />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </section>
-  );
 };
 
-export default async function JobsPage() {
-  return (
-    <div className="flex flex-col">
-      <Suspense fallback={<div className="h-[400px] bg-gray-200 animate-pulse" />}>
-        {/* @ts-expect-error Server Component */}
-        <SearchModuleWrapper />
-      </Suspense>
-      <div className="w-full bg-secondary">
-        <div className="container mx-auto px-4 md:px-6 py-8 space-y-12">
-            <Suspense fallback={<LoadingJobGroup />}>
-                {/* @ts-expect-error Server Component */}
-                <JobGroupSection group="luong-cao" title="Việc làm lương cao" />
-            </Suspense>
-            <Suspense fallback={<LoadingJobGroup />}>
-                {/* @ts-expect-error Server Component */}
-                <JobGroupSection group="phi-thap" title="Việc làm phí thấp" />
-            </Suspense>
-            <Suspense fallback={<LoadingJobGroup />}>
-                {/* @ts-expect-error Server Component */}
-                <JobGroupSection group="dac-dinh-dau-nhat" title="Đặc định đầu Nhật" />
-            </Suspense>
-             <Suspense fallback={<LoadingJobGroup />}>
-                {/* @ts-expect-error Server Component */}
-                <JobGroupSection group="thuc-tap-sinh-3-nam" title="Thực tập sinh 3 năm" />
-            </Suspense>
-             <Suspense fallback={<LoadingJobGroup />}>
-                {/* @ts-expect-error Server Component */}
-                <JobGroupSection group="ky-su-tri-thuc-dau-nhat" title="Kỹ sư, tri thức đầu Nhật" />
-            </Suspense>
-        </div>
-      </div>
-    </div>
-  );
-}
+const JobGroupSection = ({ groupKey, title }: { groupKey: string; title: string }) => {
+    const [jobs, setJobs] = useState<Job[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-// A wrapper to make SearchModule usable in a Server Component
-async function SearchModuleWrapper() {
-    // This wrapper can fetch initial data or props for SearchModule if needed in the future
-    return <SearchModule onSearch={() => {}} filters={{}} onFilterChange={() => {}} />;
-}
+    useEffect(() => {
+        const fetchJobs = async () => {
+            setIsLoading(true);
+            // Simulate fetching data. In a real app, this would be an API call.
+            // For now, we use a slice of the mock data.
+            const startIndex = parseInt(groupKey.replace(/[^0-9]/g, '')) || 0;
+            const mockJobs = jobData.slice(startIndex * 4, (startIndex * 4) + 8);
+            setJobs(mockJobs);
+            setIsLoading(false);
+        };
 
-function LoadingJobGroup() {
+        fetchJobs();
+    }, [groupKey]);
+
+    if (isLoading) return <LoadingJobGroup />;
+    if (jobs.length === 0) return null;
+
+    let link = `/tim-viec-lam?chi-tiet-loai-hinh-visa=${encodeURIComponent(groupKey)}`;
+    if (title === 'Việc làm lương cao') {
+        link = '/tim-viec-lam?sap-xep=luong-co-ban-cao-den-thap';
+    } else if (title === 'Việc làm phí thấp') {
+        link = '/tim-viec-lam?sap-xep=phi-thap-den-cao';
+    } else if (title === 'Gợi ý cho bạn' || title === 'Có thể bạn quan tâm') {
+        link = '/viec-lam-cua-toi';
+    }
+
     return (
-         <Card className="shadow-lg">
+        <section>
+        <Card className="shadow-lg">
             <CardHeader>
-                <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+            <div className="flex justify-between items-center">
+                <CardTitle className="text-2xl font-bold font-headline">{title}</CardTitle>
+                <Button asChild variant="link">
+                <Link href={link}>Xem tất cả</Link>
+                </Button>
+            </div>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                        <div key={i} className="space-y-3">
-                            <div className="h-40 bg-gray-200 rounded-lg animate-pulse"></div>
-                            <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                            <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                        </div>
-                    ))}
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {jobs.slice(0, 8).map(job => (
+                   <JobCard key={job.id} job={job} variant="grid-item" showApplyButtons={true} />
+                ))}
+            </div>
             </CardContent>
         </Card>
-    )
+        </section>
+    );
+};
+
+
+export default function JobsPage() {
+    const router = useRouter();
+
+    const handleSearch = (filters: any) => {
+        const query = new URLSearchParams(filters).toString();
+        router.push(`/tim-viec-lam?${query}`);
+    };
+    
+    return (
+      <div className="flex flex-col">
+          <Suspense fallback={<div className="h-[400px] bg-gray-200 animate-pulse" />}>
+            <SearchModule onSearch={handleSearch} filters={{}} onFilterChange={() => {}} />
+          </Suspense>
+        <div className="w-full bg-secondary">
+          <div className="container mx-auto px-4 md:px-6 py-8 space-y-12">
+            <JobGroupSection groupKey="luong-cao" title="Việc làm lương cao" />
+            <JobGroupSection groupKey="phi-thap" title="Việc làm phí thấp" />
+            <JobGroupSection groupKey="dac-dinh-dau-nhat" title="Đặc định đầu Nhật" />
+            <JobGroupSection groupKey="thuc-tap-sinh-3-nam" title="Thực tập sinh 3 năm" />
+            <JobGroupSection groupKey="ky-su-tri-thuc-dau-nhat" title="Kỹ sư, tri thức đầu Nhật" />
+          </div>
+        </div>
+      </div>
+    );
 }
