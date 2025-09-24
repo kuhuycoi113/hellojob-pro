@@ -169,17 +169,17 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     // Safely calculate badge class names on client
     let classes = '';
     if (job.visaDetail === 'Thực tập sinh 1 năm') {
-      classes = 'border-accent-green/70 bg-green-50 text-[#BDCF58]';
+        classes = 'border-accent-green/70 bg-green-50 text-[#BDCF58]';
     } else if (job.visaDetail === 'Thực tập sinh 3 Go') {
-      classes = 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
+        classes = 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
     } else if (job.visaDetail === 'Đặc định đầu Nhật') {
-      classes = 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
+        classes = 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
     } else if (job.visaType?.includes("Thực tập sinh")) {
-      classes = "border-accent-green/70 bg-green-50 text-accent-green";
+        classes = "border-accent-green/70 bg-green-50 text-accent-green";
     } else if (job.visaType?.includes("Kỹ năng đặc định")) {
-      classes = "border-accent-blue/70 bg-blue-50 text-accent-blue";
+        classes = "border-accent-blue/70 bg-blue-50 text-accent-blue";
     } else if (job.visaType?.includes("Kỹ sư, tri thức")) {
-      classes = "border-accent-orange/70 bg-orange-50 text-orange-500";
+        classes = "border-accent-orange/70 bg-orange-50 text-orange-500";
     }
     setBadgeClassName(classes);
 
@@ -615,4 +615,3 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   );
 };
 
-    
