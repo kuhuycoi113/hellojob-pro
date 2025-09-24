@@ -1,8 +1,8 @@
 
 import { Client } from '@elastic/elasticsearch';
 
-if (!process.env.ELASTIC_BASE_URL) {
-  throw new Error('ELASTIC_BASE_URL is not defined in environment variables');
+if (!process.env.ELASTICSEARCH_HOST) {
+  throw new Error('ELASTICSEARCH_HOST is not defined in environment variables');
 }
 
 // It's recommended to use an API Key for authentication for security.
@@ -12,7 +12,7 @@ if (!process.env.ELASTIC_USERNAME || !process.env.ELASTIC_PASSWORD) {
 }
 
 const esClient = new Client({
-  node: process.env.ELASTIC_BASE_URL,
+  node: process.env.ELASTICSEARCH_HOST,
   ...(process.env.ELASTIC_USERNAME && process.env.ELASTIC_PASSWORD && {
     auth: {
       username: process.env.ELASTIC_USERNAME,
