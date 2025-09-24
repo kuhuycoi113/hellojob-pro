@@ -4,11 +4,34 @@ import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Briefcase, LogIn } from 'lucide-react';
+import { Briefcase } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { SearchModule } from '@/components/job-search/search-module';
 import { searchDocuments } from '@/lib/elasticsearch';
 import type { Job } from '@/lib/mock-data';
+
+// Define the structure of the job object coming from Elasticsearch
+interface ElasticsearchJob {
+  id: string;
+  code: string;
+  visa: string; // This is the new visaDetail
+  job: string; // Part of the title
+  workLocation: string;
+  gender: string;
+  numberRecruits: string;
+  age: string;
+  language: string;
+  languageLevel: string;
+  basicSalary: number;
+  realSalary: number;
+  back: number;
+  interviewDay: string;
+  specialConditions: string;
+  career: string;
+  avatar: string; // This can be used as the main image
+  postedDate: number;
+  dataAnalyst: string; // Recruiter name
+}
 
 const jobGroupTitles: { [key: string]: string } = {
   'dac-dinh-dau-nhat': 'Đặc định đầu Nhật',
@@ -25,7 +48,7 @@ const jobGroupTitles: { [key: string]: string } = {
   'goi-y': 'Gợi ý cho bạn',
 };
 
-const getJobsForGroup = async (group: string): Promise<Job[]> => {
+const getJobsForGroup = async (group: string): Promise<ElasticsearchJob[]> => {
   let queryBody: any = {
     size: 8,
     query: {
@@ -35,21 +58,21 @@ const getJobsForGroup = async (group: string): Promise<Job[]> => {
 
   if (jobGroupTitles[group]) {
     if (group === 'luong-cao') {
-      queryBody.sort = [{ "salary.basic": { order: 'desc', "numeric_type" : "long" } }];
+      queryBody.sort = [{ basicSalary: { order: 'desc' } }];
     } else if (group === 'phi-thap') {
       queryBody.query = {
         range: {
-          postedTime: {
+          postedDate: { // Assuming postedDate is a timestamp or date
             gte: 'now-7d/d',
             lte: 'now/d',
           },
         },
       };
-      queryBody.sort = [{ netFee: { order: 'asc', missing: '_last' } }];
+      queryBody.sort = [{ netFee: { order: 'asc', missing: '_last' } }]; // Assuming a 'netFee' field
     } else if (group !== 'co-the-ban-quan-tam' && group !== 'goi-y') {
        queryBody.query = {
         match: {
-          'visaDetail.keyword': jobGroupTitles[group],
+          'visa.keyword': jobGroupTitles[group], // Use the 'visa' field from the new structure
         },
       };
     }
@@ -57,7 +80,7 @@ const getJobsForGroup = async (group: string): Promise<Job[]> => {
 
   try {
     const response = await searchDocuments('hellojobv5-job-crawled', queryBody);
-    return response.body.hits.hits.map((hit: any) => hit._source as Job);
+    return response.body.hits.hits.map((hit: any) => hit._source as ElasticsearchJob);
   } catch (error) {
     console.error(`Error fetching jobs for group "${group}":`, error);
     return [];
@@ -65,15 +88,58 @@ const getJobsForGroup = async (group: string): Promise<Job[]> => {
 };
 
 const JobGroupSection = async ({ group, title }: { group: string; title: string }) => {
-  const jobs = await getJobsForGroup(group);
+  const esJobs = await getJobsForGroup(group);
 
-  if (jobs.length === 0) return null;
+  if (esJobs.length === 0) return null;
+
+  // Function to transform Elasticsearch job data to the format JobCard expects
+  const transformEsJobToJobCardProps = (esJob: ElasticsearchJob): Job => {
+    // Construct a title from available fields
+    const constructedTitle = `${esJob.job}, ${esJob.workLocation}, tuyển ${esJob.numberRecruits} ${esJob.gender === 'Cả nam và nữ' ? 'Nam/Nữ' : esJob.gender}`;
+
+    return {
+      id: esJob.id,
+      isRecording: false,
+      image: {
+        src: esJob.avatar || '/img/vieclam001.webp', // Use avatar as the main image, with a fallback
+        type: 'thucte',
+      },
+      likes: '0', // Placeholder
+      salary: {
+        basic: String(esJob.basicSalary || 0),
+        actual: String(esJob.realSalary || 0),
+      },
+      title: constructedTitle,
+      recruiter: {
+        id: esJob.dataAnalyst.toLowerCase().replace(/\s/g, '-'), // Create an ID from the name
+        name: esJob.dataAnalyst,
+        avatarUrl: '/img/favi2.png', // Placeholder avatar
+        company: 'HelloJob', // Placeholder company
+      },
+      status: 'Đang tuyển', // Assuming default status
+      postedTimeOffset: 0, // Cannot be calculated from timestamp without client-side logic
+      interviewDateOffset: esJob.interviewDay === "Đủ người thì phỏng vấn" ? 999 : 10, // Placeholder
+      interviewRounds: 1, // Placeholder
+      tags: [esJob.career, esJob.visa],
+      visaDetail: esJob.visa,
+      industry: esJob.career,
+      workLocation: esJob.workLocation,
+      quantity: parseInt(esJob.numberRecruits, 10) || 1,
+      details: { // Add placeholder details
+          description: esJob.aiContent || 'Mô tả công việc chi tiết.',
+          requirements: 'Yêu cầu chi tiết sẽ được trao đổi khi phỏng vấn.',
+          benefits: 'Quyền lợi và chế độ đãi ngộ hấp dẫn.'
+      }
+    };
+  };
+
+  const jobs: Job[] = esJobs.map(transformEsJobToJobCardProps);
 
   let link = `/tim-viec-lam?chi-tiet-loai-hinh-visa=${encodeURIComponent(group)}`;
   if (title === 'Việc làm lương cao') {
-      link = '/tim-viec-lam?sap-xep=salary_desc';
+      link = '/tim-viec-lam?sap-xep=luong-co-ban-cao-den-thap';
   } else if (title === 'Việc làm phí thấp') {
-      link = '/tim-viec-lam?sap-xep=fee_asc';
+      link = '/tim-viec-lam?sap-xep=phi-thap-den-cao';
   } else if (title === 'Gợi ý cho bạn' || title === 'Có thể bạn quan tâm') {
       link = '/viec-lam-cua-toi';
   }
@@ -102,9 +168,6 @@ const JobGroupSection = async ({ group, title }: { group: string; title: string 
 };
 
 export default async function JobsPage() {
-  // This page is now a server component.
-  // The client-side logic for search is handled inside SearchModule and SearchResults page.
-
   return (
     <div className="flex flex-col">
       <Suspense fallback={<div className="h-[400px] bg-gray-200 animate-pulse" />}>
