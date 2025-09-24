@@ -1,4 +1,6 @@
 
+'use server'; // Add this directive to ensure it's a server-only module
+
 import { Client } from '@elastic/elasticsearch';
 
 const elasticsearchHost = process.env.ELASTICSEARCH_HOST;
