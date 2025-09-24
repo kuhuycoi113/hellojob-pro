@@ -319,14 +319,14 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
              <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Bạn cần có tài khoản để lưu các lựa chọn và xem việc làm phù hợp. Đi đến trang đăng ký/đăng nhập?
-                        </AlertDialogDescription>
+                    <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Bạn cần có tài khoản để lưu các lựa chọn và xem việc làm phù hợp. Đi đến trang đăng ký/đăng nhập?
+                    </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Từ chối</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction>
+                    <AlertDialogCancel>Từ chối</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -531,7 +531,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
     return (
         <div className="bg-secondary">
-            {job && <JsonLdScript job={job} />}
+            {job && <JsonLdScript job={job} appliedFilters={appliedFilters}/>}
             <div className="container mx-auto px-4 md:px-6 py-12">
                 <div className="mb-6">
                     <Button asChild variant="outline" size="sm">
@@ -681,31 +681,23 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         </Card>
                         <Card 
                             id="MDTVV01"
-                            className="shadow-lg group hover:shadow-xl hover:border-primary transition-all cursor-pointer"
-                            onClick={(e) => {
-                                if ((e.target as HTMLElement).closest('a, button')) return;
-                                router.push(`/tu-van-vien/${assignedConsultant.id}`);
-                            }}
+                            className="shadow-lg group hover:shadow-xl hover:border-primary transition-all"
                         >
                             <CardHeader>
                                 <CardTitle className="text-lg font-bold flex items-center gap-2 group-hover:text-primary transition-colors"><UserRound/>Tư vấn viên</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <div onClick={(e) => e.stopPropagation()}>
-                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`} >
-                                            <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
-                                                <AvatarImage src={assignedConsultant.avatarUrl} alt={assignedConsultant.name} />
-                                                <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
-                                            </Avatar>
-                                        </Link>
-                                    </div>
+                                    <Link href={`/tu-van-vien/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
+                                        <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
+                                            <AvatarImage src={assignedConsultant.avatarUrl} alt={assignedConsultant.name} />
+                                            <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                    </Link>
                                     <div>
-                                        <div onClick={(e) => e.stopPropagation()}>
-                                            <Link href={`/tu-van-vien/${assignedConsultant.id}`} >
-                                                <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
-                                            </Link>
-                                        </div>
+                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
+                                            <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
+                                        </Link>
                                         <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
                                     </div>
                                 </div>
@@ -713,17 +705,10 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
                                 </div>
                             </CardContent>
-                            <div className="border-t p-4 flex justify-center gap-2">
-                                {isClient ? (
-                                    <>
-                                        <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                            <Share2 className="mr-2 h-4 w-4"/>Chia sẻ việc làm
-                                        </Button>
-                                        <Button variant="ghost" className="text-muted-foreground text-sm">
-                                            <Share2 className="mr-2 h-4 w-4"/>Chia sẻ tư vấn viên
-                                        </Button>
-                                    </>
-                                ) : <Skeleton className="h-8 w-full" />}
+                             <div className="border-t p-4 flex flex-col sm:flex-row justify-center items-center gap-4">
+                                <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
+                                    <Link href={`/tu-van-vien/${assignedConsultant.id}`}>Xem hồ sơ chi tiết</Link>
+                                </Button>
                             </div>
                         </Card>
                     </aside>
