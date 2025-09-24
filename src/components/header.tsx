@@ -169,7 +169,7 @@ const SearchDialog = () => {
                                 <SelectTrigger><SelectValue placeholder="Tất cả loại hình" /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Tất cả loại hình</SelectItem>
-                                    {japanJobTypes.map(type => (
+                                     {japanJobTypes.map(type => (
                                         <SelectGroup key={type.slug}>
                                             <SelectLabel>{type.name}</SelectLabel>
                                             {(visaDetailsByVisaType[type.slug] || []).map(detail => (
@@ -576,9 +576,14 @@ export function Header() {
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
           value={role}
-          onValueChange={(value) => setRole(value as 'candidate' | 'candidate-empty-profile' | 'guest')}
+          onValueChange={(value) => setRole(value as Role)}
         >
           <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuRadioItem value="candidate-full-profile">
+              Đã đăng nhập (Profile full)
+            </DropdownMenuRadioItem>
+          </DropdownMenuItem>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
             <DropdownMenuRadioItem value="candidate">
               Đã đăng nhập (Có Profile)
@@ -607,6 +612,7 @@ export function Header() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="candidate-full-profile">Đã đăng nhập (Profile full)</SelectItem>
             <SelectItem value="candidate">Đã đăng nhập (Có Profile)</SelectItem>
             <SelectItem value="candidate-empty-profile">Đã đăng nhập (Profile trắng)</SelectItem>
             <SelectItem value="guest">Khách (Chưa đăng nhập)</SelectItem>
