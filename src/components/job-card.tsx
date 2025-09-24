@@ -610,3 +610,5 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     </>
   );
 };
+
+    
