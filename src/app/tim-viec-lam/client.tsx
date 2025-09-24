@@ -206,38 +206,34 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
     // It will replace the mock data logic.
     useEffect(() => {
         async function fetchData() {
-            try {
-                // In a real application, you would build a query based on `searchParams`
-                const response = await fetch('/api/search/jobs', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: { match_all: {} } }) // Example: get all jobs
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const results = await response.json();
-                
-                // Assuming the API returns data in the format { hits: { hits: [...] } }
-                // and each hit has a _source property with the job data.
-                const jobsFromEs = results.hits.hits.map((hit: any) => hit._source as Job);
-
-                // Here you would run your filtering logic on `jobsFromEs`
-                // For now, let's just set the state.
-                setFilteredJobs(jobsFromEs);
-                setStagedResultCount(jobsFromEs.length);
-
-            } catch (error) {
-                console.error("Failed to fetch jobs from Elasticsearch:", error);
-                // Fallback to mock data or show an error message
-                setFilteredJobs([]);
-                setStagedResultCount(0);
-            }
+          try {
+            // Truy vấn Elasticsearch với cấu hình bạn muốn
+            const response = await client.search({
+              index: 'jobs', // Tên index của bạn trong Elasticsearch
+              body: {
+                query: {
+                  match_all: {}, // Truy vấn lấy tất cả công việc
+                },
+              },
+            });
+    
+            // Kiểm tra kết quả trả về
+            const jobsFromEs = response.body.hits.hits.map((hit: any) => hit._source as Job);
+    
+            // Lọc dữ liệu hoặc thao tác theo logic của bạn
+            setFilteredJobs(jobsFromEs);
+            setStagedResultCount(jobsFromEs.length);
+    
+          } catch (error) {
+            console.error("Failed to fetch jobs from Elasticsearch:", error);
+            setFilteredJobs([]);
+            setStagedResultCount(0);
+          }
         }
-
-        // We don't have an API route yet, so we'll comment this out and keep using mock data for now.
-        // fetchData();
-    }, []);
+    
+        fetchData();  // Gọi hàm fetchData khi component mount
+    
+      }, []);
 
 
     const runFilter = useCallback((filtersToApply: SearchFilters, sortOption: string) => {
