@@ -94,9 +94,9 @@ const validateProfileForApplication = (profile: CandidateProfile): boolean => {
 const controlledFeeVisas = [
   'Thực tập sinh 3 năm',
   'Thực tập sinh 1 năm',
-  'Đặc định đầu Việt',
   'Đặc định đi mới',
-  'Kỹ sư, tri thức đầu Việt'
+  'Kỹ sư, tri thức đầu Việt',
+  'Đặc định đầu Việt'
 ];
 
 const CTAForGuest = ({ title, icon: Icon, onLoginClick }: { title: string, icon: React.ElementType, onLoginClick: () => void }) => (
@@ -287,7 +287,7 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                     </Dialog>
                     <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
                         <DialogTrigger asChild>
-                             <Button>
+                            <Button variant="default">
                                 <PlusCircle className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ chi tiết
                             </Button>
@@ -307,6 +307,9 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                                     <h3 className="font-bold text-base mb-1">Thủ công</h3>
                                     <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
                                 </Card>
+                            </div>
+                             <div className="mt-4 text-center">
+                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -336,7 +339,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const resolvedParams = use(params);
     const router = useRouter();
     const { toast } = useToast();
-    const { role, isLoggedIn } = useAuth();
+    const { role, isLoggedIn, setPostLoginAction } = useAuth();
     const job = jobData.find(j => j.id === resolvedParams.id);
     const [isClient, setIsClient] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
@@ -711,7 +714,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             <div className="border-t p-4 flex justify-center">
                                 {isClient ? (
                                     <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ thông tin việc làm này
+                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ việc làm
                                     </Button>
                                 ) : <Skeleton className="h-8 w-48" />}
                             </div>
@@ -810,3 +813,5 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 }
+
+    
