@@ -7,15 +7,16 @@ if (!process.env.ELASTIC_BASE_URL) {
 
 // It's recommended to use an API Key for authentication for security.
 // Ensure you have ELASTIC_API_KEY in your .env file.
-if (!process.env.ELASTIC_API_KEY) {
-    console.warn('ELASTIC_API_KEY is not defined. Connecting without authentication.');
+if (!process.env.ELASTIC_USERNAME || !process.env.ELASTIC_PASSWORD) {
+    console.warn('ELASTIC_USERNAME or ELASTIC_PASSWORD are not defined. Connecting without authentication.');
 }
 
 const esClient = new Client({
   node: process.env.ELASTIC_BASE_URL,
-  ...(process.env.ELASTIC_API_KEY && {
+  ...(process.env.ELASTIC_USERNAME && process.env.ELASTIC_PASSWORD && {
     auth: {
-      apiKey: process.env.ELASTIC_API_KEY
+      username: process.env.ELASTIC_USERNAME,
+      password: process.env.ELASTIC_PASSWORD,
     }
   })
 });
