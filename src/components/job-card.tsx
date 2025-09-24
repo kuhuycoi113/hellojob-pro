@@ -261,7 +261,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const getFeeDisplayInfo = () => {
       const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
       const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
-      const isControlled = controlledFeeVisas.includes(visaDetail || '');
+      const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
       
       const visasForUsd = ['Đặc định đầu Việt'];
 
@@ -280,10 +280,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       }
       
       if (!feeLabel || feeValue === undefined) {
-          return { shouldShow: isControlledVisa, text: `Phí: Không rõ` };
+          return { shouldShow: isControlled, text: `Phí: Không rõ` };
       }
       
-      if (isControlledVisa && feeValue > feeLimit) {
+      if (isControlled && feeValue > feeLimit) {
           return { shouldShow: true, text: `Phí: Không rõ` };
       }
 
