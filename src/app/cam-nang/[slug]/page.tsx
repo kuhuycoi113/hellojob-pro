@@ -68,66 +68,77 @@ const ShareDialogContent = () => (
     </>
 );
 
-const DesktopJobItem = ({ job }: { job: Job }) => {
-    const router = useRouter();
-    const [isSaved, setIsSaved] = useState(false);
-    const [interviewDate, setInterviewDate] = useState<string | null>(null);
+const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = false }: { job: Job, showRecruiterName?: boolean, showPostedTime?: boolean }) => {
+  const router = useRouter();
+  const [isSaved, setIsSaved] = useState(false);
+  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
-    useEffect(() => {
-        const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-        setIsSaved(savedJobs.includes(job.id));
+  useEffect(() => {
+    const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+    setIsSaved(savedJobs.includes(job.id));
+    
+    // Safely calculate date on client
+    const today = new Date();
+    const fullInterviewDate = new Date(today);
+    fullInterviewDate.setDate(today.getDate() + job.interviewDateOffset);
+    setInterviewDate(fullInterviewDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
 
-        const today = new Date();
-        const fullInterviewDate = new Date(today);
-        fullInterviewDate.setDate(today.getDate() + job.interviewDateOffset);
-        setInterviewDate(fullInterviewDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'}));
-    }, [job.id, job.interviewDateOffset]);
+  }, [job.id, job.interviewDateOffset]);
 
 
-    const handleSaveJob = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-        if (isSaved) {
-            const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
-            localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
-            setIsSaved(false);
-        } else {
-            savedJobs.push(job.id);
-            localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
-            setIsSaved(true);
-        }
-        window.dispatchEvent(new Event('storage'));
-    };
+  const handleSaveJob = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+    if (isSaved) {
+        const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
+        localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
+        setIsSaved(false);
+    } else {
+        savedJobs.push(job.id);
+        localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+        setIsSaved(true);
+    }
+    window.dispatchEvent(new Event('storage'));
+  };
+  
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('a, button')) return;
+    router.push(`/viec-lam/${job.id}`);
+  };
 
-    return (
-        <Card 
-            className="hidden md:flex p-4 gap-4 transition-shadow hover:shadow-md cursor-pointer" 
-            onClick={() => router.push(`/viec-lam/${job.id}`)}
-        >
-            <div className="relative w-48 h-auto flex-shrink-0">
-                <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
-                <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
-                    <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
-                    <span>{job.id}</span>
+  return (
+    <div onClick={handleCardClick} className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground">
+        <div className="p-3 hover:bg-secondary/30">
+            <div className="flex flex-col items-stretch gap-4 md:flex-row">
+                <div className="relative h-48 w-full flex-shrink-0 md:h-auto md:w-48">
+                    <Image src={job.image.src} alt={job.title} fill className="rounded-lg object-cover" />
+                    <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
+                        <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
+                        <span>{job.id}</span>
+                    </div>
                 </div>
-            </div>
-            <div className="flex flex-col flex-grow">
-                <h4 className="font-bold text-base leading-tight mb-2 hover:text-primary line-clamp-2">{job.title}</h4>
-                <div className="flex flex-wrap gap-2 text-xs mb-2">
-                    <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>
-                    {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {job.salary.actual}</Badge>}
-                    <Badge variant="secondary">Cơ bản: {job.salary.basic}</Badge>
-                     <Badge variant="secondary">{job.workLocation}</Badge>
-                </div>
-                <div className="text-sm text-muted-foreground mb-3">
-                    <p className="flex items-center gap-1.5">
-                        <span className="text-primary font-semibold">Ngày phỏng vấn:</span>
-                        <span>{interviewDate || "N/A"}</span>
-                    </p>
-                </div>
-                <div className="mt-auto flex justify-between items-end">
-                    <div className="flex items-center gap-2">
+                <div className="flex flex-grow flex-col">
+                    <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
+                    <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        {job.visaDetail && <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>}
+                        {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {job.salary.actual}</Badge>}
+                        <Badge variant="secondary">Cơ bản: {job.salary.basic}</Badge>
+                    </div>
+                     <div className="text-xs text-muted-foreground mt-1">
+                        <p className="flex items-center gap-1.5">
+                            <span className="text-primary">Ngày phỏng vấn:</span>
+                            <span>{interviewDate || "N/A"}</span>
+                        </p>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                        <p className="flex items-center gap-1.5">
+                            <MapPin className="h-4 w-4 flex-shrink-0" />
+                            <span>{job.workLocation}</span>
+                        </p>
+                    </div>
+                    <div className="mt-auto flex flex-wrap items-end justify-between gap-y-2 pt-2">
+                       <div className="flex items-center gap-2">
                          <Link href={`/tu-van-vien/${job.recruiter.id}`} onClick={(e) => e.stopPropagation()}>
                             <Avatar className="h-9 w-9">
                                 <AvatarImage src={job.recruiter.avatarUrl} />
@@ -135,22 +146,23 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
                             </Avatar>
                         </Link>
                          <ContactButtons contact={job.recruiter as any} />
-                    </div>
-                    <div className="text-right">
-                       <div className="flex items-center gap-2">
-                         <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
-                             <Bookmark className={cn("mr-2 h-4 w-4", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
-                             Lưu
-                         </Button>
-                         <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/viec-lam/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
+                       </div>
+                       <div className="text-right">
+                           <div className="flex items-center gap-2">
+                             <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                                 <Bookmark className={cn("mr-2 h-4 w-4", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
+                                 Lưu
+                             </Button>
+                             <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/viec-lam/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
+                           </div>
                        </div>
                     </div>
                 </div>
             </div>
-        </Card>
-    )
+        </div>
+    </div>
+  )
 }
-
 
 export default function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const [activeId, setActiveId] = useState('');
@@ -340,14 +352,7 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
                 </h2>
                 <div className="space-y-4">
                     {hotJobs.map(job => (
-                        <div key={job.id}>
-                          {/* Mobile View: Use the standard JobCard */}
-                          <div className="md:hidden">
-                            <JobCard job={job} variant="list-item" showApplyButtons={true} />
-                          </div>
-                           {/* Desktop View: Use the new custom layout */}
-                           <DesktopJobItem job={job} />
-                        </div>
+                        <ConsultantJobCard key={job.id} job={job} showRecruiterName={false} />
                     ))}
                 </div>
             </section>
