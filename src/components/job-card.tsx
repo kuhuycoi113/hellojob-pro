@@ -167,23 +167,23 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     setInterviewDate(interviewFullDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'}));
 
     // Safely calculate badge class names on client
-    let classes = '';
+    let classes = 'transition-opacity opacity-100 ';
     if (job.visaDetail === 'Thực tập sinh 1 năm') {
-        classes = 'border-accent-green/70 bg-green-50 text-[#BDCF58]';
+        classes += 'border-accent-green/70 bg-green-50 text-[#BDCF58]';
     } else if (job.visaDetail === 'Thực tập sinh 3 Go') {
-        classes = 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
+        classes += 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
     } else if (job.visaDetail === 'Đặc định đầu Nhật') {
-        classes = 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
+        classes += 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
     } else if (job.visaDetail === 'Đặc định đi mới') {
-        classes = 'text-[#40B5E4]';
+        classes += 'text-[#40B5E4]';
     } else if (job.visaDetail === 'Kỹ sư, tri thức đầu Việt') {
-        classes = 'border-accent-orange/70 bg-orange-50 text-[#F2B92A]';
+        classes += 'border-accent-orange/70 bg-orange-50 text-[#F2B92A]';
     } else if (job.visaType?.includes("Thực tập sinh")) {
-        classes = "border-accent-green/70 bg-green-50 text-accent-green";
+        classes += "border-accent-green/70 bg-green-50 text-accent-green";
     } else if (job.visaType?.includes("Kỹ năng đặc định")) {
-        classes = "border-accent-blue/70 bg-blue-50 text-accent-blue";
+        classes += "border-accent-blue/70 bg-blue-50 text-accent-blue";
     } else if (job.visaType?.includes("Kỹ sư, tri thức")) {
-        classes = "border-accent-orange/70 bg-orange-50 text-orange-500";
+        classes += "border-accent-orange/70 bg-orange-50 text-orange-500";
     }
     setBadgeClassName(classes);
 
@@ -264,8 +264,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
       const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
       const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
-      
-      const visasForUsd = ['Đặc định đầu Việt'];
 
       let feeValue: number | undefined;
       let feeLabel: string | undefined;
@@ -305,6 +303,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
           return { shouldShow: true, text: `Phí: ${formattedVnd.replace('.',',')}tr` };
       }
       
+      const visasForUsd = ['Đặc định đầu Việt'];
       if (visaDetail && visasForUsd.includes(visaDetail)) {
          return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
       }
@@ -340,14 +339,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 {isClient && job.visaDetail && (
                                     <Badge
                                         variant="outline"
-                                        className={cn("px-1.5 py-0 text-xs transition-opacity", badgeClassName)}
+                                        className={cn("px-1.5 py-0 text-xs", badgeClassName)}
                                     >
                                         {job.visaDetail}
                                     </Badge>
                                 )}
                                 {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
                                 <Badge variant="secondary" className="text-xs">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
-                                {feeFilterIsActive && feeInfo.shouldShow && (
+                                {isClient && feeFilterIsActive && feeInfo.shouldShow && (
                                     <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
                                         {feeInfo.text}
                                     </Badge>
@@ -533,13 +532,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         {isClient && job.visaDetail && (
                             <Badge
                                 variant="outline"
-                                className={cn("px-1.5 py-0 text-xs transition-opacity", badgeClassName)}
+                                className={cn("px-1.5 py-0 text-xs", badgeClassName)}
                             >
                                 {job.visaDetail}
                             </Badge>
                         )}
-                        {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
-                        <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
+                        {isClient && job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
+                        {isClient && <Badge variant="secondary" className="px-1.5 py-0 text-xs">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>}
                     </div>
                     <div className="text-xs text-muted-foreground">
                         <p className="flex items-center gap-1.5">
@@ -563,7 +562,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 </Link>
                                 <ContactButtons contact={job.recruiter as any} job={job} />
                             </div>
-                            {isClient && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
+                            {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                         </div>
                         {showPostedTime && (
                              <p className="mt-1 text-right text-xs">
