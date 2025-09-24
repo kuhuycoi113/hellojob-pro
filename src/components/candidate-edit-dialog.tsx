@@ -133,7 +133,7 @@ const renderLevel1Edit = (
                 <Info className="h-4 w-4" />
                 <AlertTitle className="font-bold">Lưu ý quan trọng</AlertTitle>
                 <AlertDescription>
-                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên lạc (Zalo, SĐT...) để có thể sử dụng nút 
+                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên lạc (Zalo, SĐT...) để có thể sử dụng nút
                     <Badge className="mx-1 bg-accent-orange text-white align-middle">Ứng tuyển</Badge> 
                     trên các tin tuyển dụng.
                 </AlertDescription>
@@ -255,7 +255,7 @@ const renderLevel1Edit = (
                             <Select value={phoneCountry} onValueChange={setPhoneCountry}>
                             <SelectTrigger className="w-[100px] rounded-r-none">
                                 <SelectValue>
-                                <div className="flex items-center">
+                                <div className="flex items-center mr-1">
                                     {phoneCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm mr-1" /> : <JpFlagIcon className="w-3 h-3 rounded-sm mr-1" />}
                                     {phoneCountry}
                                 </div>
@@ -275,7 +275,7 @@ const renderLevel1Edit = (
                             <Select value={zaloCountry} onValueChange={setZaloCountry}>
                                 <SelectTrigger className="w-[100px] rounded-r-none">
                                 <SelectValue>
-                                    <div className="flex items-center">
+                                    <div className="flex items-center mr-1">
                                     {zaloCountry === '+84' ? <VnFlagIcon className="w-3 h-3 rounded-sm mr-1" /> : <JpFlagIcon className="w-3 h-3 rounded-sm mr-1" />}
                                     {zaloCountry}
                                     </div>
@@ -411,7 +411,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     return (
         <>
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-[600px]" id="DIENTHONGTINCANHAN01">
+                <DialogContent className="sm:max-w-2xl" id="DIENTHONGTINCANHAN01">
                     <DialogHeader>
                         <DialogTitle className="font-headline text-2xl">Chỉnh sửa Thông tin Cá nhân</DialogTitle>
                         <DialogDescription>Cập nhật thông tin của bạn để nhà tuyển dụng có thể liên hệ.</DialogDescription>
