@@ -115,8 +115,10 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
   const [isSaved, setIsSaved] = useState(false);
   const [interviewDate, setInterviewDate] = useState<string | null>(null);
   const [postedTime, setPostedTime] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     setIsSaved(savedJobs.includes(job.id));
     
@@ -167,9 +169,13 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
                 <div className="flex flex-grow flex-col">
                     <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
                     <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-                        {job.visaDetail && <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>}
-                        {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
-                        <Badge variant="secondary">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
+                        {isClient && (
+                          <>
+                            {job.visaDetail && <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>}
+                            {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
+                            <Badge variant="secondary">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
+                          </>
+                        )}
                     </div>
                      <div className="text-xs text-muted-foreground mt-1">
                         <p className="flex items-center gap-1.5">
@@ -223,21 +229,31 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
     
     // HIENTHIVIEC01 Algorithm
     const getConsultantJobs = (): Job[] => {
+        // Helper to safely parse and get date for sorting
+        const getSortableDate = (job: Job) => {
+            if (!job.postedTime) return 0;
+            try {
+                return new Date(job.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime();
+            } catch (e) {
+                return 0; // Return a default value if parsing fails
+            }
+        };
+
+        const sortJobsByDate = (jobs: Job[]) => {
+            return jobs.sort((a, b) => getSortableDate(b) - getSortableDate(a));
+        };
+
         // First, try to get jobs explicitly assigned to the consultant
         const directlyAssignedJobs = jobData.filter(job => job.recruiter.id === consultant.id);
         
         if (directlyAssignedJobs.length > 0) {
-            return directlyAssignedJobs
-                .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
-                .slice(0, 4);
+            return sortJobsByDate(directlyAssignedJobs).slice(0, 4);
         }
         
         // If no jobs are directly assigned, fall back to the grouped expertise logic (PHANLOAINHOMNGANH01)
         const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
         if (jobsByGroup) {
-            return jobsByGroup
-                .sort((a, b) => new Date(b.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime() - new Date(a.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime())
-                .slice(0, 4);
+            return sortJobsByDate(jobsByGroup).slice(0, 4);
         }
         
         // If no jobs are found by either method, return an empty array.
@@ -356,10 +372,10 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                         <Button variant="link" asChild><Link href="/viec-lam">Xem tất cả <ChevronRight className="h-4 w-4"/></Link></Button>
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {consultantJobs.length > 0 ? (
                         consultantJobs.map(job => (
-                            <ConsultantJobCard key={job.id} job={job} showPostedTime={true} />
+                            <ConsultantJobCard key={job.id} job={job} showRecruiterName={false} />
                         ))
                     ) : (
                         <p className="text-muted-foreground col-span-2">Hiện tại tư vấn viên này chưa phụ trách công việc nào.</p>
@@ -372,5 +388,3 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
     </div>
   );
 }
-
-    
