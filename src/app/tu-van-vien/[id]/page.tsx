@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { use, useState, useEffect } from 'react';
@@ -371,3 +372,5 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
     </div>
   );
 }
+
+    
