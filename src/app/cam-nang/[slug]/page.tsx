@@ -72,6 +72,7 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
     const router = useRouter();
     const [isSaved, setIsSaved] = useState(false);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
+    const [postedDate, setPostedDate] = useState<string | null>(null);
 
     useEffect(() => {
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -82,7 +83,12 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
         fullInterviewDate.setDate(today.getDate() + job.interviewDateOffset);
         setInterviewDate(fullInterviewDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'}));
 
-    }, [job.id, job.interviewDateOffset]);
+        const fullPostedDate = new Date(today);
+        fullPostedDate.setDate(today.getDate() + job.postedTimeOffset);
+        setPostedDate(fullPostedDate.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'}));
+
+
+    }, [job.id, job.interviewDateOffset, job.postedTimeOffset]);
 
 
     const handleSaveJob = (e: React.MouseEvent) => {
@@ -123,7 +129,7 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
                 </div>
                 <div className="text-sm text-muted-foreground mb-3">
                     <p className="flex items-center gap-1.5">
-                        <span className="text-primary">Ngày phỏng vấn:</span>
+                        <span className="text-primary font-semibold">Ngày phỏng vấn:</span>
                         <span>{interviewDate || "N/A"}</span>
                     </p>
                 </div>
@@ -131,7 +137,7 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
                     <div className="flex items-center gap-2">
                          <Link href={`/tu-van-vien/${job.recruiter.id}`} onClick={(e) => e.stopPropagation()}>
                             <Avatar className="h-9 w-9">
-                                <AvatarImage src={job.recruiter.avatar} />
+                                <AvatarImage src={job.recruiter.avatarUrl} />
                                 <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                             </Avatar>
                         </Link>
@@ -146,7 +152,7 @@ const DesktopJobItem = ({ job }: { job: Job }) => {
                          <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/viec-lam/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
                        </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            <span className="text-primary">Đăng lúc:</span> {job.postedTime.split(' ')[1]}
+                            <span className="text-primary">Đăng lúc:</span> {postedDate || '...'}
                         </p>
                     </div>
                 </div>
