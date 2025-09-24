@@ -103,11 +103,10 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 };
 
 
-const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = false }: { job: Job, showRecruiterName?: boolean, showPostedTime?: boolean }) => {
+const ConsultantJobCard = ({ job, showRecruiterName = true }: { job: Job, showRecruiterName?: boolean }) => {
   const router = useRouter();
   const [isSaved, setIsSaved] = useState(false);
   const [interviewDate, setInterviewDate] = useState<string | null>(null);
-  const [postedTime, setPostedTime] = useState<string | null>(null);
 
   useEffect(() => {
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -118,12 +117,7 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
     fullInterviewDate.setDate(today.getDate() + job.interviewDateOffset);
     setInterviewDate(fullInterviewDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
     
-    const fullPostedDate = new Date(today);
-    fullPostedDate.setDate(today.getDate() + job.postedTimeOffset);
-    setPostedTime(`10:00 ${fullPostedDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`);
-
-
-  }, [job.id, job.interviewDateOffset, job.postedTimeOffset]);
+  }, [job.id, job.interviewDateOffset]);
 
 
   const handleSaveJob = (e: React.MouseEvent) => {
@@ -177,7 +171,7 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
                             <span>{job.workLocation}</span>
                         </p>
                     </div>
-                    <div className="mt-auto flex flex-wrap items-end justify-between gap-y-2 pt-2">
+                    <div id="DONGLIENHEUNGTUYEN01" className="mt-auto flex flex-wrap items-end justify-between gap-y-2 pt-2">
                        <div className="flex items-center gap-2">
                          <Link href={`/tu-van-vien/${job.recruiter.id}`} onClick={(e) => e.stopPropagation()}>
                             <Avatar className="h-9 w-9">
@@ -187,19 +181,12 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
                         </Link>
                          <ContactButtons contact={job.recruiter as any} />
                        </div>
-                       <div className="text-right flex flex-col items-end gap-1">
-                           <div className="flex items-center gap-2">
-                             <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
-                                 <Bookmark className={cn("mr-2 h-4 w-4", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
-                                 Lưu
-                             </Button>
-                             <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/viec-lam/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
-                           </div>
-                            {showPostedTime && (
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    <span className="text-primary">Đăng lúc:</span> {postedTime ? postedTime.split(' ')[1] : '...'}
-                                </p>
-                           )}
+                       <div className="flex items-center gap-2">
+                         <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                             <Bookmark className={cn("mr-2 h-4 w-4", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
+                             Lưu
+                         </Button>
+                         <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/viec-lam/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
                        </div>
                     </div>
                 </div>
