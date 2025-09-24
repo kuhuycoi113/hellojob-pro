@@ -291,8 +291,8 @@ const renderLevel1Edit = (
                             <Select value={phoneCountry} onValueChange={setPhoneCountry}>
                             <SelectTrigger className="w-[120px] rounded-r-none">
                                 <SelectValue>
-                                <div className="flex items-center gap-1.5">
-                                    <span className='font-semibold'>{phoneCountry === '+84' ? 'VN' : 'JP'}</span>
+                                <div className="flex items-center gap-1">
+                                    <span>{phoneCountry === '+84' ? 'VN' : 'JP'}</span>
                                     <span>{phoneCountry}</span>
                                 </div>
                                 </SelectValue>
@@ -314,8 +314,8 @@ const renderLevel1Edit = (
                             <Select value={zaloCountry} onValueChange={setZaloCountry}>
                                 <SelectTrigger className="w-[120px] rounded-r-none">
                                 <SelectValue>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className='font-semibold'>{zaloCountry === '+84' ? 'VN' : 'JP'}</span>
+                                    <div className="flex items-center gap-1">
+                                        <span>{zaloCountry === '+84' ? 'VN' : 'JP'}</span>
                                         <span>{zaloCountry}</span>
                                     </div>
                                 </SelectValue>
@@ -538,4 +538,3 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </>
     );
 }
-
