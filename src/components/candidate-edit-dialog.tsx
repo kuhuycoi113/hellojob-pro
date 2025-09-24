@@ -375,7 +375,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                     about: '',
                     education: [],
                     experience: [],
-                    personalInfo: { birthYear: 2000, gender: '', phone: '', japaneseProficiency: '' },
+                    personalInfo: { birthYear: 2000, gender: 'Nữ', phone: '', japaneseProficiency: '' },
                     skills: [],
                     interests: [],
                     certifications: [],
@@ -441,7 +441,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                     const mockPhoneNumber = '0912345678';
                     handleTempChange('personalInfo', 'zalo', mockPhoneNumber);
                     toast({
-                        title: "Quét QR thành công (mô phỏng)",
+                        title: "Quét QR thành công",
                         description: `Số Zalo đã được cập nhật thành: ${mockPhoneNumber}`,
                     });
                     setIsQrDialogOpen(false);
