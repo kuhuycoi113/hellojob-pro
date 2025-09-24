@@ -397,7 +397,7 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
                 </h2>
                 <div className="space-y-4">
                     {hotJobs.map(job => (
-                        <ConsultantJobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} />
+                        <ConsultantJobCard key={job.id} job={job} showRecruiterName={false} />
                     ))}
                 </div>
             </section>
