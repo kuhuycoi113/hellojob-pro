@@ -475,11 +475,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
     };
 
     const handleFlexibleDateChange = (checked: boolean) => {
-        if (checked) {
-            onFilterChange({ interviewDate: 'flexible' });
-        } else {
-            onFilterChange({ interviewDate: '' });
-        }
+        onFilterChange({ interviewDate: checked ? 'flexible' : '' });
     };
 
     const handleVisaDetailChange = (value: string) => {
@@ -738,11 +734,11 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Ngày phỏng vấn</Label>
-                                    <Tabs value={filters.interviewDateType || 'until'} onValueChange={(value) => onFilterChange({ interviewDateType: value as any })} className="w-full">
+                                    <Tabs defaultValue={filters.interviewDateType || 'until'} onValueChange={(value) => onFilterChange({ interviewDateType: value as any })} className="w-full">
                                         <TabsList className="grid w-full h-auto grid-cols-3">
-                                            <TabsTrigger value="until" className={cn("text-xs py-1 h-auto", filters.interviewDateType === 'until' && "data-[state=active]:bg-accent-yellow")}>Đến ngày</TabsTrigger>
-                                            <TabsTrigger value="exact" className={cn("text-xs py-1 h-auto", filters.interviewDateType === 'exact' && "data-[state=active]:bg-accent-blue")}>Đúng ngày</TabsTrigger>
-                                            <TabsTrigger value="from" className={cn("text-xs py-1 h-auto", filters.interviewDateType === 'from' && "data-[state=active]:bg-accent-green")}>Từ ngày</TabsTrigger>
+                                            <TabsTrigger value="until" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-yellow")}>Đến ngày</TabsTrigger>
+                                            <TabsTrigger value="exact" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-blue")}>Đúng ngày</TabsTrigger>
+                                            <TabsTrigger value="from" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-green")}>Từ ngày</TabsTrigger>
                                         </TabsList>
                                     </Tabs>
                                     <div className='flex gap-2 items-center pt-2'>
@@ -822,7 +818,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                              <AccordionContent className="pt-4">
                                 {shouldShowTabs ? (
                                     <Tabs defaultValue="basic">
-                                        <TabsList className={cn("grid w-full h-auto", (shouldShowLươngGiờ && shouldShowLươngNăm) ? "grid-cols-3" : "grid-cols-2")}>
+                                        <TabsList className={cn("grid w-full h-auto data-[state=active]:bg-accent-yellow", (shouldShowLươngGiờ && shouldShowLươngNăm) ? "grid-cols-3" : "grid-cols-2")}>
                                             <TabsTrigger value="basic" className="text-xs data-[state=active]:bg-accent-yellow">Lương tháng</TabsTrigger>
                                             {shouldShowLươngGiờ && <TabsTrigger value="hourly" className="text-xs data-[state=active]:bg-accent-yellow">Lương giờ</TabsTrigger>}
                                             {shouldShowLươngNăm && <TabsTrigger value="yearly" className="text-xs data-[state=active]:bg-accent-yellow">Lương năm</TabsTrigger>}
@@ -1205,5 +1201,3 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         </div>
     );
 }
-
-    
