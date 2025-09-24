@@ -291,15 +291,15 @@ const renderLevel1Edit = (
                             <Select value={phoneCountry} onValueChange={setPhoneCountry}>
                             <SelectTrigger className="w-[120px] rounded-r-none">
                                 <SelectValue>
-                                <div className="flex items-center">
-                                    <VnFlagIcon className="w-3 h-3 mr-1" />
-                                    {phoneCountry}
+                                <div className="flex items-center gap-1.5">
+                                    <span className='font-semibold'>{phoneCountry === '+84' ? 'VN' : 'JP'}</span>
+                                    <span>{phoneCountry}</span>
                                 </div>
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon /> VN (+84)</div></SelectItem>
-                                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon /> JP (+81)</div></SelectItem>
+                                <SelectItem value="+84"><div className="flex items-center gap-2">VN (+84)</div></SelectItem>
+                                <SelectItem value="+81"><div className="flex items-center gap-2">JP (+81)</div></SelectItem>
                             </SelectContent>
                             </Select>
                             <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
@@ -314,15 +314,15 @@ const renderLevel1Edit = (
                             <Select value={zaloCountry} onValueChange={setZaloCountry}>
                                 <SelectTrigger className="w-[120px] rounded-r-none">
                                 <SelectValue>
-                                    <div className="flex items-center">
-                                    <VnFlagIcon className="w-3 h-3 mr-1" />
-                                    {zaloCountry}
+                                    <div className="flex items-center gap-1.5">
+                                        <span className='font-semibold'>{zaloCountry === '+84' ? 'VN' : 'JP'}</span>
+                                        <span>{zaloCountry}</span>
                                     </div>
                                 </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon /> VN (+84)</div></SelectItem>
-                                    <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon /> JP (+81)</div></SelectItem>
+                                    <SelectItem value="+84"><div className="flex items-center gap-2">VN (+84)</div></SelectItem>
+                                    <SelectItem value="+81"><div className="flex items-center gap-2">JP (+81)</div></SelectItem>
                                 </SelectContent>
                             </Select>
                             <Input id="zalo" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
