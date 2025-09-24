@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { use, useState, useEffect } from 'react';
@@ -224,6 +223,8 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
                             </p>
                         </div>
                         <div className="mt-auto flex flex-wrap items-end justify-between gap-y-2 pt-2">
+                           <div className="flex items-center gap-2">
+                           </div>
                            <div className="flex items-center gap-2">
                             {isClient && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                            </div>
