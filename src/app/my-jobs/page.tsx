@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -381,10 +382,9 @@ const EmptyProfileView = () => {
 
 
 const LoggedInView = () => {
-    const { role, postLoginAction, clearPostLoginAction } = useAuth();
+    const { role } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { toast } = useToast();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
     const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]); // CANHANHOA01
@@ -399,10 +399,12 @@ const LoggedInView = () => {
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
     const [suggestionPrinciple, setSuggestionPrinciple] = useState<'salary' | 'fee' | 'company' | null>(null);
     const [forceUpdate, setForceUpdate] = useState(0); 
+    const { toast } = useToast();
     const [tempSalary, setTempSalary] = useState('');
     const [tempFee, setTempFee] = useState('');
     const [chartData, setChartData] = useState([]);
-    const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = useState(false);
+    const JPY_VND_RATE = 180;
+    const USD_VND_RATE = 26300;
 
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
@@ -411,36 +413,7 @@ const LoggedInView = () => {
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
-
-    useEffect(() => {
-      if (postLoginAction && postLoginAction.type === 'APPLY_JOB') {
-        setIsPostLoginApplyDialogOpen(true);
-      }
-    }, [postLoginAction]);
     
-    const handlePostLoginApply = (apply: boolean) => {
-        if (apply && postLoginAction) {
-            const { jobId, jobTitle } = postLoginAction.data;
-            const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-            appliedJobs.push(jobId);
-            localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
-            toast({
-                title: 'Ứng tuyển thành công!',
-                description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
-                className: 'bg-green-500 text-white'
-            });
-            // You might need a way to update the 'hasApplied' state on the specific JobCard
-            // This can be done via a global state or by forcing a re-render.
-             window.dispatchEvent(new Event('storage'));
-        }
-        setIsPostLoginApplyDialogOpen(false);
-        clearPostLoginAction();
-    };
-
-    const JPY_VND_RATE = 180;
-    const USD_VND_RATE = 26300;
-
-
     useEffect(() => {
         // Generate dynamic chart data
         const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
@@ -674,21 +647,6 @@ const LoggedInView = () => {
 
     return (
         <>
-        <AlertDialog open={isPostLoginApplyDialogOpen} onOpenChange={setIsPostLoginApplyDialogOpen}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Tiếp tục ứng tuyển?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Bạn có muốn tiếp tục ứng tuyển công việc "{postLoginAction?.data.jobTitle}" không?
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => handlePostLoginApply(false)}>Từ chối</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handlePostLoginApply(true)}>Đồng ý</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-
         <div className="text-center md:text-left mb-8">
             <h1 className="text-3xl font-bold font-headline">Trang quản lý việc làm</h1>
             <p className="text-muted-foreground mt-1">Quản lý toàn bộ hành trình tìm việc của bạn tại một nơi duy nhất.</p>
