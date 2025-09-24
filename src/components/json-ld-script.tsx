@@ -40,7 +40,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 ${job.details.benefits.replace(/<[^>]*>?/gm, '')}
             `;
 
-            const additionalInfo = [];
+            const additionalInfo: string[] = [];
             if (job.interviewLocation) {
                 const interviewInfo = job.interviewLocation.toLowerCase().includes('online')
                     ? `<li>Hình thức phỏng vấn: Online.</li>`
@@ -52,10 +52,16 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 additionalInfo.push(`<li>Số vòng phỏng vấn: ${job.interviewRounds} vòng.</li>`);
             }
             
+            // Logic for interview date from filters
+            if (appliedFilters?.interviewDate && appliedFilters.interviewDate !== 'flexible') {
+                 const interviewDateStr = `<li>Lịch phỏng vấn: ${appliedFilters.interviewDateType === 'from' ? 'Từ ngày' : appliedFilters.interviewDateType === 'exact' ? 'Đúng ngày' : 'Đến ngày'} ${appliedFilters.interviewDate}.</li>`;
+                 additionalInfo.push(interviewDateStr);
+            }
+
             // Structured data for special conditions
             const jobBenefits: string[] = [];
             const qualifications: string[] = [];
-            const specialCommitments: string[] = [];
+            let specialCommitments: string[] = [];
             let organizationName = "HelloJob (Qua công ty phái cử)";
 
             const specialConditionList = job.specialConditions ? job.specialConditions.split(', ') : [];
@@ -190,7 +196,23 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
             if (job.specialConditions && job.specialConditions.toLowerCase().includes('haken')) {
                 employmentType.push('CONTRACTOR');
             }
+            
+            const events = [];
+            if (appliedFilters?.interviewDateType === 'exact' && appliedFilters.interviewDate) {
+                events.push({
+                    "@type": "Event",
+                    "name": "Phỏng vấn tuyển dụng",
+                    "startDate": appliedFilters.interviewDate,
+                    "endDate": appliedFilters.interviewDate,
+                    "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+                    "description": `Lịch phỏng vấn dự kiến diễn ra vào ngày ${appliedFilters.interviewDate}.`
+                });
+            }
 
+            let validThrough = expiryDate.toISOString();
+            if (appliedFilters?.interviewDateType === 'until' && appliedFilters.interviewDate) {
+                validThrough = new Date(appliedFilters.interviewDate).toISOString();
+            }
 
             const data = {
                 "@context": "https://schema.org/",
@@ -203,7 +225,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                     "value": job.id
                 },
                 "datePosted": isoDate,
-                "validThrough": expiryDate.toISOString(),
+                "validThrough": validThrough,
                 "employmentType": employmentType,
                 "hiringOrganization": {
                     "@type": "Organization",
@@ -247,6 +269,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                         }
                     }
                 }),
+                ...(events.length > 0 && { "events": events }),
                 ...(getApplicantLocationRequirements() && { "applicantLocationRequirements": getApplicantLocationRequirements() }),
                 ...(getJobStartDate() && { "jobStartDate": getJobStartDate() }),
                 ...(languageQualification && { "educationRequirements": languageQualification })

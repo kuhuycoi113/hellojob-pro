@@ -112,6 +112,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const annualIncome = searchParams['thu-nhap-nam'] as string;
   const annualBonus = searchParams['thuong-nam'] as string;
   const interviewDate = searchParams['ngay-phong-van'] as string;
+  const interviewDateType = searchParams['loai-ngay-phong-van'] as string; // Read the date type
   const interviewRoundsSlug = searchParams['so-vong-phong-van'] as string;
   const jobDetailSlug = searchParams['chi-tiet-cong-viec'] as string;
   const netFee = searchParams['muc-phi'] as string;
@@ -250,10 +251,18 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     } else {
         const parsedDate = parse(interviewDate, 'yyyy-MM-dd', new Date());
         if (isValid(parsedDate)) {
-            titleParts.push(`phỏng vấn đến ngày ${format(parsedDate, 'dd/MM/yyyy')}`);
+            const formattedDate = format(parsedDate, 'dd/MM/yyyy');
+            if (interviewDateType === 'from') {
+                titleParts.push(`phỏng vấn từ ngày ${formattedDate}`);
+            } else if (interviewDateType === 'exact') {
+                titleParts.push(`phỏng vấn đúng ngày ${formattedDate}`);
+            } else { // 'until' is the default
+                titleParts.push(`phỏng vấn đến ngày ${formattedDate}`);
+            }
         }
     }
   }
+
 
   if (interviewRoundsSlug) {
     const roundsName = getNameFromSlug(interviewRoundsSlug, interviewRoundsOptions);
@@ -330,6 +339,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (netFee) cleanSearchParams['muc-phi'] = netFee;
   if (netFeeNoTicket) cleanSearchParams['muc-phi-khong-ve'] = netFeeNoTicket;
   if (interviewDate) cleanSearchParams['ngay-phong-van'] = interviewDate;
+  if (interviewDateType) cleanSearchParams['loai-ngay-phong-van'] = interviewDateType;
   if (interviewRoundsSlug) cleanSearchParams['so-vong-phong-van'] = interviewRoundsSlug;
   if (jobDetailSlug) cleanSearchParams['chi-tiet-cong-viec'] = jobDetailSlug;
   if (ginouExpirySlug) cleanSearchParams['han-ginou'] = ginouExpirySlug;
