@@ -68,22 +68,62 @@ const ShareDialogContent = () => (
     </>
 );
 
+const visasForVndDisplay = [
+    'Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đi mới', 'Kỹ sư, tri thức đầu Việt',
+];
+
+const JPY_VND_RATE = 180;
+
+const formatCurrency = (value?: string) => {
+    if (!value) return 'N/A';
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): string => {
+    if (!salaryValue) return 'N/A';
+    const numericValue = parseInt(salaryValue.replace(/[^0-9]/g, ''), 10);
+    if (isNaN(numericValue)) return salaryValue;
+
+    if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
+        const vndValue = numericValue * JPY_VND_RATE;
+        const valueInMillions = vndValue / 1000000;
+        
+        if (valueInMillions % 1 === 0) {
+            return `${valueInMillions.toLocaleString('vi-VN')}tr`;
+        }
+        
+        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        });
+        return `${formattedVnd.replace('.',',')}tr`;
+    }
+    
+    return `${formatCurrency(salaryValue)} JPY`;
+};
+
+
 const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = false }: { job: Job, showRecruiterName?: boolean, showPostedTime?: boolean }) => {
   const router = useRouter();
   const [isSaved, setIsSaved] = useState(false);
   const [interviewDate, setInterviewDate] = useState<string | null>(null);
+  const [postedTime, setPostedTime] = useState<string | null>(null);
 
   useEffect(() => {
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     setIsSaved(savedJobs.includes(job.id));
     
-    // Safely calculate date on client
     const today = new Date();
     const fullInterviewDate = new Date(today);
     fullInterviewDate.setDate(today.getDate() + job.interviewDateOffset);
     setInterviewDate(fullInterviewDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+    
+    const fullPostedDate = new Date(today);
+    fullPostedDate.setDate(today.getDate() + job.postedTimeOffset);
+    setPostedTime(`10:00 ${fullPostedDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`);
 
-  }, [job.id, job.interviewDateOffset]);
+
+  }, [job.id, job.interviewDateOffset, job.postedTimeOffset]);
 
 
   const handleSaveJob = (e: React.MouseEvent) => {
@@ -122,8 +162,8 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
                     <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{job.title}</h3>
                     <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
                         {job.visaDetail && <Badge variant="outline" className="border-accent-blue text-accent-blue">{job.visaDetail}</Badge>}
-                        {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {job.salary.actual}</Badge>}
-                        <Badge variant="secondary">Cơ bản: {job.salary.basic}</Badge>
+                        {job.salary.actual && <Badge variant="secondary" className="bg-green-100 text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
+                        <Badge variant="secondary">Cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
                     </div>
                      <div className="text-xs text-muted-foreground mt-1">
                         <p className="flex items-center gap-1.5">
@@ -147,14 +187,19 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
                         </Link>
                          <ContactButtons contact={job.recruiter as any} />
                        </div>
-                       <div className="text-right">
+                       <div className="text-right flex flex-col items-end gap-1">
                            <div className="flex items-center gap-2">
-                             <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                             <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                                  <Bookmark className={cn("mr-2 h-4 w-4", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                                  Lưu
                              </Button>
                              <Button size="sm" onClick={(e) => {e.stopPropagation(); router.push(`/viec-lam/${job.id}#apply`)}} className="bg-accent-orange text-white">Ứng tuyển</Button>
                            </div>
+                            {showPostedTime && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    <span className="text-primary">Đăng lúc:</span> {postedTime ? postedTime.split(' ')[1] : '...'}
+                                </p>
+                           )}
                        </div>
                     </div>
                 </div>
@@ -352,7 +397,7 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
                 </h2>
                 <div className="space-y-4">
                     {hotJobs.map(job => (
-                        <ConsultantJobCard key={job.id} job={job} showRecruiterName={false} />
+                        <ConsultantJobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} />
                     ))}
                 </div>
             </section>
