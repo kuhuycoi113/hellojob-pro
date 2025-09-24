@@ -714,23 +714,19 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
                                 </div>
                             </CardContent>
-                             <div className="border-t p-4 flex flex-col items-center gap-2">
-                                <div className="flex justify-center gap-2">
-                                    <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                        <Copy className="mr-2 h-4 w-4"/>Chia sẻ việc làm
-                                    </Button>
-                                    <Button variant="ghost" className="text-muted-foreground text-sm">
-                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ tư vấn viên
-                                    </Button>
-                                </div>
-                                <div className="flex justify-center gap-2">
-                                    <Button asChild variant="ghost" className="text-muted-foreground text-sm">
-                                        <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4"/>Xem các tư vấn viên khác</Link>
-                                    </Button>
-                                    <Button asChild variant="link" className="text-muted-foreground text-sm p-0 h-auto">
-                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4"/>Xem hồ sơ chi tiết</Link>
-                                    </Button>
-                                </div>
+                             <div className="border-t p-4 grid grid-cols-2 gap-2">
+                                 <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
+                                    <Copy className="mr-2 h-4 w-4"/>Giới thiệu việc làm
+                                </Button>
+                                 <Button variant="ghost" className="text-muted-foreground text-sm">
+                                    <Share2 className="mr-2 h-4 w-4"/>Giới thiệu tư vấn viên
+                                </Button>
+                                 <Button asChild variant="ghost" className="text-muted-foreground text-sm">
+                                    <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4"/>Tư vấn viên khác</Link>
+                                </Button>
+                                <Button asChild variant="ghost" className="text-muted-foreground text-sm">
+                                    <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4"/>Xem hồ sơ chi tiết</Link>
+                                </Button>
                             </div>
                         </Card>
                     </aside>
@@ -827,3 +823,4 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 }
+
