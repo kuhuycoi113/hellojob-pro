@@ -512,7 +512,13 @@ export default function CandidateProfilePage() {
             if (Array.isArray(newEmptyProfile[key])) newEmptyProfile[key] = [];
             if (key === 'personalInfo' || key === 'aspirations' || key === 'documents') {
                 if (newEmptyProfile[key]) {
-                    Object.keys(newEmptyProfile[key]).forEach(subKey => newEmptyProfile[key][subKey] = '');
+                    Object.keys(newEmptyProfile[key]).forEach(subKey => {
+                         if (subKey === 'birthYear') {
+                             newEmptyProfile[key][subKey] = new Date().getFullYear() - 18;
+                         } else {
+                            newEmptyProfile[key][subKey] = '';
+                         }
+                    });
                 }
             }
         });
@@ -1205,11 +1211,12 @@ export default function CandidateProfilePage() {
   }
 
   const MainEditDialog = ({ children }: { children: React.ReactNode }) => {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     return (
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
+                 <DialogHeader>
                     <DialogTitle className="font-headline text-2xl">Hoàn thiện hồ sơ</DialogTitle>
                     <DialogDescription>Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn.</DialogDescription>
                 </DialogHeader>
@@ -1218,7 +1225,7 @@ export default function CandidateProfilePage() {
                         <Image src="https://placehold.co/100x100.png" alt="AI Assistant" width={80} height={80} data-ai-hint="friendly robot mascot" className="mx-auto" />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Button variant="outline" className="h-auto p-4 flex flex-col items-center justify-center space-y-2 border-2 border-accent-orange" onClick={() => setIsProfileEditDialogOpen(true)}>
+                        <Button variant="outline" className="h-auto p-4 flex flex-col items-center justify-center space-y-2 border-2 border-accent-orange" onClick={() => {setIsDialogOpen(false); setIsProfileEditDialogOpen(true);}}>
                             <h4 className="font-bold text-accent-orange">Cá nhân</h4>
                             <User className="h-12 w-12 text-gray-300" />
                             <p className="text-sm text-muted-foreground">(Thông tin cơ bản)</p>
@@ -1539,9 +1546,7 @@ export default function CandidateProfilePage() {
                     {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
                 </div>
                  {hasMissingFields && !candidate.personalInfo.phone && !candidate.personalInfo.zalo && !candidate.personalInfo.messenger && !candidate.personalInfo.line && (
-                    <p className="text-destructive font-semibold text-sm mt-4 text-center">
-                        Cần cung cấp ít nhất một phương thức liên lạc.
-                    </p>
+                     <p className="mt-4 text-center text-sm text-muted-foreground">Cung cấp ít nhất một phương thức để <Badge className="bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge></p>
                 )}
             </CardContent>
         </Card>
@@ -1596,9 +1601,9 @@ export default function CandidateProfilePage() {
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="icon" disabled={isTranslating}>
                            {isTranslating ? <Loader2 className="h-5 w-5 animate-spin" /> :
-                            currentLang === 'vi' ? <VnFlagIcon className="w-6 h-6 rounded-full object-cover"/> :
-                            currentLang === 'ja' ? <JpFlagIcon className="w-6 h-6 rounded-full object-cover"/> :
-                            <EnFlagIcon className="w-6 h-6 rounded-full object-cover"/>
+                            currentLang === 'vi' ? <VnFlagIcon className="w-4 h-4 rounded-sm object-cover"/> :
+                            currentLang === 'ja' ? <JpFlagIcon className="w-4 h-4 rounded-sm object-cover"/> :
+                            <EnFlagIcon className="w-4 h-4 rounded-sm object-cover"/>
                            }
                         </Button>
                       </DropdownMenuTrigger>
@@ -1907,3 +1912,5 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+    
