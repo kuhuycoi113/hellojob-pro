@@ -1210,24 +1210,15 @@ export default function CandidateProfilePage() {
       );
   }
 
+
   const MainEditDialog = ({ children }: { children: React.ReactNode }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     
-    // Wrapper for handleTempChange to work with the unified dialog
-    const handleMainDialogTempChange = (
-      section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
-      ...args: any[]
-    ) => {
-        // This function will be passed down to the actual edit dialogs
-        // which will then call the state update logic within this scope.
-        // For the purpose of this trigger, it doesn't need to do anything itself.
-    };
-
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent className="sm:max-w-2xl">
-                 <DialogHeader>
+                <DialogHeader>
                     <DialogTitle className="font-headline text-2xl">Hoàn thiện hồ sơ</DialogTitle>
                     <DialogDescription>Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn.</DialogDescription>
                 </DialogHeader>
@@ -1576,7 +1567,7 @@ export default function CandidateProfilePage() {
                  <div className="relative group">
                      <Avatar id="PROFILEAVATAR02" className="h-32 w-32 border-4 border-background bg-background shadow-lg">
                       <AvatarImage src={candidate.avatarUrl || undefined} alt={candidate.name} data-ai-hint="professional headshot" className="object-cover" />
-                      <AvatarFallback>{candidate.name?.charAt(0)}</AvatarFallback>
+                      <AvatarFallback id="PROFILEAVATAR01">{candidate.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <Label htmlFor="avatar-upload" className="absolute bottom-1 right-1 cursor-pointer bg-black/50 text-white p-2 rounded-full group-hover:bg-black/70 transition-colors">
                         <Camera className="h-5 w-5" />
