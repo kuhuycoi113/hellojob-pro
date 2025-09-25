@@ -367,7 +367,9 @@ const renderLevel1Edit = (
                              <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
                         </div>
                     </div>
-                     <p className="text-sm text-muted-foreground mt-4 text-center">Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle">Ứng tuyển</Badge></p>
+                     <div className="text-sm text-muted-foreground mt-4 text-center">
+                        Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                    </div>
                 </div>
             </div>
         </div>
@@ -397,7 +399,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                     about: '',
                     education: [],
                     experience: [],
-                    personalInfo: { birthYear: 2000, gender: '', phone: '', japaneseProficiency: '' , height: '0', weight: '0'},
+                    personalInfo: { birthYear: 2000, gender: 'Nữ', phone: '', japaneseProficiency: '' , height: '0', weight: '0'},
                     skills: [],
                     interests: [],
                     certifications: [],
