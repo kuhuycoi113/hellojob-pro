@@ -699,7 +699,7 @@ const LoggedInView = () => {
                        ) : suggestedJobs.length > 0 ? (
                             <>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                    {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true}/> ))}
                                 </div>
                                 {visibleJobsCount < suggestedJobs.length && (
                                     <div className="text-center mt-8">
@@ -740,7 +740,7 @@ const LoggedInView = () => {
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {appliedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                            {appliedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true}/> ))}
                         </div>
                     </AccordionContent>
                 </AccordionItem>
@@ -755,7 +755,7 @@ const LoggedInView = () => {
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                        {savedJobs.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true}/> ))}
                             </div>
                         ) : (
                              <div className="text-center py-8 text-muted-foreground">
@@ -784,7 +784,7 @@ const LoggedInView = () => {
                        ) : behavioralSuggestedJobs.length > 0 ? (
                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {behavioralSuggestedJobs.map((item) => (
-                                    <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
+                                    <JobCard key={item.job.id} job={item.job} showRecruiterName={false} showPostedTime={true}/>
                                 ))}
                             </div>
                        ) : (
@@ -1312,5 +1312,3 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-
-    
