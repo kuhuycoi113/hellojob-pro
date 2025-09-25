@@ -392,7 +392,7 @@ export function Header() {
             <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
         </Button>
         <Button 
-            onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }} 
+            onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }}
             variant="outline" 
             className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
@@ -746,7 +746,6 @@ const LoggedOutContent = () => {
                 </div>
                 {isClient && isMobile && (
                     <div className="flex items-center gap-2">
-                        <SearchDialog />
                         {!isLoggedIn && (
                             <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
                         )}
