@@ -113,7 +113,7 @@ const translations = {
         notes: "Ghi chú",
         videos: "Video",
         bodyPhotos: "Ảnh hình thể",
-        noInfo: "Chưa có thông tin.",
+        noInfo: "Chưa cập nhật",
         clickToUpdate: "Nhấn vào đây để cập nhật",
     },
     ja: {
@@ -1576,8 +1576,8 @@ export default function CandidateProfilePage() {
                             <MessengerIcon className="h-6 w-6" />
                             <LineIcon className="h-6 w-6" />
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                            <p>Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge></p>
+                        <div className="text-sm text-muted-foreground mt-4 text-center">
+                            Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
                         </div>
                     </div>
                 )}
@@ -2005,6 +2005,7 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
 
 
 
