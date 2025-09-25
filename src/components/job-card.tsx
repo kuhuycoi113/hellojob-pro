@@ -440,7 +440,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                 </AlertDialogContent>
             </AlertDialog>
              <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
-                <AlertDialogContent>
+                <AlertDialogContent id="UNGTUYEN-L02-B1">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
                         <AlertDialogDescription>
@@ -600,7 +600,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             </AlertDialogContent>
         </AlertDialog>
         <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
-            <AlertDialogContent>
+            <AlertDialogContent id="UNGTUYEN-L02-B1">
                 <AlertDialogHeader>
                     <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
                     <AlertDialogDescription>
