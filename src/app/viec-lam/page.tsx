@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -9,7 +10,7 @@ import { JobCarousel } from '@/components/job-carousel';
 import { visaDetailsByVisaType } from '@/lib/visa-data';
 
 
-export default function HomePage() {
+export default function ViecLamPage() {
   const router = useRouter();
 
   const handleSearch = (filters: Partial<SearchFilters>) => {
@@ -75,7 +76,7 @@ export default function HomePage() {
             onSearch={handleSearch} 
             filters={homeFilters} 
             onFilterChange={handleHomeFilterChange} 
-            showHero={true} 
+            showHero={false} 
         />
         <div className="w-full flex-grow container mx-auto px-4 md:px-6 py-8">
             {groupedJobs.map(group => (
@@ -83,7 +84,7 @@ export default function HomePage() {
                     key={group.title}
                     title={group.title}
                     jobs={group.jobs}
-                    viewAllLink={`/tim-viec-lam?chi-tiet-loai-hinh-visa=${visaDetailsByVisaType[Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key].some(detail => detail.name === group.title)) as keyof typeof visaDetailsByVisaType]?.find(d => d.name === group.title)?.slug || ''}`}
+                    viewAllLink={`/tim-viec-lam?chi-tiet-loai-hinh-visa=${visaDetailsByVisaType[Object.keys(visaDetailsByVisaType).find(key => visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType].some(detail => detail.name === group.title)) as keyof typeof visaDetailsByVisaType]?.find(d => d.name === group.title)?.slug || ''}`}
                 />
             ))}
         </div>

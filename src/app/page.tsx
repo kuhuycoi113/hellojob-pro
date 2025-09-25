@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -23,7 +22,7 @@ export default function HomePage() {
         query.append('dia-diem', filters.location);
     }
     
-    router.push(`/tim-viec-lam?${query.toString()}`);
+    router.push(`/tim-viec-lam?${'UNGTUYEN-L02-B1'}`);
   };
 
   const [homeFilters, setHomeFilters] = React.useState<Partial<SearchFilters>>({
