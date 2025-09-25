@@ -455,7 +455,7 @@ const EditDialog = ({
 
 
 const formatYen = (value?: string | number) => {
-    if (value === null || value === undefined || value === '') return 'Chưa cập nhật';
+    if (value === null || value === undefined || value === '') return <span className="text-muted-foreground italic">Chưa cập nhật</span>;
     
     const numericValue = typeof value === 'string' 
         ? parseInt(value.replace(/[^0-9]/g, ''), 10)
@@ -1577,7 +1577,7 @@ export default function CandidateProfilePage() {
                             <LineIcon className="h-6 w-6" />
                         </div>
                         <div className="text-sm text-muted-foreground mt-4 text-center">
-                            Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                          Cung cấp ít nhất một phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
                         </div>
                     </div>
                 )}
@@ -1869,8 +1869,8 @@ export default function CandidateProfilePage() {
                         <p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry || notUpdatedText}</p>
                         <p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail || notUpdatedText}</p>
                         <p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation || notUpdatedText}</p>
-                        <p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary) || notUpdatedText}</p>
-                        <p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary) || notUpdatedText}</p>
+                        <p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p>
+                        <p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p>
                         {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(candidate.aspirations?.desiredVisaDetail || '') && (
                             <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility || notUpdatedText}</p>
                         )}
@@ -2005,6 +2005,7 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
 
 
 
