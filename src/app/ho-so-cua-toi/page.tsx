@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -52,6 +53,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { locations } from '@/lib/location-data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { EditProfileDialog } from '@/components/candidate-edit-dialog';
+import { validateProfileForApplication } from '@/lib/utils';
 
 
 type MediaItem = {
@@ -456,7 +458,7 @@ const visaTypes = Object.keys(visaDetailsByVisaType);
 
 export default function CandidateProfilePage() {
   const { toast } = useToast();
-  const { role } = useAuth();
+  const { role, profileName, profileHeadline } = useAuth();
   const [profileByLang, setProfileByLang] = useState<ProfilesByLang>({ vi: null, ja: null, en: null });
   const [newSkill, setNewSkill] = useState('');
   const [newInterest, setNewInterest] = useState('');
@@ -551,8 +553,10 @@ export default function CandidateProfilePage() {
   };
 
   useEffect(() => {
-    if (profileByLang.vi && role === 'candidate') {
+    if (profileByLang.vi && (role === 'candidate' || role === 'candidate-full-profile')) {
       localStorage.setItem('generatedCandidateProfile', JSON.stringify(profileByLang.vi));
+      // Manually trigger a storage event so the header updates
+      window.dispatchEvent(new Event('storage'));
     }
   }, [profileByLang.vi, role]);
 
@@ -1498,35 +1502,54 @@ export default function CandidateProfilePage() {
     return phone; // Fallback
   }
 
-  const PersonalInfoCard = () => (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="font-headline text-xl flex items-center"><UserCog className="mr-3 text-primary"/> {t.personalInfo}</CardTitle>
-        <Button variant="ghost" size="icon" onClick={() => setIsProfileEditDialogOpen(true)}>
-            <Edit className="h-4 w-4"/>
-        </Button>
-      </CardHeader>
-      <CardContent className="space-y-3 text-sm">
-        <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : 'Chưa cập nhật'}</p>
-        <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender || 'Chưa cập nhật'}</p>
-        <p><strong>{t.height}:</strong> {candidate.personalInfo.height ? `${candidate.personalInfo.height} cm` : 'Chưa cập nhật'}</p>
-        <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight ? `${candidate.personalInfo.weight} kg` : 'Chưa cập nhật'}</p>
-        <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus || 'Chưa cập nhật'}</p>
-        <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus || 'Chưa cập nhật'}</p>
-        <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency || 'Chưa cập nhật'}</p>
-        <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency || 'Chưa cập nhật'}</p>
-      </CardContent>
-      <CardContent>
-        <div className="space-y-2">
-            {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(candidate.personalInfo.phone)}</Link></Button>}
-            {candidate.personalInfo.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${candidate.personalInfo.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.messenger}</Link></Button>}
-            {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(candidate.personalInfo.zalo)}</Link></Button>}
-            {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
-        </div>
-      </CardContent>
-    </Card>
-  );
+  const PersonalInfoCard = () => {
+    const missingFields = validateProfileForApplication(candidate);
+    const hasMissingFields = missingFields.length > 0;
 
+    return (
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="font-headline text-xl flex items-center"><UserCog className="mr-3 text-primary"/> {t.personalInfo}</CardTitle>
+                <Button variant="ghost" size="icon" onClick={() => setIsProfileEditDialogOpen(true)}>
+                    <Edit className="h-4 w-4"/>
+                </Button>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+                <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
+                <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender || <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
+                <p><strong>{t.height}:</strong> {candidate.personalInfo.height && parseInt(candidate.personalInfo.height) > 0 ? `${candidate.personalInfo.height} cm` : <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
+                <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight && parseInt(candidate.personalInfo.weight) > 0 ? `${candidate.personalInfo.weight} kg` : <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
+                <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus || <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
+                <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus || <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
+                <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency || 'Chưa cập nhật'}</p>
+                <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency || 'Chưa cập nhật'}</p>
+            </CardContent>
+            <CardContent>
+                <div className="space-y-2">
+                    {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(candidate.personalInfo.phone)}</Link></Button>}
+                    {candidate.personalInfo.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${candidate.personalInfo.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.messenger}</Link></Button>}
+                    {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(candidate.personalInfo.zalo)}</Link></Button>}
+                    {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
+                </div>
+                 {hasMissingFields && !candidate.personalInfo.phone && !candidate.personalInfo.zalo && !candidate.personalInfo.messenger && !candidate.personalInfo.line && (
+                    <p className="text-destructive font-semibold text-sm mt-4 text-center">
+                        Cần cung cấp ít nhất một phương thức liên lạc.
+                    </p>
+                )}
+            </CardContent>
+        </Card>
+    )
+  };
+
+
+  const MainEditDialogTrigger = ({ children }: { children: React.ReactNode }) => (
+    <Dialog>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent className="sm:max-w-2xl">
+            {MainEditDialogContent(profileByLang.vi!, handleTempChange as any)}
+        </DialogContent>
+    </Dialog>
+  );
 
   return (
     <div className="bg-secondary">
@@ -1548,8 +1571,8 @@ export default function CandidateProfilePage() {
                     <Input id="avatar-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('avatar', e)}/>
                  </div>
                 <div className="md:ml-6 mt-4 md:mt-0 text-center md:text-left">
-                  <h1 className="text-3xl font-headline font-bold">{candidate.name}</h1>
-                  <p className="text-muted-foreground">{candidate.headline}</p>
+                  <h1 className="text-3xl font-headline font-bold">{profileName || 'Chưa có tên'}</h1>
+                  <p className="text-muted-foreground">{profileHeadline || 'Cập nhật hồ sơ của bạn'}</p>
                   <p className="text-sm text-muted-foreground flex items-center justify-center md:justify-start gap-2 mt-1">
                     <MapPin className="h-4 w-4" /> {candidate.location}
                   </p>
@@ -1587,25 +1610,12 @@ export default function CandidateProfilePage() {
                         <DropdownMenuItem onSelect={() => handleLanguageChange('en')}><EnFlagIcon className="w-4 h-4 mr-2"/>English</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-
-                     <EditDialog
-                        title="Hoàn thiện hồ sơ"
-                        onSave={handleSave}
-                        renderContent={MainEditDialogContent}
-                        description="Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn."
-                        candidate={profileByLang.vi!} 
-                     >
+                    <MainEditDialogTrigger>
                         <Button variant="outline" size="icon" className="sm:hidden"><Edit /></Button>
-                     </EditDialog>
-                     <EditDialog
-                        title="Hoàn thiện hồ sơ"
-                        onSave={handleSave}
-                        renderContent={MainEditDialogContent}
-                        description="Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn."
-                        candidate={profileByLang.vi!}
-                     >
+                    </MainEditDialogTrigger>
+                    <MainEditDialogTrigger>
                          <Button variant="outline" className="hidden sm:inline-flex"><Edit /> {editButtonText}</Button>
-                     </EditDialog>
+                    </MainEditDialogTrigger>
                  </div>
               </div>
             </CardHeader>
@@ -1785,7 +1795,7 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                   <CardContent>
-                     <h4 className="font-semibold mb-2 text-sm">{t.skills}</h4
+                     <h4 className="font-semibold mb-2 text-sm">{t.skills}</h4>
                      <div className="flex flex-wrap gap-2 mb-4">
                         {candidate.skills.length > 0 ? candidate.skills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>) : 
                         <div className="text-muted-foreground text-sm">
@@ -1899,5 +1909,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-
-    
