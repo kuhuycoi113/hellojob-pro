@@ -250,7 +250,9 @@ const renderLevel1Edit = (
                 <div className="space-y-2">
                 <div className="flex justify-between items-center">
                     <Label>Chiều cao (cm)</Label>
-                    <span className="text-sm font-semibold text-primary">{height > 0 ? `${height} cm` : 'Chưa chọn'}</span>
+                    <span className={cn("text-sm font-semibold", height > 0 ? "text-primary" : "text-muted-foreground")}>
+                        {height > 0 ? `${height} cm` : 'Chưa chọn'}
+                    </span>
                 </div>
                 <Slider
                     value={[height]}
@@ -263,7 +265,9 @@ const renderLevel1Edit = (
                 <div className="space-y-2">
                     <div className="flex justify-between items-center">
                         <Label>Cân nặng (kg)</Label>
-                        <span className="text-sm font-semibold text-primary">{weight > 0 ? `${weight} kg` : 'Chưa chọn'}</span>
+                         <span className={cn("text-sm font-semibold", weight > 0 ? "text-primary" : "text-muted-foreground")}>
+                            {weight > 0 ? `${weight} kg` : 'Chưa chọn'}
+                         </span>
                     </div>
                     <Slider
                         value={[weight]}
@@ -296,8 +300,6 @@ const renderLevel1Edit = (
                 </Select>
                 </div>
                 <div className="md:col-span-2 mt-6 pt-6 border-t">
-                    <h4 className="font-bold text-lg mb-1">Thông tin liên hệ</h4>
-                    <p className="text-sm text-muted-foreground mb-4">Cung cấp ít nhất một phương thức để nhà tuyển dụng có thể liên lạc với bạn.</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="phone" className="flex items-center gap-2">
@@ -353,7 +355,7 @@ const renderLevel1Edit = (
                                 <MessengerIcon />
                                 Facebook Messenger
                             </Label>
-                            <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc nhập username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
+                            <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
                             <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
                         </div>
                         <div className="space-y-2">
@@ -362,9 +364,10 @@ const renderLevel1Edit = (
                                 Line (Link hồ sơ)
                             </Label>
                             <Input id="line" placeholder="Dán link Line hoặc nhập ID của bạn" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
-                            <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
+                             <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
                         </div>
                     </div>
+                     <p className="text-sm text-muted-foreground mt-4 text-center">Cung cấp ít nhất một phương thức để <span className="text-accent-orange font-semibold">Ứng tuyển</span></p>
                 </div>
             </div>
         </div>
@@ -557,3 +560,5 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </>
     );
 }
+
+    
