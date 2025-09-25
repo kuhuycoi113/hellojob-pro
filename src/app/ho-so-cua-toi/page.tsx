@@ -499,21 +499,23 @@ const DocumentGrid = ({
     documents,
     docType,
     handleMediaChange,
+    onAddClick,
 }: {
     documents: DocumentItem[];
     docType: 'vietnam' | 'japan' | 'other';
     handleMediaChange: (type: 'document', e: React.ChangeEvent<HTMLInputElement>, index: number, docType: 'vietnam' | 'japan' | 'other') => void;
+    onAddClick: (docType: 'vietnam' | 'japan' | 'other') => void;
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const isMobile = useIsMobile();
     
     const COLLAPSED_ROWS_MOBILE = 3;
     const ITEMS_PER_ROW_MOBILE = 2;
-    const collapsedItemCountMobile = COLLAPSED_ROWS_MOBILE * ITEMS_PER_ROW_MOBILE;
+    const collapsedItemCountMobile = COLLAPSED_ROWS_MOBILE * ITEMS_PER_ROW_MOBILE - 1; // -1 for the add button
 
     const COLLAPSED_ROWS_DESKTOP = 2;
     const ITEMS_PER_ROW_DESKTOP = 4;
-    const collapsedItemCountDesktop = COLLAPSED_ROWS_DESKTOP * ITEMS_PER_ROW_DESKTOP;
+    const collapsedItemCountDesktop = COLLAPSED_ROWS_DESKTOP * ITEMS_PER_ROW_DESKTOP - 1; // -1 for the add button
 
     const collapsedItemCount = isMobile ? collapsedItemCountMobile : collapsedItemCountDesktop;
     const visibleDocuments = isExpanded ? documents : documents.slice(0, collapsedItemCount);
@@ -537,6 +539,14 @@ const DocumentGrid = ({
                         <p className="text-xs text-muted-foreground">{doc.name}</p>
                     </div>
                 ))}
+                
+                {/* Add new document button */}
+                 <div className="space-y-2 text-center">
+                    <button onClick={() => onAddClick(docType)} className="relative group aspect-square rounded-lg overflow-hidden border-2 border-dashed flex items-center justify-center cursor-pointer bg-secondary/20 hover:border-primary hover:bg-primary/5 w-full transition-colors">
+                        <PlusCircle className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors"/>
+                    </button>
+                    <p className="text-xs text-muted-foreground">Thêm giấy tờ</p>
+                </div>
             </div>
             {documents.length > collapsedItemCount && (
                 <div className="text-center mt-4">
@@ -563,6 +573,11 @@ export default function CandidateProfilePage() {
   const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
   const [activeDocTab, setActiveDocTab] = useState('japan');
   const isMobile = useIsMobile();
+  const [isAddDocDialogOpen, setIsAddDocDialogOpen] = useState(false);
+  const [currentDocTypeToAdd, setCurrentDocTypeToAdd] = useState<'vietnam' | 'japan' | 'other' | null>(null);
+  const [newDocName, setNewDocName] = useState('');
+  const [newDocImage, setNewDocImage] = useState<File | null>(null);
+  const [newDocImagePreview, setNewDocImagePreview] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -826,7 +841,7 @@ export default function CandidateProfilePage() {
     }
   };
 
-  const handleAddItem = (section: 'experience' | 'education' | 'certifications' | 'documents', docType?: 'vietnam' | 'japan' | 'other') => {
+  const handleAddItem = (section: 'experience' | 'education' | 'certifications' | 'documents', docType: 'vietnam' | 'japan' | 'other', newDoc?: DocumentItem) => {
       if (!profileByLang.vi) return;
       const newProfile = JSON.parse(JSON.stringify(profileByLang.vi));
       if (section === 'experience') {
@@ -835,11 +850,14 @@ export default function CandidateProfilePage() {
           newProfile.education.push({ school: '', degree: '', gradYear: new Date().getFullYear() });
       } else if (section === 'certifications') {
           newProfile.certifications.push('');
-      } else if (section === 'documents' && docType) {
+      } else if (section === 'documents' && docType && newDoc) {
           if (!newProfile.documents) {
               newProfile.documents = { vietnam: [], japan: [], other: [] };
           }
-          newProfile.documents[docType].push({name: 'Giấy tờ mới'});
+          if (!newProfile.documents[docType]) {
+              newProfile.documents[docType] = [];
+          }
+          newProfile.documents[docType].push(newDoc);
       }
       setProfileByLang({ vi: newProfile, ja: null, en: null });
       setCurrentLang('vi');
@@ -884,6 +902,39 @@ export default function CandidateProfilePage() {
     }
   };
 
+  const handleOpenAddDocDialog = (docType: 'vietnam' | 'japan' | 'other') => {
+    setCurrentDocTypeToAdd(docType);
+    setNewDocName('');
+    setNewDocImage(null);
+    setNewDocImagePreview(null);
+    setIsAddDocDialogOpen(true);
+  };
+
+  const handleAddNewDocument = () => {
+      if (newDocName.trim() && newDocImagePreview && currentDocTypeToAdd) {
+          handleAddItem('documents', currentDocTypeToAdd, { name: newDocName, url: newDocImagePreview });
+          setIsAddDocDialogOpen(false);
+      } else {
+          toast({
+              variant: "destructive",
+              title: "Thông tin chưa đủ",
+              description: "Vui lòng nhập tên và tải lên ảnh cho giấy tờ.",
+          });
+      }
+  };
+
+   const handleNewDocImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setNewDocImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setNewDocImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
 
   const renderAboutEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
     <Textarea
@@ -922,7 +973,7 @@ export default function CandidateProfilePage() {
           <Textarea value={exp.description} onChange={e => handleTempChange('experience', index, 'description', e.target.value)} />
         </div>
       ))}
-      <Button variant="outline" className="w-full" onClick={() => handleAddItem('experience')}>
+      <Button variant="outline" className="w-full" onClick={() => handleAddItem('experience', 'vietnam', undefined)}>
         <PlusCircle className="mr-2"/> Thêm kinh nghiệm
       </Button>
     </div>
@@ -946,7 +997,7 @@ export default function CandidateProfilePage() {
           <Input type="number" value={edu.gradYear} onChange={e => handleTempChange('education', index, 'gradYear', parseInt(e.target.value))} />
         </div>
       ))}
-      <Button variant="outline" className="w-full" onClick={() => handleAddItem('education')}>
+      <Button variant="outline" className="w-full" onClick={() => handleAddItem('education', 'vietnam', undefined)}>
         <PlusCircle className="mr-2"/> Thêm học vấn
       </Button>
     </div>
@@ -1020,7 +1071,7 @@ export default function CandidateProfilePage() {
           <Input id={`cert-${index}`} value={cert} onChange={(e) => handleTempChange('certifications', index, e.target.value)} />
         </div>
       ))}
-      <Button variant="outline" className="w-full" onClick={() => handleAddItem('certifications')}>
+      <Button variant="outline" className="w-full" onClick={() => handleAddItem('certifications', 'vietnam', undefined)}>
         <PlusCircle className="mr-2"/> Thêm chứng chỉ
       </Button>
     </div>
@@ -1036,7 +1087,7 @@ export default function CandidateProfilePage() {
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'vietnam')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'vietnam')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'vietnam', {name: 'Giấy tờ mới'})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
         </div>
          <div>
             <h4 className="font-bold mb-2">Giấy tờ Nhật Bản</h4>
@@ -1046,7 +1097,7 @@ export default function CandidateProfilePage() {
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'japan')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'japan')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'japan', {name: 'Giấy tờ mới'})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
         </div>
          <div>
             <h4 className="font-bold mb-2">Giấy tờ nước ngoài / Du học</h4>
@@ -1056,7 +1107,7 @@ export default function CandidateProfilePage() {
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'other')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'other')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'other', {name: 'Giấy tờ mới'})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
         </div>
     </div>
   );
@@ -1697,6 +1748,7 @@ export default function CandidateProfilePage() {
     )
   };
 
+
   const MainEditDialog = ({ children }: { children: React.ReactNode }) => {
     return (
         <Dialog>
@@ -1946,28 +1998,28 @@ export default function CandidateProfilePage() {
                     <Tabs defaultValue="japan" value={activeDocTab} onValueChange={setActiveDocTab} className="w-full">
                       <TabsList className="grid w-full grid-cols-3">
                         <TabsTrigger value="vietnam" className="doc-tab-vn">
-                          {isMobile && activeDocTab !== 'vietnam' ? 'Việt Nam' : t.vietnamDocs}
+                           {isMobile ? (activeDocTab === 'vietnam' ? t.vietnamDocs : 'Việt Nam') : t.vietnamDocs}
                         </TabsTrigger>
                         <TabsTrigger value="japan" className="doc-tab-jp">
-                          {isMobile && activeDocTab !== 'japan' ? 'Nhật Bản' : t.japanDocs}
+                           {isMobile ? (activeDocTab === 'japan' ? t.japanDocs : 'Nhật Bản') : t.japanDocs}
                         </TabsTrigger>
                         <TabsTrigger value="other" className="doc-tab-other">
-                          {isMobile && activeDocTab !== 'other' ? 'Du học' : t.otherDocs}
+                           {isMobile ? (activeDocTab === 'other' ? t.otherDocs : 'Du học') : t.otherDocs}
                         </TabsTrigger>
                       </TabsList>
                       <TabsContent value="vietnam" className="pt-4">
-                        {candidate.documents?.vietnam?.length ? (
-                             <DocumentGrid documents={candidate.documents.vietnam} docType="vietnam" handleMediaChange={handleMediaChange} />
+                        {(candidate.documents?.vietnam?.length || 0) > 0 ? (
+                             <DocumentGrid documents={candidate.documents!.vietnam!} docType="vietnam" handleMediaChange={handleMediaChange} onAddClick={handleOpenAddDocDialog} />
                         ) : (<p className="text-sm text-muted-foreground py-4 text-center">{notUpdatedText}</p>)}
                       </TabsContent>
                       <TabsContent value="japan" className="pt-4">
-                         {candidate.documents?.japan?.length ? (
-                             <DocumentGrid documents={candidate.documents.japan} docType="japan" handleMediaChange={handleMediaChange} />
+                         {(candidate.documents?.japan?.length || 0) > 0 ? (
+                             <DocumentGrid documents={candidate.documents!.japan!} docType="japan" handleMediaChange={handleMediaChange} onAddClick={handleOpenAddDocDialog}/>
                         ) : (<p className="text-sm text-muted-foreground py-4 text-center">{notUpdatedText}</p>)}
                       </TabsContent>
                        <TabsContent value="other" className="pt-4">
-                         {candidate.documents?.other?.length ? (
-                            <DocumentGrid documents={candidate.documents.other} docType="other" handleMediaChange={handleMediaChange} />
+                         {(candidate.documents?.other?.length || 0) > 0 ? (
+                            <DocumentGrid documents={candidate.documents!.other!} docType="other" handleMediaChange={handleMediaChange} onAddClick={handleOpenAddDocDialog}/>
                         ) : (<p className="text-sm text-muted-foreground py-4 text-center">{notUpdatedText}</p>)}
                       </TabsContent>
                     </Tabs>
@@ -2143,10 +2195,66 @@ export default function CandidateProfilePage() {
             }
         }}
     />
+    <Dialog open={isAddDocDialogOpen} onOpenChange={setIsAddDocDialogOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Thêm giấy tờ mới</DialogTitle>
+                <DialogDescription>
+                    Đặt tên cho giấy tờ và tải lên hình ảnh tương ứng.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="doc-name">Tên giấy tờ</Label>
+                    <Input 
+                        id="doc-name" 
+                        value={newDocName}
+                        onChange={(e) => setNewDocName(e.target.value)}
+                        placeholder="VD: Sơ yếu lý lịch"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Ảnh giấy tờ</Label>
+                    <Label
+                        htmlFor="doc-image-upload"
+                        className="relative flex justify-center w-full h-48 px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer border-border hover:border-primary transition-colors"
+                    >
+                        {newDocImagePreview ? (
+                            <Image
+                                src={newDocImagePreview}
+                                alt="Xem trước ảnh"
+                                fill
+                                className="object-contain rounded-md"
+                            />
+                        ) : (
+                            <div className="space-y-1 text-center">
+                                <UploadCloud className="w-10 h-10 mx-auto text-muted-foreground" />
+                                <p className="text-sm text-muted-foreground">Nhấp hoặc kéo thả file vào đây</p>
+                            </div>
+                        )}
+                        <Input
+                            id="doc-image-upload"
+                            type="file"
+                            className="sr-only"
+                            accept="image/*"
+                            onChange={handleNewDocImageChange}
+                        />
+                    </Label>
+                </div>
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button variant="outline">Hủy</Button>
+                </DialogClose>
+                <Button onClick={handleAddNewDocument}>Lưu giấy tờ</Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
     </div>
   );
 }
 
 
   
+
 
