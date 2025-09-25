@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import Link from 'next/link';
@@ -563,7 +562,6 @@ const LoggedOutContent = () => {
                     
                     {isClient && (
                         <>
-                            
                             {isLoggedIn ? (
                                 <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
@@ -575,20 +573,16 @@ const LoggedOutContent = () => {
                                 <Button onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập / Đăng ký</Button>
                             )}
 
-                            {(role === 'candidate' || role === 'candidate-full-profile') ? (
-                                <Button asChild className="bg-accent-orange hover:bg-accent-orange/90 text-white">
-                                    <Link href="/ho-so-cua-toi">Sửa hồ sơ</Link>
-                                </Button>
-                            ) : (
-                                <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-                                    <DialogTrigger asChild>
-                                        <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="sm:max-w-2xl">
-                                        {renderDialogContent()}
-                                    </DialogContent>
-                                </Dialog>
-                            )}
+                             <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                                <DialogTrigger asChild>
+                                    <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                                        {(role === 'candidate' || role === 'candidate-full-profile') ? 'Sửa hồ sơ' : 'Tạo hồ sơ'}
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-2xl">
+                                    {renderDialogContent()}
+                                </DialogContent>
+                            </Dialog>
 
                              <Button asChild>
                                 <Link href="/viec-lam-cua-toi">Trang việc làm</Link>
@@ -605,20 +599,16 @@ const LoggedOutContent = () => {
                             <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
                         )}
                         
-                        {(role === 'candidate' || role === 'candidate-full-profile') ? (
-                             <Button asChild size="sm" className="bg-accent-orange hover:bg-accent-orange/90 text-white">
-                                <Link href="/ho-so-cua-toi">Sửa</Link>
-                             </Button>
-                        ) : (
-                            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-                                <DialogTrigger asChild>
-                                    <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" size="sm">Tạo</Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-2xl">
-                                    {renderDialogContent()}
-                                </DialogContent>
-                            </Dialog>
-                        )}
+                        <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                            <DialogTrigger asChild>
+                                <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" size="sm">
+                                    {(role === 'candidate' || role === 'candidate-full-profile') ? 'Sửa' : 'Tạo'}
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-2xl">
+                                {renderDialogContent()}
+                            </DialogContent>
+                        </Dialog>
 
                          <Button asChild variant="default" size="sm">
                             <Link href="/viec-lam-cua-toi">Việc</Link>
