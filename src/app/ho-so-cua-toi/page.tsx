@@ -1539,6 +1539,8 @@ export default function CandidateProfilePage() {
     const missingFields = validateProfileForApplication(candidate);
     const hasMissingFields = missingFields.length > 0;
 
+    const notUpdatedText = <span className='text-muted-foreground italic'>Chưa cập nhật</span>;
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -1548,12 +1550,12 @@ export default function CandidateProfilePage() {
                 </Button>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-                <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
-                <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender || <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
-                <p><strong>{t.height}:</strong> {candidate.personalInfo.height && parseInt(candidate.personalInfo.height) > 0 ? `${candidate.personalInfo.height} cm` : <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
-                <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight && parseInt(candidate.personalInfo.weight) > 0 ? `${candidate.personalInfo.weight} kg` : <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
-                <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus || <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
-                <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus || <span className='text-destructive font-semibold'>Chưa cập nhật</span>}</p>
+                <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : notUpdatedText}</p>
+                <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender || notUpdatedText}</p>
+                <p><strong>{t.height}:</strong> {candidate.personalInfo.height && parseInt(candidate.personalInfo.height) > 0 ? `${candidate.personalInfo.height} cm` : notUpdatedText}</p>
+                <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight && parseInt(candidate.personalInfo.weight) > 0 ? `${candidate.personalInfo.weight} kg` : notUpdatedText}</p>
+                <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus || notUpdatedText}</p>
+                <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus || notUpdatedText}</p>
                 <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency || 'Chưa cập nhật'}</p>
                 <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency || 'Chưa cập nhật'}</p>
             </CardContent>
@@ -1574,7 +1576,7 @@ export default function CandidateProfilePage() {
                             <LineIcon className="h-6 w-6" />
                         </div>
                         <div className="text-sm text-muted-foreground">
-                            Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                            <p className="text-sm text-muted-foreground">Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge></p>
                         </div>
                     </div>
                 )}
@@ -2000,5 +2002,6 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
 
 
