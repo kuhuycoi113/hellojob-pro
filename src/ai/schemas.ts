@@ -50,7 +50,7 @@ export const CandidateProfileSchema = z.object({
     desiredJobDetail: z.string().optional().describe('A more specific job role or task the candidate wants (e.g., "Vận hành máy CNC", "Làm cơm hộp").'),
     financialAbility: z.string().optional().describe('Financial ability (e.g., "90 triệu").'),
     interviewLocation: z.string().optional().describe('The location for job interviews (e.g., "Hà Nội").'),
-    specialAspirations: z.string().optional().describe('Special requests or aspirations (e.g., "Tăng ca, hỗ trợ...").'),
+    specialAspirations: z.array(z.string()).optional().describe('A list of special requests or aspirations (e.g., ["Tăng ca", "Hỗ trợ nhà ở"]).'),
   }).optional(),
   notes: z.string().optional().describe('Additional notes or descriptions.'),
 });

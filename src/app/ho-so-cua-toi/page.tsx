@@ -231,7 +231,7 @@ const emptyCandidate: EnrichedCandidateProfile = {
         desiredJobDetail: 'Vận hành máy CNC',
         financialAbility: 'Không yêu cầu',
         interviewLocation: 'Thành phố Hồ Chí Minh',
-        specialAspirations: 'Mong muốn có nhiều cơ hội làm thêm giờ và được hỗ trợ đào tạo chuyên sâu về kỹ năng quản lý.',
+        specialAspirations: ['Mong muốn có nhiều cơ hội làm thêm giờ', 'Được hỗ trợ đào tạo chuyên sâu'],
     },
     notes: 'Đã có kinh nghiệm phỏng vấn với công ty Nhật 2 lần, mong muốn tìm đơn hàng bay nhanh trong vòng 3 tháng tới. Có thể đóng phí ngay.',
     interests: ['Cơ khí', 'Tự động hóa', 'Sản xuất'],
@@ -387,6 +387,14 @@ const EditDialog = ({
             newCandidate[section] = { ...newCandidate[section]!, [field]: parseZaloInput(value) };
         } else if (section === 'personalInfo' && field === 'line') {
              newCandidate[section] = { ...newCandidate[section]!, [field]: parseLineInput(value) };
+        } else if (section === 'aspirations' && field === 'specialAspirations') {
+            const currentAspirations = newCandidate.aspirations?.specialAspirations || [];
+            const [item, checked] = args.slice(1);
+            if (checked) {
+                newCandidate.aspirations.specialAspirations = [...currentAspirations, item];
+            } else {
+                newCandidate.aspirations.specialAspirations = currentAspirations.filter((i: string) => i !== item);
+            }
         } else {
              // @ts-ignore
              newCandidate[section] = { ...newCandidate[section], [field]: value };
@@ -646,7 +654,7 @@ export default function CandidateProfilePage() {
                     else
                         output[key] = mergeDeep(target[key], source[key]);
                 } else if (Array.isArray(source[key])) {
-                     if (key === 'skills' || key === 'interests' || key === 'certifications' || key === 'documents') {
+                     if (key === 'skills' || key === 'interests' || key === 'certifications' || key === 'documents' || key === 'specialAspirations') {
                         Object.assign(output, { [key]: source[key] });
                     } else if (key === 'education' || key === 'experience') {
                         const targetArray = target[key] || [];
@@ -1229,8 +1237,19 @@ export default function CandidateProfilePage() {
               </div>
             )}
              <div className="md:col-span-2 space-y-2">
-              <Label>Nguyện vọng đặc biệt</Label>
-              <Textarea value={tempCandidate.aspirations?.specialAspirations} onChange={e => handleTempChange('aspirations', 'specialAspirations', e.target.value)} />
+                <Label>Nguyện vọng đặc biệt</Label>
+                <div className="p-4 border rounded-md grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">
+                    {['Lương tốt', 'Tăng ca', 'Công ty uy tín', 'Hỗ trợ nhà ở', 'Bay nhanh'].map(item => (
+                        <div key={item} className="flex items-center space-x-2">
+                            <Checkbox 
+                                id={`aspiration-${item}`} 
+                                checked={tempCandidate.aspirations?.specialAspirations?.includes(item)}
+                                onCheckedChange={(checked) => handleTempChange('aspirations', 'specialAspirations', item, checked)}
+                            />
+                            <Label htmlFor={`aspiration-${item}`} className="text-sm font-normal cursor-pointer">{item}</Label>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
       );
@@ -1875,7 +1894,18 @@ export default function CandidateProfilePage() {
                             <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility || notUpdatedText}</p>
                         )}
                         <p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation || notUpdatedText}</p>
-                        <p><strong>{t.specialAspirations}:</strong> {candidate.aspirations?.specialAspirations || notUpdatedText}</p>
+                         <div className="space-y-1">
+                            <p><strong>{t.specialAspirations}:</strong></p>
+                            {candidate.aspirations?.specialAspirations && candidate.aspirations.specialAspirations.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                {candidate.aspirations.specialAspirations.map(aspiration => (
+                                    <Badge key={aspiration} variant="secondary">{aspiration}</Badge>
+                                ))}
+                                </div>
+                            ) : (
+                                notUpdatedText
+                            )}
+                        </div>
                   </CardContent>
                 </Card>
 
@@ -1974,6 +2004,8 @@ export default function CandidateProfilePage() {
                     </div>}
                   </CardContent>
                 </Card>
+
+                 <Button className="w-full bg-accent-green hover:bg-accent-green/90 text-white"><FileDown/> Tải CV (.pdf)</Button>
                  <div className="text-center pt-4">
                     <Button variant="link" className="text-muted-foreground text-sm" onClick={() => { /* Handle logout */ }}>
                         <LogOut className="mr-2 h-4 w-4"/>
@@ -2005,6 +2037,7 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
 
 
 
