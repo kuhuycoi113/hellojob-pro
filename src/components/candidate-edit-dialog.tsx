@@ -40,6 +40,7 @@ interface EditProfileDialogProps {
     isOpen: boolean;
     onOpenChange: (isOpen: boolean) => void;
     onSaveSuccess: () => void;
+    onCancel?: () => void;
     source?: 'application' | 'profile';
 }
 
@@ -391,7 +392,7 @@ const renderLevel1Edit = (
     );
 };
 
-export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source = 'profile' }: EditProfileDialogProps) {
+export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source = 'profile', onCancel }: EditProfileDialogProps) {
     const { toast } = useToast();
     const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile | null>(null);
     const [phoneCountry, setPhoneCountry] = useState('+84');
@@ -400,7 +401,6 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
     const [qrImagePreview, setQrImagePreview] = useState<string | null>(null);
     const isMobile = useIsMobile();
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-    const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -439,16 +439,11 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
     };
     
     const handleCancel = () => {
-        if (source === 'application') {
-            setIsConfirmCancelOpen(true);
+        if (onCancel) {
+            onCancel();
         } else {
             onOpenChange(false);
         }
-    };
-
-    const handleConfirmCancel = () => {
-        setIsConfirmCancelOpen(false);
-        onOpenChange(false);
     };
 
     const handleTempChange = (
@@ -536,22 +531,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-            <AlertDialog open={isConfirmCancelOpen} onOpenChange={setIsConfirmCancelOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                    <AlertDialogTitle>Xác nhận hủy</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Hồ sơ của bạn vẫn cần thêm thông tin để có thể ứng tuyển. Bạn có muốn dừng việc cập nhật lúc này không?
-                    </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                    <AlertDialogCancel>Ở lại</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleConfirmCancel}>
-                        Vẫn Hủy
-                    </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            
             <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
                 <DialogContent className="sm:max-w-xl">
                     <DialogHeader>

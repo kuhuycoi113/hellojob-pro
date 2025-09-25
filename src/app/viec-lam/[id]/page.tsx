@@ -354,6 +354,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
+    const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
     const appliedFilters: Partial<SearchFilters> = {};
 
 
@@ -817,6 +818,10 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     });
                 }}
                 source="application"
+                onCancel={() => {
+                    setIsProfileEditDialogOpen(false);
+                    // Optionally open another dialog here to confirm cancellation if needed
+                }}
             />
         </div>
     );
