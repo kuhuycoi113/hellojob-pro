@@ -263,17 +263,17 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
         const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
         const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
-        let determinedFeeValue: string | undefined;
+        let feeValue : string | undefined;
 
-        if (netFee) determinedFeeValue = netFee;
-        else if (netFeeNoTicket) determinedFeeValue = netFeeNoTicket;
-        else if (netFeeWithTuition) determinedFeeValue = netFeeWithTuition;
+        if (netFee) feeValue = netFee;
+        else if (netFeeNoTicket) feeValue = netFeeNoTicket;
+        else if (netFeeWithTuition) feeValue = netFeeWithTuition;
 
-        if (!determinedFeeValue) {
+        if (!feeValue) {
             return { shouldShow: isControlled, text: `Phí: Không rõ` };
         }
 
-        const numericFee = parseInt(determinedFeeValue);
+        const numericFee = parseInt(feeValue);
         if (isControlled && numericFee > feeLimit) {
             return { shouldShow: true, text: `Phí: Không rõ` };
         }
@@ -295,9 +295,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         
         const visasForUsd = ['Đặc định đầu Việt'];
         if (visaDetail && visasForUsd.includes(visaDetail)) {
-           return { shouldShow: true, text: `Phí: $${formatCurrency(String(determinedFeeValue))}` };
+           return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
         }
-        return { shouldShow: true, text: `Phí: $${formatCurrency(String(determinedFeeValue))}` };
+        return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
     };
 
 
@@ -316,7 +316,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                             <span>{job.id}</span>
                             </div>
-                            {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white md:hidden" onClick={handleSaveJob}>
+                            {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
                                 <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                             </Button>}
                         </div>
@@ -461,45 +461,55 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   if (variant === 'chat') {
     return (
         <div id="HIENTHIVIEC03" onClick={() => router.push(`/viec-lam/${job.id}`)} className="block w-full cursor-pointer">
-            <Card className="flex items-start p-3 gap-3 hover:bg-secondary/50 transition-colors">
-                <div className="relative w-20 h-20 flex-shrink-0">
-                    <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
-                </div>
-                <div className="flex-grow overflow-hidden space-y-1">
-                    <h4 className="font-semibold text-sm leading-tight line-clamp-2">{job.title}</h4>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <FileText className="h-3 w-3 flex-shrink-0"/>
-                        Mã: {job.id}
-                    </p>
-                     {isClient && job.visaDetail && (
+            <Card className="p-3 hover:bg-secondary/50 transition-colors">
+                <div className="flex items-start gap-3">
+                    <div className="relative w-20 h-20 flex-shrink-0">
+                        <Image src={job.image.src} alt={job.title} fill className="object-cover rounded-md" />
+                    </div>
+                    <div className="flex-grow overflow-hidden space-y-1">
+                        <h4 className="font-semibold text-sm leading-tight line-clamp-2">{job.title}</h4>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Star className="h-3 w-3 flex-shrink-0"/>
-                            Visa: {job.visaDetail}
+                            <FileText className="h-3 w-3 flex-shrink-0"/>
+                            Mã: {job.id}
                         </p>
-                    )}
-                    <div className="text-xs text-muted-foreground">
-                        <p className="flex items-center gap-1.5">
-                            <span className="text-primary">Ngày PV:</span>
-                            <span>{interviewDate || "N/A"}</span>
-                        </p>
-                    </div>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <MapPin className="h-3 w-3 flex-shrink-0" />
-                        {job.workLocation}
-                    </p>
-                    <div className="text-xs font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1">
-                         {job.salary.actual && (
-                            <span className="flex items-center gap-1 text-green-600">
-                                <DollarSign className="h-3 w-3 flex-shrink-0" />
-                                Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}
-                            </span>
+                        {isClient && job.visaDetail && (
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Star className="h-3 w-3 flex-shrink-0"/>
+                                Visa: {job.visaDetail}
+                            </p>
                         )}
-                        <span className="flex items-center gap-1 text-muted-foreground">
-                            <DollarSign className="h-3 w-3 flex-shrink-0" />
-                            Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}
-                        </span>
+                        <div className="text-xs text-muted-foreground">
+                            <p className="flex items-center gap-1.5">
+                                <span className="text-primary">Ngày PV:</span>
+                                <span>{interviewDate || "N/A"}</span>
+                            </p>
+                        </div>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <MapPin className="h-3 w-3 flex-shrink-0" />
+                            {job.workLocation}
+                        </p>
+                        <div className="text-xs font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1">
+                            {job.salary.actual && (
+                                <span className="flex items-center gap-1 text-green-600">
+                                    <DollarSign className="h-3 w-3 flex-shrink-0" />
+                                    Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}
+                                </span>
+                            )}
+                            <span className="flex items-center gap-1 text-muted-foreground">
+                                <DollarSign className="h-3 w-3 flex-shrink-0" />
+                                Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}
+                            </span>
+                        </div>
                     </div>
                 </div>
+                {showPostedTime && (
+                    <div className="w-full px-1 pt-1 mt-1 border-t">
+                        <p className="flex items-center justify-end gap-1.5 text-right w-full" style={{ fontSize: '10px', color: '#9B999A' }}>
+                            <span className='text-primary font-semibold'>Đăng lúc:</span>
+                            <span>{postedTime ? postedTime.split(' ')[1] : '...'}</span>
+                        </p>
+                    </div>
+                )}
             </Card>
         </div>
     );
