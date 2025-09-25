@@ -63,7 +63,6 @@ const EmptyProfileView = () => {
     const [selectedVisa, setSelectedVisa] = useState<{name: string, slug: string} | null>(null);
     const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
     const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
-    const [selectedJob, setSelectedJob] = useState<string | null>(null);
     const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
     const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
@@ -216,15 +215,13 @@ const EmptyProfileView = () => {
     };
 
     const IndustryStepDialog = () => {
-        const parentVisaSlug = selectedVisa?.slug;
-        if (!parentVisaSlug) return null;
-
-        const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
+        if (!selectedVisa) return null;
+        const industries = industriesByJobType[selectedVisa.slug as keyof typeof industriesByJobType] || [];
         
         let screenIdComment = '';
-        if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-        else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-        else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+        if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+        else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+        else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
 
         return (
             <>
@@ -306,7 +303,13 @@ const EmptyProfileView = () => {
                 <div className="mt-6 flex flex-wrap gap-4 justify-center">
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
-                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                           <Button 
+                                className="bg-accent-orange hover:bg-accent-orange/90 text-white"
+                                onClick={() => {
+                                    setProfileCreationStep(2); // Start from step 2 directly
+                                    setIsDialogOpen(true);
+                                }}
+                            >
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
@@ -339,7 +342,7 @@ const EmptyProfileView = () => {
                                 </Card>
                             </div>
                              <div className="mt-4 text-center">
-                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
+                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); setProfileCreationStep(1)}}>Quay lại</Button>
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -617,12 +620,8 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: string[] } = {
-        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
-    };
-    const visaTypes = Object.keys(visaDetailsOptions);
+    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = visaDetailsByVisaType;
+    const visaTypes = Object.keys(visaDetailsByVisaType);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
@@ -637,7 +636,7 @@ const LoggedInView = () => {
             <h1 className="text-3xl font-bold font-headline">Trang quản lý việc làm</h1>
             <p className="text-muted-foreground mt-1">Quản lý toàn bộ hành trình tìm việc của bạn tại một nơi duy nhất.</p>
         </div>
-        {/* Main Content */}
+         {/* Main Content */}
         <div className="w-full mb-8">
             <Accordion 
                 type="multiple"
@@ -887,7 +886,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.name}>{vd.name}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -1298,3 +1297,5 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
