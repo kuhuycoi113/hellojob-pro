@@ -193,7 +193,7 @@ const renderLevel1Edit = (
                 <Info className="h-4 w-4" />
                 <AlertTitle className="font-bold">Lưu ý quan trọng</AlertTitle>
                 <AlertDescription>
-                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên hệ (Số điện thoại, Zalo, Messenger, Line...) để có thể sử dụng nút "Ứng tuyển" trên các tin tuyển dụng.
+                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên hệ (Số điện thoại, Zalo, Messenger, Line...) để có thể sử dụng nút <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge> trên các tin tuyển dụng.
                 </AlertDescription>
             </Alert>
 
@@ -370,9 +370,9 @@ const renderLevel1Edit = (
                         </div>
                     </div>
                     <div className="mt-4 text-center text-sm">
-                       <div className="text-muted-foreground">
-                        Cung cấp ít nhất một phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
-                       </div>
+                        <div className="text-muted-foreground">
+                            Cung cấp ít nhất một phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -567,3 +567,5 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     );
 }
 
+
+    
