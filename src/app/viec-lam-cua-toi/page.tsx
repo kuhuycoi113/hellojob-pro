@@ -67,7 +67,7 @@ const EmptyProfileView = () => {
     const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
     const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-    const { isLoggedIn } = useAuth();
+    const { isLoggedIn, setRole } = useAuth();
     const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
 
 
@@ -80,7 +80,6 @@ const EmptyProfileView = () => {
         };
     
         if (isLoggedIn) {
-          console.log("Applying preferences for logged in user:", preferences);
           const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
           let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
           
@@ -96,11 +95,12 @@ const EmptyProfileView = () => {
           if (preferences.desiredIndustry) profile.desiredIndustry = preferences.desiredIndustry;
     
           localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+          setRole('candidate');
           setIsDialogOpen(false);
-          router.push('/ho-so-cua-toi?highlight=suggested');
+          router.push('/viec-lam-cua-toi?highlight=suggested');
         } else {
           sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
-          sessionStorage.setItem('postLoginRedirect', '/ho-so-cua-toi?highlight=suggested');
+          sessionStorage.setItem('postLoginRedirect', '/viec-lam-cua-toi?highlight=suggested');
           setIsDialogOpen(false);
           setIsConfirmLoginOpen(true);
         }
@@ -216,10 +216,7 @@ const EmptyProfileView = () => {
     };
 
     const IndustryStepDialog = () => {
-        const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key => 
-            (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === selectedVisaDetail)
-        );
-
+        const parentVisaSlug = selectedVisa?.slug;
         if (!parentVisaSlug) return null;
 
         const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
@@ -1301,4 +1298,3 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-

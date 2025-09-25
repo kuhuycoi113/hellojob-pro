@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -285,7 +286,6 @@ export function Header() {
     };
 
     if (isLoggedIn) {
-      console.log("Applying preferences for logged in user:", preferences);
       const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
       let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
       
@@ -301,6 +301,7 @@ export function Header() {
       if (preferences.desiredIndustry) profile.desiredIndustry = preferences.desiredIndustry;
 
       localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+      setRole('candidate');
       setIsDialogOpen(false);
       router.push('/viec-lam-cua-toi?highlight=suggested');
     } else {
@@ -392,7 +393,7 @@ export function Header() {
             <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
         </Button>
         <Button 
-            onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }} 
+            onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }}
             variant="outline" 
             className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
@@ -436,9 +437,7 @@ export function Header() {
   };
 
   const IndustryStepDialog = () => {
-    const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key => 
-        (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === selectedVisaDetail)
-    );
+    const parentVisaSlug = selectedVisa?.slug;
 
     if (!parentVisaSlug) return null;
 
@@ -830,4 +829,3 @@ const LoggedOutContent = () => {
     </>
   );
 }
-
