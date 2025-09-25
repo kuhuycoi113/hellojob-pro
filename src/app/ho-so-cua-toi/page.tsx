@@ -1212,6 +1212,17 @@ export default function CandidateProfilePage() {
 
   const MainEditDialog = ({ children }: { children: React.ReactNode }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    
+    // Wrapper for handleTempChange to work with the unified dialog
+    const handleMainDialogTempChange = (
+      section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
+      ...args: any[]
+    ) => {
+        // This function will be passed down to the actual edit dialogs
+        // which will then call the state update logic within this scope.
+        // For the purpose of this trigger, it doesn't need to do anything itself.
+    };
+
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
@@ -1257,7 +1268,7 @@ export default function CandidateProfilePage() {
                         >
                             <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-blue">
                                 <h4 className="font-bold text-accent-blue">Nguyện vọng</h4>
-                                <Target className="h-12 w-12 text-gray-300 mx-auto my-2" />
+                                 <Target className="h-12 w-12 text-gray-300 mx-auto my-2" />
                                 <p className="text-sm text-muted-foreground">(Lương, địa điểm...)</p>
                             </Card>
                         </EditDialog>
@@ -1546,7 +1557,7 @@ export default function CandidateProfilePage() {
                     {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
                 </div>
                  {hasMissingFields && !candidate.personalInfo.phone && !candidate.personalInfo.zalo && !candidate.personalInfo.messenger && !candidate.personalInfo.line && (
-                     <p className="mt-4 text-center text-sm text-muted-foreground">Cung cấp ít nhất một phương thức để <Badge className="bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge></p>
+                     <div className="mt-4 text-center text-sm text-muted-foreground">Cung cấp ít nhất một phương thức để <Badge className="bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge></div>
                 )}
             </CardContent>
         </Card>
@@ -1913,4 +1924,3 @@ export default function CandidateProfilePage() {
   );
 }
 
-    
