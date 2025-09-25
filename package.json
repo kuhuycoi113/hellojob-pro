@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npx next dev --turbopack -p 9002",
+    "dev": "npx next dev --turbopack",
     "build": "next build",
     "start": "next start -p 9994",
     "lint": "next lint",
@@ -69,4 +69,3 @@
     "typescript": "^5"
   }
 }
-
