@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -43,7 +42,9 @@ export function MobileSecondaryHeader() {
       setLastScrollY(window.scrollY);
     };
 
+    window.removeEventListener('scroll', controlNavbar);
     window.addEventListener('scroll', controlNavbar);
+
     return () => window.removeEventListener('scroll', controlNavbar);
   }, [isClient, isMobile, lastScrollY]);
 
@@ -80,15 +81,13 @@ export function MobileSecondaryHeader() {
                         "flex items-center justify-center text-sm text-muted-foreground hover:text-primary transition-colors flex-shrink-0 w-auto px-4 py-2 rounded-md",
                         isActive ? 'text-primary font-bold bg-primary/10' : ''
                     )}>
-                    {Icon ? (
+                    {Icon && isAiProfile ? (
                         <div className="flex items-center gap-2">
                             <Icon className={cn("h-4 w-4", isAiProfile && "text-accent-orange")} />
                             <span className="text-center leading-tight">{label}</span>
                         </div>
                     ) : (
-                       
                         <span className="text-center leading-tight">{label}</span>
-                       
                     )}
                     </Link>
                 )
