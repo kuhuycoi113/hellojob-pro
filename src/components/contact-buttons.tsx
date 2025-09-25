@@ -23,10 +23,10 @@ type ContactPerson = {
 interface ContactButtonsProps {
     contact: ContactPerson;
     job?: Job; // Make job optional
-    showChatText?: boolean; // New prop to control text visibility
+    variant?: 'default' | 'compact';
 }
 
-export function ContactButtons({ contact, job, showChatText = false }: ContactButtonsProps) {
+export function ContactButtons({ contact, job, variant = 'default' }: ContactButtonsProps) {
   const { openChat } = useChat();
   const [isClient, setIsClient] = useState(false);
 
@@ -56,16 +56,18 @@ export function ContactButtons({ contact, job, showChatText = false }: ContactBu
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-1">
              <Button
-                size={showChatText ? 'sm' : 'icon'}
+                size={variant === 'default' ? 'sm' : 'icon'}
                 variant="default"
                 className={cn(
                     'h-8 hover:bg-primary/90',
-                    showChatText ? 'w-auto px-3' : 'w-8'
+                    variant === 'default' ? 'w-auto px-3' : 'w-8'
                 )}
                 onClick={handleChatClick}
             >
                 <MessageSquare className="h-4 w-4"/>
-                {showChatText && <span className="ml-2">Chat với Tư vấn viên</span>}
+                 <span className={cn('ml-2', variant === 'compact' ? 'hidden' : 'md:inline')}>
+                  {variant === 'compact' ? 'Chat' : 'Chat với Tư vấn viên'}
+                </span>
             </Button>
             <Button asChild variant="outline" size="icon" className="h-8 w-8 border-purple-500 text-purple-500 hover:bg-purple-50 hover:text-purple-600">
                 <Link href="https://m.me/your_user_id" target="_blank" onClick={handleLinkClick}>
@@ -132,5 +134,3 @@ export function ContactButtons({ contact, job, showChatText = false }: ContactBu
     </>
   );
 }
-
-  

@@ -133,7 +133,7 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 };
 
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean }) => {
+export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean }) => {
   const { isLoggedIn, setPostLoginAction } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -221,15 +221,15 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         if (profileRaw) {
             const profile: CandidateProfile = JSON.parse(profileRaw);
             if (validateProfileForApplication(profile)) {
-                const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-                appliedJobs.push(job.id);
-                localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
-                setHasApplied(true);
-                toast({
-                    title: 'Ứng tuyển thành công!',
-                    description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
-                    className: 'bg-green-500 text-white'
-                });
+                 const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+                 appliedJobs.push(job.id);
+                 localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
+                 setHasApplied(true);
+                 toast({
+                     title: 'Ứng tuyển thành công!',
+                     description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
+                     className: 'bg-green-500 text-white'
+                 });
             } else {
                 setIsProfileIncompleteAlertOpen(true);
             }
@@ -260,55 +260,52 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
   
-  const getFeeDisplayInfo = () => {
-      const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
-      const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
-      const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
-      let feeValue: string | undefined;
-      
-      if (netFee) feeValue = netFee;
-      else if (netFeeNoTicket) feeValue = netFeeNoTicket;
-      else if (netFeeWithTuition) feeValue = netFeeWithTuition;
+    const getFeeDisplayInfo = () => {
+        const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
+        const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
+        const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
+        let feeValue: string | undefined;
 
-      if (!feeValue) {
-          return { shouldShow: isControlled, text: `Phí: Không rõ` };
-      }
+        if (netFee) feeValue = netFee;
+        else if (netFeeNoTicket) feeValue = netFeeNoTicket;
+        else if (netFeeWithTuition) feeValue = netFeeWithTuition;
 
-      const numericFee = parseInt(feeValue);
-      if (isControlled && numericFee > feeLimit) {
-          return { shouldShow: true, text: `Phí: Không rõ` };
-      }
+        if (!feeValue) {
+            return { shouldShow: isControlled, text: `Phí: Không rõ` };
+        }
 
-      if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
-          const vndValue = numericFee * USD_VND_RATE;
-          const valueInMillions = vndValue / 1000000;
-          let formattedVnd: string;
-          // Apply rounding only on search page
-          if (isSearchPage && valueInMillions % 1 === 0) {
-              formattedVnd = valueInMillions.toLocaleString('vi-VN');
-          } else {
-              formattedVnd = valueInMillions.toLocaleString('vi-VN', {
-                  minimumFractionDigits: 1,
-                  maximumFractionDigits: 1
-              });
-          }
-          return { shouldShow: true, text: `Phí: ${formattedVnd.replace('.',',')}tr` };
-      }
-      
-      const visasForUsd = ['Đặc định đầu Việt'];
-      if (visaDetail && visasForUsd.includes(visaDetail)) {
-         return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
-      }
-
-      // Default fallback for other controlled visas or if logic doesn't match
-      return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
-  };
+        const numericFee = parseInt(feeValue);
+        if (isControlled && numericFee > feeLimit) {
+            return { shouldShow: true, text: `Phí: Không rõ` };
+        }
+        
+        if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
+            const vndValue = numericFee * USD_VND_RATE;
+            const valueInMillions = vndValue / 1000000;
+            let formattedVnd: string;
+            if (isSearchPage && valueInMillions % 1 === 0) {
+                formattedVnd = valueInMillions.toLocaleString('vi-VN');
+            } else {
+                formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1
+                });
+            }
+            return { shouldShow: true, text: `Phí: ${formattedVnd.replace('.',',')}tr` };
+        }
+        
+        const visasForUsd = ['Đặc định đầu Việt'];
+        if (visaDetail && visasForUsd.includes(visaDetail)) {
+           return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
+        }
+        return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
+    };
 
 
   const feeInfo = getFeeDisplayInfo();
   const feeFilterIsActive = !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket);
 
-  if (variant === 'list-item') {
+  if (variant === 'list-item' || variant === 'list-item-compact') {
      return (
         <>
             <div id="HIENTHIVIEC01" className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground" onClick={handleCardClick}>
@@ -320,7 +317,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                             <span>{job.id}</span>
                             </div>
-                            {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white md:hidden" onClick={handleSaveJob}>
+                            {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
                                 <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                             </Button>}
                         </div>
@@ -392,13 +389,15 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             </div>
                                         </PopoverContent>
                                     </Popover>
-                                    <ContactButtons contact={job.recruiter as any} job={job} showChatText={true} />
+                                    <ContactButtons contact={job.recruiter as any} job={job} variant={variant === 'list-item-compact' ? 'compact' : 'default'} />
                                 </div>
                                 {isClient && <div className="flex items-center gap-2">
+                                    {variant !== 'list-item-compact' &&
                                     <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                                         <Bookmark className={cn("mr-2 h-5 w-5", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                                         Lưu
                                     </Button>
+                                    }
                                     {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                                 </div>}
                             </div>

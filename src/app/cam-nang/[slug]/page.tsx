@@ -263,7 +263,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
                 </h2>
                 <div className="space-y-4">
                     {hotJobs.map(job => (
-                        <JobCard key={job.id} job={job} variant="list-item" showApplyButtons={true} showPostedTime={true} />
+                        <JobCard key={job.id} job={job} variant="list-item-compact" showApplyButtons={true} showPostedTime={true} />
                     ))}
                 </div>
             </section>
