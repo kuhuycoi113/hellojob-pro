@@ -55,6 +55,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { EditProfileDialog } from '@/components/candidate-edit-dialog';
 import { validateProfileForApplication } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 
 type MediaItem = {
@@ -504,9 +505,18 @@ const DocumentGrid = ({
     handleMediaChange: (type: 'document', e: React.ChangeEvent<HTMLInputElement>, index: number, docType: 'vietnam' | 'japan' | 'other') => void;
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const ITEMS_PER_ROW = 4; // Based on md:grid-cols-4
-    const COLLAPSED_ROWS = 2;
-    const collapsedItemCount = ITEMS_PER_ROW * COLLAPSED_ROWS;
+    const isMobile = useIsMobile();
+    
+    // grid-cols-2 sm:grid-cols-3 md:grid-cols-4
+    const ITEMS_PER_ROW_MOBILE = 2;
+    const COLLAPSED_ROWS_MOBILE = 3;
+
+    const ITEMS_PER_ROW_DESKTOP = 4;
+    const COLLAPSED_ROWS_DESKTOP = 2;
+
+    const collapsedItemCount = isMobile 
+        ? ITEMS_PER_ROW_MOBILE * COLLAPSED_ROWS_MOBILE 
+        : ITEMS_PER_ROW_DESKTOP * COLLAPSED_ROWS_DESKTOP;
 
     const visibleDocuments = isExpanded ? documents : documents.slice(0, collapsedItemCount);
 
