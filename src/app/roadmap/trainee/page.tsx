@@ -1,5 +1,3 @@
-
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileSignature, School, Plane, UserCheck, CheckCircle, TrendingUp, User, Briefcase, Calendar, Map, DollarSign, ChevronRight, Sparkles } from 'lucide-react';
 import React from 'react';
@@ -201,12 +199,12 @@ export default function TraineeRoadmapPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                  {featuredJobs.map(job => (
-                    <JobCard key={job.id} job={job} variant="grid-item"/>
+                    <JobCard key={job.id} job={job} variant="grid-item" showApplyButtons={true} />
                  ))}
             </div>
             <div className="text-center mt-12">
                 <Button asChild size="lg">
-                    <Link href="/jobs">Xem tất cả việc làm Thực tập sinh <ChevronRight /></Link>
+                    <Link href="/viec-lam">Xem tất cả việc làm Thực tập sinh <ChevronRight /></Link>
                 </Button>
             </div>
         </div>
@@ -221,10 +219,10 @@ export default function TraineeRoadmapPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                  <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                    <Link href="/ai-profile">Tạo hồ sơ bằng AI <Sparkles/></Link>
+                    <Link href="/tao-ho-so-ai">Tạo hồ sơ bằng AI <Sparkles/></Link>
                 </Button>
                 <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
-                    <Link href="/jobs">Tìm việc làm TTS <Briefcase/></Link>
+                    <Link href="/viec-lam">Tìm việc làm TTS <Briefcase/></Link>
                 </Button>
             </div>
         </div>

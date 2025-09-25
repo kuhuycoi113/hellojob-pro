@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -237,7 +236,7 @@ const ConsultantJobCard = ({ job, showRecruiterName = true, showPostedTime = fal
   )
 }
 
-export default function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+export default function ArticlePage({ params }: { params: { slug: string } }) {
   const [activeId, setActiveId] = useState('');
   
   const resolvedParams = use(params);
