@@ -1546,7 +1546,7 @@ export default function CandidateProfilePage() {
                     {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
                 </div>
                  <div className="mt-4 text-center text-sm text-muted-foreground">
-                    Cung cấp ít nhất một phương thức để <Badge className="bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                    Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
                 </div>
             </CardContent>
         </Card>
@@ -1623,9 +1623,9 @@ export default function CandidateProfilePage() {
                <div className="bg-gradient-to-tr from-primary to-accent h-32" />
                  <div className="p-6 flex flex-col md:flex-row items-center md:items-end -mt-16">
                  <div className="relative group">
-                     <Avatar id="PROFILEAVATAR02" className="h-32 w-32 border-4 border-background bg-background shadow-lg">
+                     <Avatar id="PROFILEAVATAR01" className="h-32 w-32 border-4 border-background bg-background shadow-lg">
                       <AvatarImage id="PROFILEAVATAR03" src={candidate.avatarUrl || undefined} alt={candidate.name} data-ai-hint="professional headshot" className="object-cover" />
-                      <AvatarFallback id="PROFILEAVATAR01">{candidate.name?.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{candidate.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <Label htmlFor="avatar-upload" className="absolute bottom-1 right-1 cursor-pointer bg-black/50 text-white p-2 rounded-full group-hover:bg-black/70 transition-colors">
                         <Camera className="h-5 w-5" />
@@ -1970,4 +1970,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-
