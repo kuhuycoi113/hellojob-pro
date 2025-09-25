@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -194,9 +193,7 @@ const renderLevel1Edit = (
                 <Info className="h-4 w-4" />
                 <AlertTitle className="font-bold">Lưu ý quan trọng</AlertTitle>
                 <AlertDescription>
-                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên lạc (Zalo, SĐT...) để có thể sử dụng nút
-                    <Badge className="mx-1 bg-accent-orange text-white align-middle">Ứng tuyển</Badge> 
-                    trên các tin tuyển dụng.
+                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên hệ (Số điện thoại, Zalo, Messenger, Line...) để có thể sử dụng nút "Ứng tuyển" trên các tin tuyển dụng.
                 </AlertDescription>
             </Alert>
 
