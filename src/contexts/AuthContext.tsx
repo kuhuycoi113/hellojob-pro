@@ -41,7 +41,7 @@ interface AuthProviderProps {
 
 // A complete profile for the new role
 const fullCandidateProfile: CandidateProfile = {
-    name: 'Lê Thị An (Full Profile)',
+    name: 'Lê Thị An',
     headline: 'Kỹ sư Cơ khí với 2 năm kinh nghiệm',
     location: 'TP. Hồ Chí Minh, Việt Nam',
     about: 'Là một kỹ sư cơ khí năng động và ham học hỏi với 2 năm kinh nghiệm trong lĩnh vực thiết kế và vận hành máy móc công nghiệp. Có khả năng sử dụng thành thạo AutoCAD, SolidWorks và có kiến thức nền tảng về hệ thống CNC. Mong muốn tìm kiếm một cơ hội làm việc tại Nhật Bản để phát triển kỹ năng chuyên môn và đóng góp vào sự thành công của công ty.',
@@ -174,3 +174,5 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+    
