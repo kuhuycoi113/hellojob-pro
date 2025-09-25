@@ -121,10 +121,11 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
     const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
     const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
     const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-    const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
     const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
     const { isLoggedIn } = useAuth();
+    const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
+
 
     const handleCreateProfileRedirect = () => {
         const preferences = {
@@ -135,6 +136,7 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
         };
     
         if (isLoggedIn) {
+          console.log("Applying preferences for logged in user:", preferences);
           const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
           let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
           
@@ -322,7 +324,7 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel>Từ chối</AlertDialogCancel>
+                    <AlertDialogCancel>Để sau</AlertDialogCancel>
                     <AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -794,11 +796,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     <AlertDialogHeader>
                         <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
                         <AlertDialogDescription>
-                            <p>Để có thể ứng tuyển, bạn cần cập nhật các thông tin sau:</p>
-                            <ul className="list-disc pl-5 mt-2 text-destructive font-medium">
-                                {missingProfileFields.map(field => <li key={field}>{field}</li>)}
-                            </ul>
-                            <p className="mt-2">Bạn có muốn cập nhật hồ sơ ngay bây giờ không?</p>
+                            Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -817,6 +815,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         className: 'bg-green-500 text-white'
                     });
                 }}
+                source="application"
             />
         </div>
     );

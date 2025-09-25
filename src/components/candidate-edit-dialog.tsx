@@ -22,6 +22,16 @@ import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 
 type EnrichedCandidateProfile = CandidateProfile & { avatarUrl?: string };
@@ -30,6 +40,7 @@ interface EditProfileDialogProps {
     isOpen: boolean;
     onOpenChange: (isOpen: boolean) => void;
     onSaveSuccess: () => void;
+    source?: 'application' | 'profile';
 }
 
 const parseMessengerInput = (input: string): string => {
@@ -380,7 +391,7 @@ const renderLevel1Edit = (
     );
 };
 
-export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditProfileDialogProps) {
+export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source = 'profile' }: EditProfileDialogProps) {
     const { toast } = useToast();
     const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile | null>(null);
     const [phoneCountry, setPhoneCountry] = useState('+84');
@@ -389,6 +400,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     const [qrImagePreview, setQrImagePreview] = useState<string | null>(null);
     const isMobile = useIsMobile();
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+    const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -424,6 +436,19 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
             onSaveSuccess();
             onOpenChange(false);
         }
+    };
+    
+    const handleCancel = () => {
+        if (source === 'application') {
+            setIsConfirmCancelOpen(true);
+        } else {
+            onOpenChange(false);
+        }
+    };
+
+    const handleConfirmCancel = () => {
+        setIsConfirmCancelOpen(false);
+        onOpenChange(false);
     };
 
     const handleTempChange = (
@@ -504,16 +529,29 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                         )}
                     </div>
                     <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">Hủy</Button>
-                        </DialogClose>
+                        <Button variant="outline" onClick={handleCancel}>Hủy</Button>
                         <Button type="button" onClick={handleSave} className="bg-primary text-white">
                             Lưu thay đổi
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
+            <AlertDialog open={isConfirmCancelOpen} onOpenChange={setIsConfirmCancelOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Xác nhận hủy</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Hồ sơ của bạn vẫn cần thêm thông tin để có thể ứng tuyển. Bạn có muốn dừng việc cập nhật lúc này không?
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Ở lại</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmCancel}>
+                        Vẫn Hủy
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
                 <DialogContent className="sm:max-w-xl">
                     <DialogHeader>
@@ -566,6 +604,3 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </>
     );
 }
-
-
-    
