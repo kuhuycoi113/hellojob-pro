@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -1519,7 +1517,7 @@ export default function CandidateProfilePage() {
       </CardContent>
       <CardContent>
         <div className="space-y-2">
-            {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Phone className="mr-2"/>{formatPhoneNumber(candidate.personalInfo.phone)}</Link></Button>}
+            {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(candidate.personalInfo.phone)}</Link></Button>}
             {candidate.personalInfo.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${candidate.personalInfo.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.messenger}</Link></Button>}
             {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(candidate.personalInfo.zalo)}</Link></Button>}
             {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
