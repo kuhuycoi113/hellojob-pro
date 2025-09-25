@@ -77,8 +77,25 @@ const parseZaloInput = (input: string): string => {
 
 const parseLineInput = (input: string): string => {
     if (!input) return '';
-    return input.trim();
+    const trimmedInput = input.trim();
+    try {
+        // Handle URLs like https://line.me/ti/p/~[LINE_ID]
+        if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
+            const url = new URL(trimmedInput);
+            const pathParts = url.pathname.split('/');
+            const lastPart = pathParts[pathParts.length - 1];
+            if (lastPart) {
+                // Remove the '~' character if it exists
+                return lastPart.startsWith('~') ? lastPart.substring(1) : lastPart;
+            }
+        }
+    } catch (error) {
+         console.warn("Could not parse Line input as URL, treating as ID:", error);
+    }
+    // Fallback for direct ID or other formats
+    return trimmedInput.split('/').pop()?.replace('~', '') || trimmedInput;
 };
+
 
 const formatPhoneNumberInput = (value: string, country: string): string => {
     if (!value) return '';
@@ -344,7 +361,8 @@ const renderLevel1Edit = (
                             <LineIcon />
                             Line (Link hồ sơ)
                         </Label>
-                        <Input id="line" placeholder="Dán link Line của bạn vào đây" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
+                        <Input id="line" placeholder="Dán link Line hoặc nhập ID của bạn" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
+                        <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
                     </div>
                 </div>
             </div>
@@ -539,4 +557,3 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     );
 }
 
-    
