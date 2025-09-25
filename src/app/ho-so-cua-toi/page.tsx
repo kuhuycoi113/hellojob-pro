@@ -318,15 +318,19 @@ const parseLineInput = (input: string): string => {
       if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
           const url = new URL(trimmedInput);
           const pathParts = url.pathname.split('/');
-          const lastPart = pathParts[pathParts.length - 1];
+          const lastPart = pathParts.pop(); // Get the last part of the path
           if (lastPart) {
-              return lastPart.startsWith('~') ? lastPart.substring(1) : lastPart;
+              // Extract the ID from /R/ti/p/@id or /ti/p/~id
+              const match = lastPart.match(/([@~]?\w+)/);
+              if (match && match[1]) return match[1].replace('~', '').replace('@', '');
+              return lastPart;
           }
       }
   } catch (error) {
        console.warn("Could not parse Line input as URL, treating as ID:", error);
   }
-  return trimmedInput.split('/').pop()?.replace('~', '') || trimmedInput;
+  // Fallback to treat the whole input as an ID, removing potential URL parts
+  return trimmedInput.split('/').pop()?.replace('~', '').replace('@', '') || trimmedInput;
 };
 
 
@@ -1530,6 +1534,8 @@ export default function CandidateProfilePage() {
   }
 
   const PersonalInfoCard = () => {
+    const { phone, zalo, messenger, line } = candidate.personalInfo;
+    const hasContactInfo = !!(phone || zalo || messenger || line);
     const missingFields = validateProfileForApplication(candidate);
     const hasMissingFields = missingFields.length > 0;
 
@@ -1552,15 +1558,26 @@ export default function CandidateProfilePage() {
                 <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency || 'Chưa cập nhật'}</p>
             </CardContent>
             <CardContent>
-                <div className="space-y-2">
-                    {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(candidate.personalInfo.phone)}</Link></Button>}
-                    {candidate.personalInfo.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${candidate.personalInfo.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.messenger}</Link></Button>}
-                    {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(candidate.personalInfo.zalo)}</Link></Button>}
-                    {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${candidate.personalInfo.line}`} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
-                </div>
-                 <div className="mt-4 text-center text-sm text-muted-foreground">
-                    Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
-                </div>
+                {hasContactInfo ? (
+                    <div className="space-y-2">
+                        {phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(phone)}</Link></Button>}
+                        {messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{messenger}</Link></Button>}
+                        {zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(zalo)}</Link></Button>}
+                        {line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${line}`} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{line}</Link></Button>}
+                    </div>
+                ) : (
+                    <div className="text-center">
+                        <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
+                            <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
+                            <ZaloIcon className="h-6 w-6" />
+                            <MessengerIcon className="h-6 w-6" />
+                            <LineIcon className="h-6 w-6" />
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                            Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                        </div>
+                    </div>
+                )}
             </CardContent>
         </Card>
     )
@@ -1983,4 +2000,5 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
 
