@@ -60,13 +60,13 @@ export function ContactButtons({ contact, job, variant = 'default' }: ContactBut
                 variant="default"
                 className={cn(
                     'h-8 hover:bg-primary/90',
-                    variant === 'default' ? 'w-auto px-3' : 'w-8'
+                    variant === 'compact' ? 'w-8' : 'w-auto px-3'
                 )}
                 onClick={handleChatClick}
             >
                 <MessageSquare className="h-4 w-4"/>
-                 <span className={cn('ml-2', variant === 'compact' ? 'hidden' : 'md:inline')}>
-                  {variant === 'compact' ? 'Chat' : 'Chat với Tư vấn viên'}
+                 <span className={cn('ml-2', variant === 'compact' ? 'hidden' : 'inline')}>
+                  Chat với Tư vấn viên
                 </span>
             </Button>
             <Button asChild variant="outline" size="icon" className="h-8 w-8 border-purple-500 text-purple-500 hover:bg-purple-50 hover:text-purple-600">

@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -264,17 +263,17 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
         const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
         const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
-        let feeValue: string | undefined;
+        let determinedFeeValue: string | undefined;
 
-        if (netFee) feeValue = netFee;
-        else if (netFeeNoTicket) feeValue = netFeeNoTicket;
-        else if (netFeeWithTuition) feeValue = netFeeWithTuition;
+        if (netFee) determinedFeeValue = netFee;
+        else if (netFeeNoTicket) determinedFeeValue = netFeeNoTicket;
+        else if (netFeeWithTuition) determinedFeeValue = netFeeWithTuition;
 
-        if (!feeValue) {
+        if (!determinedFeeValue) {
             return { shouldShow: isControlled, text: `Phí: Không rõ` };
         }
 
-        const numericFee = parseInt(feeValue);
+        const numericFee = parseInt(determinedFeeValue);
         if (isControlled && numericFee > feeLimit) {
             return { shouldShow: true, text: `Phí: Không rõ` };
         }
@@ -296,9 +295,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         
         const visasForUsd = ['Đặc định đầu Việt'];
         if (visaDetail && visasForUsd.includes(visaDetail)) {
-           return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
+           return { shouldShow: true, text: `Phí: $${formatCurrency(String(determinedFeeValue))}` };
         }
-        return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
+        return { shouldShow: true, text: `Phí: $${formatCurrency(String(determinedFeeValue))}` };
     };
 
 
@@ -317,7 +316,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                             <span>{job.id}</span>
                             </div>
-                            {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
+                            {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white md:hidden" onClick={handleSaveJob}>
                                 <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                             </Button>}
                         </div>
@@ -559,7 +558,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                         <AvatarFallback>{job.recruiter.name.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                 </Link>
-                                <ContactButtons contact={job.recruiter as any} job={job} />
+                                <ContactButtons contact={job.recruiter as any} job={job} variant="compact" />
                             </div>
                             {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                         </div>
