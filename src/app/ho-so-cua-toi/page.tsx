@@ -1886,11 +1886,11 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                   <CardContent>
-                    <Tabs defaultValue="vietnam" className="w-full">
+                    <Tabs defaultValue="japan" className="w-full">
                       <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="vietnam">{t.vietnamDocs}</TabsTrigger>
-                        <TabsTrigger value="japan">{t.japanDocs}</TabsTrigger>
-                        <TabsTrigger value="other">{t.otherDocs}</TabsTrigger>
+                        <TabsTrigger value="vietnam" className="doc-tab-vn">{t.vietnamDocs}</TabsTrigger>
+                        <TabsTrigger value="japan" className="doc-tab-jp">{t.japanDocs}</TabsTrigger>
+                        <TabsTrigger value="other" className="doc-tab-other">{t.otherDocs}</TabsTrigger>
                       </TabsList>
                       <TabsContent value="vietnam" className="pt-4">
                         {candidate.documents?.vietnam?.length ? (
