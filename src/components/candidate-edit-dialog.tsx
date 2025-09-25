@@ -554,7 +554,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
             </Dialog>
 
              <AlertDialog open={isConfirmCancelOpen} onOpenChange={setIsConfirmCancelOpen}>
-                <AlertDialogContent>
+                <AlertDialogContent id="UNGTUYEN-L02-HUY01">
                     <AlertDialogHeader>
                     <AlertDialogTitle>Bạn chắc chắn muốn hủy?</AlertDialogTitle>
                     <AlertDialogDescription>

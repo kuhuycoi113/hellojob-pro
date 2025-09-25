@@ -179,29 +179,31 @@ const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.
     
     const FirstStepDialog = () => (
         <>
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
-                <DialogDescription className="text-center">
-                    Bạn muốn tạo hồ sơ để làm gì?
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                    <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
-                    <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
-                </Card>
-                 <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                    <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
-                    <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
-                </Card>
-            </div>
+        {/* Screen: THSN001 */}
+        <DialogHeader>
+            <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
+            <DialogDescription className="text-center">
+                Bạn muốn tạo hồ sơ để làm gì?
+            </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+            <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
+                <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
+            </Card>
+             <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
+                <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
+            </Card>
+        </div>
         </>
     );
 
     const QuickCreateStepDialog = () => (
         <>
+            {/* Screen: THSN002 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
                 <DialogDescription className="text-center">
@@ -352,9 +354,10 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
     const [missingProfileFields, setMissingProfileFields] = useState<string[]>([]);
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
+    const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
-    const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
+
     const appliedFilters: Partial<SearchFilters> = {};
 
 
@@ -424,6 +427,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             savedJobs.push(job.id);
             localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
             setIsSaved(true);
+            logInteraction(job, 'save'); // CANHANHOA01: Log save interaction
         }
         window.dispatchEvent(new Event('storage'));
     };
@@ -819,10 +823,23 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 }}
                 source="application"
                 onCancel={() => {
-                    setIsProfileEditDialogOpen(false);
-                    // Optionally open another dialog here to confirm cancellation if needed
+                    setIsConfirmCancelOpen(true);
                 }}
             />
+            <AlertDialog open={isConfirmCancelOpen} onOpenChange={setIsConfirmCancelOpen}>
+                <AlertDialogContent id="UNGTUYEN-L02-HUY01">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Bạn chắc chắn muốn hủy?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Hồ sơ của bạn vẫn cần thêm thông tin để có thể ứng tuyển. Bạn có muốn dừng việc cập nhật lúc này không?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Ở lại</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => { setIsConfirmCancelOpen(false); setIsProfileEditDialogOpen(false); }}>Vẫn hủy</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
