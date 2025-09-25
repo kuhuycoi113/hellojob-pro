@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat, ChevronRight } from 'lucide-react';
+import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat, ChevronRight, Search, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { useState, useEffect } from 'react';
@@ -32,7 +32,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose
+  DialogClose,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -50,25 +51,185 @@ import Image from 'next/image';
 import { useChat } from '@/contexts/ChatContext';
 import { mainNavLinks, quickAccessLinks, mobileFooterLinks } from '@/lib/nav-data';
 import { useAuth, type Role } from '@/contexts/AuthContext';
-import { Industry, industriesByJobType } from '@/lib/industry-data';
+import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { AuthDialog } from './auth-dialog';
-import { locations } from '@/lib/location-data';
+import { locations, allJapanLocations, japanRegions } from '@/lib/location-data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileSecondaryHeader } from './mobile-secondary-header';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from './ui/select';
 import { Label } from './ui/label';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { Input } from './ui/input';
+import type { SearchFilters } from './job-search/search-results';
+import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 
 
 export const Logo = ({ className }: { className?: string }) => (
     <Image src="/img/HJPNG.png" alt="HelloJob Logo" width={120} height={40} className={cn("h-10 w-auto", className)} priority />
 );
 
+const SearchDialog = () => {
+    const router = useRouter();
+    const [filters, setFilters] = useState<Partial<SearchFilters>>({
+        q: '',
+        visaDetail: '',
+        industry: '',
+        location: [],
+    });
+    const [isSearching, setIsSearching] = useState(false);
+    const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
+    const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
+
+    const handleFilterChange = (field: keyof typeof filters, value: any) => {
+        setFilters(prev => ({...prev, [field]: value}));
+    };
+
+    const handleVisaDetailChange = (value: string) => {
+        const newFilters: Partial<SearchFilters> = { visaDetail: value === 'all' ? '' : value };
+        
+        const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
+        if (parentType && filters.visa !== parentType) {
+            newFilters.visa = parentType;
+            newFilters.industry = ''; // Reset industry
+            const industries = industriesByJobType[parentType as keyof typeof industriesByJobType] || [];
+            const uniqueIndustries = Array.from(new Map(industries.map(item => [item.slug, item])).values());
+            setAvailableIndustries(uniqueIndustries);
+        } else if (!value || value === 'all') {
+            newFilters.visa = '';
+            setAvailableIndustries(allIndustries);
+        }
+        setFilters(prev => ({ ...prev, ...newFilters }));
+    };
+    
+    const handleSearch = async () => {
+        setIsSearching(true);
+        const query = new URLSearchParams();
+        
+        let finalFilters: Partial<SearchFilters> = { ...filters };
+
+        if (filters.q) {
+            try {
+                const criteria = await recommendJobs(filters.q);
+                if (criteria) {
+                    finalFilters.industry = allIndustries.find(i => i.name === criteria.industry)?.slug || finalFilters.industry;
+                    finalFilters.location = allJapanLocations.find(l => l.name === criteria.workLocation)?.slug ? [allJapanLocations.find(l => l.name === criteria.workLocation)!.slug] : finalFilters.location;
+                    finalFilters.visaDetail = Object.values(visaDetailsByVisaType).flat().find(v => v.name === criteria.visaDetail)?.slug || finalFilters.visaDetail;
+                    if(criteria.gender) query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
+                    if(criteria.sortBy) query.set('sap-xep', 'salary_desc');
+                } else {
+                     query.set('q', filters.q);
+                }
+            } catch (error) {
+                console.error("AI search failed, falling back to keyword search:", error);
+                query.set('q', filters.q);
+            }
+        }
+        
+        if (finalFilters.visaDetail && finalFilters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', finalFilters.visaDetail);
+        if (finalFilters.industry && finalFilters.industry !== 'all') query.set('nganh-nghe', finalFilters.industry);
+        if (Array.isArray(finalFilters.location) && finalFilters.location.length > 0) {
+            finalFilters.location.forEach(loc => query.append('dia-diem', loc));
+        }
+        
+        setIsSearchDialogOpen(false);
+        setIsSearching(false);
+        router.push(`/tim-viec-lam?${query.toString()}`);
+    }
+
+    return (
+        <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
+            <DialogTrigger asChild>
+                 <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
+                    <Search className="h-5 w-5" />
+                    <span className="sr-only">Tìm kiếm</span>
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-xl" id="TIMKIEM02">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-2xl">Tìm kiếm việc làm</DialogTitle>
+                    <DialogDescription>
+                        Nhập từ khóa, hoặc sử dụng bộ lọc để tìm cơ hội phù hợp nhất.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input 
+                            placeholder="Nhập chức danh, kỹ năng, hoặc tên công ty..." 
+                            className="pl-10 h-12 text-base"
+                            value={filters.q}
+                            onChange={(e) => handleFilterChange('q', e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                        />
+                    </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                         <div className="space-y-2">
+                            <Label>Chi tiết loại hình visa</Label>
+                            <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail || 'all'}>
+                                <SelectTrigger><SelectValue placeholder="Tất cả loại hình" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Tất cả loại hình</SelectItem>
+                                     {japanJobTypes.map(type => (
+                                        <SelectGroup key={type.slug}>
+                                            <SelectLabel>{type.name}</SelectLabel>
+                                            {(visaDetailsByVisaType[type.slug] || []).map(detail => (
+                                                <SelectItem key={detail.slug} value={detail.slug}>{detail.name}</SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Ngành nghề</Label>
+                            <Select onValueChange={(value) => handleFilterChange('industry', value === 'all' ? '' : value)} value={filters.industry || 'all'}>
+                                <SelectTrigger><SelectValue placeholder="Tất cả ngành nghề"/></SelectTrigger>
+                                <SelectContent>
+                                     <SelectItem value="all">Tất cả ngành nghề</SelectItem>
+                                    {availableIndustries.map((industry) => (
+                                        <SelectItem key={industry.slug} value={industry.slug}>
+                                            {industry.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Địa điểm làm việc</Label>
+                            <Select onValueChange={(value) => handleFilterChange('location', value === 'all' ? [] : [value])} value={Array.isArray(filters.location) ? (filters.location[0] || 'all') : 'all'}>
+                                <SelectTrigger><SelectValue placeholder="Tất cả Nhật Bản"/></SelectTrigger>
+                                 <SelectContent className="max-h-[300px]">
+                                    <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                                    {japanRegions.map((region) => (
+                                        <SelectGroup key={region.slug}>
+                                            <SelectLabel>{region.name}</SelectLabel>
+                                            {region.slug !== 'hokkaido' && region.slug !== 'okinawa' && (
+                                              <SelectItem value={region.slug}>Toàn bộ vùng {region.name}</SelectItem>
+                                            )}
+                                            {region.prefectures.map(p => <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>)}
+                                        </SelectGroup>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button onClick={handleSearch} className="w-full sm:w-auto" disabled={isSearching}>
+                        {isSearching && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Tìm kiếm
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { openChat } = useChat();
-  const { role, setRole, isLoggedIn } = useAuth();
+  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -275,13 +436,18 @@ export function Header() {
   };
 
   const IndustryStepDialog = () => {
-    if (!selectedVisa) return null;
-    const industries = industriesByJobType[selectedVisa.slug] || [];
+    const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key => 
+        (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === selectedVisaDetail)
+    );
+
+    if (!parentVisaSlug) return null;
+
+    const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
     
     let screenIdComment = '';
-    if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-    else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-    else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
 
     return (
         <>
@@ -369,24 +535,15 @@ export function Header() {
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12">
                   <AvatarImage
-                    src="https://placehold.co/100x100.png"
+                    src={avatarUrl || "https://placehold.co/100x100.png"}
                     alt="User"
                     data-ai-hint="user avatar"
                   />
-                  <AvatarFallback>A</AvatarFallback>
+                  <AvatarFallback>{profileName?.charAt(0) || 'A'}</AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col space-y-1">
-                  {role === 'candidate-empty-profile' ? (
-                     <>
-                        <p className="text-base font-medium leading-none">Hoàn thiện hồ sơ</p>
-                        <p className="text-xs leading-none text-muted-foreground">Nhà tuyển dụng đang chờ bạn!</p>
-                     </>
-                  ) : (
-                    <>
-                      <p className="text-base font-medium leading-none">Lê Ngọc Hân</p>
-                      <p className="text-xs leading-none text-muted-foreground">Ứng viên Thực tập sinh</p>
-                    </>
-                  )}
+                <div className="flex flex-col space-y-1 overflow-hidden">
+                  <p className="text-base font-medium leading-none truncate">{profileName || 'Ứng viên'}</p>
+                  <p className="text-xs leading-none text-muted-foreground truncate">{profileHeadline || 'Cập nhật hồ sơ của bạn'}</p>
                 </div>
               </div>
             </Link>
@@ -415,9 +572,14 @@ export function Header() {
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
           value={role}
-          onValueChange={(value) => setRole(value as 'candidate' | 'candidate-empty-profile' | 'guest')}
+          onValueChange={(value) => setRole(value as Role)}
         >
           <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuRadioItem value="candidate-full-profile">
+              Đã đăng nhập (Profile full)
+            </DropdownMenuRadioItem>
+          </DropdownMenuItem>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
             <DropdownMenuRadioItem value="candidate">
               Đã đăng nhập (Có Profile)
@@ -446,6 +608,7 @@ export function Header() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="candidate-full-profile">Đã đăng nhập (Profile full)</SelectItem>
             <SelectItem value="candidate">Đã đăng nhập (Có Profile)</SelectItem>
             <SelectItem value="candidate-empty-profile">Đã đăng nhập (Profile trắng)</SelectItem>
             <SelectItem value="guest">Khách (Chưa đăng nhập)</SelectItem>
@@ -461,14 +624,14 @@ export function Header() {
             <Link href="/ho-so-cua-toi" className="block" >
             <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary hover:bg-accent/20">
                 <Avatar className="h-12 w-12">
-                <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
-                <AvatarFallback>A</AvatarFallback>
+                <AvatarImage src={avatarUrl || "https://placehold.co/100x100.png"} alt="User" data-ai-hint="user avatar" />
+                <AvatarFallback>{profileName?.charAt(0) || 'A'}</AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col space-y-1">
-                <p className="text-base font-medium leading-none">Lê Ngọc Hân</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                    Ứng viên Thực tập sinh
-                </p>
+                <div className="flex flex-col space-y-1 overflow-hidden">
+                    <p className="text-base font-medium leading-none truncate">{profileName || 'Ứng viên'}</p>
+                    <p className="text-xs leading-none text-muted-foreground truncate">
+                        {profileHeadline || 'Cập nhật hồ sơ của bạn'}
+                    </p>
                 </div>
             </div>
             </Link>
@@ -558,11 +721,12 @@ const LoggedOutContent = () => {
                     
                     {isClient && (
                         <>
+                            <SearchDialog />
                             {isLoggedIn ? (
                                 <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
-                                        <AvatarImage src={"https://placehold.co/100x100.png" || undefined} alt="User Avatar" data-ai-hint="user avatar" />
-                                        <AvatarFallback>A</AvatarFallback>
+                                        <AvatarImage src={avatarUrl || undefined} alt="User Avatar" data-ai-hint="user avatar" />
+                                        <AvatarFallback>{profileName?.charAt(0) || 'A'}</AvatarFallback>
                                     </Avatar>
                                 </Link>
                             ): (
@@ -588,6 +752,7 @@ const LoggedOutContent = () => {
                 </div>
                 {isClient && isMobile && (
                     <div className="flex items-center gap-2">
+                        <SearchDialog />
                         {!isLoggedIn && (
                             <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
                         )}
@@ -599,7 +764,7 @@ const LoggedOutContent = () => {
                                 {renderDialogContent()}
                             </DialogContent>
                         </Dialog>
-                        <Button asChild variant="default" size="sm">
+                         <Button asChild variant="default" size="sm">
                             <Link href="/viec-lam-cua-toi">Việc</Link>
                         </Button>
                         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>

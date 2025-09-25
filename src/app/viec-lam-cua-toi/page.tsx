@@ -59,7 +59,7 @@ const EmptyProfileView = () => {
     const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [profileCreationStep, setProfileCreationStep] = useState(1);
-    const [selectedVisaType, setSelectedVisaType] = useState<string | null>(null);
+    const [selectedVisa, setSelectedVisa] = useState<{name: string, slug: string} | null>(null);
     const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
     const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
     const [selectedJob, setSelectedJob] = useState<string | null>(null);
@@ -72,7 +72,7 @@ const EmptyProfileView = () => {
 
     const handleCreateProfileRedirect = () => {
         const preferences = {
-          desiredVisaType: selectedVisaType || undefined,
+          desiredVisaType: selectedVisa?.name || undefined,
           desiredVisaDetail: selectedVisaDetail || undefined,
           desiredIndustry: selectedIndustry?.name || undefined,
           desiredLocation: selectedRegion || undefined,
@@ -154,26 +154,17 @@ const EmptyProfileView = () => {
                 </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-            <Button 
-                onClick={() => { setSelectedVisaType('Thực tập sinh kỹ năng'); setProfileCreationStep(3); }} 
-                variant="outline" 
-                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+            <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                 <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
                 <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
                 <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
             </Button>
-            <Button 
-                onClick={() => { setSelectedVisaType('Kỹ năng đặc định'); setProfileCreationStep(3); }}
-                variant="outline" 
-                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+            <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                 <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                 <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
                 <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
             </Button>
-            <Button 
-                onClick={() => { setSelectedVisaType('Kỹ sư, tri thức'); setProfileCreationStep(3); }}
-                variant="outline" 
-                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+            <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                 <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
                 <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
                 <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
@@ -201,28 +192,22 @@ const EmptyProfileView = () => {
     };
     
     const VisaDetailStepDialog = () => {
-        if (!selectedVisaType) return null;
-        const options = visaDetailsOptions[selectedVisaType];
-        
-        let screenIdComment = '';
-        if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN003-1';
-        else if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN003-2';
-        else if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN003-3';
+        if (!selectedVisa) return null;
+        const options = visaDetailsByVisaType[selectedVisa.slug] || [];
         
         return (
             <>
-            <span className="hidden">{screenIdComment}</span>
             <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisaType}</DialogTitle>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisa.name}</DialogTitle>
                 <DialogDescription className="text-center">
                 Chọn loại hình chi tiết để tiếp tục.
                 </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
                 {options.map(option => (
-                    <Button key={option.label} onClick={() => { setSelectedVisaDetail(option.label); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <h3 className="font-bold text-base mb-1">{option.label}</h3>
-                        <p className="text-muted-foreground text-xs">{option.description}</p>
+                    <Button key={option.name} onClick={() => { setSelectedVisaDetail(option.name); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <h3 className="font-bold text-base mb-1">{option.name}</h3>
+                        <p className="text-muted-foreground text-xs">{option.slug}</p>
                     </Button>
                 ))}
             </div>
@@ -230,15 +215,20 @@ const EmptyProfileView = () => {
             </>
         )
     };
-
+    
     const IndustryStepDialog = () => {
-        if (!selectedVisaType) return null;
-        const industries = industriesByJobType[selectedVisaType as keyof typeof industriesByJobType] || [];
+        const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key => 
+            (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === selectedVisaDetail)
+        );
+
+        if (!parentVisaSlug) return null;
+
+        const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
         
         let screenIdComment = '';
-        if (selectedVisaType === 'Thực tập sinh kỹ năng') screenIdComment = '// Screen: THSN004-1';
-        else if (selectedVisaType === 'Kỹ năng đặc định') screenIdComment = '// Screen: THSN004-2';
-        else if (selectedVisaType === 'Kỹ sư, tri thức') screenIdComment = '// Screen: THSN004-3';
+        if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+        else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+        else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
 
         return (
             <>
@@ -751,7 +741,7 @@ const LoggedInView = () => {
                             <span>Việc đã lưu</span>
                             <Badge>{savedJobs.length}</Badge>
                         </div>
-                    </AccordionTrigger>
+                    </AccordionContent>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                        {savedJobs.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
