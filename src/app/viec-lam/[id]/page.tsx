@@ -411,7 +411,9 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         notFound();
     }
     
-    const handleSaveJob = () => {
+    const handleSaveJob = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
         if (isSaved) {
             const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
@@ -421,7 +423,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             savedJobs.push(job.id);
             localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
             setIsSaved(true);
-            // logInteraction(job, 'save'); // CANHANHOA01: Log save interaction
         }
         window.dispatchEvent(new Event('storage'));
     };
