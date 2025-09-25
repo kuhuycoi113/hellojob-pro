@@ -92,7 +92,7 @@ const fullCandidateProfile: CandidateProfile = {
 
 // A partially filled profile for the 'candidate' role
 const partialCandidateProfile: Partial<CandidateProfile> = {
-    name: 'Lê Thị An',
+    name: 'Lê Ngọc Hân',
     headline: 'Thực tập sinh ngành cơ khí',
     location: 'Hà Nội, Việt Nam',
     about: 'Mong muốn tìm kiếm cơ hội làm việc tại Nhật Bản để học hỏi kinh nghiệm.',
@@ -105,12 +105,20 @@ const partialCandidateProfile: Partial<CandidateProfile> = {
       gender: 'Nữ',
       phone: '0987654321',
       dateOfBirth: '2001-10-10',
-      // Missing height, weight, tattoo, hepatitisB, language proficiency, etc.
+      // Fields below are intentionally left out for testing purposes
+      height: '',
+      weight: '',
+      tattooStatus: '',
+      hepatitisBStatus: '',
+      japaneseProficiency: '',
+      englishProficiency: '',
+      messenger: '',
+      zalo: '',
+      line: '',
     },
     aspirations: {
         desiredLocation: 'Aichi',
         desiredVisaType: 'Thực tập sinh kỹ năng',
-        // Missing desired salary, visa detail etc.
     },
     desiredIndustry: 'Cơ khí, Chế tạo máy',
     skills: ['Làm việc nhóm'],
