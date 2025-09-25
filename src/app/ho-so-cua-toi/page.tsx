@@ -390,10 +390,12 @@ const EditDialog = ({
         } else if (section === 'aspirations' && field === 'specialAspirations') {
             const currentAspirations = newCandidate.aspirations?.specialAspirations || [];
             const [item, checked] = args.slice(1);
+            const aspirationArray = Array.isArray(currentAspirations) ? currentAspirations : [currentAspirations];
+
             if (checked) {
-                newCandidate.aspirations.specialAspirations = [...currentAspirations, item];
+                newCandidate.aspirations.specialAspirations = [...aspirationArray, item];
             } else {
-                newCandidate.aspirations.specialAspirations = currentAspirations.filter((i: string) => i !== item);
+                newCandidate.aspirations.specialAspirations = aspirationArray.filter((i: string) => i !== item);
             }
         } else {
              // @ts-ignore
@@ -1237,13 +1239,13 @@ export default function CandidateProfilePage() {
               </div>
             )}
              <div className="md:col-span-2 space-y-2">
-                <Label>Nguyện vọng đặc biệt</Label>
+              <Label>Nguyện vọng đặc biệt</Label>
                 <div className="p-4 border rounded-md grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">
                     {['Lương tốt', 'Tăng ca', 'Công ty uy tín', 'Hỗ trợ nhà ở', 'Bay nhanh'].map(item => (
                         <div key={item} className="flex items-center space-x-2">
                             <Checkbox 
                                 id={`aspiration-${item}`} 
-                                checked={tempCandidate.aspirations?.specialAspirations?.includes(item)}
+                                checked={Array.isArray(tempCandidate.aspirations?.specialAspirations) && tempCandidate.aspirations.specialAspirations.includes(item)}
                                 onCheckedChange={(checked) => handleTempChange('aspirations', 'specialAspirations', item, checked)}
                             />
                             <Label htmlFor={`aspiration-${item}`} className="text-sm font-normal cursor-pointer">{item}</Label>
@@ -1894,16 +1896,22 @@ export default function CandidateProfilePage() {
                             <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility || notUpdatedText}</p>
                         )}
                         <p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation || notUpdatedText}</p>
-                         <div className="space-y-1">
+                        <div className="space-y-1">
                             <p><strong>{t.specialAspirations}:</strong></p>
-                            {candidate.aspirations?.specialAspirations && candidate.aspirations.specialAspirations.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                {candidate.aspirations.specialAspirations.map(aspiration => (
-                                    <Badge key={aspiration} variant="secondary">{aspiration}</Badge>
-                                ))}
-                                </div>
-                            ) : (
-                                notUpdatedText
+                            {candidate.aspirations?.specialAspirations && (
+                                Array.isArray(candidate.aspirations.specialAspirations) && candidate.aspirations.specialAspirations.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                        {candidate.aspirations.specialAspirations.map(aspiration => (
+                                            <Badge key={aspiration} variant="secondary">{aspiration}</Badge>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    typeof candidate.aspirations.specialAspirations === 'string' && candidate.aspirations.specialAspirations ? (
+                                        <p className="text-muted-foreground">{candidate.aspirations.specialAspirations}</p>
+                                    ) : (
+                                        notUpdatedText
+                                    )
+                                )
                             )}
                         </div>
                   </CardContent>
@@ -2039,9 +2047,4 @@ export default function CandidateProfilePage() {
 }
 
 
-
-
-
-
-
-
+  

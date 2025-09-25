@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -485,7 +486,18 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                     newCandidate[section] = { ...newCandidate[section]!, [field]: parseZaloInput(value) };
                 } else if (section === 'personalInfo' && field === 'line') {
                      newCandidate[section] = { ...newCandidate[section]!, [field]: parseLineInput(value) };
+                } else if (section === 'aspirations' && field === 'specialAspirations') {
+                    const currentAspirations = newCandidate.aspirations?.specialAspirations || [];
+                    const [item, checked] = args.slice(1);
+                    const aspirationArray = Array.isArray(currentAspirations) ? currentAspirations : (typeof currentAspirations === 'string' && currentAspirations ? currentAspirations.split(',').map(s => s.trim()) : []);
+
+                    if (checked) {
+                        newCandidate.aspirations.specialAspirations = [...aspirationArray, item];
+                    } else {
+                        newCandidate.aspirations.specialAspirations = aspirationArray.filter((i: string) => i !== item);
+                    }
                 } else {
+                     // @ts-ignore
                      newCandidate[section] = { ...newCandidate[section], [field]: value };
                 }
             } else {
@@ -635,3 +647,5 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
         </>
     );
 }
+
+  
