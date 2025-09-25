@@ -507,17 +507,15 @@ const DocumentGrid = ({
     const [isExpanded, setIsExpanded] = useState(false);
     const isMobile = useIsMobile();
     
-    // grid-cols-2 sm:grid-cols-3 md:grid-cols-4
-    const ITEMS_PER_ROW_MOBILE = 2;
     const COLLAPSED_ROWS_MOBILE = 3;
+    const ITEMS_PER_ROW_MOBILE = 2;
+    const collapsedItemCountMobile = COLLAPSED_ROWS_MOBILE * ITEMS_PER_ROW_MOBILE;
 
-    const ITEMS_PER_ROW_DESKTOP = 4;
     const COLLAPSED_ROWS_DESKTOP = 2;
+    const ITEMS_PER_ROW_DESKTOP = 4;
+    const collapsedItemCountDesktop = COLLAPSED_ROWS_DESKTOP * ITEMS_PER_ROW_DESKTOP;
 
-    const collapsedItemCount = isMobile 
-        ? ITEMS_PER_ROW_MOBILE * COLLAPSED_ROWS_MOBILE 
-        : ITEMS_PER_ROW_DESKTOP * COLLAPSED_ROWS_DESKTOP;
-
+    const collapsedItemCount = isMobile ? collapsedItemCountMobile : collapsedItemCountDesktop;
     const visibleDocuments = isExpanded ? documents : documents.slice(0, collapsedItemCount);
 
     return (
@@ -563,6 +561,8 @@ export default function CandidateProfilePage() {
   const [languageToSend, setLanguageToSend] = useState('');
   const [isNewProfile, setIsNewProfile] = useState(false);
   const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
+  const [activeDocTab, setActiveDocTab] = useState('japan');
+  const isMobile = useIsMobile();
 
 
   useEffect(() => {
@@ -1943,11 +1943,17 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                   <CardContent>
-                    <Tabs defaultValue="japan" className="w-full">
+                    <Tabs defaultValue="japan" value={activeDocTab} onValueChange={setActiveDocTab} className="w-full">
                       <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="vietnam" className="doc-tab-vn">{t.vietnamDocs}</TabsTrigger>
-                        <TabsTrigger value="japan" className="doc-tab-jp">{t.japanDocs}</TabsTrigger>
-                        <TabsTrigger value="other" className="doc-tab-other">{t.otherDocs}</TabsTrigger>
+                        <TabsTrigger value="vietnam" className="doc-tab-vn">
+                          {isMobile && activeDocTab !== 'vietnam' ? 'Việt Nam' : t.vietnamDocs}
+                        </TabsTrigger>
+                        <TabsTrigger value="japan" className="doc-tab-jp">
+                          {isMobile && activeDocTab !== 'japan' ? 'Nhật Bản' : t.japanDocs}
+                        </TabsTrigger>
+                        <TabsTrigger value="other" className="doc-tab-other">
+                          {isMobile && activeDocTab !== 'other' ? 'Du học' : t.otherDocs}
+                        </TabsTrigger>
                       </TabsList>
                       <TabsContent value="vietnam" className="pt-4">
                         {candidate.documents?.vietnam?.length ? (
@@ -2143,3 +2149,4 @@ export default function CandidateProfilePage() {
 
 
   
+
