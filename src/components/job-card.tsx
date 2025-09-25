@@ -265,25 +265,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
       const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
 
-      let feeValue: number | undefined;
-      let feeLabel: string | undefined;
-
-      if (netFeeWithTuition) {
-          feeValue = parseInt(netFeeWithTuition);
-          feeLabel = 'Phí và vé và học phí';
-      } else if (netFee) {
-          feeValue = parseInt(netFee);
-          feeLabel = (visaDetail?.includes('Thực tập sinh')) ? 'Phí và vé không học phí' : 'Phí có vé';
-      } else if (netFeeNoTicket) {
-          feeValue = parseInt(netFeeNoTicket);
-          feeLabel = 'Phí không vé';
-      }
-      
-      if (!feeLabel || feeValue === undefined) {
+      if (!feeValue) {
           return { shouldShow: isControlled, text: `Phí: Không rõ` };
       }
-      
-      if (isControlled && feeValue > feeLimit) {
+
+      const numericFee = parseInt(feeValue);
+      if (isControlled && numericFee > feeLimit) {
           return { shouldShow: true, text: `Phí: Không rõ` };
       }
 
