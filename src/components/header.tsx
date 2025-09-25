@@ -229,7 +229,7 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { openChat } = useChat();
-  const { role, setRole, isLoggedIn, profileName, profileHeadline } = useAuth();
+  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -530,24 +530,15 @@ export function Header() {
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12">
                   <AvatarImage
-                    src="https://placehold.co/100x100.png"
+                    src={avatarUrl || "https://placehold.co/100x100.png"}
                     alt="User"
                     data-ai-hint="user avatar"
                   />
                   <AvatarFallback>{profileName?.charAt(0) || 'A'}</AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col space-y-1">
-                  {role === 'candidate-empty-profile' ? (
-                     <>
-                        <p className="text-base font-medium leading-none">Hoàn thiện hồ sơ</p>
-                        <p className="text-xs leading-none text-muted-foreground">Nhà tuyển dụng đang chờ bạn!</p>
-                     </>
-                  ) : (
-                    <>
-                      <p className="text-base font-medium leading-none">{profileName || 'Ứng viên'}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{profileHeadline || 'Cập nhật hồ sơ của bạn'}</p>
-                    </>
-                  )}
+                <div className="flex flex-col space-y-1 overflow-hidden">
+                  <p className="text-base font-medium leading-none truncate">{profileName || 'Ứng viên'}</p>
+                  <p className="text-xs leading-none text-muted-foreground truncate">{profileHeadline || 'Cập nhật hồ sơ của bạn'}</p>
                 </div>
               </div>
             </Link>
@@ -628,7 +619,7 @@ export function Header() {
             <Link href="/ho-so-cua-toi" className="block" >
             <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary hover:bg-accent/20">
                 <Avatar className="h-12 w-12">
-                <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
+                <AvatarImage src={avatarUrl || "https://placehold.co/100x100.png"} alt="User" data-ai-hint="user avatar" />
                 <AvatarFallback>{profileName?.charAt(0) || 'A'}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col space-y-1 overflow-hidden">
@@ -728,7 +719,7 @@ const LoggedOutContent = () => {
                             {isLoggedIn ? (
                                 <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
-                                        <AvatarImage src={"https://placehold.co/100x100.png" || undefined} alt="User Avatar" data-ai-hint="user avatar" />
+                                        <AvatarImage src={avatarUrl || undefined} alt="User Avatar" data-ai-hint="user avatar" />
                                         <AvatarFallback>{profileName?.charAt(0) || 'A'}</AvatarFallback>
                                     </Avatar>
                                 </Link>

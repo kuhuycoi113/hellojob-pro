@@ -21,6 +21,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   profileName: string | null;
   profileHeadline: string | null;
+  avatarUrl: string | null; // Added avatarUrl
   setRole: (role: Role) => void;
   postLoginAction: PostLoginAction;
   setPostLoginAction: (action: PostLoginAction) => void;
@@ -134,6 +135,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [postLoginAction, setPostLoginAction] = useState<PostLoginAction>(null);
   const [profileName, setProfileName] = useState<string | null>(null);
   const [profileHeadline, setProfileHeadline] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const isLoggedIn = role !== 'guest';
 
   const updateProfileInfoFromStorage = useCallback(() => {
@@ -141,17 +143,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const storedProfile = localStorage.getItem('generatedCandidateProfile');
     if (storedProfile) {
       try {
-        const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+        const profile: Partial<CandidateProfile & { avatarUrl?: string }> = JSON.parse(storedProfile);
         setProfileName(profile.name || null);
         setProfileHeadline(profile.headline || null);
+        setAvatarUrl(profile.avatarUrl || null);
       } catch (e) {
         console.error("Failed to parse profile from localStorage", e);
         setProfileName(null);
         setProfileHeadline(null);
+        setAvatarUrl(null);
       }
     } else {
       setProfileName(null);
       setProfileHeadline(null);
+      setAvatarUrl(null);
     }
   }, []);
 
@@ -180,7 +185,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     updateProfileInfoFromStorage();
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'generatedCandidateProfile') {
+      if (event.key === 'generatedCandidateProfile' || event.key === null) {
         updateProfileInfoFromStorage();
       }
     };
@@ -225,6 +230,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     isLoggedIn,
     profileName,
     profileHeadline,
+    avatarUrl,
     setRole,
     postLoginAction,
     setPostLoginAction,
