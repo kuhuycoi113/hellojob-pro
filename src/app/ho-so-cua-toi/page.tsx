@@ -1576,7 +1576,7 @@ export default function CandidateProfilePage() {
                             <LineIcon className="h-6 w-6" />
                         </div>
                         <div className="text-sm text-muted-foreground">
-                            <p className="text-sm text-muted-foreground">Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge></p>
+                            Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
                         </div>
                     </div>
                 )}
@@ -2002,6 +2002,7 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
 
 
 
