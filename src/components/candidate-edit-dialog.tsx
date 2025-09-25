@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -82,15 +83,19 @@ const parseLineInput = (input: string): string => {
       if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
           const url = new URL(trimmedInput);
           const pathParts = url.pathname.split('/');
-          const lastPart = pathParts[pathParts.length - 1];
+          const lastPart = pathParts.pop(); // Get the last part of the path
           if (lastPart) {
-              return lastPart.startsWith('~') ? lastPart.substring(1) : lastPart;
+              // Extract the ID from /R/ti/p/@id or /ti/p/~id
+              const match = lastPart.match(/([@~]?\w+)/);
+              if (match && match[1]) return match[1].replace('~', '').replace('@', '');
+              return lastPart;
           }
       }
   } catch (error) {
        console.warn("Could not parse Line input as URL, treating as ID:", error);
   }
-  return trimmedInput.split('/').pop()?.replace('~', '') || trimmedInput;
+  // Fallback to treat the whole input as an ID, removing potential URL parts
+  return trimmedInput.split('/').pop()?.replace('~', '').replace('@', '') || trimmedInput;
 };
 
 
@@ -367,8 +372,10 @@ const renderLevel1Edit = (
                              <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
                         </div>
                     </div>
-                     <div className="text-sm text-muted-foreground mt-4 text-center">
+                    <div className="mt-4 text-center text-sm">
+                       <div className="text-muted-foreground">
                         Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                       </div>
                     </div>
                 </div>
             </div>
@@ -562,3 +569,4 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </>
     );
 }
+

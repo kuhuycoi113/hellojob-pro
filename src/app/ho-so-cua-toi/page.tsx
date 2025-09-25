@@ -312,8 +312,21 @@ const parseZaloInput = (input: string): string => {
 };
 
 const parseLineInput = (input: string): string => {
-    if (!input) return '';
-    return input.trim();
+  if (!input) return '';
+  const trimmedInput = input.trim();
+  try {
+      if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
+          const url = new URL(trimmedInput);
+          const pathParts = url.pathname.split('/');
+          const lastPart = pathParts[pathParts.length - 1];
+          if (lastPart) {
+              return lastPart.startsWith('~') ? lastPart.substring(1) : lastPart;
+          }
+      }
+  } catch (error) {
+       console.warn("Could not parse Line input as URL, treating as ID:", error);
+  }
+  return trimmedInput.split('/').pop()?.replace('~', '') || trimmedInput;
 };
 
 
@@ -458,7 +471,7 @@ const visaTypes = Object.keys(visaDetailsByVisaType);
 
 export default function CandidateProfilePage() {
   const { toast } = useToast();
-  const { role, profileName, profileHeadline } = useAuth();
+  const { role, profileName, profileHeadline, avatarUrl } = useAuth();
   const [profileByLang, setProfileByLang] = useState<ProfilesByLang>({ vi: null, ja: null, en: null });
   const [newSkill, setNewSkill] = useState('');
   const [newInterest, setNewInterest] = useState('');
@@ -1543,7 +1556,7 @@ export default function CandidateProfilePage() {
                     {candidate.personalInfo.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${candidate.personalInfo.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(candidate.personalInfo.phone)}</Link></Button>}
                     {candidate.personalInfo.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${candidate.personalInfo.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.messenger}</Link></Button>}
                     {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(candidate.personalInfo.zalo)}</Link></Button>}
-                    {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
+                    {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${candidate.personalInfo.line}`} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
                 </div>
                  <div className="mt-4 text-center text-sm text-muted-foreground">
                     Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
@@ -1624,7 +1637,7 @@ export default function CandidateProfilePage() {
                  <div className="p-6 flex flex-col md:flex-row items-center md:items-end -mt-16">
                  <div className="relative group">
                      <Avatar id="PROFILEAVATAR01" className="h-32 w-32 border-4 border-background bg-background shadow-lg">
-                      <AvatarImage id="PROFILEAVATAR03" src={candidate.avatarUrl || undefined} alt={candidate.name} data-ai-hint="professional headshot" className="object-cover" />
+                      <AvatarImage id="PROFILEAVATAR03" src={avatarUrl || undefined} alt={candidate.name} data-ai-hint="professional headshot" className="object-cover" />
                       <AvatarFallback>{candidate.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <Label htmlFor="avatar-upload" className="absolute bottom-1 right-1 cursor-pointer bg-black/50 text-white p-2 rounded-full group-hover:bg-black/70 transition-colors">
@@ -1970,3 +1983,4 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
