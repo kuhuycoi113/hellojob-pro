@@ -154,17 +154,26 @@ const EmptyProfileView = () => {
                 </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-            <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+            <Button 
+                onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }} 
+                variant="outline" 
+                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                 <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
                 <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
                 <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
             </Button>
-            <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+            <Button 
+                onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }}
+                variant="outline" 
+                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                 <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                 <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
                 <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
             </Button>
-            <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+            <Button 
+                onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }}
+                variant="outline" 
+                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                 <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
                 <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
                 <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
@@ -173,23 +182,6 @@ const EmptyProfileView = () => {
             <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
         </>
     );
-
-    const visaDetailsOptions: { [key: string]: { label: string, description: string }[] } = {
-        'Thực tập sinh kỹ năng': [
-          { label: 'Thực tập sinh 3 năm', description: 'Chương trình phổ thông nhất' },
-          { label: 'Thực tập sinh 1 năm', description: 'Chương trình ngắn hạn' },
-          { label: 'Thực tập sinh 3 Go', description: 'Dành cho người có kinh nghiệm' },
-        ],
-        'Kỹ năng đặc định': [
-          { label: 'Đặc định đầu Nhật', description: 'Dành cho người đang ở Nhật' },
-          { label: 'Đặc định đầu Việt', description: 'Dành cho người ở Việt Nam' },
-          { label: 'Đặc định đi mới', description: 'Lần đầu đăng ký' },
-        ],
-        'Kỹ sư, tri thức': [
-          { label: 'Kỹ sư đầu Nhật', description: 'Dành cho kỹ sư đang ở Nhật' },
-          { label: 'Kỹ sư đầu Việt', description: 'Dành cho kỹ sư ở Việt Nam' },
-        ],
-    };
     
     const VisaDetailStepDialog = () => {
         if (!selectedVisa) return null;
@@ -215,24 +207,13 @@ const EmptyProfileView = () => {
             </>
         )
     };
-    
+
     const IndustryStepDialog = () => {
-        const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key => 
-            (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === selectedVisaDetail)
-        );
-
-        if (!parentVisaSlug) return null;
-
-        const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
+        if (!selectedVisa) return null;
+        const industries = industriesByJobType[selectedVisa.slug] || [];
         
-        let screenIdComment = '';
-        if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-        else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-        else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
-
         return (
             <>
-                <span className="hidden">{screenIdComment}</span>
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
                     <DialogDescription className="text-center">
@@ -641,7 +622,7 @@ const LoggedInView = () => {
             <h1 className="text-3xl font-bold font-headline">Trang quản lý việc làm</h1>
             <p className="text-muted-foreground mt-1">Quản lý toàn bộ hành trình tìm việc của bạn tại một nơi duy nhất.</p>
         </div>
-         {/* Main Content */}
+        {/* Main Content */}
         <div className="w-full mb-8">
             <Accordion 
                 type="multiple"
@@ -689,7 +670,7 @@ const LoggedInView = () => {
                        ) : suggestedJobs.length > 0 ? (
                             <>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true}/> ))}
+                                    {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} /> ))}
                                 </div>
                                 {visibleJobsCount < suggestedJobs.length && (
                                     <div className="text-center mt-8">
@@ -741,7 +722,7 @@ const LoggedInView = () => {
                             <span>Việc đã lưu</span>
                             <Badge>{savedJobs.length}</Badge>
                         </div>
-                    </AccordionContent>
+                    </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                        {savedJobs.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -1268,7 +1249,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
@@ -1302,3 +1283,5 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
