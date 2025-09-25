@@ -54,6 +54,7 @@ import { locations } from '@/lib/location-data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { EditProfileDialog } from '@/components/candidate-edit-dialog';
 import { validateProfileForApplication } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 type MediaItem = {
@@ -1884,9 +1885,14 @@ export default function CandidateProfilePage() {
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
                     </EditDialog>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div>
-                        <h4 className="font-semibold mb-3 text-sm">{t.vietnamDocs}</h4>
+                  <CardContent>
+                    <Tabs defaultValue="vietnam" className="w-full">
+                      <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="vietnam">{t.vietnamDocs}</TabsTrigger>
+                        <TabsTrigger value="japan">{t.japanDocs}</TabsTrigger>
+                        <TabsTrigger value="other">{t.otherDocs}</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="vietnam" className="pt-4">
                         {candidate.documents?.vietnam?.length ? (
                              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                                 {candidate.documents.vietnam.map((doc, index) => (
@@ -1906,11 +1912,10 @@ export default function CandidateProfilePage() {
                                     </div>
                                 ))}
                              </div>
-                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
-                    </div>
-                     <div>
-                        <h4 className="font-semibold mb-3 text-sm">{t.japanDocs}</h4>
-                        {candidate.documents?.japan?.length ? (
+                        ) : (<p className="text-sm text-muted-foreground py-4 text-center">{t.noInfo}</p>)}
+                      </TabsContent>
+                      <TabsContent value="japan" className="pt-4">
+                         {candidate.documents?.japan?.length ? (
                              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                                {candidate.documents.japan.map((doc, index) => (
                                     <div key={index} className="space-y-2 text-center">
@@ -1929,11 +1934,10 @@ export default function CandidateProfilePage() {
                                     </div>
                                 ))}
                              </div>
-                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
-                    </div>
-                     <div>
-                        <h4 className="font-semibold mb-3 text-sm">{t.otherDocs}</h4>
-                        {candidate.documents?.other?.length ? (
+                        ) : (<p className="text-sm text-muted-foreground py-4 text-center">{t.noInfo}</p>)}
+                      </TabsContent>
+                       <TabsContent value="other" className="pt-4">
+                         {candidate.documents?.other?.length ? (
                              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                                 {candidate.documents.other.map((doc, index) => (
                                     <div key={index} className="space-y-2 text-center">
@@ -1952,8 +1956,9 @@ export default function CandidateProfilePage() {
                                     </div>
                                 ))}
                              </div>
-                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
-                    </div>
+                        ) : (<p className="text-sm text-muted-foreground py-4 text-center">{t.noInfo}</p>)}
+                      </TabsContent>
+                    </Tabs>
                   </CardContent>
                 </Card>
 
@@ -2071,7 +2076,7 @@ export default function CandidateProfilePage() {
                      </div>
                   </CardContent>
                 </Card>
-
+                
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><Award className="mr-3 text-primary"/> {t.certifications}</CardTitle>
