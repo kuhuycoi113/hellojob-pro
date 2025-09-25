@@ -44,6 +44,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { JsonLdScript } from '@/components/json-ld-script';
+import { validateProfileForApplication } from '@/lib/utils';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -85,17 +86,6 @@ const convertCurrency = (value?: string, from: 'JPY' | 'USD' = 'JPY') => {
     return `≈ ${vndValue.toLocaleString('vi-VN')} VNĐ`;
 };
 
-const validateProfileForApplication = (profile: CandidateProfile): boolean => {
-    if (!profile || !profile.personalInfo) return false;
-
-    const { name, personalInfo } = profile;
-    const { gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = personalInfo;
-
-    const hasRequiredPersonalInfo = name && gender && height && weight && tattooStatus && hepatitisBStatus;
-    const hasContactInfo = phone || zalo || messenger || line;
-
-    return !!hasRequiredPersonalInfo && !!hasContactInfo;
-};
 
 // List of visa details that have special fee handling
 const controlledFeeVisas = [
@@ -358,6 +348,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
     const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
     const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
+    const [missingProfileFields, setMissingProfileFields] = useState<string[]>([]);
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
@@ -443,7 +434,8 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             const profileRaw = localStorage.getItem('generatedCandidateProfile');
             if (profileRaw) {
                 const profile: CandidateProfile = JSON.parse(profileRaw);
-                if (validateProfileForApplication(profile)) {
+                const missingFields = validateProfileForApplication(profile);
+                if (missingFields.length === 0) {
                      const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
                      appliedJobs.push(job.id);
                      localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
@@ -454,9 +446,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                          className: 'bg-green-500 text-white'
                      });
                 } else {
+                    setMissingProfileFields(missingFields);
                     setIsProfileIncompleteAlertOpen(true);
                 }
             } else {
+                 setMissingProfileFields(['Hồ sơ']);
                  setIsProfileIncompleteAlertOpen(true);
             }
         }
@@ -800,7 +794,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     <AlertDialogHeader>
                         <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
+                            <p>Để có thể ứng tuyển, bạn cần cập nhật các thông tin sau:</p>
+                            <ul className="list-disc pl-5 mt-2 text-destructive font-medium">
+                                {missingProfileFields.map(field => <li key={field}>{field}</li>)}
+                            </ul>
+                            <p className="mt-2">Bạn có muốn cập nhật hồ sơ ngay bây giờ không?</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -823,4 +821,3 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 }
-

@@ -76,24 +76,21 @@ const parseZaloInput = (input: string): string => {
 };
 
 const parseLineInput = (input: string): string => {
-    if (!input) return '';
-    const trimmedInput = input.trim();
-    try {
-        // Handle URLs like https://line.me/ti/p/~[LINE_ID]
-        if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
-            const url = new URL(trimmedInput);
-            const pathParts = url.pathname.split('/');
-            const lastPart = pathParts[pathParts.length - 1];
-            if (lastPart) {
-                // Remove the '~' character if it exists
-                return lastPart.startsWith('~') ? lastPart.substring(1) : lastPart;
-            }
-        }
-    } catch (error) {
-         console.warn("Could not parse Line input as URL, treating as ID:", error);
-    }
-    // Fallback for direct ID or other formats
-    return trimmedInput.split('/').pop()?.replace('~', '') || trimmedInput;
+  if (!input) return '';
+  const trimmedInput = input.trim();
+  try {
+      if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
+          const url = new URL(trimmedInput);
+          const pathParts = url.pathname.split('/');
+          const lastPart = pathParts[pathParts.length - 1];
+          if (lastPart) {
+              return lastPart.startsWith('~') ? lastPart.substring(1) : lastPart;
+          }
+      }
+  } catch (error) {
+       console.warn("Could not parse Line input as URL, treating as ID:", error);
+  }
+  return trimmedInput.split('/').pop()?.replace('~', '') || trimmedInput;
 };
 
 
@@ -146,8 +143,8 @@ const renderLevel1Edit = (
     isDatePickerOpen: boolean,
     setIsDatePickerOpen: (open: boolean) => void
 ) => {
-    const height = parseInt(tempCandidate.personalInfo?.height || '160', 10);
-    const weight = parseInt(tempCandidate.personalInfo?.weight || '50', 10);
+    const height = parseInt(tempCandidate.personalInfo?.height || '0', 10);
+    const weight = parseInt(tempCandidate.personalInfo?.weight || '0', 10);
 
     const handleDateSelect = (date: Date | undefined) => {
         handleTempChange('personalInfo', 'dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '');
@@ -253,7 +250,7 @@ const renderLevel1Edit = (
                 <div className="space-y-2">
                 <div className="flex justify-between items-center">
                     <Label>Chiều cao (cm)</Label>
-                    <span className="text-sm font-semibold text-primary">{height} cm</span>
+                    <span className="text-sm font-semibold text-primary">{height > 0 ? `${height} cm` : 'Chưa chọn'}</span>
                 </div>
                 <Slider
                     value={[height]}
@@ -266,7 +263,7 @@ const renderLevel1Edit = (
                 <div className="space-y-2">
                     <div className="flex justify-between items-center">
                         <Label>Cân nặng (kg)</Label>
-                        <span className="text-sm font-semibold text-primary">{weight} kg</span>
+                        <span className="text-sm font-semibold text-primary">{weight > 0 ? `${weight} kg` : 'Chưa chọn'}</span>
                     </div>
                     <Slider
                         value={[weight]}
@@ -393,7 +390,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                     about: '',
                     education: [],
                     experience: [],
-                    personalInfo: { birthYear: 2000, gender: 'Nữ', phone: '', japaneseProficiency: '' },
+                    personalInfo: { birthYear: 2000, gender: '', phone: '', japaneseProficiency: '' , height: '0', weight: '0'},
                     skills: [],
                     interests: [],
                     certifications: [],
@@ -476,7 +473,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     return (
         <>
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-3xl" id="DIENTHONGTINCANHAN01">
+                <DialogContent className="sm:max-w-4xl" id="DIENTHONGTINCANHAN01">
                     <DialogHeader>
                         <DialogTitle className="font-headline text-2xl">Chỉnh sửa Thông tin Cá nhân</DialogTitle>
                         <DialogDescription>Cập nhật thông tin của bạn để nhà tuyển dụng có thể liên hệ.</DialogDescription>
@@ -556,4 +553,3 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
         </>
     );
 }
-
