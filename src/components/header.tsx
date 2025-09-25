@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -285,7 +286,6 @@ export function Header() {
     };
 
     if (isLoggedIn) {
-      console.log("Applying preferences for logged in user:", preferences);
       const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
       let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
       
@@ -301,6 +301,7 @@ export function Header() {
       if (preferences.desiredIndustry) profile.desiredIndustry = preferences.desiredIndustry;
 
       localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+      setRole('candidate');
       setIsDialogOpen(false);
       router.push('/viec-lam-cua-toi?highlight=suggested');
     } else {
@@ -436,13 +437,16 @@ export function Header() {
   };
 
   const IndustryStepDialog = () => {
-    if (!selectedVisa) return null;
-    const industries = industriesByJobType[selectedVisa.slug] || [];
+    const parentVisaSlug = selectedVisa?.slug;
+
+    if (!parentVisaSlug) return null;
+
+    const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
     
     let screenIdComment = '';
-    if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-    else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-    else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
 
     return (
         <>
@@ -716,6 +720,7 @@ const LoggedOutContent = () => {
                     
                     {isClient && (
                         <>
+                            <SearchDialog />
                             {isLoggedIn ? (
                                 <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
@@ -727,14 +732,20 @@ const LoggedOutContent = () => {
                                 <Button onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập / Đăng ký</Button>
                             )}
 
-                            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-                                <DialogTrigger asChild>
-                                    <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-2xl">
-                                    {renderDialogContent()}
-                                </DialogContent>
-                            </Dialog>
+                            {(role === 'candidate' || role === 'candidate-full-profile') ? (
+                                <Button asChild className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                                    <Link href="/ho-so-cua-toi">Sửa hồ sơ</Link>
+                                </Button>
+                            ) : (
+                                <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                                    <DialogTrigger asChild>
+                                        <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">Tạo hồ sơ</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-2xl">
+                                        {renderDialogContent()}
+                                    </DialogContent>
+                                </Dialog>
+                            )}
 
                              <Button asChild>
                                 <Link href="/viec-lam-cua-toi">Trang việc làm</Link>
@@ -746,17 +757,26 @@ const LoggedOutContent = () => {
                 </div>
                 {isClient && isMobile && (
                     <div className="flex items-center gap-2">
+                        <SearchDialog />
                         {!isLoggedIn && (
                             <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
                         )}
-                        <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-                            <DialogTrigger asChild>
-                                <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" size="sm">Tạo</Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-2xl">
-                                {renderDialogContent()}
-                            </DialogContent>
-                        </Dialog>
+                        
+                        {(role === 'candidate' || role === 'candidate-full-profile') ? (
+                             <Button asChild size="sm" className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                                <Link href="/ho-so-cua-toi">Sửa</Link>
+                             </Button>
+                        ) : (
+                            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                                <DialogTrigger asChild>
+                                    <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" size="sm">Tạo</Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-2xl">
+                                    {renderDialogContent()}
+                                </DialogContent>
+                            </Dialog>
+                        )}
+
                          <Button asChild variant="default" size="sm">
                             <Link href="/viec-lam-cua-toi">Việc</Link>
                         </Button>
