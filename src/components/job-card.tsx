@@ -264,6 +264,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
       const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
       const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
+      let feeValue: string | undefined;
+      
+      if (netFee) feeValue = netFee;
+      else if (netFeeNoTicket) feeValue = netFeeNoTicket;
+      else if (netFeeWithTuition) feeValue = netFeeWithTuition;
 
       if (!feeValue) {
           return { shouldShow: isControlled, text: `Phí: Không rõ` };
@@ -275,7 +280,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
       }
 
       if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
-          const vndValue = feeValue * USD_VND_RATE;
+          const vndValue = numericFee * USD_VND_RATE;
           const valueInMillions = vndValue / 1000000;
           let formattedVnd: string;
           // Apply rounding only on search page
