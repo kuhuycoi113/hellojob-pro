@@ -229,7 +229,7 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { openChat } = useChat();
-  const { role, setRole, isLoggedIn } = useAuth();
+  const { role, setRole, isLoggedIn, profileName, profileHeadline } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -534,7 +534,7 @@ export function Header() {
                     alt="User"
                     data-ai-hint="user avatar"
                   />
-                  <AvatarFallback>A</AvatarFallback>
+                  <AvatarFallback>{profileName?.charAt(0) || 'A'}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col space-y-1">
                   {role === 'candidate-empty-profile' ? (
@@ -544,8 +544,8 @@ export function Header() {
                      </>
                   ) : (
                     <>
-                      <p className="text-base font-medium leading-none">Lê Ngọc Hân</p>
-                      <p className="text-xs leading-none text-muted-foreground">Ứng viên Thực tập sinh</p>
+                      <p className="text-base font-medium leading-none">{profileName || 'Ứng viên'}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{profileHeadline || 'Cập nhật hồ sơ của bạn'}</p>
                     </>
                   )}
                 </div>
@@ -629,13 +629,13 @@ export function Header() {
             <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary hover:bg-accent/20">
                 <Avatar className="h-12 w-12">
                 <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="user avatar" />
-                <AvatarFallback>A</AvatarFallback>
+                <AvatarFallback>{profileName?.charAt(0) || 'A'}</AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col space-y-1">
-                <p className="text-base font-medium leading-none">Lê Ngọc Hân</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                    Ứng viên Thực tập sinh
-                </p>
+                <div className="flex flex-col space-y-1 overflow-hidden">
+                    <p className="text-base font-medium leading-none truncate">{profileName || 'Ứng viên'}</p>
+                    <p className="text-xs leading-none text-muted-foreground truncate">
+                        {profileHeadline || 'Cập nhật hồ sơ của bạn'}
+                    </p>
                 </div>
             </div>
             </Link>
@@ -722,13 +722,14 @@ const LoggedOutContent = () => {
                 ))}
                 </nav>
                 <div className="hidden md:flex items-center gap-2">
+                    
                     {isClient && (
                         <>
                             {isLoggedIn ? (
                                 <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
                                         <AvatarImage src={"https://placehold.co/100x100.png" || undefined} alt="User Avatar" data-ai-hint="user avatar" />
-                                        <AvatarFallback>A</AvatarFallback>
+                                        <AvatarFallback>{profileName?.charAt(0) || 'A'}</AvatarFallback>
                                     </Avatar>
                                 </Link>
                             ): (
@@ -743,6 +744,7 @@ const LoggedOutContent = () => {
                                     {renderDialogContent()}
                                 </DialogContent>
                             </Dialog>
+
                              <Button asChild>
                                 <Link href="/viec-lam-cua-toi">Trang việc làm</Link>
                             </Button>
@@ -753,6 +755,7 @@ const LoggedOutContent = () => {
                 </div>
                 {isClient && isMobile && (
                     <div className="flex items-center gap-2">
+                        <SearchDialog />
                         {!isLoggedIn && (
                             <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
                         )}
@@ -764,9 +767,6 @@ const LoggedOutContent = () => {
                                 {renderDialogContent()}
                             </DialogContent>
                         </Dialog>
-                        <Button asChild variant="default" size="sm">
-                            <Link href="/viec-lam-cua-toi">Việc</Link>
-                        </Button>
                         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="ghost" size="icon">

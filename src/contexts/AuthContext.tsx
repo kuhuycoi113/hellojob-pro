@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import * as chatData from '@/lib/chat-data';
 import type { CandidateProfile } from '@/ai/schemas';
 
@@ -19,6 +19,8 @@ export type PostLoginAction = {
 interface AuthContextType {
   role: Role;
   isLoggedIn: boolean;
+  profileName: string | null;
+  profileHeadline: string | null;
   setRole: (role: Role) => void;
   postLoginAction: PostLoginAction;
   setPostLoginAction: (action: PostLoginAction) => void;
@@ -130,43 +132,71 @@ const partialCandidateProfile: Partial<CandidateProfile> = {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [role, setInternalRole] = useState<Role>('guest');
   const [postLoginAction, setPostLoginAction] = useState<PostLoginAction>(null);
+  const [profileName, setProfileName] = useState<string | null>(null);
+  const [profileHeadline, setProfileHeadline] = useState<string | null>(null);
   const isLoggedIn = role !== 'guest';
+
+  const updateProfileInfoFromStorage = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const storedProfile = localStorage.getItem('generatedCandidateProfile');
+    if (storedProfile) {
+      try {
+        const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+        setProfileName(profile.name || null);
+        setProfileHeadline(profile.headline || null);
+      } catch (e) {
+        console.error("Failed to parse profile from localStorage", e);
+        setProfileName(null);
+        setProfileHeadline(null);
+      }
+    } else {
+      setProfileName(null);
+      setProfileHeadline(null);
+    }
+  }, []);
 
   const setRole = (newRole: Role) => {
     if (newRole === 'guest') {
         chatData.setCurrentUser(chatData.guestUser);
-    } else { // 'candidate' or 'candidate-empty-profile' or 'candidate-full-profile'
-        chatData.setCurrentUser(chatData.loggedInUser);
-    }
-
-    if (newRole === 'candidate-full-profile') {
-        localStorage.setItem('generatedCandidateProfile', JSON.stringify(fullCandidateProfile));
-    } else if (newRole === 'candidate') {
-        localStorage.setItem('generatedCandidateProfile', JSON.stringify(partialCandidateProfile));
-    } else if (newRole === 'candidate-empty-profile') {
         localStorage.removeItem('generatedCandidateProfile');
+    } else { 
+        chatData.setCurrentUser(chatData.loggedInUser);
+        if (newRole === 'candidate-full-profile') {
+            localStorage.setItem('generatedCandidateProfile', JSON.stringify(fullCandidateProfile));
+        } else if (newRole === 'candidate') {
+            localStorage.setItem('generatedCandidateProfile', JSON.stringify(partialCandidateProfile));
+        } else if (newRole === 'candidate-empty-profile') {
+            localStorage.removeItem('generatedCandidateProfile');
+        }
     }
-    
     setInternalRole(newRole);
+    updateProfileInfoFromStorage();
   };
   
   const clearPostLoginAction = () => {
     setPostLoginAction(null);
   };
-
+  
+  useEffect(() => {
+    updateProfileInfoFromStorage();
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'generatedCandidateProfile') {
+        updateProfileInfoFromStorage();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [updateProfileInfoFromStorage]);
 
   useEffect(() => {
     const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
-    
-    // When role changes to 'candidate-empty-profile' (which is the default on login)
-    // we check if there are preferences to apply from the guest session.
     if (role === 'candidate-empty-profile' && preferencesRaw) {
         try {
             const preferences = JSON.parse(preferencesRaw);
             const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
             let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
-
-            // Merge preferences into the profile
             profile = {
                 ...profile,
                 desiredIndustry: preferences.desiredIndustry || profile.desiredIndustry,
@@ -179,27 +209,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             };
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
             sessionStorage.removeItem('onboardingPreferences');
-            
-            // After applying preferences, the profile is no longer 'empty' in spirit,
-            // so we transition the role to 'candidate'.
             setRole('candidate');
-
         } catch(e) {
             console.error("Failed to apply onboarding preferences:", e);
-            // If applying preferences fails, we still remove the temp data
             sessionStorage.removeItem('onboardingPreferences');
         }
     } else if (role === 'candidate-empty-profile' && !preferencesRaw) {
-        // If the role is set to empty but there are no preferences, it means a fresh start.
-        // Clear any potentially lingering profile data.
         localStorage.removeItem('generatedCandidateProfile');
+        updateProfileInfoFromStorage();
     }
-
-  }, [role]);
+  }, [role, updateProfileInfoFromStorage]);
 
   const value = {
     role,
     isLoggedIn,
+    profileName,
+    profileHeadline,
     setRole,
     postLoginAction,
     setPostLoginAction,
