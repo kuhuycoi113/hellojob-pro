@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -1507,13 +1508,13 @@ export default function CandidateProfilePage() {
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
         <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : 'Chưa cập nhật'}</p>
-        <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender}</p>
-        <p><strong>{t.height}:</strong> {candidate.personalInfo.height} cm</p>
-        <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight} kg</p>
-        <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus}</p>
-        <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus}</p>
-        <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency}</p>
-        <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency}</p>
+        <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender || 'Chưa cập nhật'}</p>
+        <p><strong>{t.height}:</strong> {candidate.personalInfo.height ? `${candidate.personalInfo.height} cm` : 'Chưa cập nhật'}</p>
+        <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight ? `${candidate.personalInfo.weight} kg` : 'Chưa cập nhật'}</p>
+        <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus || 'Chưa cập nhật'}</p>
+        <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus || 'Chưa cập nhật'}</p>
+        <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency || 'Chưa cập nhật'}</p>
+        <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency || 'Chưa cập nhật'}</p>
       </CardContent>
       <CardContent>
         <div className="space-y-2">
@@ -1536,7 +1537,7 @@ export default function CandidateProfilePage() {
                <div className="bg-gradient-to-tr from-primary to-accent h-32" />
                  <div className="p-6 flex flex-col md:flex-row items-center md:items-end -mt-16">
                  <div className="relative group">
-                     <Avatar className="h-32 w-32 border-4 border-background bg-background shadow-lg">
+                     <Avatar id="PROFILEAVATAR02" className="h-32 w-32 border-4 border-background bg-background shadow-lg">
                       <AvatarImage src={candidate.avatarUrl || undefined} alt={candidate.name} data-ai-hint="professional headshot" className="object-cover" />
                       <AvatarFallback>{candidate.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
@@ -1694,7 +1695,7 @@ export default function CandidateProfilePage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                      {candidate.education.length > 0 ? candidate.education.map((edu, index) => (
-                        <div key={index} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:rounded-full before:bg-primary">
+                         <div key={index} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:rounded-full before:bg-primary">
                             <p className="font-semibold flex items-center gap-2"><School className="h-4 w-4"/> {edu.school}</p>
                             <p className="text-muted-foreground ml-6">Chuyên ngành: {edu.degree}</p>
                             <p className="text-muted-foreground ml-6">Tốt nghiệp năm: {edu.gradYear}</p>
@@ -1755,18 +1756,18 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                    <CardContent className="space-y-3 text-sm">
-                        <p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.desiredVisaType}</p>
-                        <p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.desiredVisaDetail}</p>
-                        <p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry}</p>
-                        <p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail}</p>
-                        <p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation}</p>
+                        <p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.desiredVisaType || 'Chưa cập nhật'}</p>
+                        <p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.desiredVisaDetail || 'Chưa cập nhật'}</p>
+                        <p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry || 'Chưa cập nhật'}</p>
+                        <p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail || 'Chưa cập nhật'}</p>
+                        <p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation || 'Chưa cập nhật'}</p>
                         <p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p>
                         <p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p>
                         {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(candidate.aspirations?.desiredVisaDetail || '') && (
-                            <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility}</p>
+                            <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility || 'Chưa cập nhật'}</p>
                         )}
-                        <p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation}</p>
-                        <p><strong>{t.specialAspirations}:</strong> {candidate.aspirations?.specialAspirations}</p>
+                        <p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation || 'Chưa cập nhật'}</p>
+                        <p><strong>{t.specialAspirations}:</strong> {candidate.aspirations?.specialAspirations || 'Chưa cập nhật'}</p>
                   </CardContent>
                 </Card>
 
@@ -1784,7 +1785,7 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                   <CardContent>
-                     <h4 className="font-semibold mb-2 text-sm">{t.skills}</h4>
+                     <h4 className="font-semibold mb-2 text-sm">{t.skills}</h4
                      <div className="flex flex-wrap gap-2 mb-4">
                         {candidate.skills.length > 0 ? candidate.skills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>) : 
                         <div className="text-muted-foreground text-sm">
@@ -1898,3 +1899,5 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+    
