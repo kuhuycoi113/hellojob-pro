@@ -90,6 +90,35 @@ const fullCandidateProfile: CandidateProfile = {
     desiredIndustry: 'Cơ khí, Chế tạo máy',
 };
 
+// A partially filled profile for the 'candidate' role
+const partialCandidateProfile: Partial<CandidateProfile> = {
+    name: 'Lê Thị An',
+    headline: 'Thực tập sinh ngành cơ khí',
+    location: 'Hà Nội, Việt Nam',
+    about: 'Mong muốn tìm kiếm cơ hội làm việc tại Nhật Bản để học hỏi kinh nghiệm.',
+    education: [
+        { school: 'Đại học Công nghiệp Hà Nội', degree: 'Kỹ sư Cơ khí', gradYear: 2023 },
+    ],
+    experience: [],
+    personalInfo: {
+      birthYear: 2001,
+      gender: 'Nữ',
+      phone: '0987654321',
+      dateOfBirth: '2001-10-10',
+      // Missing height, weight, tattoo, hepatitisB, language proficiency, etc.
+    },
+    aspirations: {
+        desiredLocation: 'Aichi',
+        desiredVisaType: 'Thực tập sinh kỹ năng',
+        // Missing desired salary, visa detail etc.
+    },
+    desiredIndustry: 'Cơ khí, Chế tạo máy',
+    skills: ['Làm việc nhóm'],
+    interests: ['Cơ khí'],
+    certifications: [],
+    notes: '',
+};
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [role, setInternalRole] = useState<Role>('guest');
   const [postLoginAction, setPostLoginAction] = useState<PostLoginAction>(null);
@@ -105,10 +134,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (newRole === 'candidate-full-profile') {
         localStorage.setItem('generatedCandidateProfile', JSON.stringify(fullCandidateProfile));
     } else if (newRole === 'candidate') {
-         // Ensure a partial profile exists for the standard 'candidate' role if not already there
-        if (!localStorage.getItem('generatedCandidateProfile')) {
-             localStorage.setItem('generatedCandidateProfile', JSON.stringify({ name: 'Lê Thị An', personalInfo: { gender: 'Nữ' } })); // A minimal profile
-        }
+        localStorage.setItem('generatedCandidateProfile', JSON.stringify(partialCandidateProfile));
     } else if (newRole === 'candidate-empty-profile') {
         localStorage.removeItem('generatedCandidateProfile');
     }
@@ -174,5 +200,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-    
