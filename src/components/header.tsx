@@ -69,163 +69,6 @@ export const Logo = ({ className }: { className?: string }) => (
     <Image src="/img/HJPNG.png" alt="HelloJob Logo" width={120} height={40} className={cn("h-10 w-auto", className)} priority />
 );
 
-const SearchDialog = () => {
-    const router = useRouter();
-    const [filters, setFilters] = useState<Partial<SearchFilters>>({
-        q: '',
-        visaDetail: '',
-        industry: '',
-        location: [],
-    });
-    const [isSearching, setIsSearching] = useState(false);
-    const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
-    const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
-
-    const handleFilterChange = (field: keyof typeof filters, value: any) => {
-        setFilters(prev => ({...prev, [field]: value}));
-    };
-
-    const handleVisaDetailChange = (value: string) => {
-        const newFilters: Partial<SearchFilters> = { visaDetail: value === 'all' ? '' : value };
-        
-        const parentType = Object.keys(visaDetailsByVisaType).find(key => (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value));
-        if (parentType && filters.visa !== parentType) {
-            newFilters.visa = parentType;
-            newFilters.industry = ''; // Reset industry
-            const industries = industriesByJobType[parentType as keyof typeof industriesByJobType] || [];
-            const uniqueIndustries = Array.from(new Map(industries.map(item => [item.slug, item])).values());
-            setAvailableIndustries(uniqueIndustries);
-        } else if (!value || value === 'all') {
-            newFilters.visa = '';
-            setAvailableIndustries(allIndustries);
-        }
-        setFilters(prev => ({ ...prev, ...newFilters }));
-    };
-    
-    const handleSearch = async () => {
-        setIsSearching(true);
-        const query = new URLSearchParams();
-        
-        let finalFilters: Partial<SearchFilters> = { ...filters };
-
-        if (filters.q) {
-            try {
-                const criteria = await recommendJobs(filters.q);
-                if (criteria) {
-                    finalFilters.industry = allIndustries.find(i => i.name === criteria.industry)?.slug || finalFilters.industry;
-                    finalFilters.location = allJapanLocations.find(l => l.name === criteria.workLocation)?.slug ? [allJapanLocations.find(l => l.name === criteria.workLocation)!.slug] : finalFilters.location;
-                    finalFilters.visaDetail = Object.values(visaDetailsByVisaType).flat().find(v => v.name === criteria.visaDetail)?.slug || finalFilters.visaDetail;
-                    if(criteria.gender) query.set('gioi-tinh', criteria.gender.toLowerCase() === 'nam' ? 'nam' : 'nu');
-                    if(criteria.sortBy) query.set('sap-xep', 'salary_desc');
-                } else {
-                     query.set('q', filters.q);
-                }
-            } catch (error) {
-                console.error("AI search failed, falling back to keyword search:", error);
-                query.set('q', filters.q);
-            }
-        }
-        
-        if (finalFilters.visaDetail && finalFilters.visaDetail !== 'all') query.set('chi-tiet-loai-hinh-visa', finalFilters.visaDetail);
-        if (finalFilters.industry && finalFilters.industry !== 'all') query.set('nganh-nghe', finalFilters.industry);
-        if (Array.isArray(finalFilters.location) && finalFilters.location.length > 0) {
-            finalFilters.location.forEach(loc => query.append('dia-diem', loc));
-        }
-        
-        setIsSearchDialogOpen(false);
-        setIsSearching(false);
-        router.push(`/tim-viec-lam?${query.toString()}`);
-    }
-
-    return (
-        <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
-            <DialogTrigger asChild>
-                 <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
-                    <Search className="h-5 w-5" />
-                    <span className="sr-only">Tìm kiếm</span>
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-xl" id="TIMKIEM02">
-                <DialogHeader>
-                    <DialogTitle className="font-headline text-2xl">Tìm kiếm việc làm</DialogTitle>
-                    <DialogDescription>
-                        Nhập từ khóa, hoặc sử dụng bộ lọc để tìm cơ hội phù hợp nhất.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input 
-                            placeholder="Nhập chức danh, kỹ năng, hoặc tên công ty..." 
-                            className="pl-10 h-12 text-base"
-                            value={filters.q}
-                            onChange={(e) => handleFilterChange('q', e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                        />
-                    </div>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                         <div className="space-y-2">
-                            <Label>Chi tiết loại hình visa</Label>
-                            <Select onValueChange={handleVisaDetailChange} value={filters.visaDetail || 'all'}>
-                                <SelectTrigger><SelectValue placeholder="Tất cả loại hình" /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Tất cả loại hình</SelectItem>
-                                     {japanJobTypes.map(type => (
-                                        <SelectGroup key={type.slug}>
-                                            <SelectLabel>{type.name}</SelectLabel>
-                                            {(visaDetailsByVisaType[type.slug] || []).map(detail => (
-                                                <SelectItem key={detail.slug} value={detail.slug}>{detail.name}</SelectItem>
-                                            ))}
-                                        </SelectGroup>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Ngành nghề</Label>
-                            <Select onValueChange={(value) => handleFilterChange('industry', value === 'all' ? '' : value)} value={filters.industry || 'all'}>
-                                <SelectTrigger><SelectValue placeholder="Tất cả ngành nghề"/></SelectTrigger>
-                                <SelectContent>
-                                     <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                                    {availableIndustries.map((industry) => (
-                                        <SelectItem key={industry.slug} value={industry.slug}>
-                                            {industry.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Địa điểm làm việc</Label>
-                            <Select onValueChange={(value) => handleFilterChange('location', value === 'all' ? [] : [value])} value={Array.isArray(filters.location) ? (filters.location[0] || 'all') : 'all'}>
-                                <SelectTrigger><SelectValue placeholder="Tất cả Nhật Bản"/></SelectTrigger>
-                                 <SelectContent className="max-h-[300px]">
-                                    <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                                    {japanRegions.map((region) => (
-                                        <SelectGroup key={region.slug}>
-                                            <SelectLabel>{region.name}</SelectLabel>
-                                            {region.slug !== 'hokkaido' && region.slug !== 'okinawa' && (
-                                              <SelectItem value={region.slug}>Toàn bộ vùng {region.name}</SelectItem>
-                                            )}
-                                            {region.prefectures.map(p => <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>)}
-                                        </SelectGroup>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                </div>
-                <DialogFooter>
-                    <Button onClick={handleSearch} className="w-full sm:w-auto" disabled={isSearching}>
-                        {isSearching && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Tìm kiếm
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    )
-}
-
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -720,7 +563,7 @@ const LoggedOutContent = () => {
                     
                     {isClient && (
                         <>
-                            <SearchDialog />
+                            
                             {isLoggedIn ? (
                                 <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
@@ -757,7 +600,7 @@ const LoggedOutContent = () => {
                 </div>
                 {isClient && isMobile && (
                     <div className="flex items-center gap-2">
-                        <SearchDialog />
+                        
                         {!isLoggedIn && (
                             <Button size="sm" onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập</Button>
                         )}
