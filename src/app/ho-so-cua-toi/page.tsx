@@ -494,6 +494,53 @@ const visaDetailsByVisaType: { [key: string]: string[] } = {
 const visaTypes = Object.keys(visaDetailsByVisaType);
 
 
+const DocumentGrid = ({
+    documents,
+    docType,
+    handleMediaChange,
+}: {
+    documents: DocumentItem[];
+    docType: 'vietnam' | 'japan' | 'other';
+    handleMediaChange: (type: 'document', e: React.ChangeEvent<HTMLInputElement>, index: number, docType: 'vietnam' | 'japan' | 'other') => void;
+}) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const ITEMS_PER_ROW = 4; // Based on md:grid-cols-4
+    const COLLAPSED_ROWS = 2;
+    const collapsedItemCount = ITEMS_PER_ROW * COLLAPSED_ROWS;
+
+    const visibleDocuments = isExpanded ? documents : documents.slice(0, collapsedItemCount);
+
+    return (
+        <div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {visibleDocuments.map((doc, index) => (
+                    <div key={index} className="space-y-2 text-center">
+                        <Label htmlFor={`doc-${docType}-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center cursor-pointer bg-secondary/50">
+                            {doc.url ? (
+                                <Image src={doc.url} alt={doc.name} fill className="object-cover"/>
+                            ) : (
+                                <UploadCloud className="h-8 w-8 text-muted-foreground"/>
+                            )}
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Camera className="h-6 w-6 text-white"/>
+                            </div>
+                        </Label>
+                        <Input id={`doc-${docType}-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, docType)}/>
+                        <p className="text-xs text-muted-foreground">{doc.name}</p>
+                    </div>
+                ))}
+            </div>
+            {documents.length > collapsedItemCount && (
+                <div className="text-center mt-4">
+                    <Button variant="link" onClick={() => setIsExpanded(!isExpanded)}>
+                        {isExpanded ? 'Thu gọn' : `Xem thêm (${documents.length - collapsedItemCount})`}
+                    </Button>
+                </div>
+            )}
+        </div>
+    );
+};
+
 export default function CandidateProfilePage() {
   const { toast } = useToast();
   const { role, profileName, profileHeadline, avatarUrl } = useAuth();
@@ -1894,69 +1941,18 @@ export default function CandidateProfilePage() {
                       </TabsList>
                       <TabsContent value="vietnam" className="pt-4">
                         {candidate.documents?.vietnam?.length ? (
-                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                {candidate.documents.vietnam.map((doc, index) => (
-                                    <div key={index} className="space-y-2 text-center">
-                                        <Label htmlFor={`doc-vn-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center cursor-pointer">
-                                            {doc.url ? (
-                                                <Image src={doc.url} alt={doc.name} fill className="object-cover"/>
-                                            ) : (
-                                                <UploadCloud className="h-8 w-8 text-muted-foreground"/>
-                                            )}
-                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Camera className="h-6 w-6 text-white"/>
-                                            </div>
-                                        </Label>
-                                        <Input id={`doc-vn-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, 'vietnam')}/>
-                                        <p className="text-xs text-muted-foreground">{doc.name}</p>
-                                    </div>
-                                ))}
-                             </div>
-                        ) : (<p className="text-sm text-muted-foreground py-4 text-center">{t.noInfo}</p>)}
+                             <DocumentGrid documents={candidate.documents.vietnam} docType="vietnam" handleMediaChange={handleMediaChange} />
+                        ) : (<p className="text-sm text-muted-foreground py-4 text-center">{notUpdatedText}</p>)}
                       </TabsContent>
                       <TabsContent value="japan" className="pt-4">
                          {candidate.documents?.japan?.length ? (
-                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                               {candidate.documents.japan.map((doc, index) => (
-                                    <div key={index} className="space-y-2 text-center">
-                                        <Label htmlFor={`doc-jp-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center cursor-pointer">
-                                            {doc.url ? (
-                                                <Image src={doc.url} alt={doc.name} fill className="object-cover"/>
-                                            ) : (
-                                                <UploadCloud className="h-8 w-8 text-muted-foreground"/>
-                                            )}
-                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Camera className="h-6 w-6 text-white"/>
-                                            </div>
-                                        </Label>
-                                        <Input id={`doc-jp-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, 'japan')}/>
-                                        <p className="text-xs text-muted-foreground">{doc.name}</p>
-                                    </div>
-                                ))}
-                             </div>
-                        ) : (<p className="text-sm text-muted-foreground py-4 text-center">{t.noInfo}</p>)}
+                             <DocumentGrid documents={candidate.documents.japan} docType="japan" handleMediaChange={handleMediaChange} />
+                        ) : (<p className="text-sm text-muted-foreground py-4 text-center">{notUpdatedText}</p>)}
                       </TabsContent>
                        <TabsContent value="other" className="pt-4">
                          {candidate.documents?.other?.length ? (
-                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                {candidate.documents.other.map((doc, index) => (
-                                    <div key={index} className="space-y-2 text-center">
-                                        <Label htmlFor={`doc-ot-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center cursor-pointer">
-                                            {doc.url ? (
-                                                <Image src={doc.url} alt={doc.name} fill className="object-cover"/>
-                                            ) : (
-                                                <UploadCloud className="h-8 w-8 text-muted-foreground"/>
-                                            )}
-                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Camera className="h-6 w-6 text-white"/>
-                                            </div>
-                                        </Label>
-                                        <Input id={`doc-ot-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, 'other')}/>
-                                        <p className="text-xs text-muted-foreground">{doc.name}</p>
-                                    </div>
-                                ))}
-                             </div>
-                        ) : (<p className="text-sm text-muted-foreground py-4 text-center">{t.noInfo}</p>)}
+                            <DocumentGrid documents={candidate.documents.other} docType="other" handleMediaChange={handleMediaChange} />
+                        ) : (<p className="text-sm text-muted-foreground py-4 text-center">{notUpdatedText}</p>)}
                       </TabsContent>
                     </Tabs>
                   </CardContent>
