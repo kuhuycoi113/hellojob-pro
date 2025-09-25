@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -1544,7 +1545,9 @@ export default function CandidateProfilePage() {
                     {candidate.personalInfo.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${candidate.personalInfo.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(candidate.personalInfo.zalo)}</Link></Button>}
                     {candidate.personalInfo.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={candidate.personalInfo.line} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{candidate.personalInfo.line}</Link></Button>}
                 </div>
-                 <div className="mt-4 text-center text-sm text-muted-foreground">Cung cấp ít nhất một phương thức để <Badge className="bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge></div>
+                 <div className="mt-4 text-center text-sm text-muted-foreground">
+                    Cung cấp ít nhất một phương thức để <Badge className="bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                </div>
             </CardContent>
         </Card>
     )
@@ -1936,8 +1939,6 @@ export default function CandidateProfilePage() {
                     </div>}
                   </CardContent>
                 </Card>
-
-                 <Button className="w-full bg-accent-green hover:bg-accent-green/90 text-white"><FileDown/> Tải CV (.pdf)</Button>
                  <div className="text-center pt-4">
                     <Button variant="link" className="text-muted-foreground text-sm" onClick={() => { /* Handle logout */ }}>
                         <LogOut className="mr-2 h-4 w-4"/>
@@ -1969,3 +1970,4 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
