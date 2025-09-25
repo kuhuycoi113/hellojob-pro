@@ -32,6 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { validateProfileForApplication } from '@/lib/utils';
 
 
 type EnrichedCandidateProfile = CandidateProfile & { avatarUrl?: string };
@@ -401,6 +402,9 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
     const [qrImagePreview, setQrImagePreview] = useState<string | null>(null);
     const isMobile = useIsMobile();
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+    const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
+    const [isConfirmSaveOpen, setIsConfirmSaveOpen] = useState(false);
+
 
     useEffect(() => {
         if (isOpen) {
@@ -430,16 +434,33 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
         }
     }, [isOpen]);
 
-    const handleSave = () => {
+    const forceSave = () => {
         if (tempCandidate) {
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(tempCandidate));
             onSaveSuccess();
             onOpenChange(false);
+            setIsConfirmSaveOpen(false);
         }
+    }
+
+    const handleSave = () => {
+        if (!tempCandidate) return;
+
+        if (source === 'application') {
+            const missingFields = validateProfileForApplication(tempCandidate);
+            if (missingFields.length > 0) {
+                setIsConfirmSaveOpen(true);
+                return;
+            }
+        }
+        
+        forceSave();
     };
     
     const handleCancel = () => {
-        if (onCancel) {
+        if (source === 'application') {
+            setIsConfirmCancelOpen(true);
+        } else if (onCancel) {
             onCancel();
         } else {
             onOpenChange(false);
@@ -531,6 +552,36 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+             <AlertDialog open={isConfirmCancelOpen} onOpenChange={setIsConfirmCancelOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Bạn chắc chắn muốn hủy?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Hồ sơ của bạn vẫn cần thêm thông tin để có thể ứng tuyển. Bạn có muốn dừng việc cập nhật lúc này không?
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Ở lại</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => { setIsConfirmCancelOpen(false); onOpenChange(false); }}>Vẫn hủy</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            
+            <AlertDialog open={isConfirmSaveOpen} onOpenChange={setIsConfirmSaveOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Lưu hồ sơ chưa hoàn chỉnh?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Bạn vẫn chưa điền đủ dữ liệu để Ứng tuyển, bạn chắc chắn muốn lưu chứ?
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Tiếp tục sửa</AlertDialogCancel>
+                    <AlertDialogAction onClick={forceSave}>Vẫn lưu</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             
             <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
                 <DialogContent className="sm:max-w-xl">
