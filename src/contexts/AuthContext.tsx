@@ -79,16 +79,16 @@ const fullCandidateProfile: CandidateProfile = {
         desiredJobDetail: 'Vận hành máy CNC',
         financialAbility: 'Không yêu cầu',
         interviewLocation: 'Thành phố Hồ Chí Minh',
-        specialAspirations: 'Mong muốn có nhiều cơ hội làm thêm giờ và được hỗ trợ đào tạo chuyên sâu về kỹ năng quản lý.',
+        specialAspirations: ['Mong muốn có nhiều cơ hội làm thêm giờ', 'Được hỗ trợ đào tạo chuyên sâu'],
     },
     notes: 'Đã có kinh nghiệm phỏng vấn với công ty Nhật 2 lần, mong muốn tìm đơn hàng bay nhanh trong vòng 3 tháng tới. Có thể đóng phí ngay.',
     interests: ['Cơ khí', 'Tự động hóa', 'Sản xuất'],
     skills: ['Vận hành máy CNC', 'AutoCAD', 'SolidWorks', 'Làm việc nhóm', 'Giải quyết vấn đề'],
     certifications: ['Chứng chỉ JLPT N3', 'Chứng chỉ An toàn lao động'],
     documents: {
-        vietnam: ['Xác nhận cư trú', 'Xác nhận dân sự', 'Căn cước mặt trước'],
-        japan: ['Thẻ ngoại kiều mặt trước', 'Chứng chỉ tokutei'],
-        other: [],
+        vietnam: ['Xác nhận cư trú', 'Xác nhận dân sự', 'Căn cước mặt trước', 'Căn cước mặt sau', 'Hộ chiếu mặt trước', 'Hộ chiếu mặt sau', 'Giấy khám sức khỏe', 'Bằng học vấn', 'Xác nhận tình trạng hôn nhân', 'Giấy tờ khác'],
+        japan: ['Thẻ ngoại kiều mặt trước', 'Thẻ ngoại kiều mặt sau', 'Ảnh CV gốc mặt trước', 'Ảnh CV gốc mặt sau', 'Giấy kết thúc 3 năm mặt trước', 'Giấy kết thúc 3 năm mặt sau', 'Chứng chỉ tokutei', 'Chứng chỉ tiếng Nhật', 'Giấy Shiteisho', 'Giấy đánh giá Hyokachoso', 'Giấy tờ khác'],
+        other: ['Thẻ ID', 'Bằng ngoại ngữ', 'Sổ tiết kiệm', 'Xác nhận công việc người bảo lãnh 1', 'Xác nhận công việc người bảo lãnh 2', 'Thẻ ID người bảo lãnh 1', 'Thẻ ID người bảo lãnh 2', 'Giấy tờ khác'],
     },
     desiredIndustry: 'Cơ khí, Chế tạo máy',
 };
@@ -108,15 +108,14 @@ const partialCandidateProfile: Partial<CandidateProfile> = {
       gender: 'Nữ',
       phone: '0987654321',
       dateOfBirth: '2001-10-10',
-      // Fields below are intentionally left out for testing purposes
-      height: '',
-      weight: '',
-      tattooStatus: '',
-      hepatitisBStatus: '',
-      japaneseProficiency: '',
+      height: '158',
+      weight: '48',
+      tattooStatus: 'Không có',
+      hepatitisBStatus: 'Không viêm gan B',
+      japaneseProficiency: 'Tiếng Nhật N4',
       englishProficiency: '',
       messenger: '',
-      zalo: '',
+      zalo: '0987654321',
       line: '',
     },
     aspirations: {
@@ -128,6 +127,11 @@ const partialCandidateProfile: Partial<CandidateProfile> = {
     interests: ['Cơ khí'],
     certifications: [],
     notes: '',
+    documents: {
+        vietnam: ['Căn cước mặt trước', 'Căn cước mặt sau', 'Bằng học vấn'],
+        japan: [],
+        other: [],
+    },
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
