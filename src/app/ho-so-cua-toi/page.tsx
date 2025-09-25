@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon, Ruler, QrCode, Info } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon, Ruler, QrCode, Info, UploadCloud } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -63,10 +63,20 @@ type MediaItem = {
   "data-ai-hint": string;
 };
 
-type EnrichedCandidateProfile = CandidateProfile & { 
+type DocumentItem = {
+  name: string;
+  url?: string; // Data URL of the uploaded image
+};
+
+type EnrichedCandidateProfile = Omit<CandidateProfile, 'documents'> & { 
   avatarUrl?: string;
   videos: MediaItem[];
   images: MediaItem[];
+  documents?: {
+    vietnam?: DocumentItem[];
+    japan?: DocumentItem[];
+    other?: DocumentItem[];
+  }
 };
 
 type Language = 'vi' | 'ja' | 'en';
@@ -238,9 +248,9 @@ const emptyCandidate: EnrichedCandidateProfile = {
     skills: ['Vận hành máy CNC', 'AutoCAD', 'SolidWorks', 'Làm việc nhóm', 'Giải quyết vấn đề'],
     certifications: ['Chứng chỉ JLPT N3', 'Chứng chỉ An toàn lao động'],
     documents: {
-        vietnam: ['Xác nhận cư trú', 'Xác nhận dân sự', 'Căn cước mặt trước', 'Căn cước mặt sau', 'Hộ chiếu mặt trước', 'Hộ chiếu mặt sau', 'Giấy khám sức khỏe', 'Bằng học vấn', 'Xác nhận tình trạng hôn nhân', 'Giấy tờ khác'],
-        japan: ['Thẻ ngoại kiều mặt trước', 'Thẻ ngoại kiều mặt sau', 'Ảnh CV gốc mặt trước', 'Ảnh CV gốc mặt sau', 'Giấy kết thúc 3 năm mặt trước', 'Giấy kết thúc 3 năm mặt sau', 'Chứng chỉ tokutei', 'Chứng chỉ tiếng Nhật', 'Giấy Shiteisho', 'Giấy đánh giá Hyokachoso', 'Giấy tờ khác'],
-        other: ['Thẻ ID', 'Bằng ngoại ngữ', 'Sổ tiết kiệm', 'Xác nhận công việc người bảo lãnh 1', 'Xác nhận công việc người bảo lãnh 2', 'Thẻ ID người bảo lãnh 1', 'Thẻ ID người bảo lãnh 2', 'Giấy tờ khác'],
+        vietnam: ['Xác nhận cư trú', 'Xác nhận dân sự', 'Căn cước mặt trước', 'Căn cước mặt sau', 'Hộ chiếu mặt trước', 'Hộ chiếu mặt sau', 'Giấy khám sức khỏe', 'Bằng học vấn', 'Xác nhận tình trạng hôn nhân', 'Giấy tờ khác'].map(name => ({name})),
+        japan: ['Thẻ ngoại kiều mặt trước', 'Thẻ ngoại kiều mặt sau', 'Ảnh CV gốc mặt trước', 'Ảnh CV gốc mặt sau', 'Giấy kết thúc 3 năm mặt trước', 'Giấy kết thúc 3 năm mặt sau', 'Chứng chỉ tokutei', 'Chứng chỉ tiếng Nhật', 'Giấy Shiteisho', 'Giấy đánh giá Hyokachoso', 'Giấy tờ khác'].map(name => ({name})),
+        other: ['Thẻ ID', 'Bằng ngoại ngữ', 'Sổ tiết kiệm', 'Xác nhận công việc người bảo lãnh 1', 'Xác nhận công việc người bảo lãnh 2', 'Thẻ ID người bảo lãnh 1', 'Thẻ ID người bảo lãnh 2', 'Giấy tờ khác'].map(name => ({name})),
     },
     desiredIndustry: 'Cơ khí, Chế tạo máy',
     avatarUrl: undefined,
@@ -390,7 +400,7 @@ const EditDialog = ({
         } else if (section === 'aspirations' && field === 'specialAspirations') {
             const currentAspirations = newCandidate.aspirations?.specialAspirations || [];
             const [item, checked] = args.slice(1);
-            const aspirationArray = Array.isArray(currentAspirations) ? currentAspirations : [currentAspirations];
+            const aspirationArray = Array.isArray(currentAspirations) ? currentAspirations : (typeof currentAspirations === 'string' && currentAspirations ? currentAspirations.split(',').map(s => s.trim()) : []);
 
             if (checked) {
                 newCandidate.aspirations.specialAspirations = [...aspirationArray, item];
@@ -537,7 +547,7 @@ export default function CandidateProfilePage() {
         Object.keys(newEmptyProfile).forEach(key => {
             if (typeof newEmptyProfile[key] === 'string') newEmptyProfile[key] = '';
             if (Array.isArray(newEmptyProfile[key])) newEmptyProfile[key] = [];
-            if (key === 'personalInfo' || key === 'aspirations' || key === 'documents') {
+            if (key === 'personalInfo' || key === 'aspirations') {
                 if (newEmptyProfile[key]) {
                     Object.keys(newEmptyProfile[key]).forEach(subKey => {
                          if (subKey === 'birthYear') {
@@ -545,6 +555,13 @@ export default function CandidateProfilePage() {
                          } else {
                             newEmptyProfile[key][subKey] = '';
                          }
+                    });
+                }
+            }
+             if (key === 'documents') {
+                if (newEmptyProfile[key]) {
+                    Object.keys(newEmptyProfile[key]).forEach(docType => {
+                        newEmptyProfile[key][docType] = newEmptyProfile[key][docType].map((doc: any) => typeof doc === 'string' ? {name: doc} : doc)
                     });
                 }
             }
@@ -559,12 +576,22 @@ export default function CandidateProfilePage() {
     } else {
       try {
         const parsedProfile = JSON.parse(storedProfile!);
+
+        // Normalize documents structure
+        if (parsedProfile.documents) {
+             Object.keys(parsedProfile.documents).forEach(docType => {
+                if (Array.isArray(parsedProfile.documents[docType])) {
+                    parsedProfile.documents[docType] = parsedProfile.documents[docType].map((doc: any) => typeof doc === 'string' ? {name: doc} : doc);
+                }
+            });
+        }
+
         profileToLoad = {
           ...emptyCandidate,
           ...parsedProfile,
           personalInfo: { ...emptyCandidate.personalInfo, ...parsedProfile.personalInfo },
           aspirations: { ...emptyCandidate.aspirations, ...parsedProfile.aspirations },
-          documents: { ...emptyCandidate.documents, ...parsedProfile.documents },
+          documents: parsedProfile.documents ? parsedProfile.documents : emptyCandidate.documents,
           avatarUrl: parsedProfile.avatarUrl || undefined,
           videos: (parsedProfile.videos && parsedProfile.videos.length > 0) ? parsedProfile.videos : defaultVideos,
           images: (parsedProfile.images && parsedProfile.images.length > 0) ? parsedProfile.images : defaultImages,
@@ -612,7 +639,7 @@ export default function CandidateProfilePage() {
         }
 
         const input: TranslateProfileInput = {
-            profile: profileToTranslate,
+            profile: profileToTranslate as CandidateProfile,
             targetLanguage: lang === 'ja' ? 'Japanese' : 'English',
         };
         const translatedProfile = await translateProfile(input);
@@ -656,7 +683,7 @@ export default function CandidateProfilePage() {
                     else
                         output[key] = mergeDeep(target[key], source[key]);
                 } else if (Array.isArray(source[key])) {
-                     if (key === 'skills' || key === 'interests' || key === 'certifications' || key === 'documents' || key === 'specialAspirations') {
+                     if (key === 'skills' || key === 'interests' || key === 'certifications' || key === 'specialAspirations') {
                         Object.assign(output, { [key]: source[key] });
                     } else if (key === 'education' || key === 'experience') {
                         const targetArray = target[key] || [];
@@ -714,7 +741,7 @@ export default function CandidateProfilePage() {
       );
   }
   
-  const handleMediaChange = (type: 'avatar' | 'image', e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
+  const handleMediaChange = (type: 'avatar' | 'image' | 'document', e: React.ChangeEvent<HTMLInputElement>, index?: number, docType?: 'vietnam' | 'japan' | 'other') => {
     const file = e.target.files?.[0];
     if (file && profileByLang.vi) {
       const reader = new FileReader();
@@ -725,7 +752,12 @@ export default function CandidateProfilePage() {
             newProfile.avatarUrl = newUrl;
         } else if (type === 'image' && index !== undefined) {
             newProfile.images[index].src = newUrl;
+        } else if (type === 'document' && docType && index !== undefined) {
+            if (!newProfile.documents) newProfile.documents = {};
+            if (!newProfile.documents[docType]) newProfile.documents[docType] = [];
+            newProfile.documents[docType][index].url = newUrl;
         }
+
         setProfileByLang({ vi: newProfile, ja: null, en: null });
         setCurrentLang('vi');
         
@@ -749,7 +781,7 @@ export default function CandidateProfilePage() {
           if (!newProfile.documents) {
               newProfile.documents = { vietnam: [], japan: [], other: [] };
           }
-          newProfile.documents[docType].push('');
+          newProfile.documents[docType].push({name: 'Giấy tờ mới'});
       }
       setProfileByLang({ vi: newProfile, ja: null, en: null });
       setCurrentLang('vi');
@@ -942,7 +974,7 @@ export default function CandidateProfilePage() {
             <h4 className="font-bold mb-2">Giấy tờ Việt Nam</h4>
             {(tempCandidate.documents?.vietnam || []).map((doc, index) => (
                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <Input value={doc} onChange={(e) => handleTempChange('documents', 'vietnam', index, e.target.value)} />
+                    <Input value={doc.name} onChange={(e) => handleTempChange('documents', 'vietnam', index, { ...doc, name: e.target.value })} />
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'vietnam')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
@@ -952,7 +984,7 @@ export default function CandidateProfilePage() {
             <h4 className="font-bold mb-2">Giấy tờ Nhật Bản</h4>
             {(tempCandidate.documents?.japan || []).map((doc, index) => (
                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <Input value={doc} onChange={(e) => handleTempChange('documents', 'japan', index, e.target.value)} />
+                    <Input value={doc.name} onChange={(e) => handleTempChange('documents', 'japan', index, { ...doc, name: e.target.value })} />
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'japan')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
@@ -962,7 +994,7 @@ export default function CandidateProfilePage() {
             <h4 className="font-bold mb-2">Giấy tờ nước ngoài / Du học</h4>
             {(tempCandidate.documents?.other || []).map((doc, index) => (
                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <Input value={doc} onChange={(e) => handleTempChange('documents', 'other', index, e.target.value)} />
+                    <Input value={doc.name} onChange={(e) => handleTempChange('documents', 'other', index, { ...doc, name: e.target.value })} />
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'other')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
@@ -1040,7 +1072,7 @@ export default function CandidateProfilePage() {
     };
 
     const getDisplayValue = (field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND' | 'USD') => {
-        const rawValue = tempCandidate.aspirations?.[field];
+        const rawValue = tempCandidate.aspirations?.[field as keyof typeof tempCandidate.aspirations];
         if (!rawValue || isNaN(parseInt(rawValue, 10))) return '';
         
         const numericValue = parseInt(rawValue, 10);
@@ -1059,7 +1091,7 @@ export default function CandidateProfilePage() {
     }
     
     const getConvertedSalaryDisplay = (field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND' | 'USD') => {
-        const rawValue = tempCandidate.aspirations?.[field];
+        const rawValue = tempCandidate.aspirations?.[field as keyof typeof tempCandidate.aspirations];
         if (!rawValue) return '';
         let numericValue = parseInt(rawValue, 10);
         if (isNaN(numericValue)) return '';
@@ -1839,6 +1871,92 @@ export default function CandidateProfilePage() {
                      )}
                   </CardContent>
                 </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-headline text-xl flex items-center"><FileArchive className="mr-3 text-primary"/> {t.documentsSection}</CardTitle>
+                     <EditDialog
+                        title="Chỉnh sửa Hồ sơ/Giấy tờ"
+                        onSave={handleSave}
+                        renderContent={renderDocumentsEdit}
+                        candidate={profileByLang.vi!}
+                    >
+                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                    </EditDialog>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div>
+                        <h4 className="font-semibold mb-3 text-sm">{t.vietnamDocs}</h4>
+                        {candidate.documents?.vietnam?.length ? (
+                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                {candidate.documents.vietnam.map((doc, index) => (
+                                    <div key={index} className="space-y-2 text-center">
+                                        <Label htmlFor={`doc-vn-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center cursor-pointer">
+                                            {doc.url ? (
+                                                <Image src={doc.url} alt={doc.name} fill className="object-cover"/>
+                                            ) : (
+                                                <UploadCloud className="h-8 w-8 text-muted-foreground"/>
+                                            )}
+                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Camera className="h-6 w-6 text-white"/>
+                                            </div>
+                                        </Label>
+                                        <Input id={`doc-vn-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, 'vietnam')}/>
+                                        <p className="text-xs text-muted-foreground">{doc.name}</p>
+                                    </div>
+                                ))}
+                             </div>
+                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
+                    </div>
+                     <div>
+                        <h4 className="font-semibold mb-3 text-sm">{t.japanDocs}</h4>
+                        {candidate.documents?.japan?.length ? (
+                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                               {candidate.documents.japan.map((doc, index) => (
+                                    <div key={index} className="space-y-2 text-center">
+                                        <Label htmlFor={`doc-jp-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center cursor-pointer">
+                                            {doc.url ? (
+                                                <Image src={doc.url} alt={doc.name} fill className="object-cover"/>
+                                            ) : (
+                                                <UploadCloud className="h-8 w-8 text-muted-foreground"/>
+                                            )}
+                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Camera className="h-6 w-6 text-white"/>
+                                            </div>
+                                        </Label>
+                                        <Input id={`doc-jp-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, 'japan')}/>
+                                        <p className="text-xs text-muted-foreground">{doc.name}</p>
+                                    </div>
+                                ))}
+                             </div>
+                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
+                    </div>
+                     <div>
+                        <h4 className="font-semibold mb-3 text-sm">{t.otherDocs}</h4>
+                        {candidate.documents?.other?.length ? (
+                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                {candidate.documents.other.map((doc, index) => (
+                                    <div key={index} className="space-y-2 text-center">
+                                        <Label htmlFor={`doc-ot-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center cursor-pointer">
+                                            {doc.url ? (
+                                                <Image src={doc.url} alt={doc.name} fill className="object-cover"/>
+                                            ) : (
+                                                <UploadCloud className="h-8 w-8 text-muted-foreground"/>
+                                            )}
+                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Camera className="h-6 w-6 text-white"/>
+                                            </div>
+                                        </Label>
+                                        <Input id={`doc-ot-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, 'other')}/>
+                                        <p className="text-xs text-muted-foreground">{doc.name}</p>
+                                    </div>
+                                ))}
+                             </div>
+                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
+                    </div>
+                  </CardContent>
+                </Card>
+
                  <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><FilePen className="mr-3 text-primary"/>{t.notes}</CardTitle>
@@ -1951,40 +2069,6 @@ export default function CandidateProfilePage() {
                             </EditDialog>
                         </div>}
                      </div>
-                  </CardContent>
-                </Card>
-                
-                 <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><FileArchive className="mr-3 text-primary"/> {t.documentsSection}</CardTitle>
-                     <EditDialog
-                        title="Chỉnh sửa Hồ sơ/Giấy tờ"
-                        onSave={handleSave}
-                        renderContent={renderDocumentsEdit}
-                        candidate={profileByLang.vi!}
-                    >
-                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
-                    </EditDialog>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                        <h4 className="font-semibold mb-2 text-sm">{t.vietnamDocs}</h4>
-                        {candidate.documents?.vietnam?.length > 0 ? (
-                             <div className="flex flex-wrap gap-2">{candidate.documents.vietnam.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
-                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
-                    </div>
-                     <div>
-                        <h4 className="font-semibold mb-2 text-sm">{t.japanDocs}</h4>
-                        {candidate.documents?.japan?.length > 0 ? (
-                             <div className="flex flex-wrap gap-2">{candidate.documents.japan.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
-                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
-                    </div>
-                     <div>
-                        <h4 className="font-semibold mb-2 text-sm">{t.otherDocs}</h4>
-                        {candidate.documents?.other?.length > 0 ? (
-                             <div className="flex flex-wrap gap-2">{candidate.documents.other.map(doc => <Badge key={doc} variant="secondary">{doc}</Badge>)}</div>
-                        ) : (<p className="text-sm text-muted-foreground">{t.noInfo}</p>)}
-                    </div>
                   </CardContent>
                 </Card>
 
