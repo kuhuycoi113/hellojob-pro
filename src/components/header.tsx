@@ -184,29 +184,37 @@ export function Header() {
     </Link>
   );
   
-  const FirstStepDialog = () => (
-    <>
-      {/* Screen: THSN001 */}
-      <DialogHeader>
-          <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
-          <DialogDescription className="text-center">
-            Bạn muốn tạo hồ sơ để làm gì?
-          </DialogDescription>
-      </DialogHeader>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-        <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-            <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
-            <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
-            <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
-        </Card>
-        <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-            <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
-            <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
-        </Card>
-      </div>
-    </>
-  );
+  const FirstStepDialog = () => {
+    const isEditing = role === 'candidate' || role === 'candidate-full-profile';
+    const titleText = isEditing ? 'Chọn phương thức sửa hồ sơ' : 'Chọn phương thức tạo hồ sơ';
+    const quickActionText = isEditing ? 'Sửa nhanh' : 'Tạo nhanh';
+    const detailActionText = isEditing ? 'Sửa chi tiết' : 'Tạo chi tiết';
+    const screenId = isEditing ? 'SHSN001' : 'THSN001';
+
+    return (
+        <>
+        {/* Screen: {screenId} */}
+        <DialogHeader>
+            <DialogTitle className="text-2xl font-headline text-center">{titleText}</DialogTitle>
+            <DialogDescription className="text-center">
+                Bạn muốn hồ sơ của mình được xử lý như thế nào?
+            </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+            <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">{quickActionText}</h3>
+                <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
+            </Card>
+            <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                <h3 className="font-bold text-base mb-1">{detailActionText}</h3>
+                <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
+            </Card>
+        </div>
+        </>
+    );
+  };
 
   const QuickCreateStepDialog = () => (
     <>
@@ -536,6 +544,9 @@ const LoggedOutContent = () => {
     );
 };
 
+  const isEditing = role === 'candidate' || role === 'candidate-full-profile';
+  const createProfileButtonText = isEditing ? 'Sửa hồ sơ' : 'Tạo hồ sơ';
+  const createProfileButtonTextMobile = isEditing ? 'Sửa' : 'Tạo';
 
   return (
     <>
@@ -573,11 +584,9 @@ const LoggedOutContent = () => {
                                 <Button onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập / Đăng ký</Button>
                             )}
 
-                             <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                            <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                                 <DialogTrigger asChild>
-                                    <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
-                                        {(role === 'candidate' || role === 'candidate-full-profile') ? 'Sửa hồ sơ' : 'Tạo hồ sơ'}
-                                    </Button>
+                                    <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">{createProfileButtonText}</Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-2xl">
                                     {renderDialogContent()}
@@ -602,7 +611,7 @@ const LoggedOutContent = () => {
                         <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                             <DialogTrigger asChild>
                                 <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white" size="sm">
-                                    {(role === 'candidate' || role === 'candidate-full-profile') ? 'Sửa' : 'Tạo'}
+                                    {createProfileButtonTextMobile}
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-2xl">
@@ -676,3 +685,5 @@ const LoggedOutContent = () => {
     </>
   );
 }
+
+    
