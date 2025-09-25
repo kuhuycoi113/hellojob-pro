@@ -461,7 +461,7 @@ const formatYen = (value?: string | number) => {
         ? parseInt(value.replace(/[^0-9]/g, ''), 10)
         : value;
         
-    if (isNaN(numericValue)) return value;
+    if (isNaN(numericValue)) return <span className="text-muted-foreground italic">{value || 'Chưa cập nhật'}</span>;
     return `${numericValue.toLocaleString('ja-JP')} yên`;
 };
 
@@ -675,6 +675,7 @@ export default function CandidateProfilePage() {
   
   const candidate = getDisplayedProfile();
   const t = translations[currentLang];
+  const notUpdatedText = <span className="text-muted-foreground italic">{t.noInfo}</span>;
 
 
   if (!candidate) {
@@ -1281,7 +1282,9 @@ export default function CandidateProfilePage() {
                     </Card>
                 </EditDialog>
             </div>
-            <p className="text-center mt-4 text-muted-foreground">Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-accent-green font-semibold">Cập nhật thông tin</span>.</p>
+            <div className="text-center mt-4 text-muted-foreground">
+              <p>Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-accent-green font-semibold">Cập nhật thông tin</span>.</p>
+            </div>
         </div>
       )
   };
@@ -1539,8 +1542,6 @@ export default function CandidateProfilePage() {
     const missingFields = validateProfileForApplication(candidate);
     const hasMissingFields = missingFields.length > 0;
 
-    const notUpdatedText = <span className='text-muted-foreground italic'>Chưa cập nhật</span>;
-
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -1556,8 +1557,8 @@ export default function CandidateProfilePage() {
                 <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight && parseInt(candidate.personalInfo.weight) > 0 ? `${candidate.personalInfo.weight} kg` : notUpdatedText}</p>
                 <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus || notUpdatedText}</p>
                 <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus || notUpdatedText}</p>
-                <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency || 'Chưa cập nhật'}</p>
-                <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency || 'Chưa cập nhật'}</p>
+                <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency || notUpdatedText}</p>
+                <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency || notUpdatedText}</p>
             </CardContent>
             <CardContent>
                 {hasContactInfo ? (
@@ -1576,7 +1577,7 @@ export default function CandidateProfilePage() {
                             <LineIcon className="h-6 w-6" />
                         </div>
                         <div className="text-sm text-muted-foreground">
-                            Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                            <p>Cung cấp ít nhất một phương thức để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge></p>
                         </div>
                     </div>
                 )}
@@ -1638,7 +1639,9 @@ export default function CandidateProfilePage() {
                             </Card>
                         </EditDialog>
                     </div>
-                    <p className="text-center mt-4 text-muted-foreground">Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-accent-green font-semibold">Cập nhật thông tin</span>.</p>
+                    <div className="text-center mt-4 text-muted-foreground">
+                      <p>Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-accent-green font-semibold">Cập nhật thông tin</span>.</p>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>
@@ -1741,9 +1744,9 @@ export default function CandidateProfilePage() {
                       <p className="text-muted-foreground whitespace-pre-line">{candidate.about}</p>
                     ) : (
                       <div className="text-muted-foreground">
-                        <span>{t.noInfo}</span>
+                        <span>{notUpdatedText}</span>
                         <EditDialog title="Chỉnh sửa Giới thiệu bản thân" onSave={handleSave} renderContent={renderAboutEdit} candidate={profileByLang.vi!}>
-                            <button className="text-primary hover:underline">{t.clickToUpdate}</button>
+                            <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                         </EditDialog>
                       </div>
                     )}
@@ -1777,9 +1780,9 @@ export default function CandidateProfilePage() {
                         </div>
                     )) : (
                         <div className="text-muted-foreground">
-                           <span>{t.noInfo}</span>
+                           <span>{notUpdatedText}</span>
                             <EditDialog title="Chỉnh sửa Kinh nghiệm làm việc" onSave={handleSave} renderContent={renderExperienceEdit} candidate={profileByLang.vi!}>
-                               <button className="text-primary hover:underline">{t.clickToUpdate}</button>
+                               <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>
                     )}
@@ -1807,9 +1810,9 @@ export default function CandidateProfilePage() {
                         </div>
                      )) : (
                         <div className="text-muted-foreground">
-                            <span>{t.noInfo}</span>
+                            <span>{notUpdatedText}</span>
                             <EditDialog title="Chỉnh sửa Học vấn" onSave={handleSave} renderContent={renderEducationEdit} candidate={profileByLang.vi!}>
-                                <button className="text-primary hover:underline">{t.clickToUpdate}</button>
+                                <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>
                      )}
@@ -1833,9 +1836,9 @@ export default function CandidateProfilePage() {
                       <p className="text-muted-foreground whitespace-pre-line">{candidate.notes}</p>
                     ) : (
                       <div className="text-muted-foreground">
-                        <span>{t.noInfo}</span>
+                        <span>{notUpdatedText}</span>
                         <EditDialog title="Chỉnh sửa Ghi chú" onSave={handleSave} renderContent={renderNotesEdit} candidate={profileByLang.vi!}>
-                            <button className="text-primary hover:underline">{t.clickToUpdate}</button>
+                            <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                         </EditDialog>
                       </div>
                     )}
@@ -1861,18 +1864,18 @@ export default function CandidateProfilePage() {
                     </EditDialog>
                   </CardHeader>
                    <CardContent className="space-y-3 text-sm">
-                        <p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.desiredVisaType || 'Chưa cập nhật'}</p>
-                        <p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.desiredVisaDetail || 'Chưa cập nhật'}</p>
-                        <p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry || 'Chưa cập nhật'}</p>
-                        <p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail || 'Chưa cập nhật'}</p>
-                        <p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation || 'Chưa cập nhật'}</p>
-                        <p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p>
-                        <p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p>
+                        <p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.desiredVisaType || notUpdatedText}</p>
+                        <p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.desiredVisaDetail || notUpdatedText}</p>
+                        <p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry || notUpdatedText}</p>
+                        <p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail || notUpdatedText}</p>
+                        <p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation || notUpdatedText}</p>
+                        <p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary) || notUpdatedText}</p>
+                        <p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary) || notUpdatedText}</p>
                         {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(candidate.aspirations?.desiredVisaDetail || '') && (
-                            <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility || 'Chưa cập nhật'}</p>
+                            <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility || notUpdatedText}</p>
                         )}
-                        <p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation || 'Chưa cập nhật'}</p>
-                        <p><strong>{t.specialAspirations}:</strong> {candidate.aspirations?.specialAspirations || 'Chưa cập nhật'}</p>
+                        <p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation || notUpdatedText}</p>
+                        <p><strong>{t.specialAspirations}:</strong> {candidate.aspirations?.specialAspirations || notUpdatedText}</p>
                   </CardContent>
                 </Card>
 
@@ -1894,9 +1897,9 @@ export default function CandidateProfilePage() {
                      <div className="flex flex-wrap gap-2 mb-4">
                         {candidate.skills.length > 0 ? candidate.skills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>) : 
                         <div className="text-muted-foreground text-sm">
-                            <span>{t.noInfo}</span>
+                            <span>{notUpdatedText}</span>
                             <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={profileByLang.vi!}>
-                               <button className="text-primary hover:underline">{t.clickToUpdate}</button>
+                               <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>}
                      </div>
@@ -1904,9 +1907,9 @@ export default function CandidateProfilePage() {
                      <div className="flex flex-wrap gap-2">
                         {candidate.interests.length > 0 ? candidate.interests.map(interest => <Badge key={interest} className="bg-accent-blue text-white">{interest}</Badge>) : 
                         <div className="text-muted-foreground text-sm">
-                            <span>{t.noInfo}</span>
+                            <span>{notUpdatedText}</span>
                              <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={profileByLang.vi!}>
-                                <button className="text-primary hover:underline">{t.clickToUpdate}</button>
+                                <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>}
                      </div>
@@ -1964,9 +1967,9 @@ export default function CandidateProfilePage() {
                          <p key={index} className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-muted-foreground"/>{cert}</p>
                      )) : 
                      <div className="text-muted-foreground text-sm">
-                        <span>{t.noInfo}</span>
+                        <span>{notUpdatedText}</span>
                         <EditDialog title="Chỉnh sửa Chứng chỉ & Giải thưởng" onSave={handleSave} renderContent={renderCertificationsEdit} candidate={profileByLang.vi!}>
-                            <button className="text-primary hover:underline">{t.clickToUpdate}</button>
+                            <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                         </EditDialog>
                     </div>}
                   </CardContent>
@@ -2002,6 +2005,7 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
 
 
 
