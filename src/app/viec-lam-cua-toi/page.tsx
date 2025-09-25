@@ -36,6 +36,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
+import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 
 
 const aspirations = [
@@ -187,8 +188,14 @@ const EmptyProfileView = () => {
         if (!selectedVisa) return null;
         const options = visaDetailsByVisaType[selectedVisa.slug] || [];
         
+        let screenIdComment = '';
+        if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN003-1';
+        else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN003-2';
+        else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN003-3';
+        
         return (
             <>
+            <span className="hidden">{screenIdComment}</span>
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisa.name}</DialogTitle>
                 <DialogDescription className="text-center">
@@ -209,11 +216,22 @@ const EmptyProfileView = () => {
     };
 
     const IndustryStepDialog = () => {
-        if (!selectedVisa) return null;
-        const industries = industriesByJobType[selectedVisa.slug] || [];
+        const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key => 
+            (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === selectedVisaDetail)
+        );
+
+        if (!parentVisaSlug) return null;
+
+        const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
         
+        let screenIdComment = '';
+        if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+        else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+        else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+
         return (
             <>
+                <span className="hidden">{screenIdComment}</span>
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
                     <DialogDescription className="text-center">
@@ -1284,4 +1302,3 @@ export default function MyJobsDashboardPage() {
     )
 }
 
-    
