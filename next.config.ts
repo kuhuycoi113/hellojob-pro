@@ -3,6 +3,12 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    // This is needed to allow cross-origin requests from the editor and preview in the development environment.
+    allowedDevOrigins: [
+        'https://*.cluster-ancjwrkgr5dvux4qug5rbzyc2y.cloudworkstations.dev',
+    ],
+  },
   devIndicators: false,
   typescript: {
     ignoreBuildErrors: true,
