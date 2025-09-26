@@ -47,7 +47,7 @@ const partnerBenefits = [
   }
 ];
 
-export default function NhaTuyenDung2Page() {
+export default function NhaTuyenDungPage() {
   return (
     <div className="flex flex-col items-center">
       {/* Hero Section */}

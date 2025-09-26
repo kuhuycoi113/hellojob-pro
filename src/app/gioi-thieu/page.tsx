@@ -187,7 +187,7 @@ export default function AboutPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                 <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
-                  <Link href="/nha-tuyen-dung-2">
+                  <Link href="/nha-tuyen-dung">
                     <div className="text-center">
                         <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                         <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
@@ -195,7 +195,7 @@ export default function AboutPage() {
                   </Link>
                 </Button>
                  <Button asChild size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" id="DANGKYDOITAC01">
-                  <Link href="/nha-tuyen-dung-2">
+                  <Link href="/nhuong-quyen">
                      <div className="text-center">
                         <span className="font-semibold">Đăng ký đối tác</span>
                         <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
@@ -206,7 +206,7 @@ export default function AboutPage() {
             </div>
              <div className="md:w-1/2 flex justify-center">
               <Image
-                src="/img/phong-van(6).jpg"
+                src="/img/phong-van(8).jpg"
                 alt="Hợp tác tuyển dụng tại Nhật"
                 width={500}
                 height={350}
