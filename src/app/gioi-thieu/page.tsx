@@ -1,5 +1,4 @@
 
-
 import { Button } from '@/components/ui/button';
 import type { Metadata } from 'next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -207,7 +206,7 @@ export default function AboutPage() {
             </div>
              <div className="md:w-1/2 flex justify-center">
               <Image
-                src="/img/viet-img/phong-van (3).jpg"
+                src="/img/phong-van (3).jpg"
                 alt="Hợp tác tuyển dụng tại Nhật"
                 width={500}
                 height={350}
