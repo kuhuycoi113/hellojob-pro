@@ -1,5 +1,7 @@
 
 
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldCheck, Users, FileSignature, BarChart } from 'lucide-react';
@@ -79,7 +81,7 @@ export default function NhaTuyenDung2Page() {
             </div>
              <div className="relative hidden md:block">
                 <Image 
-                  src="https://placehold.co/600x400.png"
+                  src="/img/viet-img/phong-van (3).jpg"
                   alt="Sơ đồ hợp tác đối tác"
                   width={600}
                   height={400}
