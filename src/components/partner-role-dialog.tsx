@@ -12,7 +12,7 @@ import {
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building, User, Briefcase, Handshake, Scale, UserCircle, Users } from 'lucide-react';
+import { Building, UserCheck, Handshake, Briefcase, Users, Plane } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from './custom-icons';
 
@@ -23,28 +23,28 @@ interface PartnerRoleDialogProps {
 
 const roles = {
   vi: [
-    { id: 'enterprise', icon: Building, title: 'Xí nghiệp/Công ty tiếp nhận', desc: 'Đang tìm kiếm nhân sự' },
-    { id: 'dispatch', icon: Handshake, title: 'Công ty phái cử', desc: 'Đang có ứng viên' },
-    { id: 'union', icon: Users, title: 'Nghiệp đoàn', desc: 'Hỗ trợ thực tập sinh' },
-    { id: 'shokai', icon: Briefcase, title: 'Shokai/Giới thiệu việc làm', desc: 'Có việc làm cho ứng viên' },
-    { id: 'lawyer', icon: Scale, title: 'Luật sư/Văn phòng luật', desc: 'Hỗ trợ thủ tục pháp lý' },
-    { id: 'individual', icon: UserCircle, title: 'Cá nhân/Khác', desc: 'Cộng tác viên hoặc vai trò khác' },
+    { id: 'enterprise', icon: Building, title: 'Xí nghiệp tiếp nhận', desc: 'Trực tiếp tuyển dụng và sử dụng lao động.' },
+    { id: 'dispatch', icon: Plane, title: 'Công ty phái cử', desc: 'Tuyển và phái cử lao động từ Việt Nam.' },
+    { id: 'support', icon: UserCheck, title: 'Cơ quan hỗ trợ (Shien Kikan)', desc: 'Hỗ trợ các công ty và người lao động.' },
+    { id: 'union', icon: Handshake, title: 'Nghiệp đoàn (Kumiai)', desc: 'Quản lý và hỗ trợ thực tập sinh.' },
+    { id: 'shokai', icon: Users, title: 'Công ty giới thiệu có phí (Yuryo Shokai)', desc: 'Cung cấp dịch vụ giới thiệu việc làm có tính phí.' },
+    { id: 'haken', icon: Briefcase, title: 'Công ty Haken', desc: 'Cung cấp dịch vụ phái cử lao động tạm thời.' },
   ],
   ja: [
-    { id: 'enterprise', icon: Building, title: '受け入れ企業', desc: '人材を探している' },
-    { id: 'dispatch', icon: Handshake, title: '送り出し機関', desc: '候補者がいる' },
-    { id: 'union', icon: Users, title: '監理団体', desc: '実習生を支援する' },
-    { id: 'shokai', icon: Briefcase, title: '紹介会社', desc: '候補者向けの仕事がある' },
-    { id: 'lawyer', icon: Scale, title: '弁護士/法律事務所', desc: '法的手続きを支援する' },
-    { id: 'individual', icon: UserCircle, title: '個人/その他', desc: '協力者または他の役割' },
+    { id: 'enterprise', icon: Building, title: '受け入れ企業', desc: '労働者を直接雇用・使用する。' },
+    { id: 'dispatch', icon: Plane, title: '送り出し機関', desc: 'ベトナムから労働者を募集・派遣する。' },
+    { id: 'support', icon: UserCheck, title: '支援機関', desc: '企業と労働者を支援する。' },
+    { id: 'union', icon: Handshake, title: '監理団体 (組合)', desc: '技能実習生を管理・支援する。' },
+    { id: 'shokai', icon: Users, title: '有料職業紹介事業所', desc: '有料の職業紹介サービスを提供する。' },
+    { id: 'haken', icon: Briefcase, title: '派遣会社', desc: '一時的な労働者派遣サービスを提供する。' },
   ],
   en: [
-    { id: 'enterprise', icon: Building, title: 'Accepting Company', desc: 'Looking for personnel' },
-    { id: 'dispatch', icon: Handshake, title: 'Dispatching Company', desc: 'Have candidates' },
-    { id: 'union', icon: Users, title: 'Supervising Organization', desc: 'Support for trainees' },
-    { id: 'shokai', icon: Briefcase, title: 'Recruitment Agency (Shokai)', desc: 'Have jobs for candidates' },
-    { id: 'lawyer', icon: Scale, title: 'Lawyer/Law Office', desc: 'Support for legal procedures' },
-    { id: 'individual', icon: UserCircle, title: 'Individual/Other', desc: 'Collaborator or other roles' },
+    { id: 'enterprise', icon: Building, title: 'Accepting Company', desc: 'Directly recruit and employ workers.' },
+    { id: 'dispatch', icon: Plane, title: 'Dispatching Company', desc: 'Recruit and dispatch workers from Vietnam.' },
+    { id: 'support', icon: UserCheck, title: 'Support Organization (Shien Kikan)', desc: 'Support companies and workers.' },
+    { id: 'union', icon: Handshake, title: 'Supervising Organization (Kumiai)', desc: 'Manage and support technical interns.' },
+    { id: 'shokai', icon: Users, title: 'Paid Employment Placement Agency (Yuryo Shokai)', desc: 'Provide paid job placement services.' },
+    { id: 'haken', icon: Briefcase, title: 'Temporary Staffing Agency (Haken)', desc: 'Provide temporary worker dispatch services.' },
   ],
 };
 
@@ -64,8 +64,8 @@ export function PartnerRoleDialog({ isOpen, onOpenChange }: PartnerRoleDialogPro
 
   const dialogTitles = {
     vi: 'Bạn là ai?',
-    ja: 'あなたは誰ですか？',
-    en: 'Who are you?',
+    ja: 'あなたの役割をお選びください',
+    en: 'What is your role?',
   };
 
   const dialogDescriptions = {
