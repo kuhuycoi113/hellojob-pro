@@ -206,7 +206,7 @@ export default function AboutPage() {
             </div>
              <div className="md:w-1/2 flex justify-center">
               <Image
-                src="/img/phong-van (3).jpg"
+                src="/img/phong-van(6).jpg"
                 alt="Hợp tác tuyển dụng tại Nhật"
                 width={500}
                 height={350}
