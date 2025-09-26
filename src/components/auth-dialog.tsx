@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { Phone } from 'lucide-react';
 
 interface AuthDialogProps {
   isOpen: boolean;
@@ -76,10 +77,10 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
         <div className="p-8 md:p-12 flex flex-col justify-center">
             <DialogHeader className="mb-6 text-left">
               <DialogTitle className="text-3xl font-headline">
-                {authType === 'register' ? 'Chào mừng bạn đến với HelloJob!' : 'Chào mừng trở lại!'}
+                {'Chào mừng bạn đến với HelloJob!'}
               </DialogTitle>
               <DialogDescription>
-                {authType === 'register' ? 'Tạo tài khoản để mở khóa tiềm năng sự nghiệp của bạn.' : 'Đăng nhập để tiếp tục hành trình của bạn.'}
+                {'Tạo tài khoản để mở khóa tiềm năng sự nghiệp của bạn.'}
               </DialogDescription>
             </DialogHeader>
 
@@ -92,47 +93,13 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
                     <FacebookIcon />
                     Tiếp tục với Facebook
                  </Button>
-            </div>
-            
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">HOẶC</span>
-              </div>
+                 <Button variant="outline" className="w-full justify-center h-12 text-base">
+                    <Phone className="mr-3 h-5 w-5" />
+                    Tiếp tục với Số điện thoại
+                 </Button>
             </div>
 
-             <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="email">Email hoặc Số điện thoại</Label>
-                    <Input id="email" placeholder="email@example.com" type="email" />
-                </div>
-                 {authType === 'register' ? (
-                    <Button type="submit" className="w-full h-11 text-base">Đăng ký</Button>
-                 ) : (
-                    <Button type="submit" className="w-full h-11 text-base">Đăng nhập</Button>
-                 )}
-            </form>
-
-            <div className="mt-6 text-center text-sm">
-                {authType === 'register' ? (
-                    <>
-                        Đã có tài khoản?{' '}
-                        <Button variant="link" className="p-0 h-auto" onClick={() => setAuthType('login')}>
-                            Đăng nhập
-                        </Button>
-                    </>
-                ) : (
-                    <>
-                        Chưa có tài khoản?{' '}
-                        <Button variant="link" className="p-0 h-auto" onClick={() => setAuthType('register')}>
-                            Đăng ký ngay
-                        </Button>
-                    </>
-                )}
-            </div>
-            <p className="mt-4 px-8 text-center text-xs text-muted-foreground">
+            <p className="mt-8 text-center text-xs text-muted-foreground">
                 Bằng việc tiếp tục, bạn đồng ý với {' '}
                 <a href="#" className="underline underline-offset-4 hover:text-primary">
                     Điều khoản dịch vụ
