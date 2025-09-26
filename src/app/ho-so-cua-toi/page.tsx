@@ -1,4 +1,5 @@
 
+      
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -505,25 +506,29 @@ const DocumentGrid = ({
     docType,
     handleMediaChange,
     onAddClick,
+    isExpanded,
+    setIsExpanded,
 }: {
     documents: DocumentItem[];
     docType: 'vietnam' | 'japan' | 'other';
     handleMediaChange: (type: 'document', e: React.ChangeEvent<HTMLInputElement>, index: number, docType: 'vietnam' | 'japan' | 'other') => void;
     onAddClick: (docType: 'vietnam' | 'japan' | 'other') => void;
+    isExpanded: boolean;
+    setIsExpanded: (expanded: boolean) => void;
 }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
     const isMobile = useIsMobile();
     
     const COLLAPSED_ROWS_MOBILE = 3;
     const ITEMS_PER_ROW_MOBILE = 2;
-    const collapsedItemCountMobile = COLLAPSED_ROWS_MOBILE * ITEMS_PER_ROW_MOBILE - 1; // -1 for the add button
+    const collapsedItemCountMobile = COLLAPSED_ROWS_MOBILE * ITEMS_PER_ROW_MOBILE - 1;
 
     const COLLAPSED_ROWS_DESKTOP = 2;
     const ITEMS_PER_ROW_DESKTOP = 4;
-    const collapsedItemCountDesktop = COLLAPSED_ROWS_DESKTOP * ITEMS_PER_ROW_DESKTOP - 1; // -1 for the add button
+    const collapsedItemCountDesktop = COLLAPSED_ROWS_DESKTOP * ITEMS_PER_ROW_DESKTOP - 1; 
 
     const collapsedItemCount = isMobile ? collapsedItemCountMobile : collapsedItemCountDesktop;
     const visibleDocuments = isExpanded ? documents : documents.slice(0, collapsedItemCount);
+    const hiddenCount = documents.length - visibleDocuments.length;
 
     return (
         <div>
@@ -545,18 +550,26 @@ const DocumentGrid = ({
                     </div>
                 ))}
                 
-                {/* Add new document button */}
-                 <div className="space-y-2 text-center">
-                    <button onClick={() => onAddClick(docType)} className="relative group aspect-square rounded-lg overflow-hidden border-2 border-dashed flex items-center justify-center cursor-pointer bg-secondary/20 hover:border-primary hover:bg-primary/5 w-full transition-colors">
-                        <PlusCircle className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors"/>
-                    </button>
-                    <p className="text-xs text-muted-foreground">Thêm giấy tờ</p>
-                </div>
+                {(!isExpanded || documents.length <= collapsedItemCount) && (
+                     <div className="space-y-2 text-center">
+                        <button onClick={() => onAddClick(docType)} className="relative group aspect-square rounded-lg overflow-hidden border-2 border-dashed flex items-center justify-center cursor-pointer bg-secondary/20 hover:border-primary hover:bg-primary/5 w-full transition-colors">
+                            <PlusCircle className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors"/>
+                        </button>
+                        <p className="text-xs text-muted-foreground">Thêm giấy tờ</p>
+                    </div>
+                )}
             </div>
-            {documents.length > collapsedItemCount && (
+            {hiddenCount > 0 && !isExpanded && (
                 <div className="text-center mt-4">
-                    <Button variant="link" onClick={() => setIsExpanded(!isExpanded)}>
-                        {isExpanded ? 'Thu gọn' : `Xem thêm (${documents.length - collapsedItemCount})`}
+                    <Button variant="link" onClick={() => setIsExpanded(true)}>
+                        Xem thêm ({hiddenCount})
+                    </Button>
+                </div>
+            )}
+             {isExpanded && (
+                 <div className="text-center mt-4">
+                    <Button variant="link" onClick={() => setIsExpanded(false)}>
+                        Thu gọn
                     </Button>
                 </div>
             )}
@@ -616,19 +629,6 @@ const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
     </Dialog>
 );
 
-const MainEditDialog = ({ children }: { children: React.ReactNode }) => {
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                {children}
-            </DialogTrigger>
-            <DialogContent>
-                {/* Content will be added here */}
-            </DialogContent>
-        </Dialog>
-    )
-}
-
 export default function CandidateProfilePage() {
   const { toast } = useToast();
   const { role, profileName, profileHeadline, avatarUrl } = useAuth();
@@ -648,6 +648,7 @@ export default function CandidateProfilePage() {
   const [newDocName, setNewDocName] = useState<DocumentName>({ vi: '', ja: '', en: '' });
   const [newDocImage, setNewDocImage] = useState<File | null>(null);
   const [newDocImagePreview, setNewDocImagePreview] = useState<string | null>(null);
+  const [expandedGrids, setExpandedGrids] = useState({ vietnam: false, japan: true, other: false });
 
 
   useEffect(() => {
@@ -988,6 +989,7 @@ export default function CandidateProfilePage() {
       if (newDocName.vi.trim() && newDocImagePreview && currentDocTypeToAdd) {
           handleAddItem('documents', currentDocTypeToAdd, { name: newDocName, url: newDocImagePreview });
           setIsAddDocDialogOpen(false);
+          setExpandedGrids(prev => ({...prev, [currentDocTypeToAdd]: true }));
       } else {
           toast({
               variant: "destructive",
@@ -1899,30 +1901,60 @@ export default function CandidateProfilePage() {
                   </CardHeader>
                   <CardContent>
                     <Tabs defaultValue="japan" value={activeDocTab} onValueChange={setActiveDocTab} className="w-full">
-                      <TabsList className={cn("w-full md:grid md:grid-cols-3", isMobile && "flex justify-between")}>
-                        <TabsTrigger value="vietnam" className={cn("doc-tab-vn flex-1 md:flex-auto", isMobile && "flex-grow basis-0", isMobile && activeDocTab !== 'vietnam' && "flex-shrink")}>
+                      <TabsList className={cn("w-full md:grid-cols-3", isMobile ? "flex justify-between" : "grid")}>
+                        <TabsTrigger 
+                            value="vietnam" 
+                            className={cn("doc-tab-vn flex-1 md:flex-auto", isMobile && activeDocTab !== 'vietnam' && "flex-shrink basis-0")}
+                        >
                            {isMobile ? (activeDocTab === 'vietnam' ? t.vietnamDocs : 'Việt Nam') : t.vietnamDocs}
                         </TabsTrigger>
-                        <TabsTrigger value="japan" className={cn("doc-tab-jp flex-1 md:flex-auto", isMobile && "flex-grow basis-0", isMobile && activeDocTab !== 'japan' && "flex-shrink")}>
+                        <TabsTrigger 
+                            value="japan" 
+                            className={cn("doc-tab-jp flex-1 md:flex-auto", isMobile && activeDocTab !== 'japan' && "flex-shrink basis-0")}
+                        >
                            {isMobile ? (activeDocTab === 'japan' ? t.japanDocs : 'Nhật Bản') : t.japanDocs}
                         </TabsTrigger>
-                        <TabsTrigger value="other" className={cn("doc-tab-other flex-1 md:flex-auto", isMobile && "flex-grow basis-0", isMobile && activeDocTab !== 'other' && "flex-shrink")}>
+                        <TabsTrigger 
+                            value="other" 
+                            className={cn("doc-tab-other flex-1 md:flex-auto", isMobile && activeDocTab !== 'other' && "flex-shrink basis-0")}
+                        >
                            {isMobile ? (activeDocTab === 'other' ? t.otherDocs : 'Du học') : t.otherDocs}
                         </TabsTrigger>
                       </TabsList>
                       <TabsContent value="vietnam" className="pt-4">
                         {(candidate.documents?.vietnam?.length || 0) > 0 ? (
-                             <DocumentGrid documents={candidate.documents!.vietnam!} docType="vietnam" handleMediaChange={handleMediaChange} onAddClick={handleOpenAddDocDialog} />
+                             <DocumentGrid 
+                                documents={candidate.documents!.vietnam!} 
+                                docType="vietnam" 
+                                handleMediaChange={handleMediaChange} 
+                                onAddClick={handleOpenAddDocDialog} 
+                                isExpanded={expandedGrids.vietnam}
+                                setIsExpanded={(expanded) => setExpandedGrids(prev => ({...prev, vietnam: expanded}))}
+                             />
                         ) : (<p className="text-sm text-muted-foreground py-4 text-center">{notUpdatedText}</p>)}
                       </TabsContent>
                       <TabsContent value="japan" className="pt-4">
                          {(candidate.documents?.japan?.length || 0) > 0 ? (
-                             <DocumentGrid documents={candidate.documents!.japan!} docType="japan" handleMediaChange={handleMediaChange} onAddClick={handleOpenAddDocDialog}/>
+                             <DocumentGrid 
+                                documents={candidate.documents!.japan!} 
+                                docType="japan" 
+                                handleMediaChange={handleMediaChange} 
+                                onAddClick={handleOpenAddDocDialog}
+                                isExpanded={expandedGrids.japan}
+                                setIsExpanded={(expanded) => setExpandedGrids(prev => ({...prev, japan: expanded}))}
+                             />
                         ) : (<p className="text-sm text-muted-foreground py-4 text-center">{notUpdatedText}</p>)}
                       </TabsContent>
                        <TabsContent value="other" className="pt-4">
                          {(candidate.documents?.other?.length || 0) > 0 ? (
-                            <DocumentGrid documents={candidate.documents!.other!} docType="other" handleMediaChange={handleMediaChange} onAddClick={handleOpenAddDocDialog}/>
+                            <DocumentGrid 
+                                documents={candidate.documents!.other!} 
+                                docType="other" 
+                                handleMediaChange={handleMediaChange} 
+                                onAddClick={handleOpenAddDocDialog}
+                                isExpanded={expandedGrids.other}
+                                setIsExpanded={(expanded) => setExpandedGrids(prev => ({...prev, other: expanded}))}
+                            />
                         ) : (<p className="text-sm text-muted-foreground py-4 text-center">{notUpdatedText}</p>)}
                       </TabsContent>
                     </Tabs>
@@ -2098,7 +2130,7 @@ export default function CandidateProfilePage() {
         }}
     />
     <Dialog open={isAddDocDialogOpen} onOpenChange={setIsAddDocDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-xl">
             <DialogHeader>
                 <DialogTitle>Thêm giấy tờ mới</DialogTitle>
                 <DialogDescription>
@@ -2178,3 +2210,5 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+    
