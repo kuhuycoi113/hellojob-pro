@@ -1,7 +1,6 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Cpu, Database, Layers, ShieldCheck, Briefcase, Users, FileSignature, BarChart } from 'lucide-react';
+import { ShieldCheck, Users, FileSignature, BarChart, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -36,24 +35,34 @@ export default function EmployersPage() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-center md:text-left">
-              <h1 className="text-4xl md:text-5xl font-headline font-bold mb-4">
-                Nền tảng Đối tác Tuyển dụng Kỹ năng Đặc định
+              <h1 className="text-4xl md:text-5xl font-headline font-bold mb-2">
+                Nền tảng Đối tác Tuyển dụng
+                <span className="block text-2xl text-primary-foreground/80 mt-1">特定技能パートナーシップ基盤</span>
+                <span className="block text-2xl text-primary-foreground/80 mt-1">Recruitment Partner Platform</span>
               </h1>
-              <p className="text-lg md:text-xl max-w-md mx-auto md:mx-0 text-primary-foreground/80">
-                Hợp tác cùng HelloJob để khai thác tối đa tiềm năng thị trường lao động Tokutei Ginou tại Nhật Bản.
+              <p className="text-lg md:text-xl max-w-xl mx-auto md:mx-0 text-primary-foreground/80">
+                Hợp tác cùng HelloJob để khai thác tối đa tiềm năng thị trường lao động tại Nhật Bản.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                 <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
                   <Link href="/doi-tac/dang-tin-tuyen-dung">
-                    <Briefcase /> Đăng tin ngay
+                    <div className="text-center">
+                      <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
+                      <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                    </div>
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 hover:text-white">
-                  <Link href="/nhuong-quyen">Đối tác tại Nhật</Link>
+                <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
+                  <Link href="/nhuong-quyen">
+                     <div className="text-center">
+                        <span className="font-semibold">Đăng ký đối tác</span>
+                        <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                    </div>
+                  </Link>
                 </Button>
               </div>
             </div>
-             <div className="relative">
+             <div className="relative hidden md:block">
                 <Image 
                   src="https://placehold.co/600x400.png"
                   alt="Sơ đồ hợp tác đối tác"
@@ -66,19 +75,75 @@ export default function EmployersPage() {
           </div>
         </div>
       </section>
+      
+      <section className="w-full py-20 md:py-28 bg-background">
+        <div className="container mx-auto px-4 md:px-6">
+            <Card className="p-8 md:p-12 bg-secondary border-none">
+                 <div className="text-center">
+                    <h2 className="text-3xl font-bold font-headline mb-2">
+                      Chào mừng các Đối tác Tuyển dụng
+                      <span className="block text-xl text-muted-foreground mt-1">採用パートナー様へようこそ / Welcome, Recruiting Partners</span>
+                    </h2>
+                    <p className="text-muted-foreground max-w-4xl mx-auto">
+                        HelloJob là hệ thống giúp các đối tác đăng tải thông tin việc làm miễn phí để tuyển dụng ứng viên Việt Nam. Chúng tôi chào mừng các đối tác là Cá nhân (làm việc cho các tổ chức nhân lực) hoặc Pháp nhân tại Việt Nam và Nhật Bản.
+                        <br/>
+                        <span className="text-sm opacity-80">
+                            (HelloJobは、ベトナム人候補者を採用するための無料の求人投稿プラットフォームです。ベトナムおよび日本の個人（人材紹介会社勤務）または法人パートナーを歓迎します。)
+                        </span>
+                        <br/>
+                        <span className="text-sm opacity-80">
+                            (HelloJob is a free job posting platform to recruit Vietnamese candidates. We welcome individual partners (working for recruitment agencies) or legal entities in Vietnam and Japan.)
+                        </span>
+                    </p>
+                    <div className="mt-6 bg-background p-6 rounded-lg inline-block">
+                        <h3 className="font-semibold mb-3">Các loại hình tuyển dụng chính:</h3>
+                        <ul className="space-y-1 text-muted-foreground text-left">
+                            <li>- Kỹ năng đặc định (特定技能)</li>
+                            <li>- Thực tập sinh kỹ năng (技能実習)</li>
+                            <li>- Kỹ sư, tri thức (技術・人文知識・国際業務 - 技人国)</li>
+                        </ul>
+                    </div>
+                     <p className="mt-6 text-muted-foreground max-w-4xl mx-auto">
+                        Bạn có thể đăng việc làm ngay hoặc để lại thông tin liên hệ để tìm hiểu về cơ chế hợp tác.
+                    </p>
+                    <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                         <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
+                           <Link href="/doi-tac/dang-tin-tuyen-dung">
+                            <div className="text-center">
+                                <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
+                                <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                            </div>
+                          </Link>
+                        </Button>
+                         <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
+                          <Link href="/nhuong-quyen">
+                             <div className="text-center">
+                                <span className="font-semibold">Đăng ký đối tác</span>
+                                <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                            </div>
+                          </Link>
+                        </Button>
+                    </div>
+                 </div>
+            </Card>
+        </div>
+      </section>
 
       {/* Featured Benefits */}
       <section className="w-full py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4 md:px-6">
            <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold">Lợi ích dành cho Đối tác</h2>
+            <h2 className="text-3xl md:text-4xl font-headline font-bold">
+                Lợi ích dành cho Đối tác
+                 <span className="block text-xl text-muted-foreground mt-1">パートナーのメリット / Benefits for Partners</span>
+            </h2>
             <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
               Chúng tôi cung cấp một nền tảng toàn diện với các công cụ và sự hỗ trợ cần thiết để giúp bạn thành công.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
             {partnerBenefits.map(feature => (
-              <Card key={feature.title} className="text-center p-6 border-t-4 border-primary shadow-lg hover:shadow-xl transition-shadow">
+              <Card key={feature.title} className="text-center p-6 border-t-4 border-primary shadow-lg hover:shadow-xl transition-shadow h-full">
                  <feature.icon className="w-12 h-12 text-primary mx-auto mb-4" />
                  <h3 className="text-xl font-bold font-headline mb-2">{feature.title}</h3>
                  <p className="text-muted-foreground text-sm">{feature.description}</p>
