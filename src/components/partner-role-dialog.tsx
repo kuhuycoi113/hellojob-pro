@@ -30,9 +30,9 @@ const roles = {
   vi: [
     { id: 'haken_staff', icon: UserSquare, title: 'Nhân viên phái cử', desc: 'Nhân viên tuyển dụng/đối ngoại của Công ty XKLĐ.' },
     { id: 'jp_hr_staff', icon: UserCog, title: 'Nhân viên Nhân lực Nhật', desc: 'Nhân viên tại Nghiệp đoàn, Shien, Shokai, Haken.' },
+    { id: 'support', icon: UserCheck, title: 'Cơ quan hỗ trợ (Shien Kikan)', desc: 'Hỗ trợ các công ty và người lao động.' },
     { id: 'enterprise', icon: Building, title: 'Xí nghiệp tiếp nhận', desc: 'Trực tiếp tuyển dụng và sử dụng lao động.' },
     { id: 'dispatch', icon: Plane, title: 'Công ty phái cử', desc: 'Tuyển và phái cử lao động từ Việt Nam.' },
-    { id: 'support', icon: UserCheck, title: 'Cơ quan hỗ trợ (Shien Kikan)', desc: 'Hỗ trợ các công ty và người lao động.' },
     { id: 'union', icon: Handshake, title: 'Nghiệp đoàn (Kumiai)', desc: 'Quản lý và hỗ trợ thực tập sinh.' },
     { id: 'shokai', icon: Users, title: 'Công ty giới thiệu có phí (Yuryo Shokai)', desc: 'Cung cấp dịch vụ giới thiệu việc làm có tính phí.' },
     { id: 'haken', icon: Briefcase, title: 'Công ty Haken', desc: 'Cung cấp dịch vụ phái cử lao động tạm thời.' },
@@ -40,9 +40,9 @@ const roles = {
   ja: [
     { id: 'haken_staff', icon: UserSquare, title: '派遣会社の社員', desc: '送り出し機関の採用・渉外担当者。' },
     { id: 'jp_hr_staff', icon: UserCog, title: '日本の人材担当者', desc: '監理団体、支援機関、職業紹介所、派遣会社の社員。' },
+    { id: 'support', icon: UserCheck, title: '支援機関', desc: '企業と労働者を支援する。' },
     { id: 'enterprise', icon: Building, title: '受け入れ企業', desc: '労働者を直接雇用・使用する。' },
     { id: 'dispatch', icon: Plane, title: '送り出し機関', desc: 'ベトナムから労働者を募集・派遣する。' },
-    { id: 'support', icon: UserCheck, title: '支援機関', desc: '企業と労働者を支援する。' },
     { id: 'union', icon: Handshake, title: '監理団体 (組合)', desc: '技能実習生を管理・支援する。' },
     { id: 'shokai', icon: Users, title: '有料職業紹介事業所', desc: '有料の職業紹介サービスを提供する。' },
     { id: 'haken', icon: Briefcase, title: '派遣会社', desc: '一時的な労働者派遣サービスを提供する。' },
@@ -50,9 +50,9 @@ const roles = {
   en: [
     { id: 'haken_staff', icon: UserSquare, title: 'Sending Company Staff', desc: 'Recruitment/external affairs staff of a sending company.' },
     { id: 'jp_hr_staff', icon: UserCog, title: 'Japan-side HR Staff', desc: 'Staff at a supervising, support, placement, or staffing agency.' },
+    { id: 'support', icon: UserCheck, title: 'Support Organization (Shien Kikan)', desc: 'Support companies and workers.' },
     { id: 'enterprise', icon: Building, title: 'Accepting Company', desc: 'Directly recruit and employ workers.' },
     { id: 'dispatch', icon: Plane, title: 'Sending Company', desc: 'Recruit and dispatch workers from Vietnam.' },
-    { id: 'support', icon: UserCheck, title: 'Support Organization (Shien Kikan)', desc: 'Support companies and workers.' },
     { id: 'union', icon: Handshake, title: 'Supervising Organization (Kumiai)', desc: 'Manage and support technical interns.' },
     { id: 'shokai', icon: Users, title: 'Paid Employment Placement Agency', desc: 'Provide paid job placement services.' },
     { id: 'haken', icon: Briefcase, title: 'Temporary Staffing Agency (Haken)', desc: 'Provide temporary worker dispatch services.' },
