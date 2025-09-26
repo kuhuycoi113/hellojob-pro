@@ -1,4 +1,5 @@
 
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldCheck, Users, FileSignature, BarChart } from 'lucide-react';
@@ -8,23 +9,39 @@ import Image from 'next/image';
 const partnerBenefits = [
   { 
     icon: Users,
-    title: 'Nguồn ứng viên dồi dào', 
-    description: 'Tiếp cận hệ thống dữ liệu ứng viên Kỹ năng Đặc định (Tokutei) đã được sàng lọc và xác thực thông tin ban đầu.'
+    title_vi: 'Nguồn ứng viên dồi dào',
+    title_ja: '豊富な候補者源',
+    title_en: 'Abundant Candidate Pool',
+    description_vi: 'Tiếp cận hệ thống dữ liệu ứng viên Kỹ năng Đặc định (Tokutei) đã được sàng lọc và xác thực thông tin ban đầu.',
+    description_ja: '事前にスクリーニング・検証された特定技能候補者のデータベースにアクセスできます。',
+    description_en: 'Access a database of Special Skilled Worker (Tokutei) candidates that has been pre-screened and verified.'
   },
   { 
     icon: FileSignature,
-    title: 'Công cụ quản lý hiệu quả', 
-    description: 'Sử dụng nền tảng để quản lý tin tuyển dụng, theo dõi trạng thái ứng viên và tương tác một cách chuyên nghiệp.'
+    title_vi: 'Công cụ quản lý hiệu quả',
+    title_ja: '効率的な管理ツール',
+    title_en: 'Effective Management Tools',
+    description_vi: 'Sử dụng nền tảng để quản lý tin tuyển dụng, theo dõi trạng thái ứng viên và tương tác một cách chuyên nghiệp.',
+    description_ja: 'プラットフォームを使用して、求人情報を管理し、候補者の状況を追跡し、専門的に対話します。',
+    description_en: 'Use the platform to manage job postings, track candidate status, and interact professionally.'
   },
   { 
     icon: BarChart,
-    title: 'Hỗ trợ Marketing & Vận hành', 
-    description: 'Được hỗ trợ quảng bá tin tuyển dụng trên các kênh của HelloJob, tiếp cận đúng đối tượng mục tiêu và tối ưu hóa hiệu quả.'
+    title_vi: 'Hỗ trợ Marketing & Vận hành',
+    title_ja: 'マーケティング・運営支援',
+    title_en: 'Marketing & Operations Support',
+    description_vi: 'Được hỗ trợ quảng bá tin tuyển dụng trên các kênh của HelloJob, tiếp cận đúng đối tượng mục tiêu và tối ưu hóa hiệu quả.',
+    description_ja: 'HelloJobのチャネルで求人広告を宣伝し、適切なターゲット層にリーチし、効果を最適化するためのサポートを受けられます。',
+    description_en: 'Receive support to promote job postings on HelloJob\'s channels, reaching the right target audience and optimizing effectiveness.'
   },
   {
     icon: ShieldCheck,
-    title: 'Hợp tác minh bạch',
-    description: 'Quy trình hợp tác rõ ràng, cơ chế chia sẻ doanh thu hấp dẫn và minh bạch, đảm bảo quyền lợi cho đối tác.'
+    title_vi: 'Hợp tác minh bạch',
+    title_ja: '透明性の高い協力体制',
+    title_en: 'Transparent Partnership',
+    description_vi: 'Quy trình hợp tác rõ ràng, cơ chế chia sẻ doanh thu hấp dẫn và minh bạch, đảm bảo quyền lợi cho đối tác.',
+    description_ja: '明確な協力プロセス、魅力的で透明な収益分配メカニズムにより、パートナーの利益を保証します。',
+    description_en: 'A clear cooperation process, along with an attractive and transparent revenue-sharing mechanism, ensures benefits for partners.'
   }
 ];
 
@@ -85,10 +102,14 @@ export default function NhaTuyenDung2Page() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
             {partnerBenefits.map(feature => (
-              <Card key={feature.title} className="text-center p-6 border-t-4 border-primary shadow-lg hover:shadow-xl transition-shadow">
+              <Card key={feature.title_vi} className="text-center p-6 border-t-4 border-primary shadow-lg hover:shadow-xl transition-shadow h-full">
                  <feature.icon className="w-12 h-12 text-primary mx-auto mb-4" />
-                 <h3 className="text-xl font-bold font-headline mb-2">{feature.title}</h3>
-                 <p className="text-muted-foreground text-sm">{feature.description}</p>
+                 <h3 className="text-xl font-bold font-headline mb-2">{feature.title_vi}</h3>
+                 <p className="text-sm text-muted-foreground">{feature.description_vi}</p>
+                 <div className="mt-2 text-xs text-muted-foreground/70">
+                    <p>{feature.title_ja}</p>
+                    <p>{feature.title_en}</p>
+                 </div>
               </Card>
             ))}
           </div>
