@@ -105,10 +105,14 @@ export default function NhaTuyenDung2Page() {
               <Card key={feature.title_vi} className="text-center p-6 border-t-4 border-primary shadow-lg hover:shadow-xl transition-shadow h-full">
                  <feature.icon className="w-12 h-12 text-primary mx-auto mb-4" />
                  <h3 className="text-xl font-bold font-headline mb-2">{feature.title_vi}</h3>
-                 <p className="text-sm text-muted-foreground">{feature.description_vi}</p>
-                 <div className="mt-2 text-xs text-muted-foreground/70">
-                    <p>{feature.title_ja}</p>
-                    <p>{feature.title_en}</p>
+                 <p className="text-muted-foreground text-sm">{feature.description_vi}</p>
+                 <div className="mt-4 pt-4 border-t border-dashed">
+                    <p className="text-sm font-semibold text-muted-foreground">{feature.title_ja}</p>
+                    <p className="text-xs text-muted-foreground/80 mt-1">{feature.description_ja}</p>
+                 </div>
+                 <div className="mt-2">
+                    <p className="text-sm font-semibold text-muted-foreground">{feature.title_en}</p>
+                    <p className="text-xs text-muted-foreground/80 mt-1">{feature.description_en}</p>
                  </div>
               </Card>
             ))}
