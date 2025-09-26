@@ -540,11 +540,11 @@ const DocumentGrid = ({
     
     const COLLAPSED_ROWS_MOBILE = 3;
     const ITEMS_PER_ROW_MOBILE = 2;
-    const collapsedItemCountMobile = COLLAPSED_ROWS_MOBILE * ITEMS_PER_ROW_MOBILE - 1;
+    const collapsedItemCountMobile = COLLAPSED_ROWS_MOBILE * ITEMS_PER_ROW_MOBILE;
 
     const COLLAPSED_ROWS_DESKTOP = 2;
     const ITEMS_PER_ROW_DESKTOP = 4;
-    const collapsedItemCountDesktop = COLLAPSED_ROWS_DESKTOP * ITEMS_PER_ROW_DESKTOP - 1; 
+    const collapsedItemCountDesktop = COLLAPSED_ROWS_DESKTOP * ITEMS_PER_ROW_DESKTOP; 
 
     const collapsedItemCount = isMobile ? collapsedItemCountMobile : collapsedItemCountDesktop;
     const visibleDocuments = isExpanded ? documents : documents.slice(0, collapsedItemCount);
@@ -568,16 +568,14 @@ const DocumentGrid = ({
                                     <Camera className="h-6 w-6 text-white"/>
                                 </div>
                             </Label>
-                            {doc.url && (
-                                <Button
-                                    variant="destructive"
-                                    size="icon"
-                                    className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                    onClick={() => onRemoveClick(index, docType)}
-                                >
-                                    <Trash2 className="h-3 w-3" />
-                                </Button>
-                            )}
+                             <Button
+                                variant="destructive"
+                                size="icon"
+                                className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => onRemoveClick(index, docType)}
+                            >
+                                <Trash2 className="h-3 w-3" />
+                            </Button>
                         </div>
                         <Input id={`doc-${docType}-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, docType)}/>
                         <p className="text-xs text-muted-foreground">{doc.name.vi}</p>
@@ -598,7 +596,7 @@ const DocumentGrid = ({
                     </Button>
                 </div>
             )}
-             {isExpanded && (
+             {isExpanded && documents.length > collapsedItemCount && (
                  <div className="text-center mt-4">
                     <Button variant="link" onClick={() => setIsExpanded(false)}>
                         Thu gọn
@@ -2243,7 +2241,7 @@ export default function CandidateProfilePage() {
         }}
     />
     <Dialog open={isAddDocDialogOpen} onOpenChange={setIsAddDocDialogOpen}>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="sm:max-w-xl" id="THEMGIAYTO01">
             <DialogHeader>
                 <DialogTitle>Thêm giấy tờ mới</DialogTitle>
                 <DialogDescription>
@@ -2325,6 +2323,7 @@ export default function CandidateProfilePage() {
 }
 
     
+
 
 
 
