@@ -85,13 +85,11 @@ export default function NhaTuyenDungPage() {
                   <span className="block font-semibold mt-4">Bạn có thể chọn đăng nhanh thông tin tuyển dụng mong muốn để chúng tôi hỗ trợ hoặc để lại thông tin để liên hệ hợp tác.</span>
                 </p>
                 <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                  <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
-                    <Link href="/doi-tac/dang-tin-tuyen-dung">
+                  <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsPartnerRoleDialogOpen(true)}>
                       <div className="text-center">
                           <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                           <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                       </div>
-                    </Link>
                   </Button>
                   <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsPartnerRoleDialogOpen(true)}>
                       <div className="text-center">
@@ -169,13 +167,11 @@ export default function NhaTuyenDungPage() {
                           <span className="block text-sm opacity-80 mt-2">すぐに求人を掲載するか、連絡先を残して協力体制についてご相談ください。/ You can post a job now or leave your contact information to learn about our partnership.</span>
                       </p>
                       <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                          <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90" id="DANGTINTUYENDUNG01">
-                             <Link href="/doi-tac/dang-tin-tuyen-dung">
-                                  <div className="text-center">
-                                      <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
-                                      <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
-                                  </div>
-                              </Link>
+                          <Button size="lg" className="bg-primary text-white hover:bg-primary/90" id="DANGTINTUYENDUNG01" onClick={() => setIsPartnerRoleDialogOpen(true)}>
+                              <div className="text-center">
+                                  <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
+                                  <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                              </div>
                           </Button>
                            <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsPartnerRoleDialogOpen(true)}>
                               <div className="text-center">
