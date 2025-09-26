@@ -17,20 +17,11 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { Phone } from 'lucide-react';
 
 interface AuthDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const FacebookIcon = () => (
-    <svg className="mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-        <path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"></path>
-        <path fill="#fff" d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v12.022C24.529,41.938,25.539,41.974,26.572,41.974z"></path>
-    </svg>
-);
-
 
 export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
   const [authType, setAuthType] = useState<'login' | 'register'>('register');
@@ -77,7 +68,7 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
 
             <div className="space-y-3">
                  <Button variant="outline" className="w-full justify-center h-12 text-base">
-                    <FacebookIcon />
+                    <Image src="/img/Facebook.svg" alt="Facebook" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Facebook
                  </Button>
                  <Button variant="outline" className="w-full justify-center h-12 text-base">
