@@ -46,14 +46,64 @@ const TranslatableCandidateProfileSchema = CandidateProfileSchema.partial().pick
         desiredVisaType: z.string().optional(),
         desiredVisaDetail: z.string().optional(),
         desiredJobDetail: z.string().optional(),
-        specialAspirations: z.string().optional(),
+        specialAspirations: z.array(z.string()).optional(),
+    }).optional(),
+    documents: z.object({
+        vietnam: z.array(z.object({ name: z.object({ vi: z.string() }) })) .optional(),
+        japan: z.array(z.object({ name: z.object({ vi: z.string() }) })) .optional(),
+        other: z.array(z.object({ name: z.object({ vi: z.string() }) })) .optional(),
     }).optional(),
 });
 
 export async function translateProfile(
   input: TranslateProfileInput
 ): Promise<Partial<CandidateProfile>> {
-  return translateProfileFlow(input);
+  // Before calling the flow, transform the documents array to fit the expected schema if needed.
+  const profileForTranslation = {
+      ...input.profile,
+      documents: {
+          vietnam: input.profile.documents?.vietnam?.map(doc => doc.name.vi),
+          japan: input.profile.documents?.japan?.map(doc => doc.name.vi),
+          other: input.profile.documents?.other?.map(doc => doc.name.vi),
+      }
+  };
+
+  const flowInput = {
+      ...input,
+      profile: profileForTranslation,
+  };
+  
+  const translatedPartialProfile = await translateProfileFlow(flowInput as any);
+
+  // After getting the translation, transform the documents back to the original object structure
+  const finalProfile = { ...translatedPartialProfile };
+  if (translatedPartialProfile.documents && input.profile.documents) {
+      finalProfile.documents = {
+          vietnam: translatedPartialProfile.documents.vietnam?.map((translatedName, index) => ({
+              ...input.profile.documents!.vietnam![index],
+              name: {
+                  ...input.profile.documents!.vietnam![index].name,
+                  [input.targetLanguage.toLowerCase().slice(0, 2)]: translatedName.name.vi, // Assuming translation returns in 'vi' field
+              },
+          })),
+          japan: translatedPartialProfile.documents.japan?.map((translatedName, index) => ({
+              ...input.profile.documents!.japan![index],
+              name: {
+                  ...input.profile.documents!.japan![index].name,
+                  [input.targetLanguage.toLowerCase().slice(0, 2)]: translatedName.name.vi,
+              },
+          })),
+          other: translatedPartialProfile.documents.other?.map((translatedName, index) => ({
+              ...input.profile.documents!.other![index],
+              name: {
+                  ...input.profile.documents!.other![index].name,
+                  [input.targetLanguage.toLowerCase().slice(0, 2)]: translatedName.name.vi,
+              },
+          })),
+      };
+  }
+
+  return finalProfile;
 }
 
 const prompt = ai.definePrompt({
@@ -69,7 +119,7 @@ const prompt = ai.definePrompt({
   - Do not translate non-textual data like numbers (birthYear, gradYear), URLs, or specific technical terms unless appropriate for the language.
   - Keep the original JSON structure.
   - If a field is empty or null, keep it as is.
-  - For arrays of objects (like education, experience), translate the relevant text fields within each object.
+  - For arrays of objects (like education, experience, documents), translate the relevant text fields within each object.
   - For simple arrays of strings (like skills, interests, certifications), translate each string in the array.
 
   Original Profile:
@@ -85,12 +135,35 @@ const translateProfileFlow = ai.defineFlow(
     outputSchema: TranslatableCandidateProfileSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    // To handle the schema mismatch, we temporarily flatten the documents for the AI
+    const profileForAI = { ...input.profile };
+    if (profileForAI.documents) {
+        profileForAI.documents = {
+            // @ts-ignore
+            vietnam: profileForAI.documents.vietnam?.map(d => d.name.vi),
+            // @ts-ignore
+            japan: profileForAI.documents.japan?.map(d => d.name.vi),
+            // @ts-ignore
+            other: profileForAI.documents.other?.map(d => d.name.vi),
+        }
+    }
+
+    const { output } = await prompt({ ...input, profile: profileForAI as any });
+
     if (!output) {
       throw new Error("The AI failed to translate the profile. Please try again.");
     }
+    
+    // Transform the translated strings back into the object structure
+    if (output.documents && input.profile.documents) {
+        // @ts-ignore
+        output.documents.vietnam = output.documents.vietnam?.map(nameStr => ({ name: { vi: nameStr } }));
+        // @ts-ignore
+        output.documents.japan = output.documents.japan?.map(nameStr => ({ name: { vi: nameStr } }));
+        // @ts-ignore
+        output.documents.other = output.documents.other?.map(nameStr => ({ name: { vi: nameStr } }));
+    }
+
     return output;
   }
 );
-
-    
