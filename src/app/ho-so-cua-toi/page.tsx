@@ -85,6 +85,7 @@ type DocumentName = {
 type DocumentItem = {
   name: DocumentName;
   url?: string; // Data URL of the uploaded image
+  isDefault?: boolean; // Flag to identify default documents
 };
 
 type EnrichedCandidateProfile = Omit<CandidateProfile, 'documents'> & { 
@@ -267,9 +268,9 @@ const emptyCandidate: EnrichedCandidateProfile = {
     skills: ['Vận hành máy CNC', 'AutoCAD', 'SolidWorks', 'Làm việc nhóm', 'Giải quyết vấn đề'],
     certifications: ['Chứng chỉ JLPT N3', 'Chứng chỉ An toàn lao động'],
     documents: {
-        vietnam: ['Xác nhận cư trú', 'Xác nhận dân sự', 'Căn cước mặt trước', 'Căn cước mặt sau', 'Hộ chiếu mặt trước', 'Hộ chiếu mặt sau', 'Giấy khám sức khỏe', 'Bằng học vấn', 'Xác nhận tình trạng hôn nhân', 'Giấy tờ khác'].map(name => ({name: {vi: name}})),
-        japan: ['Thẻ ngoại kiều mặt trước', 'Thẻ ngoại kiều mặt sau', 'Ảnh CV gốc mặt trước', 'Ảnh CV gốc mặt sau', 'Giấy kết thúc 3 năm mặt trước', 'Giấy kết thúc 3 năm mặt sau', 'Chứng chỉ tokutei', 'Chứng chỉ tiếng Nhật', 'Giấy Shiteisho', 'Giấy đánh giá Hyokachoso', 'Giấy tờ khác'].map(name => ({name: {vi: name}})),
-        other: ['Thẻ ID', 'Bằng ngoại ngữ', 'Sổ tiết kiệm', 'Xác nhận công việc người bảo lãnh 1', 'Xác nhận công việc người bảo lãnh 2', 'Thẻ ID người bảo lãnh 1', 'Thẻ ID người bảo lãnh 2', 'Giấy tờ khác'].map(name => ({name: {vi: name}})),
+        vietnam: ['Xác nhận cư trú', 'Xác nhận dân sự', 'Căn cước mặt trước', 'Căn cước mặt sau', 'Hộ chiếu mặt trước', 'Hộ chiếu mặt sau', 'Giấy khám sức khỏe', 'Bằng học vấn', 'Xác nhận tình trạng hôn nhân', 'Giấy tờ khác'].map(name => ({name: {vi: name}, isDefault: true})),
+        japan: ['Thẻ ngoại kiều mặt trước', 'Thẻ ngoại kiều mặt sau', 'Ảnh CV gốc mặt trước', 'Ảnh CV gốc mặt sau', 'Giấy kết thúc 3 năm mặt trước', 'Giấy kết thúc 3 năm mặt sau', 'Chứng chỉ tokutei', 'Chứng chỉ tiếng Nhật', 'Giấy Shiteisho', 'Giấy đánh giá Hyokachoso', 'Giấy tờ khác'].map(name => ({name: {vi: name}, isDefault: true})),
+        other: ['Thẻ ID', 'Bằng ngoại ngữ', 'Sổ tiết kiệm', 'Xác nhận công việc người bảo lãnh 1', 'Xác nhận công việc người bảo lãnh 2', 'Thẻ ID người bảo lãnh 1', 'Thẻ ID người bảo lãnh 2', 'Giấy tờ khác'].map(name => ({name: {vi: name}, isDefault: true})),
     },
     desiredIndustry: 'Cơ khí, Chế tạo máy',
     avatarUrl: undefined,
@@ -576,6 +577,15 @@ const DocumentGrid = ({
                             >
                                 <Trash2 className="h-3 w-3" />
                             </Button>
+                             {!doc.isDefault && (
+                                 <Button
+                                    variant="secondary"
+                                    size="icon"
+                                    className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <Edit className="h-3 w-3" />
+                                </Button>
+                             )}
                         </div>
                         <Input id={`doc-${docType}-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, docType)}/>
                         <p className="text-xs text-muted-foreground">{doc.name.vi}</p>
@@ -736,7 +746,7 @@ export default function CandidateProfilePage() {
              if (key === 'documents') {
                 if (newEmptyProfile[key]) {
                     Object.keys(newEmptyProfile[key]).forEach(docType => {
-                        newEmptyProfile[key][docType] = newEmptyProfile[key][docType].map((doc: any) => typeof doc === 'string' ? {name: {vi: doc}} : doc)
+                        newEmptyProfile[key][docType] = newEmptyProfile[key][docType].map((doc: any) => typeof doc === 'string' ? {name: {vi: doc}, isDefault: true} : {...doc, isDefault: true})
                     });
                 }
             }
@@ -1018,7 +1028,7 @@ export default function CandidateProfilePage() {
 
   const handleAddNewDocument = () => {
       if (newDocName.vi.trim() && newDocImagePreview && currentDocTypeToAdd) {
-          handleAddItem('documents', currentDocTypeToAdd, { name: newDocName, url: newDocImagePreview });
+          handleAddItem('documents', currentDocTypeToAdd, { name: newDocName, url: newDocImagePreview, isDefault: false });
           setIsAddDocDialogOpen(false);
           setExpandedGrids(prev => ({...prev, [currentDocTypeToAdd]: true }));
       } else {
@@ -1562,6 +1572,7 @@ export default function CandidateProfilePage() {
         </div>
       );
   }
+
 
   const editButtonText = isNewProfile ? 'Tạo hồ sơ' : 'Sửa hồ sơ';
 
@@ -2323,6 +2334,7 @@ export default function CandidateProfilePage() {
 }
 
     
+
 
 
 
