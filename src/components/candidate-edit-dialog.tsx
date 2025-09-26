@@ -213,7 +213,7 @@ const renderLevel1Edit = (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 <div className="space-y-2">
                 <Label>Họ và tên</Label>
-                <Input value={tempCandidate.name} onChange={(e) => handleTempChange('name' as any, 'name' as any, e.target.value)} />
+                <Input value={tempCandidate.name || ''} onChange={(e) => handleTempChange('name' as any, 'name' as any, e.target.value)} />
                 </div>
                 <div className="space-y-2">
                     <Label>Ngày sinh</Label>
@@ -646,5 +646,3 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
         </>
     );
 }
-
-  
