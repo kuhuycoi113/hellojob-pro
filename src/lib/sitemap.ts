@@ -1,5 +1,4 @@
 
-
 import { MetadataRoute } from 'next';
 import { articles } from '@/lib/handbook-data';
 import { jobData } from '@/lib/mock-data';
@@ -20,7 +19,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/cam-nang',
     '/gioi-thieu',
     '/ho-so-cua-toi',
-    '/nha-tuyen-dung',
     '/nhuong-quyen',
     '/doi-tac',
     '/doi-tac/dang-tin-tuyen-dung',
