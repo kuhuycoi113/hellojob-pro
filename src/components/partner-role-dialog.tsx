@@ -16,9 +16,14 @@ import { Building, UserCheck, Handshake, Briefcase, Users, Plane } from 'lucide-
 import { cn } from '@/lib/utils';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from './custom-icons';
 
+type Language = 'vi' | 'ja' | 'en';
+
 interface PartnerRoleDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onSelect: (roleId: string) => void;
+  onLanguageChange: (lang: Language) => void;
+  initialLang?: Language;
 }
 
 const roles = {
@@ -48,19 +53,20 @@ const roles = {
   ],
 };
 
-type Language = 'vi' | 'ja' | 'en';
 
-export function PartnerRoleDialog({ isOpen, onOpenChange }: PartnerRoleDialogProps) {
+export function PartnerRoleDialog({ isOpen, onOpenChange, onSelect, onLanguageChange, initialLang = 'vi' }: PartnerRoleDialogProps) {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [currentLang, setCurrentLang] = useState<Language>('vi');
+  const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   const handleRoleSelect = (roleId: string) => {
     setSelectedRole(roleId);
-    // Here you would typically handle the logic after a role is selected,
-    // e.g., redirecting to a specific registration form.
-    console.log(`Selected role: ${roleId}`);
-    onOpenChange(false); // Close dialog after selection
+    onSelect(roleId);
   };
+
+  const handleLangChange = (lang: Language) => {
+      setCurrentLang(lang);
+      onLanguageChange(lang);
+  }
 
   const dialogTitles = {
     vi: 'Bạn là ai?',
@@ -84,7 +90,7 @@ export function PartnerRoleDialog({ isOpen, onOpenChange }: PartnerRoleDialogPro
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="vi" onValueChange={(value) => setCurrentLang(value as Language)} className="w-full">
+        <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)} className="w-full">
             <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="vi" className="flex items-center gap-2"><VnFlagIcon /> Tiếng Việt</TabsTrigger>
                 <TabsTrigger value="ja" className="flex items-center gap-2"><JpFlagIcon /> 日本語</TabsTrigger>
@@ -110,10 +116,6 @@ export function PartnerRoleDialog({ isOpen, onOpenChange }: PartnerRoleDialogPro
                 </div>
             </div>
         </Tabs>
-
-        <div className="mt-4 text-center">
-            <Button variant="link" onClick={() => onOpenChange(false)}>Quay lại</Button>
-        </div>
       </DialogContent>
     </Dialog>
   );

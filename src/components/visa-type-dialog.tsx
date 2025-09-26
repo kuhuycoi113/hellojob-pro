@@ -14,36 +14,46 @@ import { Card } from './ui/card';
 import { HardHat, UserCheck, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+type Language = 'vi' | 'ja' | 'en';
+
 interface VisaTypeDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onSelect: (visaType: string) => void;
   onBack: () => void;
+  lang: Language;
 }
 
-const visaTypes = [
-  { 
-    id: 'tts', 
-    icon: HardHat, 
-    title: 'Thực tập sinh kỹ năng', 
-    desc: 'Chương trình dành cho lao động phổ thông, đào tạo kỹ năng tại Nhật Bản.',
-    color: 'blue'
+const visaTypeContent = {
+  vi: {
+    title: 'Bạn muốn tuyển loại Visa nào?',
+    description: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
+    roles: [
+      { id: 'tts', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Chương trình dành cho lao động phổ thông, đào tạo kỹ năng tại Nhật Bản.', color: 'blue' },
+      { id: 'tokutei', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Lao động có kinh nghiệm làm việc dài hạn.', color: 'yellow' },
+      { id: 'engineer', icon: Briefcase, title: 'Kỹ sư, tri thức', desc: 'Chuyên gia có trình độ cao, bằng cấp chuyên ngành.', color: 'green' },
+    ]
   },
-  { 
-    id: 'tokutei', 
-    icon: UserCheck, 
-    title: 'Kỹ năng đặc định', 
-    desc: 'Lao động có kinh nghiệm làm việc dài hạn.',
-    color: 'yellow'
+  ja: {
+    title: 'どのビザタイプを募集しますか？',
+    description: '採用ニーズに最も適したビザタイプを選択してください。',
+    roles: [
+      { id: 'tts', icon: HardHat, title: '技能実習', desc: '一般労働者向けの日本での技能訓練プログラム。', color: 'blue' },
+      { id: 'tokutei', icon: UserCheck, title: '特定技能', desc: '長期就労経験のある労働者向け。', color: 'yellow' },
+      { id: 'engineer', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門学位を持つ専門家。', color: 'green' },
+    ]
   },
-  { 
-    id: 'engineer', 
-    icon: Briefcase, 
-    title: 'Kỹ sư, tri thức', 
-    desc: 'Chuyên gia có trình độ cao, bằng cấp chuyên ngành.',
-    color: 'green'
-  },
-];
+  en: {
+    title: 'Which Visa Type do you want to recruit?',
+    description: 'Please select the visa type that best suits your recruitment needs.',
+    roles: [
+      { id: 'tts', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Program for general workers, providing skills training in Japan.', color: 'blue' },
+      { id: 'tokutei', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'For experienced workers for long-term employment.', color: 'yellow' },
+      { id: 'engineer', icon: Briefcase, title: 'Engineer/Specialist in Humanities', desc: 'Professionals with high qualifications and specialized degrees.', color: 'green' },
+    ]
+  }
+};
+
 
 const iconColors = {
     blue: 'bg-blue-100 text-blue-500',
@@ -51,28 +61,28 @@ const iconColors = {
     green: 'bg-green-100 text-green-500',
 }
 
-export function VisaTypeDialog({ isOpen, onOpenChange, onSelect, onBack }: VisaTypeDialogProps) {
+export function VisaTypeDialog({ isOpen, onOpenChange, onSelect, onBack, lang }: VisaTypeDialogProps) {
   const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
 
   const handleSelect = (visaId: string) => {
     setSelectedVisa(visaId);
-    // In a real scenario, you'd likely go to the next step
-    onSelect(visaId); 
-    onOpenChange(false); // Close dialog on selection
+    onSelect(visaId);
   };
+
+  const content = visaTypeContent[lang];
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl" id="NTD003">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-headline text-center">Bạn muốn tuyển loại Visa nào?</DialogTitle>
+          <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
           <DialogDescription className="text-center">
-            Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.
+            {content.description}
           </DialogDescription>
         </DialogHeader>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
-            {visaTypes.map((visa) => (
+            {content.roles.map((visa) => (
                 <Card 
                     key={visa.id} 
                     onClick={() => handleSelect(visa.id)}
