@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldCheck, Users, FileSignature, BarChart } from 'lucide-react';
@@ -123,6 +124,7 @@ export default function NhaTuyenDung2Page() {
                            <Link href="/doi-tac/dang-tin-tuyen-dung">
                                 <div className="text-center">
                                     <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
+                                    <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                                 </div>
                             </Link>
                         </Button>
@@ -130,6 +132,7 @@ export default function NhaTuyenDung2Page() {
                           <Link href="/nhuong-quyen">
                             <div className="text-center">
                                 <span className="font-semibold">Đăng ký đối tác</span>
+                                <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
                             </div>
                           </Link>
                         </Button>
