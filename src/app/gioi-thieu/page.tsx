@@ -173,20 +173,49 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-accent text-white py-20 md:py-28">
-        <div className="container mx-auto px-4 md:px-6 text-center">
-            <h2 className="text-3xl font-headline font-bold mb-4">Trở thành đối tác của HelloJob</h2>
-            <p className="text-white/80 mb-8 max-w-2xl mx-auto text-lg">
-                Bạn là một nhà tuyển dụng, một công ty phái cử hay một nhà đầu tư có tầm nhìn? Hãy liên hệ với chúng tôi để cùng khai thác tiềm năng của thị trường.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                 <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                    <Link href="/nhuong-quyen">Tìm hiểu mô hình Nhượng quyền <FileSignature/></Link>
+       <section className="w-full py-20 md:py-28 bg-background">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex flex-col md:flex-row items-center gap-12 rounded-lg bg-accent text-primary-foreground p-12 lg:p-16">
+            <div className="md:w-1/2 text-center md:text-left">
+               <h2 className="text-3xl md:text-4xl font-headline font-bold mb-2">
+                Đăng tin tuyển dụng miễn phí
+                <span className="block text-xl text-primary-foreground/80 mt-1">無料で求人掲載 / Post Jobs for Free</span>
+              </h2>
+               <p className="text-lg text-primary-foreground/80 mb-8">
+                Tiếp cận hàng ngàn ứng viên Thực tập sinh kỹ năng, Kỹ năng đặc định, Kỹ sư chất lượng cao từ Việt Nam. Đăng tin miễn phí và kết nối với nhân tài ngay hôm nay.
+                <span className="block text-sm opacity-80 mt-2">質の高い技能実習生、特定技能、エンジニア人材にアクセス。無料で求人を掲載し、今日から人材と繋がりましょう。</span>
+                <span className="block text-sm opacity-80 mt-1">Access thousands of high-quality Technical Intern Trainees, Skilled Workers, and Engineers from Vietnam. Post jobs for free and connect with talent today.</span>
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
+                  <Link href="/nha-tuyen-dung-2">
+                    <div className="text-center">
+                        <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
+                        <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                    </div>
+                  </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 hover:text-white">
-                    <Link href="/nha-tuyen-dung">Dành cho Đối tác tuyển dụng <BarChart/></Link>
+                 <Button asChild size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" id="DANGKYDOITAC01">
+                  <Link href="/nha-tuyen-dung-2">
+                     <div className="text-center">
+                        <span className="font-semibold">Đăng ký đối tác</span>
+                        <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                    </div>
+                  </Link>
                 </Button>
+              </div>
             </div>
+             <div className="md:w-1/2 flex justify-center">
+              <Image
+                src="https://placehold.co/500x350.png"
+                alt="Hợp tác tuyển dụng tại Nhật"
+                width={500}
+                height={350}
+                className="rounded-lg shadow-xl"
+                data-ai-hint="recruitment partnership japan"
+              />
+            </div>
+          </div>
         </div>
       </section>
     </>

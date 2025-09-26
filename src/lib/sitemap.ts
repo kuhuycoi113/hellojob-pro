@@ -20,7 +20,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/gioi-thieu',
     '/ho-so-cua-toi',
     '/nha-tuyen-dung-2',
-    '/nhuong-quyen',
     '/doi-tac/dang-tin-tuyen-dung',
     '/bang-dieu-khien',
     '/gop-y',
