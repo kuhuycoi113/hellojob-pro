@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -564,6 +563,58 @@ const DocumentGrid = ({
         </div>
     );
 };
+
+const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
+    <Dialog>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+                <DialogTitle className="font-headline text-2xl">Tải hồ sơ xuống</DialogTitle>
+                <DialogDescription>
+                    Chọn định dạng bạn muốn tải xuống.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+                <Card className="hover:bg-secondary cursor-pointer">
+                    <CardContent className="p-4 flex items-center gap-4">
+                        <FileCode className="h-10 w-10 text-blue-500 shrink-0"/>
+                        <div>
+                            <p className="font-semibold">Dạng HTML</p>
+                            <p className="text-xs text-muted-foreground">Tải xuống như giao diện Web.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card className="hover:bg-secondary cursor-pointer">
+                     <CardContent className="p-4 flex items-center gap-4">
+                        <FileText className="h-10 w-10 text-red-500 shrink-0"/>
+                        <div>
+                            <p className="font-semibold">Dạng PDF</p>
+                            <p className="text-xs text-muted-foreground">Lý tưởng để gửi qua email hoặc in ấn.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+                 <Card className="hover:bg-secondary cursor-pointer">
+                     <CardContent className="p-4 flex items-center gap-4">
+                        <FileType className="h-10 w-10 text-sky-600 shrink-0"/>
+                        <div>
+                            <p className="font-semibold">Dạng Docx</p>
+                            <p className="text-xs text-muted-foreground">Dễ dàng chỉnh sửa bằng Microsoft Word.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+                 <Card className="hover:bg-secondary cursor-pointer">
+                     <CardContent className="p-4 flex items-center gap-4">
+                        <Sheet className="h-10 w-10 text-green-600 shrink-0"/>
+                        <div>
+                            <p className="font-semibold">Dạng Excel</p>
+                            <p className="text-xs text-muted-foreground">Phù hợp để quản lý và phân tích dữ liệu.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </DialogContent>
+    </Dialog>
+)
 
 export default function CandidateProfilePage() {
   const { toast } = useToast();
@@ -1408,7 +1459,6 @@ export default function CandidateProfilePage() {
       );
   }
 
-
   const editButtonText = isNewProfile ? 'Tạo hồ sơ' : 'Sửa hồ sơ';
 
   const formatPhoneNumber = (phone: string | undefined): string => {
@@ -1475,8 +1525,187 @@ export default function CandidateProfilePage() {
         </Card>
     )
   };
+  
+  const SendProfileDialog = () => {
+    const handleSendClick = (lang: string) => {
+        setLanguageToSend(lang);
+        setIsSendOptionsOpen(true);
+    };
 
-  return (
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline" className="hidden sm:inline-flex"><Send/> Gửi hồ sơ</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-2xl">Bạn muốn gửi hồ sơ theo ngôn ngữ nào?</DialogTitle>
+                    <DialogDescription>
+                        Chọn một ngôn ngữ để gửi hồ sơ này cho nhà tuyển dụng.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <VnFlagIcon className="w-8 h-6 rounded-sm"/>
+                            <span className="font-semibold">Tiếng Việt</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
+                            <Button size="sm" onClick={() => handleSendClick('Tiếng Việt')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
+                        </div>
+                    </div>
+                     <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <JpFlagIcon className="w-8 h-6 rounded-sm"/>
+                            <span className="font-semibold">Tiếng Nhật</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                             <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
+                            <Button size="sm" onClick={() => handleSendClick('Tiếng Nhật')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
+                        </div>
+                    </div>
+                     <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <EnFlagIcon className="w-8 h-6 rounded-sm"/>
+                            <span className="font-semibold">Tiếng Anh</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
+                            <Button size="sm" onClick={() => handleSendClick('Tiếng Anh')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
+                        </div>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+  };
+  
+
+    const MediaCarousel = ({ items, title }: { items: MediaItem[], title: string }) => (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="font-headline text-xl flex items-center"><Video className="mr-3 text-primary"/> {title}</CardTitle>
+          <Button variant="ghost" size="icon"><PlusCircle className="h-5 w-5"/></Button>
+      </CardHeader>
+      <CardContent>
+        <Carousel className="w-full" opts={{align: "start", loop: true}}>
+            <CarouselContent className="-ml-2 md:-ml-4">
+                {items.slice(0, 6).map((item, index) => (
+                    <CarouselItem key={index} className="pl-2 md:pl-4 basis-[30%] md:basis-1/3 lg:basis-1/4">
+                       <div className="relative group overflow-hidden rounded-lg aspect-[9/16] cursor-pointer">
+                            <Image src={item.thumbnail || item.src} alt={item.alt} fill className="object-cover transition-transform duration-300 group-hover:scale-105" data-ai-hint={item['data-ai-hint']} />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <PlayCircle className="h-12 w-12 text-white/80 drop-shadow-lg" />
+                            </div>
+                            <div className="absolute bottom-2 left-2 text-white text-xs font-semibold drop-shadow-md p-1 bg-black/40 rounded">
+                                {item.alt}
+                            </div>
+                        </div>
+                    </CarouselItem>
+                ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+        </Carousel>
+      </CardContent>
+    </Card>
+  );
+
+  const BodyPhotosCarousel = ({items, onImageChange}: {items: MediaItem[], onImageChange: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void}) => (
+    <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="font-headline text-xl flex items-center"><ImageIcon className="mr-3 text-primary"/> {t.bodyPhotos}</CardTitle>
+             <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="ghost" size="icon"><PlusCircle className="h-5 w-5"/></Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Cập nhật ảnh hình thể</DialogTitle>
+                        <DialogDescription>Tải lên các ảnh theo yêu cầu để hoàn thiện hồ sơ.</DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+             </Dialog>
+        </CardHeader>
+        <CardContent>
+            <Carousel className="w-full" opts={{align: "start"}}>
+                <CarouselContent className="-ml-2 md:-ml-4">
+                    {items.map((item, index) => (
+                        <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/3 md:basis-1/4 lg:basis-1/5">
+                           <div className="space-y-2">
+                                <div className="relative group aspect-[3/4] rounded-lg overflow-hidden border">
+                                     <Image src={item.src} alt={item.alt} fill className="object-cover" data-ai-hint={item['data-ai-hint']} />
+                                     <Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                        <Camera className="h-8 w-8 text-white"/>
+                                     </Label>
+                                     <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => onImageChange(e, index)} />
+                                </div>
+                                <p className="text-center text-sm font-semibold text-muted-foreground">{item.alt}</p>
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden md:flex" />
+                <CarouselNext className="hidden md:flex" />
+            </Carousel>
+        </CardContent>
+    </Card>
+  )
+
+  const SendOptionsDialog = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+    
+    const handleSendToConsultant = () => {
+        toast({
+            title: "Đã gửi hồ sơ!",
+            description: `Hồ sơ ${languageToSend} của bạn đã được gửi tới các tư vấn viên phù hợp.`,
+            className: "bg-green-500 text-white"
+        });
+        onOpenChange(false);
+    };
+
+    const handleGetShareLink = () => {
+        const link = `${window.location.origin}/ho-so-cua-toi/public/${candidate?.name.toLowerCase().replace(/\s/g, '-')}`;
+        navigator.clipboard.writeText(link);
+        toast({
+            title: "Đã sao chép đường dẫn!",
+            description: "Bạn có thể gửi đường dẫn này cho người khác.",
+        });
+        onOpenChange(false);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-2xl">Gửi hồ sơ</DialogTitle>
+                    <DialogDescription>
+                        Chọn cách bạn muốn chia sẻ hồ sơ này.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <Button onClick={handleSendToConsultant} className="w-full justify-start h-auto p-4" variant="outline">
+                        <UserCog className="mr-4 h-6 w-6 text-primary"/>
+                        <div>
+                            <p className="font-semibold text-base">Gửi cho tư vấn viên</p>
+                            <p className="text-xs text-muted-foreground text-left">Hồ sơ của bạn sẽ được gửi đến các tư vấn viên phù hợp trong hệ thống.</p>
+                        </div>
+                    </Button>
+                    <Button onClick={handleGetShareLink} className="w-full justify-start h-auto p-4" variant="outline">
+                        <Link2 className="mr-4 h-6 w-6 text-green-500"/>
+                        <div>
+                            <p className="font-semibold text-base">Lấy đường dẫn chia sẻ</p>
+                            <p className="text-xs text-muted-foreground text-left">Tạo một đường dẫn công khai để gửi hồ sơ cho bất kỳ ai.</p>
+                        </div>
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+};
+  
+    return (
     <div className="bg-secondary">
       <div className="container mx-auto px-4 md:px-6 py-12">
         <div className="max-w-5xl mx-auto">
@@ -1656,7 +1885,7 @@ export default function CandidateProfilePage() {
                   </CardHeader>
                   <CardContent>
                     <Tabs defaultValue="japan" value={activeDocTab} onValueChange={setActiveDocTab} className="w-full">
-                      <TabsList className="flex w-full">
+                      <TabsList className={cn("flex w-full", isMobile && "w-full justify-between")}>
                         <TabsTrigger value="vietnam" className={cn("doc-tab-vn flex-1 md:flex-auto", isMobile && "flex-grow basis-0", isMobile && activeDocTab !== 'vietnam' && "flex-shrink")}>
                            {isMobile ? (activeDocTab === 'vietnam' ? t.vietnamDocs : 'Việt Nam') : t.vietnamDocs}
                         </TabsTrigger>
@@ -1825,7 +2054,6 @@ export default function CandidateProfilePage() {
                     </div>}
                   </CardContent>
                 </Card>
-
                  <div className="text-center pt-4">
                     <Button variant="link" className="text-muted-foreground text-sm" onClick={() => { /* Handle logout */ }}>
                         <LogOut className="mr-2 h-4 w-4"/>
@@ -1909,7 +2137,7 @@ export default function CandidateProfilePage() {
                                 className="object-contain rounded-md"
                             />
                         ) : (
-                            <div className="space-y-1 text-center">
+                            <div className="space-y-2 text-center">
                                 <UploadCloud className="w-10 h-10 mx-auto text-muted-foreground" />
                                 <p className="text-sm text-muted-foreground">Nhấp hoặc kéo thả file vào đây</p>
                             </div>
@@ -1935,13 +2163,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-
-
-  
-
-
-
-
-
-
-
