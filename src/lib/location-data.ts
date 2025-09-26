@@ -67,11 +67,11 @@ export const interviewLocations = {
         { name: "Hà Nội", slug: "ha-noi" },
         { name: "Thành phố Hồ Chí Minh", slug: "thanh-pho-ho-chi-minh" },
         { name: "Đà Nẵng", slug: "da-nang" },
-        { name: "Phỏng vấn Online", slug: "online" }
+        { name: "Phỏng vấn Online (Việt Nam)", slug: "online-vn" }
     ],
     "Nhật Bản": [
         { name: "Phỏng vấn tại Công ty", slug: "tai-cong-ty" },
-        { name: "Phỏng vấn Online", slug: "online-jp" }
+        { name: "Phỏng vấn Online (Nhật Bản)", slug: "online-jp" }
     ]
 };
 
