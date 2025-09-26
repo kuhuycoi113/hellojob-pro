@@ -213,7 +213,7 @@ const renderLevel1Edit = (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 <div className="space-y-2">
                 <Label>Họ và tên</Label>
-                <Input value={tempCandidate.name || ''} onChange={(e) => handleTempChange('name' as any, 'name' as any, e.target.value)} />
+                <Input value={tempCandidate.name || ''} onChange={(e) => handleTempChange('name' as any, e.target.value, '')} />
                 </div>
                 <div className="space-y-2">
                     <Label>Ngày sinh</Label>
@@ -469,16 +469,17 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
 
     const handleTempChange = (
         section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
-        ...args: any[]
+        fieldOrValue: any,
+        value?: any
     ) => {
         setTempCandidate(prev => {
             if (!prev) return null;
             const newCandidate = JSON.parse(JSON.stringify(prev)); // Deep copy
-
+    
             if (section === 'name') {
-                 newCandidate.name = args[2];
+                newCandidate.name = fieldOrValue;
             } else if (section === 'personalInfo' || section === 'aspirations') {
-                const [field, value] = args;
+                const field = fieldOrValue;
                 if (section === 'personalInfo' && field === 'messenger') {
                      newCandidate[section] = { ...newCandidate[section]!, [field]: parseMessengerInput(value) };
                 } else if (section === 'personalInfo' && field === 'zalo') {
@@ -487,24 +488,21 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                      newCandidate[section] = { ...newCandidate[section]!, [field]: parseLineInput(value) };
                 } else if (section === 'aspirations' && field === 'specialAspirations') {
                     const currentAspirations = newCandidate.aspirations?.specialAspirations || [];
-                    const [item, checked] = args.slice(1);
+                    const [item, checked] = [value, arguments[3]];
                     const aspirationArray = Array.isArray(currentAspirations) ? currentAspirations : (typeof currentAspirations === 'string' && currentAspirations ? currentAspirations.split(',').map(s => s.trim()) : []);
-
+    
                     if (checked) {
                         newCandidate.aspirations.specialAspirations = [...aspirationArray, item];
                     } else {
                         newCandidate.aspirations.specialAspirations = aspirationArray.filter((i: string) => i !== item);
                     }
                 } else {
-                     // @ts-ignore
                      newCandidate[section] = { ...newCandidate[section], [field]: value };
                 }
             } else {
-                const [value] = args;
-                 // @ts-ignore
-                newCandidate[section] = value;
+                newCandidate[section as keyof EnrichedCandidateProfile] = fieldOrValue;
             }
-
+    
             return newCandidate;
         });
     };
