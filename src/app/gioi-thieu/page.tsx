@@ -97,7 +97,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="relative aspect-[4/3] max-h-[450px]">
               <Image
-                src="https://placehold.co/600x450.png"
+                src="/img/viet-img/phong-van (3).jpg"
                 alt="Đội ngũ HelloJob"
                 fill
                 className="object-contain rounded-lg shadow-xl"
@@ -171,7 +171,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
+       {/* CTA Section */}
        <section className="w-full py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center gap-12 rounded-lg bg-accent text-primary-foreground p-12 lg:p-16">
@@ -195,7 +195,7 @@ export default function AboutPage() {
                   </Link>
                 </Button>
                  <Button asChild size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" id="DANGKYDOITAC01">
-                  <Link href="/nhuong-quyen">
+                  <Link href="/nha-tuyen-dung">
                      <div className="text-center">
                         <span className="font-semibold">Đăng ký đối tác</span>
                         <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>

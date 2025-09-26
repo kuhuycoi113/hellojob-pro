@@ -73,7 +73,7 @@ export default function NhaTuyenDungPage() {
                   </Link>
                 </Button>
                 <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
-                  <Link href="/nhuong-quyen">
+                  <Link href="/nha-tuyen-dung">
                     <div className="text-center">
                         <span className="font-semibold">Đăng ký đối tác</span>
                         <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
@@ -159,7 +159,7 @@ export default function NhaTuyenDungPage() {
                             </Link>
                         </Button>
                          <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
-                          <Link href="/nhuong-quyen">
+                          <Link href="/nha-tuyen-dung">
                             <div className="text-center">
                                 <span className="font-semibold">Đăng ký đối tác</span>
                                 <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
