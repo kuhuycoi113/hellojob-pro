@@ -197,22 +197,40 @@ export const MainContent = () => (
         </div>
       </section>
 
-      {/* For Employers & Franchise */}
+      {/* For Employers & Partners */}
       <section className="w-full py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center gap-12 rounded-lg bg-accent text-primary-foreground p-12 lg:p-16">
-            <div className="md:w-1/2">
-              <h2 className="text-3xl md:text-4xl font-headline font-bold mb-4">Giải pháp cho các đối tác tuyển Tokutei đầu Nhật</h2>
+            <div className="md:w-1/2 text-center md:text-left">
+              <h2 className="text-3xl md:text-4xl font-headline font-bold mb-2">
+                Đăng tin tuyển dụng miễn phí
+                <span className="block text-xl text-primary-foreground/80 mt-1">無料で求人掲載 / Post Jobs for Free</span>
+              </h2>
               <p className="text-lg text-primary-foreground/80 mb-8">
-                Hợp tác cùng HelloJob để tiếp cận nguồn ứng viên dồi dào, chất lượng cao và tối ưu hóa quy trình tuyển dụng Kỹ năng Đặc định.
+                Tiếp cận hàng ngàn ứng viên Thực tập sinh, Kỹ năng đặc định, Kỹ sư chất lượng cao từ Việt Nam. Đăng tin miễn phí và kết nối với nhân tài ngay hôm nay.
               </p>
-              <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                <Link href="/nhuong-quyen">Tìm hiểu về Mô hình Đối tác</Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+                  <Link href="/doi-tac/dang-tin-tuyen-dung">
+                    <div className="text-center">
+                        <span className="font-semibold">Đăng tin ngay</span>
+                        <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                    </div>
+                  </Link>
+                </Button>
+                 <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 hover:text-white">
+                  <Link href="/nhuong-quyen">
+                     <div className="text-center">
+                        <span className="font-semibold">Đăng ký đối tác</span>
+                        <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                    </div>
+                  </Link>
+                </Button>
+              </div>
             </div>
              <div className="md:w-1/2 flex justify-center">
               <Image
-                src="/img/giai_phap_phai_cu.jpg"
+                src="https://placehold.co/500x350.png"
                 alt="Hợp tác tuyển dụng tại Nhật"
                 width={500}
                 height={350}
