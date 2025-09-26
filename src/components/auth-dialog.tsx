@@ -94,7 +94,7 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
                     Tiếp tục với Facebook
                  </Button>
                  <Button variant="outline" className="w-full justify-center h-12 text-base">
-                    <Phone className="mr-3 h-5 w-5" />
+                    <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Số điện thoại
                  </Button>
             </div>
