@@ -207,7 +207,7 @@ export default function AboutPage() {
             </div>
              <div className="md:w-1/2 flex justify-center">
               <Image
-                src="https://placehold.co/500x350.png"
+                src="/img/viet-img/phong-van (3).jpg"
                 alt="Hợp tác tuyển dụng tại Nhật"
                 width={500}
                 height={350}
