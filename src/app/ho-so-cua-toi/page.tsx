@@ -20,6 +20,17 @@ import {
     DialogClose,
 } from "@/components/ui/dialog";
 import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -656,6 +667,7 @@ export default function CandidateProfilePage() {
   const [newDocImage, setNewDocImage] = useState<File | null>(null);
   const [newDocImagePreview, setNewDocImagePreview] = useState<string | null>(null);
   const [expandedGrids, setExpandedGrids] = useState({ vietnam: false, japan: true, other: false });
+  const [lastDocumentsState, setLastDocumentsState] = useState<EnrichedCandidateProfile['documents'] | null>(null);
 
 
   useEffect(() => {
@@ -1020,8 +1032,9 @@ export default function CandidateProfilePage() {
     
     const handleRestoreDocuments = () => {
         if (!profileByLang.vi) return;
+        const currentDocs = profileByLang.vi.documents;
+        setLastDocumentsState(JSON.parse(JSON.stringify(currentDocs))); // Save current state for undo
 
-        const currentDocs = profileByLang.vi.documents || { vietnam: [], japan: [], other: [] };
         const defaultDocs = emptyCandidate.documents || { vietnam: [], japan: [], other: [] };
         const newDocs: EnrichedCandidateProfile['documents'] = { vietnam: [], japan: [], other: [] };
 
@@ -1031,7 +1044,7 @@ export default function CandidateProfilePage() {
 
             // 1. Preserve default docs with uploaded images
             defaultDocs[type]?.forEach(defaultDoc => {
-                const currentDoc = currentDocs[type]?.find(d => d.name.vi === defaultDoc.name.vi);
+                const currentDoc = currentDocs?.[type]?.find(d => d.name.vi === defaultDoc.name.vi);
                 if (currentDoc && currentDoc.url) {
                     restoredDocsForType.push(currentDoc);
                 } else {
@@ -1040,7 +1053,7 @@ export default function CandidateProfilePage() {
             });
 
             // 2. Preserve user-added docs with uploaded images
-            currentDocs[type]?.forEach(currentDoc => {
+            currentDocs?.[type]?.forEach(currentDoc => {
                 if (!defaultDocNames.has(currentDoc.name.vi) && currentDoc.url) {
                      restoredDocsForType.push(currentDoc);
                 }
@@ -1055,9 +1068,26 @@ export default function CandidateProfilePage() {
 
         toast({
             title: "Khôi phục thành công!",
-            description: "Danh sách giấy tờ đã được khôi phục về mặc định, giữ lại các tệp đã tải lên.",
+            description: "Danh sách giấy tờ đã được khôi phục.",
+            action: (
+              <Button variant="ghost" onClick={handleUndoRestore}>Hoàn tác</Button>
+            ),
         });
     };
+
+    const handleUndoRestore = () => {
+        if (lastDocumentsState && profileByLang.vi) {
+            const newProfile = { ...profileByLang.vi, documents: lastDocumentsState };
+            setProfileByLang({ vi: newProfile, ja: null, en: null });
+            setCurrentLang('vi');
+            setLastDocumentsState(null); // Clear undo state
+            toast({
+                title: "Đã hoàn tác!",
+                description: "Danh sách giấy tờ đã được quay lại như cũ.",
+            });
+        }
+    };
+
 
   const renderAboutEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
     <Textarea
@@ -1210,7 +1240,7 @@ export default function CandidateProfilePage() {
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'vietnam')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'vietnam', {name: {vi:'Giấy tờ mới'}})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+            <Button variant="outline" size="sm" onClick={() => handleOpenAddDocDialog('vietnam')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
         </div>
          <div>
             <h4 className="font-bold mb-2">Giấy tờ Nhật Bản</h4>
@@ -1220,7 +1250,7 @@ export default function CandidateProfilePage() {
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'japan')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'japan', {name: {vi:'Giấy tờ mới'}})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+            <Button variant="outline" size="sm" onClick={() => handleOpenAddDocDialog('japan')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
         </div>
          <div>
             <h4 className="font-bold mb-2">Giấy tờ nước ngoài / Du học</h4>
@@ -1230,7 +1260,7 @@ export default function CandidateProfilePage() {
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'other')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'other', {name: {vi:'Giấy tờ mới'}})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+            <Button variant="outline" size="sm" onClick={() => handleOpenAddDocDialog('other')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
         </div>
     </div>
   );
@@ -1767,6 +1797,7 @@ export default function CandidateProfilePage() {
     );
 };
   
+  
     return (
     <div className="bg-secondary">
       <div className="container mx-auto px-4 md:px-6 py-12">
@@ -1941,7 +1972,25 @@ export default function CandidateProfilePage() {
                         onSave={handleSave}
                         renderContent={renderDocumentsEdit}
                         candidate={profileByLang.vi!}
-                        footerContent={<Button variant="ghost" onClick={handleRestoreDocuments}><RefreshCw className="mr-2 h-4 w-4" />Khôi phục danh sách ban đầu</Button>}
+                        footerContent={
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="ghost"><RefreshCw className="mr-2 h-4 w-4" />Khôi phục danh sách</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Xác nhận khôi phục?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Những giấy tờ đã bị xoá sẽ được khôi phục về danh sách ban đầu. Các giấy tờ bạn đã thêm (nếu có ảnh) và các ảnh đã tải lên sẽ được giữ nguyên. Bạn có muốn tiếp tục?
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleRestoreDocuments}>Đồng ý</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        }
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
                     </EditDialog>
@@ -2259,3 +2308,4 @@ export default function CandidateProfilePage() {
 }
 
     
+
