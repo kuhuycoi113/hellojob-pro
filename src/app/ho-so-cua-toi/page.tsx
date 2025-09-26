@@ -524,6 +524,7 @@ const DocumentGrid = ({
     docType,
     handleMediaChange,
     onAddClick,
+    onRemoveClick,
     isExpanded,
     setIsExpanded,
 }: {
@@ -531,6 +532,7 @@ const DocumentGrid = ({
     docType: 'vietnam' | 'japan' | 'other';
     handleMediaChange: (type: 'document', e: React.ChangeEvent<HTMLInputElement>, index: number, docType: 'vietnam' | 'japan' | 'other') => void;
     onAddClick: (docType: 'vietnam' | 'japan' | 'other') => void;
+    onRemoveClick: (index: number, docType: 'vietnam' | 'japan' | 'other') => void;
     isExpanded: boolean;
     setIsExpanded: (expanded: boolean) => void;
 }) => {
@@ -553,29 +555,41 @@ const DocumentGrid = ({
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {visibleDocuments.map((doc, index) => (
                     <div key={index} className="space-y-2 text-center">
-                        <Label htmlFor={`doc-${docType}-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center cursor-pointer bg-secondary/50">
-                            {doc.url ? (
-                                <Image src={doc.url} alt={doc.name.vi} fill className="object-cover"/>
-                            ) : (
-                                <UploadCloud className="h-8 w-8 text-muted-foreground"/>
+                        <div className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center bg-secondary/50">
+                            <Label htmlFor={`doc-${docType}-${index}`} className="w-full h-full cursor-pointer">
+                                {doc.url ? (
+                                    <Image src={doc.url} alt={doc.name.vi} fill className="object-cover"/>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full">
+                                      <UploadCloud className="h-8 w-8 text-muted-foreground"/>
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Camera className="h-6 w-6 text-white"/>
+                                </div>
+                            </Label>
+                            {doc.url && (
+                                <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={() => onRemoveClick(index, docType)}
+                                >
+                                    <Trash2 className="h-3 w-3" />
+                                </Button>
                             )}
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Camera className="h-6 w-6 text-white"/>
-                            </div>
-                        </Label>
+                        </div>
                         <Input id={`doc-${docType}-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, docType)}/>
                         <p className="text-xs text-muted-foreground">{doc.name.vi}</p>
                     </div>
                 ))}
                 
-                {(!isExpanded || documents.length <= collapsedItemCount) && (
-                     <div className="space-y-2 text-center">
-                        <button onClick={() => onAddClick(docType)} className="relative group aspect-square rounded-lg overflow-hidden border-2 border-dashed flex items-center justify-center cursor-pointer bg-secondary/20 hover:border-primary hover:bg-primary/5 w-full transition-colors">
-                            <PlusCircle className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors"/>
-                        </button>
-                        <p className="text-xs text-muted-foreground">Thêm giấy tờ</p>
-                    </div>
-                )}
+                <div className="space-y-2 text-center">
+                    <button onClick={() => onAddClick(docType)} className="relative group aspect-square rounded-lg overflow-hidden border-2 border-dashed flex items-center justify-center cursor-pointer bg-secondary/20 hover:border-primary hover:bg-primary/5 w-full transition-colors">
+                        <PlusCircle className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors"/>
+                    </button>
+                    <p className="text-xs text-muted-foreground">Thêm giấy tờ</p>
+                </div>
             </div>
             {hiddenCount > 0 && !isExpanded && (
                 <div className="text-center mt-4">
@@ -2023,7 +2037,8 @@ export default function CandidateProfilePage() {
                                 documents={candidate.documents!.vietnam!} 
                                 docType="vietnam" 
                                 handleMediaChange={handleMediaChange} 
-                                onAddClick={handleOpenAddDocDialog} 
+                                onAddClick={handleOpenAddDocDialog}
+                                onRemoveClick={handleRemoveItem as any}
                                 isExpanded={expandedGrids.vietnam}
                                 setIsExpanded={(expanded) => setExpandedGrids(prev => ({...prev, vietnam: expanded}))}
                              />
@@ -2036,6 +2051,7 @@ export default function CandidateProfilePage() {
                                 docType="japan" 
                                 handleMediaChange={handleMediaChange} 
                                 onAddClick={handleOpenAddDocDialog}
+                                onRemoveClick={handleRemoveItem as any}
                                 isExpanded={expandedGrids.japan}
                                 setIsExpanded={(expanded) => setExpandedGrids(prev => ({...prev, japan: expanded}))}
                              />
@@ -2048,6 +2064,7 @@ export default function CandidateProfilePage() {
                                 docType="other" 
                                 handleMediaChange={handleMediaChange} 
                                 onAddClick={handleOpenAddDocDialog}
+                                onRemoveClick={handleRemoveItem as any}
                                 isExpanded={expandedGrids.other}
                                 setIsExpanded={(expanded) => setExpandedGrids(prev => ({...prev, other: expanded}))}
                             />
@@ -2308,5 +2325,6 @@ export default function CandidateProfilePage() {
 }
 
     
+
 
 
