@@ -50,7 +50,7 @@ export default function NhaTuyenDungPage() {
   return (
     <div className="flex flex-col items-center">
       {/* Hero Section */}
-      <section className="w-full bg-accent text-primary-foreground py-20 md:py-28">
+      <section className="w-full bg-gradient-to-br from-accent to-primary text-primary-foreground py-20 md:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-center md:text-left">
