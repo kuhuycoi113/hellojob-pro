@@ -1,5 +1,4 @@
 
-
 'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -215,7 +214,7 @@ export const MainContent = () => (
                 <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
                   <Link href="/doi-tac/dang-tin-tuyen-dung">
                     <div className="text-center">
-                        <span className="font-semibold">Đăng tin ngay</span>
+                        <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                         <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                     </div>
                   </Link>
