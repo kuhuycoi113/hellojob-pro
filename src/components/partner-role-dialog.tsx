@@ -38,7 +38,7 @@ const roles = {
     { id: 'haken', icon: Briefcase, title: 'Công ty Haken', desc: 'Cung cấp dịch vụ phái cử lao động tạm thời.' },
   ],
   ja: [
-    { id: 'haken_staff', icon: UserSquare, title: '派遣会社の社員', desc: '送り出し機関の採用・渉外担当者。' },
+    { id: 'haken_staff', icon: UserSquare, title: '送り出し機関の社員', desc: '送り出し機関の採用・渉外担当者。' },
     { id: 'jp_hr_staff', icon: UserCog, title: '日本の人材担当者', desc: '監理団体、支援機関、職業紹介所、派遣会社の社員。' },
     { id: 'dispatch', icon: Plane, title: '送り出し機関', desc: 'ベトナムから労働者を募集・派遣する。' },
     { id: 'support', icon: UserCheck, title: '支援機関', desc: '企業と労働者を支援する。' },
