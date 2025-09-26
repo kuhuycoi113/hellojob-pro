@@ -47,7 +47,7 @@ export default function EmployersPage() {
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                 <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                  <Link href="/doi-tac/dang-tin-tuyen-dung">
+                  <Link href="/nha-tuyen-dung-2">
                     <Briefcase /> Đăng tin ngay
                   </Link>
                 </Button>
@@ -112,7 +112,7 @@ export default function EmployersPage() {
                     </p>
                     <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                         <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
-                           <Link href="/doi-tac/dang-tin-tuyen-dung">
+                           <Link href="/nha-tuyen-dung-2">
                             <div className="text-center">
                                 <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                                 <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
