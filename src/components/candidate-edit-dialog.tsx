@@ -167,23 +167,6 @@ const renderLevel1Edit = (
         handleTempChange('personalInfo', 'dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '');
     };
 
-    const DatePickerTrigger = () => (
-         <Button
-            variant={"outline"}
-            className={cn(
-            "w-full justify-start text-left font-normal",
-            !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
-            )}
-        >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {tempCandidate.personalInfo.dateOfBirth ? (
-            format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
-            ) : (
-            <span>Chọn ngày sinh</span>
-            )}
-        </Button>
-    )
-
     const CalendarComponent = () => (
          <Calendar
             mode="single"
@@ -198,7 +181,7 @@ const renderLevel1Edit = (
             fromYear={1950}
             toYear={new Date().getFullYear() - 16}
         />
-    )
+    );
 
     return (
         <div className="space-y-4">
@@ -206,21 +189,34 @@ const renderLevel1Edit = (
                 <Info className="h-4 w-4" />
                 <AlertTitle className="font-bold">Lưu ý quan trọng</AlertTitle>
                 <AlertDescription>
-                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên hệ (Số điện thoại, Zalo, Messenger, Line...) để có thể sử dụng nút <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge> trên các tin tuyển dụng.
+                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên lạc (Số điện thoại, Zalo, Messenger, Line...) để có thể sử dụng nút <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge> trên các tin tuyển dụng.
                 </AlertDescription>
             </Alert>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 <div className="space-y-2">
                 <Label>Họ và tên</Label>
-                <Input value={tempCandidate.name || ''} onChange={(e) => handleTempChange('name' as any, e.target.value, '')} />
+                <Input value={tempCandidate.name || ''} onChange={(e) => handleTempChange('name' as any, 'name', e.target.value)} />
                 </div>
                 <div className="space-y-2">
                     <Label>Ngày sinh</Label>
                      {isMobile ? (
                         <Sheet open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
                             <SheetTrigger asChild>
-                                <DatePickerTrigger />
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {tempCandidate.personalInfo.dateOfBirth ? (
+                                    format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
+                                    ) : (
+                                    <span>Chọn ngày sinh</span>
+                                    )}
+                                </Button>
                             </SheetTrigger>
                             <SheetContent side="bottom" className="h-auto">
                                 <SheetHeader>
@@ -232,7 +228,20 @@ const renderLevel1Edit = (
                     ) : (
                         <Popover>
                             <PopoverTrigger asChild>
-                                <DatePickerTrigger />
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {tempCandidate.personalInfo.dateOfBirth ? (
+                                    format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
+                                    ) : (
+                                    <span>Chọn ngày sinh</span>
+                                    )}
+                                </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
                                 <CalendarComponent />
@@ -469,7 +478,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
 
     const handleTempChange = (
         section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
-        fieldOrValue: any,
+        field: any,
         value?: any
     ) => {
         setTempCandidate(prev => {
@@ -477,9 +486,8 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
             const newCandidate = JSON.parse(JSON.stringify(prev)); // Deep copy
     
             if (section === 'name') {
-                newCandidate.name = fieldOrValue;
+                newCandidate.name = value;
             } else if (section === 'personalInfo' || section === 'aspirations') {
-                const field = fieldOrValue;
                 if (section === 'personalInfo' && field === 'messenger') {
                      newCandidate[section] = { ...newCandidate[section]!, [field]: parseMessengerInput(value) };
                 } else if (section === 'personalInfo' && field === 'zalo') {
@@ -500,7 +508,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                      newCandidate[section] = { ...newCandidate[section], [field]: value };
                 }
             } else {
-                newCandidate[section as keyof EnrichedCandidateProfile] = fieldOrValue;
+                newCandidate[section as keyof EnrichedCandidateProfile] = value;
             }
     
             return newCandidate;
