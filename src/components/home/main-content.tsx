@@ -244,3 +244,4 @@ export const MainContent = () => (
       </section>
     </>
   );
+
