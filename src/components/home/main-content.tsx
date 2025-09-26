@@ -211,7 +211,7 @@ export const MainContent = () => (
                 <span className="block text-sm opacity-80 mt-1">Access thousands of high-quality Technical Intern Trainees, Skilled Workers, and Engineers from Vietnam. Post jobs for free and connect with talent today.</span>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+                <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
                   <Link href="/nha-tuyen-dung-2">
                     <div className="text-center">
                         <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
@@ -219,7 +219,7 @@ export const MainContent = () => (
                     </div>
                   </Link>
                 </Button>
-                 <Button asChild size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                 <Button asChild size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" id="DANGKYDOITAC01">
                   <Link href="/nha-tuyen-dung-2">
                      <div className="text-center">
                         <span className="font-semibold">Đăng ký đối tác</span>
