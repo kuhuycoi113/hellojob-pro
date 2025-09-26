@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -1399,56 +1398,66 @@ export default function CandidateProfilePage() {
   }
 
 
-  const MainEditDialogContent = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
+  const MainEditDialog = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div className="space-y-4">
-            <div className="text-center">
-                <Image src="https://placehold.co/100x100.png" alt="AI Assistant" width={80} height={80} data-ai-hint="friendly robot mascot" className="mx-auto" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                 <Button variant="outline" className="h-auto p-4 flex flex-col items-center justify-center space-y-2 border-2 border-accent-orange" onClick={() => setIsProfileEditDialogOpen(true)}>
-                    <h4 className="font-bold text-accent-orange">Cá nhân</h4>
-                    <User className="h-12 w-12 text-gray-300" />
-                    <p className="text-sm text-muted-foreground">(Thông tin cơ bản)</p>
-                </Button>
-                 <EditDialog
-                    title="Chỉnh sửa Kinh nghiệm & Học vấn"
-                    onSave={handleSave}
-                    renderContent={(temp, handleChange) => (
-                        <div className="max-h-[60vh] overflow-y-auto pr-4 space-y-4">
-                            <h3 className="font-bold text-lg">Kinh nghiệm</h3>
-                            {renderExperienceEdit(temp, handleChange)}
-                            <h3 className="font-bold text-lg mt-4">Học vấn</h3>
-                            {renderEducationEdit(temp, handleChange)}
-                        </div>
-                    )}
-                    candidate={profileByLang.vi!}
-                >
-                    <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-green">
-                        <h4 className="font-bold text-accent-green">Sự nghiệp</h4>
-                        <Briefcase className="h-12 w-12 text-gray-300 mx-auto my-2" />
-                        <p className="text-sm text-muted-foreground">(Kinh nghiệm, học vấn)</p>
-                    </Card>
-                </EditDialog>
-                
-                 <EditDialog
-                    title="Chỉnh sửa Nguyện vọng"
-                    onSave={handleSave}
-                    renderContent={renderAspirationsEdit}
-                    candidate={profileByLang.vi!}
-                >
-                    <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-blue">
-                        <h4 className="font-bold text-accent-blue">Nguyện vọng</h4>
-                         <Target className="h-12 w-12 text-gray-300 mx-auto my-2" />
-                        <p className="text-sm text-muted-foreground">(Lương, địa điểm...)</p>
-                    </Card>
-                </EditDialog>
-            </div>
-            <div className="text-center mt-4 text-muted-foreground">
-              <p>Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-accent-green font-semibold">Cập nhật thông tin</span>.</p>
-            </div>
-        </div>
-      )
+        <Dialog>
+            <DialogTrigger asChild>
+                {children}
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-2xl">Hoàn thiện hồ sơ</DialogTitle>
+                    <DialogDescription>Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="text-center">
+                        <Image src="https://placehold.co/100x100.png" alt="AI Assistant" width={80} height={80} data-ai-hint="friendly robot mascot" className="mx-auto" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Button variant="outline" className="h-auto p-4 flex flex-col items-center justify-center space-y-2 border-2 border-accent-orange" onClick={() => setIsProfileEditDialogOpen(true)}>
+                            <h4 className="font-bold text-accent-orange">Cá nhân</h4>
+                            <User className="h-12 w-12 text-gray-300" />
+                            <p className="text-sm text-muted-foreground">(Thông tin cơ bản)</p>
+                        </Button>
+                        <EditDialog
+                            title="Chỉnh sửa Kinh nghiệm & Học vấn"
+                            onSave={handleSave}
+                            renderContent={(temp, handleChange) => (
+                                <div className="max-h-[60vh] overflow-y-auto pr-4 space-y-4">
+                                    <h3 className="font-bold text-lg">Kinh nghiệm</h3>
+                                    {renderExperienceEdit(temp, handleChange)}
+                                    <h3 className="font-bold text-lg mt-4">Học vấn</h3>
+                                    {renderEducationEdit(temp, handleChange)}
+                                </div>
+                            )}
+                            candidate={profileByLang.vi!}
+                        >
+                            <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-green">
+                                <h4 className="font-bold text-accent-green">Sự nghiệp</h4>
+                                <Briefcase className="h-12 w-12 text-gray-300 mx-auto my-2" />
+                                <p className="text-sm text-muted-foreground">(Kinh nghiệm, học vấn)</p>
+                            </Card>
+                        </EditDialog>
+                        <EditDialog
+                            title="Chỉnh sửa Nguyện vọng"
+                            onSave={handleSave}
+                            renderContent={renderAspirationsEdit}
+                            candidate={profileByLang.vi!}
+                        >
+                            <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-blue">
+                                <h4 className="font-bold text-accent-blue">Nguyện vọng</h4>
+                                 <Target className="h-12 w-12 text-gray-300 mx-auto my-2" />
+                                <p className="text-sm text-muted-foreground">(Lương, địa điểm...)</p>
+                            </Card>
+                        </EditDialog>
+                    </div>
+                    <div className="text-center mt-4 text-muted-foreground">
+                      <p>Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-accent-green font-semibold">Cập nhật thông tin</span>.</p>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
   };
   
     const MediaCarousel = ({ items, title }: { items: MediaItem[], title: string }) => (
@@ -2166,7 +2175,6 @@ export default function CandidateProfilePage() {
                   </CardContent>
                 </Card>
 
-                 <Button className="w-full bg-accent-green hover:bg-accent-green/90 text-white"><FileDown/> Tải CV (.pdf)</Button>
                  <div className="text-center pt-4">
                     <Button variant="link" className="text-muted-foreground text-sm" onClick={() => { /* Handle logout */ }}>
                         <LogOut className="mr-2 h-4 w-4"/>
@@ -2217,7 +2225,7 @@ export default function CandidateProfilePage() {
                     <Label>Ảnh giấy tờ</Label>
                     <Label
                         htmlFor="doc-image-upload"
-                        className="relative flex justify-center w-full h-48 px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer border-border hover:border-primary transition-colors"
+                        className="relative flex flex-col items-center justify-center w-full h-48 px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer border-border hover:border-primary transition-colors"
                     >
                         {newDocImagePreview ? (
                             <Image
@@ -2256,6 +2264,7 @@ export default function CandidateProfilePage() {
 
 
   
+
 
 
 
