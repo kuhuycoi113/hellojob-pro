@@ -65,8 +65,14 @@ type MediaItem = {
   "data-ai-hint": string;
 };
 
+type DocumentName = {
+  vi: string;
+  ja?: string;
+  en?: string;
+};
+
 type DocumentItem = {
-  name: string;
+  name: DocumentName;
   url?: string; // Data URL of the uploaded image
 };
 
@@ -250,9 +256,9 @@ const emptyCandidate: EnrichedCandidateProfile = {
     skills: ['Vận hành máy CNC', 'AutoCAD', 'SolidWorks', 'Làm việc nhóm', 'Giải quyết vấn đề'],
     certifications: ['Chứng chỉ JLPT N3', 'Chứng chỉ An toàn lao động'],
     documents: {
-        vietnam: ['Xác nhận cư trú', 'Xác nhận dân sự', 'Căn cước mặt trước', 'Căn cước mặt sau', 'Hộ chiếu mặt trước', 'Hộ chiếu mặt sau', 'Giấy khám sức khỏe', 'Bằng học vấn', 'Xác nhận tình trạng hôn nhân', 'Giấy tờ khác'].map(name => ({name})),
-        japan: ['Thẻ ngoại kiều mặt trước', 'Thẻ ngoại kiều mặt sau', 'Ảnh CV gốc mặt trước', 'Ảnh CV gốc mặt sau', 'Giấy kết thúc 3 năm mặt trước', 'Giấy kết thúc 3 năm mặt sau', 'Chứng chỉ tokutei', 'Chứng chỉ tiếng Nhật', 'Giấy Shiteisho', 'Giấy đánh giá Hyokachoso', 'Giấy tờ khác'].map(name => ({name})),
-        other: ['Thẻ ID', 'Bằng ngoại ngữ', 'Sổ tiết kiệm', 'Xác nhận công việc người bảo lãnh 1', 'Xác nhận công việc người bảo lãnh 2', 'Thẻ ID người bảo lãnh 1', 'Thẻ ID người bảo lãnh 2', 'Giấy tờ khác'].map(name => ({name})),
+        vietnam: ['Xác nhận cư trú', 'Xác nhận dân sự', 'Căn cước mặt trước', 'Căn cước mặt sau', 'Hộ chiếu mặt trước', 'Hộ chiếu mặt sau', 'Giấy khám sức khỏe', 'Bằng học vấn', 'Xác nhận tình trạng hôn nhân', 'Giấy tờ khác'].map(name => ({name: {vi: name}})),
+        japan: ['Thẻ ngoại kiều mặt trước', 'Thẻ ngoại kiều mặt sau', 'Ảnh CV gốc mặt trước', 'Ảnh CV gốc mặt sau', 'Giấy kết thúc 3 năm mặt trước', 'Giấy kết thúc 3 năm mặt sau', 'Chứng chỉ tokutei', 'Chứng chỉ tiếng Nhật', 'Giấy Shiteisho', 'Giấy đánh giá Hyokachoso', 'Giấy tờ khác'].map(name => ({name: {vi: name}})),
+        other: ['Thẻ ID', 'Bằng ngoại ngữ', 'Sổ tiết kiệm', 'Xác nhận công việc người bảo lãnh 1', 'Xác nhận công việc người bảo lãnh 2', 'Thẻ ID người bảo lãnh 1', 'Thẻ ID người bảo lãnh 2', 'Giấy tờ khác'].map(name => ({name: {vi: name}})),
     },
     desiredIndustry: 'Cơ khí, Chế tạo máy',
     avatarUrl: undefined,
@@ -527,7 +533,7 @@ const DocumentGrid = ({
                     <div key={index} className="space-y-2 text-center">
                         <Label htmlFor={`doc-${docType}-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center cursor-pointer bg-secondary/50">
                             {doc.url ? (
-                                <Image src={doc.url} alt={doc.name} fill className="object-cover"/>
+                                <Image src={doc.url} alt={doc.name.vi} fill className="object-cover"/>
                             ) : (
                                 <UploadCloud className="h-8 w-8 text-muted-foreground"/>
                             )}
@@ -536,7 +542,7 @@ const DocumentGrid = ({
                             </div>
                         </Label>
                         <Input id={`doc-${docType}-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, docType)}/>
-                        <p className="text-xs text-muted-foreground">{doc.name}</p>
+                        <p className="text-xs text-muted-foreground">{doc.name.vi}</p>
                     </div>
                 ))}
                 
@@ -575,7 +581,7 @@ export default function CandidateProfilePage() {
   const isMobile = useIsMobile();
   const [isAddDocDialogOpen, setIsAddDocDialogOpen] = useState(false);
   const [currentDocTypeToAdd, setCurrentDocTypeToAdd] = useState<'vietnam' | 'japan' | 'other' | null>(null);
-  const [newDocName, setNewDocName] = useState('');
+  const [newDocName, setNewDocName] = useState<DocumentName>({ vi: '', ja: '', en: '' });
   const [newDocImage, setNewDocImage] = useState<File | null>(null);
   const [newDocImagePreview, setNewDocImagePreview] = useState<string | null>(null);
 
@@ -634,7 +640,7 @@ export default function CandidateProfilePage() {
              if (key === 'documents') {
                 if (newEmptyProfile[key]) {
                     Object.keys(newEmptyProfile[key]).forEach(docType => {
-                        newEmptyProfile[key][docType] = newEmptyProfile[key][docType].map((doc: any) => typeof doc === 'string' ? {name: doc} : doc)
+                        newEmptyProfile[key][docType] = newEmptyProfile[key][docType].map((doc: any) => typeof doc === 'string' ? {name: {vi: doc}} : doc)
                     });
                 }
             }
@@ -654,7 +660,11 @@ export default function CandidateProfilePage() {
         if (parsedProfile.documents) {
              Object.keys(parsedProfile.documents).forEach(docType => {
                 if (Array.isArray(parsedProfile.documents[docType])) {
-                    parsedProfile.documents[docType] = parsedProfile.documents[docType].map((doc: any) => typeof doc === 'string' ? {name: doc} : doc);
+                    parsedProfile.documents[docType] = parsedProfile.documents[docType].map((doc: any) => {
+                        if (typeof doc === 'string') return { name: { vi: doc } };
+                        if (typeof doc.name === 'string') return { ...doc, name: { vi: doc.name } };
+                        return doc;
+                    });
                 }
             });
         }
@@ -904,21 +914,21 @@ export default function CandidateProfilePage() {
 
   const handleOpenAddDocDialog = (docType: 'vietnam' | 'japan' | 'other') => {
     setCurrentDocTypeToAdd(docType);
-    setNewDocName('');
+    setNewDocName({ vi: '', ja: '', en: '' });
     setNewDocImage(null);
     setNewDocImagePreview(null);
     setIsAddDocDialogOpen(true);
   };
 
   const handleAddNewDocument = () => {
-      if (newDocName.trim() && newDocImagePreview && currentDocTypeToAdd) {
+      if (newDocName.vi.trim() && newDocImagePreview && currentDocTypeToAdd) {
           handleAddItem('documents', currentDocTypeToAdd, { name: newDocName, url: newDocImagePreview });
           setIsAddDocDialogOpen(false);
       } else {
           toast({
               variant: "destructive",
               title: "Thông tin chưa đủ",
-              description: "Vui lòng nhập tên và tải lên ảnh cho giấy tờ.",
+              description: "Vui lòng nhập tên Tiếng Việt và tải lên ảnh cho giấy tờ.",
           });
       }
   };
@@ -1083,31 +1093,31 @@ export default function CandidateProfilePage() {
             <h4 className="font-bold mb-2">Giấy tờ Việt Nam</h4>
             {(tempCandidate.documents?.vietnam || []).map((doc, index) => (
                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <Input value={doc.name} onChange={(e) => handleTempChange('documents', 'vietnam', index, { ...doc, name: e.target.value })} />
+                    <Input value={doc.name.vi} onChange={(e) => handleTempChange('documents', 'vietnam', index, { ...doc, name: {...doc.name, vi: e.target.value} })} />
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'vietnam')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'vietnam', {name: 'Giấy tờ mới'})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'vietnam', {name: {vi:'Giấy tờ mới'}})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
         </div>
          <div>
             <h4 className="font-bold mb-2">Giấy tờ Nhật Bản</h4>
             {(tempCandidate.documents?.japan || []).map((doc, index) => (
                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <Input value={doc.name} onChange={(e) => handleTempChange('documents', 'japan', index, { ...doc, name: e.target.value })} />
+                    <Input value={doc.name.vi} onChange={(e) => handleTempChange('documents', 'japan', index, { ...doc, name: {...doc.name, vi: e.target.value} })} />
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'japan')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'japan', {name: 'Giấy tờ mới'})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'japan', {name: {vi:'Giấy tờ mới'}})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
         </div>
          <div>
             <h4 className="font-bold mb-2">Giấy tờ nước ngoài / Du học</h4>
             {(tempCandidate.documents?.other || []).map((doc, index) => (
                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <Input value={doc.name} onChange={(e) => handleTempChange('documents', 'other', index, { ...doc, name: e.target.value })} />
+                    <Input value={doc.name.vi} onChange={(e) => handleTempChange('documents', 'other', index, { ...doc, name: {...doc.name, vi: e.target.value} })} />
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'other')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                  </div>
             ))}
-            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'other', {name: 'Giấy tờ mới'})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+            <Button variant="outline" size="sm" onClick={() => handleAddItem('documents', 'other', {name: {vi:'Giấy tờ mới'}})}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
         </div>
     </div>
   );
@@ -1399,297 +1409,6 @@ export default function CandidateProfilePage() {
   }
 
 
-  const MainEditDialog = ({ children }: { children: React.ReactNode }) => {
-    return (
-        <Dialog>
-            <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <MainEditDialogContent tempCandidate={profileByLang.vi!} handleTempChange={() => {}} />
-            </DialogContent>
-        </Dialog>
-    )
-  };
-  
-  const MainEditDialogContent = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
-    return (
-        <div className="space-y-4">
-            <div className="text-center">
-                <Image src="https://placehold.co/100x100.png" alt="AI Assistant" width={80} height={80} data-ai-hint="friendly robot mascot" className="mx-auto" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                 <Button variant="outline" className="h-auto p-4 flex flex-col items-center justify-center space-y-2 border-2 border-accent-orange" onClick={() => setIsProfileEditDialogOpen(true)}>
-                    <h4 className="font-bold text-accent-orange">Cá nhân</h4>
-                    <User className="h-12 w-12 text-gray-300" />
-                    <p className="text-sm text-muted-foreground">(Thông tin cơ bản)</p>
-                </Button>
-                 <EditDialog
-                    title="Chỉnh sửa Kinh nghiệm & Học vấn"
-                    onSave={handleSave}
-                    renderContent={(temp, handleChange) => (
-                        <div className="max-h-[60vh] overflow-y-auto pr-4 space-y-4">
-                            <h3 className="font-bold text-lg">Kinh nghiệm</h3>
-                            {renderExperienceEdit(temp, handleChange)}
-                            <h3 className="font-bold text-lg mt-4">Học vấn</h3>
-                            {renderEducationEdit(temp, handleChange)}
-                        </div>
-                    )}
-                    candidate={profileByLang.vi!}
-                >
-                    <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-green">
-                        <h4 className="font-bold text-accent-green">Sự nghiệp</h4>
-                        <Briefcase className="h-12 w-12 text-gray-300 mx-auto my-2" />
-                        <p className="text-sm text-muted-foreground">(Kinh nghiệm, học vấn)</p>
-                    </Card>
-                </EditDialog>
-                
-                 <EditDialog
-                    title="Chỉnh sửa Nguyện vọng"
-                    onSave={handleSave}
-                    renderContent={renderAspirationsEdit}
-                    candidate={profileByLang.vi!}
-                >
-                    <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-blue">
-                        <h4 className="font-bold text-accent-blue">Nguyện vọng</h4>
-                         <Target className="h-12 w-12 text-gray-300 mx-auto my-2" />
-                        <p className="text-sm text-muted-foreground">(Lương, địa điểm...)</p>
-                    </Card>
-                </EditDialog>
-            </div>
-            <p className="text-center mt-4 text-muted-foreground">Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-accent-green font-semibold">Cập nhật thông tin</span>.</p>
-        </div>
-      )
-  };
-  
-    const MediaCarousel = ({ items, title }: { items: MediaItem[], title: string }) => (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="font-headline text-xl flex items-center"><Video className="mr-3 text-primary"/> {title}</CardTitle>
-          <Button variant="ghost" size="icon"><PlusCircle className="h-5 w-5"/></Button>
-      </CardHeader>
-      <CardContent>
-        <Carousel className="w-full" opts={{align: "start", loop: true}}>
-            <CarouselContent className="-ml-2 md:-ml-4">
-                {items.slice(0, 6).map((item, index) => (
-                    <CarouselItem key={index} className="pl-2 md:pl-4 basis-[30%] md:basis-1/3 lg:basis-1/4">
-                       <div className="relative group overflow-hidden rounded-lg aspect-[9/16] cursor-pointer">
-                            <Image src={item.thumbnail || item.src} alt={item.alt} fill className="object-cover transition-transform duration-300 group-hover:scale-105" data-ai-hint={item['data-ai-hint']} />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <PlayCircle className="h-12 w-12 text-white/80 drop-shadow-lg" />
-                            </div>
-                            <div className="absolute bottom-2 left-2 text-white text-xs font-semibold drop-shadow-md p-1 bg-black/40 rounded">
-                                {item.alt}
-                            </div>
-                        </div>
-                    </CarouselItem>
-                ))}
-            </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
-        </Carousel>
-      </CardContent>
-    </Card>
-  );
-
-  const BodyPhotosCarousel = ({items, onImageChange}: {items: MediaItem[], onImageChange: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void}) => (
-    <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="font-headline text-xl flex items-center"><ImageIcon className="mr-3 text-primary"/> {t.bodyPhotos}</CardTitle>
-             <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant="ghost" size="icon"><PlusCircle className="h-5 w-5"/></Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Cập nhật ảnh hình thể</DialogTitle>
-                        <DialogDescription>Tải lên các ảnh theo yêu cầu để hoàn thiện hồ sơ.</DialogDescription>
-                    </DialogHeader>
-                </DialogContent>
-             </Dialog>
-        </CardHeader>
-        <CardContent>
-            <Carousel className="w-full" opts={{align: "start"}}>
-                <CarouselContent className="-ml-2 md:-ml-4">
-                    {items.map((item, index) => (
-                        <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/3 md:basis-1/4 lg:basis-1/5">
-                           <div className="space-y-2">
-                                <div className="relative group aspect-[3/4] rounded-lg overflow-hidden border">
-                                     <Image src={item.src} alt={item.alt} fill className="object-cover" data-ai-hint={item['data-ai-hint']} />
-                                     <Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                        <Camera className="h-8 w-8 text-white"/>
-                                     </Label>
-                                     <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => onImageChange(e, index)} />
-                                </div>
-                                <p className="text-center text-sm font-semibold text-muted-foreground">{item.alt}</p>
-                            </div>
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-                <CarouselPrevious className="hidden md:flex" />
-                <CarouselNext className="hidden md:flex" />
-            </Carousel>
-        </CardContent>
-    </Card>
-  )
-
-  const SendOptionsDialog = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
-    
-    const handleSendToConsultant = () => {
-        toast({
-            title: "Đã gửi hồ sơ!",
-            description: `Hồ sơ ${languageToSend} của bạn đã được gửi tới các tư vấn viên phù hợp.`,
-            className: "bg-green-500 text-white"
-        });
-        onOpenChange(false);
-    };
-
-    const handleGetShareLink = () => {
-        const link = `${window.location.origin}/ho-so-cua-toi/public/${candidate?.name.toLowerCase().replace(/\s/g, '-')}`;
-        navigator.clipboard.writeText(link);
-        toast({
-            title: "Đã sao chép đường dẫn!",
-            description: "Bạn có thể gửi đường dẫn này cho người khác.",
-        });
-        onOpenChange(false);
-    };
-
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle className="font-headline text-2xl">Gửi hồ sơ</DialogTitle>
-                    <DialogDescription>
-                        Chọn cách bạn muốn chia sẻ hồ sơ này.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <Button onClick={handleSendToConsultant} className="w-full justify-start h-auto p-4" variant="outline">
-                        <UserCog className="mr-4 h-6 w-6 text-primary"/>
-                        <div>
-                            <p className="font-semibold text-base">Gửi cho tư vấn viên</p>
-                            <p className="text-xs text-muted-foreground text-left">Hồ sơ của bạn sẽ được gửi đến các tư vấn viên phù hợp trong hệ thống.</p>
-                        </div>
-                    </Button>
-                    <Button onClick={handleGetShareLink} className="w-full justify-start h-auto p-4" variant="outline">
-                        <Link2 className="mr-4 h-6 w-6 text-green-500"/>
-                        <div>
-                            <p className="font-semibold text-base">Lấy đường dẫn chia sẻ</p>
-                            <p className="text-xs text-muted-foreground text-left">Tạo một đường dẫn công khai để gửi hồ sơ cho bất kỳ ai.</p>
-                        </div>
-                    </Button>
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
-};
-  
-  const SendProfileDialog = () => {
-    const handleSendClick = (lang: string) => {
-        setLanguageToSend(lang);
-        setIsSendOptionsOpen(true);
-    };
-
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="outline" className="hidden sm:inline-flex"><Send/> Gửi hồ sơ</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle className="font-headline text-2xl">Bạn muốn gửi hồ sơ theo ngôn ngữ nào?</DialogTitle>
-                    <DialogDescription>
-                        Chọn một ngôn ngữ để gửi hồ sơ này cho nhà tuyển dụng.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
-                        <div className="flex items-center gap-3">
-                            <VnFlagIcon className="w-8 h-6 rounded-sm"/>
-                            <span className="font-semibold">Tiếng Việt</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
-                            <Button size="sm" onClick={() => handleSendClick('Tiếng Việt')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
-                        </div>
-                    </div>
-                     <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
-                        <div className="flex items-center gap-3">
-                            <JpFlagIcon className="w-8 h-6 rounded-sm"/>
-                            <span className="font-semibold">Tiếng Nhật</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                             <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
-                            <Button size="sm" onClick={() => handleSendClick('Tiếng Nhật')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
-                        </div>
-                    </div>
-                     <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
-                        <div className="flex items-center gap-3">
-                            <EnFlagIcon className="w-8 h-6 rounded-sm"/>
-                            <span className="font-semibold">Tiếng Anh</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="sm"><Eye className="mr-2 h-4 w-4"/>Xem trước</Button>
-                            <Button size="sm" onClick={() => handleSendClick('Tiếng Anh')}><Send className="mr-2 h-4 w-4"/>Gửi</Button>
-                        </div>
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
-  };
-  
-    const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
-        <Dialog>
-            <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-                <DialogHeader>
-                    <DialogTitle className="font-headline text-2xl">Tải hồ sơ xuống</DialogTitle>
-                    <DialogDescription>
-                        Chọn định dạng bạn muốn tải xuống.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-                    <Card className="hover:bg-secondary cursor-pointer">
-                        <CardContent className="p-4 flex items-center gap-4">
-                            <FileCode className="h-10 w-10 text-blue-500 shrink-0"/>
-                            <div>
-                                <p className="font-semibold">Dạng HTML</p>
-                                <p className="text-xs text-muted-foreground">Tải xuống như giao diện Web.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="hover:bg-secondary cursor-pointer">
-                         <CardContent className="p-4 flex items-center gap-4">
-                            <FileText className="h-10 w-10 text-red-500 shrink-0"/>
-                            <div>
-                                <p className="font-semibold">Dạng PDF</p>
-                                <p className="text-xs text-muted-foreground">Lý tưởng để gửi qua email hoặc in ấn.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                     <Card className="hover:bg-secondary cursor-pointer">
-                         <CardContent className="p-4 flex items-center gap-4">
-                            <FileType className="h-10 w-10 text-sky-600 shrink-0"/>
-                            <div>
-                                <p className="font-semibold">Dạng Docx</p>
-                                <p className="text-xs text-muted-foreground">Dễ dàng chỉnh sửa bằng Microsoft Word.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                     <Card className="hover:bg-secondary cursor-pointer">
-                         <CardContent className="p-4 flex items-center gap-4">
-                            <Sheet className="h-10 w-10 text-green-600 shrink-0"/>
-                            <div>
-                                <p className="font-semibold">Dạng Excel</p>
-                                <p className="text-xs text-muted-foreground">Phù hợp để quản lý và phân tích dữ liệu.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </DialogContent>
-        </Dialog>
-    )
-
   const editButtonText = isNewProfile ? 'Tạo hồ sơ' : 'Sửa hồ sơ';
 
   const formatPhoneNumber = (phone: string | undefined): string => {
@@ -1816,12 +1535,8 @@ export default function CandidateProfilePage() {
                         <DropdownMenuItem onSelect={() => handleLanguageChange('en')}><EnFlagIcon className="w-4 h-4 mr-2"/>English</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <MainEditDialog>
-                         <Button variant="outline" size="icon" className="sm:hidden"><Edit /></Button>
-                    </MainEditDialog>
-                     <MainEditDialog>
-                         <Button variant="outline" className="hidden sm:inline-flex"><Edit /> {editButtonText}</Button>
-                    </MainEditDialog>
+                    <Button variant="outline" size="icon" className="sm:hidden" onClick={() => setIsProfileEditDialogOpen(true)}><Edit /></Button>
+                    <Button variant="outline" className="hidden sm:inline-flex" onClick={() => setIsProfileEditDialogOpen(true)}><Edit /> {editButtonText}</Button>
                  </div>
               </div>
             </CardHeader>
@@ -1942,13 +1657,13 @@ export default function CandidateProfilePage() {
                   <CardContent>
                     <Tabs defaultValue="japan" value={activeDocTab} onValueChange={setActiveDocTab} className="w-full">
                       <TabsList className="flex w-full">
-                        <TabsTrigger value="vietnam" className={cn("doc-tab-vn flex-1 md:flex-auto", isMobile && activeDocTab !== 'vietnam' && "flex-shrink basis-1/4", isMobile && activeDocTab === 'vietnam' && "flex-grow")}>
+                        <TabsTrigger value="vietnam" className={cn("doc-tab-vn flex-1 md:flex-auto", isMobile && "flex-grow basis-0", isMobile && activeDocTab !== 'vietnam' && "flex-shrink")}>
                            {isMobile ? (activeDocTab === 'vietnam' ? t.vietnamDocs : 'Việt Nam') : t.vietnamDocs}
                         </TabsTrigger>
-                        <TabsTrigger value="japan" className={cn("doc-tab-jp flex-1 md:flex-auto", isMobile && activeDocTab !== 'japan' && "flex-shrink basis-1/4", isMobile && activeDocTab === 'japan' && "flex-grow")}>
+                        <TabsTrigger value="japan" className={cn("doc-tab-jp flex-1 md:flex-auto", isMobile && "flex-grow basis-0", isMobile && activeDocTab !== 'japan' && "flex-shrink")}>
                            {isMobile ? (activeDocTab === 'japan' ? t.japanDocs : 'Nhật Bản') : t.japanDocs}
                         </TabsTrigger>
-                        <TabsTrigger value="other" className={cn("doc-tab-other flex-1 md:flex-auto", isMobile && activeDocTab !== 'other' && "flex-shrink basis-1/4", isMobile && activeDocTab === 'other' && "flex-grow")}>
+                        <TabsTrigger value="other" className={cn("doc-tab-other flex-1 md:flex-auto", isMobile && "flex-grow basis-0", isMobile && activeDocTab !== 'other' && "flex-shrink")}>
                            {isMobile ? (activeDocTab === 'other' ? t.otherDocs : 'Du học') : t.otherDocs}
                         </TabsTrigger>
                       </TabsList>
@@ -2148,15 +1863,38 @@ export default function CandidateProfilePage() {
                 </DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="doc-name">Tên giấy tờ</Label>
-                    <Input 
-                        id="doc-name" 
-                        value={newDocName}
-                        onChange={(e) => setNewDocName(e.target.value)}
+                <Tabs defaultValue="vi" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="vi">Tiếng Việt</TabsTrigger>
+                    <TabsTrigger value="ja">Tiếng Nhật</TabsTrigger>
+                    <TabsTrigger value="en">Tiếng Anh</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="vi" className="pt-2">
+                     <Input 
+                        id="doc-name-vi" 
+                        value={newDocName.vi}
+                        onChange={(e) => setNewDocName(prev => ({...prev, vi: e.target.value}))}
                         placeholder="VD: Sơ yếu lý lịch"
                     />
-                </div>
+                  </TabsContent>
+                   <TabsContent value="ja" className="pt-2">
+                     <Input 
+                        id="doc-name-ja" 
+                        value={newDocName.ja || ''}
+                        onChange={(e) => setNewDocName(prev => ({...prev, ja: e.target.value}))}
+                        placeholder="例: 履歴書"
+                    />
+                  </TabsContent>
+                   <TabsContent value="en" className="pt-2">
+                     <Input 
+                        id="doc-name-en" 
+                        value={newDocName.en || ''}
+                        onChange={(e) => setNewDocName(prev => ({...prev, en: e.target.value}))}
+                        placeholder="E.g., Resume"
+                    />
+                  </TabsContent>
+                </Tabs>
+                
                 <div className="space-y-2">
                     <Label>Ảnh giấy tờ</Label>
                     <Label
@@ -2200,6 +1938,7 @@ export default function CandidateProfilePage() {
 
 
   
+
 
 
 
