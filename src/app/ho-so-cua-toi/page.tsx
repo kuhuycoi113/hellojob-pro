@@ -1996,14 +1996,14 @@ export default function CandidateProfilePage() {
                   </CardHeader>
                   <CardContent>
                     <Tabs defaultValue="japan" value={activeDocTab} onValueChange={setActiveDocTab} className="w-full">
-                      <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="vietnam" className="doc-tab-vn">
+                      <TabsList className="flex w-full">
+                        <TabsTrigger value="vietnam" className={cn("doc-tab-vn flex-1 md:flex-auto", isMobile && activeDocTab !== 'vietnam' && "flex-shrink basis-1/4", isMobile && activeDocTab === 'vietnam' && "flex-grow")}>
                            {isMobile ? (activeDocTab === 'vietnam' ? t.vietnamDocs : 'Việt Nam') : t.vietnamDocs}
                         </TabsTrigger>
-                        <TabsTrigger value="japan" className="doc-tab-jp">
+                        <TabsTrigger value="japan" className={cn("doc-tab-jp flex-1 md:flex-auto", isMobile && activeDocTab !== 'japan' && "flex-shrink basis-1/4", isMobile && activeDocTab === 'japan' && "flex-grow")}>
                            {isMobile ? (activeDocTab === 'japan' ? t.japanDocs : 'Nhật Bản') : t.japanDocs}
                         </TabsTrigger>
-                        <TabsTrigger value="other" className="doc-tab-other">
+                        <TabsTrigger value="other" className={cn("doc-tab-other flex-1 md:flex-auto", isMobile && activeDocTab !== 'other' && "flex-shrink basis-1/4", isMobile && activeDocTab === 'other' && "flex-grow")}>
                            {isMobile ? (activeDocTab === 'other' ? t.otherDocs : 'Du học') : t.otherDocs}
                         </TabsTrigger>
                       </TabsList>
@@ -2256,5 +2256,6 @@ export default function CandidateProfilePage() {
 
 
   
+
 
 
