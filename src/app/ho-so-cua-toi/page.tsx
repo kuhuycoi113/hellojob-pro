@@ -666,7 +666,7 @@ export default function CandidateProfilePage() {
   const [newDocName, setNewDocName] = useState<DocumentName>({ vi: '', ja: '', en: '' });
   const [newDocImage, setNewDocImage] = useState<File | null>(null);
   const [newDocImagePreview, setNewDocImagePreview] = useState<string | null>(null);
-  const [expandedGrids, setExpandedGrids] = useState({ vietnam: false, japan: true, other: false });
+  const [expandedGrids, setExpandedGrids] = useState({ vietnam: false, japan: false, other: false });
   const [lastDocumentsState, setLastDocumentsState] = useState<EnrichedCandidateProfile['documents'] | null>(null);
 
 
@@ -2308,4 +2308,5 @@ export default function CandidateProfilePage() {
 }
 
     
+
 
