@@ -13,9 +13,6 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { HardHat, UserCheck, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
-import { VnFlagIcon, JpFlagIcon, EnFlagIcon } from './custom-icons';
-
 
 type Language = 'vi' | 'ja' | 'en';
 
@@ -64,30 +61,19 @@ const iconColors = {
     green: 'bg-green-100 text-green-500',
 }
 
-export function VisaTypeDialog({ isOpen, onOpenChange, onSelect, onBack, lang: initialLang }: VisaTypeDialogProps) {
+export function VisaTypeDialog({ isOpen, onOpenChange, onSelect, onBack, lang }: VisaTypeDialogProps) {
   const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
-  const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   const handleSelect = (visaId: string) => {
     setSelectedVisa(visaId);
     onSelect(visaId);
   };
 
-  const handleLangChange = (lang: Language) => {
-      setCurrentLang(lang);
-      // Although onLanguageChange is not passed, this structure allows for it in the future
-  }
-  
-  // Update local lang state if initialLang prop changes
-  useState(() => {
-    setCurrentLang(initialLang);
-  });
-
-  const content = visaTypeContent[currentLang];
+  const content = visaTypeContent[lang];
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl" id="NTD003">
+      <DialogContent className="sm:max-w-3xl" id="NTD003">
         <DialogHeader>
           <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
           <DialogDescription className="text-center">
@@ -95,37 +81,31 @@ export function VisaTypeDialog({ isOpen, onOpenChange, onSelect, onBack, lang: i
           </DialogDescription>
         </DialogHeader>
         
-         <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="vi" className="flex items-center gap-2"><VnFlagIcon /> Tiếng Việt</TabsTrigger>
-                <TabsTrigger value="ja" className="flex items-center gap-2"><JpFlagIcon /> 日本語</TabsTrigger>
-                <TabsTrigger value="en" className="flex items-center gap-2"><EnFlagIcon /> English</TabsTrigger>
-            </TabsList>
-            
-            <div className="pt-6 max-h-[60vh] overflow-y-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {content.roles.map((visa) => (
-                        <Card 
-                            key={visa.id} 
-                            onClick={() => handleSelect(visa.id)}
-                            className={cn(
-                                "text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center",
-                                selectedVisa === visa.id && "ring-2 ring-primary border-primary"
-                            )}
-                        >
-                            <div className={cn("rounded-full p-3 w-fit mb-4", iconColors[visa.color as keyof typeof iconColors])}>
-                                <visa.icon className="h-8 w-8" />
-                            </div>
-                            <h3 className="font-bold text-lg mb-2">{visa.title}</h3>
-                            <p className="text-muted-foreground text-sm flex-grow">{visa.desc}</p>
-                        </Card>
-                    ))}
-                </div>
+        <div className="pt-6 max-h-[60vh] overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {content.roles.map((visa) => (
+                    <Card 
+                        key={visa.id} 
+                        onClick={() => handleSelect(visa.id)}
+                        className={cn(
+                            "text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center",
+                            selectedVisa === visa.id && "ring-2 ring-primary border-primary"
+                        )}
+                    >
+                        <div className={cn("rounded-full p-3 w-fit mb-4", iconColors[visa.color as keyof typeof iconColors])}>
+                            <visa.icon className="h-8 w-8" />
+                        </div>
+                        <h3 className="font-bold text-lg mb-2">{visa.title}</h3>
+                        <p className="text-muted-foreground text-sm flex-grow">{visa.desc}</p>
+                    </Card>
+                ))}
             </div>
-        </Tabs>
+        </div>
 
         <div className="mt-6 text-center">
-            <Button variant="ghost" onClick={onBack}>Quay lại</Button>
+            <Button variant="ghost" onClick={onBack}>
+                {lang === 'ja' ? '戻る' : lang === 'en' ? 'Back' : 'Quay lại'}
+            </Button>
         </div>
       </DialogContent>
     </Dialog>
