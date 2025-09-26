@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -101,7 +102,7 @@ const translations = {
         englishProficiency: "Năng lực tiếng Anh",
         documentsSection: "Hồ sơ/Giấy tờ",
         vietnamDocs: "Giấy tờ Việt Nam",
-        japanDocs: "Giấy tờ Nhật Bản",
+        japanDocs: "Giầy tờ Nhật Bản",
         otherDocs: "Giấy tờ nước ngoài/Du học",
         aspirations: "Nguyện vọng",
         desiredIndustry: "Ngành nghề",
@@ -1401,63 +1402,62 @@ export default function CandidateProfilePage() {
   const MainEditDialog = ({ children }: { children: React.ReactNode }) => {
     return (
         <Dialog>
-            <DialogTrigger asChild>
-                {children}
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle className="font-headline text-2xl">Hoàn thiện hồ sơ</DialogTitle>
-                    <DialogDescription>Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn.</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <div className="text-center">
-                        <Image src="https://placehold.co/100x100.png" alt="AI Assistant" width={80} height={80} data-ai-hint="friendly robot mascot" className="mx-auto" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Button variant="outline" className="h-auto p-4 flex flex-col items-center justify-center space-y-2 border-2 border-accent-orange" onClick={() => setIsProfileEditDialogOpen(true)}>
-                            <h4 className="font-bold text-accent-orange">Cá nhân</h4>
-                            <User className="h-12 w-12 text-gray-300" />
-                            <p className="text-sm text-muted-foreground">(Thông tin cơ bản)</p>
-                        </Button>
-                        <EditDialog
-                            title="Chỉnh sửa Kinh nghiệm & Học vấn"
-                            onSave={handleSave}
-                            renderContent={(temp, handleChange) => (
-                                <div className="max-h-[60vh] overflow-y-auto pr-4 space-y-4">
-                                    <h3 className="font-bold text-lg">Kinh nghiệm</h3>
-                                    {renderExperienceEdit(temp, handleChange)}
-                                    <h3 className="font-bold text-lg mt-4">Học vấn</h3>
-                                    {renderEducationEdit(temp, handleChange)}
-                                </div>
-                            )}
-                            candidate={profileByLang.vi!}
-                        >
-                            <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-green">
-                                <h4 className="font-bold text-accent-green">Sự nghiệp</h4>
-                                <Briefcase className="h-12 w-12 text-gray-300 mx-auto my-2" />
-                                <p className="text-sm text-muted-foreground">(Kinh nghiệm, học vấn)</p>
-                            </Card>
-                        </EditDialog>
-                        <EditDialog
-                            title="Chỉnh sửa Nguyện vọng"
-                            onSave={handleSave}
-                            renderContent={renderAspirationsEdit}
-                            candidate={profileByLang.vi!}
-                        >
-                            <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-blue">
-                                <h4 className="font-bold text-accent-blue">Nguyện vọng</h4>
-                                 <Target className="h-12 w-12 text-gray-300 mx-auto my-2" />
-                                <p className="text-sm text-muted-foreground">(Lương, địa điểm...)</p>
-                            </Card>
-                        </EditDialog>
-                    </div>
-                    <div className="text-center mt-4 text-muted-foreground">
-                      <p>Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-accent-green font-semibold">Cập nhật thông tin</span>.</p>
-                    </div>
-                </div>
+            <DialogTrigger asChild>{children}</DialogTrigger>
+            <DialogContent className="sm:max-w-xl">
+                <MainEditDialogContent tempCandidate={profileByLang.vi!} handleTempChange={() => {}} />
             </DialogContent>
         </Dialog>
-    );
+    )
+  };
+  
+  const MainEditDialogContent = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
+    return (
+        <div className="space-y-4">
+            <div className="text-center">
+                <Image src="https://placehold.co/100x100.png" alt="AI Assistant" width={80} height={80} data-ai-hint="friendly robot mascot" className="mx-auto" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                 <Button variant="outline" className="h-auto p-4 flex flex-col items-center justify-center space-y-2 border-2 border-accent-orange" onClick={() => setIsProfileEditDialogOpen(true)}>
+                    <h4 className="font-bold text-accent-orange">Cá nhân</h4>
+                    <User className="h-12 w-12 text-gray-300" />
+                    <p className="text-sm text-muted-foreground">(Thông tin cơ bản)</p>
+                </Button>
+                 <EditDialog
+                    title="Chỉnh sửa Kinh nghiệm & Học vấn"
+                    onSave={handleSave}
+                    renderContent={(temp, handleChange) => (
+                        <div className="max-h-[60vh] overflow-y-auto pr-4 space-y-4">
+                            <h3 className="font-bold text-lg">Kinh nghiệm</h3>
+                            {renderExperienceEdit(temp, handleChange)}
+                            <h3 className="font-bold text-lg mt-4">Học vấn</h3>
+                            {renderEducationEdit(temp, handleChange)}
+                        </div>
+                    )}
+                    candidate={profileByLang.vi!}
+                >
+                    <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-green">
+                        <h4 className="font-bold text-accent-green">Sự nghiệp</h4>
+                        <Briefcase className="h-12 w-12 text-gray-300 mx-auto my-2" />
+                        <p className="text-sm text-muted-foreground">(Kinh nghiệm, học vấn)</p>
+                    </Card>
+                </EditDialog>
+                
+                 <EditDialog
+                    title="Chỉnh sửa Nguyện vọng"
+                    onSave={handleSave}
+                    renderContent={renderAspirationsEdit}
+                    candidate={profileByLang.vi!}
+                >
+                    <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-blue">
+                        <h4 className="font-bold text-accent-blue">Nguyện vọng</h4>
+                         <Target className="h-12 w-12 text-gray-300 mx-auto my-2" />
+                        <p className="text-sm text-muted-foreground">(Lương, địa điểm...)</p>
+                    </Card>
+                </EditDialog>
+            </div>
+            <p className="text-center mt-4 text-muted-foreground">Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-accent-green font-semibold">Cập nhật thông tin</span>.</p>
+        </div>
+      )
   };
   
     const MediaCarousel = ({ items, title }: { items: MediaItem[], title: string }) => (
@@ -1756,70 +1756,6 @@ export default function CandidateProfilePage() {
         </Card>
     )
   };
-
-
-  const MainEditDialog = ({ children }: { children: React.ReactNode }) => {
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                {children}
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle className="font-headline text-2xl">Hoàn thiện hồ sơ</DialogTitle>
-                    <DialogDescription>Chọn một mục dưới đây để cập nhật hoặc hoàn thiện thông tin hồ sơ của bạn.</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <div className="text-center">
-                        <Image src="https://placehold.co/100x100.png" alt="AI Assistant" width={80} height={80} data-ai-hint="friendly robot mascot" className="mx-auto" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Button variant="outline" className="h-auto p-4 flex flex-col items-center justify-center space-y-2 border-2 border-accent-orange" onClick={() => setIsProfileEditDialogOpen(true)}>
-                            <h4 className="font-bold text-accent-orange">Cá nhân</h4>
-                            <User className="h-12 w-12 text-gray-300" />
-                            <p className="text-sm text-muted-foreground">(Thông tin cơ bản)</p>
-                        </Button>
-                        <EditDialog
-                            title="Chỉnh sửa Kinh nghiệm & Học vấn"
-                            onSave={handleSave}
-                            renderContent={(temp, handleChange) => (
-                                <div className="max-h-[60vh] overflow-y-auto pr-4 space-y-4">
-                                    <h3 className="font-bold text-lg">Kinh nghiệm</h3>
-                                    {renderExperienceEdit(temp, handleChange)}
-                                    <h3 className="font-bold text-lg mt-4">Học vấn</h3>
-                                    {renderEducationEdit(temp, handleChange)}
-                                </div>
-                            )}
-                            candidate={profileByLang.vi!}
-                        >
-                            <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-green">
-                                <h4 className="font-bold text-accent-green">Sự nghiệp</h4>
-                                <Briefcase className="h-12 w-12 text-gray-300 mx-auto my-2" />
-                                <p className="text-sm text-muted-foreground">(Kinh nghiệm, học vấn)</p>
-                            </Card>
-                        </EditDialog>
-                        <EditDialog
-                            title="Chỉnh sửa Nguyện vọng"
-                            onSave={handleSave}
-                            renderContent={renderAspirationsEdit}
-                            candidate={profileByLang.vi!}
-                        >
-                            <Card className="p-4 text-center cursor-pointer hover:shadow-lg transition-shadow border-2 border-accent-blue">
-                                <h4 className="font-bold text-accent-blue">Nguyện vọng</h4>
-                                 <Target className="h-12 w-12 text-gray-300 mx-auto my-2" />
-                                <p className="text-sm text-muted-foreground">(Lương, địa điểm...)</p>
-                            </Card>
-                        </EditDialog>
-                    </div>
-                    <div className="text-center mt-4 text-muted-foreground">
-                      <p>Để <span className="text-primary font-semibold">Nhà tuyển dụng</span> hiểu rõ về bạn, hãy <span className="text-accent-green font-semibold">Cập nhật thông tin</span>.</p>
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
-  };
-
 
   return (
     <div className="bg-secondary">
@@ -2264,6 +2200,8 @@ export default function CandidateProfilePage() {
 
 
   
+
+
 
 
 
