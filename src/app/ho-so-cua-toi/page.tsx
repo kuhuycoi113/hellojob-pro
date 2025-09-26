@@ -561,7 +561,10 @@ const DocumentGrid = ({
                             <Label htmlFor={`doc-${docType}-${index}`} className="w-full h-full cursor-pointer">
                                 {doc.url ? (
                                     doc.fileType === 'pdf' ? (
-                                        <iframe src={doc.url} className="w-full h-full" title={doc.name.vi}/>
+                                        <div className="flex flex-col items-center justify-center h-full text-center p-2">
+                                            <PdfIcon className="w-12 h-12" />
+                                            <p className="mt-2 text-xs font-semibold text-muted-foreground line-clamp-2">{doc.name.vi}</p>
+                                        </div>
                                     ) : (
                                         <Image src={doc.url} alt={doc.name.vi} fill className="object-cover"/>
                                     )
@@ -2353,4 +2356,5 @@ export default function CandidateProfilePage() {
 }
 
     
+
 
