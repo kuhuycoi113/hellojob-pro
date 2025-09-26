@@ -46,16 +46,16 @@ export default function EmployersPage() {
                 <span className="block text-base opacity-80 mt-2">Partner with HelloJob to fully exploit the potential of the Tokutei Ginou labor market in Japan.</span>
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                  <Link href="/nha-tuyen-dung-2" id="DANGTINTUYENDUNG01">
+                <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
+                  <Link href="/nha-tuyen-dung">
                     <div className="text-center">
                         <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                         <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                     </div>
                   </Link>
                 </Button>
-                <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
-                  <Link href="/nhuong-quyen">
+                <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
+                  <Link href="/nha-tuyen-dung">
                     <div className="text-center">
                         <span className="font-semibold">Đăng ký đối tác</span>
                         <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
@@ -120,7 +120,7 @@ export default function EmployersPage() {
                     </p>
                     <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                         <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
-                           <Link href="/nha-tuyen-dung-2">
+                           <Link href="/nha-tuyen-dung">
                             <div className="text-center">
                                 <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                                 <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>

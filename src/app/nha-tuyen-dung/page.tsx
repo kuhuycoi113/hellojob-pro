@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldCheck, Users, FileSignature, BarChart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
+import { PartnerRoleDialog } from '@/components/partner-role-dialog';
 
 const partnerBenefits = [
   { 
@@ -47,7 +48,10 @@ const partnerBenefits = [
 ];
 
 export default function NhaTuyenDungPage() {
+  const [isPartnerRoleDialogOpen, setIsPartnerRoleDialogOpen] = useState(false);
+
   return (
+    <>
     <div className="flex flex-col items-center">
       {/* Hero Section */}
       <section className="w-full bg-gradient-to-br from-accent to-primary text-primary-foreground py-20 md:py-28">
@@ -73,13 +77,11 @@ export default function NhaTuyenDungPage() {
                     </div>
                   </Link>
                 </Button>
-                <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
-                  <Link href="/nha-tuyen-dung">
+                <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsPartnerRoleDialogOpen(true)}>
                     <div className="text-center">
                         <span className="font-semibold">Đăng ký đối tác</span>
                         <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
                     </div>
-                  </Link>
                 </Button>
               </div>
             </div>
@@ -159,13 +161,11 @@ export default function NhaTuyenDungPage() {
                                 </div>
                             </Link>
                         </Button>
-                         <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
-                          <Link href="/nha-tuyen-dung">
+                         <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsPartnerRoleDialogOpen(true)}>
                             <div className="text-center">
                                 <span className="font-semibold">Đăng ký đối tác</span>
                                 <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
                             </div>
-                          </Link>
                         </Button>
                     </div>
                  </div>
@@ -173,5 +173,7 @@ export default function NhaTuyenDungPage() {
         </div>
       </section>
     </div>
+    <PartnerRoleDialog isOpen={isPartnerRoleDialogOpen} onOpenChange={setIsPartnerRoleDialogOpen} />
+    </>
   );
 }
