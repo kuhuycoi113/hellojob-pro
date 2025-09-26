@@ -208,6 +208,8 @@ export const MainContent = () => (
               </h2>
               <p className="text-lg text-primary-foreground/80 mb-8">
                 Tiếp cận hàng ngàn ứng viên Thực tập sinh, Kỹ năng đặc định, Kỹ sư chất lượng cao từ Việt Nam. Đăng tin miễn phí và kết nối với nhân tài ngay hôm nay.
+                 <span className="block text-sm opacity-80 mt-2">質の高い研修生、特定技能、エンジニア人材にアクセス。無料で求人を掲載し、今日から人材と繋がりましょう。</span>
+                 <span className="block text-sm opacity-80 mt-1">Access thousands of high-quality Trainees, Skilled Workers, and Engineers from Vietnam. Post jobs for free and connect with talent today.</span>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                 <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
