@@ -29,7 +29,7 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
   const { toast } = useToast();
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setRole('candidate-empty-profile'); // Default to empty profile, context will fill it
     onOpenChange(false);
@@ -51,6 +51,17 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
         sessionStorage.removeItem('postLoginRedirect');
         router.push(redirectPath);
     }
+  }
+  
+  const handleSimulateLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setRole('candidate-empty-profile'); 
+    onOpenChange(false);
+    toast({
+        title: "Đăng nhập giả lập thành công!",
+        description: "Vai trò: Đã đăng nhập (Profile trắng).",
+        duration: 2000,
+    })
   }
 
   return (
@@ -81,17 +92,24 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
                  </Button>
             </div>
 
-            <p className="mt-8 text-center text-xs text-muted-foreground">
-                Bằng việc tiếp tục, bạn đồng ý với {' '}
-                <a href="#" className="underline underline-offset-4 hover:text-primary">
-                    Điều khoản dịch vụ
-                </a>
-                {' '} và {' '}
-                <a href="#" className="underline underline-offset-4 hover:text-primary">
-                    Chính sách bảo mật
-                </a>
-                {' '} của chúng tôi.
-            </p>
+            <div className="mt-auto pt-8 flex flex-col">
+                <p className="text-xs text-muted-foreground">
+                    Bằng việc tiếp tục, bạn đồng ý với {' '}
+                    <a href="#" className="underline underline-offset-4 hover:text-primary">
+                        Điều khoản dịch vụ
+                    </a>
+                    {' '} và {' '}
+                    <a href="#" className="underline underline-offset-4 hover:text-primary">
+                        Chính sách bảo mật
+                    </a>
+                    {' '} của chúng tôi.
+                </p>
+                 <div className="flex justify-end mt-2">
+                    <Button variant="link" size="sm" className="h-auto p-0 text-xs text-muted-foreground" onClick={handleSimulateLogin}>
+                        Giả lập đăng nhập
+                    </Button>
+                </div>
+            </div>
         </div>
         <div className="hidden md:block relative">
             <Image src="/img/SSO(3).png" alt="Japanese workers" fill className="object-cover" data-ai-hint="happy worker japan"/>
