@@ -202,11 +202,11 @@ export const MainContent = () => (
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center gap-12 rounded-lg bg-accent text-primary-foreground p-12 lg:p-16">
             <div className="md:w-1/2 text-center md:text-left">
-              <h2 className="text-3xl md:text-4xl font-headline font-bold mb-2">
+               <h2 className="text-3xl md:text-4xl font-headline font-bold mb-2">
                 Đăng tin tuyển dụng miễn phí
                 <span className="block text-xl text-primary-foreground/80 mt-1">無料で求人掲載 / Post Jobs for Free</span>
               </h2>
-              <p className="text-lg text-primary-foreground/80 mb-8">
+               <p className="text-lg text-primary-foreground/80 mb-8">
                 Tiếp cận hàng ngàn ứng viên Thực tập sinh, Kỹ năng đặc định, Kỹ sư chất lượng cao từ Việt Nam. Đăng tin miễn phí và kết nối với nhân tài ngay hôm nay.
                  <span className="block text-sm opacity-80 mt-2">質の高い研修生、特定技能、エンジニア人材にアクセス。無料で求人を掲載し、今日から人材と繋がりましょう。</span>
                  <span className="block text-sm opacity-80 mt-1">Access thousands of high-quality Trainees, Skilled Workers, and Engineers from Vietnam. Post jobs for free and connect with talent today.</span>
@@ -220,7 +220,7 @@ export const MainContent = () => (
                     </div>
                   </Link>
                 </Button>
-                 <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 hover:text-white">
+                 <Button asChild size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white">
                   <Link href="/nhuong-quyen">
                      <div className="text-center">
                         <span className="font-semibold">Đăng ký đối tác</span>
@@ -245,3 +245,5 @@ export const MainContent = () => (
       </section>
     </>
   );
+
+    
