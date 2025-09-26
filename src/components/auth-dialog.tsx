@@ -67,15 +67,15 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
             </DialogHeader>
 
             <div className="space-y-3">
-                 <Button variant="outline" className="w-full justify-center h-12 text-base">
+                 <Button variant="outline" className="w-full justify-start h-12 text-base">
                     <Image src="/img/Facebook.svg" alt="Facebook" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Facebook
                  </Button>
-                 <Button variant="outline" className="w-full justify-center h-12 text-base">
+                 <Button variant="outline" className="w-full justify-start h-12 text-base">
                     <Image src="/img/google.svg" alt="Google" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Google
                  </Button>
-                 <Button variant="outline" className="w-full justify-center h-12 text-base">
+                 <Button variant="outline" className="w-full justify-start h-12 text-base">
                     <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Số điện thoại
                  </Button>
