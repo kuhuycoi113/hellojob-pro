@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -56,7 +57,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGr
 import { Slider } from '@/components/ui/slider';
 import { translateProfile } from '@/ai/flows/translate-profile-flow';
 import type { TranslateProfileInput } from '@/ai/schemas/translate-profile-schema';
-import { JpFlagIcon, EnFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon } from '@/components/custom-icons';
+import { JpFlagIcon, EnFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon, PdfIcon } from '@/components/custom-icons';
 import { industriesByJobType } from '@/lib/industry-data';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -83,8 +84,9 @@ type DocumentName = {
 
 type DocumentItem = {
   name: DocumentName;
-  url?: string; // Data URL of the uploaded image
+  url?: string; // Data URL of the uploaded file
   isDefault?: boolean; // Flag to identify default documents
+  fileType?: 'pdf' | 'image'; // Track the file type
 };
 
 type EnrichedCandidateProfile = Omit<CandidateProfile, 'documents'> & { 
@@ -558,7 +560,11 @@ const DocumentGrid = ({
                         <div className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center bg-secondary/50">
                             <Label htmlFor={`doc-${docType}-${index}`} className="w-full h-full cursor-pointer">
                                 {doc.url ? (
-                                    <Image src={doc.url} alt={doc.name.vi} fill className="object-cover"/>
+                                    doc.fileType === 'pdf' ? (
+                                        <iframe src={doc.url} className="w-full h-full" title={doc.name.vi}/>
+                                    ) : (
+                                        <Image src={doc.url} alt={doc.name.vi} fill className="object-cover"/>
+                                    )
                                 ) : (
                                     <div className="flex flex-col items-center justify-center h-full">
                                       <UploadCloud className="h-8 w-8 text-muted-foreground"/>
@@ -586,7 +592,7 @@ const DocumentGrid = ({
                                 </Button>
                              )}
                         </div>
-                        <Input id={`doc-${docType}-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleMediaChange('document', e, index, docType)}/>
+                        <Input id={`doc-${docType}-${index}`} type="file" className="hidden" accept="application/pdf,image/*" onChange={(e) => handleMediaChange('document', e, index, docType)}/>
                         <p className="text-xs text-muted-foreground">{doc.name.vi}</p>
                     </div>
                 ))}
@@ -685,8 +691,8 @@ export default function CandidateProfilePage() {
   const [isAddDocDialogOpen, setIsAddDocDialogOpen] = useState(false);
   const [currentDocTypeToAdd, setCurrentDocTypeToAdd] = useState<'vietnam' | 'japan' | 'other' | null>(null);
   const [newDocName, setNewDocName] = useState<DocumentName>({ vi: '', ja: '', en: '' });
-  const [newDocImage, setNewDocImage] = useState<File | null>(null);
-  const [newDocImagePreview, setNewDocImagePreview] = useState<string | null>(null);
+  const [newDocFile, setNewDocFile] = useState<File | null>(null);
+  const [newDocFilePreview, setNewDocFilePreview] = useState<string | null>(null);
   const [expandedGrids, setExpandedGrids] = useState({ vietnam: false, japan: false, other: false });
   const [lastDocumentsState, setLastDocumentsState] = useState<EnrichedCandidateProfile['documents'] | null>(null);
 
@@ -944,6 +950,7 @@ export default function CandidateProfilePage() {
             if (!newProfile.documents) newProfile.documents = {};
             if (!newProfile.documents[docType]) newProfile.documents[docType] = [];
             newProfile.documents[docType][index].url = newUrl;
+            newProfile.documents[docType][index].fileType = file.type.startsWith('image/') ? 'image' : 'pdf';
         }
 
         setProfileByLang({ vi: newProfile, ja: null, en: null });
@@ -1020,32 +1027,37 @@ export default function CandidateProfilePage() {
   const handleOpenAddDocDialog = (docType: 'vietnam' | 'japan' | 'other') => {
     setCurrentDocTypeToAdd(docType);
     setNewDocName({ vi: '', ja: '', en: '' });
-    setNewDocImage(null);
-    setNewDocImagePreview(null);
+    setNewDocFile(null);
+    setNewDocFilePreview(null);
     setIsAddDocDialogOpen(true);
   };
 
   const handleAddNewDocument = () => {
-      if (newDocName.vi.trim() && newDocImagePreview && currentDocTypeToAdd) {
-          handleAddItem('documents', currentDocTypeToAdd, { name: newDocName, url: newDocImagePreview, isDefault: false });
+      if (newDocName.vi.trim() && newDocFilePreview && currentDocTypeToAdd) {
+          handleAddItem('documents', currentDocTypeToAdd, { 
+              name: newDocName, 
+              url: newDocFilePreview, 
+              isDefault: false,
+              fileType: newDocFile?.type.startsWith('image/') ? 'image' : 'pdf'
+          });
           setIsAddDocDialogOpen(false);
           setExpandedGrids(prev => ({...prev, [currentDocTypeToAdd]: true }));
       } else {
           toast({
               variant: "destructive",
               title: "Thông tin chưa đủ",
-              description: "Vui lòng nhập tên Tiếng Việt và tải lên ảnh cho giấy tờ.",
+              description: "Vui lòng nhập tên Tiếng Việt và tải lên tệp cho giấy tờ.",
           });
       }
   };
 
-   const handleNewDocImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   const handleNewDocFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setNewDocImage(file);
+            setNewDocFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
-                setNewDocImagePreview(reader.result as string);
+                setNewDocFilePreview(reader.result as string);
             };
             reader.readAsDataURL(file);
         }
@@ -2255,7 +2267,7 @@ export default function CandidateProfilePage() {
             <DialogHeader>
                 <DialogTitle>Thêm giấy tờ mới</DialogTitle>
                 <DialogDescription>
-                    Đặt tên cho giấy tờ và tải lên hình ảnh tương ứng.
+                    Đặt tên cho giấy tờ và tải lên tệp (PDF hoặc ảnh) tương ứng.
                 </DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-4">
@@ -2292,30 +2304,38 @@ export default function CandidateProfilePage() {
                 </Tabs>
                 
                 <div className="space-y-2">
-                    <Label>Ảnh giấy tờ</Label>
+                    <Label>Tệp giấy tờ</Label>
                     <Label
-                        htmlFor="doc-image-upload"
+                        htmlFor="doc-file-upload"
                         className="relative flex flex-col items-center justify-center w-full h-48 px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer border-border hover:border-primary transition-colors"
                     >
-                        {newDocImagePreview ? (
-                            <Image
-                                src={newDocImagePreview}
-                                alt="Xem trước ảnh"
-                                fill
-                                className="object-contain rounded-md"
-                            />
+                        {newDocFilePreview ? (
+                            newDocFile?.type.startsWith('image/') ? (
+                                <Image
+                                    src={newDocFilePreview}
+                                    alt="Xem trước"
+                                    fill
+                                    className="object-contain rounded-md"
+                                />
+                            ) : (
+                                <div className="flex flex-col items-center justify-center text-center">
+                                    <PdfIcon className="w-16 h-16" />
+                                    <p className="mt-2 text-sm font-semibold">{newDocFile?.name}</p>
+                                </div>
+                            )
                         ) : (
                             <div className="space-y-2 text-center">
                                 <UploadCloud className="w-10 h-10 mx-auto text-muted-foreground" />
                                 <p className="text-sm text-muted-foreground">Nhấp hoặc kéo thả file vào đây</p>
+                                <p className="text-xs text-muted-foreground">PDF, PNG, JPG</p>
                             </div>
                         )}
                         <Input
-                            id="doc-image-upload"
+                            id="doc-file-upload"
                             type="file"
                             className="sr-only"
-                            accept="image/*"
-                            onChange={handleNewDocImageChange}
+                            accept="application/pdf,image/png,image/jpeg"
+                            onChange={handleNewDocFileChange}
                         />
                     </Label>
                 </div>
@@ -2333,3 +2353,4 @@ export default function CandidateProfilePage() {
 }
 
     
+
