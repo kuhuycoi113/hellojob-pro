@@ -155,4 +155,13 @@
   .doc-tab-other[data-state=active] {
     background-color: hsl(var(--accent-green));
   }
+  .doc-lang-tab-vi[data-state=active] {
+    background-color: hsl(var(--accent-orange));
+  }
+  .doc-lang-tab-ja[data-state=active] {
+    background-color: hsl(var(--accent-blue));
+  }
+  .doc-lang-tab-en[data-state=active] {
+    background-color: hsl(var(--accent-green));
+  }
 }

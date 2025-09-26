@@ -614,7 +614,20 @@ const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
             </div>
         </DialogContent>
     </Dialog>
-)
+);
+
+const MainEditDialog = ({ children }: { children: React.ReactNode }) => {
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                {children}
+            </DialogTrigger>
+            <DialogContent>
+                {/* Content will be added here */}
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 export default function CandidateProfilePage() {
   const { toast } = useToast();
@@ -1459,6 +1472,7 @@ export default function CandidateProfilePage() {
       );
   }
 
+
   const editButtonText = isNewProfile ? 'Tạo hồ sơ' : 'Sửa hồ sơ';
 
   const formatPhoneNumber = (phone: string | undefined): string => {
@@ -1885,7 +1899,7 @@ export default function CandidateProfilePage() {
                   </CardHeader>
                   <CardContent>
                     <Tabs defaultValue="japan" value={activeDocTab} onValueChange={setActiveDocTab} className="w-full">
-                      <TabsList className={cn("flex w-full", isMobile && "w-full justify-between")}>
+                      <TabsList className={cn("w-full md:grid md:grid-cols-3", isMobile && "flex justify-between")}>
                         <TabsTrigger value="vietnam" className={cn("doc-tab-vn flex-1 md:flex-auto", isMobile && "flex-grow basis-0", isMobile && activeDocTab !== 'vietnam' && "flex-shrink")}>
                            {isMobile ? (activeDocTab === 'vietnam' ? t.vietnamDocs : 'Việt Nam') : t.vietnamDocs}
                         </TabsTrigger>
@@ -2054,6 +2068,7 @@ export default function CandidateProfilePage() {
                     </div>}
                   </CardContent>
                 </Card>
+
                  <div className="text-center pt-4">
                     <Button variant="link" className="text-muted-foreground text-sm" onClick={() => { /* Handle logout */ }}>
                         <LogOut className="mr-2 h-4 w-4"/>
@@ -2093,9 +2108,9 @@ export default function CandidateProfilePage() {
             <div className="py-4 space-y-4">
                 <Tabs defaultValue="vi" className="w-full">
                   <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="vi">Tiếng Việt</TabsTrigger>
-                    <TabsTrigger value="ja">Tiếng Nhật</TabsTrigger>
-                    <TabsTrigger value="en">Tiếng Anh</TabsTrigger>
+                    <TabsTrigger value="vi" className="doc-lang-tab-vi">Tiếng Việt</TabsTrigger>
+                    <TabsTrigger value="ja" className="doc-lang-tab-ja">Tiếng Nhật</TabsTrigger>
+                    <TabsTrigger value="en" className="doc-lang-tab-en">Tiếng Anh</TabsTrigger>
                   </TabsList>
                   <TabsContent value="vi" className="pt-2">
                      <Input 
