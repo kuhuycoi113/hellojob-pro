@@ -8,6 +8,8 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { PartnerRoleDialog } from '@/components/partner-role-dialog';
 import { XL01Dialog } from '@/components/X-L01-dialog';
+import { FeeDialog } from '@/components/fee-dialog';
+import { ManagementFeeDialog } from '@/components/management-fee-dialog';
 import { XL06Dialog } from '@/components/X-L06-dialog';
 import { XL07Dialog } from '@/components/X-L07-dialog';
 
@@ -54,6 +56,8 @@ const partnerBenefits = [
 export default function NhaTuyenDungPage() {
   const [isPartnerRoleDialogOpen, setIsPartnerRoleDialogOpen] = useState(false);
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
+  const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
+  const [isManagementFeeDialogOpen, setIsManagementFeeDialogOpen] = useState(false);
   const [isXL06DialogOpen, setIsXL06DialogOpen] = useState(false);
   const [isXL07DialogOpen, setIsXL07DialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -62,19 +66,19 @@ export default function NhaTuyenDungPage() {
   const handleRoleSelected = (roleId: string) => {
     setSelectedRole(roleId);
     setIsPartnerRoleDialogOpen(false);
-    setIsXL01DialogOpen(true); // Open the X-L01 dialog starting at step 2
+    setIsXL01DialogOpen(true);
   };
 
   const handleXL01Complete = (preferences: any) => {
     console.log("X-L01 Completed with:", preferences);
     setIsXL01DialogOpen(false);
-    setIsXL06DialogOpen(true);
+    setIsXL06DialogOpen(true); // Open X006 instead of NTD007
   };
   
   const handleXL06Complete = (fee: string) => {
-    console.log("XL06 (Referral Fee) selected:", fee);
+    console.log("X006 (Referral Fee) selected:", fee);
     setIsXL06DialogOpen(false);
-    setIsXL07DialogOpen(true);
+    setIsXL07DialogOpen(true); // Open X007
   };
 
   const handleXL07Complete = (fee: string) => {
@@ -211,7 +215,7 @@ export default function NhaTuyenDungPage() {
       <XL01Dialog 
         isOpen={isXL01DialogOpen} 
         onOpenChange={setIsXL01DialogOpen}
-        initialStep={2} // Start from step 2
+        initialStep={2}
         onComplete={handleXL01Complete}
       />
        <XL06Dialog
