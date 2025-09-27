@@ -47,35 +47,12 @@ interface EditProfileDialogProps {
 
 const parseMessengerInput = (input: string): string => {
     if (!input) return '';
-    const trimmedInput = input.trim();
-    try {
-        if (trimmedInput.startsWith('http') || trimmedInput.startsWith('www.')) {
-            const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
-            
-            if (url.hostname.includes('facebook.com') || url.hostname.includes('m.facebook.com')) {
-                if (url.pathname.includes('profile.php')) {
-                    const id = url.searchParams.get('id');
-                    if (id) return id;
-                }
-                const pathParts = url.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0) {
-                    const lastPart = pathParts[pathParts.length - 1];
-                    if (lastPart !== 'profile.php' && lastPart !== 'home.php') {
-                        return lastPart;
-                    }
-                }
-            }
-             if (url.hostname.includes('m.me')) {
-                const pathParts = url.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0) {
-                     return pathParts[pathParts.length - 1];
-                }
-            }
-        }
-    } catch (error) {
-        console.warn("Could not parse input as URL, treating as username:", error);
+    let trimmedInput = input.trim();
+    // Remove "www." if it exists
+    if (trimmedInput.includes('www.facebook.com')) {
+        trimmedInput = trimmedInput.replace('www.facebook.com', 'facebook.com');
     }
-    return trimmedInput.split('/').pop() || trimmedInput;
+    return trimmedInput;
 };
 
 const parseZaloInput = (input: string): string => {
@@ -90,24 +67,12 @@ const parseZaloInput = (input: string): string => {
 
 const parseLineInput = (input: string): string => {
   if (!input) return '';
-  const trimmedInput = input.trim();
-  try {
-      if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
-          const url = new URL(trimmedInput);
-          const pathParts = url.pathname.split('/');
-          const lastPart = pathParts.pop(); // Get the last part of the path
-          if (lastPart) {
-              // Extract the ID from /R/ti/p/@id or /ti/p/~id
-              const match = lastPart.match(/([@~]?\w+)/);
-              if (match && match[1]) return match[1].replace('~', '').replace('@', '');
-              return lastPart;
-          }
-      }
-  } catch (error) {
-       console.warn("Could not parse Line input as URL, treating as ID:", error);
+  let trimmedInput = input.trim();
+   // Remove "www." if it exists
+  if (trimmedInput.includes('www.line.me')) {
+    trimmedInput = trimmedInput.replace('www.line.me', 'line.me');
   }
-  // Fallback to treat the whole input as an ID, removing potential URL parts
-  return trimmedInput.split('/').pop()?.replace('~', '').replace('@', '') || trimmedInput;
+  return trimmedInput;
 };
 
 
@@ -489,9 +454,9 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                 newCandidate.name = value;
             } else if (section === 'personalInfo' || section === 'aspirations') {
                 if (section === 'personalInfo' && field === 'messenger') {
-                     newCandidate[section]!.messenger = value; // Store raw value
+                     newCandidate[section]!.messenger = parseMessengerInput(value); // Store raw value
                 } else if (section === 'personalInfo' && field === 'line') {
-                     newCandidate[section]!.line = value; // Store raw value
+                     newCandidate[section]!.line = parseLineInput(value); // Store raw value
                 } else if (section === 'personalInfo' && field === 'zalo') {
                     newCandidate[section] = { ...newCandidate[section]!, [field]: parseZaloInput(value) };
                 } else if (section === 'aspirations' && field === 'specialAspirations') {
