@@ -142,8 +142,33 @@ export default function AboutPage() {
          </div>
       </section>
 
-      {/* Team Section */}
+      {/* Activity Photos Section */}
       <section className="py-20 md:py-28 bg-secondary">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-headline font-bold text-primary">Hình ảnh hoạt động</h2>
+            <p className="text-muted-foreground mt-4 max-w-3xl mx-auto text-lg">
+              Những khoảnh khắc đáng nhớ trong hành trình phát triển và kết nối của HelloJob.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {Array.from({ length: 25 }).map((_, index) => (
+              <div key={index} className="relative aspect-square w-full overflow-hidden rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105">
+                <Image
+                  src={`https://picsum.photos/seed/${100 + index}/300/300`}
+                  alt={`Hoạt động HelloJob ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  data-ai-hint="team building event"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-headline font-bold text-primary">Đội ngũ của chúng tôi</h2>
@@ -172,7 +197,7 @@ export default function AboutPage() {
       </section>
 
        {/* CTA Section */}
-      <section className="w-full py-20 md:py-28 bg-background">
+      <section className="w-full py-20 md:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center gap-12 rounded-lg bg-gradient-to-br from-accent to-primary text-primary-foreground p-12 lg:p-16">
             <div className="md:w-1/2 text-center md:text-left">
@@ -220,5 +245,3 @@ export default function AboutPage() {
     </>
   );
 }
-
-    
