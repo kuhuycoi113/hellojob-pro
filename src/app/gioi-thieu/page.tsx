@@ -34,7 +34,7 @@ const teamMembers = [
    {
     name: 'Nguyễn Ngọc Hà',
     role: 'Co-Founder - Thành viên HĐQT',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Ha01.png',
     dataAiHint: 'female board member portrait',
   },
   {
@@ -274,3 +274,5 @@ export default function AboutPage() {
     </>
   );
 }
+
+    
