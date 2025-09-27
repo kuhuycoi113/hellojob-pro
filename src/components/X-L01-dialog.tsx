@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -263,7 +264,17 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1, on
                     <Button 
                         key={region} 
                         variant="outline"
-                        onClick={() => setSelectedRegion(region)} 
+                        onClick={() => {
+                            setSelectedRegion(region);
+                            if (onComplete) {
+                                onComplete({
+                                    desiredVisaType: selectedVisa?.name,
+                                    desiredVisaDetail: selectedVisaDetail,
+                                    desiredIndustry: selectedIndustry?.name,
+                                    desiredLocation: region,
+                                });
+                            }
+                        }}
                         className={cn(
                             "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary",
                             selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
@@ -275,7 +286,7 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1, on
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <Button variant="link" onClick={() => setProfileCreationStep(4)}>Quay lại</Button>
-                <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và tìm đối tác phù hợp</Button>
+                
             </div>
         </>
     )
