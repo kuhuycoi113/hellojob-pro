@@ -333,12 +333,18 @@ export function XL01Dialog({
     if (!parentVisaSlug) return null;
     const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
     
+    let screenIdComment = '';
+    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+
     return (
         <>
+            <span className="hidden">{screenIdComment}</span>
             <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề muốn tuyển dụng</DialogTitle>
                 <DialogDescription className="text-center">
-                    Lựa chọn ngành nghề bạn quan tâm nhất.
+                    Lựa chọn ngành nghề bạn muốn tuyển dụng.
                 </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
