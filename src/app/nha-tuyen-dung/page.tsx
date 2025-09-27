@@ -13,6 +13,7 @@ import { VisaDetailDialog } from '@/components/visa-detail-dialog';
 import { IndustryDialog } from '@/components/industry-dialog';
 import { RegionDialog } from '@/components/region-dialog';
 import { FeeDialog } from '@/components/fee-dialog';
+import { ManagementFeeDialog } from '@/components/management-fee-dialog';
 
 const partnerBenefits = [
   { 
@@ -60,6 +61,7 @@ export default function NhaTuyenDungPage() {
   const [isIndustryDialogOpen, setIsIndustryDialogOpen] = useState(false);
   const [isRegionDialogOpen, setIsRegionDialogOpen] = useState(false);
   const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
+  const [isManagementFeeDialogOpen, setIsManagementFeeDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
@@ -98,10 +100,17 @@ export default function NhaTuyenDungPage() {
   }
   
   const handleFeeEntered = (fee: string) => {
-    console.log("Role:", selectedRole, "Visa Type:", selectedVisa, "Visa Detail:", selectedVisaDetail, "Industry:", selectedIndustry, "Region:", selectedRegion, "Fee:", fee);
+    console.log("Referral Fee:", fee);
     setIsFeeDialogOpen(false);
+    setIsManagementFeeDialogOpen(true);
+  }
+
+  const handleManagementFeeEntered = (managementFee: string) => {
+    console.log("Role:", selectedRole, "Visa Type:", selectedVisa, "Visa Detail:", selectedVisaDetail, "Industry:", selectedIndustry, "Region:", selectedRegion, "Management Fee:", managementFee);
+    setIsManagementFeeDialogOpen(false);
     // Navigate to the next step, e.g., a registration form or dashboard
   }
+
 
   return (
     <>
@@ -278,6 +287,16 @@ export default function NhaTuyenDungPage() {
         onBack={() => {
             setIsFeeDialogOpen(false);
             setIsRegionDialogOpen(true);
+        }}
+        lang={selectedLang}
+       />
+       <ManagementFeeDialog
+        isOpen={isManagementFeeDialogOpen}
+        onOpenChange={setIsManagementFeeDialogOpen}
+        onSelect={handleManagementFeeEntered}
+        onBack={() => {
+            setIsManagementFeeDialogOpen(false);
+            setIsFeeDialogOpen(true);
         }}
         lang={selectedLang}
        />
