@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { PartnerRoleDialog } from '@/components/partner-role-dialog';
 import { VisaTypeDialog } from '@/components/visa-type-dialog';
+import { VisaDetailDialog } from '@/components/visa-detail-dialog';
 
 const partnerBenefits = [
   { 
@@ -52,19 +53,28 @@ const partnerBenefits = [
 export default function NhaTuyenDungPage() {
   const [isPartnerRoleDialogOpen, setIsPartnerRoleDialogOpen] = useState(false);
   const [isVisaTypeDialogOpen, setIsVisaTypeDialogOpen] = useState(false);
+  const [isVisaDetailDialogOpen, setIsVisaDetailDialogOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
 
   const handleRoleSelected = (roleId: string) => {
-    console.log("Role Selected:", roleId);
+    setSelectedRole(roleId);
     setIsPartnerRoleDialogOpen(false);
-    setIsVisaTypeDialogOpen(true); // Open the next dialog
+    setIsVisaTypeDialogOpen(true);
   };
 
   const handleVisaSelected = (visaType: string) => {
-    console.log("Visa Selected:", visaType);
+    setSelectedVisa(visaType);
     setIsVisaTypeDialogOpen(false);
-    // Navigate to the next step, e.g., a registration form
+    setIsVisaDetailDialogOpen(true);
   };
+
+  const handleVisaDetailSelected = (visaDetail: string) => {
+    console.log("Role:", selectedRole, "Visa Type:", selectedVisa, "Visa Detail:", visaDetail);
+    setIsVisaDetailDialogOpen(false);
+    // Navigate to the next step, e.g., a registration form
+  }
 
   return (
     <>
@@ -201,6 +211,17 @@ export default function NhaTuyenDungPage() {
             setIsPartnerRoleDialogOpen(true);
         }}
         lang={selectedLang}
+      />
+      <VisaDetailDialog
+        isOpen={isVisaDetailDialogOpen}
+        onOpenChange={setIsVisaDetailDialogOpen}
+        onSelect={handleVisaDetailSelected}
+        onBack={() => {
+            setIsVisaDetailDialogOpen(false);
+            setIsVisaTypeDialogOpen(true);
+        }}
+        lang={selectedLang}
+        visaType={selectedVisa || ''}
       />
     </>
   );
