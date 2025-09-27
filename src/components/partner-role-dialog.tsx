@@ -1,128 +1,228 @@
-
 'use client';
 
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ShieldCheck, Users, FileSignature, BarChart } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building, Plane, UserCheck, Handshake, Briefcase, Users, UserSquare, UserCog } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from './custom-icons';
-
-type Language = 'vi' | 'ja' | 'en';
-
-interface PartnerRoleDialogProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSelect: (roleId: string) => void;
-  onLanguageChange: (lang: Language) => void;
-  initialLang?: Language;
-}
-
-const roles = {
-  vi: [
-    { id: 'haken_staff', icon: UserSquare, title: 'Nhân viên phái cử', desc: 'Nhân viên tuyển dụng/đối ngoại của Công ty XKLĐ.' },
-    { id: 'jp_hr_staff', icon: UserCog, title: 'Nhân viên Nhân lực Nhật', desc: 'Nhân viên tại Nghiệp đoàn, Shien, Shokai, Haken.' },
-    { id: 'dispatch', icon: Plane, title: 'Công ty phái cử', desc: 'Tuyển và phái cử lao động từ Việt Nam.' },
-    { id: 'support', icon: UserCheck, title: 'Cơ quan hỗ trợ (Shien Kikan)', desc: 'Hỗ trợ các công ty và người lao động.' },
-    { id: 'enterprise', icon: Building, title: 'Xí nghiệp tiếp nhận', desc: 'Trực tiếp tuyển dụng và sử dụng lao động.' },
-    { id: 'union', icon: Handshake, title: 'Nghiệp đoàn (Kumiai)', desc: 'Quản lý và hỗ trợ thực tập sinh.' },
-    { id: 'shokai', icon: Users, title: 'Công ty giới thiệu có phí (Yuryo Shokai)', desc: 'Cung cấp dịch vụ giới thiệu việc làm có tính phí.' },
-    { id: 'haken', icon: Briefcase, title: 'Công ty Haken', desc: 'Cung cấp dịch vụ phái cử lao động tạm thời.' },
-  ],
-  ja: [
-    { id: 'haken_staff', icon: UserSquare, title: '送り出し機関の社員', desc: '送り出し機関の採用・渉外担当者。' },
-    { id: 'jp_hr_staff', icon: UserCog, title: '日本人材法人の社員', desc: '監理団体、支援機関、職業紹介所、派遣会社の社員。' },
-    { id: 'dispatch', icon: Plane, title: '送り出し機関', desc: 'ベトナムから労働者を募集・派遣する。' },
-    { id: 'support', icon: UserCheck, title: '支援機関', desc: '企業と労働者を支援する。' },
-    { id: 'enterprise', icon: Building, title: '受け入れ企業', desc: '労働者を直接雇用・使用する。' },
-    { id: 'union', icon: Handshake, title: '監理団体 (組合)', desc: '技能実習生を管理・支援する。' },
-    { id: 'shokai', icon: Users, title: '有料職業紹介事業所', desc: '有料の職業紹介サービスを提供する。' },
-    { id: 'haken', icon: Briefcase, title: '派遣会社', desc: '一時的な労働者派遣サービスを提供する。' },
-  ],
-  en: [
-    { id: 'haken_staff', icon: UserSquare, title: 'Sending Company Staff', desc: 'Recruitment/external affairs staff of a sending company.' },
-    { id: 'jp_hr_staff', icon: UserCog, title: 'Japan-side HR Staff', desc: 'Staff at a supervising, support, placement, or staffing agency.' },
-    { id: 'dispatch', icon: Plane, title: 'Sending Company', desc: 'Recruit and dispatch workers from Vietnam.' },
-    { id: 'support', icon: UserCheck, title: 'Support Organization (Shien Kikan)', desc: 'Support companies and workers.' },
-    { id: 'enterprise', icon: Building, title: 'Accepting Company', desc: 'Directly recruit and employ workers.' },
-    { id: 'union', icon: Handshake, title: 'Supervising Organization (Kumiai)', desc: 'Manage and support technical interns.' },
-    { id: 'shokai', icon: Users, title: 'Paid Employment Placement Agency', desc: 'Provide paid job placement services.' },
-    { id: 'haken', icon: Briefcase, title: 'Temporary Staffing Agency (Haken)', desc: 'Provide temporary worker dispatch services.' },
-  ],
-};
+import { XL01Dialog } from '@/components/X-L01-dialog';
+import { XL06Dialog } from '@/components/X-L06-dialog';
+import { XL07Dialog } from '@/components/X-L07-dialog';
 
 
-export function PartnerRoleDialog({ isOpen, onOpenChange, onSelect, onLanguageChange, initialLang = 'vi' }: PartnerRoleDialogProps) {
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [currentLang, setCurrentLang] = useState<Language>(initialLang);
-
-  const handleRoleSelect = (roleId: string) => {
-    setSelectedRole(roleId);
-    onSelect(roleId);
-  };
-
-  const handleLangChange = (lang: Language) => {
-      setCurrentLang(lang);
-      onLanguageChange(lang);
+const partnerBenefits = [
+  { 
+    icon: Users,
+    title_vi: 'Nguồn ứng viên dồi dào',
+    title_ja: '豊富な候補者源',
+    title_en: 'Abundant Candidate Pool',
+    description_vi: 'Tiếp cận hệ thống dữ liệu ứng viên Kỹ năng Đặc định (Tokutei) đã được sàng lọc và xác thực thông tin ban đầu.',
+    description_ja: '事前にスクリーニング・検証された特定技能候補者のデータベースにアクセスできます。',
+    description_en: 'Access a database of Special Skilled Worker (Tokutei) candidates that has been pre-screened and verified.'
+  },
+  { 
+    icon: FileSignature,
+    title_vi: 'Công cụ quản lý hiệu quả',
+    title_ja: '効率的な管理ツール',
+    title_en: 'Effective Management Tools',
+    description_vi: 'Sử dụng nền tảng để quản lý tin tuyển dụng, theo dõi trạng thái ứng viên và tương tác một cách chuyên nghiệp.',
+    description_ja: 'プラットフォームを使用して、求人情報を管理し、候補者の状況を追跡し、専門的に対話します。',
+    description_en: 'Use the platform to manage job postings, track candidate status, and interact professionally.'
+  },
+  { 
+    icon: BarChart,
+    title_vi: 'Hỗ trợ Marketing & Vận hành',
+    title_ja: 'マーケティング・運営支援',
+    title_en: 'Marketing & Operations Support',
+    description_vi: 'Được hỗ trợ quảng bá tin tuyển dụng trên các kênh của HelloJob, tiếp cận đúng đối tượng mục tiêu và tối ưu hóa hiệu quả.',
+    description_ja: 'HelloJobのチャネルで求人広告を宣伝し、適切なターゲット層にリーチし、効果を最適化するためのサポートを受けられます。',
+    description_en: 'Receive support to promote job postings on HelloJob\'s channels, reaching the right target audience and optimizing effectiveness.'
+  },
+  {
+    icon: ShieldCheck,
+    title_vi: 'Hợp tác minh bạch',
+    title_ja: '透明性の高い協力体制',
+    title_en: 'Transparent Partnership',
+    description_vi: 'Quy trình hợp tác rõ ràng, cơ chế chia sẻ doanh thu hấp dẫn và minh bạch, đảm bảo quyền lợi cho đối tác.',
+    description_ja: '明確な協力プロセス、魅力的で透明な収益分配メカニズムにより、パートナーの利益を保証します。',
+    description_en: 'A clear cooperation process, along with an attractive and transparent revenue-sharing mechanism, ensures benefits for partners.'
   }
+];
 
-  const dialogTitles = {
-    vi: 'Bạn là ai?',
-    ja: 'あなたの役割をお選びください',
-    en: 'What is your role?',
+export default function NhaTuyenDungPage() {
+  const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
+  const [isXL06DialogOpen, setIsXL06DialogOpen] = useState(false);
+  const [isXL07DialogOpen, setIsXL07DialogOpen] = useState(false);
+  const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
+
+  const handleXL01Complete = (preferences: any) => {
+    console.log("X-L01 Completed with:", preferences);
+    setIsXL01DialogOpen(false);
+    setIsXL06DialogOpen(true);
+  };
+  
+  const handleXL06Complete = (fee: string) => {
+    console.log("X006 (Referral Fee) selected:", fee);
+    setIsXL06DialogOpen(false);
+    setIsXL07DialogOpen(true);
   };
 
-  const dialogDescriptions = {
-    vi: 'Chọn vai trò phù hợp nhất với bạn để chúng tôi có thể hỗ trợ tốt hơn.',
-    ja: 'より良いサポートを提供するために、あなたに最も適した役割を選択してください。',
-    en: 'Select the role that best fits you so we can provide better support.',
+  const handleXL07Complete = (fee: string) => {
+    console.log("XL07 (Management Fee) selected:", fee);
+    setIsXL07DialogOpen(false);
+    // Here you can proceed to the next step, e.g., finding partners
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl" id="NTD002">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-headline text-center">{dialogTitles[currentLang]}</DialogTitle>
-          <DialogDescription className="text-center">
-            {dialogDescriptions[currentLang]}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="vi" className="flex items-center gap-2"><VnFlagIcon /> Tiếng Việt</TabsTrigger>
-                <TabsTrigger value="ja" className="flex items-center gap-2"><JpFlagIcon /> 日本語</TabsTrigger>
-                <TabsTrigger value="en" className="flex items-center gap-2"><EnFlagIcon /> English</TabsTrigger>
-            </TabsList>
-            
-            <div className="pt-6 max-h-[60vh] overflow-y-auto">
-                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {roles[currentLang].map((role) => (
-                        <Card 
-                            key={role.id} 
-                            onClick={() => handleRoleSelect(role.id)}
-                            className={cn(
-                                "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center",
-                                selectedRole === role.id && "ring-2 ring-primary border-primary"
-                            )}
-                        >
-                            <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                            <h3 className="font-bold text-base mb-1">{role.title}</h3>
-                            <p className="text-muted-foreground text-xs flex-grow">{role.desc}</p>
-                        </Card>
-                    ))}
+    <>
+      <div className="flex flex-col items-center">
+        {/* Hero Section */}
+        <section className="w-full bg-gradient-to-br from-accent to-primary text-primary-foreground py-20 md:py-28">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="text-center md:text-left">
+                <h1 className="text-4xl md:text-5xl font-headline font-bold mb-2">
+                  Đăng tin tuyển dụng miễn phí
+                  <span className="block text-xl text-primary-foreground/80 mt-1">無料で求人掲載 / Post Jobs for Free</span>
+                </h1>
+                <p className="text-lg text-primary-foreground/80 my-8">
+                  Tiếp cận hàng ngàn ứng viên Thực tập sinh kỹ năng, Kỹ năng đặc định, Kỹ sư chất lượng cao từ Việt Nam. Đăng tin miễn phí và kết nối với nhân tài ngay hôm nay.
+                  <span className="block text-sm opacity-80 mt-2">質の高い技能実習生、特定技能、エンジニア人材にアクセス。無料で求人を掲載し、今日から人材と繋がりましょう。/ HelloJob is a free job posting platform to recruit Vietnamese candidates...</span>
+                  <span className="block font-semibold mt-4">Bạn có thể chọn đăng nhanh thông tin tuyển dụng mong muốn để chúng tôi hỗ trợ hoặc để lại thông tin để liên hệ hợp tác.</span>
+                </p>
+                <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                  <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
+                      <div className="text-center">
+                          <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
+                          <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                      </div>
+                  </Button>
+                  <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsXL01DialogOpen(true)}>
+                      <div className="text-center">
+                          <span className="font-semibold">Đăng ký đối tác</span>
+                          <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                      </div>
+                  </Button>
                 </div>
+              </div>
+               <div className="relative hidden md:block">
+                  <Image 
+                    src="/img/viet-img/phong-van (3).jpg"
+                    alt="Sơ đồ hợp tác đối tác"
+                    width={600}
+                    height={400}
+                    className="rounded-lg shadow-2xl"
+                    data-ai-hint="partnership model diagram"
+                  />
+              </div>
             </div>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+          </div>
+        </section>
+
+        {/* Featured Benefits */}
+        <section className="w-full py-20 md:py-28 bg-secondary">
+          <div className="container mx-auto px-4 md:px-6">
+             <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-headline font-bold">
+                  Lợi ích dành cho Đối tác
+                  <span className="block text-lg text-muted-foreground mt-2">パートナーのメリット / Benefits for Partners</span>
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
+              {partnerBenefits.map(feature => (
+                <Card key={feature.title_vi} className="text-center p-6 border-t-4 border-primary shadow-lg hover:shadow-xl transition-shadow h-full">
+                   <feature.icon className="w-12 h-12 text-primary mx-auto mb-4" />
+                   <h3 className="text-xl font-bold font-headline mb-2">{feature.title_vi}</h3>
+                   <p className="text-muted-foreground text-sm">{feature.description_vi}</p>
+                   <div className="mt-4 pt-4 border-t border-dashed">
+                      <p className="text-sm font-semibold text-muted-foreground">{feature.title_ja}</p>
+                      <p className="text-xs text-muted-foreground/80 mt-1">{feature.description_ja}</p>
+                   </div>
+                   <div className="mt-2">
+                      <p className="text-sm font-semibold text-muted-foreground">{feature.title_en}</p>
+                      <p className="text-xs text-muted-foreground/80 mt-1">{feature.description_en}</p>
+                   </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        <section className="w-full py-20 md:py-28 bg-background">
+          <div className="container mx-auto px-4 md:px-6">
+              <Card className="p-8 md:p-12 bg-secondary border-none">
+                   <div className="text-center">
+                      <h2 className="text-3xl font-bold font-headline mb-4">
+                          Chào mừng các Đối tác Tuyển dụng
+                          <span className="block text-lg text-muted-foreground mt-2">採用パートナー様へようこそ / Welcome, Recruiting Partners</span>
+                      </h2>
+                      <p className="text-muted-foreground max-w-4xl mx-auto">
+                          HelloJob là hệ thống giúp các đối tác đăng tải thông tin việc làm miễn phí để tuyển dụng ứng viên Việt Nam. Chúng tôi chào mừng các đối tác là Cá nhân (làm việc cho các tổ chức nhân lực) hoặc Pháp nhân tại Việt Nam và Nhật Bản.
+                          <span className="block text-sm opacity-80 mt-2">HelloJobはベトナム人候補者を採用するための無料求人投稿プラットフォームです... / HelloJob is a free job posting platform to recruit Vietnamese candidates...</span>
+                      </p>
+                      <div className="mt-6 bg-background p-6 rounded-lg inline-block text-left">
+                          <h3 className="font-semibold mb-3">Các loại hình tuyển dụng chính:</h3>
+                          <ul className="space-y-1 text-muted-foreground">
+                              <li>- Kỹ năng đặc định (特定技能)</li>
+                              <li>- Thực tập sinh kỹ năng (技能実習)</li>
+                              <li>- Kỹ sư, tri thức (技術・人文知識・国際業務 - 技人国)</li>
+                          </ul>
+                      </div>
+                       <p className="mt-6 text-muted-foreground max-w-4xl mx-auto">
+                          Bạn có thể đăng việc làm ngay hoặc để lại thông tin liên hệ để tìm hiểu về cơ chế hợp tác.
+                          <span className="block text-sm opacity-80 mt-2">すぐに求人を掲載するか、連絡先を残して協力体制についてご相談ください。/ You can post a job now or leave your contact information to learn about our partnership.</span>
+                      </p>
+                      <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                          <Button size="lg" className="bg-primary text-white hover:bg-primary/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
+                              <div className="text-center">
+                                  <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
+                                  <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                              </div>
+                          </Button>
+                           <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsXL01DialogOpen(true)}>
+                              <div className="text-center">
+                                  <span className="font-semibold">Đăng ký đối tác</span>
+                                  <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                              </div>
+                          </Button>
+                      </div>
+                   </div>
+              </Card>
+          </div>
+        </section>
+      </div>
+      <XL01Dialog 
+        isOpen={isXL01DialogOpen} 
+        onOpenChange={setIsXL01DialogOpen}
+        onLanguageChange={setSelectedLang}
+        initialLang={selectedLang}
+        initialStep={1}
+        onComplete={handleXL01Complete}
+        onBack={() => {
+            setIsXL01DialogOpen(false);
+        }}
+      />
+       <XL06Dialog
+        isOpen={isXL06DialogOpen}
+        onOpenChange={setIsXL06DialogOpen}
+        onSelect={handleXL06Complete}
+        onBack={() => {
+            setIsXL06DialogOpen(false);
+            setIsXL01DialogOpen(true);
+        }}
+        lang={selectedLang}
+      />
+       <XL07Dialog
+        isOpen={isXL07DialogOpen}
+        onOpenChange={setIsXL07DialogOpen}
+        onSelect={handleXL07Complete}
+        onBack={() => {
+            setIsXL07DialogOpen(false);
+            setIsXL06DialogOpen(true);
+        }}
+        lang={selectedLang}
+      />
+    </>
   );
 }

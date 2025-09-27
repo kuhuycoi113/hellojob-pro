@@ -7,7 +7,6 @@ import { ShieldCheck, Users, FileSignature, BarChart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
-import { PartnerRoleDialog } from '@/components/partner-role-dialog';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 import { XL06Dialog } from '@/components/X-L06-dialog';
 import { XL07Dialog } from '@/components/X-L07-dialog';
@@ -53,18 +52,10 @@ const partnerBenefits = [
 ];
 
 export default function NhaTuyenDungPage() {
-  const [isPartnerRoleDialogOpen, setIsPartnerRoleDialogOpen] = useState(false);
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
   const [isXL06DialogOpen, setIsXL06DialogOpen] = useState(false);
   const [isXL07DialogOpen, setIsXL07DialogOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
-
-  const handleRoleSelected = (roleId: string) => {
-    setSelectedRole(roleId);
-    setIsPartnerRoleDialogOpen(false);
-    setIsXL01DialogOpen(true);
-  };
 
   const handleXL01Complete = (preferences: any) => {
     console.log("X-L01 Completed with:", preferences);
@@ -102,13 +93,13 @@ export default function NhaTuyenDungPage() {
                   <span className="block font-semibold mt-4">Bạn có thể chọn đăng nhanh thông tin tuyển dụng mong muốn để chúng tôi hỗ trợ hoặc để lại thông tin để liên hệ hợp tác.</span>
                 </p>
                 <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                  <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsPartnerRoleDialogOpen(true)}>
+                  <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
                       <div className="text-center">
                           <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                           <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                       </div>
                   </Button>
-                  <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsPartnerRoleDialogOpen(true)}>
+                  <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsXL01DialogOpen(true)}>
                       <div className="text-center">
                           <span className="font-semibold">Đăng ký đối tác</span>
                           <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
@@ -184,13 +175,13 @@ export default function NhaTuyenDungPage() {
                           <span className="block text-sm opacity-80 mt-2">すぐに求人を掲載するか、連絡先を残して協力体制についてご相談ください。/ You can post a job now or leave your contact information to learn about our partnership.</span>
                       </p>
                       <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                          <Button size="lg" className="bg-primary text-white hover:bg-primary/90" id="DANGTINTUYENDUNG01" onClick={() => setIsPartnerRoleDialogOpen(true)}>
+                          <Button size="lg" className="bg-primary text-white hover:bg-primary/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
                               <div className="text-center">
                                   <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                                   <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                               </div>
                           </Button>
-                           <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsPartnerRoleDialogOpen(true)}>
+                           <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsXL01DialogOpen(true)}>
                               <div className="text-center">
                                   <span className="font-semibold">Đăng ký đối tác</span>
                                   <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
@@ -202,21 +193,15 @@ export default function NhaTuyenDungPage() {
           </div>
         </section>
       </div>
-      <PartnerRoleDialog 
-        isOpen={isPartnerRoleDialogOpen} 
-        onOpenChange={setIsPartnerRoleDialogOpen}
-        onSelect={handleRoleSelected}
-        onLanguageChange={setSelectedLang}
-        initialLang={selectedLang}
-      />
       <XL01Dialog 
         isOpen={isXL01DialogOpen} 
         onOpenChange={setIsXL01DialogOpen}
-        initialStep={2}
+        onLanguageChange={setSelectedLang}
+        initialLang={selectedLang}
+        initialStep={1}
         onComplete={handleXL01Complete}
         onBack={() => {
             setIsXL01DialogOpen(false);
-            setIsPartnerRoleDialogOpen(true);
         }}
       />
        <XL06Dialog
