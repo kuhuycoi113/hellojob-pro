@@ -165,10 +165,11 @@ export function XL01Dialog({
 
   const QuickCreateStepDialog = () => (
     <>
+      {/* Screen: THSN002 */}
       <DialogHeader>
           <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
           <DialogDescription className="text-center">
-            Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
+            Hãy chọn loại hình phù hợp nhất với mong muốn sử dụng lao động của bạn.
           </DialogDescription>
       </DialogHeader>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
@@ -178,7 +179,7 @@ export function XL01Dialog({
             className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
-            <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
+            <p className="text-muted-foreground text-xs">Tuyển dụng lao động phổ thông, chi phí thấp.</p>
         </Button>
         <Button 
             onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }}
@@ -186,7 +187,7 @@ export function XL01Dialog({
             className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
-            <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
+            <p className="text-muted-foreground text-xs">Tuyển dụng lao động có tay nghề, làm việc dài hạn.</p>
         </Button>
         <Button 
             onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }}
@@ -194,7 +195,7 @@ export function XL01Dialog({
             className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
             <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
-            <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
+            <p className="text-muted-foreground text-xs">Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.</p>
         </Button>
       </div>
       <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
