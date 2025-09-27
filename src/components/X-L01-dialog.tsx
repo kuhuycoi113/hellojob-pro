@@ -428,10 +428,21 @@ export function XL01Dialog({
     );
   };
   
-  const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
-
   const RegionStepDialog = () => {
     const content = regionContent[currentLang];
+    const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
+    const regionKanjiMap: { [key: string]: string } = {
+      Hokkaido: '北海道',
+      Tohoku: '東北',
+      Kanto: '関東',
+      Chubu: '中部',
+      Kansai: '関西',
+      Chugoku: '中国',
+      Shikoku: '四国',
+      Kyushu: '九州',
+      Okinawa: '沖縄',
+    };
+    
     return (
          <>
             {/* Screen: X005 */}
@@ -450,7 +461,7 @@ export function XL01Dialog({
                             selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
                         )}
                     >
-                        <p className="font-semibold text-sm">{region}</p>
+                        <p className="font-semibold text-sm">{currentLang === 'ja' ? regionKanjiMap[region] : region}</p>
                     </Button>
                 ))}
             </div>
