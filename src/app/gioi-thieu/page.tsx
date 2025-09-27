@@ -22,7 +22,7 @@ const teamMembers = [
   {
     name: 'Phùng Thị Tuyết Nhung',
     role: 'Founder & COO',
-    avatar: '/img/HDQT/Nhung02.png',
+    avatar: '/img/HDQT/Nhung03.png',
     dataAiHint: 'female coo portrait',
   },
   {
@@ -274,5 +274,3 @@ export default function AboutPage() {
     </>
   );
 }
-
-    
