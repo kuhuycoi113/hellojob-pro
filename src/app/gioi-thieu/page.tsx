@@ -80,7 +80,7 @@ const values = [
 
 const activityImages = [
     "/img/anhgioithieu/congty001.webp",
-    "/img/anhgioithieu/congty002.webp",
+    "/img/anhgioithieu/congty005.webp",
     "/img/anhgioithieu/khachhang001.webp",
     "/img/anhgioithieu/khachhang002.webp",
     "/img/anhgioithieu/khachhang007.webp",
