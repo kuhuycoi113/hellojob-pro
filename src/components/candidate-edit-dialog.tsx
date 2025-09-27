@@ -454,7 +454,14 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
 
     const forceSave = () => {
         if (tempCandidate) {
-            localStorage.setItem('generatedCandidateProfile', JSON.stringify(tempCandidate));
+            const finalCandidate = { ...tempCandidate };
+            if (finalCandidate.personalInfo.messenger) {
+                finalCandidate.personalInfo.messenger = parseMessengerInput(finalCandidate.personalInfo.messenger);
+            }
+            if (finalCandidate.personalInfo.line) {
+                finalCandidate.personalInfo.line = parseLineInput(finalCandidate.personalInfo.line);
+            }
+            localStorage.setItem('generatedCandidateProfile', JSON.stringify(finalCandidate));
             onSaveSuccess();
             onOpenChange(false);
             setIsConfirmSaveOpen(false);
@@ -510,15 +517,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
             if (section === 'name') {
                 newCandidate.name = value;
             } else if (section === 'personalInfo') {
-                let processedValue = value;
-                if (field === 'messenger') {
-                    processedValue = parseMessengerInput(value);
-                } else if (field === 'line') {
-                    processedValue = parseLineInput(value);
-                } else if (field === 'zalo') {
-                    processedValue = parseZaloInput(value);
-                }
-                 newCandidate.personalInfo = { ...newCandidate.personalInfo, [field]: processedValue };
+                newCandidate.personalInfo = { ...newCandidate.personalInfo, [field]: value };
             } else {
                 newCandidate[section as keyof EnrichedCandidateProfile] = value;
             }
@@ -666,4 +665,3 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
         </>
     );
 }
-
