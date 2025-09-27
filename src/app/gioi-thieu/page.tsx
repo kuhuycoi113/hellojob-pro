@@ -16,25 +16,25 @@ const teamMembers = [
   {
     name: 'Nguyễn Quốc Việt',
     role: 'Founder & CEO',
-    avatar: '/img/HDQT/Viet01.png',
+    avatar: '/img/HDQT/Viet02.png',
     dataAiHint: 'male ceo portrait',
   },
   {
     name: 'Phùng Thị Tuyết Nhung',
     role: 'Founder & COO',
-    avatar: '/img/HDQT/Nhung01.png',
+    avatar: 'https://placehold.co/200x200.png',
     dataAiHint: 'female coo portrait',
   },
   {
     name: 'Trương Quỳnh Phương',
     role: 'Co-Founder - Thành viên HĐQT',
-    avatar: '/img/HDQT/Phuong01.png',
+    avatar: 'https://placehold.co/200x200.png',
     dataAiHint: 'female board member portrait',
   },
    {
     name: 'Nguyễn Ngọc Hà',
     role: 'Co-Founder - Thành viên HĐQT',
-    avatar: '/img/HDQT/Ha01.png',
+    avatar: 'https://placehold.co/200x200.png',
     dataAiHint: 'female board member portrait',
   },
   {
@@ -46,7 +46,7 @@ const teamMembers = [
   {
     name: 'Lê Mạnh Hùng',
     role: 'Head of Marketing',
-    avatar: '/img/HDQT/Hung01.png',
+    avatar: 'https://placehold.co/200x200.png',
     dataAiHint: 'male marketing head portrait',
   },
 ];
