@@ -16,7 +16,7 @@ const teamMembers = [
   {
     name: 'Nguyễn Quốc Việt',
     role: 'Founder & CEO',
-    avatar: '/img/HDQT/Viet02.png',
+    avatar: '/img/HDQT/Viet01.png',
     dataAiHint: 'male ceo portrait',
   },
   {
@@ -40,7 +40,7 @@ const teamMembers = [
   {
     name: 'Bùi Quang Huy',
     role: 'CTO',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Huy02.png',
     dataAiHint: 'male cto portrait',
   },
   {
@@ -274,3 +274,5 @@ export default function AboutPage() {
     </>
   );
 }
+
+    
