@@ -29,7 +29,7 @@ const contentByLang = {
         label: 'Phí quản lý/tháng',
         placeholder: 'Ví dụ: 20,000 JPY',
         backButton: 'Quay lại',
-        continueButton: 'Lưu và tìm đối tác phù hợp',
+        continueButton: 'Lưu, xem kết quả và để lại thông tin liên hệ',
     },
     ja: {
         title: 'パートナーに提案する管理費を入力してください',
