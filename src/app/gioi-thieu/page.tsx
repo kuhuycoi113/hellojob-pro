@@ -16,7 +16,7 @@ const teamMembers = [
   {
     name: 'Nguyễn Quốc Việt',
     role: 'Founder & CEO',
-    avatar: '/img/HDQT/Viet02.png',
+    avatar: '/img/HDQT/Viet05.png',
     dataAiHint: 'male ceo portrait',
   },
   {
@@ -278,5 +278,3 @@ export default function AboutPage() {
     </>
   );
 }
-
-    
