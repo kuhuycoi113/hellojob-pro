@@ -78,6 +78,35 @@ const values = [
     },
 ]
 
+const activityImages = [
+    "/img/anhgioithieu/congty001.webp",
+    "/img/anhgioithieu/congty002.webp",
+    "/img/anhgioithieu/khachhang001.webp",
+    "/img/anhgioithieu/khachhang002.webp",
+    "/img/anhgioithieu/khachhang003.webp",
+    "/img/anhgioithieu/khachhang004.webp",
+    "/img/anhgioithieu/khachhang005.webp",
+    "/img/anhgioithieu/laodong001.webp",
+    "/img/anhgioithieu/laodong002.webp",
+    "/img/anhgioithieu/laodong003.webp",
+    "/img/anhgioithieu/laodong004.webp",
+    "/img/anhgioithieu/laodong005.webp",
+    "/img/anhgioithieu/laodong006.webp",
+    "/img/anhgioithieu/laodong007.webp",
+    "/img/anhgioithieu/laodong008.webp",
+    "/img/anhgioithieu/laodong009.webp",
+    "/img/anhgioithieu/laodong010.webp",
+    "/img/anhgioithieu/laodong011.webp",
+    "/img/anhgioithieu/laodong012.webp",
+    "/img/anhgioithieu/laodong013.webp",
+    "/img/anhgioithieu/laodong014.webp",
+    "/img/anhgioithieu/nhanvien001.webp",
+    "/img/anhgioithieu/nhanvien002.webp",
+    "/img/anhgioithieu/nhanvien003.webp",
+    "/img/anhgioithieu/nhanvien004.webp",
+];
+
+
 export default function AboutPage() {
   return (
     <>
@@ -152,10 +181,10 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {Array.from({ length: 25 }).map((_, index) => (
+            {activityImages.map((src, index) => (
               <div key={index} className="relative aspect-square w-full overflow-hidden rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105">
                 <Image
-                  src={`https://picsum.photos/seed/${100 + index}/300/300`}
+                  src={src}
                   alt={`Hoạt động HelloJob ${index + 1}`}
                   fill
                   className="object-cover"
