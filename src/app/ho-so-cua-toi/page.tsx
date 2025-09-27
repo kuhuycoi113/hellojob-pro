@@ -1633,9 +1633,9 @@ export default function CandidateProfilePage() {
                 {hasContactInfo ? (
                     <div className="space-y-2">
                         {phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(phone)}</Link></Button>}
-                        {messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4"/>{messenger}</Link></Button>}
+                        {messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{messenger}</span></Link></Button>}
                         {zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(zalo)}</Link></Button>}
-                        {line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${line}`} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{line}</Link></Button>}
+                        {line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{line}</span></Link></Button>}
                     </div>
                 ) : (
                     <div className="text-center">
@@ -2310,7 +2310,7 @@ export default function CandidateProfilePage() {
                     <Label>Tệp giấy tờ</Label>
                     <Label
                         htmlFor="doc-file-upload"
-                        className="relative flex flex-col items-center justify-center w-full h-48 px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer border-border hover:border-primary transition-colors"
+                        className="relative flex flex-col items-center justify-center w-full h-48 px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer border-border hover:border-primary transition-colors bg-secondary/50"
                     >
                         {newDocFilePreview ? (
                             newDocFile?.type.startsWith('image/') ? (
@@ -2356,5 +2356,6 @@ export default function CandidateProfilePage() {
 }
 
     
+
 
 
