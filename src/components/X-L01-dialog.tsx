@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Dialog,
@@ -31,14 +31,16 @@ import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 
 interface XL01DialogProps {
-  children: React.ReactNode;
+  children?: React.ReactNode; // Make children optional
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  initialStep?: number;
 }
 
-export function XL01Dialog({ children }: XL01DialogProps) {
+export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: XL01DialogProps) {
   const router = useRouter();
   const { role, setRole, isLoggedIn } = useAuth();
-  const [profileCreationStep, setProfileCreationStep] = useState(1);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [profileCreationStep, setProfileCreationStep] = useState(initialStep);
   const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [selectedVisa, setSelectedVisa] = useState<{name: string, slug: string} | null>(null);
@@ -46,6 +48,12 @@ export function XL01Dialog({ children }: XL01DialogProps) {
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setProfileCreationStep(initialStep);
+    }
+  }, [isOpen, initialStep]);
 
   const handleCreateProfileRedirect = () => {
     const preferences = {
@@ -72,12 +80,12 @@ export function XL01Dialog({ children }: XL01DialogProps) {
 
       localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
       setRole('candidate');
-      setIsDialogOpen(false);
+      onOpenChange(false);
       router.push('/viec-lam-cua-toi?highlight=suggested');
     } else {
       sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
       sessionStorage.setItem('postLoginRedirect', '/viec-lam-cua-toi?highlight=suggested');
-      setIsDialogOpen(false);
+      onOpenChange(false);
       setIsConfirmLoginOpen(true);
     }
   };
@@ -89,7 +97,7 @@ export function XL01Dialog({ children }: XL01DialogProps) {
 
   const handleCreateDetailedProfile = (method: 'ai' | 'manual') => {
     setIsCreateDetailOpen(false);
-    setIsDialogOpen(false);
+    onOpenChange(false);
     if (method === 'ai') {
         router.push('/tao-ho-so-ai');
     } else {
@@ -119,7 +127,7 @@ export function XL01Dialog({ children }: XL01DialogProps) {
                 <h3 className="font-bold text-base mb-1">{quickActionText}</h3>
                 <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
             </Card>
-            <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+            <Card onClick={() => { onOpenChange(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
                 <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
                 <h3 className="font-bold text-base mb-1">{detailActionText}</h3>
                 <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
@@ -164,7 +172,9 @@ export function XL01Dialog({ children }: XL01DialogProps) {
             <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
         </Button>
       </div>
-      <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
+      {initialStep !== 2 && (
+        <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
+      )}
     </>
   );
 
@@ -280,10 +290,8 @@ export function XL01Dialog({ children }: XL01DialogProps) {
   }
   return (
     <>
-      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-          <DialogTrigger asChild>
-            {children}
-          </DialogTrigger>
+      <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setProfileCreationStep(initialStep); }}>
+          {children && <DialogTrigger asChild>{children}</DialogTrigger>}
           <DialogContent className="sm:max-w-2xl">
               {renderDialogContent()}
           </DialogContent>
@@ -323,7 +331,7 @@ export function XL01Dialog({ children }: XL01DialogProps) {
                 </Card>
             </div>
              <div className="mt-4 text-center">
-                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
+                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); onOpenChange(true); }}>Quay lại</Button>
             </div>
         </DialogContent>
       </Dialog>

@@ -8,12 +8,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { PartnerRoleDialog } from '@/components/partner-role-dialog';
-import { VisaTypeDialog } from '@/components/visa-type-dialog';
-import { VisaDetailDialog } from '@/components/visa-detail-dialog';
-import { IndustryDialog } from '@/components/industry-dialog';
-import { RegionDialog } from '@/components/region-dialog';
-import { FeeDialog } from '@/components/fee-dialog';
-import { ManagementFeeDialog } from '@/components/management-fee-dialog';
+import { XL01Dialog } from '@/components/X-L01-dialog';
+
 
 const partnerBenefits = [
   { 
@@ -56,61 +52,15 @@ const partnerBenefits = [
 
 export default function NhaTuyenDungPage() {
   const [isPartnerRoleDialogOpen, setIsPartnerRoleDialogOpen] = useState(false);
-  const [isVisaTypeDialogOpen, setIsVisaTypeDialogOpen] = useState(false);
-  const [isVisaDetailDialogOpen, setIsVisaDetailDialogOpen] = useState(false);
-  const [isIndustryDialogOpen, setIsIndustryDialogOpen] = useState(false);
-  const [isRegionDialogOpen, setIsRegionDialogOpen] = useState(false);
-  const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
-  const [isManagementFeeDialogOpen, setIsManagementFeeDialogOpen] = useState(false);
+  const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
-  const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
-  const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null);
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
 
   const handleRoleSelected = (roleId: string) => {
     setSelectedRole(roleId);
     setIsPartnerRoleDialogOpen(false);
-    setIsVisaTypeDialogOpen(true);
+    setIsXL01DialogOpen(true); // Open the X-L01 dialog
   };
-
-  const handleVisaSelected = (visaType: string) => {
-    setSelectedVisa(visaType);
-    setIsVisaTypeDialogOpen(false);
-    setIsVisaDetailDialogOpen(true);
-  };
-
-  const handleVisaDetailSelected = (visaDetail: string) => {
-    setSelectedVisaDetail(visaDetail);
-    setIsVisaDetailDialogOpen(false);
-    setIsIndustryDialogOpen(true);
-  }
-
-  const handleIndustrySelected = (industry: string) => {
-    setSelectedIndustry(industry);
-    setIsIndustryDialogOpen(false);
-    setIsRegionDialogOpen(true);
-  }
-
-  const handleRegionSelected = (region: string) => {
-    setSelectedRegion(region);
-    setIsRegionDialogOpen(false);
-    setIsFeeDialogOpen(true);
-  }
-  
-  const handleFeeEntered = (fee: string) => {
-    console.log("Referral Fee:", fee);
-    setIsFeeDialogOpen(false);
-    setIsManagementFeeDialogOpen(true);
-  }
-
-  const handleManagementFeeEntered = (managementFee: string) => {
-    console.log("Role:", selectedRole, "Visa Type:", selectedVisa, "Visa Detail:", selectedVisaDetail, "Industry:", selectedIndustry, "Region:", selectedRegion, "Management Fee:", managementFee);
-    setIsManagementFeeDialogOpen(false);
-    // Navigate to the next step, e.g., a registration form or dashboard
-  }
-
 
   return (
     <>
@@ -126,8 +76,7 @@ export default function NhaTuyenDungPage() {
                 </h1>
                 <p className="text-lg text-primary-foreground/80 my-8">
                   Tiếp cận hàng ngàn ứng viên Thực tập sinh kỹ năng, Kỹ năng đặc định, Kỹ sư chất lượng cao từ Việt Nam. Đăng tin miễn phí và kết nối với nhân tài ngay hôm nay.
-                  <span className="block text-sm opacity-80 mt-2">質の高い技能実習生、特定技能、エンジニア人材にアクセス。無料で求人を掲載し、今日から人材と繋がりましょう。</span>
-                  <span className="block text-sm opacity-80 mt-1">Access thousands of high-quality Technical Intern Trainees, Skilled Workers, and Engineers from Vietnam. Post jobs for free and connect with talent today.</span>
+                  <span className="block text-sm opacity-80 mt-2">質の高い技能実習生、特定技能、エンジニア人材にアクセス。無料で求人を掲載し、今日から人材と繋がりましょう。/ HelloJob is a free job posting platform to recruit Vietnamese candidates...</span>
                   <span className="block font-semibold mt-4">Bạn có thể chọn đăng nhanh thông tin tuyển dụng mong muốn để chúng tôi hỗ trợ hoặc để lại thông tin để liên hệ hợp tác.</span>
                 </p>
                 <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -238,68 +187,11 @@ export default function NhaTuyenDungPage() {
         onLanguageChange={setSelectedLang}
         initialLang={selectedLang}
       />
-      <VisaTypeDialog 
-        isOpen={isVisaTypeDialogOpen}
-        onOpenChange={setIsVisaTypeDialogOpen}
-        onSelect={handleVisaSelected}
-        onBack={() => {
-            setIsVisaTypeDialogOpen(false);
-            setIsPartnerRoleDialogOpen(true);
-        }}
-        lang={selectedLang}
+      <XL01Dialog 
+        isOpen={isXL01DialogOpen} 
+        onOpenChange={setIsXL01DialogOpen}
+        initialStep={2} // Start from step 2
       />
-      <VisaDetailDialog
-        isOpen={isVisaDetailDialogOpen}
-        onOpenChange={setIsVisaDetailDialogOpen}
-        onSelect={handleVisaDetailSelected}
-        onBack={() => {
-            setIsVisaDetailDialogOpen(false);
-            setIsVisaTypeDialogOpen(true);
-        }}
-        lang={selectedLang}
-        visaType={selectedVisa || ''}
-      />
-       <IndustryDialog
-        isOpen={isIndustryDialogOpen}
-        onOpenChange={setIsIndustryDialogOpen}
-        onSelect={handleIndustrySelected}
-        onBack={() => {
-            setIsIndustryDialogOpen(false);
-            setIsVisaDetailDialogOpen(true);
-        }}
-        lang={selectedLang}
-        visaType={selectedVisa || ''}
-      />
-       <RegionDialog
-        isOpen={isRegionDialogOpen}
-        onOpenChange={setIsRegionDialogOpen}
-        onSelect={handleRegionSelected}
-        onBack={() => {
-            setIsRegionDialogOpen(false);
-            setIsIndustryDialogOpen(true);
-        }}
-        lang={selectedLang}
-       />
-       <FeeDialog
-        isOpen={isFeeDialogOpen}
-        onOpenChange={setIsFeeDialogOpen}
-        onSelect={handleFeeEntered}
-        onBack={() => {
-            setIsFeeDialogOpen(false);
-            setIsRegionDialogOpen(true);
-        }}
-        lang={selectedLang}
-       />
-       <ManagementFeeDialog
-        isOpen={isManagementFeeDialogOpen}
-        onOpenChange={setIsManagementFeeDialogOpen}
-        onSelect={handleManagementFeeEntered}
-        onBack={() => {
-            setIsManagementFeeDialogOpen(false);
-            setIsFeeDialogOpen(true);
-        }}
-        lang={selectedLang}
-       />
     </>
   );
 }
