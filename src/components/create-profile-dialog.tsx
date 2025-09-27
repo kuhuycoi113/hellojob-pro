@@ -51,7 +51,7 @@ export function CreateProfileDialog({ children }: CreateProfileDialogProps) {
     const preferences = {
       desiredVisaType: selectedVisa?.name || undefined,
       desiredVisaDetail: selectedVisaDetail || undefined,
-      desiredIndustry: selectedIndustry?.name || undefined,
+      desiredIndustry: selectedIndustry?.name.vi || undefined,
       desiredLocation: selectedRegion || undefined,
     };
 
@@ -215,15 +215,15 @@ export function CreateProfileDialog({ children }: CreateProfileDialogProps) {
         <>
             <span className="hidden">{screenIdComment}</span>
             <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề muốn tuyển dụng</DialogTitle>
                 <DialogDescription className="text-center">
-                    Lựa chọn ngành nghề bạn quan tâm nhất để chúng tôi gợi ý việc làm chính xác hơn.
+                    Lựa chọn ngành nghề bạn muốn tuyển dụng.
                 </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                 {industries.map(industry => (
                     <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <p className="font-semibold text-sm">{industry.name}</p>
+                        <p className="font-semibold text-sm">{industry.name.vi}</p>
                     </Button>
                 ))}
             </div>
