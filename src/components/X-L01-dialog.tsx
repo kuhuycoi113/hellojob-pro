@@ -36,9 +36,10 @@ interface XL01DialogProps {
   onOpenChange: (open: boolean) => void;
   initialStep?: number;
   onComplete?: (preferences: any) => void;
+  onBack?: () => void; // Add onBack prop
 }
 
-export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 2, onComplete }: XL01DialogProps) {
+export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 2, onComplete, onBack }: XL01DialogProps) {
   const router = useRouter();
   const { role, setRole, isLoggedIn } = useAuth();
   const [profileCreationStep, setProfileCreationStep] = useState(initialStep);
@@ -146,6 +147,7 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 2, on
             <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
         </Button>
       </div>
+      {onBack && <Button variant="link" onClick={onBack} className="mt-4 mx-auto block">Quay lại</Button>}
     </>
   );
 
