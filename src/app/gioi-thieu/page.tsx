@@ -28,7 +28,7 @@ const teamMembers = [
   {
     name: 'Trương Quỳnh Phương',
     role: 'Co-Founder - Thành viên HĐQT',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Phuong01.png',
     dataAiHint: 'female board member portrait',
   },
    {
