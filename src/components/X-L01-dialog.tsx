@@ -135,8 +135,8 @@ const visaDetailContent = {
 
 const visaTypeContent = {
   vi: {
-    title: 'Chọn loại hình lao động',
-    description: 'Hãy chọn loại hình phù hợp nhất với mong muốn sử dụng lao động của bạn.',
+    title: 'Bạn muốn tuyển loại Visa nào?',
+    description: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
     options: [
       { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
       { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
@@ -144,23 +144,41 @@ const visaTypeContent = {
     ]
   },
   ja: {
-    title: '労働者の種類を選択',
-    description: 'あなたの雇用ニーズに最も適した労働者の種類を選択してください。',
+    title: 'どのビザタイプを募集しますか？',
+    description: '採用ニーズに最も適したビザタイプを選択してください。',
     options: [
-      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習生', desc: '一般労働者を低コストで採用。', color: 'orange' },
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
       { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
       { id: 'ky-su-tri-thuc', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門知識を持つ専門家を採用。', color: 'green' },
     ]
   },
   en: {
-    title: 'Select Worker Type',
-    description: 'Please select the type of worker that best suits your employment needs.',
+    title: 'Which Visa Type do you want to recruit?',
+    description: 'Please select the visa type that best suits your recruitment needs.',
     options: [
       { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
       { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
       { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
     ]
   }
+};
+
+const industryContent = {
+    vi: {
+        title: "Chọn ngành nghề muốn tuyển dụng",
+        description: "Lựa chọn ngành nghề bạn muốn tuyển dụng.",
+        backButton: "Quay lại",
+    },
+    ja: {
+        title: "募集したい業種を選択",
+        description: "募集したい業種を選択してください。",
+        backButton: "戻る",
+    },
+    en: {
+        title: "Select Industry to Recruit",
+        description: "Select the industry you want to recruit for.",
+        backButton: "Back",
+    },
 };
 
 
@@ -179,7 +197,7 @@ export function XL01Dialog({
   const [profileCreationStep, setProfileCreationStep] = useState(initialStep);
   const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-  const [selectedVisa, setSelectedVisa] = useState<{name: string, slug: string} | null>(null);
+  const [selectedVisa, setSelectedVisa] = useState<{name: { vi: string, ja: string, en: string }, slug: string} | null>(null);
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -201,9 +219,9 @@ export function XL01Dialog({
   const handleComplete = () => {
     const preferences = {
       role: selectedRole,
-      desiredVisaType: selectedVisa?.name || undefined,
+      desiredVisaType: selectedVisa?.name[currentLang] || undefined,
       desiredVisaDetail: selectedVisaDetail || undefined,
-      desiredIndustry: selectedIndustry?.name || undefined,
+      desiredIndustry: selectedIndustry?.name[currentLang] || undefined,
       desiredLocation: selectedRegion || undefined,
     };
 
@@ -365,27 +383,29 @@ export function XL01Dialog({
     const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
     
     let screenIdComment = '';
-    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: X004-1';
+    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: X004-2';
+    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: X004-3';
+    
+    const content = industryContent[currentLang];
 
     return (
         <>
             <span className="hidden">{screenIdComment}</span>
             <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề muốn tuyển dụng</DialogTitle>
-                <DialogDescription className="text-center">
-                    Lựa chọn ngành nghề bạn muốn tuyển dụng.
-                </DialogDescription>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                 {industries.map(industry => (
                     <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <p className="font-semibold text-sm">{industry.name}</p>
+                        <p className="font-semibold text-sm">{industry.name[currentLang]}</p>
                     </Button>
                 ))}
             </div>
-            <Button variant="link" onClick={() => setProfileCreationStep(3)} className="mt-4 mx-auto block">Quay lại</Button>
+            <Button variant="link" onClick={() => setProfileCreationStep(3)} className="mt-4 mx-auto block">
+                {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
+            </Button>
         </>
     );
   };
@@ -440,4 +460,3 @@ export function XL01Dialog({
     </>
   );
 }
- 
