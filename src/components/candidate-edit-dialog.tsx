@@ -489,11 +489,11 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                 newCandidate.name = value;
             } else if (section === 'personalInfo' || section === 'aspirations') {
                 if (section === 'personalInfo' && field === 'messenger') {
-                     newCandidate[section] = { ...newCandidate[section]!, [field]: parseMessengerInput(value) };
+                     newCandidate[section]!.messenger = value; // Store raw value
+                } else if (section === 'personalInfo' && field === 'line') {
+                     newCandidate[section]!.line = value; // Store raw value
                 } else if (section === 'personalInfo' && field === 'zalo') {
                     newCandidate[section] = { ...newCandidate[section]!, [field]: parseZaloInput(value) };
-                } else if (section === 'personalInfo' && field === 'line') {
-                     newCandidate[section] = { ...newCandidate[section]!, [field]: parseLineInput(value) };
                 } else if (section === 'aspirations' && field === 'specialAspirations') {
                     const currentAspirations = newCandidate.aspirations?.specialAspirations || [];
                     const [item, checked] = [value, arguments[3]];
