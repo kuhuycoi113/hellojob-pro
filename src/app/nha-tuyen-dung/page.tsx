@@ -8,7 +8,8 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { PartnerRoleDialog } from '@/components/partner-role-dialog';
 import { XL01Dialog } from '@/components/X-L01-dialog';
-import { FeeDialog } from '@/components/fee-dialog';
+import { XL06Dialog } from '@/components/X-L06-dialog';
+import { XL07Dialog } from '@/components/X-L07-dialog';
 
 
 const partnerBenefits = [
@@ -53,25 +54,32 @@ const partnerBenefits = [
 export default function NhaTuyenDungPage() {
   const [isPartnerRoleDialogOpen, setIsPartnerRoleDialogOpen] = useState(false);
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
-  const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
+  const [isXL06DialogOpen, setIsXL06DialogOpen] = useState(false);
+  const [isXL07DialogOpen, setIsXL07DialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
 
   const handleRoleSelected = (roleId: string) => {
     setSelectedRole(roleId);
     setIsPartnerRoleDialogOpen(false);
-    setIsXL01DialogOpen(true); // Open the X-L01 dialog
+    setIsXL01DialogOpen(true); // Open the X-L01 dialog starting at step 2
   };
 
   const handleXL01Complete = (preferences: any) => {
     console.log("X-L01 Completed with:", preferences);
     setIsXL01DialogOpen(false);
-    setIsFeeDialogOpen(true);
+    setIsXL06DialogOpen(true);
   };
   
-  const handleFeeSelected = (fee: string) => {
-    console.log("Fee selected:", fee);
-    setIsFeeDialogOpen(false);
+  const handleXL06Complete = (fee: string) => {
+    console.log("XL06 (Referral Fee) selected:", fee);
+    setIsXL06DialogOpen(false);
+    setIsXL07DialogOpen(true);
+  };
+
+  const handleXL07Complete = (fee: string) => {
+    console.log("XL07 (Management Fee) selected:", fee);
+    setIsXL07DialogOpen(false);
     // Here you can proceed to the next step, e.g., finding partners
   };
 
@@ -206,13 +214,23 @@ export default function NhaTuyenDungPage() {
         initialStep={2} // Start from step 2
         onComplete={handleXL01Complete}
       />
-       <FeeDialog
-        isOpen={isFeeDialogOpen}
-        onOpenChange={setIsFeeDialogOpen}
-        onSelect={handleFeeSelected}
+       <XL06Dialog
+        isOpen={isXL06DialogOpen}
+        onOpenChange={setIsXL06DialogOpen}
+        onSelect={handleXL06Complete}
         onBack={() => {
-            setIsFeeDialogOpen(false);
+            setIsXL06DialogOpen(false);
             setIsXL01DialogOpen(true);
+        }}
+        lang={selectedLang}
+      />
+       <XL07Dialog
+        isOpen={isXL07DialogOpen}
+        onOpenChange={setIsXL07DialogOpen}
+        onSelect={handleXL07Complete}
+        onBack={() => {
+            setIsXL07DialogOpen(false);
+            setIsXL06DialogOpen(true);
         }}
         lang={selectedLang}
       />
