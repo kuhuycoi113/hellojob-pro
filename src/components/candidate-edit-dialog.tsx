@@ -47,11 +47,35 @@ interface EditProfileDialogProps {
 
 const parseMessengerInput = (input: string): string => {
     if (!input) return '';
-    let trimmedInput = input.trim();
-    if (trimmedInput.includes('www.facebook.com')) {
-        trimmedInput = trimmedInput.replace('www.facebook.com', 'facebook.com');
+    const trimmedInput = input.trim();
+    try {
+        if (trimmedInput.startsWith('http') || trimmedInput.includes('facebook.com') || trimmedInput.includes('m.me')) {
+            const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
+            
+            if (url.hostname.includes('facebook.com') || url.hostname.includes('m.facebook.com')) {
+                if (url.pathname.includes('profile.php')) {
+                    const id = url.searchParams.get('id');
+                    if (id) return id;
+                }
+                const pathParts = url.pathname.split('/').filter(Boolean);
+                if (pathParts.length > 0) {
+                    const lastPart = pathParts[pathParts.length - 1];
+                    if (lastPart !== 'profile.php' && lastPart !== 'home.php') {
+                        return lastPart;
+                    }
+                }
+            }
+             if (url.hostname.includes('m.me')) {
+                const pathParts = url.pathname.split('/').filter(Boolean);
+                if (pathParts.length > 0) {
+                     return pathParts[pathParts.length - 1];
+                }
+            }
+        }
+    } catch (error) {
+        console.warn("Could not parse input as URL, treating as username:", error);
     }
-    return trimmedInput;
+    return trimmedInput.split('/').pop() || trimmedInput;
 };
 
 const parseZaloInput = (input: string): string => {
@@ -66,11 +90,25 @@ const parseZaloInput = (input: string): string => {
 
 const parseLineInput = (input: string): string => {
   if (!input) return '';
-  let trimmedInput = input.trim();
-  if (trimmedInput.includes('www.line.me')) {
-    trimmedInput = trimmedInput.replace('www.line.me', 'line.me');
+  const trimmedInput = input.trim();
+  try {
+      if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
+          const url = new URL(trimmedInput);
+          const pathParts = url.pathname.split('/');
+          // Get the last part, which could be 'p' or the ID itself
+          let potentialId = pathParts.pop(); 
+          if(potentialId === 'p' || potentialId === 'R' || potentialId === 'ti'){
+             potentialId = pathParts.pop();
+          }
+          if (potentialId) {
+             return potentialId.replace(/[~@]/g, '');
+          }
+      }
+  } catch (error) {
+       console.warn("Could not parse Line input as URL, treating as ID:", error);
   }
-  return trimmedInput;
+  // Fallback to treat the whole input as an ID, removing potential URL parts and special characters
+  return trimmedInput.split('/').pop()?.replace(/[~@]/g, '') || trimmedInput;
 };
 
 
@@ -352,7 +390,6 @@ const renderLevel1Edit = (
                                 onBlur={(e) => validateField('messenger', e.target.value)}
                                 className={cn(errors.messenger && "border-destructive")}
                             />
-                             <p className="text-xs text-muted-foreground">Chỉ cần nhập link Facebook, hệ thống sẽ tự động nhận diện ngầm Messenger của bạn</p>
                              {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                         <div className="space-y-1">
@@ -368,7 +405,6 @@ const renderLevel1Edit = (
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
-                             <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                     </div>
@@ -461,6 +497,9 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
             if (finalCandidate.personalInfo.line) {
                 finalCandidate.personalInfo.line = parseLineInput(finalCandidate.personalInfo.line);
             }
+            if (finalCandidate.personalInfo.zalo) {
+                finalCandidate.personalInfo.zalo = parseZaloInput(finalCandidate.personalInfo.zalo);
+            }
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(finalCandidate));
             onSaveSuccess();
             onOpenChange(false);
@@ -515,11 +554,12 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
             const newCandidate = JSON.parse(JSON.stringify(prev)); // Deep copy
     
             if (section === 'name') {
-                newCandidate.name = value;
+                newCandidate.name = field; // In this case, 'field' is the value
             } else if (section === 'personalInfo') {
                 newCandidate.personalInfo = { ...newCandidate.personalInfo, [field]: value };
             } else {
-                newCandidate[section as keyof EnrichedCandidateProfile] = value;
+                // @ts-ignore
+                newCandidate[section as keyof EnrichedCandidateProfile] = field;
             }
     
             return newCandidate;

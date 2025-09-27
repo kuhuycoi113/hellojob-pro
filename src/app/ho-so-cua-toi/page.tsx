@@ -300,7 +300,7 @@ const parseMessengerInput = (input: string): string => {
     if (!input) return '';
     const trimmedInput = input.trim();
     try {
-        if (trimmedInput.startsWith('http') || trimmedInput.startsWith('www.')) {
+        if (trimmedInput.startsWith('http') || trimmedInput.includes('facebook.com') || trimmedInput.includes('m.me')) {
             const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
             
             if (url.hostname.includes('facebook.com') || url.hostname.includes('m.facebook.com')) {
@@ -311,7 +311,6 @@ const parseMessengerInput = (input: string): string => {
                 const pathParts = url.pathname.split('/').filter(Boolean);
                 if (pathParts.length > 0) {
                     const lastPart = pathParts[pathParts.length - 1];
-                    // Avoid returning generic paths
                     if (lastPart !== 'profile.php' && lastPart !== 'home.php') {
                         return lastPart;
                     }
@@ -327,7 +326,6 @@ const parseMessengerInput = (input: string): string => {
     } catch (error) {
         console.warn("Could not parse input as URL, treating as username:", error);
     }
-    // Fallback: remove any potential URL parts and treat as username
     return trimmedInput.split('/').pop() || trimmedInput;
 };
 
@@ -338,7 +336,6 @@ const parseZaloInput = (input: string): string => {
         const parts = trimmedInput.split('/');
         return parts.pop()?.replace(/\D/g, '') || '';
     }
-    // Keep only numbers
     return trimmedInput.replace(/\D/g, '');
 };
 
@@ -349,19 +346,20 @@ const parseLineInput = (input: string): string => {
       if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
           const url = new URL(trimmedInput);
           const pathParts = url.pathname.split('/');
-          const lastPart = pathParts.pop(); // Get the last part of the path
-          if (lastPart) {
-              // Extract the ID from /R/ti/p/@id or /ti/p/~id
-              const match = lastPart.match(/([@~]?\w+)/);
-              if (match && match[1]) return match[1].replace('~', '').replace('@', '');
-              return lastPart;
+          // Get the last part, which could be 'p' or the ID itself
+          let potentialId = pathParts.pop(); 
+          if(potentialId === 'p' || potentialId === 'R' || potentialId === 'ti'){
+             potentialId = pathParts.pop();
+          }
+          if (potentialId) {
+             return potentialId.replace(/[~@]/g, '');
           }
       }
   } catch (error) {
        console.warn("Could not parse Line input as URL, treating as ID:", error);
   }
-  // Fallback to treat the whole input as an ID, removing potential URL parts
-  return trimmedInput.split('/').pop()?.replace('~', '').replace('@', '') || trimmedInput;
+  // Fallback to treat the whole input as an ID, removing potential URL parts and special characters
+  return trimmedInput.split('/').pop()?.replace(/[~@]/g, '') || trimmedInput;
 };
 
 
@@ -400,7 +398,17 @@ const EditDialog = ({
   }, [isOpen, candidate]);
 
   const handleSave = () => {
-    onSave(tempCandidate);
+    const finalCandidate = { ...tempCandidate };
+    if (finalCandidate.personalInfo.messenger) {
+        finalCandidate.personalInfo.messenger = parseMessengerInput(finalCandidate.personalInfo.messenger);
+    }
+    if (finalCandidate.personalInfo.line) {
+        finalCandidate.personalInfo.line = parseLineInput(finalCandidate.personalInfo.line);
+    }
+    if (finalCandidate.personalInfo.zalo) {
+        finalCandidate.personalInfo.zalo = parseZaloInput(finalCandidate.personalInfo.zalo);
+    }
+    onSave(finalCandidate);
     setIsOpen(false);
   };
 
@@ -415,11 +423,11 @@ const EditDialog = ({
         const [field, value] = args;
         
         if (section === 'personalInfo' && field === 'messenger') {
-             newCandidate[section] = { ...newCandidate[section]!, [field]: parseMessengerInput(value) };
+             newCandidate[section] = { ...newCandidate[section]!, [field]: value };
         } else if (section === 'personalInfo' && field === 'zalo') {
-            newCandidate[section] = { ...newCandidate[section]!, [field]: parseZaloInput(value) };
+            newCandidate[section] = { ...newCandidate[section]!, [field]: value };
         } else if (section === 'personalInfo' && field === 'line') {
-             newCandidate[section] = { ...newCandidate[section]!, [field]: parseLineInput(value) };
+             newCandidate[section] = { ...newCandidate[section]!, [field]: value };
         } else if (section === 'aspirations' && field === 'specialAspirations') {
             const currentAspirations = newCandidate.aspirations?.specialAspirations || [];
             const [item, checked] = args.slice(1);
@@ -1153,13 +1161,13 @@ export default function CandidateProfilePage() {
             </Button>
           </div>
           <Label>Vai trò</Label>
-          <Input value={exp.role} onChange={e => handleTempChange('experience', index, 'role', e.target.value)} />
+          <Input value={exp.role} onChange={e => handleArrayChange('experience', index, 'role', e.target.value)} />
           <Label>Công ty</Label>
-          <Input value={exp.company} onChange={e => handleTempChange('experience', index, 'company', e.target.value)} />
+          <Input value={exp.company} onChange={e => handleArrayChange('experience', index, 'company', e.target.value)} />
           <Label>Thời gian</Label>
-          <Input value={exp.period} onChange={e => handleTempChange('experience', index, 'period', e.target.value)} />
+          <Input value={exp.period} onChange={e => handleArrayChange('experience', index, 'period', e.target.value)} />
           <Label>Mô tả</Label>
-          <Textarea value={exp.description} onChange={e => handleTempChange('experience', index, 'description', e.target.value)} />
+          <Textarea value={exp.description} onChange={e => handleArrayChange('experience', index, 'description', e.target.value)} />
         </div>
       ))}
       <Button variant="outline" className="w-full" onClick={() => handleAddItem('experience', 'vietnam', undefined)}>
@@ -1179,11 +1187,11 @@ export default function CandidateProfilePage() {
             </Button>
           </div>
           <Label>Trường</Label>
-          <Input value={edu.school} onChange={e => handleTempChange('education', index, 'school', e.target.value)} />
+          <Input value={edu.school} onChange={e => handleArrayChange('education', index, 'school', e.target.value)} />
           <Label>Chuyên ngành</Label>
-          <Input value={edu.degree} onChange={e => handleTempChange('education', index, 'degree', e.target.value)} />
+          <Input value={edu.degree} onChange={e => handleArrayChange('education', index, 'degree', e.target.value)} />
           <Label>Năm tốt nghiệp</Label>
-          <Input type="number" value={edu.gradYear} onChange={e => handleTempChange('education', index, 'gradYear', parseInt(e.target.value))} />
+          <Input type="number" value={edu.gradYear} onChange={e => handleArrayChange('education', index, 'gradYear', parseInt(e.target.value))} />
         </div>
       ))}
       <Button variant="outline" className="w-full" onClick={() => handleAddItem('education', 'vietnam', undefined)}>
@@ -2313,7 +2321,7 @@ export default function CandidateProfilePage() {
                 <div className="space-y-2">
                     <Label>Tệp giấy tờ</Label>
                     <Label
-                        htmlFor="doc-file-upload"
+                        htmlFor="zalo-qr-file-input"
                         className="relative flex flex-col items-center justify-center w-full h-48 px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer border-border hover:border-primary transition-colors bg-secondary/50"
                     >
                         {newDocFilePreview ? (
@@ -2333,12 +2341,14 @@ export default function CandidateProfilePage() {
                         ) : (
                             <div className="space-y-2 text-center">
                                 <UploadCloud className="w-10 h-10 mx-auto text-muted-foreground" />
-                                <p className="text-sm text-muted-foreground">Nhấp hoặc kéo thả file vào đây</p>
+                                <p className="font-semibold text-foreground">
+                                Nhấp hoặc kéo thả file vào đây
+                                </p>
                                 <p className="text-xs text-muted-foreground">PDF, PNG, JPG</p>
                             </div>
                         )}
                         <Input
-                            id="doc-file-upload"
+                            id="zalo-qr-file-input"
                             type="file"
                             className="sr-only"
                             accept="application/pdf,image/png,image/jpeg"
