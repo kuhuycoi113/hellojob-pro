@@ -150,6 +150,7 @@ export default function AboutPage() {
                 <p className="text-muted-foreground text-lg">
                   Trở thành giải pháp dịch chuyển lao động trên toàn cầu
                 </p>
+                <p className="text-sm italic text-muted-foreground/80 mt-2">Với xu thế Toàn cầu hoá và Thế giới ngày càng phẳng, chúng tôi tin rằng tương lai của người lao động sẽ là những nhân lực được phát huy tối đa tài năng, có thể làm việc ở nhiều nơi khác nhau trên Thế giới một cách dễ dàng, những nơi mà cần đến tài năng tốt nhất của các bạn. HelloJob sẽ là nơi cung cấp cho những ước mơ phát triển tối đa đó, làm cho Thế giới ngày càng tươi đẹp.</p>
               </div>
             </div>
           </div>
