@@ -84,29 +84,29 @@ const visaDetailContent = {
         ]
     }
   },
-  engineer: { // Placeholder for Engineer
+  engineer: {
     vi: {
-        title: 'Chọn loại Kỹ sư/Tri thức',
-        description: 'Chọn chương trình Kỹ sư/Tri thức bạn muốn tuyển.',
+        title: 'Chọn loại Kỹ sư, tri thức',
+        description: 'Chọn chương trình Kỹ sư bạn muốn tuyển.',
         options: [
-          { id: 'ks_dau_nhat', icon: Briefcase, title: 'Kỹ sư đầu Nhật', desc: 'Tuyển kỹ sư đã có kinh nghiệm tại Nhật' },
-          { id: 'ks_dau_viet', icon: Briefcase, title: 'Kỹ sư đầu Việt', desc: 'Tuyển kỹ sư từ Việt Nam' },
+          { id: 'ks_dau_nhat', icon: Users, title: 'Kỹ sư, tri thức đầu Nhật', desc: 'Để tuyển kỹ sư ở Nhật' },
+          { id: 'ks_dau_viet', icon: Plane, title: 'Kỹ sư, tri thức đầu Việt', desc: 'Để tuyển kỹ sư từ Việt Nam' },
         ]
     },
     ja: {
         title: '技術・人文知識・国際業務の種類を選択',
         description: '募集したいプログラムを選択してください。',
         options: [
-          { id: 'ks_dau_nhat', icon: Briefcase, title: '国内エンジニア', desc: '日本での経験があるエンジニアを採用' },
-          { id: 'ks_dau_viet', icon: Briefcase, title: '国外エンジニア', desc: 'ベトナムからエンジニアを採用' },
+          { id: 'ks_dau_nhat', icon: Users, title: '国内エンジニア', desc: '日本での経験があるエンジニアを採用' },
+          { id: 'ks_dau_viet', icon: Plane, title: '国外エンジニア', desc: 'ベトナムからエンジニアを採用' },
         ]
     },
     en: {
         title: 'Select Engineer/Specialist Type',
         description: 'Choose the program you want to recruit for.',
         options: [
-          { id: 'ks_dau_nhat', icon: Briefcase, title: 'Engineer (In Japan)', desc: 'Recruit engineers with experience in Japan' },
-          { id: 'ks_dau_viet', icon: Briefcase, title: 'Engineer (In Vietnam)', desc: 'Recruit engineers from Vietnam' },
+          { id: 'ks_dau_nhat', icon: Users, title: 'Engineer (In Japan)', desc: 'Recruit engineers with experience in Japan' },
+          { id: 'ks_dau_viet', icon: Plane, title: 'Engineer (In Vietnam)', desc: 'Recruit engineers from Vietnam' },
         ]
     }
   }
@@ -123,7 +123,7 @@ export function VisaDetailDialog({ isOpen, onOpenChange, onSelect, onBack, lang,
   
   const contentData = visaDetailContent[visaType as keyof typeof visaDetailContent] || visaDetailContent.tts;
   const content = contentData[lang];
-  const dialogId = visaType === 'tts' ? 'NTD004-1' : (visaType === 'tokutei' ? 'NTD004-2' : 'visa-detail-dialog');
+  const dialogId = visaType === 'tts' ? 'NTD004-1' : (visaType === 'tokutei' ? 'NTD004-2' : 'NTD004-3');
   
   const iconColors = {
     tts: 'bg-orange-100 text-orange-500',
@@ -135,7 +135,7 @@ export function VisaDetailDialog({ isOpen, onOpenChange, onSelect, onBack, lang,
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl" id={dialogId}>
+      <DialogContent className="sm:max-w-3xl" id={dialogId}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
           <DialogDescription className="text-center">
@@ -144,7 +144,10 @@ export function VisaDetailDialog({ isOpen, onOpenChange, onSelect, onBack, lang,
         </DialogHeader>
         
         <div className="pt-6 max-h-[60vh] overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className={cn(
+                "grid grid-cols-1 gap-6",
+                content.options.length > 2 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-2xl mx-auto"
+            )}>
                 {content.options.map((option) => (
                     <Card 
                         key={option.id} 
