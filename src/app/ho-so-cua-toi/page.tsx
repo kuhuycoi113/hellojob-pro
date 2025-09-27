@@ -294,7 +294,7 @@ const emptyCandidate: EnrichedCandidateProfile = {
 const commonSkills = ['Vận hành máy CNC', 'AutoCAD', 'Kiểm tra chất lượng', 'Làm việc nhóm', 'Giải quyết vấn đề', 'Tiếng Anh giao tiếp'];
 const commonInterests = ['Cơ khí', 'Điện tử', 'IT', 'Logistics', 'Dệt may', 'Chế biến thực phẩm'];
 
-const allIndustries = Object.values(industriesByJobType).flat().filter((v,i,a)=>a.findIndex(t=>(t.name === v.name))===i);
+const allIndustries = Object.values(industriesByJobType).flat().filter((v,i,a)=>a.findIndex(t=>(t.name.vi === v.name.vi))===i);
 
 const parseMessengerInput = (input: string): string => {
     if (!input) return '';
@@ -490,7 +490,7 @@ const EditDialog = ({
                  <DialogClose asChild>
                     <Button variant="outline">Hủy</Button>
                 </DialogClose>
-              <Button type="submit" onClick={handleSave} className="bg-primary text-white">
+              <Button type="button" onClick={handleSave} className="bg-primary text-white">
                 Lưu thay đổi
               </Button>
             </div>
@@ -1313,7 +1313,7 @@ export default function CandidateProfilePage() {
       ? industriesByJobType[tempCandidate.aspirations.desiredVisaType as keyof typeof industriesByJobType] || allIndustries
       : allIndustries;
       
-    const selectedIndustryData = availableIndustries.find(ind => ind.name === tempCandidate.desiredIndustry);
+    const selectedIndustryData = availableIndustries.find(ind => ind.name.vi === tempCandidate.desiredIndustry);
     const availableJobDetails = selectedIndustryData ? selectedIndustryData.keywords : [];
 
     const getPlaceholder = (field: 'basic' | 'net' | 'financial', currency: 'JPY' | 'VND' | 'USD') => {
@@ -1437,12 +1437,16 @@ export default function CandidateProfilePage() {
             <div className="space-y-2">
               <Label>Ngành nghề mong muốn</Label>
               <Select value={tempCandidate.desiredIndustry} onValueChange={value => {
-                handleTempChange('desiredIndustry' as any, 'desiredIndustry' as any, value); // Hack to satisfy TS
+                handleTempChange('desiredIndustry', 'desiredIndustry', value);
                 handleTempChange('aspirations', 'desiredJobDetail', '');
               }} disabled={!tempCandidate.aspirations?.desiredVisaType}>
-                <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
+                <SelectTrigger>
+                    <SelectValue placeholder="Chọn ngành nghề">
+                        {availableIndustries.find(ind => ind.name.vi === tempCandidate.desiredIndustry)?.name.vi || "Chọn ngành nghề"}
+                    </SelectValue>
+                </SelectTrigger>
                 <SelectContent>
-                  {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                  {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -2354,8 +2358,3 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
-
-    
-
-
-
