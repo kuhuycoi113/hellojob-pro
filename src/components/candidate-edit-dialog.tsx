@@ -380,7 +380,7 @@ const renderLevel1Edit = (
                                 Facebook Messenger
                             </Label>
                             <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
-                            <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
+                             <p className="text-xs text-muted-foreground">Chỉ cần nhập link Facebook, hệ thống sẽ tự động nhận diện ngầm Messenger của bạn</p>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="line" className="flex items-center gap-2">
