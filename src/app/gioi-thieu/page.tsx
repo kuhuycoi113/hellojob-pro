@@ -140,6 +140,9 @@ export default function AboutPage() {
                 <p className="text-muted-foreground text-lg">
                   Tạo ra một thế giới việc làm giúp con người phát triển và hạnh phúc
                 </p>
+                <p className="text-sm italic text-muted-foreground/80 mt-2">
+                  Bằng hệ thống công nghệ, chúng tôi mong muốn mang đến thật nhiều lựa chọn việc làm phù hợp cho mọi người, thông qua đó chúng tôi đồng hành, giúp họ phát triển tư duy, thái độ, kỹ năng, kiến thức để phát huy tối đa giá trị tốt nhất của họ, hướng họ tới cuộc sống thành công và hạnh phúc
+                </p>
               </div>
               <div>
                 <Lightbulb className="h-12 w-12 text-accent-green mb-4" />
@@ -274,5 +277,3 @@ export default function AboutPage() {
     </>
   );
 }
-
-    
