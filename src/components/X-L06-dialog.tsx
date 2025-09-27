@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -27,24 +28,24 @@ const contentByLang = {
     vi: {
         title: 'Nhập phí giới thiệu bạn đề xuất cho đối tác',
         description: 'Mức phí này sẽ được đề xuất cho đối tác của bạn.',
-        label: 'Phí giới thiệu',
-        placeholder: 'Ví dụ: 200,000 JPY',
+        label: 'Phí giới thiệu (JPY)',
+        placeholder: 'Ví dụ: 200,000',
         backButton: 'Quay lại',
         continueButton: 'Tiếp tục',
     },
     ja: {
         title: 'パートナーに提案する紹介料を入力してください',
         description: 'この料金がパートナーに提案されます。',
-        label: '紹介料',
-        placeholder: '例: 200,000 JPY',
+        label: '紹介料 (JPY)',
+        placeholder: '例: 200,000',
         backButton: '戻る',
         continueButton: '続ける',
     },
     en: {
         title: 'Enter the referral fee you propose to the partner',
         description: 'This fee will be proposed to your partner.',
-        label: 'Referral Fee',
-        placeholder: 'Example: 200,000 JPY',
+        label: 'Referral Fee (JPY)',
+        placeholder: 'Example: 200,000',
         backButton: 'Back',
         continueButton: 'Continue',
     }
@@ -54,7 +55,17 @@ export function XL06Dialog({ isOpen, onOpenChange, onSelect, onBack, lang }: XL0
   const [fee, setFee] = useState<string>('');
 
   const handleSelect = () => {
-    onSelect(fee);
+    onSelect(fee.replace(/,/g, ''));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    const numericValue = rawValue.replace(/[^0-9]/g, '');
+    if (numericValue) {
+        setFee(parseInt(numericValue, 10).toLocaleString('en-US'));
+    } else {
+        setFee('');
+    }
   };
   
   const content = contentByLang[lang];
@@ -75,9 +86,11 @@ export function XL06Dialog({ isOpen, onOpenChange, onSelect, onBack, lang }: XL0
             <Input
                 id="referral-fee"
                 value={fee}
-                onChange={(e) => setFee(e.target.value)}
+                onChange={handleInputChange}
                 placeholder={content.placeholder}
                 className="mt-2"
+                type="text" 
+                inputMode="numeric"
             />
         </div>
 

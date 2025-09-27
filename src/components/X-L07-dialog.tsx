@@ -28,24 +28,24 @@ interface XL07DialogProps {
 const contentByLang = {
     vi: {
         title: 'Nhập phí quản lý bạn đề xuất cho đối tác',
-        label: 'Phí quản lý/tháng',
-        placeholder: 'Ví dụ: 20,000 JPY',
+        label: 'Phí quản lý/tháng (JPY)',
+        placeholder: 'Ví dụ: 20,000',
         backButton: 'Quay lại',
         continueButton: 'Lưu, xem kết quả và để lại thông tin liên hệ',
         continueButtonMobile: 'Lưu, xem kết quả, để lại liên hệ',
     },
     ja: {
         title: 'パートナーに提案する管理費を入力してください',
-        label: '管理費/月',
-        placeholder: '例: 20,000 JPY',
+        label: '管理費/月 (JPY)',
+        placeholder: '例: 20,000',
         backButton: '戻る',
         continueButton: '保存して結果を表示し、連絡先を残す',
         continueButtonMobile: '保存、結果表示、連絡先',
     },
     en: {
         title: 'Enter the management fee you propose to the partner',
-        label: 'Management Fee/Month',
-        placeholder: 'Example: 20,000 JPY',
+        label: 'Management Fee/Month (JPY)',
+        placeholder: 'Example: 20,000',
         backButton: 'Back',
         continueButton: 'Save, view results, and leave contact information',
         continueButtonMobile: 'Save, view, leave contact',
@@ -57,7 +57,17 @@ export function XL07Dialog({ isOpen, onOpenChange, onSelect, onBack, lang }: XL0
   const isMobile = useIsMobile();
 
   const handleSelect = () => {
-    onSelect(fee);
+    onSelect(fee.replace(/,/g, ''));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    const numericValue = rawValue.replace(/[^0-9]/g, '');
+    if (numericValue) {
+        setFee(parseInt(numericValue, 10).toLocaleString('en-US'));
+    } else {
+        setFee('');
+    }
   };
   
   const content = contentByLang[lang];
@@ -79,9 +89,11 @@ export function XL07Dialog({ isOpen, onOpenChange, onSelect, onBack, lang }: XL0
             <Input
                 id="management-fee"
                 value={fee}
-                onChange={(e) => setFee(e.target.value)}
+                onChange={handleInputChange}
                 placeholder={content.placeholder}
                 className="mt-2"
+                type="text"
+                inputMode="numeric"
             />
         </div>
 
