@@ -16,7 +16,7 @@ const teamMembers = [
   {
     name: 'Nguyễn Quốc Việt',
     role: 'Founder & CEO',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Viet01.png',
     dataAiHint: 'male ceo portrait',
   },
   {
