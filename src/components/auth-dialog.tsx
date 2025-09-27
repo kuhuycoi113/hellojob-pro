@@ -112,7 +112,7 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
             </div>
         </div>
         <div className="hidden md:block relative">
-            <Image src="/img/SSO(3).png" alt="Japanese workers" fill className="object-cover" data-ai-hint="happy worker japan"/>
+            <Image src="/img/viet-img/sumenh1.webp" alt="Hành trình vạn dặm" fill className="object-cover" data-ai-hint="happy worker japan"/>
              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
              <div className="absolute bottom-8 left-8 text-white">
                 <h3 className="text-2xl font-bold font-headline">"Hành trình vạn dặm, bắt đầu từ một bước chân."</h3>
