@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
-import { HardHat, UserCheck, Plane, UserPlus, Users } from 'lucide-react';
+import { HardHat, UserCheck, Plane, UserPlus, Users, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type Language = 'vi' | 'ja' | 'en';
