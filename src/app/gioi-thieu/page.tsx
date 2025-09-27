@@ -94,13 +94,13 @@ export default function AboutPage() {
       {/* Mission & Vision Section */}
       <section className="py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative aspect-[1250/735]">
               <Image
                 src="/img/viet-img/HJALL.jpg"
                 alt="Đội ngũ HelloJob"
                 fill
-                className="object-contain rounded-lg shadow-xl"
+                className="object-cover rounded-lg shadow-xl"
                 data-ai-hint="diverse team working"
               />
             </div>
@@ -220,3 +220,5 @@ export default function AboutPage() {
     </>
   );
 }
+
+    
