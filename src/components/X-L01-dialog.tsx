@@ -38,7 +38,7 @@ interface XL01DialogProps {
   onComplete?: (preferences: any) => void;
 }
 
-export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1, onComplete }: XL01DialogProps) {
+export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 2, onComplete }: XL01DialogProps) {
   const router = useRouter();
   const { role, setRole, isLoggedIn } = useAuth();
   const [profileCreationStep, setProfileCreationStep] = useState(initialStep);
@@ -111,37 +111,6 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1, on
     }
   };
 
-  const FirstStepDialog = () => {
-    const isEditing = role === 'candidate' || role === 'candidate-full-profile';
-    const titleText = isEditing ? 'Chọn phương thức sửa hồ sơ' : 'Chọn phương thức tạo hồ sơ';
-    const quickActionText = isEditing ? 'Sửa nhanh' : 'Tạo nhanh';
-    const detailActionText = isEditing ? 'Sửa chi tiết' : 'Tạo chi tiết';
-    
-    return (
-        <>
-        {/* Screen: X001 (tương đương THSN001) */}
-        <DialogHeader>
-            <DialogTitle className="text-2xl font-headline text-center">{titleText}</DialogTitle>
-            <DialogDescription className="text-center">
-                Bạn muốn hồ sơ của mình được xử lý như thế nào?
-            </DialogDescription>
-        </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-            <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
-                <h3 className="font-bold text-base mb-1">{quickActionText}</h3>
-                <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
-            </Card>
-            <Card onClick={() => { onOpenChange(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                <h3 className="font-bold text-base mb-1">{detailActionText}</h3>
-                <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
-            </Card>
-        </div>
-        </>
-    );
-  };
-
   const QuickCreateStepDialog = () => (
     <>
       {/* Screen: X002 (tương đương THSN002) */}
@@ -177,9 +146,6 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1, on
             <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
         </Button>
       </div>
-      {initialStep !== 2 && (
-        <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
-      )}
     </>
   );
 
@@ -295,12 +261,11 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1, on
 
   const renderDialogContent = () => {
     switch (profileCreationStep) {
-      case 1: return <FirstStepDialog />;
       case 2: return <QuickCreateStepDialog />;
       case 3: return <VisaDetailStepDialog />;
       case 4: return <IndustryStepDialog />;
       case 5: return <RegionStepDialog />;
-      default: return <FirstStepDialog />;
+      default: return <QuickCreateStepDialog />;
     }
   }
   return (
