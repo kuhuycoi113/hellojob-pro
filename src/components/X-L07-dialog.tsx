@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -38,16 +39,16 @@ const contentByLang = {
         label: '管理費/月',
         placeholder: '例: 20,000 JPY',
         backButton: '戻る',
-        continueButton: '保存して適切なパートナーを探す',
-        continueButtonMobile: '保存して結果を見る',
+        continueButton: '保存して結果を表示し、連絡先を残す',
+        continueButtonMobile: '保存、結果表示、連絡先',
     },
     en: {
         title: 'Enter the management fee you propose to the partner',
         label: 'Management Fee/Month',
         placeholder: 'Example: 20,000 JPY',
         backButton: 'Back',
-        continueButton: 'Save and Find Partners',
-        continueButtonMobile: 'Save & Find',
+        continueButton: 'Save, view results, and leave contact information',
+        continueButtonMobile: 'Save, view, leave contact',
     }
 };
 
