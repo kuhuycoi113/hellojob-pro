@@ -34,9 +34,10 @@ interface XL01DialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   initialStep?: number;
+  onComplete?: (preferences: any) => void;
 }
 
-export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: XL01DialogProps) {
+export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1, onComplete }: XL01DialogProps) {
   const router = useRouter();
   const { role, setRole, isLoggedIn } = useAuth();
   const [profileCreationStep, setProfileCreationStep] = useState(initialStep);
@@ -61,6 +62,11 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
       desiredIndustry: selectedIndustry?.name || undefined,
       desiredLocation: selectedRegion || undefined,
     };
+
+    if (onComplete) {
+      onComplete(preferences);
+      return;
+    }
 
     if (isLoggedIn) {
       const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
@@ -109,11 +115,10 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
     const titleText = isEditing ? 'Chọn phương thức sửa hồ sơ' : 'Chọn phương thức tạo hồ sơ';
     const quickActionText = isEditing ? 'Sửa nhanh' : 'Tạo nhanh';
     const detailActionText = isEditing ? 'Sửa chi tiết' : 'Tạo chi tiết';
-    const screenId = isEditing ? 'SHSN001' : 'THSN001';
-
+    
     return (
         <>
-        {/* Screen: X001 (tương đương {screenId}) */}
+        {/* Screen: X001 (tương đương THSN001) */}
         <DialogHeader>
             <DialogTitle className="text-2xl font-headline text-center">{titleText}</DialogTitle>
             <DialogDescription className="text-center">
@@ -182,9 +187,9 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
     const options = visaDetailsByVisaType[selectedVisa.slug] || [];
     
     let screenIdComment = '';
-    if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: X003-1 (tương đương THSN003-1)';
-    else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: X003-2 (tương đương THSN003-2)';
-    else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: X003-3 (tương đương THSN003-3)';
+    if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: X003-1';
+    else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: X003-2';
+    else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: X003-3';
     
     return (
         <>
@@ -216,9 +221,9 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
     const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
     
     let screenIdComment = '';
-    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: X004-1 (tương đương THSN004-1)';
-    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: X004-2 (tương đương THSN004-2)';
-    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: X004-3 (tương đương THSN004-3)';
+    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: X004-1';
+    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: X004-2';
+    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: X004-3';
 
     return (
         <>
@@ -246,7 +251,7 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
   const RegionStepDialog = () => {
     return (
          <>
-            {/* Screen: X005 (tương đương THSN005) */}
+            {/* Screen: X005 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn khu vực làm việc</DialogTitle>
                 <DialogDescription className="text-center">
@@ -270,7 +275,7 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <Button variant="link" onClick={() => setProfileCreationStep(4)}>Quay lại</Button>
-                <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và xem việc làm phù hợp</Button>
+                <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và tìm đối tác phù hợp</Button>
             </div>
         </>
     )

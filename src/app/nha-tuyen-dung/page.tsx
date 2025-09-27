@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { PartnerRoleDialog } from '@/components/partner-role-dialog';
 import { XL01Dialog } from '@/components/X-L01-dialog';
+import { FeeDialog } from '@/components/fee-dialog';
 
 
 const partnerBenefits = [
@@ -53,6 +53,7 @@ const partnerBenefits = [
 export default function NhaTuyenDungPage() {
   const [isPartnerRoleDialogOpen, setIsPartnerRoleDialogOpen] = useState(false);
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
+  const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
 
@@ -60,6 +61,18 @@ export default function NhaTuyenDungPage() {
     setSelectedRole(roleId);
     setIsPartnerRoleDialogOpen(false);
     setIsXL01DialogOpen(true); // Open the X-L01 dialog
+  };
+
+  const handleXL01Complete = (preferences: any) => {
+    console.log("X-L01 Completed with:", preferences);
+    setIsXL01DialogOpen(false);
+    setIsFeeDialogOpen(true);
+  };
+  
+  const handleFeeSelected = (fee: string) => {
+    console.log("Fee selected:", fee);
+    setIsFeeDialogOpen(false);
+    // Here you can proceed to the next step, e.g., finding partners
   };
 
   return (
@@ -191,6 +204,17 @@ export default function NhaTuyenDungPage() {
         isOpen={isXL01DialogOpen} 
         onOpenChange={setIsXL01DialogOpen}
         initialStep={2} // Start from step 2
+        onComplete={handleXL01Complete}
+      />
+       <FeeDialog
+        isOpen={isFeeDialogOpen}
+        onOpenChange={setIsFeeDialogOpen}
+        onSelect={handleFeeSelected}
+        onBack={() => {
+            setIsFeeDialogOpen(false);
+            setIsXL01DialogOpen(true);
+        }}
+        lang={selectedLang}
       />
     </>
   );
