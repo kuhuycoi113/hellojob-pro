@@ -48,7 +48,6 @@ interface EditProfileDialogProps {
 const parseMessengerInput = (input: string): string => {
     if (!input) return '';
     let trimmedInput = input.trim();
-    // Remove "www." if it exists
     if (trimmedInput.includes('www.facebook.com')) {
         trimmedInput = trimmedInput.replace('www.facebook.com', 'facebook.com');
     }
@@ -68,7 +67,6 @@ const parseZaloInput = (input: string): string => {
 const parseLineInput = (input: string): string => {
   if (!input) return '';
   let trimmedInput = input.trim();
-   // Remove "www." if it exists
   if (trimmedInput.includes('www.line.me')) {
     trimmedInput = trimmedInput.replace('www.line.me', 'line.me');
   }
@@ -123,7 +121,9 @@ const renderLevel1Edit = (
     onQrClick: () => void,
     isMobile: boolean,
     isDatePickerOpen: boolean,
-    setIsDatePickerOpen: (open: boolean) => void
+    setIsDatePickerOpen: (open: boolean) => void,
+    errors: { messenger?: string; line?: string },
+    validateField: (field: 'messenger' | 'line', value: string) => void
 ) => {
     const height = parseInt(tempCandidate.personalInfo?.height || '0', 10);
     const weight = parseInt(tempCandidate.personalInfo?.weight || '0', 10);
@@ -339,21 +339,37 @@ const renderLevel1Edit = (
                                 </div>
                             </div>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                              <Label htmlFor="messenger" className="flex items-center gap-2">
                                 <MessengerIcon />
                                 Facebook Messenger
                             </Label>
-                            <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
+                            <Input
+                                id="messenger"
+                                placeholder="Dán link Facebook / Messenger hoặc username"
+                                value={tempCandidate.personalInfo.messenger || ''}
+                                onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)}
+                                onBlur={(e) => validateField('messenger', e.target.value)}
+                                className={cn(errors.messenger && "border-destructive")}
+                            />
                              <p className="text-xs text-muted-foreground">Chỉ cần nhập link Facebook, hệ thống sẽ tự động nhận diện ngầm Messenger của bạn</p>
+                             {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                             <Label htmlFor="line" className="flex items-center gap-2">
                                 <LineIcon />
                                 Line (Link hồ sơ)
                             </Label>
-                            <Input id="line" placeholder="Dán link Line hoặc nhập ID của bạn" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
+                            <Input
+                                id="line"
+                                placeholder="Dán link Line hoặc nhập ID của bạn"
+                                value={tempCandidate.personalInfo.line || ''}
+                                onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)}
+                                onBlur={(e) => validateField('line', e.target.value)}
+                                className={cn(errors.line && "border-destructive")}
+                            />
                              <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
+                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                     </div>
                     <div className="mt-4 text-center text-sm">
@@ -378,6 +394,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
     const [isConfirmSaveOpen, setIsConfirmSaveOpen] = useState(false);
+    const [errors, setErrors] = useState<{ messenger?: string, line?: string }>({});
 
 
     useEffect(() => {
@@ -405,8 +422,35 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                     images: [],
                 });
             }
+             setErrors({});
         }
     }, [isOpen]);
+
+    const validateField = (field: 'messenger' | 'line', value: string) => {
+        if (!value) {
+            setErrors(prev => ({...prev, [field]: undefined }));
+            return true;
+        }
+
+        let isValid = false;
+        let errorMessage = "Định dạng không hợp lệ.";
+
+        if (field === 'messenger') {
+            isValid = /^(https?:\/\/(www\.)?(facebook|m)\.com\/|m\.me\/|[\w.]{5,})/.test(value);
+            errorMessage = "Vui lòng nhập link Facebook/Messenger hoặc username hợp lệ.";
+        } else if (field === 'line') {
+            isValid = /^(https?:\/\/line\.me\/|@?[\w.-]+)/.test(value);
+            errorMessage = "Vui lòng nhập link Line hoặc Line ID hợp lệ.";
+        }
+        
+        if (isValid) {
+            setErrors(prev => ({ ...prev, [field]: undefined }));
+        } else {
+            setErrors(prev => ({ ...prev, [field]: errorMessage }));
+        }
+        return isValid;
+    };
+
 
     const forceSave = () => {
         if (tempCandidate) {
@@ -419,6 +463,19 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
 
     const handleSave = () => {
         if (!tempCandidate) return;
+
+        const isMessengerValid = validateField('messenger', tempCandidate.personalInfo.messenger || '');
+        const isLineValid = validateField('line', tempCandidate.personalInfo.line || '');
+        
+        if (!isMessengerValid || !isLineValid) {
+            toast({
+                variant: 'destructive',
+                title: 'Thông tin không hợp lệ',
+                description: 'Vui lòng sửa các lỗi được hiển thị trước khi lưu.',
+            });
+            return;
+        }
+
 
         if (source === 'application') {
             const missingFields = validateProfileForApplication(tempCandidate);
@@ -452,26 +509,16 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
     
             if (section === 'name') {
                 newCandidate.name = value;
-            } else if (section === 'personalInfo' || section === 'aspirations') {
-                if (section === 'personalInfo' && field === 'messenger') {
-                     newCandidate[section]!.messenger = parseMessengerInput(value); // Store raw value
-                } else if (section === 'personalInfo' && field === 'line') {
-                     newCandidate[section]!.line = parseLineInput(value); // Store raw value
-                } else if (section === 'personalInfo' && field === 'zalo') {
-                    newCandidate[section] = { ...newCandidate[section]!, [field]: parseZaloInput(value) };
-                } else if (section === 'aspirations' && field === 'specialAspirations') {
-                    const currentAspirations = newCandidate.aspirations?.specialAspirations || [];
-                    const [item, checked] = [value, arguments[3]];
-                    const aspirationArray = Array.isArray(currentAspirations) ? currentAspirations : (typeof currentAspirations === 'string' && currentAspirations ? currentAspirations.split(',').map(s => s.trim()) : []);
-    
-                    if (checked) {
-                        newCandidate.aspirations.specialAspirations = [...aspirationArray, item];
-                    } else {
-                        newCandidate.aspirations.specialAspirations = aspirationArray.filter((i: string) => i !== item);
-                    }
-                } else {
-                     newCandidate[section] = { ...newCandidate[section], [field]: value };
+            } else if (section === 'personalInfo') {
+                let processedValue = value;
+                if (field === 'messenger') {
+                    processedValue = parseMessengerInput(value);
+                } else if (field === 'line') {
+                    processedValue = parseLineInput(value);
+                } else if (field === 'zalo') {
+                    processedValue = parseZaloInput(value);
                 }
+                 newCandidate.personalInfo = { ...newCandidate.personalInfo, [field]: processedValue };
             } else {
                 newCandidate[section as keyof EnrichedCandidateProfile] = value;
             }
@@ -523,7 +570,9 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                             () => setIsQrDialogOpen(true),
                             isMobile,
                             isDatePickerOpen,
-                            setIsDatePickerOpen
+                            setIsDatePickerOpen,
+                            errors,
+                            validateField
                         )}
                     </div>
                     <DialogFooter>
@@ -617,3 +666,4 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
         </>
     );
 }
+
