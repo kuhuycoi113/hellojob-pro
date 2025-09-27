@@ -85,7 +85,7 @@ const activityImages = [
     "/img/anhgioithieu/khachhang002.webp",
     "/img/anhgioithieu/khachhang003.webp",
     "/img/anhgioithieu/khachhang004.webp",
-    "/img/anhgioithieu/khachhang005.webp",
+    "/img/anhgioithieu/khachhang009.webp",
     "/img/anhgioithieu/laodong001.webp",
     "/img/anhgioithieu/laodong002.webp",
     "/img/anhgioithieu/laodong003.webp",
