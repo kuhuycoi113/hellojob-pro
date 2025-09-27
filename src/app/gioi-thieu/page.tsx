@@ -46,7 +46,7 @@ const teamMembers = [
   {
     name: 'Lê Mạnh Hùng',
     role: 'Head of Marketing',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Hung01.png',
     dataAiHint: 'male marketing head portrait',
   },
 ];
@@ -274,5 +274,3 @@ export default function AboutPage() {
     </>
   );
 }
-
-    
