@@ -11,6 +11,7 @@ import { PartnerRoleDialog } from '@/components/partner-role-dialog';
 import { VisaTypeDialog } from '@/components/visa-type-dialog';
 import { VisaDetailDialog } from '@/components/visa-detail-dialog';
 import { IndustryDialog } from '@/components/industry-dialog';
+import { RegionDialog } from '@/components/region-dialog';
 
 const partnerBenefits = [
   { 
@@ -56,9 +57,11 @@ export default function NhaTuyenDungPage() {
   const [isVisaTypeDialogOpen, setIsVisaTypeDialogOpen] = useState(false);
   const [isVisaDetailDialogOpen, setIsVisaDetailDialogOpen] = useState(false);
   const [isIndustryDialogOpen, setIsIndustryDialogOpen] = useState(false);
+  const [isRegionDialogOpen, setIsRegionDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
+  const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
 
   const handleRoleSelected = (roleId: string) => {
@@ -80,8 +83,14 @@ export default function NhaTuyenDungPage() {
   }
 
   const handleIndustrySelected = (industry: string) => {
-    console.log("Role:", selectedRole, "Visa Type:", selectedVisa, "Visa Detail:", selectedVisaDetail, "Industry:", industry);
+    setSelectedIndustry(industry);
     setIsIndustryDialogOpen(false);
+    setIsRegionDialogOpen(true);
+  }
+
+  const handleRegionSelected = (region: string) => {
+    console.log("Role:", selectedRole, "Visa Type:", selectedVisa, "Visa Detail:", selectedVisaDetail, "Industry:", selectedIndustry, "Region:", region);
+    setIsRegionDialogOpen(false);
     // Navigate to the next step, e.g., a registration form
   }
 
@@ -243,6 +252,16 @@ export default function NhaTuyenDungPage() {
         lang={selectedLang}
         visaType={selectedVisa || ''}
       />
+       <RegionDialog
+        isOpen={isRegionDialogOpen}
+        onOpenChange={setIsRegionDialogOpen}
+        onSelect={handleRegionSelected}
+        onBack={() => {
+            setIsRegionDialogOpen(false);
+            setIsIndustryDialogOpen(true);
+        }}
+        lang={selectedLang}
+       />
     </>
   );
 }
