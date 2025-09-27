@@ -46,6 +46,94 @@ interface XL01DialogProps {
   initialLang?: Language;
 }
 
+const visaDetailContent = {
+  'thuc-tap-sinh-ky-nang': {
+    vi: {
+      title: 'Chọn chương trình Thực tập sinh',
+      description: 'Vui lòng chọn loại chương trình thực tập sinh phù hợp.',
+      options: [
+        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: 'Thực tập sinh 3 năm', desc: 'Chương trình phổ biến nhất, làm việc tại Nhật trong 3 năm.' },
+        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: 'Thực tập sinh 1 năm', desc: 'Chương trình ngắn hạn dành cho một số ngành nghề nhất định.' },
+        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: 'Thực tập sinh 3 Go', desc: 'Dành cho người đã hoàn thành TTS 3 năm và muốn quay lại.' },
+      ]
+    },
+    ja: {
+      title: '技能実習プログラムを選択',
+      description: '適切な技能実習プログラムを選択してください。',
+      options: [
+        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: '技能実習3年', desc: '最も一般的なプログラムで、日本で3年間働きます。' },
+        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: '技能実習1年', desc: '特定の職種向けの短期プログラム。' },
+        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: '技能実習3号', desc: '3年間の技能実習を修了し、再入国を希望する方向け。' },
+      ]
+    },
+    en: {
+      title: 'Select Trainee Program',
+      description: 'Please select the appropriate technical intern training program.',
+      options: [
+        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: '3-Year Technical Intern', desc: 'The most common program, working in Japan for 3 years.' },
+        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: '1-Year Technical Intern', desc: 'A short-term program for specific job types.' },
+        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: 'Technical Intern No. 3', desc: 'For those who have completed the 3-year program and wish to return.' },
+      ]
+    }
+  },
+  'ky-nang-dac-dinh': {
+    vi: {
+        title: 'Chọn loại Kỹ năng đặc định',
+        description: 'Chọn chương trình Kỹ năng đặc định bạn muốn tuyển.',
+        options: [
+          { id: 'dac-dinh-dau-nhat', icon: Users, title: 'Đặc định đầu Nhật', desc: 'Để tuyển ứng viên ở Nhật' },
+          { id: 'dac-dinh-dau-viet', icon: Plane, title: 'Đặc định đầu Việt', desc: 'Để tuyển ứng viên từ Việt Nam' },
+          { id: 'dac-dinh-di-moi', icon: UserPlus, title: 'Đặc định đi mới', desc: 'Để tuyển ứng viên mới' },
+        ]
+    },
+    ja: {
+        title: '特定技能の種類を選択',
+        description: '募集したい特定技能プログラムを選択してください。',
+        options: [
+          { id: 'dac-dinh-dau-nhat', icon: Users, title: '国内（日本在住者）', desc: '日本在住の候補者を採用' },
+          { id: 'dac-dinh-dau-viet', icon: Plane, title: '国外（ベトナム在住者）', desc: 'ベトナムから候補者を採用' },
+          { id: 'dac-dinh-di-moi', icon: UserPlus, title: '新規（未経験者）', desc: '新規の候補者を採用' },
+        ]
+    },
+    en: {
+        title: 'Select Specified Skilled Worker Type',
+        description: 'Choose the Specified Skilled Worker program you want to recruit for.',
+        options: [
+          { id: 'dac-dinh-dau-nhat', icon: Users, title: 'Domestic (in Japan)', desc: 'To recruit candidates already in Japan' },
+          { id: 'dac-dinh-dau-viet', icon: Plane, title: 'Overseas (in Vietnam)', desc: 'To recruit candidates from Vietnam' },
+          { id: 'dac-dinh-di-moi', icon: UserPlus, title: 'New Candidates', desc: 'To recruit new candidates' },
+        ]
+    }
+  },
+  'ky-su-tri-thuc': {
+    vi: {
+        title: 'Chọn loại Kỹ sư, tri thức',
+        description: 'Chọn chương trình Kỹ sư bạn muốn tuyển.',
+        options: [
+          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: 'Kỹ sư, tri thức đầu Nhật', desc: 'Để tuyển kỹ sư ở Nhật' },
+          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: 'Kỹ sư, tri thức đầu Việt', desc: 'Để tuyển kỹ sư từ Việt Nam' },
+        ]
+    },
+    ja: {
+        title: '技術・人文知識・国際業務の種類を選択',
+        description: '募集したいプログラムを選択してください。',
+        options: [
+          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: '国内エンジニア', desc: '日本での経験があるエンジニアを採用' },
+          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: '国外エンジニア', desc: 'ベトナムからエンジニアを採用' },
+        ]
+    },
+    en: {
+        title: 'Select Engineer/Specialist Type',
+        description: 'Choose the program you want to recruit for.',
+        options: [
+          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: 'Engineer (In Japan)', desc: 'Recruit engineers with experience in Japan' },
+          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: 'Engineer (In Vietnam)', desc: 'Recruit engineers from Vietnam' },
+        ]
+    }
+  }
+};
+
+
 export function XL01Dialog({ 
     children, 
     isOpen, 
@@ -165,7 +253,6 @@ export function XL01Dialog({
 
   const QuickCreateStepDialog = () => (
     <>
-      {/* Screen: THSN002 */}
       <DialogHeader>
           <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
           <DialogDescription className="text-center">
@@ -198,25 +285,41 @@ export function XL01Dialog({
             <p className="text-muted-foreground text-xs">Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.</p>
         </Button>
       </div>
-      <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
+      <Button variant="link" onClick={onBack} className="mt-4 mx-auto block">Quay lại</Button>
     </>
   );
 
   const VisaDetailStepDialog = () => {
     if (!selectedVisa) return null;
-    const options = visaDetailsByVisaType[selectedVisa.slug] || [];
+    
+    const contentData = visaDetailContent[selectedVisa.slug as keyof typeof visaDetailContent];
+    if (!contentData) return null;
+
+    const content = contentData[currentLang];
+    const iconColors = {
+        'thuc-tap-sinh-ky-nang': 'bg-orange-100 text-orange-500',
+        'ky-nang-dac-dinh': 'bg-blue-100 text-blue-500',
+        'ky-su-tri-thuc': 'bg-green-100 text-green-500',
+    };
+    const currentIconColor = iconColors[selectedVisa.slug as keyof typeof iconColors] || 'bg-gray-100 text-gray-500';
+
+
     return (
         <>
         <DialogHeader>
-            <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisa.name}</DialogTitle>
-            <DialogDescription className="text-center">Chọn loại hình chi tiết để tiếp tục.</DialogDescription>
+            <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+            <DialogDescription className="text-center">{content.description}</DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-            {options.map(option => (
-                <Button key={option.name} onClick={() => { setSelectedVisaDetail(option.name); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <h3 className="font-bold text-base mb-1">{option.name}</h3>
-                    <p className="text-muted-foreground text-xs">{option.slug}</p>
-                </Button>
+        <div className={cn("grid grid-cols-1 pt-4 gap-4", content.options.length > 2 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-2xl mx-auto")}>
+            {content.options.map(option => (
+                <Card key={option.id} onClick={() => { setSelectedVisaDetail(option.id); setProfileCreationStep(4); }}
+                    className={cn("text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedVisaDetail === option.id && "ring-2 ring-primary border-primary")}>
+                    <div className={cn("rounded-full p-3 w-fit mb-4", currentIconColor)}>
+                        <option.icon className="h-8 w-8" />
+                    </div>
+                    <h3 className="font-bold text-base mb-1">{option.title}</h3>
+                    <p className="text-muted-foreground text-xs flex-grow">{option.desc}</p>
+                </Card>
             ))}
         </div>
         <Button variant="link" onClick={() => setProfileCreationStep(2)} className="mt-4 mx-auto block">Quay lại</Button>
@@ -224,15 +327,19 @@ export function XL01Dialog({
     )
   };
 
+
   const IndustryStepDialog = () => {
     const parentVisaSlug = selectedVisa?.slug;
     if (!parentVisaSlug) return null;
     const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
+    
     return (
         <>
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
-                <DialogDescription className="text-center">Lựa chọn ngành nghề bạn quan tâm nhất.</DialogDescription>
+                <DialogDescription className="text-center">
+                    Lựa chọn ngành nghề bạn quan tâm nhất.
+                </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                 {industries.map(industry => (
@@ -253,7 +360,7 @@ export function XL01Dialog({
          <>
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn khu vực làm việc</DialogTitle>
-                <DialogDescription className="text-center">Lựa chọn khu vực bạn muốn làm việc tại Nhật Bản.</DialogDescription>
+                <DialogDescription className="text-center">Lựa chọn khu vực bạn muốn tuyển dụng.</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                  {japanRegions.map(region => (
