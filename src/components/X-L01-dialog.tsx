@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -114,7 +113,7 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
 
     return (
         <>
-        {/* Screen: {screenId} */}
+        {/* Screen: X001 (tương đương {screenId}) */}
         <DialogHeader>
             <DialogTitle className="text-2xl font-headline text-center">{titleText}</DialogTitle>
             <DialogDescription className="text-center">
@@ -139,7 +138,7 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
 
   const QuickCreateStepDialog = () => (
     <>
-      {/* Screen: THSN002 */}
+      {/* Screen: X002 (tương đương THSN002) */}
       <DialogHeader>
           <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
           <DialogDescription className="text-center">
@@ -183,9 +182,9 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
     const options = visaDetailsByVisaType[selectedVisa.slug] || [];
     
     let screenIdComment = '';
-    if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN003-1';
-    else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN003-2';
-    else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN003-3';
+    if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: X003-1 (tương đương THSN003-1)';
+    else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: X003-2 (tương đương THSN003-2)';
+    else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: X003-3 (tương đương THSN003-3)';
     
     return (
         <>
@@ -217,9 +216,9 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
     const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
     
     let screenIdComment = '';
-    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: X004-1 (tương đương THSN004-1)';
+    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: X004-2 (tương đương THSN004-2)';
+    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: X004-3 (tương đương THSN004-3)';
 
     return (
         <>
@@ -247,7 +246,7 @@ export function XL01Dialog({ children, isOpen, onOpenChange, initialStep = 1 }: 
   const RegionStepDialog = () => {
     return (
          <>
-            {/* Screen: THSN005 */}
+            {/* Screen: X005 (tương đương THSN005) */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn khu vực làm việc</DialogTitle>
                 <DialogDescription className="text-center">
