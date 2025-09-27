@@ -97,7 +97,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="relative aspect-[4/3] max-h-[450px]">
               <Image
-                src="/img/viet-img/phong-van (3).jpg"
+                src="/img/viet-img/HJALL.jpg"
                 alt="Đội ngũ HelloJob"
                 fill
                 className="object-contain rounded-lg shadow-xl"
@@ -220,5 +220,3 @@ export default function AboutPage() {
     </>
   );
 }
-
-    
