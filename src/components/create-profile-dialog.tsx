@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from './ui/button';
 import { Card } from './ui/card';
-import { FastForward, ListChecks, HardHat, UserCheck, GraduationCap } from 'lucide-react';
+import { FastForward, ListChecks, HardHat, UserCheck, GraduationCap, Pencil, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
