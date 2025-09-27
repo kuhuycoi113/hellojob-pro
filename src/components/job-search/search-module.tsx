@@ -48,7 +48,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
     );
 
     const industries = parentVisaSlug ? (industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
-    const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
+    const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name.vi, item])).values());
     setAvailableIndustries(uniqueIndustries);
   }, [filters.visa, filters.visaDetail]);
   
@@ -85,7 +85,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
 
   const searchSummary = [
     (Object.values(visaDetailsByVisaType).flat().find(d => d.slug === filters.visaDetail))?.name,
-    (allIndustries.find(i => i.slug === filters.industry))?.name,
+    (allIndustries.find(i => i.slug === filters.industry))?.name.vi,
     Array.isArray(filters.location) && filters.location.length > 0
         ? filters.location.map(locSlug => allJapanLocations.find(l => l.slug === locSlug)?.name).filter(Boolean).join(', ')
         : null,
@@ -167,7 +167,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                                     <SelectItem value="all">Tất cả ngành nghề</SelectItem>
                                     {availableIndustries.map((industry) => (
                                         <SelectItem key={industry.slug} value={industry.slug}>
-                                            {industry.name}
+                                            {industry.name.vi}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

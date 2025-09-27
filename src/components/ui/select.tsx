@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import * as React from "react"
@@ -11,7 +12,29 @@ const Select = SelectPrimitive.Root
 
 const SelectGroup = SelectPrimitive.Group
 
-const SelectValue = SelectPrimitive.Value
+const SelectValue = React.forwardRef<
+    React.ElementRef<typeof SelectPrimitive.Value>,
+    React.ComponentPropsWithoutRef<typeof SelectPrimitive.Value>
+>(({ className, children, ...props }, ref) => {
+    // If children are provided, render them. Otherwise, render the primitive.
+    // This allows us to manually set the displayed value, e.g., from a different field than the value.
+    if (children) {
+        return (
+            <span className={cn("text-sm", className)} {...props}>
+                {children}
+            </span>
+        )
+    }
+    return (
+        <SelectPrimitive.Value
+            ref={ref}
+            className={cn(className)}
+            {...props}
+        />
+    )
+});
+SelectValue.displayName = SelectPrimitive.Value.displayName
+
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
