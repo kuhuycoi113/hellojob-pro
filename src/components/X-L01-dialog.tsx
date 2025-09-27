@@ -181,6 +181,24 @@ const industryContent = {
     },
 };
 
+const regionContent = {
+    vi: {
+        title: 'Chọn khu vực làm việc',
+        description: 'Lựa chọn khu vực bạn muốn tuyển dụng.',
+        backButton: 'Quay lại',
+    },
+    ja: {
+        title: '希望勤務地を選択',
+        description: '募集したい地域を選択してください。',
+        backButton: '戻る',
+    },
+    en: {
+        title: 'Select Work Region',
+        description: 'Choose the region you want to recruit in.',
+        backButton: 'Back',
+    }
+};
+
 
 export function XL01Dialog({ 
     children, 
@@ -404,7 +422,7 @@ export function XL01Dialog({
                 ))}
             </div>
             <Button variant="link" onClick={() => setProfileCreationStep(3)} className="mt-4 mx-auto block">
-                {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
+                {content.backButton}
             </Button>
         </>
     );
@@ -413,11 +431,13 @@ export function XL01Dialog({
   const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
 
   const RegionStepDialog = () => {
+    const content = regionContent[currentLang];
     return (
          <>
+            {/* Screen: X005 */}
             <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn khu vực làm việc</DialogTitle>
-                <DialogDescription className="text-center">Lựa chọn khu vực bạn muốn tuyển dụng.</DialogDescription>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                  {japanRegions.map(region => (
@@ -425,14 +445,17 @@ export function XL01Dialog({
                         key={region} 
                         variant="outline"
                         onClick={() => { setSelectedRegion(region); handleComplete(); }}
-                        className={cn("h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary", selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : "")}
+                        className={cn(
+                            "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary",
+                            selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
+                        )}
                     >
                         <p className="font-semibold text-sm">{region}</p>
                     </Button>
                 ))}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setProfileCreationStep(4)}>Quay lại</Button>
+                <Button variant="link" onClick={() => setProfileCreationStep(4)}>{content.backButton}</Button>
             </div>
         </>
     )
