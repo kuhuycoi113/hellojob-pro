@@ -44,50 +44,35 @@ export const industriesByJobType: { [key: string]: Industry[] } = {
       { name: { vi: 'Hàng không', ja: '航空', en: 'Aviation' }, slug: 'hang-khong-tokutei', termCode: '4881', keywords: ['Dịch vụ mặt đất', 'Vệ sinh tàu bay', 'Bốc xếp hàng hóa'] },
       { name: { vi: 'Lưu trú, khách sạn', ja: '宿泊', en: 'Lodging' }, slug: 'luu-tru-khach-san-tokutei', termCode: '721', keywords: ['Lễ tân', 'Buồng phòng', 'Dịch vụ nhà hàng khách sạn'] },
       { name: { vi: 'Nhà hàng', ja: '外食業', en: 'Food Service Industry' }, slug: 'nha-hang-tokutei', termCode: '722511', keywords: ['Nấu ăn', 'Phục vụ', 'Quản lý nhà hàng'] },
-      { name: { vi: 'Chế tạo Vật liệu', ja: '素形材産業', en: 'Material Processing' }, slug: 'che-tao-vat-lieu-tokutei', termCode: '327', keywords: ['Đúc', 'Rèn', 'Xử lý nhiệt'] },
+      { name: { vi: 'Chế tạo Vật liệu', ja: '素形材産業', en: 'Material Processing industry' }, slug: 'che-tao-vat-lieu-tokutei', termCode: '327', keywords: ['Đúc', 'Rèn', 'Xử lý nhiệt'] },
       { name: { vi: 'Vận tải', ja: '運送', en: 'Transportation' }, slug: 'van-tai-tokutei', termCode: '484', keywords: ['Lái xe', 'Giao nhận hàng hóa', 'Quản lý kho'] },
-      { name: { vi: 'Điều dưỡng', ja: '介護', en: 'Nursing Care' }, slug: 'dieu-duong-tokutei', termCode: '623', keywords: ['Chăm sóc người cao tuổi', 'Hỗ trợ sinh hoạt', 'Hộ lý'] },
-      { name: { vi: 'Thực phẩm', ja: '飲食料品製造業', en: 'Food & Beverages Manufacturing' }, slug: 'thuc-pham-tokutei', termCode: '311', keywords: ['Chế biến thực phẩm', 'Đóng gói', 'Kiểm tra chất lượng'] },
-      { name: { vi: 'Cơ khí, chế tạo máy', ja: '産業機械製造業', en: 'Industrial Machinery Manufacturing' }, slug: 'co-khi-che-tao-may-tokutei', termCode: '333', keywords: ['Vận hành máy CNC', 'Hàn', 'Bảo trì máy móc'] },
+      { name: { vi: 'Điều dưỡng', ja: '介護', en: 'Nursing care' }, slug: 'dieu-duong-tokutei', termCode: '623', keywords: ['Chăm sóc người cao tuổi', 'Hỗ trợ sinh hoạt', 'Hộ lý'] },
+      { name: { vi: 'Thực phẩm', ja: '飲食料品製造業', en: 'Food and beverages manufacturing industry' }, slug: 'thuc-pham-tokutei', termCode: '311', keywords: ['Chế biến thực phẩm', 'Đóng gói', 'Kiểm tra chất lượng'] },
+      { name: { vi: 'Cơ khí, chế tạo máy', ja: '産業機械製造業', en: 'Industrial machinery manufacturing industry' }, slug: 'co-khi-che-tao-may-tokutei', termCode: '333', keywords: ['Vận hành máy CNC', 'Hàn', 'Bảo trì máy móc'] },
       { name: { vi: 'Xây dựng', ja: '建設', en: 'Construction' }, slug: 'xay-dung-tokutei', termCode: '23', keywords: ['Giàn giáo', 'Cốt thép', 'Cốp pha', 'Hoàn thiện nội thất'] },
     ],
     'ky-su-tri-thuc': [
-      { name: { vi: "Nông lâm ngư nghiệp", ja: "農林水産業", en: "Agriculture, Forestry and Fisheries" }, slug: "nong-lam-ngu-nghiep-ks", termCode: '11', keywords: [
-          "Chăn nuôi", "Công nghệ nông, lâm, ngư nghiệp", "Công nhân chăn nuôi đặc khu", "Công nhân Nông, Lâm, Ngư nghiệp", "Công nhân trồng trọt đặc khu"
-      ] },
-      { name: { vi: "Thực phẩm", ja: "食品・飲料", en: "Food & Beverage" }, slug: "thuc-pham-ks", termCode: '311', keywords: [
-          "thực phẩm", "đồ uống"
-      ] },
-      { name: { vi: "Sản xuất, chế tạo", ja: "製造業", en: "Manufacturing" }, slug: "san-xuat-che-tao-ks", termCode: '31-33', keywords: [
-          "Công nghệ môi trường", "Công nghệ sản xuất", "Công nhân sản xuất, gia công sản phẩm (trừ kim loại, máy móc)", "Gia công đồ xa xỉ", "Hoá học làm xưởng", "In ấn", "May mặc", "Môi trường làm xưởng", "Nhân viên sân bay", "Quản lý sản xuất tổng hợp", "Rác thải, phế liệu, tái chế", "Sản xuất sản phẩm", "Thiết kế thời trang"
-      ] },
-      { name: { vi: "Cơ khí, máy móc", ja: "機械・金属", en: "Machinery & Metal" }, slug: "co-khi-may-moc-ks", termCode: '332710', keywords: [
-          "Bảo trì hệ thống điện", "Bảo trì máy móc", "Chế tạo máy", "Cơ khí", "Công nghệ cơ khí", "Điện, kỹ thuật điện", "Gia công cơ khí", "Kiểm tra máy móc", "Lắp đặt máy móc", "Lắp ráp máy móc", "Phân tích CAE", "Quản lý sản xuất máy", "Thiết kế Auto CAD", "Thiết kế cơ khí", "Thiết kế điện", "Tự động hoá", "Vận hành máy", "Vận hành máy CNC", "Vận hành máy ép", "Vận hành robot"
-      ] },
-      { name: { vi: "Công nghệ ô tô", ja: "自動車技術", en: "Automotive Technology" }, slug: "cong-nghe-o-to-ks", termCode: '81111', keywords: [
-          "ô tô", "thiết kế ô tô", "bảo dưỡng ô tô"
-      ] },
-      { name: { vi: "Vận tải, Logistics", ja: "運輸・物流", en: "Transportation & Logistics" }, slug: "van-tai-logistics-ks", termCode: '488510', keywords: [
-          "Đại lý thủ tục hàng hải", "Quản lý đóng gói", "Quản lý vận chuyển", "Logistics"
-      ] },
-      { name: { vi: "Xây dựng, Kiến trúc", ja: "建設・建築", en: "Construction & Architecture" }, slug: "xay-dung-kien-truc-ks", termCode: '23', keywords: [
-          "Cầu đường", "Giám sát thi công", "Hoàn thiện nội thất", "Khảo sát", "Kiến trúc sư", "Kỹ thuật Kiến trúc", "Kỹ thuật Xây dựng", "Quản lý, giám sát thi công công trình", "Trắc địa", "Xây dựng dân dụng"
-      ] },
-      { name: { vi: "Công nghệ thông tin", ja: "情報技術(IT)", en: "Information Technology (IT)" }, slug: "it-ks", termCode: '541511', keywords: [
-          "Công nghệ thông tin", "IT", "lập trình", "phần mềm", "Blockchain", "BrSE (Bridge System Engineer)", "Business Analyst (BA)", "Lập trình nhúng", "Lập trình viên", "Tester", "Thiết kế UI, UX", "Trí tuệ nhân tạo"
-      ] },
-      { name: { vi: "Kinh doanh, Kinh tế", ja: "ビジネス・経済", en: "Business & Economics" }, slug: "kinh-doanh-kinh-te-ks", termCode: '541611', keywords: [
-          "Bán hàng miễn thuế", "Dịch vụ bán hàng", "Dịch vụ khách hàng", "Kinh doanh kế toán", "Kinh tế", "Nghiên cứu thị trường, marketing", "Quản lý", "Thương mại nước ngoài", "Tiếp thị (sales) doanh nghiệp"
-      ] },
-       { name: { vi: "Tài chính, Kế toán", ja: "財務・会計", en: "Finance & Accounting" }, slug: "tai-chinh-ke-toan-ks", termCode: '52', keywords: [
-          "Kế toán công chứng", "Kế toán thuế", "Tài chính, bảo hiểm", "Kiểm toán"
-      ] },
-      { name: { vi: "Dịch vụ, Du lịch", ja: "サービス・観光", en: "Service & Tourism" }, slug: "dich-vu-du-lich-ks", termCode: '721110', keywords: [
-          "Dịch vụ khách sạn", "Khu nghỉ dưỡng", "Lễ tân khách sạn", "Quản lý nhà hàng", "Hướng dẫn viên du lịch"
-      ] },
-      { name: { vi: "Hành chính, Nhân sự", ja: "管理・人事", en: "Administration & HR" }, slug: "hanh-chinh-nhan-su-ks", termCode: '561110', keywords: [
-          "Biên dịch, phiên dịch", "Nhân viên văn phòng", "Nhân sự", "Tuyển dụng"
-      ] },
+        { name: { vi: 'Nông lâm ngư nghiệp', ja: '農林水産業', en: 'Agriculture, Forestry, Fisheries' }, slug: 'nong-lam-ngu-nghiep-ks', termCode: '11', keywords: ['Nông nghiệp', 'Lâm nghiệp', 'Thủy sản'] },
+        { name: { vi: 'Thực phẩm', ja: '食品', en: 'Food Products' }, slug: 'thuc-pham-ks', termCode: '311', keywords: ['Chế biến thực phẩm', 'Sản xuất đồ uống'] },
+        { name: { vi: 'Sản xuất, chế tạo, công nghệ', ja: '製造・加工・技術', en: 'Manufacturing, Processing, Technology' }, slug: 'san-xuat-che-tao-cong-nghe-ks', termCode: '31-33', keywords: ['Sản xuất', 'Chế tạo', 'Công nghệ'] },
+        { name: { vi: 'Cơ khí, máy móc', ja: '機械', en: 'Machinery' }, slug: 'co-khi-may-moc-ks', termCode: '333', keywords: ['Cơ khí', 'Chế tạo máy'] },
+        { name: { vi: 'Công nghệ ô tô', ja: '自動車技術', en: 'Automotive Technology' }, slug: 'cong-nghe-o-to-ks', termCode: '336', keywords: ['Ô tô', 'Sản xuất ô tô', 'Bảo dưỡng ô tô'] },
+        { name: { vi: 'Vận chuyển hàng hóa', ja: '運輸・物流', en: 'Logistics & Shipping' }, slug: 'van-chuyen-hang-hoa-ks', termCode: '48-49', keywords: ['Vận tải', 'Logistics', 'Kho bãi'] },
+        { name: { vi: 'Xây dựng', ja: '建設', en: 'Construction' }, slug: 'xay-dung-ks', termCode: '23', keywords: ['Xây dựng', 'Kiến trúc', 'Giám sát công trình'] },
+        { name: { vi: 'Khách sạn, lưu trú', ja: 'ホテル・宿泊', en: 'Hospitality & Lodging' }, slug: 'khach-san-luu-tru-ks', termCode: '721', keywords: ['Khách sạn', 'Lễ tân', 'Quản lý buồng phòng'] },
+        { name: { vi: 'Y tế, điều dưỡng', ja: '医療・介護', en: 'Medical & Nursing Care' }, slug: 'y-te-dieu-duong-ks', termCode: '62', keywords: ['Điều dưỡng', 'Hộ lý', 'Y tế'] },
+        { name: { vi: 'Kinh doanh, kinh tế', ja: 'ビジネス・経済', en: 'Business & Economics' }, slug: 'kinh-doanh-kinh-te-ks', termCode: '52', keywords: ['Kinh doanh', 'Kinh tế', 'Quản trị'] },
+        { name: { vi: 'Tài chính, kế toán, bảo hiểm', ja: '金融・会計・保険', en: 'Finance, Accounting, Insurance' }, slug: 'tai-chinh-ke-toan-bao-hiem-ks', termCode: '52', keywords: ['Tài chính', 'Kế toán', 'Bảo hiểm'] },
+        { name: { vi: 'Báo chí, truyền thông, marketing', ja: 'ジャーナリズム・メディア・マーケティング', en: 'Journalism, Media, Marketing' }, slug: 'bao-chi-truyen-thong-marketing-ks', termCode: '5418', keywords: ['Báo chí', 'Truyền thông', 'Marketing'] },
+        { name: { vi: 'Công nghệ thông tin', ja: '情報技術 (IT)', en: 'Information Technology (IT)' }, slug: 'it-ks', termCode: '5415', keywords: ['Lập trình', 'Phát triển phần mềm', 'Quản trị mạng'] },
+        { name: { vi: 'Nghiên cứu, phân tích', ja: '研究・分析', en: 'Research & Analysis' }, slug: 'nghien-cuu-phan-tich-ks', termCode: '5417', keywords: ['Nghiên cứu', 'Phân tích dữ liệu'] },
+        { name: { vi: 'Giáo dục, đào tạo', ja: '教育・研修', en: 'Education & Training' }, slug: 'giao-duc-dao-tao-ks', termCode: '61', keywords: ['Giáo dục', 'Đào tạo', 'Giảng dạy'] },
+        { name: { vi: 'Hành chính, văn phòng', ja: '管理・事務', en: 'Administration & Office Work' }, slug: 'hanh-chinh-van-phong-ks', termCode: '5611', keywords: ['Hành chính', 'Thư ký', 'Văn phòng'] },
+        { name: { vi: 'Pháp lý', ja: '法務', en: 'Legal' }, slug: 'phap-ly-ks', termCode: '5411', keywords: ['Luật', 'Pháp lý'] },
+        { name: { vi: 'Nghệ thuật, nghệ sĩ', ja: 'アート・芸術', en: 'Arts & Entertainment' }, slug: 'nghe-thuat-nghe-si-ks', termCode: '71', keywords: ['Nghệ thuật', 'Thiết kế', 'Giải trí'] },
+        { name: { vi: 'Thể dục thể thao', ja: 'スポーツ', en: 'Sports & Fitness' }, slug: 'the-duc-the-thao-ks', termCode: '713940', keywords: ['Thể thao', 'Huấn luyện viên'] },
+        { name: { vi: 'Nghề có kỹ năng chuyên nghiệp', ja: '専門職', en: 'Professional Skills' }, slug: 'nghe-co-ky-nang-chuyen-nghiep-ks', termCode: '54', keywords: ['Tư vấn', 'Chuyên gia'] },
+        { name: { vi: 'Việc làm bán chuyên nghiệp', ja: '準専門職', en: 'Semi-professional Work' }, slug: 'viec-lam-ban-chuyen-nghiep-ks', termCode: '43', keywords: ['Trợ lý', 'Hỗ trợ kỹ thuật'] }
     ]
 };
 
