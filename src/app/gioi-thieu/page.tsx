@@ -172,9 +172,9 @@ export default function AboutPage() {
       </section>
 
        {/* CTA Section */}
-       <section className="w-full py-20 md:py-28 bg-background">
+      <section className="w-full py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="flex flex-col md:flex-row items-center gap-12 rounded-lg bg-accent text-primary-foreground p-12 lg:p-16">
+          <div className="flex flex-col md:flex-row items-center gap-12 rounded-lg bg-gradient-to-br from-accent to-primary text-primary-foreground p-12 lg:p-16">
             <div className="md:w-1/2 text-center md:text-left">
                <h2 className="text-3xl md:text-4xl font-headline font-bold mb-2">
                 Đăng tin tuyển dụng miễn phí
@@ -206,7 +206,7 @@ export default function AboutPage() {
             </div>
              <div className="md:w-1/2 flex justify-center">
               <Image
-                src="/img/phong-van(8).jpg"
+                src="/img/viet-img/phong-van (3).jpg"
                 alt="Hợp tác tuyển dụng tại Nhật"
                 width={500}
                 height={350}
@@ -220,3 +220,5 @@ export default function AboutPage() {
     </>
   );
 }
+
+    
