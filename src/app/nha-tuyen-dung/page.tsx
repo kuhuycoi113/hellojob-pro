@@ -12,6 +12,7 @@ import { VisaTypeDialog } from '@/components/visa-type-dialog';
 import { VisaDetailDialog } from '@/components/visa-detail-dialog';
 import { IndustryDialog } from '@/components/industry-dialog';
 import { RegionDialog } from '@/components/region-dialog';
+import { FeeDialog } from '@/components/fee-dialog';
 
 const partnerBenefits = [
   { 
@@ -58,10 +59,12 @@ export default function NhaTuyenDungPage() {
   const [isVisaDetailDialogOpen, setIsVisaDetailDialogOpen] = useState(false);
   const [isIndustryDialogOpen, setIsIndustryDialogOpen] = useState(false);
   const [isRegionDialogOpen, setIsRegionDialogOpen] = useState(false);
+  const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
 
   const handleRoleSelected = (roleId: string) => {
@@ -89,9 +92,15 @@ export default function NhaTuyenDungPage() {
   }
 
   const handleRegionSelected = (region: string) => {
-    console.log("Role:", selectedRole, "Visa Type:", selectedVisa, "Visa Detail:", selectedVisaDetail, "Industry:", selectedIndustry, "Region:", region);
+    setSelectedRegion(region);
     setIsRegionDialogOpen(false);
-    // Navigate to the next step, e.g., a registration form
+    setIsFeeDialogOpen(true);
+  }
+  
+  const handleFeeEntered = (fee: string) => {
+    console.log("Role:", selectedRole, "Visa Type:", selectedVisa, "Visa Detail:", selectedVisaDetail, "Industry:", selectedIndustry, "Region:", selectedRegion, "Fee:", fee);
+    setIsFeeDialogOpen(false);
+    // Navigate to the next step, e.g., a registration form or dashboard
   }
 
   return (
@@ -259,6 +268,16 @@ export default function NhaTuyenDungPage() {
         onBack={() => {
             setIsRegionDialogOpen(false);
             setIsIndustryDialogOpen(true);
+        }}
+        lang={selectedLang}
+       />
+       <FeeDialog
+        isOpen={isFeeDialogOpen}
+        onOpenChange={setIsFeeDialogOpen}
+        onSelect={handleFeeEntered}
+        onBack={() => {
+            setIsFeeDialogOpen(false);
+            setIsRegionDialogOpen(true);
         }}
         lang={selectedLang}
        />
