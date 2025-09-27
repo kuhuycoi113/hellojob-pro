@@ -22,7 +22,7 @@ const teamMembers = [
   {
     name: 'Phùng Thị Tuyết Nhung',
     role: 'Founder & COO',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Nhung01.png',
     dataAiHint: 'female coo portrait',
   },
   {
@@ -102,8 +102,8 @@ const activityImages = [
     "/img/anhgioithieu/laodong020.webp",
     "/img/anhgioithieu/nhanvien001.webp",
     "/img/anhgioithieu/nhanvien002.webp",
-    "/img/anhgioithieu/nhanvien003.webp",
     "/img/anhgioithieu/nhanvien004.webp",
+    "/img/anhgioithieu/nhanvien005.webp",
 ];
 
 
