@@ -391,7 +391,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                   <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
                           <p><strong>{t.foundedLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={employer.info.founded} onChange={(e) => setEmployer({...employer, info: {...employer.info, founded: e.target.value}})} /></p>
-                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info, size: {...employer.info.size, [lang]: e.target.value}}})} /></p>
+                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info.size, [lang]: e.target.value}})} /></p>
                           <p><strong>{t.licenseLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={employer.info.license} onChange={(e) => setEmployer({...employer, info: {...employer.info, license: e.target.value}})} /></p>
                           <p><strong>{t.websiteLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto text-primary" placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={employer.info.website} onChange={(e) => setEmployer({...employer, info: {...employer.info, website: e.target.value}})} /></p>
                       </div>
@@ -399,7 +399,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
                           <p><strong>{t.mainIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={employer.industries.main[lang]} onChange={(e) => setEmployer({...employer, industries: {...employer.industries, main: {...employer.industries.main, [lang]: e.target.value}}})} /></p>
-                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={employer.industries.secondary[lang]} onChange={(e) => setEmployer({...employer, industries: {...employer.industries, secondary: {...employer.industries.secondary, [lang]: e.target.value}}})} /></p>
+                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={employer.industries.secondary[lang]} onChange={(e) => setEmployer({...employer, industries: {...employer.industries.secondary, [lang]: e.target.value}}})} /></p>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
@@ -439,3 +439,5 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </>
   );
 }
+
+    
