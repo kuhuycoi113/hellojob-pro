@@ -99,11 +99,10 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
   };
   
   const content = contentByLang[lang];
-  const dialogId = "X008";
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl" id={dialogId}>
+      <DialogContent className="sm:max-w-2xl" id="X008">
         <DialogHeader className="text-center items-center">
             <div className="p-3 bg-primary/10 rounded-full w-fit">
                 <Handshake className="h-8 w-8 text-primary"/>
