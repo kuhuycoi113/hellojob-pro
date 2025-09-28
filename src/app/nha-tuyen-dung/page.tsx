@@ -13,6 +13,7 @@ import { XL06Dialog } from '@/components/X-L06-dialog';
 import { XL07Dialog } from '@/components/X-L07-dialog';
 import { XL08Dialog } from '@/components/X-L08-dialog';
 import { XL09Dialog } from '@/components/X-L09-dialog';
+import { YL01Dialog } from '@/components/Y-L01-dialog';
 
 
 const partnerBenefits = [
@@ -60,6 +61,7 @@ export default function NhaTuyenDungPage() {
   const [isXL07DialogOpen, setIsXL07DialogOpen] = useState(false);
   const [isXL08DialogOpen, setIsXL08DialogOpen] = useState(false);
   const [isXL09DialogOpen, setIsXL09DialogOpen] = useState(false);
+  const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false); // State for the new Y001 dialog
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
   const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
   const [contactInfo, setContactInfo] = useState<any>(null);
@@ -125,7 +127,7 @@ export default function NhaTuyenDungPage() {
                           <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                       </div>
                   </Button>
-                  <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
+                  <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
                       <div className="text-center">
                           <span className="font-semibold">Đăng ký đối tác</span>
                           <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
@@ -207,7 +209,7 @@ export default function NhaTuyenDungPage() {
                                   <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                               </div>
                           </Button>
-                           <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
+                           <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
                               <div className="text-center">
                                   <span className="font-semibold">Đăng ký đối tác</span>
                                   <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
@@ -272,6 +274,20 @@ export default function NhaTuyenDungPage() {
         recruitmentPrefs={recruitmentPrefs}
         contactInfo={contactInfo}
         lang={selectedLang}
+      />
+       <YL01Dialog 
+        isOpen={isYL01DialogOpen} 
+        onOpenChange={setIsYL01DialogOpen}
+        onLanguageChange={setSelectedLang}
+        initialLang={selectedLang}
+        initialStep={1}
+        onComplete={(data) => {
+            console.log('Y-L01 finished', data);
+            setIsYL01DialogOpen(false);
+        }}
+        onBack={() => {
+            setIsYL01DialogOpen(false);
+        }}
       />
     </>
   );
