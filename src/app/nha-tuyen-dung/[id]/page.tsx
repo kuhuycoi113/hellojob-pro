@@ -81,10 +81,10 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
 export default function EmployerDetailPage({ params }: { params: { id: string } }) {
   const [employer, setEmployer] = useState(mockEmployerData);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingModule, setEditingModule] = useState<{title: string, content: any, field: keyof typeof employer | `info.${keyof typeof mockEmployerData['info']}` } | null>(null);
+  const [editingModule, setEditingModule] = useState<{title: string, content: any, field: string } | null>(null);
   const [tempContent, setTempContent] = useState<any>('');
 
-  const handleEditClick = (title: string, currentContent: any, field: keyof typeof employer | `info.${keyof typeof mockEmployerData['info']}`) => {
+  const handleEditClick = (title: string, currentContent: any, field: string) => {
     setEditingModule({ title, content: currentContent, field });
     setTempContent(currentContent);
     setIsEditDialogOpen(true);
@@ -97,18 +97,21 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         const newState = { ...prev };
         const { field } = editingModule;
 
-        if (field === 'info' || field === 'industries' || field === 'benefits' || field === 'history') {
-            // @ts-ignore
-            newState[field] = tempContent;
-        } else if (field.startsWith('info.')) {
-            const infoField = field.split('.')[1] as keyof typeof mockEmployerData['info'];
-            // @ts-ignore
-            newState.info[infoField] = tempContent[infoField];
-        } else {
-            // @ts-ignore
-            newState[field as keyof typeof employer] = tempContent;
+        if (['about', 'info', 'benefits', 'industries', 'history', 'name', 'type', 'location'].includes(field)) {
+             // Handle nested and top-level properties
+            if (field.startsWith('info.')) {
+                 const infoField = field.split('.')[1] as keyof typeof mockEmployerData['info'];
+                 newState.info[infoField] = tempContent[infoField];
+            } else if (field === 'name' || field === 'type' || field === 'location') {
+                 // @ts-ignore
+                 newState[field] = tempContent[field];
+            }
+            else {
+                // @ts-ignore
+                newState[field as keyof typeof newState] = tempContent;
+            }
         }
-
+        
         return newState;
     });
 
@@ -256,6 +259,23 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     );
 };
 
+  const renderHeaderEdit = () => (
+    <div className="space-y-4">
+        <div className="space-y-2">
+            <Label htmlFor="company-name">Tên công ty</Label>
+            <Input id="company-name" value={tempContent.name} onChange={(e) => setTempContent({...tempContent, name: e.target.value})} />
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="company-type">Loại hình</Label>
+            <Input id="company-type" value={tempContent.type} onChange={(e) => setTempContent({...tempContent, type: e.target.value})} />
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="company-location">Địa điểm</Label>
+            <Input id="company-location" value={tempContent.location} onChange={(e) => setTempContent({...tempContent, location: e.target.value})} />
+        </div>
+    </div>
+  );
+
 
   const renderEditContent = () => {
     if (!editingModule) return null;
@@ -270,6 +290,8 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
             return renderIndustriesEdit();
         case 'history':
             return renderHistoryEdit();
+        case 'header':
+            return renderHeaderEdit();
         default:
             return <p>Chức năng này đang được phát triển. Vui lòng quay lại sau.</p>;
     }
@@ -309,7 +331,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           </p>
                       </div>
                       <div className="absolute top-16 right-0 md:top-20 md:right-0">
-                          <Button variant="ghost" size="icon" onClick={() => handleEditClick('Thông tin chung', {name: employer.name, type: employer.type, location: employer.location }, 'name')}>
+                          <Button variant="ghost" size="icon" onClick={() => handleEditClick('Thông tin chung', {name: employer.name, type: employer.type, location: employer.location }, 'header')}>
                               <Edit className="h-5 w-5"/>
                           </Button>
                       </div>
@@ -393,7 +415,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
             <DialogClose asChild>
                 <Button variant="outline">Hủy</Button>
             </DialogClose>
-             {(editingModule?.field === 'about' || editingModule?.field === 'info' || editingModule?.field === 'benefits' || editingModule?.field === 'industries' || editingModule?.field === 'history') && (
+             {(editingModule) && (
                 <Button onClick={handleSaveChanges}>Lưu thay đổi</Button>
              )}
           </DialogFooter>
