@@ -292,12 +292,24 @@ const commonInterests = ['Cơ khí', 'Điện tử', 'IT', 'Logistics', 'Dệt m
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v,i,a)=>a.findIndex(t=>(t.name.vi === v.name.vi))===i);
 
+const formatYen = (value?: string) => {
+    if (!value) return 'N/A';
+    
+    const numericValue = typeof value === 'string' 
+        ? parseInt(value.replace(/[^0-9]/g, ''), 10)
+        : value;
+        
+    if (isNaN(numericValue)) return 'N/A';
+    return `${numericValue.toLocaleString('ja-JP')} yên`;
+};
+
 const visaDetailsByVisaType: { [key: string]: string[] } = {
     'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
     'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
     'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
 };
 const visaTypes = Object.keys(visaDetailsByVisaType);
+
 
 const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
     <Dialog>
@@ -1270,7 +1282,7 @@ export default function CandidateProfilePage() {
                                 <div key={index} className="p-4 border rounded-lg space-y-2 relative">
                                 <div className="flex justify-between items-center mb-2">
                                     <h4 className="font-bold">Kinh nghiệm #{index + 1}</h4>
-                                    <Button variant="ghost" size="icon" onClick={()={() => handleRemoveItem('experience', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('experience', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                                 </div>
                                 <Label>Vai trò</Label><Input value={exp.role} onChange={e => handleChange('experience', index, 'role', e.target.value)} />
                                 <Label>Công ty</Label><Input value={exp.company} onChange={e => handleChange('experience', index, 'company', e.target.value)} />
@@ -1867,15 +1879,4 @@ const DocumentGrid = ({
       )}
     </div>
   )
-};
-
-const formatYen = (value?: string) => {
-    if (!value) return 'N/A';
-    
-    const numericValue = typeof value === 'string' 
-        ? parseInt(value.replace(/[^0-9]/g, ''), 10)
-        : value;
-        
-    if (isNaN(numericValue)) return 'N/A';
-    return `${numericValue.toLocaleString('ja-JP')} yên`;
 };
