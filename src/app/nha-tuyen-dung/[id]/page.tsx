@@ -6,7 +6,7 @@ import { notFound, useSearchParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -20,67 +20,69 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { QrCode } from 'lucide-react';
 
-// Mock data now serves as placeholders
-const placeholderEmployerData = {
-  id: 'Z000',
-  name: {
-    vi: 'Công ty Cổ phần ABC',
-    ja: 'ABC株式会社',
-    en: 'ABC Corporation'
-  },
-  type: {
-    vi: 'Công ty phái cử',
-    ja: '送り出し機関',
-    en: 'Dispatch Company'
-  },
-  location: {
-    vi: 'Hà Nội, Việt Nam',
-    ja: 'ベトナム、ハノイ',
-    en: 'Hanoi, Vietnam'
-  },
-  logo: '/img/favi2.png',
-  banner: 'https://placehold.co/1200x400.png?text=Tải+lên+ảnh+bìa',
-  
-  about: {
-    vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
-    ja: 'ABC株式会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。...',
-    en: 'ABC Corporation is a leading company in supplying labor to the Japanese market. ...'
-  },
-  
-  images: [
-    { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' }, dataAiHint: 'modern office interior' },
-    { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Hoạt động đội nhóm', ja: 'チーム活動', en: 'Team Activity' }, dataAiHint: 'team building activity' },
-    { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Lễ ký kết hợp tác', ja: 'パートナーシップ調印式', en: 'Partnership Signing Ceremony' }, dataAiHint: 'partnership signing ceremony' },
-    { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Đào tạo nhân viên', ja: '従業員研修', en: 'Employee Training' }, dataAiHint: 'employee training session' },
-  ],
+const employersData: { [key: string]: any } = {
+    'Z000': {
+        id: 'Z000',
+        name: {
+            vi: 'Công ty Cổ phần ABC',
+            ja: 'ABC株式会社',
+            en: 'ABC Corporation'
+        },
+        type: {
+            vi: 'Công ty phái cử',
+            ja: '送り出し機関',
+            en: 'Dispatch Company'
+        },
+        location: {
+            vi: 'Hà Nội, Việt Nam',
+            ja: 'ベトナム、ハノイ',
+            en: 'Hanoi, Vietnam'
+        },
+        logo: '/img/favi2.png',
+        banner: 'https://placehold.co/1200x400.png?text=Tải+lên+ảnh+bìa',
+        
+        about: {
+            vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
+            ja: 'ABC株式会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。...',
+            en: 'ABC Corporation is a leading company in supplying labor to the Japanese market. ...'
+        },
+        
+        images: [
+            { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' }, dataAiHint: 'modern office interior' },
+            { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Hoạt động đội nhóm', ja: 'チーム活動', en: 'Team Activity' }, dataAiHint: 'team building activity' },
+            { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Lễ ký kết hợp tác', ja: 'パートナーシップ調印式', en: 'Partnership Signing Ceremony' }, dataAiHint: 'partnership signing ceremony' },
+            { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Đào tạo nhân viên', ja: '従業員研修', en: 'Employee Training' }, dataAiHint: 'employee training session' },
+        ],
 
-  history: [
-    { year: '2010', event: { vi: 'Thành lập công ty cổ phần ABC.', ja: 'ABC株式会社設立。', en: 'Established ABC Corporation.' } },
-    { year: '2015', event: { vi: 'Nhận giấy phép hoạt động dịch vụ đưa người lao động Việt Nam đi làm việc ở nước ngoài.', ja: 'ベトナム人労働者を海外に派遣するサービス活動許可を取得。', en: 'Received license to operate services for sending Vietnamese workers abroad.' } },
-  ],
+        history: [
+            { year: '2010', event: { vi: 'Thành lập công ty cổ phần ABC.', ja: 'ABC株式会社設立。', en: 'Established ABC Corporation.' } },
+            { year: '2015', event: { vi: 'Nhận giấy phép hoạt động dịch vụ đưa người lao động Việt Nam đi làm việc ở nước ngoài.', ja: 'ベトナム人労働者を海外に派遣するサービス活動許可を取得。', en: 'Received license to operate services for sending Vietnamese workers abroad.' } },
+        ],
 
-  info: {
-    founded: '2010',
-    size: { vi: '50 - 100 nhân viên', ja: '50～100名', en: '50 - 100 employees' },
-    website: 'https://abc-corp.co.jp',
-    license: 'Số 123/LĐTBXH-GP',
-    phone: '',
-    zalo: '',
-    messenger: '',
-    line: '',
-    email: ''
-  },
+        info: {
+            founded: '2010',
+            size: { vi: '50 - 100 nhân viên', ja: '50～100名', en: '50 - 100 employees' },
+            website: 'https://abc-corp.co.jp',
+            license: 'Số 123/LĐTBXH-GP',
+            phone: '',
+            zalo: '',
+            messenger: '',
+            line: '',
+            email: ''
+        },
 
-  industries: {
-    main: { vi: 'Xây dựng, Cơ khí, Nông nghiệp, Thực phẩm', ja: '建設、機械、農業、食品', en: 'Construction, Machinery, Agriculture, Food' },
-    secondary: { vi: 'Điều dưỡng, Dệt may, Điện tử', ja: '介護、繊維、電子', en: 'Nursing, Textile, Electronics' },
-  },
+        industries: {
+            main: { vi: 'Xây dựng, Cơ khí, Nông nghiệp, Thực phẩm', ja: '建設、機械、農業、食品', en: 'Construction, Machinery, Agriculture, Food' },
+            secondary: { vi: 'Điều dưỡng, Dệt may, Điện tử', ja: '介護、繊維、電子', en: 'Nursing, Textile, Electronics' },
+        },
 
-  benefits: [
-    { vi: 'Hỗ trợ đào tạo tiếng Nhật và kỹ năng chuyên môn trước khi bay.', ja: '渡航前の日本語・専門スキル研修をサポート。', en: 'Support for Japanese language and professional skills training before departure.' },
-    { vi: 'Cam kết chi phí minh bạch, rõ ràng, không phát sinh chi phí ẩn.', ja: '透明性の高い明確な費用、隠れたコストなしを約束。', en: 'Commitment to transparent, clear costs with no hidden fees.' },
-  ]
+        benefits: [
+            { vi: 'Hỗ trợ đào tạo tiếng Nhật và kỹ năng chuyên môn trước khi bay.', ja: '渡航前の日本語・専門スキル研修をサポート。', en: 'Support for Japanese language and professional skills training before departure.' },
+            { vi: 'Cam kết chi phí minh bạch, rõ ràng, không phát sinh chi phí ẩn.', ja: '透明性の高い明確な費用、隠れたコストなしを約束。', en: 'Commitment to transparent, clear costs with no hidden fees.' },
+        ]
+    },
 };
+
 
 // Initial empty state for the form
 const emptyEmployerData = {
@@ -254,22 +256,31 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 };
 
 
-export default function EmployerDetailPage({ params: paramsProp }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(paramsProp);
+export default function EmployerDetailPage({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
+  const id = params.id;
+
+  const employerData = employersData[id];
   
   const [lang, setLang] = useState<Language>('vi');
   
+  useEffect(() => {
+    if (!employerData) {
+        notFound();
+    }
+  }, [id, employerData]);
+
   useEffect(() => {
     const langFromParams = (searchParams.get('lang') || 'vi') as Language;
     setLang(langFromParams);
   }, [searchParams]);
 
-  if (resolvedParams.id !== 'Z000') {
-    notFound();
+  if (!employerData) {
+    // This will be caught by the useEffect above, but as a safeguard:
+    return null;
   }
   
-  const [employer, setEmployer] = useState({ ...emptyEmployerData });
+  const [employer, setEmployer] = useState({ ...employerData });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<{title: string, field: string } | null>(null);
   const [tempContent, setTempContent] = useState<any>('');
@@ -658,7 +669,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                   </SectionCard>
                   <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
                        <ul className="space-y-4">
-                          {employer.history.length > 0 ? employer.history.map((item, index) => (
+                          {employer.history.length > 0 ? employer.history.map((item: any, index: number) => (
                               <li key={index} className="relative pl-6">
                                   <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
                                   <p className="font-bold text-primary mb-1">{item.year}</p>
@@ -743,3 +754,5 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     </>
   );
 }
+
+    
