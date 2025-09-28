@@ -96,61 +96,59 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
           <DialogDescription>{content.description}</DialogDescription>
         </DialogHeader>
         
-        <div className="py-4 space-y-6 max-h-[60vh] overflow-y-auto pr-2">
-            <Card className="bg-secondary">
-                <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2"><Info className="h-5 w-5"/>{content.summaryTitle}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm space-y-2">
-                    <p><strong>Loại hình:</strong> {recruitmentPrefs?.desiredVisaType}</p>
-                    <p><strong>Chi tiết:</strong> {recruitmentPrefs?.desiredVisaDetail}</p>
-                    <p><strong>Ngành nghề:</strong> {recruitmentPrefs?.desiredIndustry}</p>
-                    <p><strong>Địa điểm:</strong> {recruitmentPrefs?.desiredLocation}</p>
-                    <p><strong>Phí giới thiệu:</strong> {formatNumber(recruitmentPrefs?.referralFee)} JPY</p>
-                    <p><strong>Phí quản lý:</strong> {formatNumber(recruitmentPrefs?.managementFee)} JPY/tháng</p>
-                </CardContent>
-            </Card>
+        <div className="py-4 space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+                <Card className="bg-secondary">
+                    <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2"><Info className="h-5 w-5"/>{content.summaryTitle}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm space-y-2">
+                        <p><strong>Loại hình:</strong> {recruitmentPrefs?.desiredVisaType}</p>
+                        <p><strong>Chi tiết:</strong> {recruitmentPrefs?.desiredVisaDetail}</p>
+                        <p><strong>Ngành nghề:</strong> {recruitmentPrefs?.desiredIndustry}</p>
+                        <p><strong>Địa điểm:</strong> {recruitmentPrefs?.desiredLocation}</p>
+                        <p><strong>Phí giới thiệu:</strong> {formatNumber(recruitmentPrefs?.referralFee)} JPY</p>
+                        <p><strong>Phí quản lý:</strong> {formatNumber(recruitmentPrefs?.managementFee)} JPY/tháng</p>
+                    </CardContent>
+                </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2"><Contact className="h-5 w-5"/>{content.contactTitle}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm space-y-2">
-                    <p><strong>{content.emailLabel}:</strong> {contactInfo?.email}</p>
-                    {contactInfo?.phone && <p><strong>{content.phoneLabel}:</strong> {contactInfo?.phone}</p>}
-                    {contactInfo?.zalo && <p><strong>{content.zaloLabel}:</strong> {contactInfo?.zalo}</p>}
-                    {contactInfo?.messenger && <p><strong>{content.messengerLabel}:</strong> {contactInfo?.messenger}</p>}
-                    {contactInfo?.line && <p><strong>{content.lineLabel}:</strong> {contactInfo?.line}</p>}
-                </CardContent>
-            </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2"><Contact className="h-5 w-5"/>{content.contactTitle}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm space-y-2">
+                        <p><strong>{content.emailLabel}:</strong> {contactInfo?.email}</p>
+                        {contactInfo?.phone && <p><strong>{content.phoneLabel}:</strong> {contactInfo?.phone}</p>}
+                        {contactInfo?.zalo && <p><strong>{content.zaloLabel}:</strong> {contactInfo?.zalo}</p>}
+                        {contactInfo?.messenger && <p><strong>{content.messengerLabel}:</strong> {contactInfo?.messenger}</p>}
+                        {contactInfo?.line && <p><strong>{content.lineLabel}:</strong> {contactInfo?.line}</p>}
+                    </CardContent>
+                </Card>
+            </div>
         </div>
 
-        <DialogFooter className="flex-col items-center gap-4 border-t pt-6">
-            <div className="w-full text-center space-y-3">
+        <DialogFooter className="flex-col md:flex-row md:justify-between items-center gap-4 border-t pt-6">
+            <div className="flex flex-col items-center md:items-start text-center md:text-left">
                 <p className="text-sm font-semibold">{content.supportTitle}</p>
-                <p className="text-sm">Email: <a href="mailto:chairman@hellojob.jp" className="text-primary hover:underline">chairman@hellojob.jp</a></p>
-                <div className="flex items-center justify-center gap-4">
-                    <div className="flex-shrink-0">
-                       <Logo />
-                    </div>
-                    <div className="flex justify-center gap-2">
-                       <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-500 hover:bg-green-50">
-                            <Link href="tel:0386667999"><Image src="/img/phone.svg" alt="Phone" width={20} height={20} /></Link>
-                        </Button>
-                        <Button asChild variant="outline" size="icon" className="h-10 w-10 border-blue-500 hover:bg-blue-50">
-                            <Link href="https://zalo.me/your_zalo_id"><ZaloIcon /></Link>
-                        </Button>
-                        <Button asChild variant="outline" size="icon" className="h-10 w-10 border-purple-500 hover:bg-purple-50">
-                            <Link href="https://m.me/your_user_id"><MessengerIcon /></Link>
-                        </Button>
-                        <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-700 hover:bg-green-100">
-                            <Link href="https://line.me/ti/p/~your_line_id"><LineIcon /></Link>
-                        </Button>
-                    </div>
+                <a href="mailto:chairman@hellojob.jp" className="text-sm text-primary hover:underline">Email: chairman@hellojob.jp</a>
+                <div className="flex items-center justify-center md:justify-start gap-3 mt-2">
+                    <Logo />
+                    <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-500 hover:bg-green-50">
+                        <Link href="tel:0386667999"><Image src="/img/phone.svg" alt="Phone" width={20} height={20} /></Link>
+                    </Button>
+                    <Button asChild variant="outline" size="icon" className="h-10 w-10 border-blue-500 hover:bg-blue-50">
+                        <Link href="https://zalo.me/your_zalo_id"><ZaloIcon /></Link>
+                    </Button>
+                    <Button asChild variant="outline" size="icon" className="h-10 w-10 border-purple-500 hover:bg-purple-50">
+                        <Link href="https://m.me/your_user_id"><MessengerIcon /></Link>
+                    </Button>
+                    <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-700 hover:bg-green-100">
+                        <Link href="https://line.me/ti/p/~your_line_id"><LineIcon /></Link>
+                    </Button>
                 </div>
             </div>
-            <div className="w-full flex justify-center pt-4">
-                 <Button onClick={onComplete} className="w-full md:w-auto">
+            <div className="w-full md:w-auto mt-4 md:mt-0 flex justify-center">
+                 <Button onClick={onComplete} className="w-full md:w-auto md:px-8">
                     {content.completeButton}
                 </Button>
             </div>
