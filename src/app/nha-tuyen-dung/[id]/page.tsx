@@ -38,10 +38,10 @@ const employersData: { [key: string]: any } = {
             en: 'Hanoi, Vietnam'
         },
         logo: '/img/favi2.png',
-        banner: 'https://picsum.photos/seed/company-banner/1200/400',
+        banner: 'https://placehold.co/1200x400.png?text=Ảnh+Bìa+Công+Ty',
         
         about: {
-            vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
+            vi: 'Ví dụ: Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
             ja: 'ABC株式会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。...',
             en: 'ABC Corporation is a leading company in supplying labor to the Japanese market. ...'
         },
@@ -294,9 +294,9 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 
 
 export default function EmployerDetailPage({ params: paramsProp }: { params: { id: string } }) {
-  const params = use(paramsProp);
+  const resolvedParams = use(paramsProp);
   const searchParams = useSearchParams();
-  const id = params.id;
+  const id = resolvedParams.id;
 
   const employerData = employersData[id];
   
@@ -794,3 +794,4 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
     </>
   );
 }
+
