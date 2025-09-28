@@ -13,7 +13,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Handshake, QrCode, Mail, Info } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { ZaloIcon, MessengerIcon, LineIcon } from './custom-icons';
 import Image from 'next/image';
@@ -75,6 +75,36 @@ const contentByLang = {
         completeButton: 'Complete & Send',
     }
 };
+
+const formatPhoneNumberInput = (value: string, country: string): string => {
+    if (!value) return '';
+    const cleanValue = value.replace(/\D/g, '');
+
+    if (country === '+84') { // Vietnam (10 digits starting with 0)
+        if (cleanValue.length === 0) return '';
+        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,10);
+        if (cleanValue.length === 1) return `(0)`;
+
+        const mobilePart = cleanValue.substring(1);
+        if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
+        if (mobilePart.length <= 6) return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3)}`;
+        return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
+    }
+
+    if (country === '+81') { // Japan (11 digits starting with 0)
+        if (cleanValue.length === 0) return '';
+        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,11);
+        if (cleanValue.length === 1) return `(0)`;
+        
+        const mobilePart = cleanValue.substring(1); 
+        if (mobilePart.length <= 2) return `(0)${mobilePart}`;
+        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2, 6)}`;
+        return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2,6)} ${mobilePart.slice(6,10)}`;
+    }
+
+    return cleanValue;
+};
+
 
 export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, recruitmentPrefs }: XL08DialogProps) {
   const [email, setEmail] = useState('');
@@ -155,7 +185,7 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                                         <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="phone" type="tel" placeholder="901234567" className="rounded-l-none" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))} />
+                                <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(phone, phoneCountry)} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))} />
                             </div>
                         </div>
                          <div className="space-y-2">
@@ -168,7 +198,7 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                                         <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="zalo" type="tel" placeholder="901234567" className="rounded-l-none" value={zalo} onChange={(e) => setZalo(e.target.value.replace(/\D/g, ''))} />
+                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(zalo, zaloCountry)} onChange={(e) => setZalo(e.target.value.replace(/\D/g, ''))} />
                                 <div className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
