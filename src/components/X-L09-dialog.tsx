@@ -91,7 +91,7 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
           <DialogDescription>{content.description}</DialogDescription>
         </DialogHeader>
         
-        <div className="py-4 space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+        <div className="py-4 space-y-6">
             <Card className="bg-secondary">
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2"><Info className="h-5 w-5"/>{content.summaryTitle}</CardTitle>
@@ -139,9 +139,11 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                     </Button>
                 </div>
             </div>
-            <Button onClick={onComplete} className="w-full sm:w-auto">
-                {content.completeButton}
-            </Button>
+            <div className="w-full flex justify-center md:pt-4">
+                 <Button onClick={onComplete} className="w-full md:w-auto">
+                    {content.completeButton}
+                </Button>
+            </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
