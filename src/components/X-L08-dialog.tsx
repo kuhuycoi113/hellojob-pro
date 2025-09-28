@@ -12,8 +12,8 @@ import {
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Handshake, QrCode, Mail, Phone } from 'lucide-react';
-import { Card, CardContent } from './ui/card';
+import { Handshake, QrCode, Mail, Phone, Info } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { ZaloIcon, MessengerIcon, LineIcon } from './custom-icons';
 import Image from 'next/image';
@@ -190,4 +190,3 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
     </Dialog>
   );
 }
-
