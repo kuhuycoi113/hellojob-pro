@@ -293,7 +293,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 };
 
 
-export default function EmployerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EmployerDetailPage({ params }: { params: { id: string } }) {
   const resolvedParams = use(params);
   const searchParams = useSearchParams();
   const id = resolvedParams.id;
@@ -420,7 +420,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
     } else if (field === 'benefits') {
        setTempContent((prev: any[]) => [...prev, { vi: '', ja: '', en: '' }]);
     } else if (field === 'images') {
-       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image' }];
+       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image' }]);
     }
   };
 
@@ -692,7 +692,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={()={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
+                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
                   <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -751,7 +751,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
                           </div>
                       )}
                   </SectionCard>
-                  <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={()={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
+                  <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
                           <p><strong>{t.mainIndustriesLabel}:</strong> {employer.industries.main[lang] || '...'}</p>
                           <p><strong>{t.secondaryIndustriesLabel}:</strong> {employer.industries.secondary[lang] || '...'}</p>
@@ -766,7 +766,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
                           )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
-                  <Button size="lg" className="w-full" onClick={()={() => console.log("Saving data:", employer)}>Lưu thay đổi</Button>
+                  <Button size="lg" className="w-full" onClick={() => console.log("Saving data:", employer)}>Lưu thay đổi</Button>
               </div>
             </div>
           </div>
@@ -794,5 +794,3 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
     </>
   );
 }
-
-    
