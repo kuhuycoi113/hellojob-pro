@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, use, useEffect } from 'react';
@@ -38,7 +37,7 @@ const employersData: { [key: string]: any } = {
             ja: 'ベトナム、ハノイ',
             en: 'Hanoi, Vietnam'
         },
-        logo: '/img/logo_fpt.png',
+        logo: '/img/viet-img/company2.png',
         banner: 'https://images.unsplash.com/photo-1549880181-56a44cf4a9a5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         
         about: {
@@ -294,17 +293,16 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 };
 
 
-export default function EmployerDetailPage({ params }: { params: { id: string } }) {
+export default function EmployerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const searchParams = useSearchParams();
   const id = resolvedParams.id;
-
-  const employerData = employersData[id];
   
   const [lang, setLang] = useState<Language>('vi');
   const [role, setRole] = useState<string | null>(null);
   
   useEffect(() => {
+    const employerData = employersData[id];
     if (!employerData) {
         notFound();
     }
@@ -313,14 +311,11 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     
     const roleFromParams = searchParams.get('role');
     setRole(roleFromParams);
-  }, [id, employerData, searchParams]);
-
-  if (!employerData) {
-    // This will be caught by the useEffect above, but as a safeguard:
-    return null;
-  }
+    // Initialize employer state with data based on ID
+    setEmployer({ ...employerData });
+  }, [id, searchParams]);
   
-  const [employer, setEmployer] = useState({ ...employerData });
+  const [employer, setEmployer] = useState<any | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<{title: string, field: string } | null>(null);
   const [tempContent, setTempContent] = useState<any>('');
@@ -328,6 +323,10 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
   const [zaloCountry, setZaloCountry] = useState('+84');
   const { toast } = useToast();
   const [errors, setErrors] = useState<{ email?: string; messenger?: string, line?: string }>({});
+
+  if (!employer) {
+      return <div>Loading...</div>; // Or a skeleton loader
+  }
   
   const t = contentByLang[lang] || contentByLang['vi'];
   const roleText = role && roleTexts[role] ? roleTexts[role][lang] : employer.type[lang];
@@ -421,7 +420,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     } else if (field === 'benefits') {
        setTempContent((prev: any[]) => [...prev, { vi: '', ja: '', en: '' }]);
     } else if (field === 'images') {
-       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image' }]);
+       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image' }];
     }
   };
 
@@ -693,7 +692,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <>{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button>.</>}</p>
+                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={()={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
                   <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -752,7 +751,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           </div>
                       )}
                   </SectionCard>
-                  <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
+                  <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={()={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
                           <p><strong>{t.mainIndustriesLabel}:</strong> {employer.industries.main[lang] || '...'}</p>
                           <p><strong>{t.secondaryIndustriesLabel}:</strong> {employer.industries.secondary[lang] || '...'}</p>
@@ -767,7 +766,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
-                  <Button size="lg" className="w-full" onClick={() => console.log("Saving data:", employer)}>Lưu thay đổi</Button>
+                  <Button size="lg" className="w-full" onClick={()={() => console.log("Saving data:", employer)}>Lưu thay đổi</Button>
               </div>
             </div>
           </div>
@@ -795,3 +794,5 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </>
   );
 }
+
+    
