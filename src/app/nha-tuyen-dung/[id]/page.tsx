@@ -37,7 +37,7 @@ const employersData: { [key: string]: any } = {
             ja: 'ベトナム、ハノイ',
             en: 'Hanoi, Vietnam'
         },
-        logo: 'public/img/viet-img/company3.png',
+        logo: '/img/viet-img/company3.png',
         banner: 'https://images.unsplash.com/photo-1549880181-56a44cf4a9a5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         
         about: {
@@ -47,10 +47,10 @@ const employersData: { [key: string]: any } = {
         },
         
         images: [
-            { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' }, dataAiHint: 'modern office interior' },
-            { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Hoạt động đội nhóm', ja: 'チーム活動', en: 'Team Activity' }, dataAiHint: 'team building activity' },
-            { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Lễ ký kết hợp tác', ja: 'パートナーシップ調印式', en: 'Partnership Signing Ceremony' }, dataAiHint: 'partnership signing ceremony' },
-            { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Đào tạo nhân viên', ja: '従業員研修', en: 'Employee Training' }, dataAiHint: 'employee training session' },
+            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' }, dataAiHint: 'modern office interior' },
+            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Hoạt động đội nhóm', ja: 'チーム活動', en: 'Team Activity' }, dataAiHint: 'team building activity' },
+            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Lễ ký kết hợp tác', ja: 'パートナーシップ調印式', en: 'Partnership Signing Ceremony' }, dataAiHint: 'partnership signing ceremony' },
+            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Đào tạo nhân viên', ja: '従業員研修', en: 'Employee Training' }, dataAiHint: 'employee training session' },
         ],
 
         history: [
@@ -81,32 +81,28 @@ const employersData: { [key: string]: any } = {
 const placeholderEmployerData = {
     ...employersData['Z000'],
     about: {
-        vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
-        ja: 'ABC株式会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。...',
-        en: 'ABC Corporation is a leading company in supplying labor to the Japanese market. ...'
+        vi: '',
+        ja: '',
+        en: ''
     },
     images: [
-        { alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' } },
-        { alt: { vi: 'Hoạt động đội nhóm', ja: 'チーム活動', en: 'Team Activity' } },
-        { alt: { vi: 'Lễ ký kết hợp tác', ja: 'パートナーシップ調印式', en: 'Partnership Signing Ceremony' } },
-        { alt: { vi: 'Đào tạo nhân viên', ja: '従業員研修', en: 'Employee Training' } },
+        { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
+        { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 2', ja: '新しい写真 2', en: 'New Photo 2' }, dataAiHint: 'new image 2' },
+        { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 3', ja: '新しい写真 3', en: 'New Photo 3' }, dataAiHint: 'new image 3' },
+        { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 4', ja: '新しい写真 4', en: 'New Photo 4' }, dataAiHint: 'new image 4' },
     ],
-    history: [
-        { event: { vi: 'Thành lập công ty.', ja: '会社設立。', en: 'Company established.' } },
-        { event: { vi: 'Đạt mốc 1000 lao động được phái cử.', ja: '派遣労働者1000人達成。', en: 'Reached 1000 dispatched workers.' } },
-    ],
+    history: [],
     info: {
-        founded: '2010',
-        size: { vi: '50 - 100 nhân viên', ja: '50～100名', en: '50 - 100 employees' },
-        license: '123/LĐTBXH-GP',
+        founded: '',
+        size: { vi: '', ja: '', en: '' },
+        license: '',
+        website: '',
     },
     industries: {
-        main: { vi: 'Xây dựng, Cơ khí, Nông nghiệp, Thực phẩm', ja: '建設、機械、農業、食品', en: 'Construction, Machinery, Agriculture, Food' },
-        secondary: { vi: 'Điều dưỡng, Dệt may, Điện tử', ja: '介護、繊維、電子', en: 'Nursing, Textile, Electronics' },
+        main: { vi: '', ja: '', en: '' },
+        secondary: { vi: '', ja: '', en: '' },
     },
-    benefits: [
-        { vi: 'Hỗ trợ đào tạo tiếng Nhật.', ja: '日本語研修をサポート。', en: 'Japanese language training support.' },
-    ]
+    benefits: []
 };
 
 
@@ -120,10 +116,10 @@ const emptyEmployerData = {
     banner: 'https://placehold.co/1200x400.png?text=Tải+lên+ảnh+bìa',
     about: { vi: '', ja: '', en: '' },
     images: [
-      { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 1' },
-      { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 2' },
-      { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 3' },
-      { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 4' },
+      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
+      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 2', ja: '新しい写真 2', en: 'New Photo 2' }, dataAiHint: 'new image 2' },
+      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 3', ja: '新しい写真 3', en: 'New Photo 3' }, dataAiHint: 'new image 3' },
+      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 4', ja: '新しい写真 4', en: 'New Photo 4' }, dataAiHint: 'new image 4' },
     ],
     history: [],
     info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '', phone: '', zalo: '', messenger: '', line: '', email: '' },
@@ -341,15 +337,15 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     let isValid = false;
     let errorMessage = "Định dạng không hợp lệ.";
 
-    if (field === 'messenger') {
+    if (field === 'email') {
+        isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        errorMessage = "Vui lòng nhập địa chỉ email hợp lệ.";
+    } else if (field === 'messenger') {
         isValid = /^(https?:\/\/(www\.)?(facebook|m)\.com\/|m\.me\/|[\w.]{5,})/.test(value);
         errorMessage = "Vui lòng nhập link Facebook/Messenger hoặc username hợp lệ.";
     } else if (field === 'line') {
         isValid = /^(https?:\/\/line\.me\/|@?[\w.-]+)/.test(value);
         errorMessage = "Vui lòng nhập link Line hoặc Line ID hợp lệ.";
-    } else if (field === 'email') {
-        isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-        errorMessage = "Vui lòng nhập địa chỉ email hợp lệ.";
     }
     
     if (isValid) {
@@ -370,7 +366,6 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
   const handleSaveChanges = () => {
     if (!editingModule) return;
     
-    // Validate all fields before saving
     let allValid = true;
     if (editingModule.field === 'info') {
         if (!validateField('email', tempContent.email || '')) allValid = false;
@@ -390,8 +385,13 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
             newState.name = tempContent.name;
             newState.type = tempContent.type;
             newState.location = tempContent.location;
+        } else if (field === 'info') {
+            const finalInfo = { ...tempContent };
+            if (finalInfo.messenger) finalInfo.messenger = parseMessengerInput(finalInfo.messenger);
+            if (finalInfo.line) finalInfo.line = parseLineInput(finalInfo.line);
+            if (finalInfo.zalo) finalInfo.zalo = parseZaloInput(finalInfo.zalo);
+            newState[field] = finalInfo;
         } else {
-            // @ts-ignore
             newState[field] = tempContent;
         }
         return newState;
@@ -421,7 +421,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     } else if (field === 'benefits') {
        setTempContent((prev: any[]) => [...prev, { vi: '', ja: '', en: '' }]);
     } else if (field === 'images') {
-       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image' }]);
+       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới', ja: '新しい写真', en: 'New Photo' }, dataAiHint: 'new image' }]);
     }
   };
 
@@ -447,6 +447,8 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                 const newState = JSON.parse(JSON.stringify(prev));
                  if (field === 'banner' || field === 'logo') {
                    newState[field] = newUrl;
+                 } else if (field === 'images' && index !== undefined) {
+                    newState.images[index].src = newUrl;
                  }
                 return newState;
             });
@@ -455,6 +457,14 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
       reader.readAsDataURL(file);
     }
   };
+
+   const handleDeleteImage = (index: number) => {
+        setEmployer((prev: any) => {
+            const newState = JSON.parse(JSON.stringify(prev));
+            newState.images[index] = placeholderEmployerData.images[index];
+            return newState;
+        });
+    };
   
   const renderEditContent = () => {
     if (!editingModule) return <p>Chức năng đang được phát triển.</p>;
@@ -463,9 +473,9 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         case 'header':
             return (
                  <div className="space-y-4">
-                    <div className="space-y-2"><Label>Tên công ty</Label><Input placeholder={placeholderEmployerData.name[lang]} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>Loại hình</Label><Input placeholder={placeholderEmployerData.type[lang]} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>Địa điểm</Label><Input placeholder={placeholderEmployerData.location[lang]} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>{t.namePlaceholder}</Label><Input placeholder={placeholderEmployerData.name[lang]} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>{t.typePlaceholder}</Label><Input placeholder={placeholderEmployerData.type[lang]} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>{t.locationPlaceholder}</Label><Input placeholder={placeholderEmployerData.location[lang]} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
                 </div>
             );
         case 'about':
@@ -704,6 +714,9 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                                         <Camera className="h-6 w-6 text-white"/>
                                    </Label>
                                    <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} />
+                                   <Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
+                                        <Trash2 className="h-3 w-3"/>
+                                   </Button>
                               </div>
                           ))}
                       </div>
@@ -795,5 +808,3 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </>
   );
 }
-
-    
