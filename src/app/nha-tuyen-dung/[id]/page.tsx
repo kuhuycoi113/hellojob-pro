@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle, Info, PlusCircle, Trash2, UploadCloud } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle, Info, PlusCircle, Trash2, UploadCloud, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
