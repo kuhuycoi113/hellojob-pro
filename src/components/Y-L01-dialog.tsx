@@ -93,6 +93,7 @@ export function YL01Dialog({
     onLanguageChange,
     initialLang = 'vi'
 }: YL01DialogProps) {
+  const router = useRouter();
   const [profileCreationStep, setProfileCreationStep] = useState(initialStep);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedPartnershipType, setSelectedPartnershipType] = useState<string | null>(null);
@@ -108,6 +109,16 @@ export function YL01Dialog({
       setCurrentLang(lang);
       onLanguageChange(lang);
   }
+
+  const handleRoleSelect = (roleId: string) => {
+    setSelectedRole(roleId);
+    // Navigate directly to Z000 with parameters
+    const params = new URLSearchParams();
+    params.set('role', roleId);
+    params.set('lang', currentLang);
+    router.push(`/nha-tuyen-dung/Z000?${params.toString()}`);
+    onOpenChange(false); // Close the dialog after navigation
+  };
 
   const handleComplete = (partnershipType: string) => {
     const preferences = {
@@ -157,11 +168,6 @@ export function YL01Dialog({
         const dialogTitles = { vi: 'Bạn là ai?', ja: 'あなたの役割をお選びください', en: 'What is your role?' };
         const dialogDescriptions = { vi: 'Chọn vai trò phù hợp nhất với bạn để chúng tôi có thể hỗ trợ tốt hơn.', ja: 'より良いサポートを提供するために、あなたに最も適した役割を選択してください。', en: 'Select the role that best fits you so we can provide better support.' };
 
-        const handleRoleSelect = (roleId: string) => {
-            setSelectedRole(roleId);
-            setProfileCreationStep(2);
-        };
-
         return (
             <>
                 <DialogHeader>
@@ -180,7 +186,7 @@ export function YL01Dialog({
                                 <Card 
                                     key={role.id} 
                                     onClick={() => handleRoleSelect(role.id)}
-                                    className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
+                                    className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center")}
                                 >
                                     <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
                                     <h3 className="font-bold text-base mb-1">{role.title}</h3>
@@ -194,60 +200,12 @@ export function YL01Dialog({
         );
   }
 
-    const PartnershipTypeStepDialog = () => {
-        const content = partnershipTypeContent[currentLang];
-        const options = [
-            { id: 'dang_viec', icon: Briefcase, color: 'text-blue-500' },
-            { id: 'gioi_thieu_ung_vien', icon: Users, color: 'text-green-500' },
-            { id: 'dang_viec_va_gioi_thieu', icon1: Briefcase, icon2: Users, color1: 'text-blue-500', color2: 'text-green-500' },
-            { id: 'gioi_thieu_va_dang_viec', icon1: Users, icon2: Briefcase, color1: 'text-green-500', color2: 'text-blue-500' },
-        ];
-
-        return (
-             <>
-                <DialogHeader>
-                    <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                    <DialogDescription className="text-center">{content.description}</DialogDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                    {options.map((option, index) => (
-                        <Card key={option.id} onClick={() => handleComplete(option.id)} className="text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center">
-                            {option.icon ? (
-                                <option.icon className={cn("h-10 w-10 mx-auto mb-3", option.color)} />
-                            ) : (
-                                <div className="flex justify-center items-center mb-3">
-                                    <option.icon1 className={cn("h-8 w-8", option.color1)} />
-                                    <Plus className="h-6 w-6 mx-1 text-muted-foreground" />
-                                    <option.icon2 className={cn("h-8 w-8", option.color2)} />
-                                </div>
-                            )}
-                            <h3 className="font-bold text-lg mb-1">{content.options[index]}</h3>
-                        </Card>
-                    ))}
-                </div>
-                 <div className="mt-6 text-center">
-                    <Button variant="link" onClick={() => setProfileCreationStep(1)}>
-                        {content.backButton}
-                    </Button>
-                </div>
-            </>
-        )
-    }
-
-  const renderDialogContent = () => {
-    switch (profileCreationStep) {
-      case 1: return <PartnerRoleStepDialog />;
-      case 2: return <PartnershipTypeStepDialog />;
-      default: return <PartnerRoleStepDialog />;
-    }
-  }
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setProfileCreationStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
           <DialogContent className="sm:max-w-4xl" id="Y001_Y002">
-              {renderDialogContent()}
+              <PartnerRoleStepDialog />
           </DialogContent>
       </Dialog>
     </>

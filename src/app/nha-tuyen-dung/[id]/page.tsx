@@ -233,6 +233,18 @@ const contentByLang = {
     }
 };
 
+const roleTexts: { [key: string]: { [keyof typeof contentByLang]: string } } = {
+  haken_staff: { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
+  jp_hr_staff: { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
+  dispatch: { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
+  support: { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
+  enterprise: { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
+  union: { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
+  shokai: { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Placement Agency' },
+  haken: { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
+};
+
+
 type Language = keyof typeof contentByLang;
 
 const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void }) => (
@@ -283,22 +295,23 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 
 export default function EmployerDetailPage({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
-  const { id } = use(params);
+  const id = use(params).id;
 
   const employerData = employersData[id];
   
   const [lang, setLang] = useState<Language>('vi');
+  const [role, setRole] = useState<string | null>(null);
   
   useEffect(() => {
     if (!employerData) {
         notFound();
     }
-  }, [id, employerData]);
-
-  useEffect(() => {
     const langFromParams = (searchParams.get('lang') || 'vi') as Language;
     setLang(langFromParams);
-  }, [searchParams]);
+    
+    const roleFromParams = searchParams.get('role');
+    setRole(roleFromParams);
+  }, [id, employerData, searchParams]);
 
   if (!employerData) {
     // This will be caught by the useEffect above, but as a safeguard:
@@ -315,6 +328,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
   const [errors, setErrors] = useState<{ email?: string; messenger?: string, line?: string }>({});
   
   const t = contentByLang[lang] || contentByLang['vi'];
+  const roleText = role && roleTexts[role] ? roleTexts[role][lang] : employer.type[lang];
 
   const validateField = (field: 'messenger' | 'line' | 'email', value: string) => {
     if (!value) {
@@ -534,7 +548,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                                           <SelectItem value="+81">JP</SelectItem>
                                       </SelectContent>
                                   </Select>
-                                  <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
                               </div>
                           </div>
                           <div className="space-y-2">
@@ -661,7 +675,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                       </div>
                       <div className="flex-grow pt-16 md:pt-20">
                           <h1 className="text-2xl md:text-3xl font-headline font-bold">{employer.name[lang] || `[${t.namePlaceholder}]`}</h1>
-                          <p className="font-semibold text-primary">{employer.type[lang] || `[${t.typePlaceholder}]`}</p>
+                          <p className="font-semibold text-primary">{roleText}</p>
                           <p className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                       </div>
                       <div className="absolute top-0 right-0 md:pt-20">
@@ -759,7 +773,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
       </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent id="THONGTINDOANHNGHIEP01" className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
           </DialogHeader>
