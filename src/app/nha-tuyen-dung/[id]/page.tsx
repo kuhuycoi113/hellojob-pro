@@ -97,7 +97,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         const newState = { ...prev };
         const { field } = editingModule;
 
-        if (field === 'info' || field === 'industries') {
+        if (field === 'info' || field === 'industries' || field === 'benefits' || field === 'history') {
             // @ts-ignore
             newState[field] = tempContent;
         } else if (field.startsWith('info.')) {
@@ -205,6 +205,57 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </div>
   );
 
+    const renderHistoryEdit = () => {
+    const handleHistoryChange = (index: number, field: 'year' | 'event', value: string) => {
+        const newHistory = [...tempContent];
+        newHistory[index] = { ...newHistory[index], [field]: value };
+        setTempContent(newHistory);
+    };
+
+    const addHistoryItem = () => {
+        setTempContent([...tempContent, { year: '', event: '' }]);
+    };
+
+    const removeHistoryItem = (index: number) => {
+        setTempContent(tempContent.filter((_: any, i: number) => i !== index));
+    };
+
+    return (
+        <div className="space-y-4">
+            {tempContent.map((item: { year: string, event: string }, index: number) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-7 gap-4 p-4 border rounded-lg relative items-end">
+                    <div className="md:col-span-2 space-y-2">
+                        <Label htmlFor={`history-year-${index}`}>Năm</Label>
+                        <Input
+                            id={`history-year-${index}`}
+                            value={item.year}
+                            onChange={(e) => handleHistoryChange(index, 'year', e.target.value)}
+                            placeholder="2024"
+                        />
+                    </div>
+                    <div className="md:col-span-4 space-y-2">
+                        <Label htmlFor={`history-event-${index}`}>Sự kiện</Label>
+                        <Input
+                            id={`history-event-${index}`}
+                            value={item.event}
+                            onChange={(e) => handleHistoryChange(index, 'event', e.target.value)}
+                            placeholder="Mô tả sự kiện"
+                        />
+                    </div>
+                    <div className="flex items-end">
+                        <Button variant="ghost" size="icon" onClick={() => removeHistoryItem(index)}>
+                            <Trash2 className="h-5 w-5 text-destructive" />
+                        </Button>
+                    </div>
+                </div>
+            ))}
+            <Button variant="outline" onClick={addHistoryItem} className="w-full">
+                <PlusCircle className="mr-2 h-4 w-4" /> Thêm mốc sự kiện
+            </Button>
+        </div>
+    );
+};
+
 
   const renderEditContent = () => {
     if (!editingModule) return null;
@@ -217,6 +268,8 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
             return renderBenefitsEdit();
         case 'industries':
             return renderIndustriesEdit();
+        case 'history':
+            return renderHistoryEdit();
         default:
             return <p>Chức năng này đang được phát triển. Vui lòng quay lại sau.</p>;
     }
@@ -284,7 +337,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           ))}
                       </div>
                   </SectionCard>
-                  <SectionCard title="Lịch sử &amp; các mốc sự kiện" icon={History} onEditClick={() => handleEditClick('Lịch sử', '', 'history')}>
+                  <SectionCard title="Lịch sử &amp; các mốc sự kiện" icon={History} onEditClick={() => handleEditClick('Lịch sử & các mốc sự kiện', employer.history, 'history')}>
                       <ul className="space-y-4">
                           {employer.history.map((item, index) => (
                               <li key={index} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:rounded-full before:bg-primary">
@@ -306,13 +359,13 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           <p><strong>Website:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a></p>
                       </div>
                   </SectionCard>
-                  <SectionCard title="Ngành nghề &amp; Lĩnh vực" icon={Briefcase} onEditClick={() => handleEditClick('Ngành nghề &amp; Lĩnh vực', employer.industries, 'industries')}>
+                  <SectionCard title="Ngành nghề &amp; Lĩnh vực" icon={Briefcase} onEditClick={() => handleEditClick('Ngành nghề & Lĩnh vực', employer.industries, 'industries')}>
                       <div className="space-y-3 text-sm">
                           <p><strong>Ngành nghề chính:</strong> {employer.industries.main}</p>
                           <p><strong>Ngành nghề khác:</strong> {employer.industries.secondary}</p>
                       </div>
                   </SectionCard>
-                  <SectionCard title="Phúc lợi &amp; Môi trường" icon={Award} onEditClick={() => handleEditClick('Phúc lợi &amp; Môi trường', employer.benefits, 'benefits')}>
+                  <SectionCard title="Phúc lợi &amp; Môi trường" icon={Award} onEditClick={() => handleEditClick('Phúc lợi & Môi trường', employer.benefits, 'benefits')}>
                       <ul className="space-y-2 text-sm">
                           {employer.benefits.map((benefit, index) => (
                               <li key={index} className="flex items-start gap-2">
@@ -340,7 +393,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
             <DialogClose asChild>
                 <Button variant="outline">Hủy</Button>
             </DialogClose>
-             {(editingModule?.field === 'about' || editingModule?.field === 'info' || editingModule?.field === 'benefits' || editingModule?.field === 'industries') && (
+             {(editingModule?.field === 'about' || editingModule?.field === 'info' || editingModule?.field === 'benefits' || editingModule?.field === 'industries' || editingModule?.field === 'history') && (
                 <Button onClick={handleSaveChanges}>Lưu thay đổi</Button>
              )}
           </DialogFooter>
