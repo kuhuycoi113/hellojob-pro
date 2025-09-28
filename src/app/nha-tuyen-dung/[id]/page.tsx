@@ -6,7 +6,7 @@ import { notFound, useSearchParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -67,7 +67,8 @@ const placeholderEmployerData = {
     phone: '0123456789',
     zalo: '0123456789',
     messenger: 'abccorp.fb',
-    line: 'abccorp.line'
+    line: 'abccorp.line',
+    email: 'contact@abc-corp.co.jp'
   },
 
   industries: {
@@ -97,7 +98,7 @@ const emptyEmployerData = {
       { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 4' },
     ],
     history: [],
-    info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '', phone: '', zalo: '', messenger: '', line: '' },
+    info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '', phone: '', zalo: '', messenger: '', line: '', email: '' },
     industries: { main: { vi: '', ja: '', en: '' }, secondary: { vi: '', ja: '', en: '' } },
     benefits: []
 };
@@ -114,17 +115,25 @@ const contentByLang = {
         sizeLabel: 'Quy mô',
         licenseLabel: 'Giấy phép',
         websiteLabel: 'Website',
+        emailLabel: 'Email liên hệ',
         phoneLabel: 'Số điện thoại',
         zaloLabel: 'Zalo',
-        messengerLabel: 'Messenger',
+        messengerLabel: 'Facebook Messenger',
+        messengerPlaceholder: 'Dán link Facebook / Messenger hoặc username',
+        messengerHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
         lineLabel: 'Line',
+        linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
+        lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
+        notUpdated: 'Chưa có thông tin',
+        clickToUpdate: 'Nhấn để cập nhật',
+        headerTitle: 'Thông tin chung',
         industriesTitle: 'Ngành nghề & Lĩnh vực',
         mainIndustriesLabel: 'Ngành nghề chính',
         secondaryIndustriesLabel: 'Ngành nghề khác',
         benefitsTitle: 'Phúc lợi & Môi trường',
-        notUpdated: 'Chưa có thông tin',
-        clickToUpdate: 'Nhấn để cập nhật',
-        headerTitle: 'Thông tin chung',
+        contactTitle: 'Thông tin liên hệ',
+        registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
+        registerAction: 'Đăng ký',
     },
     ja: {
         edit: '編集',
@@ -136,17 +145,25 @@ const contentByLang = {
         sizeLabel: '従業員数',
         licenseLabel: '許可証',
         websiteLabel: 'ウェブサイト',
+        emailLabel: '連絡先メールアドレス',
         phoneLabel: '電話番号',
         zaloLabel: 'Zalo',
-        messengerLabel: 'メッセンジャー',
+        messengerLabel: 'Facebookメッセンジャー',
+        messengerPlaceholder: 'Facebook/Messengerのリンクまたはユーザー名',
+        messengerHelper: 'システムが自動的にユーザー名を取得します。',
         lineLabel: 'Line',
+        linePlaceholder: 'LineのリンクまたはIDを入力してください',
+        lineHelper: 'システムが自動的にユーザー名を取得します。',
+        notUpdated: '情報がありません',
+        clickToUpdate: 'クリックして更新',
+        headerTitle: '一般情報',
         industriesTitle: '業種と分野',
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: 'その他の業種',
         benefitsTitle: '福利厚生と環境',
-        notUpdated: '情報がありません',
-        clickToUpdate: 'クリックして更新',
-        headerTitle: '一般情報',
+        contactTitle: '連絡先情報',
+        registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
+        registerAction: '登録',
     },
     en: {
         edit: 'Edit',
@@ -158,17 +175,25 @@ const contentByLang = {
         sizeLabel: 'Company Size',
         licenseLabel: 'License',
         websiteLabel: 'Website',
+        emailLabel: 'Contact Email',
         phoneLabel: 'Phone',
         zaloLabel: 'Zalo',
-        messengerLabel: 'Messenger',
+        messengerLabel: 'Facebook Messenger',
+        messengerPlaceholder: 'Paste Facebook/Messenger link or username',
+        messengerHelper: 'The system will automatically extract your username.',
         lineLabel: 'Line',
+        linePlaceholder: 'Paste Line link or enter your ID',
+        lineHelper: 'The system will automatically extract your username.',
+        notUpdated: 'Not available',
+        clickToUpdate: 'Click to update',
+        headerTitle: 'General Information',
         industriesTitle: 'Industries & Sectors',
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Other Industries',
         benefitsTitle: 'Benefits & Environment',
-        notUpdated: 'Not available',
-        clickToUpdate: 'Click to update',
-        headerTitle: 'General Information',
+        contactTitle: 'Contact Information',
+        registerCTA: 'Provide at least 1 contact method to',
+        registerAction: 'Register',
     }
 };
 
@@ -338,13 +363,19 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
         case 'info':
              return (
                 <div className="space-y-4">
-                    <div className="space-y-2"><Label>{t.foundedLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>{t.websiteLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} /></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2"><Label>{t.foundedLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
+                        <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>{t.emailLabel}</Label><Input type="email" placeholder={`contact@company.com`} value={tempContent.email || ''} onChange={(e) => setTempContent({...tempContent, email: e.target.value})} /></div>
+                    </div>
+                     <div className="space-y-2">
+                        <Label>{t.websiteLabel}</Label>
+                        <Input placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} />
+                    </div>
                     
                     <div className="pt-4 border-t">
-                      <h4 className="font-semibold mb-4">Thông tin liên hệ</h4>
+                      <h4 className="font-semibold mb-4">{t.contactTitle}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
                               <Label htmlFor="phone" className="flex items-center gap-2">
@@ -385,6 +416,8 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                                 placeholder={t.messengerPlaceholder}
                                 value={tempContent.messenger}
                                 onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})}
+                                onBlur={(e) => {}}
+                                className={cn(errors.messenger && "border-destructive")}
                             />
                             <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>
                         </div>
@@ -395,12 +428,14 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                                 placeholder={t.linePlaceholder}
                                 value={tempContent.line}
                                 onChange={(e) => setTempContent({...tempContent, line: e.target.value})}
+                                onBlur={(e) => {}}
+                                className={cn(errors.line && "border-destructive")}
                             />
                             <p className="text-xs text-muted-foreground">{t.lineHelper}</p>
                         </div>
                       </div>
-                      <div className="text-center mt-4 text-sm text-muted-foreground">
-                          Cung cấp ít nhất 1 phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Đăng ký</Badge>
+                      <div className="text-center mt-4">
+                        <div className="text-sm text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                       </div>
                   </div>
                 </div>
@@ -526,8 +561,8 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                             <MessengerIcon className="h-6 w-6" />
                             <LineIcon className="h-6 w-6" />
                         </div>
-                        <div className="text-xs text-muted-foreground mt-4 text-center">
-                          Cung cấp ít nhất 1 phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Đăng ký</Badge>
+                        <div className="text-center text-sm">
+                           <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                         </div>
                     </div>
                   </SectionCard>
