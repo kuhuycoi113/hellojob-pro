@@ -11,6 +11,7 @@ import { XL01Dialog } from '@/components/X-L01-dialog';
 import { XL06Dialog } from '@/components/X-L06-dialog';
 import { XL07Dialog } from '@/components/X-L07-dialog';
 import { XL08Dialog } from '@/components/X-L08-dialog';
+import { XL09Dialog } from '@/components/X-L09-dialog';
 
 
 const partnerBenefits = [
@@ -57,9 +58,10 @@ export default function NhaTuyenDungPage() {
   const [isXL06DialogOpen, setIsXL06DialogOpen] = useState(false);
   const [isXL07DialogOpen, setIsXL07DialogOpen] = useState(false);
   const [isXL08DialogOpen, setIsXL08DialogOpen] = useState(false);
+  const [isXL09DialogOpen, setIsXL09DialogOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
   const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
-  const [referralFee, setReferralFee] = useState<string>('');
+  const [contactInfo, setContactInfo] = useState<any>(null);
 
   const handleXL01Complete = (preferences: any) => {
     console.log("X-L01 Completed with:", preferences);
@@ -70,23 +72,31 @@ export default function NhaTuyenDungPage() {
   
   const handleXL06Complete = (fee: string) => {
     console.log("X006 (Referral Fee) selected:", fee);
-    setReferralFee(fee);
+    setRecruitmentPrefs((prev: any) => ({ ...prev, referralFee: fee }));
     setIsXL06DialogOpen(false);
     setIsXL07DialogOpen(true);
   };
 
   const handleXL07Complete = (fee: string) => {
     console.log("XL07 (Management Fee) selected:", fee);
-    const finalPrefs = { ...recruitmentPrefs, referralFee, managementFee: fee };
-    setRecruitmentPrefs(finalPrefs);
+    setRecruitmentPrefs((prev: any) => ({ ...prev, managementFee: fee }));
     setIsXL07DialogOpen(false);
     setIsXL08DialogOpen(true);
   };
   
-  const handleXL08Complete = (contactInfo: any) => {
-    console.log("X-L08 Completed. Final Data:", { ...recruitmentPrefs, contactInfo });
+  const handleXL08Complete = (contactData: any) => {
+    console.log("X-L08 Completed. Final Data:", { ...recruitmentPrefs, ...contactData });
+    setContactInfo(contactData);
     setIsXL08DialogOpen(false);
-    // Show success toast or navigate to a thank you page
+    setIsXL09DialogOpen(true);
+  };
+  
+  const handleFinalComplete = () => {
+    setIsXL09DialogOpen(false);
+    // Reset all state for a new flow
+    setRecruitmentPrefs(null);
+    setContactInfo(null);
+    setSelectedLang('vi');
   };
 
 
@@ -248,6 +258,18 @@ export default function NhaTuyenDungPage() {
             setIsXL07DialogOpen(true);
         }}
         recruitmentPrefs={recruitmentPrefs}
+        lang={selectedLang}
+      />
+       <XL09Dialog
+        isOpen={isXL09DialogOpen}
+        onOpenChange={setIsXL09DialogOpen}
+        onComplete={handleFinalComplete}
+        onBack={() => {
+            setIsXL09DialogOpen(false);
+            setIsXL08DialogOpen(true);
+        }}
+        recruitmentPrefs={recruitmentPrefs}
+        contactInfo={contactInfo}
         lang={selectedLang}
       />
     </>
