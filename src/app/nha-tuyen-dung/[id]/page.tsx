@@ -155,10 +155,10 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
     </Card>
 );
 
-export default function EmployerDetailPage({ params }: { params: { id: string } }) {
-  const resolvedParams = use(params);
+export default function EmployerDetailPage({ params: paramsProp }: { params: { id: string } }) {
+  const params = use(paramsProp);
   
-  if (resolvedParams.id !== 'Z000') {
+  if (params.id !== 'Z000') {
     notFound();
   }
 
@@ -398,8 +398,8 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <p><strong>{t.mainIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={employer.industries.main[lang]} onChange={(e) => setEmployer({...employer, industries: {...employer.industries, main: {...employer.industries.main, [lang]: e.target.value}}})} /></p>
-                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={employer.industries.secondary[lang]} onChange={(e) => setEmployer({...employer, industries: {...employer.industries.secondary, [lang]: e.target.value}}})} /></p>
+                          <p><strong>{t.mainIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={employer.industries.main[lang]} onChange={(e) => setEmployer(prev => ({...prev, industries: {...prev.industries, main: {...prev.industries.main, [lang]: e.target.value}} }))} /></p>
+                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={employer.industries.secondary[lang]} onChange={(e) => setEmployer(prev => ({...prev, industries: {...prev.industries, secondary: {...prev.industries.secondary, [lang]: e.target.value}}}))} /></p>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
