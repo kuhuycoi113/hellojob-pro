@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, use, useEffect } from 'react';
@@ -86,9 +85,9 @@ const employersData: { [key: string]: any } = {
 const placeholderEmployerData = {
     ...employersData['Z000'],
     about: {
-        vi: 'Ví dụ: Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
-        ja: '例えば、ABC株式会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。...',
-        en: 'For example, ABC Corporation is a leading company in supplying labor to the Japanese market. ...'
+        vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
+        ja: 'ABC株式会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。...',
+        en: 'ABC Corporation is a leading company in supplying labor to the Japanese market. ...'
     },
     images: [
         { alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' } },
@@ -388,7 +387,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         return;
     }
 
-    setEmployer(prev => {
+    setEmployer((prev: any) => {
         const newState = { ...prev };
         const { field } = editingModule;
         if (field === 'header') {
@@ -448,7 +447,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                 return newImages;
             });
         } else {
-            setEmployer(prev => {
+            setEmployer((prev: any) => {
                 const newState = JSON.parse(JSON.stringify(prev));
                  if (field === 'banner' || field === 'logo') {
                    newState[field] = newUrl;
@@ -474,7 +473,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                 </div>
             );
         case 'about':
-            return <Textarea className="min-h-[150px]" placeholder={placeholderEmployerData.about[lang]} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />;
+            return <Textarea className="min-h-[150px]" placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />;
         
         case 'images':
             return (
