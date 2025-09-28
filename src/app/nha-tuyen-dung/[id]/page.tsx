@@ -38,11 +38,11 @@ const employersData: { [key: string]: any } = {
             ja: 'ベトナム、ハノイ',
             en: 'Hanoi, Vietnam'
         },
-        logo: '/img/viet-img/company2.png',
+        logo: '/img/viet-img/company3.png',
         banner: 'https://images.unsplash.com/photo-1549880181-56a44cf4a9a5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         
         about: {
-            vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
+            vi: 'Ví dụ: Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
             ja: 'ABC株式会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。...',
             en: 'ABC Corporation is a leading company in supplying labor to the Japanese market. ...'
         },
@@ -85,6 +85,11 @@ const employersData: { [key: string]: any } = {
 
 const placeholderEmployerData = {
     ...employersData['Z000'],
+    about: {
+        vi: 'Ví dụ: Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
+        ja: '例えば、ABC株式会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。...',
+        en: 'For example, ABC Corporation is a leading company in supplying labor to the Japanese market. ...'
+    },
     images: [
         { alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' } },
         { alt: { vi: 'Hoạt động đội nhóm', ja: 'チーム活動', en: 'Team Activity' } },
@@ -469,7 +474,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                 </div>
             );
         case 'about':
-            return <Textarea className="min-h-[150px]" placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />;
+            return <Textarea className="min-h-[150px]" placeholder={placeholderEmployerData.about[lang]} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />;
         
         case 'images':
             return (
@@ -795,3 +800,5 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </>
   );
 }
+
+    
