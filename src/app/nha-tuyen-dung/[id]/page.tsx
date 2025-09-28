@@ -1,13 +1,13 @@
-
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Calendar, MapPin, Users, Video, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera } from 'lucide-react';
+import { Building, Calendar, MapPin, Users, Video, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 // Mock data based on the provided image
 const mockEmployerData = {
@@ -200,4 +200,3 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </div>
   );
 }
-
