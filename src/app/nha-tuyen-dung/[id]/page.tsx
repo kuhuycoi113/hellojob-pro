@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, use, useEffect } from 'react';
@@ -39,7 +38,7 @@ const employersData: { [key: string]: any } = {
             en: 'Hanoi, Vietnam'
         },
         logo: '/img/favi2.png',
-        banner: 'https://picsum.photos/seed/z000banner/1200/400',
+        banner: '/img/viet-img/phong-van (3).jpg',
         
         about: {
             vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
@@ -542,16 +541,16 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                                 <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
                                 {t.phoneLabel}
                               </Label>
-                              <div className="flex items-center">
-                                  <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-                                      <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
-                                      <SelectContent>
-                                          <SelectItem value="+84">VN</SelectItem>
-                                          <SelectItem value="+81">JP</SelectItem>
-                                      </SelectContent>
-                                  </Select>
+                             <div className="flex items-center">
+                                <Select value={phoneCountry} onValueChange={setPhoneCountry}>
+                                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="+84">VN</SelectItem>
+                                        <SelectItem value="+81">JP</SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
-                              </div>
+                            </div>
                           </div>
                           <div className="space-y-2">
                               <Label htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
@@ -592,7 +591,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
-                             {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
+                            {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                       </div>
@@ -693,7 +692,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || `${t.notUpdated}, `}<button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button>.</p>
+                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || `${t.notUpdated}, `}<button className="underline text-primary" onClick={()={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button>.</p>
                   </SectionCard>
                   <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -716,7 +715,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                                   <p className="font-bold text-primary mb-1">{item.year}</p>
                                   <p className="text-sm text-muted-foreground">{item.event[lang]}</p>
                               </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={()={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
               </div>
@@ -752,22 +751,22 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           </div>
                       )}
                   </SectionCard>
-                  <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
+                  <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={()={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
                           <p><strong>{t.mainIndustriesLabel}:</strong> {employer.industries.main[lang] || '...'}</p>
                           <p><strong>{t.secondaryIndustriesLabel}:</strong> {employer.industries.secondary[lang] || '...'}</p>
                       </div>
                   </SectionCard>
-                  <SectionCard title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
+                  <SectionCard title={t.benefitsTitle} icon={Award} onEditClick={()={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
                       <ul className="space-y-2 text-sm">
                           {employer.benefits.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
                               <li key={index} className="flex items-start gap-2">
                                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span>{benefit[lang]}</span>
                               </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={()={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
-                  <Button size="lg" className="w-full" onClick={() => console.log("Saving data:", employer)}>Lưu thay đổi</Button>
+                  <Button size="lg" className="w-full" onClick={()={() => console.log("Saving data:", employer)}>Lưu thay đổi</Button>
               </div>
             </div>
           </div>
@@ -795,3 +794,5 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </>
   );
 }
+
+    
