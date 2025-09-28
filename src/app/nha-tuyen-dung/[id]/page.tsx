@@ -127,6 +127,9 @@ const contentByLang = {
         notUpdated: 'Chưa có thông tin',
         clickToUpdate: 'Nhấn để cập nhật',
         headerTitle: 'Thông tin chung',
+        namePlaceholder: 'Ví dụ: Công ty Cổ phần TVC',
+        typePlaceholder: 'Ví dụ: Công ty phái cử',
+        locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
         industriesTitle: 'Ngành nghề & Lĩnh vực',
         mainIndustriesLabel: 'Ngành nghề chính',
         secondaryIndustriesLabel: 'Ngành nghề khác',
@@ -157,6 +160,9 @@ const contentByLang = {
         notUpdated: '情報がありません',
         clickToUpdate: 'クリックして更新',
         headerTitle: '一般情報',
+        namePlaceholder: '例: TVC株式会社',
+        typePlaceholder: '例: 送り出し機関',
+        locationPlaceholder: '例: ベトナム、ハノイ',
         industriesTitle: '業種と分野',
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: 'その他の業種',
@@ -187,6 +193,9 @@ const contentByLang = {
         notUpdated: 'Not available',
         clickToUpdate: 'Click to update',
         headerTitle: 'General Information',
+        namePlaceholder: 'E.g., TVC Corporation',
+        typePlaceholder: 'E.g., Dispatch Company',
+        locationPlaceholder: 'E.g., Hanoi, Vietnam',
         industriesTitle: 'Industries & Sectors',
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Other Industries',
@@ -488,19 +497,19 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                           </div>
                           <div className="space-y-2">
                               <Label htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
-                              <div className="flex items-center relative">
-                                  <Select value={zaloCountry} onValueChange={setZaloCountry}>
-                                      <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
-                                      <SelectContent>
-                                          <SelectItem value="+84">VN</SelectItem>
-                                          <SelectItem value="+81">JP</SelectItem>
-                                      </SelectContent>
-                                  </Select>
-                                  <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
+                             <div className="flex items-center relative">
+                                <Select value={zaloCountry} onValueChange={setZaloCountry}>
+                                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="+84">VN</SelectItem>
+                                        <SelectItem value="+81">JP</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
                                 <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
-                              </div>
+                            </div>
                           </div>
                           <div className="space-y-1">
                              <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
@@ -609,9 +618,9 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
                       <div className="flex-grow pt-16 md:pt-20">
-                          <h1 className="text-2xl md:text-3xl font-headline font-bold">{employer.name[lang] || `[${t.headerTitle}]`}</h1>
-                          <p className="font-semibold text-primary">{employer.type[lang]}</p>
-                          <p className="text-sm text-muted-foreground">{employer.location[lang]}</p>
+                          <h1 className="text-2xl md:text-3xl font-headline font-bold">{employer.name[lang] || `[${t.namePlaceholder}]`}</h1>
+                          <p className="font-semibold text-primary">{employer.type[lang] || `[${t.typePlaceholder}]`}</p>
+                          <p className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                       </div>
                       <div className="absolute top-0 right-0 md:pt-20">
                         <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: employer.type, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
@@ -729,4 +738,3 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
   );
 }
 
-    
