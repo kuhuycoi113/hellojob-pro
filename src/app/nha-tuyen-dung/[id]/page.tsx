@@ -6,7 +6,7 @@ import { notFound, useSearchParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -14,6 +14,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { JpFlagIcon, EnFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon } from '@/components/custom-icons';
+import { Badge } from '@/components/ui/badge';
 
 // Mock data now serves as placeholders
 const placeholderEmployerData = {
@@ -59,6 +61,10 @@ const placeholderEmployerData = {
     size: { vi: '50 - 100 nhân viên', ja: '50～100名', en: '50 - 100 employees' },
     website: 'https://abc-corp.co.jp',
     license: 'Số 123/LĐTBXH-GP',
+    phone: '0123456789',
+    zalo: '0123456789',
+    messenger: 'abccorp.fb',
+    line: 'abccorp.line'
   },
 
   industries: {
@@ -88,7 +94,7 @@ const emptyEmployerData = {
       { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 4' },
     ],
     history: [],
-    info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '' },
+    info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '', phone: '', zalo: '', messenger: '', line: '' },
     industries: { main: { vi: '', ja: '', en: '' }, secondary: { vi: '', ja: '', en: '' } },
     benefits: []
 };
@@ -105,6 +111,10 @@ const contentByLang = {
         sizeLabel: 'Quy mô',
         licenseLabel: 'Giấy phép',
         websiteLabel: 'Website',
+        phoneLabel: 'Số điện thoại',
+        zaloLabel: 'Zalo',
+        messengerLabel: 'Messenger',
+        lineLabel: 'Line',
         industriesTitle: 'Ngành nghề & Lĩnh vực',
         mainIndustriesLabel: 'Ngành nghề chính',
         secondaryIndustriesLabel: 'Ngành nghề khác',
@@ -123,6 +133,10 @@ const contentByLang = {
         sizeLabel: '従業員数',
         licenseLabel: '許可証',
         websiteLabel: 'ウェブサイト',
+        phoneLabel: '電話番号',
+        zaloLabel: 'Zalo',
+        messengerLabel: 'メッセンジャー',
+        lineLabel: 'Line',
         industriesTitle: '業種と分野',
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: 'その他の業種',
@@ -141,6 +155,10 @@ const contentByLang = {
         sizeLabel: 'Company Size',
         licenseLabel: 'License',
         websiteLabel: 'Website',
+        phoneLabel: 'Phone',
+        zaloLabel: 'Zalo',
+        messengerLabel: 'Messenger',
+        lineLabel: 'Line',
         industriesTitle: 'Industries & Sectors',
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Other Industries',
@@ -217,6 +235,8 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
       const newArray = [...prev];
       if (typeof newArray[index] === 'object' && newArray[index] !== null && 'event' in newArray[index]) { // History object
         newArray[index] = { ...newArray[index], [field]: { ...newArray[index][field], [lang]: value } };
+      } else if (typeof newArray[index] === 'object' && newArray[index] !== null && 'alt' in newArray[index]) { // Image object
+         newArray[index] = { ...newArray[index], alt: { ...newArray[index].alt, [lang]: value } };
       } else if (typeof newArray[index] === 'object' && newArray[index] !== null) { // Benefits object
         newArray[index] = { ...newArray[index], [lang]: value };
       }
@@ -284,13 +304,9 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                          <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover rounded-md"/>
                       </div>
                       <Input 
-                        placeholder={`Ví dụ: ${placeholderEmployerData.images[index]?.alt[lang] || ''}`}
+                        placeholder={`Ví dụ: ${placeholderEmployerData.images[index]?.alt[lang] || 'Văn phòng hiện đại'}`}
                         value={img.alt[lang] || ''}
-                        onChange={(e) => {
-                            const newImages = [...tempContent];
-                            newImages[index] = {...newImages[index], alt: {...newImages[index].alt, [lang]: e.target.value}};
-                            setTempContent(newImages);
-                        }}
+                        onChange={(e) => handleTempArrayChange(index, 'alt', e.target.value)}
                       />
                       <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                    </div>
@@ -319,6 +335,10 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                     <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
                     <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
                     <div className="space-y-2"><Label>{t.websiteLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>{t.phoneLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.phone}`} value={tempContent.phone} onChange={(e) => setTempContent({...tempContent, phone: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>{t.zaloLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.zalo}`} value={tempContent.zalo} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>{t.messengerLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.messenger}`} value={tempContent.messenger} onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>{t.lineLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.line}`} value={tempContent.line} onChange={(e) => setTempContent({...tempContent, line: e.target.value})} /></div>
                 </div>
              );
         case 'industries':
@@ -381,9 +401,9 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
                       <div className="flex-grow pt-16 md:pt-20">
-                          <h1 className="text-2xl md:text-3xl font-headline font-bold">{employer.name[lang] || <span className="italic text-muted-foreground">Ví dụ: {placeholderEmployerData.name[lang]}</span>}</h1>
-                          <p className="font-semibold text-primary">{employer.type[lang] || <span className="italic text-muted-foreground">Ví dụ: {placeholderEmployerData.type[lang]}</span>}</p>
-                          <p className="text-sm text-muted-foreground">{employer.location[lang] || <span className="italic text-muted-foreground">Ví dụ: {placeholderEmployerData.location[lang]}</span>}</p>
+                          <Input className="text-2xl md:text-3xl font-headline font-bold h-auto p-1 border-transparent focus-visible:border-input focus-visible:ring-1" placeholder={`Ví dụ: ${placeholderEmployerData.name[lang]}`} value={employer.name[lang]} onChange={(e) => setEmployer({...employer, name: {...employer.name, [lang]: e.target.value}})} />
+                          <Input className="font-semibold text-primary h-auto p-1 border-transparent focus-visible:border-input focus-visible:ring-1 mt-1" placeholder={`Ví dụ: ${placeholderEmployerData.type[lang]}`} value={employer.type[lang]} onChange={(e) => setEmployer({...employer, type: {...employer.type, [lang]: e.target.value}})} />
+                          <Input className="text-sm text-muted-foreground h-auto p-1 border-transparent focus-visible:border-input focus-visible:ring-1" placeholder={`Ví dụ: ${placeholderEmployerData.location[lang]}`} value={employer.location[lang]} onChange={(e) => setEmployer({...employer, location: {...employer.location, [lang]: e.target.value}})} />
                       </div>
                       <div className="absolute top-0 right-0 md:pt-20">
                         <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: employer.type, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
@@ -398,9 +418,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p className="text-muted-foreground whitespace-pre-line min-h-[100px]">
-                        {employer.about[lang] || <span className="italic">{t.notUpdated}, <button className="underline text-primary">{t.clickToUpdate}</button>.</span>}
-                      </p>
+                       <Textarea className="min-h-[150px] text-muted-foreground" placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={employer.about[lang]} onChange={(e) => setEmployer({...employer, about: {...employer.about, [lang]: e.target.value}})} />
                   </SectionCard>
                   <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -416,7 +434,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                       </div>
                   </SectionCard>
                   <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
-                      <ul className="space-y-4">
+                       <ul className="space-y-4">
                           {employer.history.length > 0 ? employer.history.map((item, index) => (
                               <li key={index} className="relative pl-6">
                                   <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
@@ -437,6 +455,17 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                           <p><strong>{t.licenseLabel}:</strong> {employer.info.license || '...'}</p>
                           <p><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || '...'}</a></p>
                       </div>
+                      <div className="mt-6 border-t pt-4">
+                        <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
+                            <Phone className="h-6 w-6" />
+                            <ZaloIcon className="h-6 w-6" />
+                            <MessengerIcon className="h-6 w-6" />
+                            <LineIcon className="h-6 w-6" />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-4 text-center">
+                            Cung cấp ít nhất 1 phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Đăng ký</Badge>
+                        </p>
+                    </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
@@ -482,3 +511,4 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     );
 }
 
+```
