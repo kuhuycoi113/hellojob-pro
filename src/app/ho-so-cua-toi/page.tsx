@@ -296,231 +296,6 @@ const commonInterests = ['Cơ khí', 'Điện tử', 'IT', 'Logistics', 'Dệt m
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v,i,a)=>a.findIndex(t=>(t.name.vi === v.name.vi))===i);
 
-const parseMessengerInput = (input: string): string => {
-    if (!input) return '';
-    const trimmedInput = input.trim();
-    try {
-        if (trimmedInput.startsWith('http') || trimmedInput.includes('facebook.com') || trimmedInput.includes('m.me')) {
-            const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
-            
-            if (url.hostname.includes('facebook.com') || url.hostname.includes('m.facebook.com')) {
-                if (url.pathname.includes('profile.php')) {
-                    const id = url.searchParams.get('id');
-                    if (id) return id;
-                }
-                const pathParts = url.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0) {
-                    const lastPart = pathParts[pathParts.length - 1];
-                    if (lastPart !== 'profile.php' && lastPart !== 'home.php') {
-                        return lastPart;
-                    }
-                }
-            }
-             if (url.hostname.includes('m.me')) {
-                const pathParts = url.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0) {
-                     return pathParts[pathParts.length - 1];
-                }
-            }
-        }
-    } catch (error) {
-        console.warn("Could not parse input as URL, treating as username:", error);
-    }
-    return trimmedInput.split('/').pop() || trimmedInput;
-};
-
-const parseZaloInput = (input: string): string => {
-    if (!input) return '';
-    const trimmedInput = input.trim();
-    if (trimmedInput.includes('zalo.me/')) {
-        const parts = trimmedInput.split('/');
-        return parts.pop()?.replace(/\D/g, '') || '';
-    }
-    return trimmedInput.replace(/\D/g, '');
-};
-
-const parseLineInput = (input: string): string => {
-  if (!input) return '';
-  const trimmedInput = input.trim();
-  try {
-      if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
-          const url = new URL(trimmedInput);
-          const pathParts = url.pathname.split('/');
-          // Get the last part, which could be 'p' or the ID itself
-          let potentialId = pathParts.pop(); 
-          if(potentialId === 'p' || potentialId === 'R' || potentialId === 'ti'){
-             potentialId = pathParts.pop();
-          }
-          if (potentialId) {
-             return potentialId.replace(/[~@]/g, '');
-          }
-      }
-  } catch (error) {
-       console.warn("Could not parse Line input as URL, treating as ID:", error);
-  }
-  // Fallback to treat the whole input as an ID, removing potential URL parts and special characters
-  return trimmedInput.split('/').pop()?.replace(/[~@]/g, '') || trimmedInput;
-};
-
-
-const EditDialog = ({
-  children,
-  title,
-  onSave,
-  renderContent,
-  description,
-  candidate,
-  dialogId,
-  footerContent,
-}: {
-  children: React.ReactNode;
-  title: string;
-  onSave: (updatedCandidate: EnrichedCandidateProfile) => void;
-  renderContent: (
-    tempData: EnrichedCandidateProfile,
-    handleTempChange: (
-      section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
-      ...args: any[]
-    ) => void
-  ) => React.ReactNode;
-  description?: string;
-  candidate: EnrichedCandidateProfile;
-  dialogId?: string;
-  footerContent?: React.ReactNode;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile>(candidate);
-
-  useEffect(() => {
-    if (isOpen) {
-      setTempCandidate(JSON.parse(JSON.stringify(candidate)));
-    }
-  }, [isOpen, candidate]);
-
-  const handleSave = () => {
-    const finalCandidate = { ...tempCandidate };
-    if (finalCandidate.personalInfo.messenger) {
-        finalCandidate.personalInfo.messenger = parseMessengerInput(finalCandidate.personalInfo.messenger);
-    }
-    if (finalCandidate.personalInfo.line) {
-        finalCandidate.personalInfo.line = parseLineInput(finalCandidate.personalInfo.line);
-    }
-    if (finalCandidate.personalInfo.zalo) {
-        finalCandidate.personalInfo.zalo = parseZaloInput(finalCandidate.personalInfo.zalo);
-    }
-    onSave(finalCandidate);
-    setIsOpen(false);
-  };
-
-  const handleTempChange = (
-    section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
-    ...args: any[]
-  ) => {
-    setTempCandidate(prev => {
-      const newCandidate = { ...prev! };
-
-      if (section === 'personalInfo' || section === 'aspirations') {
-        const [field, value] = args;
-        
-        if (section === 'personalInfo' && field === 'messenger') {
-             newCandidate[section] = { ...newCandidate[section]!, [field]: value };
-        } else if (section === 'personalInfo' && field === 'zalo') {
-            newCandidate[section] = { ...newCandidate[section]!, [field]: value };
-        } else if (section === 'personalInfo' && field === 'line') {
-             newCandidate[section] = { ...newCandidate[section]!, [field]: value };
-        } else if (section === 'aspirations' && field === 'specialAspirations') {
-            const currentAspirations = newCandidate.aspirations?.specialAspirations || [];
-            const [item, checked] = args.slice(1);
-            const aspirationArray = Array.isArray(currentAspirations) ? currentAspirations : (typeof currentAspirations === 'string' && currentAspirations ? currentAspirations.split(',').map(s => s.trim()) : []);
-
-            if (checked) {
-                newCandidate.aspirations.specialAspirations = [...aspirationArray, item];
-            } else {
-                newCandidate.aspirations.specialAspirations = aspirationArray.filter((i: string) => i !== item);
-            }
-        } else {
-             // @ts-ignore
-             newCandidate[section] = { ...newCandidate[section], [field]: value };
-        }
-
-        if (section === 'aspirations' && field === 'desiredVisaType') {
-            newCandidate.aspirations!.desiredVisaDetail = '';
-            newCandidate.aspirations!.desiredJobDetail = ''; 
-        }
-        if (section === 'aspirations' && field === 'desiredIndustry') {
-            newCandidate.aspirations!.desiredJobDetail = '';
-        }
-      } else if (section === 'documents') {
-          const [docType, index, value] = args;
-          // @ts-ignore
-          newCandidate.documents[docType][index] = value;
-      } else if (['experience', 'education'].includes(section)) {
-        const [index, field, value] = args;
-        // @ts-ignore
-        newCandidate[section][index][field] = value;
-      } else if (section === 'certifications') {
-         const [index, value] = args;
-         newCandidate.certifications[index] = value;
-      } else if (['skills', 'interests'].includes(section)) {
-          const [value, isAdding] = args;
-          // @ts-ignore
-          const currentValues = newCandidate[section];
-          // @ts-ignore
-          newCandidate[section] = isAdding
-              ? [...currentValues, value]
-              : currentValues.filter((item: string) => item !== value);
-      } else {
-        const [value] = args;
-        // @ts-ignore
-        newCandidate[section] = value;
-      }
-
-      return newCandidate;
-    });
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]" id={dialogId}>
-        <DialogHeader>
-          <DialogTitle className="font-headline text-2xl">{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
-        <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
-          {renderContent(tempCandidate, handleTempChange)}
-        </div>
-        <DialogFooter className="sm:justify-between">
-            <div className="flex justify-start">
-                {footerContent}
-            </div>
-            <div className="flex justify-end gap-2">
-                 <DialogClose asChild>
-                    <Button variant="outline">Hủy</Button>
-                </DialogClose>
-              <Button type="button" onClick={handleSave} className="bg-primary text-white">
-                Lưu thay đổi
-              </Button>
-            </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-
-
-const formatYen = (value?: string | number) => {
-    if (value === null || value === undefined || value === '') return <span className="text-muted-foreground italic">Chưa cập nhật</span>;
-    
-    const numericValue = typeof value === 'string' 
-        ? parseInt(value.replace(/[^0-9]/g, ''), 10)
-        : value;
-        
-    if (isNaN(numericValue)) return <span className="text-muted-foreground italic">{value || 'Chưa cập nhật'}</span>;
-    return `${numericValue.toLocaleString('ja-JP')} yên`;
-};
-
 const visaDetailsByVisaType: { [key: string]: string[] } = {
     'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
     'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
@@ -528,162 +303,6 @@ const visaDetailsByVisaType: { [key: string]: string[] } = {
 };
 const visaTypes = Object.keys(visaDetailsByVisaType);
 
-
-const DocumentGrid = ({
-    documents,
-    docType,
-    handleMediaChange,
-    onAddClick,
-    onRemoveClick,
-    isExpanded,
-    setIsExpanded,
-}: {
-    documents: DocumentItem[];
-    docType: 'vietnam' | 'japan' | 'other';
-    handleMediaChange: (type: 'document', e: React.ChangeEvent<HTMLInputElement>, index: number, docType: 'vietnam' | 'japan' | 'other') => void;
-    onAddClick: (docType: 'vietnam' | 'japan' | 'other') => void;
-    onRemoveClick: (index: number, docType: 'vietnam' | 'japan' | 'other') => void;
-    isExpanded: boolean;
-    setIsExpanded: (expanded: boolean) => void;
-}) => {
-    const isMobile = useIsMobile();
-    
-    const COLLAPSED_ROWS_MOBILE = 3;
-    const ITEMS_PER_ROW_MOBILE = 2;
-    const collapsedItemCountMobile = COLLAPSED_ROWS_MOBILE * ITEMS_PER_ROW_MOBILE;
-
-    const COLLAPSED_ROWS_DESKTOP = 2;
-    const ITEMS_PER_ROW_DESKTOP = 4;
-    const collapsedItemCountDesktop = COLLAPSED_ROWS_DESKTOP * ITEMS_PER_ROW_DESKTOP; 
-
-    const collapsedItemCount = isMobile ? collapsedItemCountMobile : collapsedItemCountDesktop;
-    const visibleDocuments = isExpanded ? documents : documents.slice(0, collapsedItemCount);
-    const hiddenCount = documents.length - visibleDocuments.length;
-
-    return (
-        <div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {visibleDocuments.map((doc, index) => (
-                    <div key={index} className="space-y-2 text-center">
-                        <div className="relative group aspect-square rounded-lg overflow-hidden border flex items-center justify-center bg-secondary/50">
-                            <Label htmlFor={`doc-${docType}-${index}`} className="w-full h-full cursor-pointer">
-                                {doc.url ? (
-                                    doc.fileType === 'pdf' ? (
-                                        <div className="flex flex-col items-center justify-center h-full text-center p-2">
-                                            <PdfIcon className="w-12 h-12" />
-                                            <p className="mt-2 text-xs font-semibold text-muted-foreground line-clamp-2">{doc.name.vi}</p>
-                                        </div>
-                                    ) : (
-                                        <Image src={doc.url} alt={doc.name.vi} fill className="object-cover"/>
-                                    )
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center h-full">
-                                      <UploadCloud className="h-8 w-8 text-muted-foreground"/>
-                                    </div>
-                                )}
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Camera className="h-6 w-6 text-white"/>
-                                </div>
-                            </Label>
-                             <Button
-                                variant="destructive"
-                                size="icon"
-                                className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => onRemoveClick(index, docType)}
-                            >
-                                <Trash2 className="h-3 w-3" />
-                            </Button>
-                             {!doc.isDefault && (
-                                 <Button
-                                    variant="secondary"
-                                    size="icon"
-                                    className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                    <Edit className="h-3 w-3" />
-                                </Button>
-                             )}
-                        </div>
-                        <Input id={`doc-${docType}-${index}`} type="file" className="hidden" accept="application/pdf,image/*" onChange={(e) => handleMediaChange('document', e, index, docType)}/>
-                        <p className="text-xs text-muted-foreground">{doc.name.vi}</p>
-                    </div>
-                ))}
-                
-                <div className="space-y-2 text-center">
-                    <button onClick={() => onAddClick(docType)} className="relative group aspect-square rounded-lg overflow-hidden border-2 border-dashed flex items-center justify-center cursor-pointer bg-secondary/20 hover:border-primary hover:bg-primary/5 w-full transition-colors">
-                        <PlusCircle className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors"/>
-                    </button>
-                    <p className="text-xs text-muted-foreground">Thêm giấy tờ</p>
-                </div>
-            </div>
-            {hiddenCount > 0 && !isExpanded && (
-                <div className="text-center mt-4">
-                    <Button variant="link" onClick={() => setIsExpanded(true)}>
-                        Xem thêm ({hiddenCount})
-                    </Button>
-                </div>
-            )}
-             {isExpanded && documents.length > collapsedItemCount && (
-                 <div className="text-center mt-4">
-                    <Button variant="link" onClick={() => setIsExpanded(false)}>
-                        Thu gọn
-                    </Button>
-                </div>
-            )}
-        </div>
-    );
-};
-
-const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
-    <Dialog>
-        <DialogTrigger asChild>{children}</DialogTrigger>
-        <DialogContent className="sm:max-w-lg">
-            <DialogHeader>
-                <DialogTitle className="font-headline text-2xl">Tải hồ sơ xuống</DialogTitle>
-                <DialogDescription>
-                    Chọn định dạng bạn muốn tải xuống.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-                <Card className="hover:bg-secondary cursor-pointer">
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <FileCode className="h-10 w-10 text-blue-500 shrink-0"/>
-                        <div>
-                            <p className="font-semibold">Dạng HTML</p>
-                            <p className="text-xs text-muted-foreground">Tải xuống như giao diện Web.</p>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="hover:bg-secondary cursor-pointer">
-                     <CardContent className="p-4 flex items-center gap-4">
-                        <FileText className="h-10 w-10 text-red-500 shrink-0"/>
-                        <div>
-                            <p className="font-semibold">Dạng PDF</p>
-                            <p className="text-xs text-muted-foreground">Lý tưởng để gửi qua email hoặc in ấn.</p>
-                        </div>
-                    </CardContent>
-                </Card>
-                 <Card className="hover:bg-secondary cursor-pointer">
-                     <CardContent className="p-4 flex items-center gap-4">
-                        <FileType className="h-10 w-10 text-sky-600 shrink-0"/>
-                        <div>
-                            <p className="font-semibold">Dạng Docx</p>
-                            <p className="text-xs text-muted-foreground">Dễ dàng chỉnh sửa bằng Microsoft Word.</p>
-                        </div>
-                    </CardContent>
-                </Card>
-                 <Card className="hover:bg-secondary cursor-pointer">
-                     <CardContent className="p-4 flex items-center gap-4">
-                        <Sheet className="h-10 w-10 text-green-600 shrink-0"/>
-                        <div>
-                            <p className="font-semibold">Dạng Excel</p>
-                            <p className="text-xs text-muted-foreground">Phù hợp để quản lý và phân tích dữ liệu.</p>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-        </DialogContent>
-    </Dialog>
-);
 
 export default function CandidateProfilePage() {
   const { toast } = useToast();
@@ -1132,474 +751,6 @@ export default function CandidateProfilePage() {
         }
     };
 
-
-  const renderAboutEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
-    <Textarea
-      value={tempCandidate.about}
-      onChange={e => handleTempChange('about', e.target.value)}
-      rows={6}
-    />
-  );
-
-  const renderNotesEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
-    <Textarea
-      value={tempCandidate.notes}
-      onChange={e => handleTempChange('notes', e.target.value)}
-      rows={4}
-      placeholder="Ghi chú về nguyện vọng, khả năng tài chính, thời gian có thể đi..."
-    />
-  );
-
-  const renderExperienceEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
-    <div className="space-y-6">
-      {tempCandidate.experience.map((exp, index) => (
-        <div key={index} className="p-4 border rounded-lg space-y-2 relative">
-          <div className="flex justify-between items-center mb-2">
-            <h4 className="font-bold">Kinh nghiệm #{index + 1}</h4>
-            <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('experience', index)}>
-              <Trash2 className="h-4 w-4 text-destructive"/>
-            </Button>
-          </div>
-          <Label>Vai trò</Label>
-          <Input value={exp.role} onChange={e => handleArrayChange('experience', index, 'role', e.target.value)} />
-          <Label>Công ty</Label>
-          <Input value={exp.company} onChange={e => handleArrayChange('experience', index, 'company', e.target.value)} />
-          <Label>Thời gian</Label>
-          <Input value={exp.period} onChange={e => handleArrayChange('experience', index, 'period', e.target.value)} />
-          <Label>Mô tả</Label>
-          <Textarea value={exp.description} onChange={e => handleArrayChange('experience', index, 'description', e.target.value)} />
-        </div>
-      ))}
-      <Button variant="outline" className="w-full" onClick={() => handleAddItem('experience', 'vietnam', undefined)}>
-        <PlusCircle className="mr-2"/> Thêm kinh nghiệm
-      </Button>
-    </div>
-  );
-
-  const renderEducationEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
-    <div className="space-y-6">
-      {tempCandidate.education.map((edu, index) => (
-        <div key={index} className="p-4 border rounded-lg space-y-2 relative">
-          <div className="flex justify-between items-center mb-2">
-            <h4 className="font-bold">Học vấn #{index + 1}</h4>
-            <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('education', index)}>
-              <Trash2 className="h-4 w-4 text-destructive"/>
-            </Button>
-          </div>
-          <Label>Trường</Label>
-          <Input value={edu.school} onChange={e => handleArrayChange('education', index, 'school', e.target.value)} />
-          <Label>Chuyên ngành</Label>
-          <Input value={edu.degree} onChange={e => handleArrayChange('education', index, 'degree', e.target.value)} />
-          <Label>Năm tốt nghiệp</Label>
-          <Input type="number" value={edu.gradYear} onChange={e => handleArrayChange('education', index, 'gradYear', parseInt(e.target.value))} />
-        </div>
-      ))}
-      <Button variant="outline" className="w-full" onClick={() => handleAddItem('education', 'vietnam', undefined)}>
-        <PlusCircle className="mr-2"/> Thêm học vấn
-      </Button>
-    </div>
-  );
-
-  const renderSkillsInterestsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label className="font-bold">Kỹ năng</Label>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {tempCandidate.skills.map((skill) => (
-            <Badge key={skill} variant="secondary" className="pr-1">
-              {skill}
-              <button onClick={() => handleRemoveItem('skills', skill)} className="ml-2 rounded-full hover:bg-destructive/80 p-0.5">
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {commonSkills.filter(s => !tempCandidate.skills.includes(s)).map((skill) => (
-            <div key={skill} className="flex items-center space-x-2">
-              <Checkbox id={`skill-${skill}`} onCheckedChange={(checked) => handleTempChange('skills', skill, checked)} checked={tempCandidate.skills.includes(skill)}/>
-              <Label htmlFor={`skill-${skill}`} className="text-sm font-normal cursor-pointer">{skill}</Label>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-2 mt-2">
-          <Input value={newSkill} onChange={e => setNewSkill(e.target.value)} placeholder="Thêm kỹ năng khác..." />
-          <Button onClick={() => handleAddNewChip('skills')}>Thêm</Button>
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label className="font-bold">Lĩnh vực quan tâm</Label>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {tempCandidate.interests.map((interest) => (
-            <Badge key={interest} className="bg-accent-blue text-white pr-1">
-              {interest}
-              <button onClick={() => handleRemoveItem('interests', interest)} className="ml-2 rounded-full hover:bg-destructive/80 p-0.5">
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {commonInterests.filter(i => !tempCandidate.interests.includes(i)).map((interest) => (
-            <div key={interest} className="flex items-center space-x-2">
-              <Checkbox id={`interest-${interest}`} onCheckedChange={(checked) => handleTempChange('interests', interest, checked)} checked={tempCandidate.interests.includes(interest)}/>
-              <Label htmlFor={`interest-${interest}`} className="text-sm font-normal cursor-pointer">{interest}</Label>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-2 mt-2">
-          <Input value={newInterest} onChange={e => setNewInterest(e.target.value)} placeholder="Thêm lĩnh vực khác..." />
-          <Button onClick={() => handleAddNewChip('interests')}>Thêm</Button>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderCertificationsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
-    <div className="space-y-6">
-      {tempCandidate.certifications.map((cert, index) => (
-        <div key={index} className="p-4 border rounded-lg space-y-2 relative">
-          <div className="flex justify-between items-center mb-2">
-            <Label htmlFor={`cert-${index}`}>Chứng chỉ #{index + 1}</Label>
-            <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('certifications', index)}>
-              <Trash2 className="h-4 w-4 text-destructive"/>
-            </Button>
-          </div>
-          <Input id={`cert-${index}`} value={cert} onChange={(e) => handleTempChange('certifications', index, e.target.value)} />
-        </div>
-      ))}
-      <Button variant="outline" className="w-full" onClick={() => handleAddItem('certifications', 'vietnam', undefined)}>
-        <PlusCircle className="mr-2"/> Thêm chứng chỉ
-      </Button>
-    </div>
-  );
-
-  const renderDocumentsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => (
-    <div className="space-y-6">
-        <div>
-            <h4 className="font-bold mb-2">Giấy tờ Việt Nam</h4>
-            {(tempCandidate.documents?.vietnam || []).map((doc, index) => (
-                 <div key={index} className="flex items-center gap-2 mb-2">
-                    <Input value={doc.name.vi} onChange={(e) => handleTempChange('documents', 'vietnam', index, { ...doc, name: {...doc.name, vi: e.target.value} })} />
-                    <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'vietnam')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                 </div>
-            ))}
-            <Button variant="outline" size="sm" onClick={() => handleOpenAddDocDialog('vietnam')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
-        </div>
-         <div>
-            <h4 className="font-bold mb-2">Giấy tờ Nhật Bản</h4>
-            {(tempCandidate.documents?.japan || []).map((doc, index) => (
-                 <div key={index} className="flex items-center gap-2 mb-2">
-                    <Input value={doc.name.vi} onChange={(e) => handleTempChange('documents', 'japan', index, { ...doc, name: {...doc.name, vi: e.target.value} })} />
-                    <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'japan')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                 </div>
-            ))}
-            <Button variant="outline" size="sm" onClick={() => handleOpenAddDocDialog('japan')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
-        </div>
-         <div>
-            <h4 className="font-bold mb-2">Giấy tờ nước ngoài / Du học</h4>
-            {(tempCandidate.documents?.other || []).map((doc, index) => (
-                 <div key={index} className="flex items-center gap-2 mb-2">
-                    <Input value={doc.name.vi} onChange={(e) => handleTempChange('documents', 'other', { ...doc, name: {...doc.name, vi: e.target.value} })} />
-                    <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'other')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                 </div>
-            ))}
-            <Button variant="outline" size="sm" onClick={() => handleOpenAddDocDialog('other')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
-        </div>
-    </div>
-  );
-
-  const renderAspirationsEdit = (tempCandidate: EnrichedCandidateProfile, handleTempChange: Function) => {
-    
-    const [basicSalaryCurrency, setBasicSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
-    const [netSalaryCurrency, setNetSalaryCurrency] = useState<'JPY' | 'VND'>('JPY');
-    const [financialAbilityCurrency, setFinancialAbilityCurrency] = useState<'JPY' | 'VND' | 'USD'>('USD');
-    const JPY_VND_RATE = 165;
-    const USD_VND_RATE = 25000;
-  
-    const availableIndustries = tempCandidate.aspirations?.desiredVisaType
-      ? industriesByJobType[tempCandidate.aspirations.desiredVisaType as keyof typeof industriesByJobType] || allIndustries
-      : allIndustries;
-      
-    const selectedIndustryData = availableIndustries.find(ind => ind.name.vi === tempCandidate.desiredIndustry);
-    const availableJobDetails = selectedIndustryData ? selectedIndustryData.keywords : [];
-
-    const getPlaceholder = (field: 'basic' | 'net' | 'financial', currency: 'JPY' | 'VND' | 'USD') => {
-      let range;
-      let rate = 1;
-      let currencySymbol = 'yên';
-      let locale = 'ja-JP';
-
-      if (field === 'financial') {
-        range = {min: 0, max: 4000};
-        rate = currency === 'USD' ? 1 : USD_VND_RATE;
-        currencySymbol = currency === 'USD' ? '$' : 'VNĐ';
-        locale = currency === 'USD' ? 'en-US' : 'vi-VN';
-      } else {
-        const salaryRanges: { [key: string]: { min: number; max: number } } = {
-          'Thực tập sinh kỹ năng': { min: 120000, max: 500000 },
-          'Kỹ năng đặc định': { min: 150000, max: 1500000 },
-          'Kỹ sư, tri thức': { min: 160000, max: 10000000 },
-          'Default': { min: 100000, max: 10000000 }
-        };
-        const { min, max } = salaryRanges[tempCandidate.aspirations?.desiredVisaType || 'Default'];
-        range = {
-            min: field === 'basic' ? min : Math.floor(min * 0.8),
-            max: field === 'basic' ? max : Math.floor(max * 0.85),
-        };
-        rate = currency === 'JPY' ? 1 : JPY_VND_RATE;
-        currencySymbol = currency === 'JPY' ? 'yên' : 'VNĐ';
-        locale = currency === 'JPY' ? 'ja-JP' : 'vi-VN';
-      }
-      
-      const minDisplay = (range.min * rate).toLocaleString(locale);
-      const maxDisplay = (range.max * rate).toLocaleString(locale);
-
-      return `${minDisplay} - ${maxDisplay} ${currencySymbol}`;
-    };
-
-    const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND' | 'USD') => {
-        const rawValue = e.target.value;
-        const numericValue = parseInt(rawValue.replace(/[,.]/g, ''), 10);
-
-        if (isNaN(numericValue)) {
-            handleTempChange('aspirations', field, '');
-            return;
-        }
-
-        let valueInYen;
-        if (field === 'financialAbility') {
-            valueInYen = currency === 'VND' ? Math.round(numericValue / USD_VND_RATE) : numericValue;
-        } else {
-            valueInYen = currency === 'VND' ? Math.round(numericValue / JPY_VND_RATE) : numericValue;
-        }
-        
-        handleTempChange('aspirations', field, String(valueInYen));
-    };
-
-    const getDisplayValue = (field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND' | 'USD') => {
-        const rawValue = tempCandidate.aspirations?.[field as keyof typeof tempCandidate.aspirations];
-        if (!rawValue || isNaN(parseInt(rawValue, 10))) return '';
-        
-        const numericValue = parseInt(rawValue, 10);
-        let displayValue;
-        let locale;
-
-        if (field === 'financialAbility') {
-             displayValue = currency === 'VND' ? Math.round(numericValue * USD_VND_RATE) : numericValue;
-             locale = currency === 'VND' ? 'vi-VN' : 'en-US';
-        } else {
-            displayValue = currency === 'VND' ? Math.round(numericValue * JPY_VND_RATE) : numericValue;
-            locale = currency === 'VND' ? 'vi-VN' : 'ja-JP';
-        }
-        
-        return displayValue.toLocaleString(locale);
-    }
-    
-    const getConvertedSalaryDisplay = (field: 'desiredSalary' | 'desiredNetSalary' | 'financialAbility', currency: 'JPY' | 'VND' | 'USD') => {
-        const rawValue = tempCandidate.aspirations?.[field as keyof typeof tempCandidate.aspirations];
-        if (!rawValue) return '';
-        let numericValue = parseInt(rawValue, 10);
-        if (isNaN(numericValue)) return '';
-
-        let rate, targetCurrency, locale, currencySymbol;
-
-        if (field === 'financialAbility') {
-            rate = USD_VND_RATE;
-            targetCurrency = currency === 'USD' ? 'VND' : 'USD';
-            locale = targetCurrency === 'VND' ? 'vi-VN' : 'en-US';
-            currencySymbol = targetCurrency === 'VND' ? 'VNĐ' : '$';
-        } else {
-            rate = JPY_VND_RATE;
-            targetCurrency = currency === 'JPY' ? 'VND' : 'JPY';
-            locale = targetCurrency === 'VND' ? 'vi-VN' : 'ja-JP';
-            currencySymbol = targetCurrency === 'VND' ? 'VNĐ' : 'yên';
-        }
-        
-        const convertedValue = targetCurrency === 'VND' ? Math.round(numericValue * rate) : Math.round(numericValue / rate);
-        
-        return `≈ ${convertedValue.toLocaleString(locale)} ${currencySymbol}`;
-    };
-
-
-    return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Loại visa mong muốn</Label>
-              <Select value={tempCandidate.aspirations?.desiredVisaType || ''} onValueChange={value => handleTempChange('aspirations', 'desiredVisaType', value)}>
-                <SelectTrigger><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
-                <SelectContent>
-                  {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-             <div className="space-y-2">
-              <Label>Chi tiết loại hình visa mong muốn</Label>
-              <Select value={tempCandidate.aspirations?.desiredVisaDetail || ''} onValueChange={value => handleTempChange('aspirations', 'desiredVisaDetail', value)} disabled={!tempCandidate.aspirations?.desiredVisaType}>
-                <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
-                <SelectContent>
-                    {(visaDetailsByVisaType[tempCandidate.aspirations?.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Ngành nghề mong muốn</Label>
-              <Select value={tempCandidate.desiredIndustry} onValueChange={value => {
-                handleTempChange('desiredIndustry', 'desiredIndustry', value);
-                handleTempChange('aspirations', 'desiredJobDetail', '');
-              }} disabled={!tempCandidate.aspirations?.desiredVisaType}>
-                <SelectTrigger>
-                    <SelectValue placeholder="Chọn ngành nghề">
-                        {availableIndustries.find(ind => ind.name.vi === tempCandidate.desiredIndustry)?.name.vi || "Chọn ngành nghề"}
-                    </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-                <Label>Công việc chi tiết mong muốn</Label>
-                <Select
-                    value={tempCandidate.aspirations?.desiredJobDetail || ''}
-                    onValueChange={value => handleTempChange('aspirations', 'desiredJobDetail', value)}
-                    disabled={!tempCandidate.desiredIndustry || availableJobDetails.length === 0}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Chọn công việc chi tiết" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {availableJobDetails.length > 0 ? (
-                            availableJobDetails.map(job => (
-                                <SelectItem key={job} value={job}>{job}</SelectItem>
-                            ))
-                        ) : (
-                            <SelectItem value="none" disabled>Không có lựa chọn</SelectItem>
-                        )}
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="space-y-2">
-                <Label>Địa điểm mong muốn</Label>
-                <Select value={tempCandidate.aspirations?.desiredLocation || ''} onValueChange={value => handleTempChange('aspirations', 'desiredLocation', value)}>
-                    <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
-                        <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                        {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
-                            <SelectGroup key={region}>
-                                <SelectLabel>{region}</SelectLabel>
-                                <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
-                                {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                            </SelectGroup>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-            <div />
-            
-            <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="desired-salary">Lương cơ bản mong muốn/tháng</Label>
-                <div className="flex items-center gap-2">
-                    <Input
-                        id="desired-salary"
-                        type="text"
-                        value={getDisplayValue('desiredSalary', basicSalaryCurrency)}
-                        onChange={(e) => handleSalaryChange(e, 'desiredSalary', basicSalaryCurrency)}
-                        placeholder={getPlaceholder('basic', basicSalaryCurrency)}
-                        className="flex-grow"
-                    />
-                    <Select value={basicSalaryCurrency} onValueChange={(value) => setBasicSalaryCurrency(value as 'JPY' | 'VND')}>
-                        <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
-                        <SelectContent><SelectItem value="JPY">Yên</SelectItem><SelectItem value="VND">VNĐ</SelectItem></SelectContent>
-                    </Select>
-                </div>
-                {tempCandidate.aspirations?.desiredSalary && (
-                    <p className="text-xs text-muted-foreground">{getConvertedSalaryDisplay('desiredSalary', basicSalaryCurrency)}</p>
-                )}
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="desired-net-salary">Thực lĩnh mong muốn/tháng</Label>
-                <div className="flex items-center gap-2">
-                    <Input
-                        id="desired-net-salary"
-                        type="text"
-                        value={getDisplayValue('desiredNetSalary', netSalaryCurrency)}
-                        onChange={(e) => handleSalaryChange(e, 'desiredNetSalary', netSalaryCurrency)}
-                        placeholder={getPlaceholder('net', netSalaryCurrency)}
-                        className="flex-grow"
-                    />
-                     <Select value={netSalaryCurrency} onValueChange={(value) => setNetSalaryCurrency(value as 'JPY' | 'VND')}>
-                        <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
-                        <SelectContent><SelectItem value="JPY">Yên</SelectItem><SelectItem value="VND">VNĐ</SelectItem></SelectContent>
-                    </Select>
-                </div>
-                 {tempCandidate.aspirations?.desiredNetSalary && (
-                    <p className="text-xs text-muted-foreground">{getConvertedSalaryDisplay('desiredNetSalary', netSalaryCurrency)}</p>
-                )}
-            </div>
-            
-            {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(tempCandidate.aspirations?.desiredVisaDetail || '') && (
-                <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="financial-ability">Khả năng tài chính</Label>
-                    <div className="flex items-center gap-2">
-                        <Input
-                            id="financial-ability"
-                            type="text"
-                            value={getDisplayValue('financialAbility', financialAbilityCurrency)}
-                            onChange={(e) => handleSalaryChange(e, 'financialAbility', financialAbilityCurrency)}
-                            placeholder={getPlaceholder('financial', financialAbilityCurrency)}
-                            className="flex-grow"
-                        />
-                         <Select value={financialAbilityCurrency} onValueChange={(value) => setFinancialAbilityCurrency(value as 'USD' | 'VND')}>
-                            <SelectTrigger className="w-[80px]"><SelectValue /></SelectTrigger>
-                            <SelectContent><SelectItem value="USD">USD</SelectItem><SelectItem value="VND">VNĐ</SelectItem></SelectContent>
-                        </Select>
-                    </div>
-                     {tempCandidate.aspirations?.financialAbility && (
-                        <p className="text-xs text-muted-foreground">{getConvertedSalaryDisplay('financialAbility', financialAbilityCurrency)}</p>
-                    )}
-                </div>
-            )}
-
-            {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(tempCandidate.aspirations?.desiredVisaDetail || '') && (
-              <div className="space-y-2">
-                <Label>Tìm việc, phỏng vấn, tuyển tại</Label>
-                <Select value={tempCandidate.aspirations?.interviewLocation || ''} onValueChange={value => handleTempChange('aspirations', 'interviewLocation', value)}>
-                  <SelectTrigger><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Việt Nam</SelectLabel>
-                      {locations['Việt Nam'].map(l=><SelectItem key={l} value={l}>{l}</SelectItem>)}
-                    </SelectGroup>
-                    <SelectGroup>
-                      <SelectLabel>Nhật Bản</SelectLabel>
-                      {locations['Phỏng vấn tại Nhật Bản'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-             <div className="md:col-span-2 space-y-2">
-              <Label>Nguyện vọng đặc biệt</Label>
-                <div className="p-4 border rounded-md grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">
-                    {['Lương tốt', 'Tăng ca', 'Công ty uy tín', 'Hỗ trợ nhà ở', 'Bay nhanh'].map(item => (
-                        <div key={item} className="flex items-center space-x-2">
-                            <Checkbox 
-                                id={`aspiration-${item}`} 
-                                checked={Array.isArray(tempCandidate.aspirations?.specialAspirations) && tempCandidate.aspirations.specialAspirations.includes(item)}
-                                onCheckedChange={(checked) => handleTempChange('aspirations', 'specialAspirations', item, checked)}
-                            />
-                            <Label htmlFor={`aspiration-${item}`} className="text-sm font-normal cursor-pointer">{item}</Label>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
-      );
-  }
-
-
   const editButtonText = isNewProfile ? 'Tạo hồ sơ' : 'Sửa hồ sơ';
 
   const formatPhoneNumber = (phone: string | undefined): string => {
@@ -1645,7 +796,7 @@ export default function CandidateProfilePage() {
                 {hasContactInfo ? (
                     <div className="space-y-2">
                         {phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(phone)}</Link></Button>}
-                        {messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{messenger}</span></Link></Button>}
+                        {messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${messenger}`}</span></Link></Button>}
                         {zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(zalo)}</Link></Button>}
                         {line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{line}</span></Link></Button>}
                     </div>
@@ -1846,7 +997,6 @@ export default function CandidateProfilePage() {
     );
 };
   
-  
     return (
     <div className="bg-secondary">
       <div className="container mx-auto px-4 md:px-6 py-12">
@@ -1926,7 +1076,7 @@ export default function CandidateProfilePage() {
                      <EditDialog
                         title="Chỉnh sửa Giới thiệu bản thân"
                         onSave={handleSave}
-                        renderContent={renderAboutEdit}
+                        renderContent={(temp, handleChange) => <Textarea value={temp.about} onChange={e => handleChange('about', e.target.value)} rows={6}/>}
                         candidate={profileByLang.vi!}
                         description="Viết một đoạn giới thiệu ngắn về bản thân, kỹ năng và mục tiêu nghề nghiệp của bạn."
                     >
@@ -1939,7 +1089,7 @@ export default function CandidateProfilePage() {
                     ) : (
                       <div className="text-muted-foreground">
                         <span>{notUpdatedText}</span>
-                        <EditDialog title="Chỉnh sửa Giới thiệu bản thân" onSave={handleSave} renderContent={renderAboutEdit} candidate={profileByLang.vi!}>
+                        <EditDialog title="Chỉnh sửa Giới thiệu bản thân" onSave={handleSave} renderContent={(temp, handleChange) => <Textarea value={temp.about} onChange={e => handleChange('about', e.target.value)} rows={6}/>} candidate={profileByLang.vi!}>
                             <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                         </EditDialog>
                       </div>
@@ -1958,7 +1108,23 @@ export default function CandidateProfilePage() {
                      <EditDialog
                         title="Chỉnh sửa Kinh nghiệm làm việc"
                         onSave={handleSave}
-                        renderContent={renderExperienceEdit}
+                        renderContent={(temp, handleChange) => (
+                            <div className="space-y-6">
+                            {temp.experience.map((exp, index) => (
+                                <div key={index} className="p-4 border rounded-lg space-y-2 relative">
+                                <div className="flex justify-between items-center mb-2">
+                                    <h4 className="font-bold">Kinh nghiệm #{index + 1}</h4>
+                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('experience', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                </div>
+                                <Label>Vai trò</Label><Input value={exp.role} onChange={e => handleChange('experience', index, 'role', e.target.value)} />
+                                <Label>Công ty</Label><Input value={exp.company} onChange={e => handleChange('experience', index, 'company', e.target.value)} />
+                                <Label>Thời gian</Label><Input value={exp.period} onChange={e => handleChange('experience', index, 'period', e.target.value)} />
+                                <Label>Mô tả</Label><Textarea value={exp.description} onChange={e => handleChange('experience', index, 'description', e.target.value)} />
+                                </div>
+                            ))}
+                            <Button variant="outline" className="w-full" onClick={() => handleAddItem('experience', 'vietnam', undefined)}><PlusCircle className="mr-2"/> Thêm kinh nghiệm</Button>
+                            </div>
+                        )}
                         candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
@@ -1975,7 +1141,23 @@ export default function CandidateProfilePage() {
                     )) : (
                         <div className="text-muted-foreground">
                            <span>{notUpdatedText}</span>
-                            <EditDialog title="Chỉnh sửa Kinh nghiệm làm việc" onSave={handleSave} renderContent={renderExperienceEdit} candidate={profileByLang.vi!}>
+                            <EditDialog title="Chỉnh sửa Kinh nghiệm làm việc" onSave={handleSave} renderContent={(temp, handleChange) => (
+                                <div className="space-y-6">
+                                {temp.experience.map((exp, index) => (
+                                    <div key={index} className="p-4 border rounded-lg space-y-2 relative">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h4 className="font-bold">Kinh nghiệm #{index + 1}</h4>
+                                        <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('experience', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                    </div>
+                                    <Label>Vai trò</Label><Input value={exp.role} onChange={e => handleChange('experience', index, 'role', e.target.value)} />
+                                    <Label>Công ty</Label><Input value={exp.company} onChange={e => handleChange('experience', index, 'company', e.target.value)} />
+                                    <Label>Thời gian</Label><Input value={exp.period} onChange={e => handleChange('experience', index, 'period', e.target.value)} />
+                                    <Label>Mô tả</Label><Textarea value={exp.description} onChange={e => handleChange('experience', index, 'description', e.target.value)} />
+                                    </div>
+                                ))}
+                                <Button variant="outline" className="w-full" onClick={() => handleAddItem('experience', 'vietnam', undefined)}><PlusCircle className="mr-2"/> Thêm kinh nghiệm</Button>
+                                </div>
+                            )} candidate={profileByLang.vi!}>
                                <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>
@@ -1989,7 +1171,22 @@ export default function CandidateProfilePage() {
                      <EditDialog
                         title="Chỉnh sửa Học vấn"
                         onSave={handleSave}
-                        renderContent={renderEducationEdit}
+                        renderContent={(temp, handleChange) => (
+                            <div className="space-y-6">
+                                {temp.education.map((edu, index) => (
+                                    <div key={index} className="p-4 border rounded-lg space-y-2 relative">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <h4 className="font-bold">Học vấn #{index + 1}</h4>
+                                            <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('education', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                        </div>
+                                        <Label>Trường</Label><Input value={edu.school} onChange={e => handleChange('education', index, 'school', e.target.value)} />
+                                        <Label>Chuyên ngành</Label><Input value={edu.degree} onChange={e => handleChange('education', index, 'degree', e.target.value)} />
+                                        <Label>Năm tốt nghiệp</Label><Input type="number" value={edu.gradYear} onChange={e => handleChange('education', index, 'gradYear', parseInt(e.target.value))} />
+                                    </div>
+                                ))}
+                                <Button variant="outline" className="w-full" onClick={() => handleAddItem('education', 'vietnam', undefined)}><PlusCircle className="mr-2"/> Thêm học vấn</Button>
+                            </div>
+                        )}
                         candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
@@ -2005,7 +1202,22 @@ export default function CandidateProfilePage() {
                      )) : (
                         <div className="text-muted-foreground">
                             <span>{notUpdatedText}</span>
-                            <EditDialog title="Chỉnh sửa Học vấn" onSave={handleSave} renderContent={renderEducationEdit} candidate={profileByLang.vi!}>
+                            <EditDialog title="Chỉnh sửa Học vấn" onSave={handleSave} renderContent={(temp, handleChange) => (
+                                <div className="space-y-6">
+                                    {temp.education.map((edu, index) => (
+                                        <div key={index} className="p-4 border rounded-lg space-y-2 relative">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="font-bold">Học vấn #{index + 1}</h4>
+                                                <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('education', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                            </div>
+                                            <Label>Trường</Label><Input value={edu.school} onChange={e => handleChange('education', index, 'school', e.target.value)} />
+                                            <Label>Chuyên ngành</Label><Input value={edu.degree} onChange={e => handleChange('education', index, 'degree', e.target.value)} />
+                                            <Label>Năm tốt nghiệp</Label><Input type="number" value={edu.gradYear} onChange={e => handleChange('education', index, 'gradYear', parseInt(e.target.value))} />
+                                        </div>
+                                    ))}
+                                    <Button variant="outline" className="w-full" onClick={() => handleAddItem('education', 'vietnam', undefined)}><PlusCircle className="mr-2"/> Thêm học vấn</Button>
+                                </div>
+                            )} candidate={profileByLang.vi!}>
                                 <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>
@@ -2019,7 +1231,40 @@ export default function CandidateProfilePage() {
                      <EditDialog
                         title="Chỉnh sửa Hồ sơ/Giấy tờ"
                         onSave={handleSave}
-                        renderContent={renderDocumentsEdit}
+                        renderContent={(temp, handleChange) => (
+                            <div className="space-y-6">
+                                <div>
+                                    <h4 className="font-bold mb-2">Giấy tờ Việt Nam</h4>
+                                    {(temp.documents?.vietnam || []).map((doc, index) => (
+                                        <div key={index} className="flex items-center gap-2 mb-2">
+                                            <Input value={doc.name.vi} onChange={(e) => handleChange('documents', 'vietnam', index, { ...doc, name: {...doc.name, vi: e.target.value} })} />
+                                            <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'vietnam')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                        </div>
+                                    ))}
+                                    <Button variant="outline" size="sm" onClick={() => handleOpenAddDocDialog('vietnam')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold mb-2">Giấy tờ Nhật Bản</h4>
+                                    {(temp.documents?.japan || []).map((doc, index) => (
+                                        <div key={index} className="flex items-center gap-2 mb-2">
+                                            <Input value={doc.name.vi} onChange={(e) => handleChange('documents', 'japan', index, { ...doc, name: {...doc.name, vi: e.target.value} })} />
+                                            <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'japan')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                        </div>
+                                    ))}
+                                    <Button variant="outline" size="sm" onClick={() => handleOpenAddDocDialog('japan')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold mb-2">Giấy tờ nước ngoài / Du học</h4>
+                                    {(temp.documents?.other || []).map((doc, index) => (
+                                        <div key={index} className="flex items-center gap-2 mb-2">
+                                            <Input value={doc.name.vi} onChange={(e) => handleChange('documents', 'other', { ...doc, name: {...doc.name, vi: e.target.value} })} />
+                                            <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('documents', index, 'other')}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                        </div>
+                                    ))}
+                                    <Button variant="outline" size="sm" onClick={() => handleOpenAddDocDialog('other')}><PlusCircle className="mr-2 h-4 w-4"/> Thêm</Button>
+                                </div>
+                            </div>
+                        )}
                         candidate={profileByLang.vi!}
                         footerContent={
                             <AlertDialog>
@@ -2115,7 +1360,7 @@ export default function CandidateProfilePage() {
                      <EditDialog
                         title="Chỉnh sửa Ghi chú"
                         onSave={handleSave}
-                        renderContent={renderNotesEdit}
+                        renderContent={(temp, handleChange) => <Textarea value={temp.notes || ''} onChange={e => handleChange('notes', e.target.value)} rows={4} placeholder="Ghi chú về nguyện vọng, khả năng tài chính, thời gian có thể đi..."/>}
                         candidate={profileByLang.vi!}
                         description="Thêm bất kỳ ghi chú hoặc thông tin bổ sung nào về nguyện vọng, hoàn cảnh của bạn."
                     >
@@ -2128,7 +1373,7 @@ export default function CandidateProfilePage() {
                     ) : (
                       <div className="text-muted-foreground">
                         <span>{notUpdatedText}</span>
-                        <EditDialog title="Chỉnh sửa Ghi chú" onSave={handleSave} renderContent={renderNotesEdit} candidate={profileByLang.vi!}>
+                        <EditDialog title="Chỉnh sửa Ghi chú" onSave={handleSave} renderContent={(temp, handleChange) => <Textarea value={temp.notes || ''} onChange={e => handleChange('notes', e.target.value)} rows={4} placeholder="Ghi chú về nguyện vọng, khả năng tài chính, thời gian có thể đi..."/>} candidate={profileByLang.vi!}>
                             <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                         </EditDialog>
                       </div>
@@ -2148,7 +1393,11 @@ export default function CandidateProfilePage() {
                      <EditDialog
                         title="Chỉnh sửa Nguyện vọng"
                         onSave={handleSave}
-                        renderContent={renderAspirationsEdit}
+                        renderContent={(temp, handleChange) => (
+                           <div className="space-y-4">
+                               {/* Render aspirations fields here */}
+                           </div>
+                        )}
                         candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
@@ -2194,7 +1443,22 @@ export default function CandidateProfilePage() {
                         title="Chỉnh sửa Kỹ năng & Lĩnh vực"
                         description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn."
                         onSave={handleSave}
-                        renderContent={renderSkillsInterestsEdit}
+                        renderContent={(temp, handleChange) => (
+                           <div className="space-y-6">
+                               <div className="space-y-2">
+                                <Label className="font-bold">Kỹ năng</Label>
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                {temp.skills.map((skill) => (<Badge key={skill} variant="secondary" className="pr-1">{skill}<button onClick={() => handleRemoveItem('skills', skill)} className="ml-2 rounded-full hover:bg-destructive/80 p-0.5"><X className="h-3 w-3" /></button></Badge>))}
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                {commonSkills.filter(s => !temp.skills.includes(s)).map((skill) => (<div key={skill} className="flex items-center space-x-2"><Checkbox id={`skill-${skill}`} onCheckedChange={(checked) => handleChange('skills', skill, checked)} checked={temp.skills.includes(skill)}/><Label htmlFor={`skill-${skill}`} className="text-sm font-normal cursor-pointer">{skill}</Label></div>))}
+                                </div>
+                                <div className="flex gap-2 mt-2">
+                                <Input value={newSkill} onChange={e => setNewSkill(e.target.value)} placeholder="Thêm kỹ năng khác..." /><Button onClick={() => handleAddNewChip('skills')}>Thêm</Button>
+                                </div>
+                            </div>
+                           </div>
+                        )}
                         candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
@@ -2206,7 +1470,9 @@ export default function CandidateProfilePage() {
                         {candidate.skills.length > 0 ? candidate.skills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>) : 
                         <div className="text-muted-foreground text-sm">
                             <span>{notUpdatedText}</span>
-                            <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={profileByLang.vi!}>
+                            <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={(temp, handleChange) => (
+                               <div></div>
+                            )} candidate={profileByLang.vi!}>
                                <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>}
@@ -2216,7 +1482,9 @@ export default function CandidateProfilePage() {
                         {candidate.interests.length > 0 ? candidate.interests.map(interest => <Badge key={interest} className="bg-accent-blue text-white">{interest}</Badge>) : 
                         <div className="text-muted-foreground text-sm">
                             <span>{notUpdatedText}</span>
-                             <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={renderSkillsInterestsEdit} candidate={profileByLang.vi!}>
+                             <EditDialog title="Chỉnh sửa Kỹ năng & Lĩnh vực" description="Chọn các mục có sẵn hoặc thêm mới để làm nổi bật hồ sơ của bạn." onSave={handleSave} renderContent={(temp, handleChange) => (
+                                <div></div>
+                             )} candidate={profileByLang.vi!}>
                                 <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                             </EditDialog>
                         </div>}
@@ -2230,7 +1498,12 @@ export default function CandidateProfilePage() {
                      <EditDialog
                         title="Chỉnh sửa Chứng chỉ & Giải thưởng"
                         onSave={handleSave}
-                        renderContent={renderCertificationsEdit}
+                        renderContent={(temp, handleChange) => (
+                            <div className="space-y-6">
+                            {temp.certifications.map((cert, index) => (<div key={index} className="p-4 border rounded-lg space-y-2 relative"><div className="flex justify-between items-center mb-2"><Label htmlFor={`cert-${index}`}>Chứng chỉ #{index + 1}</Label><Button variant="ghost" size="icon" onClick={() => handleRemoveItem('certifications', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button></div><Input id={`cert-${index}`} value={cert} onChange={(e) => handleChange('certifications', index, e.target.value)} /></div>))}
+                            <Button variant="outline" className="w-full" onClick={() => handleAddItem('certifications', 'vietnam', undefined)}><PlusCircle className="mr-2"/> Thêm chứng chỉ</Button>
+                            </div>
+                        )}
                         candidate={profileByLang.vi!}
                     >
                       <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
@@ -2242,7 +1515,9 @@ export default function CandidateProfilePage() {
                      )) : 
                      <div className="text-muted-foreground text-sm">
                         <span>{notUpdatedText}</span>
-                        <EditDialog title="Chỉnh sửa Chứng chỉ & Giải thưởng" onSave={handleSave} renderContent={renderCertificationsEdit} candidate={profileByLang.vi!}>
+                        <EditDialog title="Chỉnh sửa Chứng chỉ & Giải thưởng" onSave={handleSave} renderContent={(temp, handleChange) => (
+                            <div/>
+                        )} candidate={profileByLang.vi!}>
                             <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                         </EditDialog>
                     </div>}

@@ -53,16 +53,14 @@ const parseMessengerInput = (input: string): string => {
             const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
             
             if (url.hostname.includes('facebook.com') || url.hostname.includes('m.facebook.com')) {
-                if (url.pathname.includes('profile.php')) {
-                    const id = url.searchParams.get('id');
-                    if (id) return id;
+                const id = url.searchParams.get('id');
+                if (id && /^\d+$/.test(id)) {
+                    return id; // Return numeric ID if found in profile.php
                 }
-                const pathParts = url.pathname.split('/').filter(Boolean);
+                // For vanity URLs like facebook.com/username
+                const pathParts = url.pathname.split('/').filter(part => part && part !== 'profile.php' && part !== 'people');
                 if (pathParts.length > 0) {
-                    const lastPart = pathParts[pathParts.length - 1];
-                    if (lastPart !== 'profile.php' && lastPart !== 'home.php') {
-                        return lastPart;
-                    }
+                    return pathParts[pathParts.length - 1];
                 }
             }
              if (url.hostname.includes('m.me')) {
@@ -73,8 +71,10 @@ const parseMessengerInput = (input: string): string => {
             }
         }
     } catch (error) {
-        console.warn("Could not parse input as URL, treating as username:", error);
+        // Not a valid URL, treat as a potential username
+        console.warn("Could not parse Messenger input as URL, treating as username:", error);
     }
+    // Fallback: treat as username, remove any URL-like parts
     return trimmedInput.split('/').pop() || trimmedInput;
 };
 
@@ -95,20 +95,19 @@ const parseLineInput = (input: string): string => {
       if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
           const url = new URL(trimmedInput);
           const pathParts = url.pathname.split('/');
-          // Get the last part, which could be 'p' or the ID itself
-          let potentialId = pathParts.pop(); 
-          if(potentialId === 'p' || potentialId === 'R' || potentialId === 'ti'){
-             potentialId = pathParts.pop();
-          }
+          let potentialId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
           if (potentialId) {
-             return potentialId.replace(/[~@]/g, '');
+             // Remove query parameters
+             potentialId = potentialId.split('?')[0];
+             // Remove leading ~ or @ if present
+             return potentialId.replace(/^[~@]/, '');
           }
       }
   } catch (error) {
        console.warn("Could not parse Line input as URL, treating as ID:", error);
   }
   // Fallback to treat the whole input as an ID, removing potential URL parts and special characters
-  return trimmedInput.split('/').pop()?.replace(/[~@]/g, '') || trimmedInput;
+  return trimmedInput.split('/').pop()?.replace(/^[~@]/, '') || trimmedInput.replace(/^[~@]/, '');
 };
 
 
@@ -395,7 +394,7 @@ const renderLevel1Edit = (
                         <div className="space-y-1">
                             <Label htmlFor="line" className="flex items-center gap-2">
                                 <LineIcon />
-                                Line (Link hồ sơ)
+                                Line
                             </Label>
                             <Input
                                 id="line"
@@ -410,7 +409,7 @@ const renderLevel1Edit = (
                     </div>
                     <div className="mt-4 text-center text-sm">
                         <div className="text-muted-foreground">
-                            Cung cấp ít nhất một phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                            Cung cấp ít nhất một phương thức liên lạc để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
                         </div>
                     </div>
                 </div>
