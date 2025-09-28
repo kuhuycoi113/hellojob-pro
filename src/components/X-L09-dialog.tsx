@@ -77,6 +77,11 @@ const formatNumber = (numStr: string | number) => {
     return num.toLocaleString('en-US');
 };
 
+const Logo = () => (
+    <Image src="/img/HJPNG.png" alt="HelloJob Logo" width={110} height={36} className="h-9 w-auto" />
+);
+
+
 export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, recruitmentPrefs, contactInfo }: XL09DialogProps) {
   const content = contentByLang[lang];
 
@@ -121,25 +126,30 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
         </div>
 
         <DialogFooter className="flex-col items-center gap-4 border-t pt-6">
-            <div className="text-center">
+            <div className="w-full text-center space-y-3">
                 <p className="text-sm font-semibold">{content.supportTitle}</p>
                 <p className="text-sm">Email: <a href="mailto:chairman@hellojob.jp" className="text-primary hover:underline">chairman@hellojob.jp</a></p>
-                <div className="flex justify-center gap-2 mt-2">
-                   <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-500 hover:bg-green-50">
-                        <Link href="tel:0386667999"><Image src="/img/phone.svg" alt="Phone" width={20} height={20} /></Link>
-                    </Button>
-                    <Button asChild variant="outline" size="icon" className="h-10 w-10 border-blue-500 hover:bg-blue-50">
-                        <Link href="https://zalo.me/your_zalo_id"><ZaloIcon /></Link>
-                    </Button>
-                    <Button asChild variant="outline" size="icon" className="h-10 w-10 border-purple-500 hover:bg-purple-50">
-                        <Link href="https://m.me/your_user_id"><MessengerIcon /></Link>
-                    </Button>
-                    <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-700 hover:bg-green-100">
-                        <Link href="https://line.me/ti/p/~your_line_id"><LineIcon /></Link>
-                    </Button>
+                <div className="flex items-center justify-center gap-4">
+                   <Link href="/" className="hidden md:block">
+                        <Logo />
+                    </Link>
+                    <div className="flex justify-center gap-2">
+                       <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-500 hover:bg-green-50">
+                            <Link href="tel:0386667999"><Image src="/img/phone.svg" alt="Phone" width={20} height={20} /></Link>
+                        </Button>
+                        <Button asChild variant="outline" size="icon" className="h-10 w-10 border-blue-500 hover:bg-blue-50">
+                            <Link href="https://zalo.me/your_zalo_id"><ZaloIcon /></Link>
+                        </Button>
+                        <Button asChild variant="outline" size="icon" className="h-10 w-10 border-purple-500 hover:bg-purple-50">
+                            <Link href="https://m.me/your_user_id"><MessengerIcon /></Link>
+                        </Button>
+                        <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-700 hover:bg-green-100">
+                            <Link href="https://line.me/ti/p/~your_line_id"><LineIcon /></Link>
+                        </Button>
+                    </div>
                 </div>
             </div>
-            <div className="w-full flex justify-center md:pt-4">
+            <div className="w-full flex justify-center pt-4">
                  <Button onClick={onComplete} className="w-full md:w-auto">
                     {content.completeButton}
                 </Button>
