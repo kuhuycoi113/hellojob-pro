@@ -281,7 +281,7 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="phone" className="flex items-center gap-2">
-                                <Image src="/img/phone.svg" alt="Phone" width={16} height={16} />
+                                <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
                                 {content.phoneLabel}
                             </Label>
                              <div className="flex items-center">
@@ -318,6 +318,7 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                                 onBlur={(e) => validateField('messenger', e.target.value)}
                                 className={cn(errors.messenger && "border-destructive")}
                             />
+                             {!errors.messenger && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự nhận diện khi bạn dán cả đường link.</p>}
                             {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                          <div className="space-y-1">
@@ -330,6 +331,7 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
+                             {!errors.line && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự nhận diện khi bạn dán cả đường link.</p>}
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                     </div>
@@ -349,5 +351,3 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
     </Dialog>
   );
 }
-
-    

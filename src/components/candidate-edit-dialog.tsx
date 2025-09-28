@@ -377,10 +377,7 @@ const renderLevel1Edit = (
                             </div>
                         </div>
                         <div className="space-y-1">
-                             <Label htmlFor="messenger" className="flex items-center gap-2">
-                                <MessengerIcon />
-                                Facebook Messenger
-                            </Label>
+                             <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon />Facebook Messenger</Label>
                             <Input
                                 id="messenger"
                                 placeholder="Dán link Facebook / Messenger hoặc username"
@@ -389,13 +386,11 @@ const renderLevel1Edit = (
                                 onBlur={(e) => validateField('messenger', e.target.value)}
                                 className={cn(errors.messenger && "border-destructive")}
                             />
-                             {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
+                            {!errors.messenger && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự nhận diện khi bạn dán cả đường link.</p>}
+                            {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="line" className="flex items-center gap-2">
-                                <LineIcon />
-                                Line
-                            </Label>
+                            <Label htmlFor="line" className="flex items-center gap-2"><LineIcon />Line</Label>
                             <Input
                                 id="line"
                                 placeholder="Dán link Line hoặc nhập ID của bạn"
@@ -404,6 +399,7 @@ const renderLevel1Edit = (
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
+                            {!errors.line && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự nhận diện khi bạn dán cả đường link.</p>}
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                     </div>
