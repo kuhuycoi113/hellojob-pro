@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, use, useEffect } from 'react';
@@ -38,7 +39,7 @@ const employersData: { [key: string]: any } = {
             en: 'Hanoi, Vietnam'
         },
         logo: '/img/favi2.png',
-        banner: 'https://placehold.co/1200x400.png?text=Tải+lên+ảnh+bìa',
+        banner: 'https://picsum.photos/seed/z000banner/1200/400',
         
         about: {
             vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
@@ -235,7 +236,7 @@ const contentByLang = {
 
 type Language = keyof typeof contentByLang;
 
-const roleTexts: { [key: string]: Record<Language, string> } = {
+const roleTexts: Record<string, Record<Language, string>> = {
   haken_staff: { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
   jp_hr_staff: { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
   dispatch: { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
@@ -293,7 +294,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 };
 
 
-export default function EmployerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EmployerDetailPage({ params }: { params: { id: string } }) {
   const resolvedParams = use(params);
   const searchParams = useSearchParams();
   const id = resolvedParams.id;
