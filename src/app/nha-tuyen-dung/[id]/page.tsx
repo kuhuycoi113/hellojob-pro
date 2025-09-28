@@ -161,10 +161,9 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
 );
 
 export default function EmployerDetailPage({ params: paramsProp }: { params: { id: string } }) {
-  const params = use(paramsProp);
+  const resolvedParams = use(paramsProp);
   const searchParams = useSearchParams();
   
-  // Initialize with a default language and update on client-side
   const [lang, setLang] = useState<Language>('vi');
   
   useEffect(() => {
@@ -172,7 +171,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
     setLang(langFromParams);
   }, [searchParams]);
 
-  if (params.id !== 'Z000') {
+  if (resolvedParams.id !== 'Z000') {
     notFound();
   }
   
@@ -458,4 +457,6 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
         </DialogContent>
       </Dialog>
     </>
-    
+    );
+}
+
