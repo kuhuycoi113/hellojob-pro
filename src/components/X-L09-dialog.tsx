@@ -127,12 +127,14 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
             </div>
         </div>
 
-        <DialogFooter className="flex-col md:flex-row md:justify-between items-center gap-4 border-t pt-6">
+        <DialogFooter className="flex-col md:flex-row md:justify-between md:items-center gap-4 border-t pt-6">
             <div className="flex flex-col items-center md:items-start text-center md:text-left">
                 <p className="text-sm font-semibold">{content.supportTitle}</p>
                 <a href="mailto:chairman@hellojob.jp" className="text-sm text-primary hover:underline">Email: chairman@hellojob.jp</a>
                 <div className="flex items-center justify-center md:justify-start gap-3 mt-2">
-                    <Logo />
+                    <div className="hidden md:block">
+                      <Logo />
+                    </div>
                     <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-500 hover:bg-green-50">
                         <Link href="tel:0386667999"><Image src="/img/phone.svg" alt="Phone" width={20} height={20} /></Link>
                     </Button>
@@ -148,7 +150,7 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                 </div>
             </div>
             <div className="w-full md:w-auto mt-4 md:mt-0 flex justify-center">
-                 <Button onClick={onComplete} className="w-full md:w-auto md:px-8">
+                 <Button onClick={onComplete} variant="ghost" size="lg" className="w-full md:w-auto md:px-8">
                     {content.completeButton}
                 </Button>
             </div>
