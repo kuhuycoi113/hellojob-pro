@@ -85,6 +85,7 @@ const emptyEmployerData = {
       { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 1' },
       { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 2' },
       { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 3' },
+      { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 4' },
     ],
     history: [],
     info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '' },
@@ -162,7 +163,14 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
 export default function EmployerDetailPage({ params: paramsProp }: { params: { id: string } }) {
   const params = use(paramsProp);
   const searchParams = useSearchParams();
-  const lang = (searchParams.get('lang') || 'vi') as Language;
+  
+  // Initialize with a default language and update on client-side
+  const [lang, setLang] = useState<Language>('vi');
+  
+  useEffect(() => {
+    const langFromParams = (searchParams.get('lang') || 'vi') as Language;
+    setLang(langFromParams);
+  }, [searchParams]);
 
   if (params.id !== 'Z000') {
     notFound();
@@ -249,7 +257,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
 
     switch(editingModule.field) {
         case 'about':
-            return <Textarea placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang]} onChange={(e) => setTempContent({...tempContent, [lang]: e.target.value})} rows={8} />;
+            return <Textarea placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({...tempContent, [lang]: e.target.value})} rows={8} />;
         
         case 'images':
             return (
@@ -257,10 +265,10 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                  {tempContent.map((img: any, index: number) => (
                    <div key={index} className="flex items-center gap-4">
                       <div className="relative w-20 h-20 flex-shrink-0">
-                         <Image src={img.src} alt={img.alt[lang]} fill className="object-cover rounded-md"/>
+                         <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover rounded-md"/>
                       </div>
                       <Input 
-                        placeholder={`Ví dụ: ${placeholderEmployerData.images[index]?.alt[lang]}`}
+                        placeholder={`Ví dụ: ${placeholderEmployerData.images[index]?.alt[lang] || ''}`}
                         value={img.alt[lang] || ''}
                         onChange={(e) => {
                             const newImages = [...tempContent];
@@ -281,7 +289,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                     {tempContent.map((item: any, index: number) => (
                         <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
                             <Input placeholder="Năm" value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
-                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang]}`} value={item.event[lang]} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
+                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang] || ''}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
@@ -292,7 +300,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
              return (
                 <div className="space-y-4">
                     <div className="space-y-2"><Label>{t.foundedLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang]} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
                     <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
                     <div className="space-y-2"><Label>{t.websiteLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} /></div>
                 </div>
@@ -300,8 +308,8 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
         case 'industries':
              return (
                 <div className="space-y-4">
-                    <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={tempContent.main[lang]} onChange={(e) => setTempContent(prev => ({...prev, main: {...prev.main, [lang]: e.target.value}}))} /></div>
-                    <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={tempContent.secondary[lang]} onChange={(e) => setTempContent(prev => ({...prev, secondary: {...prev.secondary, [lang]: e.target.value}}))} /></div>
+                    <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Textarea placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={tempContent.main[lang] || ''} onChange={(e) => setTempContent(prev => ({...prev, main: {...prev.main, [lang]: e.target.value}}))} /></div>
+                    <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Textarea placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={tempContent.secondary[lang] || ''} onChange={(e) => setTempContent(prev => ({...prev, secondary: {...prev.secondary, [lang]: e.target.value}}))} /></div>
                 </div>
              );
         case 'benefits':
@@ -309,7 +317,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                 <div className="space-y-4">
                      {tempContent.map((item: any, index: number) => (
                         <div key={index} className="flex items-center gap-2">
-                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.benefits[index]?.[lang]}`} value={item[lang] || ''} onChange={(e) => {
+                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.benefits[index]?.[lang] || ''}`} value={item[lang] || ''} onChange={(e) => {
                                 const newBenefits = [...tempContent];
                                 newBenefits[index] = {...newBenefits[index], [lang]: e.target.value};
                                 setTempContent(newBenefits);
@@ -377,7 +385,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {employer.images.map((img, index) => (
                               <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
-                                  <Image src={img.src} alt={img.alt[lang]} fill className="object-cover" />
+                                  <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover" />
                                    <Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                                         <Camera className="h-6 w-6 text-white"/>
                                    </Label>
@@ -404,7 +412,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                   <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
                           <p><strong>{t.foundedLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={employer.info.founded} onChange={(e) => setEmployer({...employer, info: {...employer.info, founded: e.target.value}})} /></p>
-                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info, size: {...employer.info.size, [lang]: e.target.value}}})} /></p>
+                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info.size, [lang]: e.target.value}})} /></p>
                           <p><strong>{t.licenseLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={employer.info.license} onChange={(e) => setEmployer({...employer, info: {...employer.info, license: e.target.value}})} /></p>
                           <p><strong>{t.websiteLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto text-primary border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={employer.info.website} onChange={(e) => setEmployer({...employer, info: {...employer.info, website: e.target.value}})} /></p>
                       </div>
@@ -450,5 +458,4 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
         </DialogContent>
       </Dialog>
     </>
-  );
-}
+    
