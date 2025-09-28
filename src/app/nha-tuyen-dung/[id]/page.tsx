@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Calendar, MapPin, Users, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle, Info, PlusCircle, Trash2, UploadCloud } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle, Info, PlusCircle, Trash2, UploadCloud } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -86,7 +86,6 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
 
   const handleEditClick = (title: string, currentContent: any, field: string) => {
     setEditingModule({ title, content: currentContent, field });
-    // Deep copy for arrays/objects to prevent direct state mutation
     setTempContent(JSON.parse(JSON.stringify(currentContent)));
     setIsEditDialogOpen(true);
   };
@@ -98,20 +97,16 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         const newState = { ...prev };
         const { field } = editingModule;
 
-        if (['about', 'info', 'benefits', 'industries', 'history', 'name', 'type', 'location', 'images'].includes(field)) {
-             // Handle nested and top-level properties
-            if (field === 'header') {
-                 // @ts-ignore
-                 newState.name = tempContent.name;
-                 // @ts-ignore
-                 newState.type = tempContent.type;
-                 // @ts-ignore
-                 newState.location = tempContent.location;
-            }
-            else {
-                // @ts-ignore
-                newState[field as keyof typeof newState] = tempContent;
-            }
+        if (['about', 'info', 'benefits', 'industries', 'history', 'images', 'banner', 'logo'].includes(field)) {
+             // @ts-ignore
+            newState[field as keyof typeof newState] = tempContent;
+        } else if (field === 'header') {
+            // @ts-ignore
+            newState.name = tempContent.name;
+            // @ts-ignore
+            newState.type = tempContent.type;
+            // @ts-ignore
+            newState.location = tempContent.location;
         }
         
         return newState;
@@ -120,6 +115,17 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     setIsEditDialogOpen(false);
     setEditingModule(null);
   }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'banner' | 'logo') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setEmployer(prev => ({ ...prev, [field]: event.target?.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const renderAboutEdit = () => (
       <Textarea 
@@ -279,7 +285,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
   );
 
   const renderImagesEdit = () => {
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, indexToUpdate: number) => {
+    const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>, indexToUpdate: number) => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
@@ -324,7 +330,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                             <Label htmlFor={`img-upload-${index}`} className="cursor-pointer p-2 bg-black/50 rounded-full text-white">
                                 <Camera className="h-5 w-5"/>
                             </Label>
-                            <Input id={`img-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleImageChange(e, index)} />
+                            <Input id={`img-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleImageFileChange(e, index)} />
                              <Button variant="destructive" size="icon" className="h-9 w-9 rounded-full" onClick={() => removeImage(index)}>
                                 <Trash2 className="h-5 w-5"/>
                             </Button>
@@ -376,9 +382,12 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                 <div className="relative w-full h-48 md:h-64">
                   <Image src={employer.banner} alt={`${employer.name} banner`} fill className="object-cover" data-ai-hint={employer.dataAiHintBanner}/>
                   <div className="absolute inset-0 bg-black/40" />
-                  <Button variant="secondary" size="sm" className="absolute top-4 right-4 z-10" onClick={() => handleEditClick('Ảnh bìa', employer.banner, 'banner')}>
-                      <Camera className="mr-2 h-4 w-4" /> Sửa ảnh bìa
-                  </Button>
+                  <Label htmlFor="banner-upload" className="absolute top-4 right-4 z-10">
+                     <Button variant="secondary" size="sm" asChild>
+                       <span><Camera className="mr-2 h-4 w-4" /> Sửa ảnh bìa</span>
+                     </Button>
+                     <Input id="banner-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'banner')} />
+                  </Label>
                 </div>
                 <div className="p-6 bg-card">
                   <div className="flex flex-col md:flex-row gap-6 items-start -mt-24 md:-mt-20 relative">
@@ -387,15 +396,16 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                             <AvatarImage src={employer.logo} alt={employer.name} data-ai-hint={employer.dataAiHint} />
                             <AvatarFallback>{employer.name.charAt(0)}</AvatarFallback>
                           </Avatar>
-                          <Button variant="secondary" size="icon" className="absolute bottom-1 right-1 h-8 w-8 rounded-full z-10" onClick={() => handleEditClick('Avatar', employer.logo, 'logo')}>
-                              <Camera className="h-4 w-4"/>
-                          </Button>
+                           <Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
+                              <Camera className="h-4 w-4 text-secondary-foreground" />
+                           </Label>
+                           <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
                       <div className="flex-grow pt-16 md:pt-20">
                           <h1 className="text-2xl md:text-3xl font-headline font-bold">{employer.name}</h1>
                           <p className="font-semibold text-primary">{employer.type}</p>
                           <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
-                              <MapPin className="h-4 w-4" /> {employer.location}
+                              {employer.location}
                           </p>
                       </div>
                       <div className="absolute top-16 right-0 md:top-20 md:right-0">
