@@ -397,16 +397,13 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                         <div className="space-y-2"><Label>{t.foundedLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} /></div>
                         <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
                         <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
-                        <div className="space-y-2"><Label>{t.emailLabel}</Label><Input type="email" placeholder="contact@company.com" value={tempContent.email} onChange={(e) => setTempContent({...tempContent, email: e.target.value})} /></div>
-                    </div>
-                     <div className="space-y-2">
-                        <Label>{t.websiteLabel}</Label>
-                        <Input placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} />
+                        <div className="space-y-2"><Label>{t.websiteLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} /></div>
                     </div>
                     
                     <div className="pt-4 border-t">
                       <h4 className="font-semibold mb-4">{t.contactTitle}</h4>
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <div className="space-y-2 md:col-span-2"><Label htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4"/> {t.emailLabel}</Label><Input type="email" id="email" placeholder="contact@company.com" value={tempContent.email} onChange={(e) => setTempContent({...tempContent, email: e.target.value})} /></div>
                           <div className="space-y-2">
                               <Label htmlFor="phone" className="flex items-center gap-2">
                                 <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
@@ -499,7 +496,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     }
   };
 
-  const hasContactInfo = employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line;
+  const hasContactInfo = employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line || employer.info.email;
 
   const formatDisplayPhoneNumber = (phone: string) => {
       if (!phone) return '';
@@ -600,10 +597,11 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                       </div>
                       {hasContactInfo ? (
                           <div id="HIENTHILIENHE04" className="mt-6 border-t pt-4 space-y-2">
+                             {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
                              {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
-                             {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${employer.info.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4" />{employer.info.messenger}</Link></Button>}
+                             {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
                              {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
-                             {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{employer.info.line}</Link></Button>}
+                             {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
                           </div>
                       ) : (
                           <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
@@ -662,3 +660,5 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     </>
   );
 }
+
+    
