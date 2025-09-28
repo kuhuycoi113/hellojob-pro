@@ -96,7 +96,7 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
           <DialogDescription>{content.description}</DialogDescription>
         </DialogHeader>
         
-        <div className="py-4 space-y-6">
+        <div className="py-4 space-y-6 max-h-[60vh] overflow-y-auto pr-2">
             <Card className="bg-secondary">
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2"><Info className="h-5 w-5"/>{content.summaryTitle}</CardTitle>
@@ -130,9 +130,9 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                 <p className="text-sm font-semibold">{content.supportTitle}</p>
                 <p className="text-sm">Email: <a href="mailto:chairman@hellojob.jp" className="text-primary hover:underline">chairman@hellojob.jp</a></p>
                 <div className="flex items-center justify-center gap-4">
-                   <Link href="/" className="hidden md:block">
-                        <Logo />
-                    </Link>
+                    <div className="flex-shrink-0">
+                       <Logo />
+                    </div>
                     <div className="flex justify-center gap-2">
                        <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-500 hover:bg-green-50">
                             <Link href="tel:0386667999"><Image src="/img/phone.svg" alt="Phone" width={20} height={20} /></Link>
