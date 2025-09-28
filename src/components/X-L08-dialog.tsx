@@ -43,7 +43,11 @@ const contentByLang = {
         phoneLabel: 'Số điện thoại',
         zaloLabel: 'Zalo',
         messengerLabel: 'Facebook Messenger',
+        messengerPlaceholder: 'Dán link Facebook / Messenger hoặc username',
+        messengerHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
         lineLabel: 'Line',
+        linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
+        lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
         backButton: 'Quay lại',
         completeButton: 'Hoàn tất & Gửi',
         programType: 'Loại hình',
@@ -63,8 +67,12 @@ const contentByLang = {
         otherContactLabel: 'その他の連絡方法 (最低1つ)',
         phoneLabel: '電話番号',
         zaloLabel: 'Zalo',
-        messengerLabel: 'Facebook Messenger',
+        messengerLabel: 'Facebookメッセンジャー',
+        messengerPlaceholder: 'Facebook/Messengerのリンクまたはユーザー名',
+        messengerHelper: 'システムが自動的にユーザー名を取得します。',
         lineLabel: 'Line',
+        linePlaceholder: 'LineのリンクまたはIDを入力してください',
+        lineHelper: 'システムが自動的にユーザー名を取得します。',
         backButton: '戻る',
         completeButton: '完了して送信',
         programType: 'プログラム種別',
@@ -85,7 +93,11 @@ const contentByLang = {
         phoneLabel: 'Phone Number',
         zaloLabel: 'Zalo',
         messengerLabel: 'Facebook Messenger',
+        messengerPlaceholder: 'Paste Facebook/Messenger link or username',
+        messengerHelper: 'The system will automatically extract your username.',
         lineLabel: 'Line',
+        linePlaceholder: 'Paste Line link or enter your ID',
+        lineHelper: 'The system will automatically extract your username.',
         backButton: 'Back',
         completeButton: 'Complete & Send',
         programType: 'Program Type',
@@ -286,7 +298,7 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2"><Info className="h-5 w-5"/>{content.summaryTitle}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm space-y-1">
+                <CardContent className="text-sm space-y-2">
                     <p><strong>{content.programType}:</strong> {recruitmentPrefs?.desiredVisaType}</p>
                     <p><strong>{content.details}:</strong> {recruitmentPrefs?.desiredVisaDetail}</p>
                     <p><strong>{content.industry}:</strong> {recruitmentPrefs?.desiredIndustry}</p>
@@ -341,26 +353,26 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                              <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{content.messengerLabel}</Label>
                             <Input
                                 id="messenger"
-                                placeholder="Dán link Facebook / Messenger hoặc username"
+                                placeholder={content.messengerPlaceholder}
                                 value={messenger}
                                 onChange={(e) => setMessenger(e.target.value)}
                                 onBlur={(e) => validateField('messenger', e.target.value)}
                                 className={cn(errors.messenger && "border-destructive")}
                             />
-                             <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
+                            {!errors.messenger && <p className="text-xs text-muted-foreground">{content.messengerHelper}</p>}
                             {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                          <div className="space-y-1">
                             <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{content.lineLabel}</Label>
                             <Input
                                 id="line"
-                                placeholder="Dán link Line hoặc nhập ID của bạn"
+                                placeholder={content.linePlaceholder}
                                 value={line}
                                 onChange={(e) => setLine(e.target.value)}
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
-                            <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
+                            {!errors.line && <p className="text-xs text-muted-foreground">{content.lineHelper}</p>}
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                     </div>
