@@ -110,7 +110,8 @@ const contentByLang = {
         secondaryIndustriesLabel: 'Ngành nghề khác',
         benefitsTitle: 'Phúc lợi & Môi trường',
         notUpdated: 'Chưa có thông tin',
-        clickToUpdate: 'Nhấn để cập nhật'
+        clickToUpdate: 'Nhấn để cập nhật',
+        headerTitle: 'Thông tin chung',
     },
     ja: {
         edit: '編集',
@@ -127,7 +128,8 @@ const contentByLang = {
         secondaryIndustriesLabel: 'その他の業種',
         benefitsTitle: '福利厚生と環境',
         notUpdated: '情報がありません',
-        clickToUpdate: 'クリックして更新'
+        clickToUpdate: 'クリックして更新',
+        headerTitle: '一般情報',
     },
     en: {
         edit: 'Edit',
@@ -144,7 +146,8 @@ const contentByLang = {
         secondaryIndustriesLabel: 'Other Industries',
         benefitsTitle: 'Benefits & Environment',
         notUpdated: 'Not available',
-        clickToUpdate: 'Click to update'
+        clickToUpdate: 'Click to update',
+        headerTitle: 'General Information',
     }
 };
 
@@ -261,6 +264,14 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     if (!editingModule) return <p>Chức năng đang được phát triển.</p>;
 
     switch(editingModule.field) {
+        case 'header':
+            return (
+                 <div className="space-y-4">
+                    <div className="space-y-2"><Label>Tên công ty</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.name[lang]}`} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>Loại hình</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.type[lang]}`} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>Địa điểm</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.location[lang]}`} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
+                </div>
+            );
         case 'about':
             return <Textarea placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({...tempContent, [lang]: e.target.value})} rows={8} />;
         
@@ -370,9 +381,12 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
                       <div className="flex-grow pt-16 md:pt-20">
-                          <Input className="text-2xl md:text-3xl font-headline font-bold border-0 shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0" placeholder={`Ví dụ: ${placeholderEmployerData.name[lang]}`} value={employer.name[lang]} onChange={(e) => setEmployer({...employer, name: {...employer.name, [lang]: e.target.value}})} />
-                          <Input className="font-semibold text-primary border-0 shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0" placeholder={`Ví dụ: ${placeholderEmployerData.type[lang]}`} value={employer.type[lang]} onChange={(e) => setEmployer({...employer, type: {...employer.type, [lang]: e.target.value}})} />
-                          <Input className="text-sm text-muted-foreground border-0 shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0" placeholder={`Ví dụ: ${placeholderEmployerData.location[lang]}`} value={employer.location[lang]} onChange={(e) => setEmployer({...employer, location: {...employer.location, [lang]: e.target.value}})} />
+                          <h1 className="text-2xl md:text-3xl font-headline font-bold">{employer.name[lang] || <span className="italic text-muted-foreground">Ví dụ: {placeholderEmployerData.name[lang]}</span>}</h1>
+                          <p className="font-semibold text-primary">{employer.type[lang] || <span className="italic text-muted-foreground">Ví dụ: {placeholderEmployerData.type[lang]}</span>}</p>
+                          <p className="text-sm text-muted-foreground">{employer.location[lang] || <span className="italic text-muted-foreground">Ví dụ: {placeholderEmployerData.location[lang]}</span>}</p>
+                      </div>
+                      <div className="absolute top-0 right-0 md:pt-20">
+                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: employer.type, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
                       </div>
                   </div>
                 </div>
