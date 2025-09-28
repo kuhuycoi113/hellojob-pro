@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -214,9 +213,6 @@ const translations = {
         workExperience: "Work Experience",
         education: "Education",
         skillsAndInterests: "Skills & Interests",
-        skills: "Skills",
-        interests: "Interests",
-        certifications: "Certifications & Awards",
         notes: "Notes",
         videos: "Videos",
         bodyPhotos: "Body Photos",
@@ -353,7 +349,115 @@ const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
             </div>
         </DialogContent>
     </Dialog>
-)
+);
+
+const EditDialog = ({
+  children,
+  title,
+  onSave,
+  renderContent,
+  description,
+  candidate,
+  dialogId,
+  footerContent,
+}: {
+  children: React.ReactNode;
+  title: string;
+  onSave: (updatedCandidate: EnrichedCandidateProfile) => void;
+  renderContent: (
+    tempData: EnrichedCandidateProfile,
+    handleTempChange: (
+      section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
+      ...args: any[]
+    ) => void
+  ) => React.ReactNode;
+  description?: string;
+  candidate: EnrichedCandidateProfile;
+  dialogId?: string;
+  footerContent?: React.ReactNode;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile>(candidate);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTempCandidate(JSON.parse(JSON.stringify(candidate)));
+    }
+  }, [isOpen, candidate]);
+
+  const handleSave = () => {
+    onSave(tempCandidate);
+    setIsOpen(false);
+  };
+
+  const handleTempChange = (
+    section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
+    ...args: any[]
+  ) => {
+    setTempCandidate(prev => {
+        if (!prev) return null;
+        const newCandidate = { ...prev };
+
+        if (section === 'personalInfo' || section === 'aspirations') {
+            const [field, value] = args;
+             // @ts-ignore
+            newCandidate[section] = { ...newCandidate[section], [field]: value };
+        } else if (section === 'documents') {
+            const [docType, index, value] = args;
+            // @ts-ignore
+            newCandidate.documents[docType][index] = value;
+        } else if (['experience', 'education', 'certifications'].includes(section)) {
+            const [index, field, value] = args;
+            if (field) {
+                // @ts-ignore
+                newCandidate[section][index][field] = value;
+            } else {
+                // For simple arrays like certifications
+                // @ts-ignore
+                newCandidate[section][index] = value;
+            }
+        } else if (['skills', 'interests'].includes(section)) {
+            const [value, isAdding] = args;
+            // @ts-ignore
+            const currentValues = newCandidate[section];
+            // @ts-ignore
+            newCandidate[section] = isAdding
+                ? [...currentValues, value]
+                : currentValues.filter((item: string) => item !== value);
+        } else {
+            const [value] = args;
+            // @ts-ignore
+            newCandidate[section] = value;
+        }
+
+        return newCandidate;
+    });
+};
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className="sm:max-w-[600px]" id={dialogId}>
+        <DialogHeader>
+          <DialogTitle className="font-headline text-2xl">{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
+        <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
+          {renderContent(tempCandidate, handleTempChange)}
+        </div>
+        <DialogFooter>
+            {footerContent && <div>{footerContent}</div>}
+           <DialogClose asChild>
+                <Button variant="outline">Hủy</Button>
+            </DialogClose>
+          <Button type="submit" onClick={handleSave} className="bg-primary text-white">
+            Lưu thay đổi
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 
 export default function CandidateProfilePage() {
@@ -1166,7 +1270,7 @@ export default function CandidateProfilePage() {
                                 <div key={index} className="p-4 border rounded-lg space-y-2 relative">
                                 <div className="flex justify-between items-center mb-2">
                                     <h4 className="font-bold">Kinh nghiệm #{index + 1}</h4>
-                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('experience', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                    <Button variant="ghost" size="icon" onClick={()={() => handleRemoveItem('experience', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                                 </div>
                                 <Label>Vai trò</Label><Input value={exp.role} onChange={e => handleChange('experience', index, 'role', e.target.value)} />
                                 <Label>Công ty</Label><Input value={exp.company} onChange={e => handleChange('experience', index, 'company', e.target.value)} />
