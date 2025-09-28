@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -962,7 +963,7 @@ export default function CandidateProfilePage() {
             </CardContent>
             <CardContent>
                 {hasContactInfo ? (
-                    <div className="space-y-2">
+                    <div id="HIENTHILIENHE01" className="space-y-2">
                         {phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(phone)}</Link></Button>}
                         {messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${messenger}`}</span></Link></Button>}
                         {zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(zalo)}</Link></Button>}
@@ -1879,3 +1880,5 @@ const DocumentGrid = ({
     </div>
   )
 };
+
+    
