@@ -334,8 +334,14 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     setEmployer(prev => {
         const newState = { ...prev };
         const { field } = editingModule;
-        // @ts-ignore
-        newState[field] = tempContent;
+        if (field === 'header') {
+            newState.name = tempContent.name;
+            newState.type = tempContent.type;
+            newState.location = tempContent.location;
+        } else {
+            // @ts-ignore
+            newState[field] = tempContent;
+        }
         return newState;
     });
 
@@ -737,4 +743,3 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     </>
   );
 }
-
