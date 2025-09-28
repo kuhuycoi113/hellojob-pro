@@ -196,7 +196,11 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
   const handleTempArrayChange = (index: number, field: string, value: any) => {
     setTempContent((prev: any[]) => {
       const newArray = [...prev];
-      newArray[index] = { ...newArray[index], [field]: { ...newArray[index][field], [lang]: value } };
+      if (typeof newArray[index] === 'string') { // Handle benefits array of strings
+        newArray[index] = { ...newArray[index], [lang]: value };
+      } else { // Handle history array of objects
+        newArray[index] = { ...newArray[index], [field]: { ...newArray[index][field], [lang]: value } };
+      }
       return newArray;
     });
   };
@@ -206,6 +210,8 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
       setTempContent((prev: any[]) => [...prev, { year: new Date().getFullYear().toString(), event: { vi: '', ja: '', en: '' } }]);
     } else if (field === 'benefits') {
        setTempContent((prev: any[]) => [...prev, { vi: '', ja: '', en: '' }]);
+    } else if (field === 'images') {
+       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image' }]);
     }
   };
 
@@ -252,7 +258,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                       </div>
                       <Input 
                         placeholder={`Ví dụ: ${placeholderEmployerData.images[index]?.alt[lang]}`}
-                        value={img.alt[lang]}
+                        value={img.alt[lang] || ''}
                         onChange={(e) => {
                             const newImages = [...tempContent];
                             newImages[index] = {...newImages[index], alt: {...newImages[index].alt, [lang]: e.target.value}};
@@ -271,7 +277,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                 <div className="space-y-4">
                     {tempContent.map((item: any, index: number) => (
                         <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
-                            <Input placeholder="Năm" value={item.year} onChange={(e) => handleTempArrayChange(index, 'year', e.target.value)} />
+                            <Input placeholder="Năm" value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
                             <Input placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang]}`} value={item.event[lang]} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
@@ -292,7 +298,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
              return (
                 <div className="space-y-4">
                     <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={tempContent.main[lang]} onChange={(e) => setTempContent({...tempContent, main: {...tempContent.main, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={tempContent.secondary[lang]} onChange={(e) => setTempContent({...tempContent, secondary: {...tempContent.secondary, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={tempContent.secondary[lang]} onChange={(e) => setTempContent(prev => ({...prev, secondary: {...prev.secondary, [lang]: e.target.value}}))} /></div>
                 </div>
              );
         case 'benefits':
@@ -300,7 +306,11 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                 <div className="space-y-4">
                      {tempContent.map((item: any, index: number) => (
                         <div key={index} className="flex items-center gap-2">
-                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.benefits[index]?.[lang]}`} value={item[lang]} onChange={(e) => handleTempArrayChange(index, 'benefit', e.target.value)} />
+                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.benefits[index]?.[lang]}`} value={item[lang] || ''} onChange={(e) => {
+                                const newBenefits = [...tempContent];
+                                newBenefits[index] = {...newBenefits[index], [lang]: e.target.value};
+                                setTempContent(newBenefits);
+                            }} />
                              <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
@@ -390,23 +400,23 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
               <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
                   <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
-                          <p><strong>{t.foundedLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={employer.info.founded} onChange={(e) => setEmployer({...employer, info: {...employer.info, founded: e.target.value}})} /></p>
-                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info.size, [lang]: e.target.value}})} /></p>
-                          <p><strong>{t.licenseLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={employer.info.license} onChange={(e) => setEmployer({...employer, info: {...employer.info, license: e.target.value}})} /></p>
-                          <p><strong>{t.websiteLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto text-primary" placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={employer.info.website} onChange={(e) => setEmployer({...employer, info: {...employer.info, website: e.target.value}})} /></p>
+                          <p><strong>{t.foundedLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={employer.info.founded} onChange={(e) => setEmployer({...employer, info: {...employer.info, founded: e.target.value}})} /></p>
+                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info.size, [lang]: e.target.value}})} /></p>
+                          <p><strong>{t.licenseLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={employer.info.license} onChange={(e) => setEmployer({...employer, info: {...employer.info, license: e.target.value}})} /></p>
+                          <p><strong>{t.websiteLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto text-primary border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={employer.info.website} onChange={(e) => setEmployer({...employer, info: {...employer.info, website: e.target.value}})} /></p>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <p><strong>{t.mainIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={employer.industries.main[lang]} onChange={(e) => setEmployer(prev => ({...prev, industries: {...prev.industries, main: {...prev.industries.main, [lang]: e.target.value}} }))} /></p>
-                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={employer.industries.secondary[lang]} onChange={(e) => setEmployer(prev => ({...prev, industries: {...prev.industries, secondary: {...prev.industries.secondary, [lang]: e.target.value}}}))} /></p>
+                          <p><strong>{t.mainIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px] border-0 shadow-none p-0 focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={employer.industries.main[lang]} onChange={(e) => setEmployer(prev => ({...prev, industries: {...prev.industries, main: {...prev.industries.main, [lang]: e.target.value}}}))} /></p>
+                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px] border-0 shadow-none p-0 focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={employer.industries.secondary[lang]} onChange={(e) => setEmployer(prev => ({...prev, industries: {...prev.industries, secondary: {...prev.industries.secondary, [lang]: e.target.value}}}))} /></p>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
                       <ul className="space-y-2 text-sm">
                           {employer.benefits.map((benefit, index) => (
                               <li key={index} className="flex items-start gap-2">
-                                  <Textarea className="text-sm text-muted-foreground min-h-[40px] border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.benefits[index]?.[lang]}`} value={benefit[lang]} onChange={(e) => { const newBenefits = [...employer.benefits]; newBenefits[index][lang] = e.target.value; setEmployer({...employer, benefits: newBenefits}); }} />
+                                  <Textarea className="text-sm text-muted-foreground min-h-[40px] border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.benefits[index]?.[lang]}`} value={benefit[lang]} onChange={(e) => { const newBenefits = [...employer.benefits]; newBenefits[index] = {...newBenefits[index], [lang]: e.target.value}; setEmployer({...employer, benefits: newBenefits}); }} />
                               </li>
                           ))}
                       </ul>
@@ -439,5 +449,3 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
     </>
   );
 }
-
-    
