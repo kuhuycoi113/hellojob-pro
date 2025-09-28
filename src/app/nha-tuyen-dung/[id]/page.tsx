@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, use, useEffect } from 'react';
-import { notFound, useSearchParams } from 'next/navigation';
+import { notFound, useSearchParams, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -233,7 +233,9 @@ const contentByLang = {
     }
 };
 
-const roleTexts: { [key: string]: { [keyof typeof contentByLang]: string } } = {
+type Language = keyof typeof contentByLang;
+
+const roleTexts: { [key: string]: Record<Language, string> } = {
   haken_staff: { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
   jp_hr_staff: { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
   dispatch: { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
@@ -244,8 +246,6 @@ const roleTexts: { [key: string]: { [keyof typeof contentByLang]: string } } = {
   haken: { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
 };
 
-
-type Language = keyof typeof contentByLang;
 
 const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void }) => (
     <Card className={cn("shadow-lg", className)}>
@@ -293,9 +293,10 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 };
 
 
-export default function EmployerDetailPage({ params }: { params: { id: string } }) {
+export default function EmployerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
   const searchParams = useSearchParams();
-  const id = use(params).id;
+  const id = resolvedParams.id;
 
   const employerData = employersData[id];
   
