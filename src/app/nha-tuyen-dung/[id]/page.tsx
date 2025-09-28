@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Calendar, MapPin, Users, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle, Info, PlusCircle, Trash2 } from 'lucide-react';
+import { Building, Calendar, MapPin, Users, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle, Info, PlusCircle, Trash2, UploadCloud } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -86,7 +86,8 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
 
   const handleEditClick = (title: string, currentContent: any, field: string) => {
     setEditingModule({ title, content: currentContent, field });
-    setTempContent(currentContent);
+    // Deep copy for arrays/objects to prevent direct state mutation
+    setTempContent(JSON.parse(JSON.stringify(currentContent)));
     setIsEditDialogOpen(true);
   };
 
@@ -97,14 +98,15 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         const newState = { ...prev };
         const { field } = editingModule;
 
-        if (['about', 'info', 'benefits', 'industries', 'history', 'name', 'type', 'location'].includes(field)) {
+        if (['about', 'info', 'benefits', 'industries', 'history', 'name', 'type', 'location', 'images'].includes(field)) {
              // Handle nested and top-level properties
-            if (field.startsWith('info.')) {
-                 const infoField = field.split('.')[1] as keyof typeof mockEmployerData['info'];
-                 newState.info[infoField] = tempContent[infoField];
-            } else if (field === 'name' || field === 'type' || field === 'location') {
+            if (field === 'header') {
                  // @ts-ignore
-                 newState[field] = tempContent[field];
+                 newState.name = tempContent.name;
+                 // @ts-ignore
+                 newState.type = tempContent.type;
+                 // @ts-ignore
+                 newState.location = tempContent.location;
             }
             else {
                 // @ts-ignore
@@ -208,7 +210,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </div>
   );
 
-    const renderHistoryEdit = () => {
+  const renderHistoryEdit = () => {
     const handleHistoryChange = (index: number, field: 'year' | 'event', value: string) => {
         const newHistory = [...tempContent];
         newHistory[index] = { ...newHistory[index], [field]: value };
@@ -257,7 +259,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
             </Button>
         </div>
     );
-};
+  };
 
   const renderHeaderEdit = () => (
     <div className="space-y-4">
@@ -276,6 +278,70 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </div>
   );
 
+  const renderImagesEdit = () => {
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, indexToUpdate: number) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const newImages = [...tempContent];
+                newImages[indexToUpdate].src = event.target?.result as string;
+                setTempContent(newImages);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleNewImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const newImage = {
+                    src: event.target?.result as string,
+                    alt: 'Ảnh mới',
+                    dataAiHint: 'new company image'
+                };
+                setTempContent([...tempContent, newImage]);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    
+    const removeImage = (indexToRemove: number) => {
+        setTempContent(tempContent.filter((_: any, i: number) => i !== indexToRemove));
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {tempContent.map((img: {src:string, alt:string}, index: number) => (
+                    <div key={index} className="relative group">
+                         <div className="relative aspect-square rounded-lg overflow-hidden border">
+                            <Image src={img.src} alt={img.alt} fill className="object-cover"/>
+                         </div>
+                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <Label htmlFor={`img-upload-${index}`} className="cursor-pointer p-2 bg-black/50 rounded-full text-white">
+                                <Camera className="h-5 w-5"/>
+                            </Label>
+                            <Input id={`img-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleImageChange(e, index)} />
+                             <Button variant="destructive" size="icon" className="h-9 w-9 rounded-full" onClick={() => removeImage(index)}>
+                                <Trash2 className="h-5 w-5"/>
+                            </Button>
+                         </div>
+                         <p className="text-xs text-center mt-1 truncate text-muted-foreground">{img.alt}</p>
+                    </div>
+                ))}
+                 <Label htmlFor="new-image-upload" className="relative flex flex-col items-center justify-center w-full aspect-square border-2 border-dashed rounded-lg cursor-pointer hover:border-primary transition-colors">
+                    <UploadCloud className="w-8 h-8 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground mt-2 text-center">Tải ảnh mới</span>
+                     <Input id="new-image-upload" type="file" className="sr-only" accept="image/*" onChange={handleNewImageUpload} />
+                </Label>
+            </div>
+        </div>
+    )
+  };
+
 
   const renderEditContent = () => {
     if (!editingModule) return null;
@@ -292,6 +358,8 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
             return renderHistoryEdit();
         case 'header':
             return renderHeaderEdit();
+        case 'images':
+            return renderImagesEdit();
         default:
             return <p>Chức năng này đang được phát triển. Vui lòng quay lại sau.</p>;
     }
@@ -347,14 +415,11 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                   <SectionCard title="Giới thiệu doanh nghiệp" icon={FileText} onEditClick={() => handleEditClick('Giới thiệu doanh nghiệp', employer.about, 'about')}>
                       <p className="text-muted-foreground whitespace-pre-line">{employer.about}</p>
                   </SectionCard>
-                  <SectionCard title="Ảnh về doanh nghiệp" icon={ImageIcon} onEditClick={() => handleEditClick('Ảnh', '', 'images')}>
+                  <SectionCard title="Ảnh về doanh nghiệp" icon={ImageIcon} onEditClick={() => handleEditClick('Ảnh về doanh nghiệp', employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {employer.images.map((img, index) => (
                               <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
                                   <Image src={img.src} alt={img.alt} fill className="object-cover" data-ai-hint={img.dataAiHint} />
-                                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <Camera className="h-8 w-8 text-white" />
-                                  </div>
                               </div>
                           ))}
                       </div>
@@ -404,7 +469,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
       </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
           </DialogHeader>
