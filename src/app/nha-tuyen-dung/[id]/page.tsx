@@ -64,11 +64,11 @@ const placeholderEmployerData = {
     size: { vi: '50 - 100 nhân viên', ja: '50～100名', en: '50 - 100 employees' },
     website: 'https://abc-corp.co.jp',
     license: 'Số 123/LĐTBXH-GP',
-    phone: '0123456789',
-    zalo: '0123456789',
-    messenger: 'abccorp.fb',
-    line: 'abccorp.line',
-    email: 'contact@abc-corp.co.jp'
+    phone: '',
+    zalo: '',
+    messenger: '',
+    line: '',
+    email: ''
   },
 
   industries: {
@@ -406,7 +406,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                     
                     <div className="pt-4 border-t">
                       <h4 className="font-semibold mb-4">{t.contactTitle}</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
                               <Label htmlFor="phone" className="flex items-center gap-2">
                                 <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
@@ -499,6 +499,20 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     }
   };
 
+  const hasContactInfo = employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line;
+
+  const formatDisplayPhoneNumber = (phone: string) => {
+      if (!phone) return '';
+      // A simplified version for display only
+      if (phone.length === 10 && phone.startsWith('0')) {
+          return `${phone.slice(0,4)} ${phone.slice(4,7)} ${phone.slice(7)}`;
+      }
+      if (phone.length === 11 && phone.startsWith('0')) {
+           return `${phone.slice(0,3)} ${phone.slice(3,7)} ${phone.slice(7)}`;
+      }
+      return phone;
+  }
+
   return (
     <>
       <div className="bg-secondary">
@@ -584,17 +598,26 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                           <p><strong>{t.licenseLabel}:</strong> {employer.info.license || '...'}</p>
                           <p><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || '...'}</a></p>
                       </div>
-                      <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
-                        <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
-                            <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
-                            <ZaloIcon className="h-6 w-6" />
-                            <MessengerIcon className="h-6 w-6" />
-                            <LineIcon className="h-6 w-6" />
-                        </div>
-                        <div className="text-center text-sm">
-                           <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
-                        </div>
-                    </div>
+                      {hasContactInfo ? (
+                          <div id="HIENTHILIENHE04" className="mt-6 border-t pt-4 space-y-2">
+                             {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
+                             {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${employer.info.messenger}`} target="_blank"><MessengerIcon className="mr-2 h-4 w-4" />{employer.info.messenger}</Link></Button>}
+                             {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
+                             {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank"><LineIcon className="mr-2 h-4 w-4"/>{employer.info.line}</Link></Button>}
+                          </div>
+                      ) : (
+                          <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
+                            <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
+                                <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
+                                <ZaloIcon className="h-6 w-6" />
+                                <MessengerIcon className="h-6 w-6" />
+                                <LineIcon className="h-6 w-6" />
+                            </div>
+                            <div className="text-center text-sm">
+                               <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                            </div>
+                          </div>
+                      )}
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
@@ -639,4 +662,3 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     </>
   );
 }
-
