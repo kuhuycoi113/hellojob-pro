@@ -271,12 +271,6 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
   
   const t = contentByLang[lang] || contentByLang['vi'];
 
-  const validateEmail = (email: string) => {
-    if (!email) return true; // Not required
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(String(email).toLowerCase());
-  };
-
   const validateField = (field: 'messenger' | 'line' | 'email', value: string) => {
     if (!value) {
         setErrors(prev => ({...prev, [field]: undefined }));
@@ -369,22 +363,27 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
   };
 
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'banner' | 'logo' | `images.${number}`) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: string, index?: number) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
         const newUrl = event.target?.result as string;
-        setEmployer(prev => {
-          const newState = JSON.parse(JSON.stringify(prev));
-          if (field === 'banner' || field === 'logo') {
-            newState[field] = newUrl;
-          } else if (field.startsWith('images.')) {
-            const index = parseInt(field.split('.')[1], 10);
-            newState.images[index].src = newUrl;
-          }
-          return newState;
-        });
+        if (editingModule?.field === 'images' && index !== undefined) {
+             setTempContent((prev: any[]) => {
+                const newImages = [...prev];
+                newImages[index].src = newUrl;
+                return newImages;
+            });
+        } else {
+            setEmployer(prev => {
+                const newState = JSON.parse(JSON.stringify(prev));
+                 if (field === 'banner' || field === 'logo') {
+                   newState[field] = newUrl;
+                 }
+                return newState;
+            });
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -407,22 +406,26 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
         
         case 'images':
             return (
-              <div className="space-y-4">
-                 {tempContent.map((img: any, index: number) => (
-                   <div key={index} className="flex items-center gap-4">
-                      <div className="relative w-20 h-20 flex-shrink-0">
-                         <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover rounded-md"/>
-                      </div>
-                      <Input 
-                        placeholder={`Ví dụ: ${placeholderEmployerData.images[index]?.alt[lang] || 'Văn phòng hiện đại'}`}
-                        value={img.alt[lang] || ''}
-                        onChange={(e) => handleTempArrayChange(index, 'alt', e.target.value)}
-                      />
-                      <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                   </div>
-                 ))}
-                 <Button variant="outline" onClick={() => addTempArrayItem('images')}><PlusCircle className="mr-2"/> Thêm ảnh</Button>
-              </div>
+                <div className="space-y-4">
+                    {tempContent.map((img: any, index: number) => (
+                    <div key={index} className="flex items-center gap-4">
+                        <Label htmlFor={`dialog-image-upload-${index}`} className="relative w-20 h-20 flex-shrink-0 cursor-pointer group">
+                           <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover rounded-md"/>
+                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                               <Camera className="h-6 w-6 text-white"/>
+                           </div>
+                           <Input id={`dialog-image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} />
+                        </Label>
+                        <Input 
+                            placeholder={`Ví dụ: ${placeholderEmployerData.images[index]?.alt[lang] || 'Văn phòng hiện đại'}`}
+                            value={img.alt[lang] || ''}
+                            onChange={(e) => handleTempArrayChange(index, 'alt', e.target.value)}
+                        />
+                        <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                    </div>
+                    ))}
+                    <Button variant="outline" onClick={() => addTempArrayItem('images')}><PlusCircle className="mr-2"/> Thêm ảnh</Button>
+                </div>
             );
 
         case 'history':
@@ -633,7 +636,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                                    <Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                                         <Camera className="h-6 w-6 text-white"/>
                                    </Label>
-                                   <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, `images.${index}`)} />
+                                   <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} />
                               </div>
                           ))}
                       </div>
