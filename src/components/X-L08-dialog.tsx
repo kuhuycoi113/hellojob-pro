@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ZaloIcon, MessengerIcon, LineIcon } from './custom-icons';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -91,7 +92,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
         return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
     }
 
-    if (country === '+81') { // Japan (11 digits starting with 0)
+    if (country === '+81') { // Japan (11 digits total starting with 0)
         if (cleanValue.length === 0) return '';
         if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,11);
         if (cleanValue.length === 1) return `(0)`;
@@ -105,6 +106,72 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
     return cleanValue;
 };
 
+const parseMessengerInput = (input: string): string => {
+    if (!input) return '';
+    const trimmedInput = input.trim();
+    try {
+        if (trimmedInput.startsWith('http') || trimmedInput.includes('facebook.com') || trimmedInput.includes('m.me')) {
+            const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
+            
+            if (url.hostname.includes('facebook.com') || url.hostname.includes('m.facebook.com')) {
+                const id = url.searchParams.get('id');
+                if (id && /^\d+$/.test(id)) {
+                    return id; // Return numeric ID if found in profile.php
+                }
+                // For vanity URLs like facebook.com/username
+                const pathParts = url.pathname.split('/').filter(part => part && part !== 'profile.php' && part !== 'people');
+                if (pathParts.length > 0) {
+                    return pathParts[pathParts.length - 1];
+                }
+            }
+             if (url.hostname.includes('m.me')) {
+                const pathParts = url.pathname.split('/').filter(Boolean);
+                if (pathParts.length > 0) {
+                     return pathParts[pathParts.length - 1];
+                }
+            }
+        }
+    } catch (error) {
+        // Not a valid URL, treat as a potential username
+        console.warn("Could not parse Messenger input as URL, treating as username:", error);
+    }
+    // Fallback: treat as username, remove any URL-like parts
+    return trimmedInput.split('/').pop() || trimmedInput;
+};
+
+const parseZaloInput = (input: string): string => {
+    if (!input) return '';
+    const trimmedInput = input.trim();
+    if (trimmedInput.includes('zalo.me/')) {
+        const parts = trimmedInput.split('/');
+        return parts.pop()?.replace(/\D/g, '') || '';
+    }
+    return trimmedInput.replace(/\D/g, '');
+};
+
+const parseLineInput = (input: string): string => {
+  if (!input) return '';
+  const trimmedInput = input.trim();
+  try {
+      if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
+          const url = new URL(trimmedInput);
+          const pathParts = url.pathname.split('/');
+          let potentialId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+          if (potentialId) {
+             // Remove query parameters
+             potentialId = potentialId.split('?')[0];
+             // Remove leading ~ or @ if present
+             return potentialId.replace(/^[~@]/, '');
+          }
+      }
+  } catch (error) {
+       console.warn("Could not parse Line input as URL, treating as ID:", error);
+  }
+  // Fallback to treat the whole input as an ID, removing potential URL parts and special characters
+  return trimmedInput.split('/').pop()?.replace(/^[~@]/, '') || trimmedInput.replace(/^[~@]/, '');
+};
+
+
 
 export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, recruitmentPrefs }: XL08DialogProps) {
   const [email, setEmail] = useState('');
@@ -115,8 +182,42 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
   const [phoneCountry, setPhoneCountry] = useState('+84');
   const [zaloCountry, setZaloCountry] = useState('+84');
   const { toast } = useToast();
+  const [errors, setErrors] = useState<{ messenger?: string, line?: string }>({});
+
+  const validateField = (field: 'messenger' | 'line', value: string) => {
+    if (!value) {
+        setErrors(prev => ({...prev, [field]: undefined }));
+        return true;
+    }
+
+    let isValid = false;
+    let errorMessage = "Định dạng không hợp lệ.";
+
+    if (field === 'messenger') {
+        isValid = /^(https?:\/\/(www\.)?(facebook|m)\.com\/|m\.me\/|[\w.]{5,})/.test(value);
+        errorMessage = "Vui lòng nhập link Facebook/Messenger hoặc username hợp lệ.";
+    } else if (field === 'line') {
+        isValid = /^(https?:\/\/line\.me\/|@?[\w.-]+)/.test(value);
+        errorMessage = "Vui lòng nhập link Line hoặc Line ID hợp lệ.";
+    }
+    
+    if (isValid) {
+        setErrors(prev => ({ ...prev, [field]: undefined }));
+    } else {
+        setErrors(prev => ({ ...prev, [field]: errorMessage }));
+    }
+    return isValid;
+  };
 
   const handleComplete = () => {
+    const isMessengerValid = validateField('messenger', messenger);
+    const isLineValid = validateField('line', line);
+    
+    if (!isMessengerValid || !isLineValid) {
+        toast({ variant: 'destructive', title: 'Thông tin không hợp lệ', description: 'Vui lòng sửa các lỗi được hiển thị trước khi lưu.' });
+        return;
+    }
+
     if (!email) {
         toast({ variant: 'destructive', title: 'Thiếu thông tin', description: 'Vui lòng nhập địa chỉ email.' });
         return;
@@ -125,7 +226,13 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
         toast({ variant: 'destructive', title: 'Thiếu thông tin', description: 'Vui lòng cung cấp ít nhất một phương thức liên hệ khác.' });
         return;
     }
-    onComplete({ email, phone: `${phoneCountry}${phone}`, zalo, messenger, line });
+    onComplete({ 
+        email, 
+        phone: `${phoneCountry}${phone}`, 
+        zalo: parseZaloInput(zalo), 
+        messenger: parseMessengerInput(messenger), 
+        line: parseLineInput(line) 
+    });
   };
   
   const content = contentByLang[lang];
@@ -199,18 +306,31 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                                     </SelectContent>
                                 </Select>
                                 <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(zalo, zaloCountry)} onChange={(e) => setZalo(e.target.value.replace(/\D/g, ''))} />
-                                <div className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
-                                    <QrCode className="h-5 w-5"/>
-                                </div>
                             </div>
                         </div>
-                         <div className="space-y-2">
+                         <div className="space-y-1">
                              <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{content.messengerLabel}</Label>
-                            <Input id="messenger" placeholder="Dán link hoặc username" value={messenger} onChange={(e) => setMessenger(e.target.value)} />
+                            <Input
+                                id="messenger"
+                                placeholder="Dán link Facebook / Messenger hoặc username"
+                                value={messenger}
+                                onChange={(e) => setMessenger(e.target.value)}
+                                onBlur={(e) => validateField('messenger', e.target.value)}
+                                className={cn(errors.messenger && "border-destructive")}
+                            />
+                            {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
-                         <div className="space-y-2">
+                         <div className="space-y-1">
                             <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{content.lineLabel}</Label>
-                            <Input id="line" placeholder="Dán link hoặc Line ID" value={line} onChange={(e) => setLine(e.target.value)} />
+                            <Input
+                                id="line"
+                                placeholder="Dán link Line hoặc nhập ID của bạn"
+                                value={line}
+                                onChange={(e) => setLine(e.target.value)}
+                                onBlur={(e) => validateField('line', e.target.value)}
+                                className={cn(errors.line && "border-destructive")}
+                            />
+                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                     </div>
                  </div>
@@ -229,3 +349,5 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
     </Dialog>
   );
 }
+
+    
