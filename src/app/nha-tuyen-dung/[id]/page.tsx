@@ -215,6 +215,36 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
     </Card>
 );
 
+const formatPhoneNumberInput = (value: string, country: string): string => {
+    if (!value) return '';
+    const cleanValue = value.replace(/\D/g, '');
+
+    if (country === '+84') { // Vietnam (10 digits starting with 0)
+        if (cleanValue.length === 0) return '';
+        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,10);
+        if (cleanValue.length === 1) return `(0)`;
+
+        const mobilePart = cleanValue.substring(1);
+        if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
+        if (mobilePart.length <= 6) return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3)}`;
+        return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
+    }
+
+    if (country === '+81') { // Japan (11 digits total starting with 0)
+        if (cleanValue.length === 0) return '';
+        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,11);
+        if (cleanValue.length === 1) return `(0)`;
+        
+        const mobilePart = cleanValue.substring(1); 
+        if (mobilePart.length <= 2) return `(0)${mobilePart}`;
+        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2, 6)}`;
+        return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2,6)} ${mobilePart.slice(6,10)}`;
+    }
+
+    return cleanValue;
+};
+
+
 export default function EmployerDetailPage({ params: paramsProp }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(paramsProp);
   const searchParams = useSearchParams();
@@ -367,7 +397,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                         <div className="space-y-2"><Label>{t.foundedLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} /></div>
                         <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
                         <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
-                        <div className="space-y-2"><Label>{t.emailLabel}</Label><Input type="email" placeholder={`contact@company.com`} value={tempContent.email || ''} onChange={(e) => setTempContent({...tempContent, email: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>{t.emailLabel}</Label><Input type="email" placeholder="contact@company.com" value={tempContent.email} onChange={(e) => setTempContent({...tempContent, email: e.target.value})} /></div>
                     </div>
                      <div className="space-y-2">
                         <Label>{t.websiteLabel}</Label>
@@ -379,8 +409,8 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
                               <Label htmlFor="phone" className="flex items-center gap-2">
-                                  <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
-                                  {t.phoneLabel}
+                                <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
+                                {t.phoneLabel}
                               </Label>
                               <div className="flex items-center">
                                   <Select value={phoneCountry} onValueChange={setPhoneCountry}>
@@ -390,7 +420,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                                           <SelectItem value="+81">JP</SelectItem>
                                       </SelectContent>
                                   </Select>
-                                  <Input id="phone" type="tel" placeholder="..." className="rounded-l-none" value={tempContent.phone} onChange={(e) => setTempContent({...tempContent, phone: e.target.value})} />
+                                  <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
                               </div>
                           </div>
                           <div className="space-y-2">
@@ -403,7 +433,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                                           <SelectItem value="+81">JP</SelectItem>
                                       </SelectContent>
                                   </Select>
-                                  <Input id="zalo" type="tel" placeholder="..." className="rounded-l-none" value={tempContent.zalo} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value})} />
+                                  <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
                                 <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
@@ -556,7 +586,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                       </div>
                       <div className="mt-6 border-t pt-4">
                         <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
-                            <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
+                            <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
                             <ZaloIcon className="h-6 w-6" />
                             <MessengerIcon className="h-6 w-6" />
                             <LineIcon className="h-6 w-6" />
@@ -609,3 +639,5 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     </>
   );
 }
+
+    
