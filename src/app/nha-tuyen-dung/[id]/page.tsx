@@ -584,7 +584,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                           <p><strong>{t.licenseLabel}:</strong> {employer.info.license || '...'}</p>
                           <p><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || '...'}</a></p>
                       </div>
-                      <div className="mt-6 border-t pt-4">
+                      <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
                         <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
                             <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
                             <ZaloIcon className="h-6 w-6" />
@@ -619,7 +619,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
       </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent id={editingModule?.field === 'info' ? 'THONGTINDOANHNGHIEP01' : undefined} className="sm:max-w-2xl">
+        <DialogContent id="THONGTINDOANHNGHIEP01" className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
           </DialogHeader>
@@ -639,3 +639,4 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     </>
   );
 }
+
