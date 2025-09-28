@@ -245,9 +245,9 @@ const emptyCandidate: EnrichedCandidateProfile = {
       weight: '50',
       tattooStatus: 'Không có',
       hepatitisBStatus: 'Không viêm gan B',
-      messenger: 'lethian.2000',
+      messenger: 'gu.en.beto.2025',
       zalo: '0901234567',
-      line: 'lethian.line',
+      line: 'zFsBmqsCMn',
     },
     aspirations: {
         desiredLocation: 'Osaka',
@@ -966,7 +966,7 @@ export default function CandidateProfilePage() {
                         {phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(phone)}</Link></Button>}
                         {messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${messenger}`}</span></Link></Button>}
                         {zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(zalo)}</Link></Button>}
-                        {line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{line}</span></Link></Button>}
+                        {line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${line}`}</span></Link></Button>}
                     </div>
                 ) : (
                     <div className="text-center">
@@ -1224,8 +1224,8 @@ export default function CandidateProfilePage() {
                         <DropdownMenuItem onSelect={() => handleLanguageChange('en')}><EnFlagIcon className="w-4 h-4 mr-2"/>English</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button variant="outline" size="icon" className="sm:hidden" onClick={() => setIsProfileEditDialogOpen(true)}><Edit /></Button>
-                    <Button variant="outline" className="hidden sm:inline-flex" onClick={() => setIsProfileEditDialogOpen(true)}><Edit /> {editButtonText}</Button>
+                    <Button variant="outline" size="icon" className="sm:hidden" onClick={()={() => setIsProfileEditDialogOpen(true)}}><Edit /></Button>
+                    <Button variant="outline" className="hidden sm:inline-flex" onClick={()={() => setIsProfileEditDialogOpen(true)}><Edit /> {editButtonText}</Button>
                  </div>
               </div>
             </CardHeader>
@@ -1376,14 +1376,14 @@ export default function CandidateProfilePage() {
                                         <div key={index} className="p-4 border rounded-lg space-y-2 relative">
                                             <div className="flex justify-between items-center mb-2">
                                                 <h4 className="font-bold">Học vấn #{index + 1}</h4>
-                                                <Button variant="ghost" size="icon" onClick={() => handleRemoveItem('education', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                                <Button variant="ghost" size="icon" onClick={()={() => handleRemoveItem('education', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                                             </div>
                                             <Label>Trường</Label><Input value={edu.school} onChange={e => handleChange('education', index, 'school', e.target.value)} />
                                             <Label>Chuyên ngành</Label><Input value={edu.degree} onChange={e => handleChange('education', index, 'degree', e.target.value)} />
                                             <Label>Năm tốt nghiệp</Label><Input type="number" value={edu.gradYear} onChange={e => handleChange('education', index, 'gradYear', parseInt(e.target.value))} />
                                         </div>
                                     ))}
-                                    <Button variant="outline" className="w-full" onClick={() => handleAddItem('education', 'vietnam', undefined)}><PlusCircle className="mr-2"/> Thêm học vấn</Button>
+                                    <Button variant="outline" className="w-full" onClick={()={() => handleAddItem('education', 'vietnam', undefined)}><PlusCircle className="mr-2"/> Thêm học vấn</Button>
                                 </div>
                             )} candidate={profileByLang.vi!}>
                                 <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
@@ -1616,13 +1616,13 @@ export default function CandidateProfilePage() {
                                <div className="space-y-2">
                                 <Label className="font-bold">Kỹ năng</Label>
                                 <div className="flex flex-wrap gap-2 mb-4">
-                                {temp.skills.map((skill) => (<Badge key={skill} variant="secondary" className="pr-1">{skill}<button onClick={() => handleRemoveItem('skills', skill)} className="ml-2 rounded-full hover:bg-destructive/80 p-0.5"><X className="h-3 w-3" /></button></Badge>))}
+                                {temp.skills.map((skill) => (<Badge key={skill} variant="secondary" className="pr-1">{skill}<button onClick={()={() => handleRemoveItem('skills', skill)} className="ml-2 rounded-full hover:bg-destructive/80 p-0.5"><X className="h-3 w-3" /></button></Badge>))}
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                                 {commonSkills.filter(s => !temp.skills.includes(s)).map((skill) => (<div key={skill} className="flex items-center space-x-2"><Checkbox id={`skill-${skill}`} onCheckedChange={(checked) => handleChange('skills', skill, checked)} checked={temp.skills.includes(skill)}/><Label htmlFor={`skill-${skill}`} className="text-sm font-normal cursor-pointer">{skill}</Label></div>))}
                                 </div>
                                 <div className="flex gap-2 mt-2">
-                                <Input value={newSkill} onChange={e => setNewSkill(e.target.value)} placeholder="Thêm kỹ năng khác..." /><Button onClick={() => handleAddNewChip('skills')}>Thêm</Button>
+                                <Input value={newSkill} onChange={e => setNewSkill(e.target.value)} placeholder="Thêm kỹ năng khác..." /><Button onClick={()={() => handleAddNewChip('skills')}>Thêm</Button>
                                 </div>
                             </div>
                            </div>
@@ -1668,7 +1668,7 @@ export default function CandidateProfilePage() {
                         onSave={handleSave}
                         renderContent={(temp, handleChange) => (
                             <div className="space-y-6">
-                            {temp.certifications.map((cert, index) => (<div key={index} className="p-4 border rounded-lg space-y-2 relative"><div className="flex justify-between items-center mb-2"><Label htmlFor={`cert-${index}`}>Chứng chỉ #{index + 1}</Label><Button variant="ghost" size="icon" onClick={() => handleRemoveItem('certifications', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button></div><Input id={`cert-${index}`} value={cert} onChange={(e) => handleChange('certifications', index, e.target.value)} /></div>))}
+                            {temp.certifications.map((cert, index) => (<div key={index} className="p-4 border rounded-lg space-y-2 relative"><div className="flex justify-between items-center mb-2"><Label htmlFor={`cert-${index}`}>Chứng chỉ #{index + 1}</Label><Button variant="ghost" size="icon" onClick={() => handleRemoveItem('certifications', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button></div><Input id={`cert-${index}`} value={cert} onChange={(e) => handleChange('certifications', index, null, e.target.value)} /></div>))}
                             <Button variant="outline" className="w-full" onClick={() => handleAddItem('certifications', 'vietnam', undefined)}><PlusCircle className="mr-2"/> Thêm chứng chỉ</Button>
                             </div>
                         )}
@@ -1739,7 +1739,7 @@ export default function CandidateProfilePage() {
                      <Input 
                         id="doc-name-vi" 
                         value={newDocName.vi}
-                        onChange={(e) => setNewDocName(prev => ({...prev, vi: e.target.value}))}
+                        onChange={e => setNewDocName(prev => ({...prev, vi: e.target.value}))}
                         placeholder="VD: Sơ yếu lý lịch"
                     />
                   </TabsContent>
@@ -1747,7 +1747,7 @@ export default function CandidateProfilePage() {
                      <Input 
                         id="doc-name-ja" 
                         value={newDocName.ja || ''}
-                        onChange={(e) => setNewDocName(prev => ({...prev, ja: e.target.value}))}
+                        onChange={e => setNewDocName(prev => ({...prev, ja: e.target.value}))}
                         placeholder="例: 履歴書"
                     />
                   </TabsContent>
@@ -1755,7 +1755,7 @@ export default function CandidateProfilePage() {
                      <Input 
                         id="doc-name-en" 
                         value={newDocName.en || ''}
-                        onChange={(e) => setNewDocName(prev => ({...prev, en: e.target.value}))}
+                        onChange={e => setNewDocName(prev => ({...prev, en: e.target.value}))}
                         placeholder="E.g., Resume"
                     />
                   </TabsContent>
@@ -1880,3 +1880,5 @@ const DocumentGrid = ({
     </div>
   )
 };
+
+    
