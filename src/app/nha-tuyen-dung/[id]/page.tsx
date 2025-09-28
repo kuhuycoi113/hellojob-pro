@@ -108,7 +108,9 @@ const contentByLang = {
         industriesTitle: 'Ngành nghề & Lĩnh vực',
         mainIndustriesLabel: 'Ngành nghề chính',
         secondaryIndustriesLabel: 'Ngành nghề khác',
-        benefitsTitle: 'Phúc lợi & Môi trường'
+        benefitsTitle: 'Phúc lợi & Môi trường',
+        notUpdated: 'Chưa có thông tin',
+        clickToUpdate: 'Nhấn để cập nhật'
     },
     ja: {
         edit: '編集',
@@ -123,7 +125,9 @@ const contentByLang = {
         industriesTitle: '業種と分野',
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: 'その他の業種',
-        benefitsTitle: '福利厚生と環境'
+        benefitsTitle: '福利厚生と環境',
+        notUpdated: '情報がありません',
+        clickToUpdate: 'クリックして更新'
     },
     en: {
         edit: 'Edit',
@@ -138,7 +142,9 @@ const contentByLang = {
         industriesTitle: 'Industries & Sectors',
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Other Industries',
-        benefitsTitle: 'Benefits & Environment'
+        benefitsTitle: 'Benefits & Environment',
+        notUpdated: 'Not available',
+        clickToUpdate: 'Click to update'
     }
 };
 
@@ -160,7 +166,7 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
     </Card>
 );
 
-export default function EmployerDetailPage({ params: paramsProp }: { params: { id: string } }) {
+export default function EmployerDetailPage({ params: paramsProp }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(paramsProp);
   const searchParams = useSearchParams();
   
@@ -206,10 +212,10 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
   const handleTempArrayChange = (index: number, field: string, value: any) => {
     setTempContent((prev: any[]) => {
       const newArray = [...prev];
-      if (typeof newArray[index] === 'string') { // Handle benefits array of strings
-        newArray[index] = { ...newArray[index], [lang]: value };
-      } else { // Handle history array of objects
+      if (typeof newArray[index] === 'object' && newArray[index] !== null && 'event' in newArray[index]) { // History object
         newArray[index] = { ...newArray[index], [field]: { ...newArray[index][field], [lang]: value } };
+      } else if (typeof newArray[index] === 'object' && newArray[index] !== null) { // Benefits object
+        newArray[index] = { ...newArray[index], [lang]: value };
       }
       return newArray;
     });
@@ -356,7 +362,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                       <div className="relative flex-shrink-0">
                         <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
                             <AvatarImage src={employer.logo} />
-                            <AvatarFallback>{employer.name[lang]?.charAt(0) || 'A'}</AvatarFallback>
+                            <AvatarFallback>{(employer.name[lang] || 'A').charAt(0)}</AvatarFallback>
                           </Avatar>
                            <Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
                               <Camera className="h-4 w-4 text-secondary-foreground" />
@@ -378,7 +384,9 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                      <Textarea className="min-h-[150px] text-muted-foreground" placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={employer.about[lang]} onChange={(e) => setEmployer({...employer, about: {...employer.about, [lang]: e.target.value}})} />
+                       <p className="text-muted-foreground whitespace-pre-line min-h-[100px]">
+                        {employer.about[lang] || <span className="italic">{t.notUpdated}, <button className="underline text-primary">{t.clickToUpdate}</button>.</span>}
+                      </p>
                   </SectionCard>
                   <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -395,13 +403,13 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                   </SectionCard>
                   <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
                       <ul className="space-y-4">
-                          {employer.history.map((item, index) => (
+                          {employer.history.length > 0 ? employer.history.map((item, index) => (
                               <li key={index} className="relative pl-6">
                                   <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
-                                  <Input className="font-bold text-primary mb-1 border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.year}`} value={item.year} onChange={(e) => { const newHistory = [...employer.history]; newHistory[index].year = e.target.value; setEmployer({...employer, history: newHistory}); }} />
-                                  <Textarea className="text-sm text-muted-foreground min-h-[40px] border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang]}`} value={item.event[lang]} onChange={(e) => { const newHistory = [...employer.history]; newHistory[index].event[lang] = e.target.value; setEmployer({...employer, history: newHistory}); }} />
+                                  <p className="font-bold text-primary mb-1">{item.year}</p>
+                                  <p className="text-sm text-muted-foreground">{item.event[lang]}</p>
                               </li>
-                          ))}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary">{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
               </div>
@@ -410,25 +418,25 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
               <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
                   <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
-                          <p><strong>{t.foundedLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={employer.info.founded} onChange={(e) => setEmployer({...employer, info: {...employer.info, founded: e.target.value}})} /></p>
-                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info.size, [lang]: e.target.value}})} /></p>
-                          <p><strong>{t.licenseLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={employer.info.license} onChange={(e) => setEmployer({...employer, info: {...employer.info, license: e.target.value}})} /></p>
-                          <p><strong>{t.websiteLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto text-primary border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={employer.info.website} onChange={(e) => setEmployer({...employer, info: {...employer.info, website: e.target.value}})} /></p>
+                          <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || '...'}</p>
+                          <p><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || '...'}</p>
+                          <p><strong>{t.licenseLabel}:</strong> {employer.info.license || '...'}</p>
+                          <p><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || '...'}</a></p>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <p><strong>{t.mainIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px] border-0 shadow-none p-0 focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={employer.industries.main[lang]} onChange={(e) => setEmployer(prev => ({...prev, industries: {...prev.industries, main: {...prev.industries.main, [lang]: e.target.value}}}))} /></p>
-                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px] border-0 shadow-none p-0 focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={employer.industries.secondary[lang]} onChange={(e) => setEmployer(prev => ({...prev, industries: {...prev.industries, secondary: {...prev.industries.secondary, [lang]: e.target.value}}}))} /></p>
+                          <p><strong>{t.mainIndustriesLabel}:</strong> {employer.industries.main[lang] || '...'}</p>
+                          <p><strong>{t.secondaryIndustriesLabel}:</strong> {employer.industries.secondary[lang] || '...'}</p>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
                       <ul className="space-y-2 text-sm">
-                          {employer.benefits.map((benefit, index) => (
+                          {employer.benefits.length > 0 ? employer.benefits.map((benefit, index) => (
                               <li key={index} className="flex items-start gap-2">
-                                  <Textarea className="text-sm text-muted-foreground min-h-[40px] border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.benefits[index]?.[lang]}`} value={benefit[lang]} onChange={(e) => { const newBenefits = [...employer.benefits]; newBenefits[index] = {...newBenefits[index], [lang]: e.target.value}; setEmployer({...employer, benefits: newBenefits}); }} />
+                                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span>{benefit[lang]}</span>
                               </li>
-                          ))}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary">{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
                   <Button size="lg" className="w-full" onClick={() => console.log("Saving data:", employer)}>Lưu thay đổi</Button>
