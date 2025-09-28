@@ -293,7 +293,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                 </div>
             );
         case 'about':
-            return <Textarea placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({...tempContent, [lang]: e.target.value})} rows={8} />;
+            return <Textarea className="min-h-[150px]" placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({...tempContent, [lang]: e.target.value})} rows={8} />;
         
         case 'images':
             return (
@@ -344,8 +344,8 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
         case 'industries':
              return (
                 <div className="space-y-4">
-                    <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Textarea placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={tempContent.main[lang] || ''} onChange={(e) => setTempContent(prev => ({...prev, main: {...prev.main, [lang]: e.target.value}}))} /></div>
-                    <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Textarea placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={tempContent.secondary[lang] || ''} onChange={(e) => setTempContent(prev => ({...prev, secondary: {...prev.secondary, [lang]: e.target.value}}))} /></div>
+                    <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Textarea className="min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={tempContent.main[lang] || ''} onChange={(e) => setTempContent(prev => ({...prev, main: {...prev.main, [lang]: e.target.value}}))} /></div>
+                    <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Textarea className="min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={tempContent.secondary[lang] || ''} onChange={(e) => setTempContent(prev => ({...prev, secondary: {...prev.secondary, [lang]: e.target.value}}))} /></div>
                 </div>
              );
         case 'benefits':
@@ -401,7 +401,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
                       <div className="flex-grow pt-16 md:pt-20">
-                          <p className="text-2xl md:text-3xl font-headline font-bold">{employer.name[lang] || `[${t.headerTitle}]`}</p>
+                          <h1 className="text-2xl md:text-3xl font-headline font-bold">{employer.name[lang] || `[${t.headerTitle}]`}</h1>
                           <p className="font-semibold text-primary">{employer.type[lang]}</p>
                           <p className="text-sm text-muted-foreground">{employer.location[lang]}</p>
                       </div>
@@ -462,9 +462,9 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                             <MessengerIcon className="h-6 w-6" />
                             <LineIcon className="h-6 w-6" />
                         </div>
-                        <p className="text-xs text-muted-foreground mt-4 text-center">
-                            Cung cấp ít nhất 1 phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Đăng ký</Badge>
-                        </p>
+                        <div className="text-xs text-muted-foreground mt-4 text-center">
+                          Cung cấp ít nhất 1 phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Đăng ký</Badge>
+                        </div>
                     </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
@@ -510,3 +510,4 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     </>
     );
 }
+
