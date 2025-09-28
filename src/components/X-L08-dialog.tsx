@@ -46,6 +46,13 @@ const contentByLang = {
         lineLabel: 'Line',
         backButton: 'Quay lại',
         completeButton: 'Hoàn tất & Gửi',
+        programType: 'Loại hình',
+        details: 'Chi tiết',
+        industry: 'Ngành nghề',
+        location: 'Địa điểm',
+        referralFee: 'Phí giới thiệu',
+        managementFee: 'Phí quản lý',
+        perMonth: '/tháng',
     },
     ja: {
         title: '確認と連絡先',
@@ -60,6 +67,13 @@ const contentByLang = {
         lineLabel: 'Line',
         backButton: '戻る',
         completeButton: '完了して送信',
+        programType: 'プログラム種別',
+        details: '詳細',
+        industry: '業種',
+        location: '勤務地',
+        referralFee: '紹介料',
+        managementFee: '管理費',
+        perMonth: '/月',
     },
     en: {
         title: 'Confirmation and Contact',
@@ -74,6 +88,13 @@ const contentByLang = {
         lineLabel: 'Line',
         backButton: 'Back',
         completeButton: 'Complete & Send',
+        programType: 'Program Type',
+        details: 'Details',
+        industry: 'Industry',
+        location: 'Location',
+        referralFee: 'Referral Fee',
+        managementFee: 'Management Fee',
+        perMonth: '/month',
     }
 };
 
@@ -266,12 +287,12 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                     <CardTitle className="text-lg flex items-center gap-2"><Info className="h-5 w-5"/>{content.summaryTitle}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm space-y-1">
-                    <p><strong>Loại hình:</strong> {recruitmentPrefs?.desiredVisaType}</p>
-                    <p><strong>Chi tiết:</strong> {recruitmentPrefs?.desiredVisaDetail}</p>
-                    <p><strong>Ngành nghề:</strong> {recruitmentPrefs?.desiredIndustry}</p>
-                    <p><strong>Địa điểm:</strong> {recruitmentPrefs?.desiredLocation}</p>
-                    <p><strong>Phí giới thiệu:</strong> {formatNumber(recruitmentPrefs?.referralFee)} JPY</p>
-                    <p><strong>Phí quản lý:</strong> {formatNumber(recruitmentPrefs?.managementFee)} JPY/tháng</p>
+                    <p><strong>{content.programType}:</strong> {recruitmentPrefs?.desiredVisaType}</p>
+                    <p><strong>{content.details}:</strong> {recruitmentPrefs?.desiredVisaDetail}</p>
+                    <p><strong>{content.industry}:</strong> {recruitmentPrefs?.desiredIndustry}</p>
+                    <p><strong>{content.location}:</strong> {recruitmentPrefs?.desiredLocation}</p>
+                    <p><strong>{content.referralFee}:</strong> {formatNumber(recruitmentPrefs?.referralFee)} JPY</p>
+                    <p><strong>{content.managementFee}:</strong> {formatNumber(recruitmentPrefs?.managementFee)} JPY{content.perMonth}</p>
                 </CardContent>
             </Card>
 
@@ -311,6 +332,9 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                                     </SelectContent>
                                 </Select>
                                 <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(zalo, zaloCountry)} onChange={(e) => setZalo(e.target.value.replace(/\D/g, ''))} />
+                                <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
+                                    <QrCode className="h-5 w-5"/>
+                                </div>
                             </div>
                         </div>
                          <div className="space-y-1">

@@ -41,6 +41,13 @@ const contentByLang = {
         lineLabel: 'Line',
         supportTitle: 'Nếu cần hỗ trợ ngay, vui lòng liên hệ:',
         completeButton: 'Hoàn thành',
+        programType: 'Loại hình',
+        details: 'Chi tiết',
+        industry: 'Ngành nghề',
+        location: 'Địa điểm',
+        referralFee: 'Phí giới thiệu',
+        managementFee: 'Phí quản lý',
+        perMonth: '/tháng',
     },
     ja: {
         title: 'リクエストは正常に送信されました！',
@@ -54,6 +61,13 @@ const contentByLang = {
         lineLabel: 'Line',
         supportTitle: 'サポートがすぐに必要な場合は、以下にご連絡ください：',
         completeButton: '完了',
+        programType: 'プログラム種別',
+        details: '詳細',
+        industry: '業種',
+        location: '勤務地',
+        referralFee: '紹介料',
+        managementFee: '管理費',
+        perMonth: '/月',
     },
     en: {
         title: 'Request Sent Successfully!',
@@ -67,6 +81,13 @@ const contentByLang = {
         lineLabel: 'Line',
         supportTitle: 'For immediate assistance, please contact:',
         completeButton: 'Complete',
+        programType: 'Program Type',
+        details: 'Details',
+        industry: 'Industry',
+        location: 'Location',
+        referralFee: 'Referral Fee',
+        managementFee: 'Management Fee',
+        perMonth: '/month',
     }
 };
 
@@ -96,19 +117,19 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
           <DialogDescription>{content.description}</DialogDescription>
         </DialogHeader>
         
-        <div className="py-4 space-y-6">
+        <div className="py-4 space-y-6 max-h-[65vh] overflow-y-auto pr-2">
             <div className="grid md:grid-cols-2 gap-6">
                 <Card className="bg-secondary">
                     <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2"><Info className="h-5 w-5"/>{content.summaryTitle}</CardTitle>
                     </CardHeader>
                     <CardContent className="text-sm space-y-2">
-                        <p><strong>Loại hình:</strong> {recruitmentPrefs?.desiredVisaType}</p>
-                        <p><strong>Chi tiết:</strong> {recruitmentPrefs?.desiredVisaDetail}</p>
-                        <p><strong>Ngành nghề:</strong> {recruitmentPrefs?.desiredIndustry}</p>
-                        <p><strong>Địa điểm:</strong> {recruitmentPrefs?.desiredLocation}</p>
-                        <p><strong>Phí giới thiệu:</strong> {formatNumber(recruitmentPrefs?.referralFee)} JPY</p>
-                        <p><strong>Phí quản lý:</strong> {formatNumber(recruitmentPrefs?.managementFee)} JPY/tháng</p>
+                        <p><strong>{content.programType}:</strong> {recruitmentPrefs?.desiredVisaType}</p>
+                        <p><strong>{content.details}:</strong> {recruitmentPrefs?.desiredVisaDetail}</p>
+                        <p><strong>{content.industry}:</strong> {recruitmentPrefs?.desiredIndustry}</p>
+                        <p><strong>{content.location}:</strong> {recruitmentPrefs?.desiredLocation}</p>
+                        <p><strong>{content.referralFee}:</strong> {formatNumber(recruitmentPrefs?.referralFee)} JPY</p>
+                        <p><strong>{content.managementFee}:</strong> {formatNumber(recruitmentPrefs?.managementFee)} JPY{content.perMonth}</p>
                     </CardContent>
                 </Card>
 
@@ -132,7 +153,7 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                 <p className="text-sm font-semibold">{content.supportTitle}</p>
                 <a href="mailto:chairman@hellojob.jp" className="text-sm text-primary hover:underline">Email: chairman@hellojob.jp</a>
                 <div className="flex items-center justify-center md:justify-start gap-3 mt-2">
-                    <div className="hidden md:block">
+                    <div className="md:block">
                       <Logo />
                     </div>
                     <Button asChild variant="outline" size="icon" className="h-10 w-10 border-green-500 hover:bg-green-50">
