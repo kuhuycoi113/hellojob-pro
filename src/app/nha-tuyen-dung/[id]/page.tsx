@@ -81,7 +81,11 @@ const emptyEmployerData = {
     logo: '/img/favi2.png',
     banner: 'https://placehold.co/1200x400.png?text=Tải+lên+ảnh+bìa',
     about: { vi: '', ja: '', en: '' },
-    images: [],
+    images: [
+      { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 1' },
+      { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 2' },
+      { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: '', ja: '', en: '' }, dataAiHint: 'new image 3' },
+    ],
     history: [],
     info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '' },
     industries: { main: { vi: '', ja: '', en: '' }, secondary: { vi: '', ja: '', en: '' } },
@@ -157,13 +161,12 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
 
 export default function EmployerDetailPage({ params: paramsProp }: { params: { id: string } }) {
   const params = use(paramsProp);
-  
+  const searchParams = useSearchParams();
+  const lang = (searchParams.get('lang') || 'vi') as Language;
+
   if (params.id !== 'Z000') {
     notFound();
   }
-
-  const searchParams = useSearchParams();
-  const lang = (searchParams.get('lang') || 'vi') as Language;
   
   const [employer, setEmployer] = useState({ ...emptyEmployerData });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -297,7 +300,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
         case 'industries':
              return (
                 <div className="space-y-4">
-                    <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={tempContent.main[lang]} onChange={(e) => setTempContent({...tempContent, main: {...tempContent.main, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={tempContent.main[lang]} onChange={(e) => setTempContent(prev => ({...prev, main: {...prev.main, [lang]: e.target.value}}))} /></div>
                     <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={tempContent.secondary[lang]} onChange={(e) => setTempContent(prev => ({...prev, secondary: {...prev.secondary, [lang]: e.target.value}}))} /></div>
                 </div>
              );
@@ -354,9 +357,9 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
                       <div className="flex-grow pt-16 md:pt-20">
-                          <Input className="text-2xl md:text-3xl font-headline font-bold border-0 shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0" placeholder={placeholderEmployerData.name[lang]} value={employer.name[lang]} onChange={(e) => setEmployer({...employer, name: {...employer.name, [lang]: e.target.value}})} />
-                          <Input className="font-semibold text-primary border-0 shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0" placeholder={placeholderEmployerData.type[lang]} value={employer.type[lang]} onChange={(e) => setEmployer({...employer, type: {...employer.type, [lang]: e.target.value}})} />
-                          <Input className="text-sm text-muted-foreground border-0 shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0" placeholder={placeholderEmployerData.location[lang]} value={employer.location[lang]} onChange={(e) => setEmployer({...employer, location: {...employer.location, [lang]: e.target.value}})} />
+                          <Input className="text-2xl md:text-3xl font-headline font-bold border-0 shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0" placeholder={`Ví dụ: ${placeholderEmployerData.name[lang]}`} value={employer.name[lang]} onChange={(e) => setEmployer({...employer, name: {...employer.name, [lang]: e.target.value}})} />
+                          <Input className="font-semibold text-primary border-0 shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0" placeholder={`Ví dụ: ${placeholderEmployerData.type[lang]}`} value={employer.type[lang]} onChange={(e) => setEmployer({...employer, type: {...employer.type, [lang]: e.target.value}})} />
+                          <Input className="text-sm text-muted-foreground border-0 shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0" placeholder={`Ví dụ: ${placeholderEmployerData.location[lang]}`} value={employer.location[lang]} onChange={(e) => setEmployer({...employer, location: {...employer.location, [lang]: e.target.value}})} />
                       </div>
                   </div>
                 </div>
@@ -401,7 +404,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
                   <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
                           <p><strong>{t.foundedLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={employer.info.founded} onChange={(e) => setEmployer({...employer, info: {...employer.info, founded: e.target.value}})} /></p>
-                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info.size, [lang]: e.target.value}})} /></p>
+                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info, size: {...employer.info.size, [lang]: e.target.value}}})} /></p>
                           <p><strong>{t.licenseLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={employer.info.license} onChange={(e) => setEmployer({...employer, info: {...employer.info, license: e.target.value}})} /></p>
                           <p><strong>{t.websiteLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto text-primary border-0 shadow-none focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={employer.info.website} onChange={(e) => setEmployer({...employer, info: {...employer.info, website: e.target.value}})} /></p>
                       </div>
