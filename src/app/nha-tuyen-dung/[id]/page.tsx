@@ -1,10 +1,11 @@
+
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Calendar, MapPin, Users, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle, Info } from 'lucide-react';
+import { Building, Calendar, MapPin, Users, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle, Info, PlusCircle, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -98,6 +99,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
 
         if (field.startsWith('info.')) {
             const infoField = field.split('.')[1] as keyof typeof mockEmployerData['info'];
+            // @ts-ignore
             newState.info[infoField] = tempContent[infoField];
         } else {
             // @ts-ignore
@@ -141,16 +143,52 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
       </div>
   );
 
+  const renderBenefitsEdit = () => {
+    const handleBenefitChange = (index: number, value: string) => {
+        const newBenefits = [...tempContent];
+        newBenefits[index] = value;
+        setTempContent(newBenefits);
+    };
+
+    const addBenefit = () => {
+        setTempContent([...tempContent, '']);
+    };
+
+    const removeBenefit = (index: number) => {
+        setTempContent(tempContent.filter((_: any, i: number) => i !== index));
+    };
+
+    return (
+        <div className="space-y-4">
+            {tempContent.map((benefit: string, index: number) => (
+                <div key={index} className="flex items-center gap-2">
+                    <Input
+                        value={benefit}
+                        onChange={(e) => handleBenefitChange(index, e.target.value)}
+                        placeholder={`Phúc lợi #${index + 1}`}
+                    />
+                    <Button variant="ghost" size="icon" onClick={() => removeBenefit(index)}>
+                        <Trash2 className="h-4 w-4 text-destructive"/>
+                    </Button>
+                </div>
+            ))}
+            <Button variant="outline" onClick={addBenefit} className="w-full">
+                <PlusCircle className="mr-2 h-4 w-4"/> Thêm phúc lợi
+            </Button>
+        </div>
+    );
+  };
+
+
   const renderEditContent = () => {
     if (!editingModule) return null;
     switch(editingModule.field) {
         case 'about':
             return renderAboutEdit();
-        case 'info.founded':
-        case 'info.size':
-        case 'info.license':
-        case 'info.website':
+        case 'info':
              return renderInfoEdit();
+        case 'benefits':
+            return renderBenefitsEdit();
         default:
             return <p>Chức năng này đang được phát triển. Vui lòng quay lại sau.</p>;
     }
@@ -232,7 +270,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
               
               {/* Right Column */}
               <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
-                  <SectionCard title="Thông tin doanh nghiệp" icon={Building} onEditClick={() => handleEditClick('Thông tin doanh nghiệp', employer.info, 'info.founded')}>
+                  <SectionCard title="Thông tin doanh nghiệp" icon={Building} onEditClick={() => handleEditClick('Thông tin doanh nghiệp', employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
                           <p><strong>Năm thành lập:</strong> {employer.info.founded}</p>
                           <p><strong>Quy mô:</strong> {employer.info.size}</p>
@@ -246,7 +284,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           <p><strong>Ngành nghề khác:</strong> {employer.industries.secondary}</p>
                       </div>
                   </SectionCard>
-                  <SectionCard title="Phúc lợi & Môi trường" icon={Award} onEditClick={() => handleEditClick('Phúc lợi', '', 'benefits')}>
+                  <SectionCard title="Phúc lợi & Môi trường" icon={Award} onEditClick={() => handleEditClick('Phúc lợi & Môi trường', employer.benefits, 'benefits')}>
                       <ul className="space-y-2 text-sm">
                           {employer.benefits.map((benefit, index) => (
                               <li key={index} className="flex items-start gap-2">
@@ -267,14 +305,14 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
           </DialogHeader>
-           <div className="py-4">
+           <div className="py-4 max-h-[60vh] overflow-y-auto pr-4">
               {renderEditContent()}
            </div>
           <DialogFooter>
             <DialogClose asChild>
                 <Button variant="outline">Hủy</Button>
             </DialogClose>
-             {(editingModule?.field === 'about' || editingModule?.field.startsWith('info.')) && (
+             {(editingModule?.field === 'about' || editingModule?.field === 'info' || editingModule?.field === 'benefits') && (
                 <Button onClick={handleSaveChanges}>Lưu thay đổi</Button>
              )}
           </DialogFooter>
