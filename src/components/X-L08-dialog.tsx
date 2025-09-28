@@ -184,6 +184,11 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
   const { toast } = useToast();
   const [errors, setErrors] = useState<{ messenger?: string, line?: string }>({});
 
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  }
+
   const validateField = (field: 'messenger' | 'line', value: string) => {
     if (!value) {
         setErrors(prev => ({...prev, [field]: undefined }));
@@ -213,15 +218,15 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
     const isMessengerValid = validateField('messenger', messenger);
     const isLineValid = validateField('line', line);
     
+    if (!validateEmail(email)) {
+        toast({ variant: 'destructive', title: 'Email không hợp lệ', description: 'Vui lòng nhập địa chỉ email đúng định dạng.' });
+        return;
+    }
     if (!isMessengerValid || !isLineValid) {
         toast({ variant: 'destructive', title: 'Thông tin không hợp lệ', description: 'Vui lòng sửa các lỗi được hiển thị trước khi lưu.' });
         return;
     }
 
-    if (!email) {
-        toast({ variant: 'destructive', title: 'Thiếu thông tin', description: 'Vui lòng nhập địa chỉ email.' });
-        return;
-    }
     if (!phone && !zalo && !messenger && !line) {
         toast({ variant: 'destructive', title: 'Thiếu thông tin', description: 'Vui lòng cung cấp ít nhất một phương thức liên hệ khác.' });
         return;
@@ -318,7 +323,7 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                                 onBlur={(e) => validateField('messenger', e.target.value)}
                                 className={cn(errors.messenger && "border-destructive")}
                             />
-                             {!errors.messenger && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>}
+                             <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
                             {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                          <div className="space-y-1">
@@ -331,7 +336,7 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
-                             {!errors.line && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>}
+                            <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                     </div>
