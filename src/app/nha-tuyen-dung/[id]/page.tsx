@@ -364,7 +364,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                           </div>
                           <div className="space-y-2">
                               <Label htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
-                              <div className="flex items-center">
+                              <div className="flex items-center relative">
                                   <Select value={zaloCountry} onValueChange={setZaloCountry}>
                                       <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
                                       <SelectContent>
@@ -373,16 +373,31 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                                       </SelectContent>
                                   </Select>
                                   <Input id="zalo" type="tel" placeholder="..." className="rounded-l-none" value={tempContent.zalo} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value})} />
+                                <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
+                                    <QrCode className="h-5 w-5"/>
+                                </div>
                               </div>
                           </div>
-                          <div className="space-y-2">
-                              <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
-                              <Input id="messenger" placeholder="..." value={tempContent.messenger} onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})} />
-                          </div>
-                          <div className="space-y-2">
-                              <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
-                              <Input id="line" placeholder="..." value={tempContent.line} onChange={(e) => setTempContent({...tempContent, line: e.target.value})} />
-                          </div>
+                          <div className="space-y-1">
+                             <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
+                            <Input
+                                id="messenger"
+                                placeholder={t.messengerPlaceholder}
+                                value={tempContent.messenger}
+                                onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})}
+                            />
+                            <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>
+                        </div>
+                         <div className="space-y-1">
+                            <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
+                            <Input
+                                id="line"
+                                placeholder={t.linePlaceholder}
+                                value={tempContent.line}
+                                onChange={(e) => setTempContent({...tempContent, line: e.target.value})}
+                            />
+                            <p className="text-xs text-muted-foreground">{t.lineHelper}</p>
+                        </div>
                       </div>
                       <div className="text-center mt-4 text-sm text-muted-foreground">
                           Cung cấp ít nhất 1 phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Đăng ký</Badge>
@@ -506,7 +521,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                       </div>
                       <div className="mt-6 border-t pt-4">
                         <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
-                            <Phone className="h-6 w-6" />
+                            <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
                             <ZaloIcon className="h-6 w-6" />
                             <MessengerIcon className="h-6 w-6" />
                             <LineIcon className="h-6 w-6" />
@@ -557,5 +572,5 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
         </DialogContent>
       </Dialog>
     </>
-    );
+  );
 }
