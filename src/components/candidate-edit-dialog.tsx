@@ -386,7 +386,7 @@ const renderLevel1Edit = (
                                 onBlur={(e) => validateField('messenger', e.target.value)}
                                 className={cn(errors.messenger && "border-destructive")}
                             />
-                            {!errors.messenger && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự nhận diện khi bạn dán cả đường link.</p>}
+                            {!errors.messenger && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>}
                             {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                         <div className="space-y-1">
@@ -399,7 +399,7 @@ const renderLevel1Edit = (
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
-                            {!errors.line && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự nhận diện khi bạn dán cả đường link.</p>}
+                             {!errors.line && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>}
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                     </div>
