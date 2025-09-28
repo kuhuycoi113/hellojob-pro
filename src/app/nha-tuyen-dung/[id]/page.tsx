@@ -97,7 +97,10 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         const newState = { ...prev };
         const { field } = editingModule;
 
-        if (field.startsWith('info.')) {
+        if (field === 'info' || field === 'industries') {
+            // @ts-ignore
+            newState[field] = tempContent;
+        } else if (field.startsWith('info.')) {
             const infoField = field.split('.')[1] as keyof typeof mockEmployerData['info'];
             // @ts-ignore
             newState.info[infoField] = tempContent[infoField];
@@ -178,6 +181,29 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         </div>
     );
   };
+  
+  const renderIndustriesEdit = () => (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="main-industries">Ngành nghề chính</Label>
+        <Input
+          id="main-industries"
+          value={tempContent.main}
+          onChange={(e) => setTempContent({ ...tempContent, main: e.target.value })}
+          placeholder="VD: Xây dựng, Cơ khí, Nông nghiệp..."
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="secondary-industries">Ngành nghề khác</Label>
+        <Input
+          id="secondary-industries"
+          value={tempContent.secondary}
+          onChange={(e) => setTempContent({ ...tempContent, secondary: e.target.value })}
+          placeholder="VD: Điều dưỡng, Dệt may..."
+        />
+      </div>
+    </div>
+  );
 
 
   const renderEditContent = () => {
@@ -189,6 +215,8 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
              return renderInfoEdit();
         case 'benefits':
             return renderBenefitsEdit();
+        case 'industries':
+            return renderIndustriesEdit();
         default:
             return <p>Chức năng này đang được phát triển. Vui lòng quay lại sau.</p>;
     }
@@ -256,7 +284,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           ))}
                       </div>
                   </SectionCard>
-                  <SectionCard title="Lịch sử & các mốc sự kiện" icon={History} onEditClick={() => handleEditClick('Lịch sử', '', 'history')}>
+                  <SectionCard title="Lịch sử &amp; các mốc sự kiện" icon={History} onEditClick={() => handleEditClick('Lịch sử', '', 'history')}>
                       <ul className="space-y-4">
                           {employer.history.map((item, index) => (
                               <li key={index} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:rounded-full before:bg-primary">
@@ -278,13 +306,13 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           <p><strong>Website:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a></p>
                       </div>
                   </SectionCard>
-                  <SectionCard title="Ngành nghề & Lĩnh vực" icon={Briefcase} onEditClick={() => handleEditClick('Ngành nghề', '', 'industries')}>
+                  <SectionCard title="Ngành nghề &amp; Lĩnh vực" icon={Briefcase} onEditClick={() => handleEditClick('Ngành nghề &amp; Lĩnh vực', employer.industries, 'industries')}>
                       <div className="space-y-3 text-sm">
                           <p><strong>Ngành nghề chính:</strong> {employer.industries.main}</p>
                           <p><strong>Ngành nghề khác:</strong> {employer.industries.secondary}</p>
                       </div>
                   </SectionCard>
-                  <SectionCard title="Phúc lợi & Môi trường" icon={Award} onEditClick={() => handleEditClick('Phúc lợi & Môi trường', employer.benefits, 'benefits')}>
+                  <SectionCard title="Phúc lợi &amp; Môi trường" icon={Award} onEditClick={() => handleEditClick('Phúc lợi &amp; Môi trường', employer.benefits, 'benefits')}>
                       <ul className="space-y-2 text-sm">
                           {employer.benefits.map((benefit, index) => (
                               <li key={index} className="flex items-start gap-2">
@@ -312,7 +340,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
             <DialogClose asChild>
                 <Button variant="outline">Hủy</Button>
             </DialogClose>
-             {(editingModule?.field === 'about' || editingModule?.field === 'info' || editingModule?.field === 'benefits') && (
+             {(editingModule?.field === 'about' || editingModule?.field === 'info' || editingModule?.field === 'benefits' || editingModule?.field === 'industries') && (
                 <Button onClick={handleSaveChanges}>Lưu thay đổi</Button>
              )}
           </DialogFooter>
