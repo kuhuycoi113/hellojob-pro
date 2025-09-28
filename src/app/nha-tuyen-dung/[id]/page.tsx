@@ -45,10 +45,10 @@ const placeholderEmployerData = {
   },
   
   images: [
-    { src: 'https://placehold.co/600x400.png?text=Ảnh+1', alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' }, dataAiHint: 'modern office interior' },
-    { src: 'https://placehold.co/600x400.png?text=Ảnh+2', alt: { vi: 'Hoạt động đội nhóm', ja: 'チーム活動', en: 'Team Activity' }, dataAiHint: 'team building activity' },
-    { src: 'https://placehold.co/600x400.png?text=Ảnh+3', alt: { vi: 'Lễ ký kết hợp tác', ja: 'パートナーシップ調印式', en: 'Partnership Signing Ceremony' }, dataAiHint: 'partnership signing ceremony' },
-    { src: 'https://placehold.co/600x400.png?text=Ảnh+4', alt: { vi: 'Đào tạo nhân viên', ja: '従業員研修', en: 'Employee Training' }, dataAiHint: 'employee training session' },
+    { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' }, dataAiHint: 'modern office interior' },
+    { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Hoạt động đội nhóm', ja: 'チーム活動', en: 'Team Activity' }, dataAiHint: 'team building activity' },
+    { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Lễ ký kết hợp tác', ja: 'パートナーシップ調印式', en: 'Partnership Signing Ceremony' }, dataAiHint: 'partnership signing ceremony' },
+    { src: 'https://placehold.co/600x400.png?text=Ảnh+mới', alt: { vi: 'Đào tạo nhân viên', ja: '従業員研修', en: 'Employee Training' }, dataAiHint: 'employee training session' },
   ],
 
   history: [
@@ -401,9 +401,9 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
                       <div className="flex-grow pt-16 md:pt-20">
-                          <Input className="text-2xl md:text-3xl font-headline font-bold h-auto p-1 border-transparent focus-visible:border-input focus-visible:ring-1" placeholder={`Ví dụ: ${placeholderEmployerData.name[lang]}`} value={employer.name[lang]} onChange={(e) => setEmployer({...employer, name: {...employer.name, [lang]: e.target.value}})} />
-                          <Input className="font-semibold text-primary h-auto p-1 border-transparent focus-visible:border-input focus-visible:ring-1 mt-1" placeholder={`Ví dụ: ${placeholderEmployerData.type[lang]}`} value={employer.type[lang]} onChange={(e) => setEmployer({...employer, type: {...employer.type, [lang]: e.target.value}})} />
-                          <Input className="text-sm text-muted-foreground h-auto p-1 border-transparent focus-visible:border-input focus-visible:ring-1" placeholder={`Ví dụ: ${placeholderEmployerData.location[lang]}`} value={employer.location[lang]} onChange={(e) => setEmployer({...employer, location: {...employer.location, [lang]: e.target.value}})} />
+                          <p className="text-2xl md:text-3xl font-headline font-bold">{employer.name[lang] || `[${t.headerTitle}]`}</p>
+                          <p className="font-semibold text-primary">{employer.type[lang]}</p>
+                          <p className="text-sm text-muted-foreground">{employer.location[lang]}</p>
                       </div>
                       <div className="absolute top-0 right-0 md:pt-20">
                         <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: employer.type, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
@@ -418,7 +418,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <Textarea className="min-h-[150px] text-muted-foreground" placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={employer.about[lang]} onChange={(e) => setEmployer({...employer, about: {...employer.about, [lang]: e.target.value}})} />
+                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || `${t.notUpdated}, `}<button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button>.</p>
                   </SectionCard>
                   <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -441,7 +441,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                                   <p className="font-bold text-primary mb-1">{item.year}</p>
                                   <p className="text-sm text-muted-foreground">{item.event[lang]}</p>
                               </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary">{t.clickToUpdate}</button>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
               </div>
@@ -479,7 +479,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                               <li key={index} className="flex items-start gap-2">
                                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span>{benefit[lang]}</span>
                               </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary">{t.clickToUpdate}</button>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
                   <Button size="lg" className="w-full" onClick={() => console.log("Saving data:", employer)}>Lưu thay đổi</Button>
@@ -510,5 +510,3 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     </>
     );
 }
-
-```
