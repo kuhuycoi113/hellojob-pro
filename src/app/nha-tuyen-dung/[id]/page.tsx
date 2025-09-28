@@ -37,13 +37,13 @@ const employersData: { [key: string]: any } = {
             ja: 'ベトナム、ハノイ',
             en: 'Hanoi, Vietnam'
         },
-        logo: '/img/viet-img/company3.png',
+        logo: 'public/img/viet-img/company3.png',
         banner: 'https://images.unsplash.com/photo-1549880181-56a44cf4a9a5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         
         about: {
-            vi: 'Ví dụ: Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
-            ja: 'ABC株式会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。...',
-            en: 'ABC Corporation is a leading company in supplying labor to the Japanese market. ...'
+            vi: '',
+            ja: '',
+            en: ''
         },
         
         images: [
@@ -54,8 +54,6 @@ const employersData: { [key: string]: any } = {
         ],
 
         history: [
-            { year: '2010', event: { vi: 'Thành lập công ty cổ phần ABC.', ja: 'ABC株式会社設立。', en: 'Established ABC Corporation.' } },
-            { year: '2015', event: { vi: 'Nhận giấy phép hoạt động dịch vụ đưa người lao động Việt Nam đi làm việc ở nước ngoài.', ja: 'ベトナム人労働者を海外に派遣するサービス活動許可を取得。', en: 'Received license to operate services for sending Vietnamese workers abroad.' } },
         ],
 
         info: {
@@ -71,13 +69,11 @@ const employersData: { [key: string]: any } = {
         },
 
         industries: {
-            main: { vi: 'Xây dựng, Cơ khí, Nông nghiệp, Thực phẩm', ja: '建設、機械、農業、食品', en: 'Construction, Machinery, Agriculture, Food' },
-            secondary: { vi: 'Điều dưỡng, Dệt may, Điện tử', ja: '介護、繊維、電子', en: 'Nursing, Textile, Electronics' },
+            main: { vi: '', ja: '', en: '' },
+            secondary: { vi: '', ja: '', en: '' },
         },
 
         benefits: [
-            { vi: 'Hỗ trợ đào tạo tiếng Nhật và kỹ năng chuyên môn trước khi bay.', ja: '渡航前の日本語・専門スキル研修をサポート。', en: 'Support for Japanese language and professional skills training before departure.' },
-            { vi: 'Cam kết chi phí minh bạch, rõ ràng, không phát sinh chi phí ẩn.', ja: '透明性の高い明確な費用、隠れたコストなしを約束。', en: 'Commitment to transparent, clear costs with no hidden fees.' },
         ]
     },
 };
@@ -105,8 +101,8 @@ const placeholderEmployerData = {
         license: '123/LĐTBXH-GP',
     },
     industries: {
-        main: { vi: 'Xây dựng, Cơ khí', ja: '建設、機械', en: 'Construction, Machinery' },
-        secondary: { vi: 'Thực phẩm, Nông nghiệp', ja: '食品、農業', en: 'Food, Agriculture' },
+        main: { vi: 'Xây dựng, Cơ khí, Nông nghiệp, Thực phẩm', ja: '建設、機械、農業、食品', en: 'Construction, Machinery, Agriculture, Food' },
+        secondary: { vi: 'Điều dưỡng, Dệt may, Điện tử', ja: '介護、繊維、電子', en: 'Nursing, Textile, Electronics' },
     },
     benefits: [
         { vi: 'Hỗ trợ đào tạo tiếng Nhật.', ja: '日本語研修をサポート。', en: 'Japanese language training support.' },
@@ -799,3 +795,5 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </>
   );
 }
+
+    
