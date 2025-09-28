@@ -59,10 +59,10 @@ const employersData: { [key: string]: any } = {
         ],
 
         info: {
-            founded: '2010',
-            size: { vi: '50 - 100 nhân viên', ja: '50～100名', en: '50 - 100 employees' },
-            website: 'https://abc-corp.co.jp',
-            license: 'Số 123/LĐTBXH-GP',
+            founded: '',
+            size: { vi: '', ja: '', en: '' },
+            website: '',
+            license: '',
             phone: '',
             zalo: '',
             messenger: '',
@@ -467,9 +467,9 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         case 'header':
             return (
                  <div className="space-y-4">
-                    <div className="space-y-2"><Label>Tên công ty</Label><Input placeholder={t.namePlaceholder} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>Loại hình</Label><Input placeholder={t.typePlaceholder} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>Địa điểm</Label><Input placeholder={t.locationPlaceholder} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>Tên công ty</Label><Input placeholder={placeholderEmployerData.name[lang]} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>Loại hình</Label><Input placeholder={placeholderEmployerData.type[lang]} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>Địa điểm</Label><Input placeholder={placeholderEmployerData.location[lang]} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
                 </div>
             );
         case 'about':
@@ -799,5 +799,3 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </>
   );
 }
-
-    
