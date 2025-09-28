@@ -267,19 +267,67 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
   const [phoneCountry, setPhoneCountry] = useState('+84');
   const [zaloCountry, setZaloCountry] = useState('+84');
   const { toast } = useToast();
-  const [errors, setErrors] = useState<{ messenger?: string, line?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; messenger?: string, line?: string }>({});
   
   const t = contentByLang[lang] || contentByLang['vi'];
+
+  const validateEmail = (email: string) => {
+    if (!email) return true; // Not required
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  const validateField = (field: 'messenger' | 'line' | 'email', value: string) => {
+    if (!value) {
+        setErrors(prev => ({...prev, [field]: undefined }));
+        return true;
+    }
+
+    let isValid = false;
+    let errorMessage = "Định dạng không hợp lệ.";
+
+    if (field === 'messenger') {
+        isValid = /^(https?:\/\/(www\.)?(facebook|m)\.com\/|m\.me\/|[\w.]{5,})/.test(value);
+        errorMessage = "Vui lòng nhập link Facebook/Messenger hoặc username hợp lệ.";
+    } else if (field === 'line') {
+        isValid = /^(https?:\/\/line\.me\/|@?[\w.-]+)/.test(value);
+        errorMessage = "Vui lòng nhập link Line hoặc Line ID hợp lệ.";
+    } else if (field === 'email') {
+        isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        errorMessage = "Vui lòng nhập địa chỉ email hợp lệ.";
+    }
+    
+    if (isValid) {
+        setErrors(prev => ({ ...prev, [field]: undefined }));
+    } else {
+        setErrors(prev => ({ ...prev, [field]: errorMessage }));
+    }
+    return isValid;
+  };
 
   const handleEditClick = (title: string, currentContent: any, field: string) => {
     setEditingModule({ title, field });
     setTempContent(JSON.parse(JSON.stringify(currentContent)));
+    setErrors({});
     setIsEditDialogOpen(true);
   };
 
   const handleSaveChanges = () => {
     if (!editingModule) return;
     
+    // Validate all fields before saving
+    let allValid = true;
+    if (editingModule.field === 'info') {
+        if (!validateField('email', tempContent.email || '')) allValid = false;
+        if (!validateField('messenger', tempContent.messenger || '')) allValid = false;
+        if (!validateField('line', tempContent.line || '')) allValid = false;
+    }
+
+    if (!allValid) {
+        toast({ variant: 'destructive', title: 'Thông tin không hợp lệ', description: 'Vui lòng sửa các lỗi được hiển thị trước khi lưu.' });
+        return;
+    }
+
     setEmployer(prev => {
         const newState = { ...prev };
         const { field } = editingModule;
@@ -397,13 +445,28 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                         <div className="space-y-2"><Label>{t.foundedLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} /></div>
                         <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
                         <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
-                        <div className="space-y-2"><Label>{t.websiteLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} /></div>
+                        <div className="space-y-2">
+                           <Label>{t.websiteLabel}</Label>
+                           <Input placeholder="https://example.com" value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} />
+                        </div>
                     </div>
                     
                     <div className="pt-4 border-t">
                       <h4 className="font-semibold mb-4">{t.contactTitle}</h4>
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                           <div className="space-y-2 md:col-span-2"><Label htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4"/> {t.emailLabel}</Label><Input type="email" id="email" placeholder="contact@company.com" value={tempContent.email} onChange={(e) => setTempContent({...tempContent, email: e.target.value})} /></div>
+                           <div className="space-y-1 md:col-span-2">
+                              <Label htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4"/> {t.emailLabel}</Label>
+                              <Input 
+                                type="email" 
+                                id="email" 
+                                placeholder="contact@company.com" 
+                                value={tempContent.email} 
+                                onChange={(e) => setTempContent({...tempContent, email: e.target.value})} 
+                                onBlur={(e) => validateField('email', e.target.value)}
+                                className={cn(errors.email && "border-destructive")}
+                              />
+                               {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                           </div>
                           <div className="space-y-2">
                               <Label htmlFor="phone" className="flex items-center gap-2">
                                 <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
@@ -443,10 +506,11 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                                 placeholder={t.messengerPlaceholder}
                                 value={tempContent.messenger}
                                 onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})}
-                                onBlur={(e) => {}}
+                                onBlur={(e) => validateField('messenger', e.target.value)}
                                 className={cn(errors.messenger && "border-destructive")}
                             />
-                            <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>
+                            {!errors.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
+                            {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                          <div className="space-y-1">
                             <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
@@ -455,10 +519,11 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                                 placeholder={t.linePlaceholder}
                                 value={tempContent.line}
                                 onChange={(e) => setTempContent({...tempContent, line: e.target.value})}
-                                onBlur={(e) => {}}
+                                onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
-                            <p className="text-xs text-muted-foreground">{t.lineHelper}</p>
+                            {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
+                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                       </div>
                       <div className="text-center mt-4">
