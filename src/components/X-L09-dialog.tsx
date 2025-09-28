@@ -171,7 +171,12 @@ export function XL09Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                 </div>
             </div>
             <div className="w-full md:w-auto mt-4 md:mt-0 flex justify-center">
-                 <Button onClick={onComplete} variant="outline" size="lg" className="w-full md:w-auto md:px-8 hover:bg-primary hover:text-primary-foreground">
+                 <Button 
+                    onClick={onComplete} 
+                    variant="outline"
+                    size="lg" 
+                    className="w-full md:w-auto md:px-8 border-[#9B999A] hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                >
                     {content.completeButton}
                 </Button>
             </div>
