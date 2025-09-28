@@ -619,7 +619,7 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
       </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent id={editingModule?.field === 'info' ? 'THONGTINDOANHNGHIEP01' : undefined} className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
           </DialogHeader>
@@ -639,5 +639,3 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     </>
   );
 }
-
-    
