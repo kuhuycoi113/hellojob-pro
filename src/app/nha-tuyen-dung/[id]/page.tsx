@@ -16,6 +16,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon } from '@/components/custom-icons';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { QrCode } from 'lucide-react';
 
 // Mock data now serves as placeholders
 const placeholderEmployerData = {
@@ -206,6 +209,10 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<{title: string, field: string } | null>(null);
   const [tempContent, setTempContent] = useState<any>('');
+  const [phoneCountry, setPhoneCountry] = useState('+84');
+  const [zaloCountry, setZaloCountry] = useState('+84');
+  const { toast } = useToast();
+  const [errors, setErrors] = useState<{ messenger?: string, line?: string }>({});
   
   const t = contentByLang[lang] || contentByLang['vi'];
 
@@ -335,10 +342,52 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
                     <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
                     <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
                     <div className="space-y-2"><Label>{t.websiteLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>{t.phoneLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.phone}`} value={tempContent.phone} onChange={(e) => setTempContent({...tempContent, phone: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>{t.zaloLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.zalo}`} value={tempContent.zalo} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>{t.messengerLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.messenger}`} value={tempContent.messenger} onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>{t.lineLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.line}`} value={tempContent.line} onChange={(e) => setTempContent({...tempContent, line: e.target.value})} /></div>
+                    
+                    <div className="pt-4 border-t">
+                      <h4 className="font-semibold mb-4">Thông tin liên hệ</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                              <Label htmlFor="phone" className="flex items-center gap-2">
+                                  <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
+                                  {t.phoneLabel}
+                              </Label>
+                              <div className="flex items-center">
+                                  <Select value={phoneCountry} onValueChange={setPhoneCountry}>
+                                      <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
+                                      <SelectContent>
+                                          <SelectItem value="+84">VN</SelectItem>
+                                          <SelectItem value="+81">JP</SelectItem>
+                                      </SelectContent>
+                                  </Select>
+                                  <Input id="phone" type="tel" placeholder="..." className="rounded-l-none" value={tempContent.phone} onChange={(e) => setTempContent({...tempContent, phone: e.target.value})} />
+                              </div>
+                          </div>
+                          <div className="space-y-2">
+                              <Label htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
+                              <div className="flex items-center">
+                                  <Select value={zaloCountry} onValueChange={setZaloCountry}>
+                                      <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
+                                      <SelectContent>
+                                          <SelectItem value="+84">VN</SelectItem>
+                                          <SelectItem value="+81">JP</SelectItem>
+                                      </SelectContent>
+                                  </Select>
+                                  <Input id="zalo" type="tel" placeholder="..." className="rounded-l-none" value={tempContent.zalo} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value})} />
+                              </div>
+                          </div>
+                          <div className="space-y-2">
+                              <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
+                              <Input id="messenger" placeholder="..." value={tempContent.messenger} onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})} />
+                          </div>
+                          <div className="space-y-2">
+                              <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
+                              <Input id="line" placeholder="..." value={tempContent.line} onChange={(e) => setTempContent({...tempContent, line: e.target.value})} />
+                          </div>
+                      </div>
+                      <div className="text-center mt-4 text-sm text-muted-foreground">
+                          Cung cấp ít nhất 1 phương thức liên hệ để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Đăng ký</Badge>
+                      </div>
+                  </div>
                 </div>
              );
         case 'industries':
@@ -510,4 +559,3 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
     </>
     );
 }
-
