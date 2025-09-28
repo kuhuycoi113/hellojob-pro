@@ -158,7 +158,7 @@ const visaTypeContent = {
     options: [
       { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
       { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist in Humanities', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
     ]
   }
 };
@@ -237,10 +237,6 @@ export function YL01Dialog({
   const handleComplete = () => {
     const preferences = {
       role: selectedRole,
-      desiredVisaType: selectedVisa?.name[currentLang] || undefined,
-      desiredVisaDetail: selectedVisaDetail || undefined,
-      desiredIndustry: selectedIndustry?.name[currentLang] || undefined,
-      desiredLocation: selectedRegion || undefined,
     };
 
     if (onComplete) {
@@ -285,6 +281,13 @@ export function YL01Dialog({
         const dialogTitles = { vi: 'Bạn là ai?', ja: 'あなたの役割をお選びください', en: 'What is your role?' };
         const dialogDescriptions = { vi: 'Chọn vai trò phù hợp nhất với bạn để chúng tôi có thể hỗ trợ tốt hơn.', ja: 'より良いサポートを提供するために、あなたに最も適した役割を選択してください。', en: 'Select the role that best fits you so we can provide better support.' };
 
+        const handleRoleSelect = (roleId: string) => {
+            setSelectedRole(roleId);
+            if (onComplete) {
+                onComplete({ role: roleId });
+            }
+        };
+
         return (
             <>
                 <DialogHeader>
@@ -302,7 +305,7 @@ export function YL01Dialog({
                             {roles[currentLang].map((role) => (
                                 <Card 
                                     key={role.id} 
-                                    onClick={() => { setSelectedRole(role.id); setProfileCreationStep(2); }}
+                                    onClick={() => handleRoleSelect(role.id)}
                                     className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
                                 >
                                     <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -317,168 +320,9 @@ export function YL01Dialog({
         );
   }
 
-  const QuickCreateStepDialog = () => {
-    const content = visaTypeContent[currentLang];
-    const iconColors = {
-        orange: 'text-orange-500',
-        blue: 'text-blue-500',
-        green: 'text-green-500',
-    };
-
-    return (
-        <>
-            {/* Screen: Y002 */}
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                <DialogDescription className="text-center">
-                    {content.description}
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                {content.options.map(option => (
-                    <Button 
-                        key={option.id}
-                        onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === option.id)!); setProfileCreationStep(3); }} 
-                        variant="outline" 
-                        className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
-                        <h3 className="font-bold text-base mb-1">{option.title}</h3>
-                        <p className="text-muted-foreground text-xs">{option.desc}</p>
-                    </Button>
-                ))}
-            </div>
-            <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">
-                {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
-            </Button>
-        </>
-    );
-  };
-
-  const VisaDetailStepDialog = () => {
-    if (!selectedVisa) return null;
-    
-    const contentData = visaDetailContent[selectedVisa.slug as keyof typeof visaDetailContent];
-    if (!contentData) return null;
-
-    const content = contentData[currentLang];
-    const iconColors = {
-        'thuc-tap-sinh-ky-nang': 'bg-orange-100 text-orange-500',
-        'ky-nang-dac-dinh': 'bg-blue-100 text-blue-500',
-        'ky-su-tri-thuc': 'bg-green-100 text-green-500',
-    };
-    const currentIconColor = iconColors[selectedVisa.slug as keyof typeof iconColors] || 'bg-gray-100 text-gray-500';
-
-
-    return (
-        <>
-        <DialogHeader>
-            <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-            <DialogDescription className="text-center">{content.description}</DialogDescription>
-        </DialogHeader>
-        <div className={cn("grid grid-cols-1 pt-4 gap-4", content.options.length > 2 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-2xl mx-auto")}>
-            {content.options.map(option => (
-                <Card key={option.id} onClick={() => { setSelectedVisaDetail(option.id); setProfileCreationStep(4); }}
-                    className={cn("text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedVisaDetail === option.id && "ring-2 ring-primary border-primary")}>
-                    <div className={cn("rounded-full p-3 w-fit mb-4", currentIconColor)}>
-                        <option.icon className="h-8 w-8" />
-                    </div>
-                    <h3 className="font-bold text-lg mb-2">{option.title}</h3>
-                    <p className="text-muted-foreground text-sm flex-grow">{option.desc}</p>
-                </Card>
-            ))}
-        </div>
-        <Button variant="link" onClick={() => setProfileCreationStep(2)} className="mt-4 mx-auto block">
-             {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
-        </Button>
-        </>
-    )
-  };
-
-
-  const IndustryStepDialog = () => {
-    const parentVisaSlug = selectedVisa?.slug;
-    if (!parentVisaSlug) return null;
-    const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
-    
-    let screenIdComment = '';
-    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: Y004-1';
-    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: Y004-2';
-    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: Y004-3';
-    
-    const content = industryContent[currentLang];
-
-    return (
-        <>
-            <span className="hidden">{screenIdComment}</span>
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                <DialogDescription className="text-center">{content.description}</DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
-                {industries.map(industry => (
-                    <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <p className="font-semibold text-sm">{industry.name[currentLang]}</p>
-                    </Button>
-                ))}
-            </div>
-            <Button variant="link" onClick={() => setProfileCreationStep(3)} className="mt-4 mx-auto block">
-                {content.backButton}
-            </Button>
-        </>
-    );
-  };
-  
-  const RegionStepDialog = () => {
-    const content = regionContent[currentLang];
-    const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
-    const regionKanjiMap: { [key: string]: string } = {
-      Hokkaido: '北海道',
-      Tohoku: '東北',
-      Kanto: '関東',
-      Chubu: '中部',
-      Kansai: '関西',
-      Chugoku: '中国',
-      Shikoku: '四国',
-      Kyushu: '九州',
-      Okinawa: '沖縄',
-    };
-    
-    return (
-         <>
-            {/* Screen: Y005 */}
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                <DialogDescription className="text-center">{content.description}</DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
-                 {japanRegions.map(region => (
-                    <Button 
-                        key={region} 
-                        variant="outline"
-                        onClick={() => { setSelectedRegion(region); handleComplete(); }}
-                        className={cn(
-                            "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary",
-                            selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
-                        )}
-                    >
-                        <p className="font-semibold text-sm">{currentLang === 'ja' ? regionKanjiMap[region] : region}</p>
-                    </Button>
-                ))}
-            </div>
-            <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setProfileCreationStep(4)}>{content.backButton}</Button>
-            </div>
-        </>
-    )
-  }
-
   const renderDialogContent = () => {
     switch (profileCreationStep) {
       case 1: return <PartnerRoleStepDialog />;
-      case 2: return <QuickCreateStepDialog />;
-      case 3: return <VisaDetailStepDialog />;
-      case 4: return <IndustryStepDialog />;
-      case 5: return <RegionStepDialog />;
       default: return <PartnerRoleStepDialog />;
     }
   }
