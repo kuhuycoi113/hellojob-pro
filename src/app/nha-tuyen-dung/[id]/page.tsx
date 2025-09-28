@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, use, useEffect } from 'react';
@@ -37,8 +38,8 @@ const employersData: { [key: string]: any } = {
             ja: 'ベトナム、ハノイ',
             en: 'Hanoi, Vietnam'
         },
-        logo: '/img/favi2.png',
-        banner: 'https://placehold.co/1200x400.png?text=Ảnh+Bìa+Công+Ty',
+        logo: '/img/logo_fpt.png',
+        banner: 'https://images.unsplash.com/photo-1549880181-56a44cf4a9a5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         
         about: {
             vi: 'Ví dụ: Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
@@ -293,8 +294,8 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 };
 
 
-export default function EmployerDetailPage({ params: paramsProp }: { params: { id: string } }) {
-  const resolvedParams = use(paramsProp);
+export default function EmployerDetailPage({ params }: { params: { id: string } }) {
+  const resolvedParams = use(params);
   const searchParams = useSearchParams();
   const id = resolvedParams.id;
 
@@ -794,4 +795,3 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: { i
     </>
   );
 }
-
