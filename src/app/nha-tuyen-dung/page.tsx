@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 import { XL06Dialog } from '@/components/X-L06-dialog';
 import { XL07Dialog } from '@/components/X-L07-dialog';
+import { XL08Dialog } from '@/components/X-L08-dialog';
 
 
 const partnerBenefits = [
@@ -55,25 +56,39 @@ export default function NhaTuyenDungPage() {
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
   const [isXL06DialogOpen, setIsXL06DialogOpen] = useState(false);
   const [isXL07DialogOpen, setIsXL07DialogOpen] = useState(false);
+  const [isXL08DialogOpen, setIsXL08DialogOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
+  const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
+  const [referralFee, setReferralFee] = useState<string>('');
 
   const handleXL01Complete = (preferences: any) => {
     console.log("X-L01 Completed with:", preferences);
+    setRecruitmentPrefs(preferences);
     setIsXL01DialogOpen(false);
     setIsXL06DialogOpen(true);
   };
   
   const handleXL06Complete = (fee: string) => {
     console.log("X006 (Referral Fee) selected:", fee);
+    setReferralFee(fee);
     setIsXL06DialogOpen(false);
     setIsXL07DialogOpen(true);
   };
 
   const handleXL07Complete = (fee: string) => {
     console.log("XL07 (Management Fee) selected:", fee);
+    const finalPrefs = { ...recruitmentPrefs, referralFee, managementFee: fee };
+    setRecruitmentPrefs(finalPrefs);
     setIsXL07DialogOpen(false);
-    // Here you can proceed to the next step, e.g., finding partners
+    setIsXL08DialogOpen(true);
   };
+  
+  const handleXL08Complete = (contactInfo: any) => {
+    console.log("X-L08 Completed. Final Data:", { ...recruitmentPrefs, contactInfo });
+    setIsXL08DialogOpen(false);
+    // Show success toast or navigate to a thank you page
+  };
+
 
   return (
     <>
@@ -222,6 +237,17 @@ export default function NhaTuyenDungPage() {
             setIsXL07DialogOpen(false);
             setIsXL06DialogOpen(true);
         }}
+        lang={selectedLang}
+      />
+      <XL08Dialog
+        isOpen={isXL08DialogOpen}
+        onOpenChange={setIsXL08DialogOpen}
+        onComplete={handleXL08Complete}
+        onBack={() => {
+            setIsXL08DialogOpen(false);
+            setIsXL07DialogOpen(true);
+        }}
+        recruitmentPrefs={recruitmentPrefs}
         lang={selectedLang}
       />
     </>
