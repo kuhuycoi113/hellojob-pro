@@ -127,7 +127,7 @@ const contentByLang = {
         notUpdated: 'Chưa có thông tin',
         clickToUpdate: 'Nhấn để cập nhật',
         headerTitle: 'Thông tin chung',
-        namePlaceholder: 'Ví dụ: Công ty Cổ phần TVC',
+        namePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
         typePlaceholder: 'Ví dụ: Công ty phái cử',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
         industriesTitle: 'Ngành nghề & Lĩnh vực',
@@ -160,7 +160,7 @@ const contentByLang = {
         notUpdated: '情報がありません',
         clickToUpdate: 'クリックして更新',
         headerTitle: '一般情報',
-        namePlaceholder: '例: TVC株式会社',
+        namePlaceholder: '例: ABC株式会社',
         typePlaceholder: '例: 送り出し機関',
         locationPlaceholder: '例: ベトナム、ハノイ',
         industriesTitle: '業種と分野',
@@ -193,7 +193,7 @@ const contentByLang = {
         notUpdated: 'Not available',
         clickToUpdate: 'Click to update',
         headerTitle: 'General Information',
-        namePlaceholder: 'E.g., TVC Corporation',
+        namePlaceholder: 'E.g., ABC Corporation',
         typePlaceholder: 'E.g., Dispatch Company',
         locationPlaceholder: 'E.g., Hanoi, Vietnam',
         industriesTitle: 'Industries & Sectors',
@@ -405,9 +405,9 @@ export default function EmployerDetailPage({ params: paramsProp }: { params: Pro
         case 'header':
             return (
                  <div className="space-y-4">
-                    <div className="space-y-2"><Label>Tên công ty</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.name[lang]}`} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>Loại hình</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.type[lang]}`} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>Địa điểm</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.location[lang]}`} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>Tên công ty</Label><Input placeholder={t.namePlaceholder} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>Loại hình</Label><Input placeholder={t.typePlaceholder} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>Địa điểm</Label><Input placeholder={t.locationPlaceholder} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
                 </div>
             );
         case 'about':
