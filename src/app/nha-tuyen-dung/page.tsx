@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -124,7 +125,7 @@ export default function NhaTuyenDungPage() {
                           <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                       </div>
                   </Button>
-                  <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsXL01DialogOpen(true)}>
+                  <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
                       <div className="text-center">
                           <span className="font-semibold">Đăng ký đối tác</span>
                           <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
@@ -206,7 +207,7 @@ export default function NhaTuyenDungPage() {
                                   <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                               </div>
                           </Button>
-                           <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsXL01DialogOpen(true)}>
+                           <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
                               <div className="text-center">
                                   <span className="font-semibold">Đăng ký đối tác</span>
                                   <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
