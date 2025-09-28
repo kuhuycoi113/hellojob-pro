@@ -4,13 +4,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Calendar, MapPin, Users, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle } from 'lucide-react';
+import { Building, Calendar, MapPin, Users, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle, Info } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 // Mock data based on the provided image
 const mockEmployerData = {
@@ -78,28 +80,80 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
 export default function EmployerDetailPage({ params }: { params: { id: string } }) {
   const [employer, setEmployer] = useState(mockEmployerData);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingModule, setEditingModule] = useState<{title: string, content: string} | null>(null);
-  const [tempContent, setTempContent] = useState('');
+  const [editingModule, setEditingModule] = useState<{title: string, content: any, field: keyof typeof employer | `info.${keyof typeof mockEmployerData['info']}` } | null>(null);
+  const [tempContent, setTempContent] = useState<any>('');
 
-  const handleEditClick = (title: string, currentContent: any, field: keyof typeof employer) => {
-    if (field === 'about') {
-        setEditingModule({ title, content: currentContent });
-        setTempContent(currentContent);
-        setIsEditDialogOpen(true);
-    } else {
-        // For other modules, show a placeholder dialog
-        setEditingModule({ title: `Chỉnh sửa ${title}`, content: 'Chức năng này đang được phát triển. Vui lòng quay lại sau.' });
-        setIsEditDialogOpen(true);
-    }
+  const handleEditClick = (title: string, currentContent: any, field: keyof typeof employer | `info.${keyof typeof mockEmployerData['info']}`) => {
+    setEditingModule({ title, content: currentContent, field });
+    setTempContent(currentContent);
+    setIsEditDialogOpen(true);
   };
 
   const handleSaveChanges = () => {
-    if (editingModule?.title === 'Giới thiệu doanh nghiệp') {
-        setEmployer(prev => ({...prev, about: tempContent}));
-    }
-    // Logic for other modules will be added here
+    if (!editingModule) return;
+    
+    setEmployer(prev => {
+        const newState = { ...prev };
+        const { field } = editingModule;
+
+        if (field.startsWith('info.')) {
+            const infoField = field.split('.')[1] as keyof typeof mockEmployerData['info'];
+            newState.info[infoField] = tempContent[infoField];
+        } else {
+            // @ts-ignore
+            newState[field as keyof typeof employer] = tempContent;
+        }
+
+        return newState;
+    });
+
     setIsEditDialogOpen(false);
     setEditingModule(null);
+  }
+
+  const renderAboutEdit = () => (
+      <Textarea 
+          value={tempContent}
+          onChange={(e) => setTempContent(e.target.value)}
+          rows={10}
+          className="text-base"
+      />
+  );
+  
+  const renderInfoEdit = () => (
+      <div className="space-y-4">
+          <div className="space-y-2">
+              <Label htmlFor="founded">Năm thành lập</Label>
+              <Input id="founded" value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} />
+          </div>
+          <div className="space-y-2">
+              <Label htmlFor="size">Quy mô</Label>
+              <Input id="size" value={tempContent.size} onChange={(e) => setTempContent({...tempContent, size: e.target.value})} />
+          </div>
+          <div className="space-y-2">
+              <Label htmlFor="license">Giấy phép</Label>
+              <Input id="license" value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} />
+          </div>
+           <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input id="website" value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} />
+          </div>
+      </div>
+  );
+
+  const renderEditContent = () => {
+    if (!editingModule) return null;
+    switch(editingModule.field) {
+        case 'about':
+            return renderAboutEdit();
+        case 'info.founded':
+        case 'info.size':
+        case 'info.license':
+        case 'info.website':
+             return renderInfoEdit();
+        default:
+            return <p>Chức năng này đang được phát triển. Vui lòng quay lại sau.</p>;
+    }
   }
 
   return (
@@ -113,7 +167,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                 <div className="relative w-full h-48 md:h-64">
                   <Image src={employer.banner} alt={`${employer.name} banner`} fill className="object-cover" data-ai-hint={employer.dataAiHintBanner}/>
                   <div className="absolute inset-0 bg-black/40" />
-                  <Button variant="secondary" size="sm" className="absolute top-4 right-4 z-10" onClick={() => handleEditClick('Ảnh bìa', '', 'banner')}>
+                  <Button variant="secondary" size="sm" className="absolute top-4 right-4 z-10" onClick={() => handleEditClick('Ảnh bìa', employer.banner, 'banner')}>
                       <Camera className="mr-2 h-4 w-4" /> Sửa ảnh bìa
                   </Button>
                 </div>
@@ -124,7 +178,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                             <AvatarImage src={employer.logo} alt={employer.name} data-ai-hint={employer.dataAiHint} />
                             <AvatarFallback>{employer.name.charAt(0)}</AvatarFallback>
                           </Avatar>
-                          <Button variant="secondary" size="icon" className="absolute bottom-1 right-1 h-8 w-8 rounded-full z-10" onClick={() => handleEditClick('Avatar', '', 'logo')}>
+                          <Button variant="secondary" size="icon" className="absolute bottom-1 right-1 h-8 w-8 rounded-full z-10" onClick={() => handleEditClick('Avatar', employer.logo, 'logo')}>
                               <Camera className="h-4 w-4"/>
                           </Button>
                       </div>
@@ -136,7 +190,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           </p>
                       </div>
                       <div className="absolute top-16 right-0 md:top-20 md:right-0">
-                          <Button variant="ghost" size="icon" onClick={() => handleEditClick('Thông tin chung', '', 'name')}>
+                          <Button variant="ghost" size="icon" onClick={() => handleEditClick('Thông tin chung', {name: employer.name, type: employer.type, location: employer.location }, 'name')}>
                               <Edit className="h-5 w-5"/>
                           </Button>
                       </div>
@@ -178,7 +232,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
               
               {/* Right Column */}
               <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
-                  <SectionCard title="Thông tin doanh nghiệp" icon={Building} onEditClick={() => handleEditClick('Thông tin', '', 'info')}>
+                  <SectionCard title="Thông tin doanh nghiệp" icon={Building} onEditClick={() => handleEditClick('Thông tin doanh nghiệp', employer.info, 'info.founded')}>
                       <div className="space-y-3 text-sm">
                           <p><strong>Năm thành lập:</strong> {employer.info.founded}</p>
                           <p><strong>Quy mô:</strong> {employer.info.size}</p>
@@ -212,30 +266,15 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
-             <DialogDescription>
-                {editingModule?.title === 'Giới thiệu doanh nghiệp' 
-                    ? 'Chỉnh sửa nội dung giới thiệu về công ty của bạn.' 
-                    : ''
-                }
-            </DialogDescription>
           </DialogHeader>
            <div className="py-4">
-              {editingModule?.title === 'Giới thiệu doanh nghiệp' ? (
-                  <Textarea 
-                      value={tempContent}
-                      onChange={(e) => setTempContent(e.target.value)}
-                      rows={10}
-                      className="text-base"
-                  />
-              ) : (
-                  <p>{editingModule?.content}</p>
-              )}
+              {renderEditContent()}
            </div>
           <DialogFooter>
             <DialogClose asChild>
                 <Button variant="outline">Hủy</Button>
             </DialogClose>
-             {editingModule?.title === 'Giới thiệu doanh nghiệp' && (
+             {(editingModule?.field === 'about' || editingModule?.field.startsWith('info.')) && (
                 <Button onClick={handleSaveChanges}>Lưu thay đổi</Button>
              )}
           </DialogFooter>
