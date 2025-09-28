@@ -12,7 +12,7 @@ import {
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Handshake, QrCode, Mail, Phone, Info } from 'lucide-react';
+import { Handshake, QrCode, Mail, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { ZaloIcon, MessengerIcon, LineIcon } from './custom-icons';
@@ -143,7 +143,10 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                     <Label>{content.otherContactLabel}</Label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="phone" className="flex items-center gap-2"><Phone className="h-4 w-4" />{content.phoneLabel}</Label>
+                            <Label htmlFor="phone" className="flex items-center gap-2">
+                                <Image src="/img/phone.svg" alt="Phone" width={16} height={16} />
+                                {content.phoneLabel}
+                            </Label>
                              <div className="flex items-center">
                                 <Select value={phoneCountry} onValueChange={setPhoneCountry}>
                                     <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
