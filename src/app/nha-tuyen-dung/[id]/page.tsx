@@ -1,10 +1,11 @@
+
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Calendar, MapPin, Users, Video, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle } from 'lucide-react';
+import { Building, Calendar, MapPin, Users, Image as ImageIcon, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -130,18 +131,6 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
             <div className="lg:col-span-2 space-y-8">
                 <SectionCard title="Giới thiệu doanh nghiệp" icon={FileText}>
                     <p className="text-muted-foreground whitespace-pre-line">{employer.about}</p>
-                </SectionCard>
-                <SectionCard title="Video về doanh nghiệp" icon={Video}>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        {employer.videos.map((video, index) => (
-                            <div key={index} className="relative aspect-video rounded-lg overflow-hidden group">
-                                <Image src={video.src} alt={video.alt} fill className="object-cover" data-ai-hint={video.dataAiHint} />
-                                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                                    <Camera className="h-8 w-8 text-white" />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
                 </SectionCard>
                  <SectionCard title="Ảnh về doanh nghiệp" icon={ImageIcon}>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
