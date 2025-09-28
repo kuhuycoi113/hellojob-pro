@@ -4,10 +4,9 @@
 import { useState, use } from 'react';
 import { notFound, useSearchParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, History, FileText, Briefcase, Award, Edit, Camera, CheckCircle, Info, PlusCircle, Trash2, UploadCloud, Image as ImageIcon } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -72,6 +71,23 @@ const placeholderEmployerData = {
     { vi: 'Cam kết chi phí minh bạch, rõ ràng, không phát sinh chi phí ẩn.', ja: '透明性の高い明確な費用、隠れたコストなしを約束。', en: 'Commitment to transparent, clear costs with no hidden fees.' },
   ]
 };
+
+// Initial empty state for the form
+const emptyEmployerData = {
+    id: 'Z000',
+    name: { vi: '', ja: '', en: '' },
+    type: { vi: '', ja: '', en: '' },
+    location: { vi: '', ja: '', en: '' },
+    logo: '/img/favi2.png',
+    banner: 'https://placehold.co/1200x400.png?text=Tải+lên+ảnh+bìa',
+    about: { vi: '', ja: '', en: '' },
+    images: [],
+    history: [],
+    info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '' },
+    industries: { main: { vi: '', ja: '', en: '' }, secondary: { vi: '', ja: '', en: '' } },
+    benefits: []
+};
+
 
 const contentByLang = {
     vi: {
@@ -139,7 +155,7 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
     </Card>
 );
 
-export default function EmployerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EmployerDetailPage({ params }: { params: { id: string } }) {
   const resolvedParams = use(params);
   
   if (resolvedParams.id !== 'Z000') {
@@ -149,7 +165,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
   const searchParams = useSearchParams();
   const lang = (searchParams.get('lang') || 'vi') as Language;
   
-  const [employer, setEmployer] = useState({ ...placeholderEmployerData, id: 'Z000' });
+  const [employer, setEmployer] = useState({ ...emptyEmployerData });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<{title: string, field: string } | null>(null);
   const [tempContent, setTempContent] = useState<any>('');
@@ -224,7 +240,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
 
     switch(editingModule.field) {
         case 'about':
-            return <Textarea placeholder={placeholderEmployerData.about[lang]} value={tempContent[lang]} onChange={(e) => setTempContent({...tempContent, [lang]: e.target.value})} rows={8} />;
+            return <Textarea placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang]} onChange={(e) => setTempContent({...tempContent, [lang]: e.target.value})} rows={8} />;
         
         case 'images':
             return (
@@ -235,7 +251,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
                          <Image src={img.src} alt={img.alt[lang]} fill className="object-cover rounded-md"/>
                       </div>
                       <Input 
-                        placeholder={`Mô tả ảnh ${index+1}`} 
+                        placeholder={`Ví dụ: ${placeholderEmployerData.images[index]?.alt[lang]}`}
                         value={img.alt[lang]}
                         onChange={(e) => {
                             const newImages = [...tempContent];
@@ -256,7 +272,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
                     {tempContent.map((item: any, index: number) => (
                         <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
                             <Input placeholder="Năm" value={item.year} onChange={(e) => handleTempArrayChange(index, 'year', e.target.value)} />
-                            <Input placeholder="Sự kiện" value={item.event[lang]} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
+                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang]}`} value={item.event[lang]} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
@@ -266,17 +282,17 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
         case 'info':
              return (
                 <div className="space-y-4">
-                    <div className="space-y-2"><Label>{t.foundedLabel}</Label><Input placeholder={placeholderEmployerData.info.founded} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={placeholderEmployerData.info.size[lang]} value={tempContent.size[lang]} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={placeholderEmployerData.info.license} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>{t.websiteLabel}</Label><Input placeholder={placeholderEmployerData.info.website} value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>{t.foundedLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang]} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>{t.websiteLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} /></div>
                 </div>
              );
         case 'industries':
              return (
                 <div className="space-y-4">
-                    <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Input placeholder={placeholderEmployerData.industries.main[lang]} value={tempContent.main[lang]} onChange={(e) => setTempContent({...tempContent, main: {...tempContent.main, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Input placeholder={placeholderEmployerData.industries.secondary[lang]} value={tempContent.secondary[lang]} onChange={(e) => setTempContent({...tempContent, secondary: {...tempContent.secondary, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={tempContent.main[lang]} onChange={(e) => setTempContent({...tempContent, main: {...tempContent.main, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={tempContent.secondary[lang]} onChange={(e) => setTempContent({...tempContent, secondary: {...tempContent.secondary, [lang]: e.target.value}})} /></div>
                 </div>
              );
         case 'benefits':
@@ -284,7 +300,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
                 <div className="space-y-4">
                      {tempContent.map((item: any, index: number) => (
                         <div key={index} className="flex items-center gap-2">
-                            <Input placeholder={`Phúc lợi ${index + 1}`} value={item[lang]} onChange={(e) => handleTempArrayChange(index, 'benefit', e.target.value)} />
+                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.benefits[index]?.[lang]}`} value={item[lang]} onChange={(e) => handleTempArrayChange(index, 'benefit', e.target.value)} />
                              <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
@@ -306,7 +322,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
             <Card className="shadow-2xl overflow-hidden mb-8">
               <CardHeader className="p-0 relative">
                 <div className="relative w-full h-48 md:h-64">
-                  <Image src={employer.banner} alt={`${employer.name[lang]} banner`} fill className="object-cover" />
+                  <Image src={employer.banner} alt={`${employer.name[lang] || ''} banner`} fill className="object-cover" />
                   <div className="absolute inset-0 bg-black/40" />
                   <Label htmlFor="banner-upload" className="absolute top-4 right-4 z-10 cursor-pointer">
                      <Button variant="secondary" size="sm" asChild>
@@ -320,7 +336,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
                       <div className="relative flex-shrink-0">
                         <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
                             <AvatarImage src={employer.logo} />
-                            <AvatarFallback>{employer.name[lang].charAt(0)}</AvatarFallback>
+                            <AvatarFallback>{employer.name[lang]?.charAt(0) || 'A'}</AvatarFallback>
                           </Avatar>
                            <Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
                               <Camera className="h-4 w-4 text-secondary-foreground" />
@@ -342,7 +358,7 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                      <Textarea className="min-h-[150px] text-muted-foreground" placeholder={placeholderEmployerData.about[lang]} value={employer.about[lang]} onChange={(e) => setEmployer({...employer, about: {...employer.about, [lang]: e.target.value}})} />
+                      <Textarea className="min-h-[150px] text-muted-foreground" placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={employer.about[lang]} onChange={(e) => setEmployer({...employer, about: {...employer.about, [lang]: e.target.value}})} />
                   </SectionCard>
                   <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -362,8 +378,8 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
                           {employer.history.map((item, index) => (
                               <li key={index} className="relative pl-6">
                                   <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
-                                  <Input className="font-bold text-primary mb-1 border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={placeholderEmployerData.history[index]?.year} value={item.year} onChange={(e) => { const newHistory = [...employer.history]; newHistory[index].year = e.target.value; setEmployer({...employer, history: newHistory}); }} />
-                                  <Textarea className="text-sm text-muted-foreground min-h-[40px] border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={placeholderEmployerData.history[index]?.event[lang]} value={item.event[lang]} onChange={(e) => { const newHistory = [...employer.history]; newHistory[index].event[lang] = e.target.value; setEmployer({...employer, history: newHistory}); }} />
+                                  <Input className="font-bold text-primary mb-1 border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.year}`} value={item.year} onChange={(e) => { const newHistory = [...employer.history]; newHistory[index].year = e.target.value; setEmployer({...employer, history: newHistory}); }} />
+                                  <Textarea className="text-sm text-muted-foreground min-h-[40px] border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang]}`} value={item.event[lang]} onChange={(e) => { const newHistory = [...employer.history]; newHistory[index].event[lang] = e.target.value; setEmployer({...employer, history: newHistory}); }} />
                               </li>
                           ))}
                       </ul>
@@ -374,24 +390,23 @@ export default function EmployerDetailPage({ params }: { params: Promise<{ id: s
               <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
                   <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
-                          <p><strong>{t.foundedLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={placeholderEmployerData.info.founded} value={employer.info.founded} onChange={(e) => setEmployer({...employer, info: {...employer.info, founded: e.target.value}})} /></p>
-                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={placeholderEmployerData.info.size[lang]} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info, size: {...employer.info.size, [lang]: e.target.value}}})} /></p>
-                          <p><strong>{t.licenseLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={placeholderEmployerData.info.license} value={employer.info.license} onChange={(e) => setEmployer({...employer, info: {...employer.info, license: e.target.value}})} /></p>
-                          <p><strong>{t.websiteLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto text-primary" placeholder={placeholderEmployerData.info.website} value={employer.info.website} onChange={(e) => setEmployer({...employer, info: {...employer.info, website: e.target.value}})} /></p>
+                          <p><strong>{t.foundedLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={employer.info.founded} onChange={(e) => setEmployer({...employer, info: {...employer.info, founded: e.target.value}})} /></p>
+                          <p><strong>{t.sizeLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={employer.info.size[lang]} onChange={(e) => setEmployer({...employer, info: {...employer.info, size: {...employer.info.size, [lang]: e.target.value}}})} /></p>
+                          <p><strong>{t.licenseLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={employer.info.license} onChange={(e) => setEmployer({...employer, info: {...employer.info, license: e.target.value}})} /></p>
+                          <p><strong>{t.websiteLabel}:</strong> <Input className="inline-block w-auto p-0 h-auto text-primary" placeholder={`Ví dụ: ${placeholderEmployerData.info.website}`} value={employer.info.website} onChange={(e) => setEmployer({...employer, info: {...employer.info, website: e.target.value}})} /></p>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <p><strong>{t.mainIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={placeholderEmployerData.industries.main[lang]} value={employer.industries.main[lang]} onChange={(e) => setEmployer({...employer, industries: {...employer.industries, main: {...employer.industries.main, [lang]: e.target.value}}})} /></p>
-                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={placeholderEmployerData.industries.secondary[lang]} value={employer.industries.secondary[lang]} onChange={(e) => setEmployer({...employer, industries: {...employer.industries, secondary: {...employer.industries.secondary, [lang]: e.target.value}}})} /></p>
+                          <p><strong>{t.mainIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={employer.industries.main[lang]} onChange={(e) => setEmployer({...employer, industries: {...employer.industries, main: {...employer.industries.main, [lang]: e.target.value}}})} /></p>
+                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <Textarea className="text-sm min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={employer.industries.secondary[lang]} onChange={(e) => setEmployer({...employer, industries: {...employer.industries, secondary: {...employer.industries.secondary, [lang]: e.target.value}}})} /></p>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
                       <ul className="space-y-2 text-sm">
                           {employer.benefits.map((benefit, index) => (
                               <li key={index} className="flex items-start gap-2">
-                                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/>
-                                  <Textarea className="text-sm text-muted-foreground min-h-[40px] border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={placeholderEmployerData.benefits[index]?.[lang]} value={benefit[lang]} onChange={(e) => { const newBenefits = [...employer.benefits]; newBenefits[index][lang] = e.target.value; setEmployer({...employer, benefits: newBenefits}); }} />
+                                  <Textarea className="text-sm text-muted-foreground min-h-[40px] border-0 shadow-none p-0 h-auto focus-visible:ring-0" placeholder={`Ví dụ: ${placeholderEmployerData.benefits[index]?.[lang]}`} value={benefit[lang]} onChange={(e) => { const newBenefits = [...employer.benefits]; newBenefits[index][lang] = e.target.value; setEmployer({...employer, benefits: newBenefits}); }} />
                               </li>
                           ))}
                       </ul>
