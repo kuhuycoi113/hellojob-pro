@@ -6,7 +6,7 @@ import { notFound, useSearchParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, CheckCircle } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, QrCode, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -18,7 +18,6 @@ import { JpFlagIcon, EnFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon }
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { QrCode } from 'lucide-react';
 
 const employersData: { [key: string]: any } = {
     'Z000': {
@@ -81,6 +80,32 @@ const employersData: { [key: string]: any } = {
             { vi: 'Cam kết chi phí minh bạch, rõ ràng, không phát sinh chi phí ẩn.', ja: '透明性の高い明確な費用、隠れたコストなしを約束。', en: 'Commitment to transparent, clear costs with no hidden fees.' },
         ]
     },
+};
+
+const placeholderEmployerData = {
+    ...employersData['Z000'],
+    images: [
+        { alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' } },
+        { alt: { vi: 'Hoạt động đội nhóm', ja: 'チーム活動', en: 'Team Activity' } },
+        { alt: { vi: 'Lễ ký kết hợp tác', ja: 'パートナーシップ調印式', en: 'Partnership Signing Ceremony' } },
+        { alt: { vi: 'Đào tạo nhân viên', ja: '従業員研修', en: 'Employee Training' } },
+    ],
+    history: [
+        { event: { vi: 'Thành lập công ty.', ja: '会社設立。', en: 'Company established.' } },
+        { event: { vi: 'Đạt mốc 1000 lao động được phái cử.', ja: '派遣労働者1000人達成。', en: 'Reached 1000 dispatched workers.' } },
+    ],
+    info: {
+        founded: '2010',
+        size: { vi: '50 - 100 nhân viên', ja: '50～100名', en: '50 - 100 employees' },
+        license: '123/LĐTBXH-GP',
+    },
+    industries: {
+        main: { vi: 'Xây dựng, Cơ khí', ja: '建設、機械', en: 'Construction, Machinery' },
+        secondary: { vi: 'Thực phẩm, Nông nghiệp', ja: '食品、農業', en: 'Food, Agriculture' },
+    },
+    benefits: [
+        { vi: 'Hỗ trợ đào tạo tiếng Nhật.', ja: '日本語研修をサポート。', en: 'Japanese language training support.' },
+    ]
 };
 
 
@@ -258,7 +283,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 
 export default function EmployerDetailPage({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
-  const id = params.id;
+  const { id } = use(params);
 
   const employerData = employersData[id];
   
@@ -551,7 +576,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
-                            {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
+                             {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                       </div>
@@ -656,7 +681,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                   </SectionCard>
                   <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          {employer.images.map((img, index) => (
+                          {employer.images.map((img: any, index: number) => (
                               <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
                                   <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover" />
                                    <Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
@@ -719,7 +744,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                   </SectionCard>
                   <SectionCard title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
                       <ul className="space-y-2 text-sm">
-                          {employer.benefits.length > 0 ? employer.benefits.map((benefit, index) => (
+                          {employer.benefits.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
                               <li key={index} className="flex items-start gap-2">
                                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span>{benefit[lang]}</span>
                               </li>
@@ -754,5 +779,3 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </>
   );
 }
-
-    
