@@ -303,6 +303,58 @@ const visaDetailsByVisaType: { [key: string]: string[] } = {
 };
 const visaTypes = Object.keys(visaDetailsByVisaType);
 
+const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
+    <Dialog>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+                <DialogTitle className="font-headline text-2xl">Tải hồ sơ xuống</DialogTitle>
+                <DialogDescription>
+                    Chọn định dạng bạn muốn tải xuống.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+                <Card className="hover:bg-secondary cursor-pointer">
+                    <CardContent className="p-4 flex items-center gap-4">
+                        <FileCode className="h-10 w-10 text-blue-500 shrink-0"/>
+                        <div>
+                            <p className="font-semibold">Dạng HTML</p>
+                            <p className="text-xs text-muted-foreground">Tải xuống như giao diện Web.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card className="hover:bg-secondary cursor-pointer">
+                     <CardContent className="p-4 flex items-center gap-4">
+                        <FileText className="h-10 w-10 text-red-500 shrink-0"/>
+                        <div>
+                            <p className="font-semibold">Dạng PDF</p>
+                            <p className="text-xs text-muted-foreground">Lý tưởng để gửi qua email hoặc in ấn.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+                 <Card className="hover:bg-secondary cursor-pointer">
+                     <CardContent className="p-4 flex items-center gap-4">
+                        <FileType className="h-10 w-10 text-sky-600 shrink-0"/>
+                        <div>
+                            <p className="font-semibold">Dạng Docx</p>
+                            <p className="text-xs text-muted-foreground">Dễ dàng chỉnh sửa bằng Microsoft Word.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+                 <Card className="hover:bg-secondary cursor-pointer">
+                     <CardContent className="p-4 flex items-center gap-4">
+                        <Sheet className="h-10 w-10 text-green-600 shrink-0"/>
+                        <div>
+                            <p className="font-semibold">Dạng Excel</p>
+                            <p className="text-xs text-muted-foreground">Phù hợp để quản lý và phân tích dữ liệu.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </DialogContent>
+    </Dialog>
+)
+
 
 export default function CandidateProfilePage() {
   const { toast } = useToast();
@@ -1643,3 +1695,83 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
+const DocumentGrid = ({
+  documents,
+  docType,
+  handleMediaChange,
+  onAddClick,
+  onRemoveClick,
+  isExpanded,
+  setIsExpanded,
+}: {
+  documents: DocumentItem[];
+  docType: 'vietnam' | 'japan' | 'other';
+  handleMediaChange: (type: 'document', e: React.ChangeEvent<HTMLInputElement>, index: number, docType: 'vietnam' | 'japan' | 'other') => void;
+  onAddClick: (docType: 'vietnam' | 'japan' | 'other') => void;
+  onRemoveClick: (section: 'documents', index: number, docType: 'vietnam' | 'japan' | 'other') => void;
+  isExpanded: boolean;
+  setIsExpanded: (expanded: boolean) => void;
+}) => {
+  const visibleCount = isExpanded ? documents.length : 8;
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {documents.slice(0, visibleCount).map((doc, index) => (
+          <Card key={index} className="group relative">
+            <CardContent className="p-2 flex flex-col items-center justify-center aspect-square">
+              {doc.url ? (
+                  <Link href={doc.url} target="_blank" className="w-full h-full flex items-center justify-center">
+                      {doc.fileType === 'pdf' ? (
+                          <PdfIcon className="w-12 h-12"/>
+                      ): (
+                          <Image src={doc.url} alt={doc.name.vi} fill className="object-contain p-2"/>
+                      )}
+                  </Link>
+              ) : (
+                <div className="text-center text-muted-foreground">
+                    <UploadCloud className="w-8 h-8 mx-auto mb-2"/>
+                    <p className="text-xs">Tải lên</p>
+                </div>
+              )}
+               <Label htmlFor={`doc-upload-${docType}-${index}`} className="absolute inset-0 cursor-pointer bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                    <Camera className="h-8 w-8 text-white"/>
+               </Label>
+               <Input id={`doc-upload-${docType}-${index}`} type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleMediaChange('document', e, index, docType)} />
+               {!doc.isDefault && (
+                 <Button variant="destructive" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onRemoveClick('documents', index, docType)}>
+                    <X className="h-4 w-4"/>
+                 </Button>
+               )}
+            </CardContent>
+            <p className="text-center text-xs font-semibold text-muted-foreground p-2 truncate">{doc.name.vi}</p>
+          </Card>
+        ))}
+         <Card className="border-dashed flex items-center justify-center cursor-pointer hover:border-primary hover:text-primary transition-colors" onClick={() => onAddClick(docType)}>
+             <div className="text-center text-muted-foreground">
+                 <PlusCircle className="w-8 h-8 mx-auto mb-2"/>
+                 <p className="text-xs font-semibold">Thêm giấy tờ</p>
+             </div>
+        </Card>
+      </div>
+       {documents.length > 8 && (
+        <div className="text-center mt-4">
+          <Button variant="link" onClick={() => setIsExpanded(!isExpanded)}>
+            {isExpanded ? 'Thu gọn' : 'Xem thêm'}
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+};
+
+const formatYen = (value?: string) => {
+    if (!value) return 'N/A';
+    
+    const numericValue = typeof value === 'string' 
+        ? parseInt(value.replace(/[^0-9]/g, ''), 10)
+        : value;
+        
+    if (isNaN(numericValue)) return 'N/A';
+    return `${numericValue.toLocaleString('ja-JP')} yên`;
+};
