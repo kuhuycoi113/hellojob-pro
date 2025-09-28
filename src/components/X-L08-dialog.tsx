@@ -99,6 +99,13 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
   };
   
   const content = contentByLang[lang];
+  
+  const formatNumber = (numStr: string | number) => {
+    if (!numStr) return '';
+    const num = Number(String(numStr).replace(/,/g, ''));
+    if (isNaN(num)) return '';
+    return num.toLocaleString('en-US');
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -121,8 +128,8 @@ export function XL08Dialog({ isOpen, onOpenChange, onComplete, onBack, lang, rec
                     <p><strong>Chi tiết:</strong> {recruitmentPrefs?.desiredVisaDetail}</p>
                     <p><strong>Ngành nghề:</strong> {recruitmentPrefs?.desiredIndustry}</p>
                     <p><strong>Địa điểm:</strong> {recruitmentPrefs?.desiredLocation}</p>
-                    <p><strong>Phí giới thiệu:</strong> {recruitmentPrefs?.referralFee} JPY</p>
-                    <p><strong>Phí quản lý:</strong> {recruitmentPrefs?.managementFee} JPY/tháng</p>
+                    <p><strong>Phí giới thiệu:</strong> {formatNumber(recruitmentPrefs?.referralFee)} JPY</p>
+                    <p><strong>Phí quản lý:</strong> {formatNumber(recruitmentPrefs?.managementFee)} JPY/tháng</p>
                 </CardContent>
             </Card>
 
