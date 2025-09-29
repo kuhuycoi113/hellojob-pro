@@ -75,6 +75,7 @@ export function YL01Dialog({
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedSubRole, setSelectedSubRole] = useState<string | null>(null);
   const [fullName, setFullName] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   useEffect(() => {
@@ -83,6 +84,7 @@ export function YL01Dialog({
       setSelectedRole(null);
       setSelectedSubRole(null);
       setFullName('');
+      setCompanyName('');
     }
   }, [isOpen, initialStep]);
   
@@ -102,7 +104,7 @@ export function YL01Dialog({
 
   const handleSubRoleSelect = (subRoleId: string) => {
     setSelectedSubRole(subRoleId);
-    setStep(3); // Proceed to name input (Y003)
+    setStep(3); // Proceed to name input
   };
   
   const handleNameContinue = () => {
@@ -110,12 +112,19 @@ export function YL01Dialog({
           // You might want to add a toast or error message here
           return;
       }
-      if (selectedRole) {
-          navigateToEmployerPage(selectedRole, selectedSubRole || undefined, fullName);
-      }
+      setStep(4); // Proceed to company name input
   }
+  
+  const handleCompanyContinue = () => {
+    if (companyName.trim() === '') {
+        return;
+    }
+    if (selectedRole) {
+        navigateToEmployerPage(selectedRole, selectedSubRole || undefined, fullName, companyName);
+    }
+  };
 
-  const navigateToEmployerPage = (roleId: string, subRoleId?: string, name?: string) => {
+  const navigateToEmployerPage = (roleId: string, subRoleId?: string, name?: string, company?: string) => {
     const params = new URLSearchParams();
     params.set('role', roleId);
     params.set('lang', currentLang);
@@ -124,6 +133,9 @@ export function YL01Dialog({
     }
     if (name) {
         params.set('name', name);
+    }
+    if (company) {
+        params.set('company_name', company);
     }
     router.push(`/nha-tuyen-dung/Z000?${params.toString()}`);
     onOpenChange(false); // Close the dialog after navigation
@@ -373,6 +385,67 @@ export function YL01Dialog({
     )
   }
 
+  const renderCompanyNameStepDialog = () => {
+    const content = {
+        vi: {
+            title: "Vui lòng nhập tên Công ty/Pháp nhân/Tổ chức của bạn",
+            description: "Thông tin này giúp chúng tôi xác thực và kết nối bạn tốt hơn.",
+            label: "Tên công ty",
+            placeholder: "Ví dụ: Công ty TNHH HelloJob",
+            backButton: "Quay lại",
+            continueButton: "Hoàn tất"
+        },
+        ja: {
+            title: "会社名/法人名/団体名を入力してください",
+            description: "この情報は、本人確認とより良い連携のために役立ちます。",
+            label: "会社名",
+            placeholder: "例: 株式会社HelloJob",
+            backButton: "戻る",
+            continueButton: "完了"
+        },
+        en: {
+            title: "Please enter your Company/Entity/Organization name",
+            description: "This information helps us verify and connect with you better.",
+            label: "Company Name",
+            placeholder: "E.g., HelloJob Co., Ltd.",
+            backButton: "Back",
+            continueButton: "Complete"
+        },
+    }[currentLang];
+
+    return (
+         <>
+            {/* Screen: Y004 */}
+            <DialogHeader className="text-center items-center">
+                <div className="p-3 bg-primary/10 rounded-full w-fit">
+                    <Building className="h-8 w-8 text-primary"/>
+                </div>
+                <DialogTitle className="text-2xl font-headline">{content.title}</DialogTitle>
+                <DialogDescription>{content.description}</DialogDescription>
+            </DialogHeader>
+            <div className="pt-4 max-w-sm mx-auto w-full">
+                <Label htmlFor="company-name">{content.label}</Label>
+                <Input
+                    id="company-name"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder={content.placeholder}
+                    className="mt-2"
+                />
+            </div>
+             <div className="mt-6 flex justify-center gap-2">
+                <Button variant="outline" onClick={() => setStep(3)}>
+                    {content.backButton}
+                </Button>
+                <Button onClick={handleCompanyContinue} disabled={!companyName.trim()}>
+                    {content.continueButton}
+                </Button>
+            </div>
+        </>
+    )
+  }
+
+
   const renderDialogContent = () => {
     switch (step) {
       case 1: return <PartnerRoleStepDialog />;
@@ -382,6 +455,8 @@ export function YL01Dialog({
         return <PartnerRoleStepDialog />; // Fallback
       case 3:
         return renderNameInputStepDialog();
+      case 4:
+        return renderCompanyNameStepDialog();
       default: return <PartnerRoleStepDialog />;
     }
   }
@@ -390,7 +465,7 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002-1_Y002-2_Y003">
+          <DialogContent className="sm:max-w-4xl" id="Y001_Y002-1_Y002-2_Y003_Y004">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
