@@ -55,7 +55,7 @@ const roleTexts: Record<string, Record<Language, string>> = {
   'support': { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
   'company': { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
   'supervising-organization': { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
-  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí (Yuryo Shokai)', ja: '有料職業紹介事業所', en: 'Paid Placement Agency' },
+  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Placement Agency' },
   'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
 };
 
@@ -232,6 +232,7 @@ export function YL01Dialog({
 
     return (
         <>
+            {/* Screen: Y002-1 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                 <DialogDescription className="text-center">{content.description}</DialogDescription>
@@ -288,6 +289,7 @@ export function YL01Dialog({
 
     return (
         <>
+             {/* Screen: Y002-2 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                 <DialogDescription className="text-center">{content.description}</DialogDescription>
@@ -341,6 +343,7 @@ export function YL01Dialog({
 
     return (
          <>
+            {/* Screen: Y003 */}
             <DialogHeader className="text-center items-center">
                 <div className="p-3 bg-primary/10 rounded-full w-fit">
                     <UserSquare className="h-8 w-8 text-primary"/>
@@ -378,7 +381,7 @@ export function YL01Dialog({
         if (selectedRole === 'nhan-vien-nhan-luc-nhat') return <JapaneseHrSubRoleStepDialog />;
         return <PartnerRoleStepDialog />; // Fallback
       case 3:
-        return <renderNameInputStepDialog />;
+        return renderNameInputStepDialog();
       default: return <PartnerRoleStepDialog />;
     }
   }
@@ -387,10 +390,12 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1_Y003-2_Y004">
+          <DialogContent className="sm:max-w-4xl" id="Y001_Y002-1_Y002-2_Y003">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
     </>
   );
 }
+
+    
