@@ -53,6 +53,7 @@ const visaTypeContent = {
   vi: {
     title: 'Bạn muốn tuyển loại Visa nào?',
     description: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
+    description_multi: 'Bạn có thể chọn nhiều mục, lựa chọn đầu tiên là ưu tiên số 1.',
     options: [
       { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
       { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
@@ -62,6 +63,7 @@ const visaTypeContent = {
   ja: {
     title: 'どのビザタイプを募集しますか？',
     description: '採用ニーズに最も適したビザタイプを選択してください。',
+    description_multi: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
     options: [
       { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
       { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
@@ -71,6 +73,7 @@ const visaTypeContent = {
   en: {
     title: 'Which Visa Type do you want to recruit?',
     description: 'Please select the visa type that best suits your recruitment needs.',
+    description_multi: 'You can select multiple items. The first selection is priority #1.',
     options: [
       { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
       { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
@@ -558,7 +561,7 @@ export function YL01Dialog({
             {/* Screen: Y016 (Replaces Y006) */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                <DialogDescription className="text-center">Bạn có thể chọn nhiều mục, lựa chọn đầu tiên là ưu tiên số 1.</DialogDescription>
+                <DialogDescription className="text-center">{content.description_multi}</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
                 {content.options.map(option => {
@@ -627,7 +630,7 @@ export function YL01Dialog({
                                 isSelected && "ring-2 ring-primary border-primary bg-primary/10"
                             )}
                         >
-                            {isSelected && (
+                             {isSelected && (
                                 <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
                                     {selectionOrder}
                                 </Badge>
@@ -663,10 +666,10 @@ export function YL01Dialog({
       case 6: // Y016 (replaces Y006)
         return <VisaTypeMultiSelectStepDialog />;
       case 7: // Y007
-        const visaDetailOptions = selectedVisa.flatMap(vSlug => (visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name[currentLang]})));
+        const visaDetailOptions = selectedVisa.flatMap(vSlug => (visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name.vi})));
         return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
       case 8: // Y008
-        const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name[currentLang]}));
+        const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name.vi}));
         return renderMultiSelectStepDialog(8, industryContent[currentLang].title, industryContent[currentLang].description, industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
       case 9: // Y009
          const regionOptions = japanRegions.map(r => ({id: r.toLowerCase(), title: r, name: {vi:r, ja: r, en:r}}));
@@ -735,3 +738,5 @@ export function YL01Dialog({
     </>
   );
 }
+
+    
