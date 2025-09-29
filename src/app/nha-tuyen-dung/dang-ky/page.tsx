@@ -199,8 +199,8 @@ const contentByLang = {
         typePlaceholder: 'Ví dụ: Công ty phái cử',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
         industriesTitle: 'Ngành nghề & Khu vực',
-        mainIndustriesLabel: 'Ngành nghề',
-        secondaryIndustriesLabel: 'Khu vực',
+        mainIndustriesLabel: 'Ngành nghề chính',
+        secondaryIndustriesLabel: 'Khu vực tuyển dụng chính',
         benefitsTitle: 'Phúc lợi & Môi trường',
         valueInterestTitle: 'Giá trị mong muốn',
         contactTitle: 'Thông tin liên hệ',
@@ -237,7 +237,7 @@ const contentByLang = {
         locationPlaceholder: '例: ベトナム、ハノイ',
         industriesTitle: '業種と分野',
         mainIndustriesLabel: '主要業種',
-        secondaryIndustriesLabel: 'その他の業種',
+        secondaryIndustriesLabel: '主な採用地域',
         benefitsTitle: '福利厚生と環境',
         valueInterestTitle: '希望する価値',
         contactTitle: '連絡先情報',
@@ -274,7 +274,7 @@ const contentByLang = {
         locationPlaceholder: 'E.g., Hanoi, Vietnam',
         industriesTitle: 'Industries & Sectors',
         mainIndustriesLabel: 'Main Industries',
-        secondaryIndustriesLabel: 'Other Industries',
+        secondaryIndustriesLabel: 'Main Recruitment Areas',
         benefitsTitle: 'Benefits & Environment',
         valueInterestTitle: 'Desired Values',
         contactTitle: 'Contact Information',
@@ -590,6 +590,8 @@ export default function EmployerDetailPage() {
              newState.visaDetail = tempContent.visaDetail;
         } else if (field === 'valueInterest') {
             newState.valueInterest = tempContent.split('\n').map((item: string) => ({ vi: item, ja: item, en: item }));
+        } else if (field === 'industries') {
+            newState.industries = tempContent;
         } else {
             newState[field] = tempContent;
         }
@@ -859,7 +861,7 @@ export default function EmployerDetailPage() {
                     ? [...currentVisaTypes, typeSlug]
                     : currentVisaTypes.filter((slug: string) => slug !== typeSlug);
 
-                const newVisaDetails = tempContent.visaDetail[lang].filter((detailSlug: string) => 
+                const newVisaDetails = (tempContent.visaDetail?.[lang] || []).filter((detailSlug: string) => 
                     newSelection.some(visaSlug => 
                         (visaDetailsByVisaType[visaSlug] || []).some(detail => detail.slug === detailSlug)
                     )
@@ -952,6 +954,87 @@ export default function EmployerDetailPage() {
                     </div>
                 </div>
             );
+        case 'industries':
+            const currentIndustries = Array.isArray(tempContent.main?.[lang]) ? tempContent.main[lang] : [];
+            const handleIndustryChange = (checked: boolean, industrySlug: string) => {
+                const newSelection = checked
+                    ? [...currentIndustries, industrySlug]
+                    : currentIndustries.filter((slug: string) => slug !== industrySlug);
+                setTempContent({ ...tempContent, main: { ...tempContent.main, [lang]: newSelection }});
+            };
+            
+            const currentRegions = Array.isArray(tempContent.secondary?.[lang]) ? tempContent.secondary[lang] : [];
+            const handleRegionChange = (checked: boolean, regionSlug: string) => {
+                const newSelection = checked
+                    ? [...currentRegions, regionSlug]
+                    : currentRegions.filter((slug: string) => slug !== regionSlug);
+                setTempContent({ ...tempContent, secondary: { ...tempContent.secondary, [lang]: newSelection }});
+            };
+            
+            const availableIndustries = Array.from(new Map(
+                (employer?.visaType?.[lang] || []).flatMap((vSlug: string) => industriesByJobType[vSlug] || []).map((item: Industry) => [item.slug, item])
+            ).values());
+
+            return (
+                <div className="space-y-4">
+                     <div className="space-y-2" id="DKY008">
+                        <Label>{t.mainIndustriesLabel}</Label>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={availableIndustries.length === 0}>
+                                    {currentIndustries.length > 0 ? (
+                                        <div className="flex flex-wrap gap-1">
+                                            {currentIndustries.map((slug: string) => <Badge key={slug} variant="secondary">{(allIndustries.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)}
+                                        </div>
+                                    ) : `Chọn ${t.mainIndustriesLabel}`}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn ngành nghề</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {availableIndustries.map(industry => (
+                                     <DropdownMenuCheckboxItem
+                                        key={industry.slug}
+                                        checked={currentIndustries.includes(industry.slug)}
+                                        onSelect={(e) => e.preventDefault()}
+                                        onCheckedChange={(checked) => handleIndustryChange(Boolean(checked), industry.slug)}
+                                    >
+                                        {industry.name[lang]}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                     <div className="space-y-2">
+                        <Label>{t.secondaryIndustriesLabel}</Label>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                    {currentRegions.length > 0 ? (
+                                        <div className="flex flex-wrap gap-1">
+                                            {currentRegions.map((slug: string) => <Badge key={slug} variant="secondary">{(japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)}
+                                        </div>
+                                    ) : `Chọn ${t.secondaryIndustriesLabel}`}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn khu vực</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {japanRegions.map(region => (
+                                     <DropdownMenuCheckboxItem
+                                        key={region.slug}
+                                        checked={currentRegions.includes(region.slug)}
+                                        onSelect={(e) => e.preventDefault()}
+                                        onCheckedChange={(checked) => handleRegionChange(Boolean(checked), region.slug)}
+                                    >
+                                        {region.name}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </div>
+            );
         default:
             return <p>Chức năng này đang được phát triển.</p>;
     }
@@ -977,12 +1060,13 @@ export default function EmployerDetailPage() {
       if (typeof value[0] === 'object') {
         return value.map(item => item[lang]).join(', ');
       }
-      const allItems = [
-        ...japanJobTypes, 
-        ...Object.values(visaDetailsByVisaType).flat(), 
-        ...Object.values(industriesByJobType).flat(), 
-        ...japanRegions
-      ];
+      
+      const allVisaTypes = japanJobTypes;
+      const allVisaDetails = Object.values(visaDetailsByVisaType).flat();
+      const allIndustriesList = Array.from(new Map(Object.values(industriesByJobType).flat().map(item => [item.slug, item])).values());
+      const allRegions = japanRegions;
+      
+      const allItems = [...allVisaTypes, ...allVisaDetails, ...allIndustriesList, ...allRegions];
       
       return value.map(slug => {
           const item = allItems.find((i: any) => i.slug === slug);
@@ -1177,3 +1261,4 @@ export default function EmployerDetailPage() {
     </>
   );
 }
+
