@@ -49,39 +49,6 @@ interface YL01DialogProps {
   initialLang?: Language;
 }
 
-const visaTypeContent = {
-  vi: {
-    title: 'Bạn muốn tuyển loại Visa nào?',
-    description: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
-    description_multi: 'Bạn có thể chọn nhiều mục, lựa chọn đầu tiên là ưu tiên số 1.',
-    options: [
-      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
-      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Kỹ sư, tri thức', desc: 'Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.', color: 'green' },
-    ]
-  },
-  ja: {
-    title: 'どのビザタイプを募集しますか？',
-    description: '採用ニーズに最も適したビザタイプを選択してください。',
-    description_multi: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
-    options: [
-      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
-      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門知識を持つ専門家を採用。', color: 'green' },
-    ]
-  },
-  en: {
-    title: 'Which Visa Type do you want to recruit?',
-    description: 'Please select the visa type that best suits your recruitment needs.',
-    description_multi: 'You can select multiple items. The first selection is priority #1.',
-    options: [
-      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
-      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist in Humanities', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
-    ]
-  }
-};
-
 const visaDetailContentMultiLang = {
     vi: {
       title: 'Chọn chi tiết loại hình visa',
@@ -359,7 +326,8 @@ export function YL01Dialog({
                         key={option.id}
                         onClick={() => {
                             setSelectedInterest(option.id);
-                            const nextStep = selectedRole && organizationRoles.includes(selectedRole) ? 6 : 3;
+                            const isOrganization = selectedRole && organizationRoles.includes(selectedRole);
+                            const nextStep = isOrganization ? 5 : 3;
                             setStep(nextStep);
                         }}
                         className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
@@ -541,7 +509,10 @@ export function YL01Dialog({
                 <Input id="company-name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder={content.placeholder} className="mt-2" />
             </div>
              <div className="mt-6 flex justify-center gap-2">
-                <Button variant="outline" onClick={() => setStep(4)}>{content.backButton}</Button>
+                <Button variant="outline" onClick={() => {
+                    const isIndividual = selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole);
+                    setStep(isIndividual ? 4 : 2);
+                }}>{content.backButton}</Button>
                 <Button onClick={() => { if (companyName.trim()) setStep(6); }} disabled={!companyName.trim()}>{content.continueButton}</Button>
             </div>
         </>
@@ -738,4 +709,3 @@ export function YL01Dialog({
     </>
   );
 }
-
