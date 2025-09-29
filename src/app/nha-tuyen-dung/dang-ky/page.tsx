@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, use, useEffect, useCallback } from 'react';
+import { useState, use, useEffect, useCallback, React } from 'react';
 import { notFound, useSearchParams, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
-import { japanJobTypes } from '@/lib/visa-data';
+import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
 
 
@@ -963,11 +963,11 @@ export default function EmployerDetailPage() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                    <div className="flex flex-wrap gap-1">
                                     {currentVisaTypes.length > 0 ? (
-                                        <div className="flex flex-wrap gap-1">
-                                            {currentVisaTypes.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanJobTypes.find(t => t.slug === slug))?.name}</Badge>)}
-                                        </div>
+                                        currentVisaTypes.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanJobTypes.find(t => t.slug === slug))?.name}</Badge>)
                                     ) : `Chọn ${t.visaTypeLabel}`}
+                                    </div>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
@@ -992,14 +992,14 @@ export default function EmployerDetailPage() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0}>
-                                    {currentVisaDetails.length > 0 ? (
-                                        <div className="flex flex-wrap gap-1">
-                                            {currentVisaDetails.map((slug: string, index: number) => {
+                                     <div className="flex flex-wrap gap-1">
+                                        {currentVisaDetails.length > 0 ? (
+                                            currentVisaDetails.map((slug: string, index: number) => {
                                                 const detail = Object.values(visaDetailsByVisaType).flat().find(d => d.slug === slug);
                                                 return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{detail?.name[lang] || slug}</Badge>
-                                            })}
-                                        </div>
-                                    ) : `Chọn ${t.visaDetailLabel}`}
+                                            })
+                                        ) : `Chọn ${t.visaDetailLabel}`}
+                                    </div>
                                 </Button>
                             </DropdownMenuTrigger>
                              <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
@@ -1058,11 +1058,11 @@ export default function EmployerDetailPage() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={availableIndustries.length === 0}>
-                                    {currentIndustries.length > 0 ? (
-                                        <div className="flex flex-wrap gap-1">
-                                            {currentIndustries.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(allIndustries.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)}
-                                        </div>
-                                    ) : `Chọn ${t.mainIndustriesLabel}`}
+                                    <div className="flex flex-wrap gap-1">
+                                        {currentIndustries.length > 0 ? (
+                                            currentIndustries.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(allIndustries.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)
+                                        ) : `Chọn ${t.mainIndustriesLabel}`}
+                                    </div>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
@@ -1087,11 +1087,11 @@ export default function EmployerDetailPage() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                    {currentRegions.length > 0 ? (
-                                        <div className="flex flex-wrap gap-1">
-                                            {currentRegions.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)}
-                                        </div>
-                                    ) : `Chọn ${t.secondaryIndustriesLabel}`}
+                                     <div className="flex flex-wrap gap-1">
+                                        {currentRegions.length > 0 ? (
+                                            currentRegions.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)
+                                        ) : `Chọn ${t.secondaryIndustriesLabel}`}
+                                    </div>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
@@ -1136,7 +1136,13 @@ export default function EmployerDetailPage() {
     const value = field?.[lang] || [];
     if (Array.isArray(value) && value.length > 0) {
       if (typeof value[0] === 'object' && value[0] !== null && 'id' in value[0]) { // For valueInterest
-        return value.map(item => item[lang]).join(', ');
+        return (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {value.map((item: any, index: number) => (
+              <Badge key={index} variant="secondary" className="font-normal">{item[lang]}</Badge>
+            ))}
+          </div>
+        );
       }
       
       const allVisaTypes = japanJobTypes;
@@ -1144,7 +1150,7 @@ export default function EmployerDetailPage() {
       
       const allItems = [...allVisaTypes, ...allVisaDetails, ...allIndustries, ...japanRegions];
       
-      const content = value.map((slug, index) => {
+      const content = value.map((slug: string, index: number) => {
           const item = allItems.find((i: any) => i.slug === slug);
           let name = slug;
           if (item && 'name' in item && typeof item.name === 'object') {
@@ -1345,4 +1351,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
