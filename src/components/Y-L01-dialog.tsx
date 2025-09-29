@@ -49,6 +49,27 @@ interface YL01DialogProps {
   initialLang?: Language;
 }
 
+const visaDetailContentMultiLang = {
+    vi: {
+      title: 'Chọn chi tiết loại hình visa',
+      description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
+      backButton: 'Quay lại',
+      continueButton: 'Tiếp tục',
+    },
+    ja: {
+      title: 'ビザの詳細を選択',
+      description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
+      backButton: '戻る',
+      continueButton: '続ける',
+    },
+    en: {
+      title: 'Select Visa Details',
+      description: 'You can select multiple items. The first selection is priority #1.',
+      backButton: 'Back',
+      continueButton: 'Continue',
+    }
+};
+
 const visaTypeContent = {
   vi: {
     title: 'Bạn muốn tuyển loại Visa nào?',
@@ -121,26 +142,6 @@ const regionContent = {
     }
 };
 
-const visaDetailContentMultiLang = {
-    vi: {
-      title: 'Chọn chi tiết loại hình visa',
-      description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
-      backButton: 'Quay lại',
-      continueButton: 'Tiếp tục',
-    },
-    ja: {
-      title: 'ビザの詳細を選択',
-      description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
-      backButton: '戻る',
-      continueButton: '続ける',
-    },
-    en: {
-      title: 'Select Visa Details',
-      description: 'You can select multiple items. The first selection is priority #1.',
-      backButton: 'Back',
-      continueButton: 'Continue',
-    }
-};
 
 export function YL01Dialog({ 
     children, 
@@ -164,7 +165,6 @@ export function YL01Dialog({
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string[]>([]);
   const [selectedIndustry, setSelectedIndustry] = useState<string[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string[]>([]);
-  const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   useEffect(() => {
@@ -603,19 +603,31 @@ export function YL01Dialog({
       case 4: return renderNameInputStepDialog();
       case 5: return renderCompanyNameStepDialog();
       case 6:
-        const visaOptions = japanJobTypes.map(o => ({...o, name: {vi: o.name, ja: o.name, en: o.name}, id: o.slug, icon: o.slug.includes('tts') ? HardHat : o.slug.includes('tokutei') ? UserCheck : Briefcase }));
+        const visaOptions = japanJobTypes.map(o => ({...o, title: o.name, id: o.slug, icon: o.slug.includes('thuc-tap-sinh-ky-nang') ? HardHat : o.slug.includes('ky-nang-dac-dinh') ? UserCheck : Briefcase, name: { vi: o.name, ja: o.name, en: o.name } }));
         return renderMultiSelectStepDialog(6, visaTypeContent[currentLang].title, visaTypeContent[currentLang].description, visaOptions as any, selectedVisa, setSelectedVisa, 7, selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2, 'md:grid-cols-3');
       case 7:
         const visaDetailOptions = selectedVisa.flatMap(vSlug => visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name[currentLang] }));
-        return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions as any, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
+        return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
       case 8:
         const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name[currentLang]}));
         return renderMultiSelectStepDialog(8, industryContent[currentLang].title, industryContent[currentLang].description, industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
       case 9:
          const regionOptions = japanRegions.map(r => ({id: r.toLowerCase(), title: r, name: {vi:r, ja: r, en:r}}));
          const content = regionContent[currentLang];
+         const regionKanjiMap: { [key: string]: string } = {
+          Hokkaido: '北海道',
+          Tohoku: '東北',
+          Kanto: '関東',
+          Chubu: '中部',
+          Kansai: '関西',
+          Chugoku: '中国',
+          Shikoku: '四国',
+          Kyushu: '九州',
+          Okinawa: '沖縄',
+        };
          return (
              <>
+                {/* Screen: Y009 */}
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                     <DialogDescription className="text-center">{content.description}</DialogDescription>
@@ -630,12 +642,12 @@ export function YL01Dialog({
                                 selectedRegion.includes(option.id) && "ring-2 ring-primary border-primary"
                             )}
                         >
-                            {selectedRegion.includes(option.id) && (
+                             {selectedRegion.includes(option.id) && (
                                 <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
                                     {selectedRegion.indexOf(option.id) + 1}
                                 </Badge>
                             )}
-                            <h3 className="font-bold text-base mb-1">{option.title}</h3>
+                            <h3 className="font-bold text-base mb-1">{currentLang === 'ja' ? regionKanjiMap[option.title] : option.title}</h3>
                         </Card>
                     ))}
                 </div>
