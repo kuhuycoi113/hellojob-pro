@@ -506,7 +506,7 @@ export default function EmployerDetailPage() {
 
   const validateEmail = (email: string) => {
     if (!email) return true; // Not required, but if present must be valid
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
   };
   
   const validateField = (field: 'messenger' | 'line', value: string) => {
