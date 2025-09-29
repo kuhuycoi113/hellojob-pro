@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, React } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Dialog,
@@ -48,93 +48,6 @@ interface YL01DialogProps {
   onLanguageChange: (lang: Language) => void;
   initialLang?: Language;
 }
-
-const visaDetailContent = {
-  'thuc-tap-sinh-ky-nang': {
-    vi: {
-      title: 'Chọn chương trình Thực tập sinh',
-      description: 'Vui lòng chọn loại chương trình thực tập sinh phù hợp.',
-      options: [
-        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: 'Thực tập sinh 3 năm', desc: 'Chương trình phổ biến nhất, làm việc tại Nhật trong 3 năm.' },
-        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: 'Thực tập sinh 1 năm', desc: 'Chương trình ngắn hạn dành cho một số ngành nghề nhất định.' },
-        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: 'Thực tập sinh 3 Go', desc: 'Dành cho người đã hoàn thành TTS 3 năm và muốn quay lại.' },
-      ]
-    },
-    ja: {
-      title: '技能実習プログラムを選択',
-      description: '適切な技能実習プログラムを選択してください。',
-      options: [
-        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: '技能実習3年', desc: '最も一般的なプログラムで、日本で3年間働きます。' },
-        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: '技能実習1年', desc: '特定の職種向けの短期プログラム。' },
-        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: '技能実習3号', desc: '3年間の技能実習を修了し、再入国を希望する方向け。' },
-      ]
-    },
-    en: {
-      title: 'Select Trainee Program',
-      description: 'Please select the appropriate technical intern training program.',
-      options: [
-        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: '3-Year Technical Intern', desc: 'The most common program, working in Japan for 3 years.' },
-        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: '1-Year Technical Intern', desc: 'A short-term program for specific job types.' },
-        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: 'Technical Intern No. 3', desc: 'For those who have completed the 3-year program and wish to return.' },
-      ]
-    }
-  },
-  'ky-nang-dac-dinh': {
-    vi: {
-        title: 'Chọn loại Kỹ năng đặc định',
-        description: 'Chọn chương trình Kỹ năng đặc định bạn muốn tuyển.',
-        options: [
-          { id: 'dac-dinh-dau-nhat', icon: Users, title: 'Đặc định đầu Nhật', desc: 'Để tuyển ứng viên ở Nhật' },
-          { id: 'dac-dinh-dau-viet', icon: Plane, title: 'Đặc định đầu Việt', desc: 'Để tuyển ứng viên từ Việt Nam' },
-          { id: 'dac-dinh-di-moi', icon: UserPlus, title: 'Đặc định đi mới', desc: 'Để tuyển ứng viên mới' },
-        ]
-    },
-    ja: {
-        title: '特定技能の種類を選択',
-        description: '募集したい特定技能プログラムを選択してください。',
-        options: [
-          { id: 'dac-dinh-dau-nhat', icon: Users, title: '国内（日本在住者）', desc: '日本在住の候補者を採用' },
-          { id: 'dac-dinh-dau-viet', icon: Plane, title: '国外（ベトナム在住者）', desc: 'ベトナムから候補者を採用' },
-          { id: 'dac-dinh-di-moi', icon: UserPlus, title: '新規（未経験者）', desc: '新規の候補者を採用' },
-        ]
-    },
-    en: {
-        title: 'Select Specified Skilled Worker Type',
-        description: 'Choose the Specified Skilled Worker program you want to recruit for.',
-        options: [
-          { id: 'dac-dinh-dau-nhat', icon: Users, title: 'Domestic (in Japan)', desc: 'To recruit candidates already in Japan' },
-          { id: 'dac-dinh-dau-viet', icon: Plane, title: 'Overseas (in Vietnam)', desc: 'To recruit candidates from Vietnam' },
-          { id: 'dac-dinh-di-moi', icon: UserPlus, title: 'New Candidates', desc: 'To recruit new candidates' },
-        ]
-    }
-  },
-  'ky-su-tri-thuc': {
-    vi: {
-        title: 'Chọn loại Kỹ sư, tri thức',
-        description: 'Chọn chương trình Kỹ sư bạn muốn tuyển.',
-        options: [
-          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: 'Kỹ sư, tri thức đầu Nhật', desc: 'Để tuyển kỹ sư ở Nhật' },
-          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: 'Kỹ sư, tri thức đầu Việt', desc: 'Để tuyển kỹ sư từ Việt Nam' },
-        ]
-    },
-    ja: {
-        title: '技術・人文知識・国際業務の種類を選択',
-        description: '募集したいプログラムを選択してください。',
-        options: [
-          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: '国内エンジニア', desc: '日本での経験があるエンジニアを採用' },
-          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: '国外エンジニア', desc: 'ベトナムからエンジニアを採用' },
-        ]
-    },
-    en: {
-        title: 'Select Engineer/Specialist Type',
-        description: 'Choose the program you want to recruit for.',
-        options: [
-          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: 'Engineer (In Japan)', desc: 'Recruit engineers with experience in Japan' },
-          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: 'Engineer (In Vietnam)', desc: 'Recruit engineers from Vietnam' },
-        ]
-    }
-  }
-};
 
 const visaTypeContent = {
   vi: {
@@ -208,6 +121,26 @@ const regionContent = {
     }
 };
 
+const visaDetailContentMultiLang = {
+    vi: {
+      title: 'Chọn chi tiết loại hình visa',
+      description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
+      backButton: 'Quay lại',
+      continueButton: 'Tiếp tục',
+    },
+    ja: {
+      title: 'ビザの詳細を選択',
+      description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
+      backButton: '戻る',
+      continueButton: '続ける',
+    },
+    en: {
+      title: 'Select Visa Details',
+      description: 'You can select multiple items. The first selection is priority #1.',
+      backButton: 'Back',
+      continueButton: 'Continue',
+    }
+};
 
 export function YL01Dialog({ 
     children, 
@@ -421,11 +354,8 @@ export function YL01Dialog({
                         key={option.id}
                         onClick={() => {
                             setSelectedInterest(option.id);
-                            if (selectedRole && organizationRoles.includes(selectedRole)) {
-                                setStep(6);
-                            } else {
-                                setStep(3);
-                            }
+                            const nextStep = selectedRole && organizationRoles.includes(selectedRole) ? 6 : 3;
+                            setStep(nextStep);
                         }}
                         className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
                     >
@@ -645,7 +575,7 @@ export function YL01Dialog({
                                 {selectedItems.indexOf(option.id) + 1}
                             </Badge>
                         )}
-                        {option.icon && <option.icon className={cn("h-8 w-8 mx-auto mb-2", `text-${option.color}-500`)} />}
+                        {option.icon && <option.icon className={cn("h-8 w-8 mx-auto mb-2", option.color ? `text-${option.color}-500` : 'text-primary')} />}
                         <h3 className="font-bold text-base mb-1">{option.name[currentLang]}</h3>
                         {option.desc && <p className="text-muted-foreground text-xs flex-grow">{option.desc}</p>}
                     </Card>
@@ -673,13 +603,13 @@ export function YL01Dialog({
       case 4: return renderNameInputStepDialog();
       case 5: return renderCompanyNameStepDialog();
       case 6:
-        const visaOptions = visaTypeContent[currentLang].options.map(o => ({...o, name: visaTypeContent['vi'].options.find(v => v.id === o.id)!.title}));
-        return renderMultiSelectStepDialog(6, 'Bạn muốn tuyển loại Visa nào?', 'Chọn một hoặc nhiều loại visa theo thứ tự ưu tiên.', visaOptions as any, selectedVisa, setSelectedVisa, 7, selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2, 'md:grid-cols-3');
+        const visaOptions = japanJobTypes.map(o => ({...o, name: {vi: o.name, ja: o.name, en: o.name}, id: o.slug, icon: o.slug.includes('tts') ? HardHat : o.slug.includes('tokutei') ? UserCheck : Briefcase }));
+        return renderMultiSelectStepDialog(6, visaTypeContent[currentLang].title, visaTypeContent[currentLang].description, visaOptions as any, selectedVisa, setSelectedVisa, 7, selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2, 'md:grid-cols-3');
       case 7:
-        const visaDetailOptions = selectedVisa.flatMap(vSlug => visaDetailsByVisaType[vSlug] || []).map(o => ({id: o.slug, title: o.name, name: {vi: o.name, ja: o.name, en: o.name}}));
-        return renderMultiSelectStepDialog(7, 'Chọn chi tiết loại hình visa', 'Bạn có thể chọn nhiều loại hình chi tiết, sắp xếp theo thứ tự ưu tiên.', visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
+        const visaDetailOptions = selectedVisa.flatMap(vSlug => visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name[currentLang] }));
+        return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions as any, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
       case 8:
-        const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({id: o.slug, title: o.name[currentLang], name: o.name}));
+        const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name[currentLang]}));
         return renderMultiSelectStepDialog(8, industryContent[currentLang].title, industryContent[currentLang].description, industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
       case 9:
          const regionOptions = japanRegions.map(r => ({id: r.toLowerCase(), title: r, name: {vi:r, ja: r, en:r}}));
@@ -736,5 +666,3 @@ export function YL01Dialog({
     </>
   );
 }
-
-    

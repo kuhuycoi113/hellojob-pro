@@ -19,7 +19,11 @@ export interface VisaType {
 }
 
 export interface VisaDetail {
-    name: string;
+    name: {
+        vi: string;
+        ja: string;
+        en: string;
+    };
     slug: string;
 }
 
@@ -31,18 +35,18 @@ export const japanJobTypes: VisaType[] = [
 
 export const visaDetailsByVisaType: { [key: string]: VisaDetail[] } = {
     'thuc-tap-sinh-ky-nang': [
-        { name: 'Thực tập sinh 3 năm', slug: 'thuc-tap-sinh-3-nam' },
-        { name: 'Thực tập sinh 1 năm', slug: 'thuc-tap-sinh-1-nam' },
-        { name: 'Thực tập sinh 3 Go', slug: 'thuc-tap-sinh-3-go' }
+        { name: { vi: 'Thực tập sinh 3 năm', ja: '技能実習3年', en: '3-Year Technical Intern' }, slug: 'thuc-tap-sinh-3-nam' },
+        { name: { vi: 'Thực tập sinh 1 năm', ja: '技能実習1年', en: '1-Year Technical Intern' }, slug: 'thuc-tap-sinh-1-nam' },
+        { name: { vi: 'Thực tập sinh 3 Go', ja: '技能実習3号', en: 'Technical Intern No. 3' }, slug: 'thuc-tap-sinh-3-go' }
     ],
     'ky-nang-dac-dinh': [
-        { name: 'Đặc định đầu Việt', slug: 'dac-dinh-dau-viet' },
-        { name: 'Đặc định đầu Nhật', slug: 'dac-dinh-dau-nhat' },
-        { name: 'Đặc định đi mới', slug: 'dac-dinh-di-moi' }
+        { name: { vi: 'Đặc định đầu Việt', ja: '国外（ベトナム在住者）', en: 'Overseas (in Vietnam)' }, slug: 'dac-dinh-dau-viet' },
+        { name: { vi: 'Đặc định đầu Nhật', ja: '国内（日本在住者）', en: 'Domestic (in Japan)' }, slug: 'dac-dinh-dau-nhat' },
+        { name: { vi: 'Đặc định đi mới', ja: '新規（未経験者）', en: 'New Candidates' }, slug: 'dac-dinh-di-moi' }
     ],
     'ky-su-tri-thuc': [
-        { name: 'Kỹ sư, tri thức đầu Việt', slug: 'ky-su-tri-thuc-dau-viet' },
-        { name: 'Kỹ sư, tri thức đầu Nhật', slug: 'ky-su-tri-thuc-dau-nhat' }
+        { name: { vi: 'Kỹ sư, tri thức đầu Việt', ja: '国外エンジニア', en: 'Engineer (In Vietnam)' }, slug: 'ky-su-tri-thuc-dau-viet' },
+        { name: { vi: 'Kỹ sư, tri thức đầu Nhật', ja: '国内エンジニア', en: 'Engineer (In Japan)' }, slug: 'ky-su-tri-thuc-dau-nhat' }
     ]
 };
 
