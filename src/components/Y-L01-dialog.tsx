@@ -70,7 +70,53 @@ const visaDetailContentMultiLang = {
     }
 };
 
-
+const valueInterestContent = {
+    vi: {
+      title: "Bạn quan tâm đến những giá trị nào nhất?",
+      description: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.",
+      options: [
+        { id: 'ung-vien-nhieu-nhanh', icon: FastForward, title: 'Ứng viên nhiều và nhanh nhất' },
+        { id: 'ung-vien-chat-luong', icon: UserCheck, title: 'Ứng viên chất lượng' },
+        { id: 'viec-lam-ro-rang', icon: FileSignature, title: 'Việc làm rõ ràng và chất lượng' },
+        { id: 'chi-phi-thap', icon: Globe, title: 'Chi phí tuyển dụng thấp nhất' },
+        { id: 'loi-nhuan-cao', icon: Users2, title: 'Lợi nhuận cao nhất' },
+        { id: 'quan-ly-ho-tro', icon: Handshake, title: 'Dịch vụ quản lý hỗ trợ tốt nhất' },
+        { id: 'cham-soc-khach-hang', icon: Users, title: 'Dịch vụ chăm sóc khách hàng tốt nhất' },
+      ],
+      backButton: 'Quay lại',
+      completeButton: 'Hoàn tất và xem trang đối tác'
+    },
+    ja: {
+      title: "どの価値観に最も関心がありますか？",
+      description: "最高のエクスペリエンスのために、あなたの主な目標を教えてください。",
+      options: [
+        { id: 'ung-vien-nhieu-nhanh', icon: FastForward, title: '最も多く、最も速い候補者' },
+        { id: 'ung-vien-chat-luong', icon: UserCheck, title: '質の高い候補者' },
+        { id: 'viec-lam-ro-rang', icon: FileSignature, title: '明確で質の高い求人' },
+        { id: 'chi-phi-thap', icon: Globe, title: '最低の採用コスト' },
+        { id: 'loi-nhuan-cao', icon: Users2, title: '最高の利益' },
+        { id: 'quan-ly-ho-tro', icon: Handshake, title: '最高の管理サポートサービス' },
+        { id: 'cham-soc-khach-hang', icon: Users, title: '最高の顧客ケアサービス' },
+      ],
+      backButton: '戻る',
+      completeButton: '完了してパートナーページを表示'
+    },
+    en: {
+      title: 'Which values are you most interested in?',
+      description: 'Tell us your main goal for the best experience.',
+      options: [
+        { id: 'ung-vien-nhieu-nhanh', icon: FastForward, title: 'Most & Fastest Candidates' },
+        { id: 'ung-vien-chat-luong', icon: UserCheck, title: 'Quality Candidates' },
+        { id: 'viec-lam-ro-rang', icon: FileSignature, title: 'Clear & Quality Jobs' },
+        { id: 'chi-phi-thap', icon: Globe, title: 'Lowest Recruitment Cost' },
+        { id: 'loi-nhuan-cao', icon: Users2, title: 'Highest Profit' },
+        { id: 'quan-ly-ho-tro', icon: Handshake, title: 'Best Support Management Service' },
+        { id: 'cham-soc-khach-hang', icon: Users, title: 'Best Customer Care Service' },
+      ],
+      backButton: 'Back',
+      completeButton: 'Complete and View Partner Page'
+    }
+};
 
 const industryContent = {
     vi: {
@@ -112,6 +158,43 @@ const regionContent = {
         backButton: 'Back',
         completeButton: 'Complete and View Partner Page'
     }
+};
+
+const visaTypeContent = {
+  vi: {
+    title: 'Bạn muốn tuyển loại Visa nào?',
+    description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
+    description_single: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Kỹ sư, tri thức', desc: 'Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.', color: 'green' },
+    ],
+    backButton: 'Quay lại',
+    continueButton: 'Tiếp tục',
+  },
+  ja: {
+    title: 'どのビザタイプを募集しますか？',
+    description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
+    description_single: '採用ニーズに最も適したビザタイプを選択してください。',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門知識を持つ専門家を採用。', color: 'green' },
+    ],
+    backButton: '戻る',
+    continueButton: '続ける',
+  },
+  en: {
+    title: 'Which Visa Type do you want to recruit?',
+    description: 'You can select multiple items. The first selection is priority #1.',
+    description_single: 'Please select the visa type that best suits your recruitment needs.',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
+    ]
+  }
 };
 
 
@@ -532,7 +615,7 @@ export function YL01Dialog({
             {/* Screen: Y016 (Replaces Y006) */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                <DialogDescription className="text-center">{content.description_multi}</DialogDescription>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
                 {content.options.map(option => {
@@ -694,6 +777,34 @@ export function YL01Dialog({
                 </div>
             </>
          );
+        case 10: // Y010
+            const valueContent = valueInterestContent[currentLang];
+            return (
+                <>
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-headline text-center">{valueContent.title}</DialogTitle>
+                    <DialogDescription className="text-center">{valueContent.description}</DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                    {valueContent.options.map(option => (
+                        <Card
+                            key={option.id}
+                            onClick={() => {
+                                // For now, just complete the flow. This can be updated later to save the value.
+                                navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion);
+                            }}
+                            className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
+                        >
+                            <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                            <h3 className="font-bold text-base">{option.title}</h3>
+                        </Card>
+                    ))}
+                </div>
+                <div className="text-center mt-4">
+                    <Button variant="link" onClick={() => setStep(9)}>{valueContent.backButton}</Button>
+                </div>
+                </>
+            );
       default: return <PartnerRoleStepDialog />;
     }
   }
