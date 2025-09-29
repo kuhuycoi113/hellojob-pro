@@ -6,7 +6,7 @@ import { notFound, useSearchParams, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, QrCode, CheckCircle, FileSignature, HardHat, UserCheck } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, QrCode, CheckCircle, FileSignature, HardHat, UserCheck, Globe, Users2, FastForward, ListChecks, GraduationCap, Users, UserSquare, UserCog, UserPlus, Handshake, Plane } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -30,8 +30,8 @@ import {
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
-import { japanJobTypes } from '@/lib/visa-data';
-import { Industry, allIndustries } from '@/lib/industry-data';
+import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { japanRegions } from '@/lib/location-data';
 
 
@@ -959,32 +959,25 @@ export default function EmployerDetailPage() {
                 <div className="space-y-4">
                      <div className="space-y-2" id="DKY006">
                         <Label>{t.visaTypeLabel}</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                    {currentVisaTypes.length > 0 ? (
-                                        <div className="flex flex-wrap gap-1">
-                                            {currentVisaTypes.map((slug: string, index: number) => <Badge key={slug} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanJobTypes.find(t => t.slug === slug))?.name || slug}</Badge>)}
-                                        </div>
-                                    ) : `Chọn ${t.visaTypeLabel}`}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn loại hình</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {japanJobTypes.map(type => (
-                                     <DropdownMenuCheckboxItem
-                                        key={type.slug}
-                                        checked={currentVisaTypes.includes(type.slug)}
-                                        onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleVisaTypeChange(Boolean(checked), type.slug)}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                           {visaTypeContent[lang].options.map(option => {
+                                const isSelected = currentVisaTypes.includes(option.id);
+                                const selectionOrder = isSelected ? currentVisaTypes.indexOf(option.id) + 1 : 0;
+                                const iconColors = { orange: 'text-orange-500', blue: 'text-blue-500', green: 'text-green-500' };
+                                return (
+                                    <Card 
+                                        key={option.id} 
+                                        onClick={() => handleVisaTypeChange(!isSelected, option.id)}
+                                        className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative", isSelected && "ring-2 ring-primary border-primary bg-primary/10")}
                                     >
-                                        <span className="font-bold w-6 mr-2">{currentVisaTypes.includes(type.slug) ? `${currentVisaTypes.indexOf(type.slug) + 1}.` : ''}</span>
-                                        {type.name}
-                                    </DropdownMenuCheckboxItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                        {isSelected && <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">{selectionOrder}</Badge>}
+                                        <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
+                                        <h3 className="font-bold text-base mb-1">{option.title}</h3>
+                                        <p className="text-muted-foreground text-xs flex-grow">{option.desc}</p>
+                                    </Card>
+                                );
+                           })}
+                        </div>
                     </div>
                      <div className="space-y-2" id="DKY007">
                         <Label>{t.visaDetailLabel}</Label>
@@ -1341,3 +1334,4 @@ export default function EmployerDetailPage() {
     </>
   );
 }
+
