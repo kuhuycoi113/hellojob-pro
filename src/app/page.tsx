@@ -22,7 +22,7 @@ export default function HomePage() {
         query.append('dia-diem', filters.location);
     }
     
-    router.push(`/tim-viec-lam?${'UNGTUYEN-L02-B1'}`);
+    router.push(`/tim-viec-lam?${query.toString()}`);
   };
 
   const [homeFilters, setHomeFilters] = React.useState<Partial<SearchFilters>>({
