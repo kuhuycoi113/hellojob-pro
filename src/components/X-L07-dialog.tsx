@@ -31,24 +31,21 @@ const contentByLang = {
         label: 'Phí quản lý/tháng (JPY)',
         placeholder: 'Ví dụ: 20,000',
         backButton: 'Quay lại',
-        continueButton: 'Lưu, xem kết quả và để lại thông tin liên hệ',
-        continueButtonMobile: 'Lưu, xem kết quả, để lại liên hệ',
+        continueButton: 'Tiếp tục',
     },
     ja: {
         title: 'パートナーに提案する管理費を入力してください',
         label: '管理費/月 (JPY)',
         placeholder: '例: 20,000',
         backButton: '戻る',
-        continueButton: '保存して結果を表示し、連絡先を残す',
-        continueButtonMobile: '保存、結果表示、連絡先',
+        continueButton: '続ける',
     },
     en: {
         title: 'Enter the management fee you propose to the partner',
         label: 'Management Fee/Month (JPY)',
         placeholder: 'Example: 20,000',
         backButton: 'Back',
-        continueButton: 'Save, view results, and leave contact information',
-        continueButtonMobile: 'Save, view, leave contact',
+        continueButton: 'Continue',
     }
 };
 
@@ -72,7 +69,8 @@ export function XL07Dialog({ isOpen, onOpenChange, onSelect, onBack, lang }: XL0
   
   const content = contentByLang[lang];
   const dialogId = "X007";
-  const continueText = isMobile ? content.continueButtonMobile : content.continueButton;
+  const continueText = isMobile ? (lang === 'ja' ? '続ける' : (lang === 'en' ? 'Continue' : 'Tiếp tục')) : (lang === 'ja' ? '保存して結果を表示し、連絡先を残す' : (lang === 'en' ? 'Save, view results, and leave contact information' : 'Lưu, xem kết quả và để lại thông tin liên hệ'));
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -102,7 +100,7 @@ export function XL07Dialog({ isOpen, onOpenChange, onSelect, onBack, lang }: XL0
                 {content.backButton}
             </Button>
             <Button onClick={handleSelect}>
-                {continueText}
+                {isMobile ? content.continueButton : 'Lưu, xem kết quả và để lại thông tin liên hệ'}
             </Button>
         </div>
       </DialogContent>
