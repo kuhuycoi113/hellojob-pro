@@ -6,7 +6,7 @@ import { notFound, useSearchParams, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, QrCode, CheckCircle } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, QrCode, CheckCircle, FileSignature } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -33,6 +33,16 @@ const employersData: { [key: string]: any } = {
             vi: 'Công ty phái cử',
             ja: '送り出し機関',
             en: 'Dispatch Company'
+        },
+        visaType: {
+            vi: 'Thực tập sinh & Đặc định',
+            ja: '技能実習・特定技能',
+            en: 'Trainee & Specified Skilled Worker'
+        },
+        visaDetail: {
+            vi: 'TTS 3 năm, Đặc định ngành Thực phẩm',
+            ja: '技能実習3年、特定技能（飲食料品製造業）',
+            en: '3-Year Trainee, SSW (Food & Beverage Manufacturing)'
         },
         location: {
             vi: 'Hà Nội, Việt Nam',
@@ -87,6 +97,16 @@ const placeholderEmployerData = {
         ja: 'ABC派遣会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。長年の経験により、私たちは何千人ものベトナム人労働者の夢を支援してきたことを誇りに思っています...',
         en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\' dreams take flight...'
     },
+    visaType: {
+        vi: 'Thực tập sinh, Kỹ năng đặc định',
+        ja: '技能実習、特定技能',
+        en: 'Technical Intern, Specified Skilled Worker'
+    },
+    visaDetail: {
+        vi: 'TTS 3 năm, Đặc định ngành Thực phẩm, Đặc định ngành Xây dựng',
+        ja: '技能実習3年、特定技能（飲食料品）、特定技能（建設）',
+        en: '3-Year Intern, SSW (Food), SSW (Construction)'
+    },
     images: [
         { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
         { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 2', ja: '新しい写真 2', en: 'New Photo 2' }, dataAiHint: 'new image 2' },
@@ -123,6 +143,8 @@ const emptyEmployerData = {
     id: 'Z000',
     name: { vi: '', ja: '', en: '' },
     type: { vi: '', ja: '', en: '' },
+    visaType: { vi: '', ja: '', en: '' },
+    visaDetail: { vi: '', ja: '', en: '' },
     location: { vi: '', ja: '', en: '' },
     logo: '/img/favi2.png',
     banner: 'https://placehold.co/1200x400.png?text=Tải+lên+ảnh+bìa',
@@ -173,6 +195,9 @@ const contentByLang = {
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
+        visaTitle: 'Loại hình và Visa',
+        visaTypeLabel: 'Loại hình',
+        visaDetailLabel: 'Chi tiết loại hình visa',
     },
     ja: {
         edit: '編集',
@@ -206,6 +231,9 @@ const contentByLang = {
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
         registerAction: '登録',
+        visaTitle: '種別とビザ',
+        visaTypeLabel: '種別',
+        visaDetailLabel: 'ビザ詳細',
     },
     en: {
         edit: 'Edit',
@@ -239,6 +267,9 @@ const contentByLang = {
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
         registerAction: 'Register',
+        visaTitle: 'Type and Visa',
+        visaTypeLabel: 'Type',
+        visaDetailLabel: 'Visa Details',
     }
 };
 
@@ -470,6 +501,9 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
             if (finalInfo.line) finalInfo.line = parseLineInput(finalInfo.line);
             if (finalInfo.zalo) finalInfo.zalo = parseZaloInput(finalInfo.zalo);
             newState[field] = finalInfo;
+        } else if (field === 'visa') {
+             newState.visaType = tempContent.visaType;
+             newState.visaDetail = tempContent.visaDetail;
         } else {
             newState[field] = tempContent;
         }
@@ -692,12 +726,12 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                 </div>
              );
         case 'industries':
-             return (
+            return (
                 <div className="space-y-4">
                     <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Textarea className="min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={tempContent.main[lang] || ''} onChange={(e) => setTempContent(prev => ({...prev, main: {...prev.main, [lang]: e.target.value}}))} /></div>
                     <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Textarea className="min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={tempContent.secondary[lang] || ''} onChange={(e) => setTempContent(prev => ({...prev, secondary: {...prev.secondary, [lang]: e.target.value}}))} /></div>
                 </div>
-             );
+            );
         case 'benefits':
              return (
                 <div className="space-y-4">
@@ -714,6 +748,13 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                     <Button variant="outline" onClick={() => addTempArrayItem('benefits')}><PlusCircle className="mr-2"/> Thêm phúc lợi</Button>
                 </div>
              );
+        case 'visa':
+            return (
+                <div className="space-y-4">
+                    <div className="space-y-2"><Label>{t.visaTypeLabel}</Label><Input placeholder={placeholderEmployerData.visaType[lang]} value={tempContent.visaType[lang] || ''} onChange={(e) => setTempContent({...tempContent, visaType: {...tempContent.visaType, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2"><Label>{t.visaDetailLabel}</Label><Textarea className="min-h-[60px]" placeholder={placeholderEmployerData.visaDetail[lang]} value={tempContent.visaDetail[lang] || ''} onChange={(e) => setTempContent({...tempContent, visaDetail: {...tempContent.visaDetail, [lang]: e.target.value}})} /></div>
+                </div>
+            );
         default:
             return <p>Chức năng này đang được phát triển.</p>;
     }
@@ -842,6 +883,12 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                             </div>
                           </div>
                       )}
+                  </SectionCard>
+                  <SectionCard title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
+                      <div className="space-y-3 text-sm">
+                          <p><strong>{t.visaTypeLabel}:</strong> {employer.visaType[lang] || '...'}</p>
+                          <p><strong>{t.visaDetailLabel}:</strong> {employer.visaDetail[lang] || '...'}</p>
+                      </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
