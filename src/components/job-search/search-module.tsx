@@ -150,7 +150,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                                     <SelectGroup key={type.slug}>
                                         <SelectLabel>{type.name}</SelectLabel>
                                         {(visaDetailsByVisaType[type.slug] || []).map(detail => (
-                                            <SelectItem key={detail.slug} value={detail.slug}>{detail.name}</SelectItem>
+                                            <SelectItem key={detail.slug} value={detail.slug}>{detail.name.vi}</SelectItem>
                                         ))}
                                     </SelectGroup>
                                 ))}
