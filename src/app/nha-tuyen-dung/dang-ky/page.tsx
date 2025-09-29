@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
-import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { japanJobTypes } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
 
 
@@ -965,7 +965,7 @@ export default function EmployerDetailPage() {
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
                                     {currentVisaTypes.length > 0 ? (
                                         <div className="flex flex-wrap gap-1">
-                                            {currentVisaTypes.map((slug: string, index: number) => <Badge key={slug} variant="secondary">{index + 1}. {(japanJobTypes.find(t => t.slug === slug))?.name}</Badge>)}
+                                            {currentVisaTypes.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanJobTypes.find(t => t.slug === slug))?.name}</Badge>)}
                                         </div>
                                     ) : `Chọn ${t.visaTypeLabel}`}
                                 </Button>
@@ -1161,7 +1161,7 @@ export default function EmployerDetailPage() {
           );
       });
       
-      return <p className="flex flex-wrap gap-1 mt-1">{content}</p>;
+      return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
     }
     return <span className="italic text-muted-foreground">{t.notUpdated}</span>;
   };
@@ -1345,3 +1345,4 @@ export default function EmployerDetailPage() {
     </>
   );
 }
+
