@@ -160,7 +160,7 @@ const valueInterestContent = {
         { id: 'cham-soc-khach-hang', icon: Users, title: 'Dịch vụ chăm sóc khách hàng tốt nhất' },
       ],
       backButton: 'Quay lại',
-      completeButton: 'Hoàn tất và xem trang đối tác'
+      completeButton: 'Lưu và xem chi tiết'
     },
     ja: {
       title: "どの価値観に最も関心がありますか？",
@@ -175,7 +175,7 @@ const valueInterestContent = {
         { id: 'cham-soc-khach-hang', icon: Users, title: '最高の顧客ケアサービス' },
       ],
       backButton: '戻る',
-      completeButton: '完了してパートナーページを表示'
+      completeButton: '保存して詳細を見る'
     },
     en: {
       title: 'Which values are you most interested in?',
@@ -190,7 +190,7 @@ const valueInterestContent = {
         { id: 'cham-soc-khach-hang', icon: Users, title: 'Best Customer Care Service' },
       ],
       backButton: 'Back',
-      completeButton: 'Complete and View Partner Page'
+      completeButton: 'Save and View Details'
     }
 };
 
@@ -265,7 +265,7 @@ export function YL01Dialog({
         region.forEach(r => params.append('location', r));
     }
 
-    router.push(`/nha-tuyen-dung/Z000?${params.toString()}`);
+    router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
     onOpenChange(false);
   };
   
@@ -445,8 +445,9 @@ export function YL01Dialog({
                     </Card>
                 ))}
             </div>
-            <div className="text-center mt-4">
+            <div className="text-center mt-4 flex justify-center gap-4">
                  <Button variant="link" onClick={() => setStep(9)}>{content.backButton}</Button>
+                 <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion)}>{content.completeButton}</Button>
             </div>
         </>
     )
