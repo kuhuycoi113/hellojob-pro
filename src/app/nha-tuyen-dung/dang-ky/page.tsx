@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon } from '@/components/custom-icons';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
+import { Checkbox } from '@/components/ui/checkbox';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Industry, allIndustries } from '@/lib/industry-data';
 import { japanRegions } from '@/lib/location-data';
@@ -901,7 +902,7 @@ export default function EmployerDetailPage() {
 
                 const newVisaDetails = (tempContent.visaDetail?.[lang] || []).filter((detailSlug: string) => 
                     newSelection.some(visaSlug => 
-                        (visaDetailsByVisaType[visaSlug] || []).some(detail => detail.slug === detailSlug)
+                        (visaDetailsByVisaType[visaSlug as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === detailSlug)
                     )
                 );
 
@@ -974,7 +975,7 @@ export default function EmployerDetailPage() {
                                     return (
                                         <DropdownMenuGroup key={visaTypeSlug}>
                                             <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">{visaType.name}</DropdownMenuLabel>
-                                            {(visaDetailsByVisaType[visaTypeSlug] || []).map((detail: any) => (
+                                            {(visaDetailsByVisaType[visaTypeSlug as keyof typeof visaDetailsByVisaType] || []).map((detail: any) => (
                                                 <DropdownMenuCheckboxItem
                                                     key={detail.slug}
                                                     checked={currentVisaDetails.includes(detail.slug)}
@@ -1010,7 +1011,7 @@ export default function EmployerDetailPage() {
             };
             
             const availableIndustries = Array.from(new Map(
-                (employer?.visaType?.[lang] || []).flatMap((vSlug: string) => (industriesByJobType[vSlug] || []).map((i: Industry) => ({...i, name: i.name[lang]}))).map((item: Industry) => [item.slug, item])
+                (employer?.visaType?.[lang] || []).flatMap((vSlug: string) => (industriesByJobType[vSlug as keyof typeof industriesByJobType] || [])).map((item: Industry) => [item.slug, item])
             ).values());
 
             return (
@@ -1037,7 +1038,7 @@ export default function EmployerDetailPage() {
                                         onSelect={(e) => e.preventDefault()}
                                         onCheckedChange={(checked) => handleIndustryChange(Boolean(checked), industry.slug)}
                                     >
-                                        {industry.name}
+                                        {industry.name[lang]}
                                     </DropdownMenuCheckboxItem>
                                 ))}
                             </DropdownMenuContent>
