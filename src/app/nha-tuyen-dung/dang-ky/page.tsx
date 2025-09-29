@@ -19,6 +19,15 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 
 const employersData: { [key: string]: any } = {
@@ -304,9 +313,7 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
                 <Icon className="text-primary h-6 w-6"/>{title}
             </CardTitle>
             {onEditClick && (
-              <Button variant="ghost" size="icon" onClick={onEditClick}>
-                  <Edit className="h-4 w-4"/>
-              </Button>
+              <Button variant="ghost" size="icon" onClick={onEditClick}><Edit className="h-4 w-4"/></Button>
             )}
         </CardHeader>
         <CardContent>{children}</CardContent>
@@ -575,8 +582,8 @@ export default function EmployerDetailPage() {
             if (finalInfo.zalo) finalInfo.zalo = parseZaloInput(finalInfo.zalo);
             newState[field] = finalInfo;
         } else if (field === 'visa') {
-             newState.visaType = tempContent.visaType;
-             newState.visaDetail = tempContent.visaDetail;
+             newState.visaType = { ...newState.visaType, [lang]: Array.isArray(tempContent.visaType) ? tempContent.visaType.join(', ') : tempContent.visaType };
+             newState.visaDetail = { ...newState.visaDetail, [lang]: tempContent.visaDetail };
         } else if (field === 'valueInterest') {
             newState.valueInterest = tempContent.split('\n').map((item: string) => ({ vi: item, ja: item, en: item }));
         } else {
@@ -849,10 +856,54 @@ export default function EmployerDetailPage() {
                 </div>
              );
         case 'visa':
+            const currentVisaTypes = Array.isArray(tempContent.visaType?.[lang])
+                ? tempContent.visaType[lang]
+                : (tempContent.visaType?.[lang] || '').split(',').map((s:string) => s.trim()).filter(Boolean);
+
             return (
                 <div className="space-y-4">
-                    <div className="space-y-2"><Label>{t.visaTypeLabel}</Label><Input placeholder={placeholderEmployerData.visaType[lang]} value={tempContent.visaType[lang] || ''} onChange={(e) => setTempContent({...tempContent, visaType: {...tempContent.visaType, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>{t.visaDetailLabel}</Label><Textarea className="min-h-[60px]" placeholder={placeholderEmployerData.visaDetail[lang]} value={tempContent.visaDetail[lang] || ''} onChange={(e) => setTempContent({...tempContent, visaDetail: {...tempContent.visaDetail, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2">
+                        <Label>{t.visaTypeLabel}</Label>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                    {currentVisaTypes.length > 0 ? (
+                                        <div className="flex flex-wrap gap-1">
+                                            {currentVisaTypes.map((visa: string) => <Badge key={visa} variant="secondary">{visa}</Badge>)}
+                                        </div>
+                                    ) : `Chọn ${t.visaTypeLabel}`}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn loại hình</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {['Thực tập sinh', 'Kỹ năng đặc định', 'Kỹ sư, tri thức'].map(type => (
+                                     <DropdownMenuCheckboxItem
+                                        key={type}
+                                        checked={currentVisaTypes.includes(type)}
+                                        onSelect={(e) => e.preventDefault()}
+                                        onCheckedChange={(checked) => {
+                                            const newSelection = checked
+                                                ? [...currentVisaTypes, type]
+                                                : currentVisaTypes.filter((item: string) => item !== type);
+                                            setTempContent({ ...tempContent, visaType: { ...tempContent.visaType, [lang]: newSelection } });
+                                        }}
+                                    >
+                                        {type}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>{t.visaDetailLabel}</Label>
+                        <Textarea 
+                            className="min-h-[60px]" 
+                            placeholder={placeholderEmployerData.visaDetail[lang]} 
+                            value={tempContent.visaDetail[lang] || ''} 
+                            onChange={(e) => setTempContent({ ...tempContent, visaDetail: { ...tempContent.visaDetail, [lang]: e.target.value } })} 
+                        />
+                    </div>
                 </div>
             );
         default:
