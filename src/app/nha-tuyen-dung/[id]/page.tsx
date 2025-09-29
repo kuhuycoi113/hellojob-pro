@@ -414,24 +414,24 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
   const searchParams = useSearchParams();
   const id = resolvedParams.id;
   
+  const [employer, setEmployer] = useState<any | null>(null);
   const [lang, setLang] = useState<Language>('vi');
   const [role, setRole] = useState<string | null>(null);
+  
+  const langFromParams = (searchParams.get('lang') || 'vi') as Language;
+  const roleFromParams = searchParams.get('role');
   
   useEffect(() => {
     const employerData = employersData[id];
     if (!employerData) {
         notFound();
+        return;
     }
-    const langFromParams = (searchParams.get('lang') || 'vi') as Language;
     setLang(langFromParams);
-    
-    const roleFromParams = searchParams.get('role');
     setRole(roleFromParams);
-    // Initialize employer state with data based on ID
     setEmployer({ ...employerData });
-  }, [id, searchParams]);
+  }, [id, langFromParams, roleFromParams]);
   
-  const [employer, setEmployer] = useState<any | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<{title: string, field: string } | null>(null);
   const [tempContent, setTempContent] = useState<any>('');
@@ -846,12 +846,12 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-              {/* Left Column */}
+              {/* Central Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
-                  <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest, 'valueInterest')}>
+                  <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest.map((i: any) => i.vi).join('\n'), 'valueInterest')}>
                     {employer.valueInterest?.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
                             {employer.valueInterest.map((item: any, index: number) => (
@@ -859,7 +859,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                             ))}
                         </div>
                     ) : (
-                        <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest, 'valueInterest')}>{t.clickToUpdate}</button>.</p>
+                        <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, '', 'valueInterest')}>{t.clickToUpdate}</button>.</p>
                     )}
                   </SectionCard>
                   <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
@@ -892,7 +892,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
               </div>
               
               {/* Right Column */}
-              <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
+              <div className="lg:order-first lg:col-span-1 space-y-6 lg:sticky lg:top-24">
                   <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
                           <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || '...'}</p>
@@ -978,3 +978,5 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </>
   );
 }
+
+    
