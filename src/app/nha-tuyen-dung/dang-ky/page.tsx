@@ -50,7 +50,7 @@ const employersData: { [key: string]: any } = {
             en: 'Hanoi, Vietnam'
         },
         logo: '/img/viet-img/company3.png',
-        banner: 'https://images.unsplash.com/photo-1549880181-56a44cf4a9a5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        banner: '/img/viet-img/anh-bia.jpg',
         
         about: {
             vi: '',
@@ -152,8 +152,8 @@ const emptyEmployerData = {
     visaType: { vi: '', ja: '', en: '' },
     visaDetail: { vi: '', ja: '', en: '' },
     location: { vi: '', ja: '', en: '' },
-    logo: '/img/favi2.png',
-    banner: 'https://placehold.co/1200x400.png?text=Tải+lên+ảnh+bìa',
+    logo: '/img/viet-img/company3.png',
+    banner: '/img/viet-img/anh-bia.jpg',
     about: { vi: '', ja: '', en: '' },
     images: [
       { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
@@ -426,8 +426,12 @@ export default function EmployerDetailPage() {
     
     let employerData;
     // Set initial data based on whether there are query params
-    if (searchParams.toString()) {
-        employerData = emptyEmployerData;
+    if (Array.from(searchParams.keys()).length > 0) {
+        employerData = {
+          ...placeholderEmployerData, // Start with placeholder for structure
+          logo: emptyEmployerData.logo, // But use default logo
+          banner: emptyEmployerData.banner // And default banner
+        };
     } else {
         employerData = placeholderEmployerData;
     }
@@ -500,7 +504,12 @@ export default function EmployerDetailPage() {
   const t = contentByLang[lang] || contentByLang['vi'];
   const roleText = (role && roleTexts[role]) ? roleTexts[role][lang] : employer.type[lang];
 
-  const validateField = (field: 'messenger' | 'line' | 'email', value: string) => {
+  const validateEmail = (email: string) => {
+    if (!email) return true; // Not required, but if present must be valid
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  
+  const validateField = (field: 'messenger' | 'line', value: string) => {
     if (!value) {
         setErrors(prev => ({...prev, [field]: undefined }));
         return true;
@@ -509,10 +518,7 @@ export default function EmployerDetailPage() {
     let isValid = false;
     let errorMessage = "Định dạng không hợp lệ.";
 
-    if (field === 'email') {
-        isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-        errorMessage = "Vui lòng nhập địa chỉ email hợp lệ.";
-    } else if (field === 'messenger') {
+    if (field === 'messenger') {
         isValid = /^(https?:\/\/(www\.)?(facebook|m)\.com\/|m\.me\/|[\w.]{5,})/.test(value);
         errorMessage = "Vui lòng nhập link Facebook/Messenger hoặc username hợp lệ.";
     } else if (field === 'line') {
@@ -750,7 +756,7 @@ export default function EmployerDetailPage() {
                                         <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, ''))} />
                                 <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
@@ -1032,3 +1038,5 @@ export default function EmployerDetailPage() {
     </>
   );
 }
+
+    
