@@ -164,9 +164,9 @@ const contentByLang = {
         namePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
         typePlaceholder: 'Ví dụ: Công ty phái cử',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
-        industriesTitle: 'Ngành nghề & Lĩnh vực',
-        mainIndustriesLabel: 'Ngành nghề chính',
-        secondaryIndustriesLabel: 'Ngành nghề khác',
+        industriesTitle: 'Ngành nghề & Khu vực',
+        mainIndustriesLabel: 'Ngành nghề',
+        secondaryIndustriesLabel: 'Khu vực',
         benefitsTitle: 'Phúc lợi & Môi trường',
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
@@ -801,6 +801,13 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
+             <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="pt-4">
+                <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="vi" className="flex items-center gap-2"><VnFlagIcon /> Tiếng Việt</TabsTrigger>
+                    <TabsTrigger value="ja" className="flex items-center gap-2"><JpFlagIcon /> 日本語</TabsTrigger>
+                    <TabsTrigger value="en" className="flex items-center gap-2"><EnFlagIcon /> English</TabsTrigger>
+                </TabsList>
+            </Tabs>
           </DialogHeader>
            <div className="py-4 max-h-[60vh] overflow-y-auto pr-4">
               {renderEditContent()}
