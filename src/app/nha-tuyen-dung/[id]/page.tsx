@@ -714,7 +714,6 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                     <Button variant="outline" onClick={() => addTempArrayItem('benefits')}><PlusCircle className="mr-2"/> Thêm phúc lợi</Button>
                 </div>
              );
-
         default:
             return <p>Chức năng này đang được phát triển.</p>;
     }
