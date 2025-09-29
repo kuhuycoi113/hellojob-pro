@@ -545,37 +545,54 @@ export function YL01Dialog({
     )
   }
   
-  const VisaTypeSingleSelectStepDialog = () => {
+  const VisaTypeMultiSelectStepDialog = () => {
     const content = visaTypeContent[currentLang];
     const iconColors = {
         orange: 'text-orange-500',
         blue: 'text-blue-500',
         green: 'text-green-500',
     };
-
+    
     return (
         <>
-            {/* Screen: Y016 */}
+            {/* Screen: Y016 (Replaces Y006) */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                <DialogDescription className="text-center">{content.description}</DialogDescription>
+                <DialogDescription className="text-center">Bạn có thể chọn nhiều mục, lựa chọn đầu tiên là ưu tiên số 1.</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                {content.options.map(option => (
-                    <Button 
-                        key={option.id}
-                        onClick={() => { setSelectedVisa([option.id]); setStep(7); }} 
-                        variant="outline" 
-                        className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
-                        <h3 className="font-bold text-base mb-1">{option.title}</h3>
-                        <p className="text-muted-foreground text-xs">{option.desc}</p>
-                    </Button>
-                ))}
+                {content.options.map(option => {
+                    const isSelected = selectedVisa.includes(option.id);
+                    const selectionOrder = isSelected ? selectedVisa.indexOf(option.id) + 1 : 0;
+                    return (
+                        <Card 
+                            key={option.id}
+                            onClick={() => handleMultiSelect(option.id, selectedVisa, setSelectedVisa)}
+                            className={cn(
+                                "h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary relative",
+                                isSelected && "ring-2 ring-primary border-primary bg-primary/10"
+                            )}
+                        >
+                            {isSelected && (
+                                <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                                    {selectionOrder}
+                                </Badge>
+                            )}
+                            <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
+                            <h3 className="font-bold text-base mb-1">{option.title}</h3>
+                            <p className="text-muted-foreground text-xs">{option.desc}</p>
+                        </Card>
+                    );
+                })}
             </div>
-            <Button variant="link" onClick={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2)} className="mt-4 mx-auto block">
-                {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
-            </Button>
+            <div className="flex justify-center items-center mt-4 gap-4">
+                <Button variant="link" onClick={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2)} className="mx-auto block">
+                    {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
+                </Button>
+                <Button onClick={() => setStep(7)} disabled={selectedVisa.length === 0}>
+                    {currentLang === 'ja' ? '続ける' : currentLang === 'en' ? 'Continue' : 'Tiếp tục'}
+                </Button>
+            </div>
         </>
     );
   };
@@ -599,24 +616,28 @@ export function YL01Dialog({
                 <DialogDescription className="text-center">{description}</DialogDescription>
             </DialogHeader>
              <div className={cn("grid grid-cols-2 pt-4 gap-4 max-h-80 overflow-y-auto", gridCols)}>
-                {options.map((option) => (
-                    <Card
-                        key={option.id}
-                        onClick={() => handleMultiSelect(option.id, selectedItems, setter)}
-                        className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
-                            selectedItems.includes(option.id) && "ring-2 ring-primary border-primary"
-                        )}
-                    >
-                         {selectedItems.includes(option.id) && (
-                            <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
-                                {selectedItems.indexOf(option.id) + 1}
-                            </Badge>
-                        )}
-                        {option.icon && <option.icon className={cn("h-8 w-8 mx-auto mb-2", option.color ? `text-${option.color}-500` : 'text-primary')} />}
-                        <h3 className="font-bold text-base mb-1">{option.name[currentLang]}</h3>
-                        {option.desc && <p className="text-muted-foreground text-xs flex-grow">{option.desc}</p>}
-                    </Card>
-                ))}
+                {options.map((option) => {
+                    const isSelected = selectedItems.includes(option.id);
+                    const selectionOrder = isSelected ? selectedItems.indexOf(option.id) + 1 : 0;
+                    return (
+                        <Card
+                            key={option.id}
+                            onClick={() => handleMultiSelect(option.id, selectedItems, setter)}
+                            className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
+                                isSelected && "ring-2 ring-primary border-primary bg-primary/10"
+                            )}
+                        >
+                            {isSelected && (
+                                <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                                    {selectionOrder}
+                                </Badge>
+                            )}
+                            {option.icon && <option.icon className={cn("h-8 w-8 mx-auto mb-2", option.color ? `text-${option.color}-500` : 'text-primary')} />}
+                            <h3 className="font-bold text-base mb-1">{option.name[currentLang]}</h3>
+                            {option.desc && <p className="text-muted-foreground text-xs flex-grow">{option.desc}</p>}
+                        </Card>
+                    )
+                })}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                 <Button variant="link" onClick={() => setStep(prevStep)}>Quay lại</Button>
@@ -639,10 +660,10 @@ export function YL01Dialog({
         return <PartnerRoleStepDialog />; // Fallback
       case 4: return renderNameInputStepDialog();
       case 5: return renderCompanyNameStepDialog();
-      case 6: // Y016 - new single select screen
-        return <VisaTypeSingleSelectStepDialog />;
+      case 6: // Y016 (replaces Y006)
+        return <VisaTypeMultiSelectStepDialog />;
       case 7: // Y007
-        const visaDetailOptions = selectedVisa.flatMap(vSlug => visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name[currentLang] }));
+        const visaDetailOptions = selectedVisa.flatMap(vSlug => (visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name[currentLang]})));
         return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
       case 8: // Y008
         const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name[currentLang]}));
@@ -675,7 +696,7 @@ export function YL01Dialog({
                             onClick={() => handleMultiSelect(option.id, selectedRegion, setSelectedRegion)}
                             className={cn(
                                 "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
-                                selectedRegion.includes(option.id) && "ring-2 ring-primary border-primary"
+                                selectedRegion.includes(option.id) && "ring-2 ring-primary border-primary bg-primary/10"
                             )}
                         >
                              {selectedRegion.includes(option.id) && (
