@@ -11,19 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from './ui/button';
 import { Card } from './ui/card';
-import { FastForward, ListChecks, HardHat, UserCheck, GraduationCap, Pencil, Sparkles, Building, Plane, Handshake, Briefcase, Users, UserSquare, UserCog, UserPlus } from 'lucide-react';
+import { Globe, Users2, FastForward, ListChecks, HardHat, UserCheck, GraduationCap, Pencil, Sparkles, Building, Plane, Handshake, Briefcase, Users, UserSquare, UserCog, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
@@ -46,40 +36,15 @@ interface YL01DialogProps {
   initialLang?: Language;
 }
 
-const partnershipTypeContent = {
-  vi: {
-    title: 'Bạn muốn hợp tác như nào?',
-    description: 'Chọn hình thức hợp tác phù hợp với nhu cầu của bạn.',
-    options: [
-      'Tôi muốn đăng việc làm',
-      'Tôi muốn giới thiệu ứng viên',
-      'Tôi muốn đăng việc làm và giới thiệu ứng viên',
-      'Tôi muốn giới thiệu ứng viên và đăng việc làm',
-    ],
-    backButton: 'Quay lại'
-  },
-  ja: {
-    title: 'どのような提携をご希望ですか？',
-    description: 'ニーズに合った提携形態を選択してください。',
-    options: [
-      '求人を掲載したい',
-      '候補者を紹介したい',
-      '求人を掲載し、候補者も紹介したい',
-      '候補者を紹介し、求人も掲載したい',
-    ],
-    backButton: '戻る'
-  },
-  en: {
-    title: 'How would you like to partner?',
-    description: 'Select the partnership model that fits your needs.',
-    options: [
-      'I want to post jobs',
-      'I want to refer candidates',
-      'I want to post jobs and refer candidates',
-      'I want to refer candidates and post jobs',
-    ],
-    backButton: 'Back'
-  }
+const roleTexts: Record<string, Record<Language, string>> = {
+  'nhan-vien-phai-cu': { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
+  'nhan-vien-nhan-luc-nhat': { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
+  'sending': { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
+  'support': { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
+  'company': { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
+  'supervising-organization': { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
+  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí (Yuryo Shokai)', ja: '有料職業紹介事業所', en: 'Paid Placement Agency' },
+  'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
 };
 
 
@@ -94,14 +59,14 @@ export function YL01Dialog({
     initialLang = 'vi'
 }: YL01DialogProps) {
   const router = useRouter();
-  const [profileCreationStep, setProfileCreationStep] = useState(initialStep);
+  const [step, setStep] = useState(initialStep);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [selectedPartnershipType, setSelectedPartnershipType] = useState<string | null>(null);
   const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   useEffect(() => {
     if (isOpen) {
-      setProfileCreationStep(initialStep);
+      setStep(initialStep);
+      setSelectedRole(null);
     }
   }, [isOpen, initialStep]);
   
@@ -112,24 +77,30 @@ export function YL01Dialog({
 
   const handleRoleSelect = (roleId: string) => {
     setSelectedRole(roleId);
-    // Navigate directly to Z000 with parameters
+    if (roleId === 'nhan-vien-phai-cu') {
+      setStep(2); // Move to sub-role selection
+    } else {
+      navigateToEmployerPage(roleId);
+    }
+  };
+
+  const handleSubRoleSelect = (subRoleId: string) => {
+    if (selectedRole) {
+      navigateToEmployerPage(selectedRole, subRoleId);
+    }
+  };
+
+  const navigateToEmployerPage = (roleId: string, subRoleId?: string) => {
     const params = new URLSearchParams();
     params.set('role', roleId);
     params.set('lang', currentLang);
+    if (subRoleId) {
+      params.set('sub_role', subRoleId);
+    }
     router.push(`/nha-tuyen-dung/Z000?${params.toString()}`);
     onOpenChange(false); // Close the dialog after navigation
   };
 
-  const handleComplete = (partnershipType: string) => {
-    const preferences = {
-      role: selectedRole,
-      partnershipType: partnershipType,
-    };
-
-    if (onComplete) {
-      onComplete(preferences);
-    }
-  };
 
   const PartnerRoleStepDialog = () => {
         const roles = {
@@ -198,14 +169,78 @@ export function YL01Dialog({
                 </Tabs>
             </>
         );
+  };
+
+  const SubRoleStepDialog = () => {
+    const content = {
+        vi: {
+            title: "Bạn có vai trò gì ở Công ty phái cử?",
+            description: "Vui lòng chọn vai trò cụ thể của bạn để tiếp tục.",
+            options: [
+                { id: 'phu-trach-doi-ngoai', icon: Globe, title: 'Phụ trách đối ngoại'},
+                { id: 'phu-trach-tuyen-dung', icon: Users2, title: 'Phụ trách tuyển dụng'},
+            ],
+            backButton: 'Quay lại',
+        },
+        ja: {
+            title: "送り出し機関でのあなたの役割は何ですか？",
+            description: "続けるためにあなたの具体的な役割を選択してください。",
+            options: [
+                { id: 'phu-trach-doi-ngoai', icon: Globe, title: '渉外担当'},
+                { id: 'phu-trach-tuyen-dung', icon: Users2, title: '採用担当'},
+            ],
+            backButton: '戻る',
+        },
+        en: {
+            title: 'What is your role at the Sending Company?',
+            description: 'Please select your specific role to continue.',
+            options: [
+                { id: 'phu-trach-doi-ngoai', icon: Globe, title: 'External Relations'},
+                { id: 'phu-trach-tuyen-dung', icon: Users2, title: 'Recruitment'},
+            ],
+            backButton: 'Back',
+        },
+    }[currentLang];
+
+    return (
+        <>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                {content.options.map(option => (
+                     <Card 
+                        key={option.id} 
+                        onClick={() => handleSubRoleSelect(option.id)}
+                        className="text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
+                    >
+                        <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                        <h3 className="font-bold text-lg mb-1">{option.title}</h3>
+                    </Card>
+                ))}
+            </div>
+            <div className="text-center mt-4">
+                 <Button variant="link" onClick={() => setStep(1)}>{content.backButton}</Button>
+            </div>
+        </>
+    )
+  }
+
+  const renderDialogContent = () => {
+    switch (step) {
+      case 1: return <PartnerRoleStepDialog />;
+      case 2: return <SubRoleStepDialog />;
+      default: return <PartnerRoleStepDialog />;
+    }
   }
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setProfileCreationStep(1); }}>
+      <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002">
-              <PartnerRoleStepDialog />
+          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1">
+              {renderDialogContent()}
           </DialogContent>
       </Dialog>
     </>
