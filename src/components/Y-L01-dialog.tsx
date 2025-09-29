@@ -169,37 +169,40 @@ const visaTypeContent = {
 const industryContent = {
     vi: {
         title: "Chọn ngành nghề muốn tuyển dụng",
-        description: "Lựa chọn ngành nghề bạn muốn tuyển dụng.",
+        description: "Lựa chọn các ngành nghề bạn muốn tuyển, sắp xếp theo thứ tự ưu tiên.",
         backButton: "Quay lại",
+        continueButton: "Tiếp tục"
     },
     ja: {
         title: "募集したい業種を選択",
-        description: "募集したい業種を選択してください。",
+        description: "募集したい業種を優先順位で選択してください。",
         backButton: "戻る",
+        continueButton: "続ける"
     },
     en: {
-        title: "Select Industry to Recruit",
-        description: "Select the industry you want to recruit for.",
+        title: "Select Industries to Recruit",
+        description: "Select the industries you want to recruit for, in order of priority.",
         backButton: "Back",
+        continueButton: "Continue"
     },
 };
 
 const regionContent = {
     vi: {
         title: 'Chọn khu vực làm việc',
-        description: 'Lựa chọn khu vực bạn muốn tuyển dụng.',
+        description: 'Lựa chọn các khu vực bạn muốn tuyển dụng, sắp xếp theo thứ tự ưu tiên.',
         backButton: 'Quay lại',
         completeButton: 'Hoàn tất và xem trang đối tác'
     },
     ja: {
         title: '希望勤務地を選択',
-        description: '募集したい地域を選択してください。',
+        description: '募集したい地域を優先順位で選択してください。',
         backButton: '戻る',
         completeButton: '完了してパートナーページを表示'
     },
     en: {
-        title: 'Select Work Region',
-        description: 'Choose the region you want to recruit in.',
+        title: 'Select Work Regions',
+        description: 'Choose the regions you want to recruit in, in order of priority.',
         backButton: 'Back',
         completeButton: 'Complete and View Partner Page'
     }
@@ -419,9 +422,9 @@ export function YL01Dialog({
                         onClick={() => {
                             setSelectedInterest(option.id);
                             if (selectedRole && organizationRoles.includes(selectedRole)) {
-                                setStep(6); // Skip to Visa Type selection
+                                setStep(6);
                             } else {
-                                setStep(3); // Proceed to Sub-role selection for individuals
+                                setStep(3);
                             }
                         }}
                         className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
@@ -554,30 +557,9 @@ export function YL01Dialog({
 
   const renderNameInputStepDialog = () => {
     const content = {
-        vi: {
-            title: "Vui lòng nhập họ tên của bạn",
-            description: "Thông tin này sẽ được dùng để cá nhân hóa tài khoản đối tác của bạn.",
-            label: "Họ và tên",
-            placeholder: "Ví dụ: Nguyễn Văn An",
-            backButton: "Quay lại",
-            continueButton: "Tiếp tục"
-        },
-        ja: {
-            title: "氏名を入力してください",
-            description: "この情報はパートナーアカウントをパーソナライズするために使用されます。",
-            label: "氏名",
-            placeholder: "例: グエン・ヴァン・アン",
-            backButton: "戻る",
-            continueButton: "続ける"
-        },
-        en: {
-            title: "Please enter your full name",
-            description: "This information will be used to personalize your partner account.",
-            label: "Full Name",
-            placeholder: "E.g., An Nguyen Van",
-            backButton: "Back",
-            continueButton: "Continue"
-        },
+        vi: { title: "Vui lòng nhập họ tên của bạn", description: "Thông tin này sẽ được dùng để cá nhân hóa tài khoản đối tác của bạn.", label: "Họ và tên", placeholder: "Ví dụ: Nguyễn Văn An", backButton: "Quay lại", continueButton: "Tiếp tục" },
+        ja: { title: "氏名を入力してください", description: "この情報はパートナーアカウントをパーソナライズするために使用されます。", label: "氏名", placeholder: "例: グエン・ヴァン・アン", backButton: "戻る", continueButton: "続ける" },
+        en: { title: "Please enter your full name", description: "This information will be used to personalize your partner account.", label: "Full Name", placeholder: "E.g., An Nguyen Van", backButton: "Back", continueButton: "Continue" },
     }[currentLang];
 
     return (
@@ -592,21 +574,11 @@ export function YL01Dialog({
             </DialogHeader>
             <div className="pt-4 max-w-sm mx-auto w-full">
                 <Label htmlFor="full-name">{content.label}</Label>
-                <Input
-                    id="full-name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder={content.placeholder}
-                    className="mt-2"
-                />
+                <Input id="full-name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={content.placeholder} className="mt-2" />
             </div>
              <div className="mt-6 flex justify-center gap-2">
-                <Button variant="outline" onClick={() => setStep(3)}>
-                    {content.backButton}
-                </Button>
-                <Button onClick={() => { if (fullName.trim()) setStep(5); }} disabled={!fullName.trim()}>
-                    {content.continueButton}
-                </Button>
+                <Button variant="outline" onClick={() => setStep(3)}>{content.backButton}</Button>
+                <Button onClick={() => { if (fullName.trim()) setStep(5); }} disabled={!fullName.trim()}>{content.continueButton}</Button>
             </div>
         </>
     )
@@ -614,30 +586,9 @@ export function YL01Dialog({
 
   const renderCompanyNameStepDialog = () => {
     const content = {
-        vi: {
-            title: "Vui lòng nhập tên Công ty/Pháp nhân/Tổ chức của bạn",
-            description: "Thông tin này giúp chúng tôi xác thực và kết nối bạn tốt hơn.",
-            label: "Tên công ty",
-            placeholder: "Ví dụ: Công ty TNHH HelloJob",
-            backButton: "Quay lại",
-            continueButton: "Tiếp tục"
-        },
-        ja: {
-            title: "会社名/法人名/団体名を入力してください",
-            description: "この情報は、本人確認とより良い連携のために役立ちます。",
-            label: "会社名",
-            placeholder: "例: 株式会社HelloJob",
-            backButton: "戻る",
-            continueButton: "続ける"
-        },
-        en: {
-            title: "Please enter your Company/Entity/Organization name",
-            description: "This information helps us verify and connect with you better.",
-            label: "Company Name",
-            placeholder: "E.g., HelloJob Co., Ltd.",
-            backButton: "Back",
-            continueButton: "Continue"
-        },
+        vi: { title: "Vui lòng nhập tên Công ty/Pháp nhân/Tổ chức của bạn", description: "Thông tin này giúp chúng tôi xác thực và kết nối bạn tốt hơn.", label: "Tên công ty", placeholder: "Ví dụ: Công ty TNHH HelloJob", backButton: "Quay lại", continueButton: "Tiếp tục" },
+        ja: { title: "会社名/法人名/団体名を入力してください", description: "この情報は、本人確認とより良い連携のために役立ちます。", label: "会社名", placeholder: "例: 株式会社HelloJob", backButton: "戻る", continueButton: "続ける" },
+        en: { title: "Please enter your Company/Entity/Organization name", description: "This information helps us verify and connect with you better.", label: "Company Name", placeholder: "E.g., HelloJob Co., Ltd.", backButton: "Back", continueButton: "Continue" },
     }[currentLang];
 
     return (
@@ -652,26 +603,16 @@ export function YL01Dialog({
             </DialogHeader>
             <div className="pt-4 max-w-sm mx-auto w-full">
                 <Label htmlFor="company-name">{content.label}</Label>
-                <Input
-                    id="company-name"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    placeholder={content.placeholder}
-                    className="mt-2"
-                />
+                <Input id="company-name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder={content.placeholder} className="mt-2" />
             </div>
              <div className="mt-6 flex justify-center gap-2">
-                <Button variant="outline" onClick={() => setStep(4)}>
-                    {content.backButton}
-                </Button>
-                <Button onClick={() => { if (companyName.trim()) setStep(6); }} disabled={!companyName.trim()}>
-                    {content.continueButton}
-                </Button>
+                <Button variant="outline" onClick={() => setStep(4)}>{content.backButton}</Button>
+                <Button onClick={() => { if (companyName.trim()) setStep(6); }} disabled={!companyName.trim()}>{content.continueButton}</Button>
             </div>
         </>
     )
   }
-
+  
   const renderMultiSelectStepDialog = (
     stepNumber: number,
     title: string,
@@ -690,7 +631,7 @@ export function YL01Dialog({
                 <DialogTitle className="text-2xl font-headline text-center">{title}</DialogTitle>
                 <DialogDescription className="text-center">{description}</DialogDescription>
             </DialogHeader>
-             <div className={`grid grid-cols-2 ${gridCols} gap-4 pt-4 max-h-80 overflow-y-auto`}>
+             <div className={cn("grid grid-cols-2 pt-4 gap-4 max-h-80 overflow-y-auto", gridCols)}>
                 {options.map((option) => (
                     <Card
                         key={option.id}
@@ -705,7 +646,7 @@ export function YL01Dialog({
                             </Badge>
                         )}
                         {option.icon && <option.icon className={cn("h-8 w-8 mx-auto mb-2", `text-${option.color}-500`)} />}
-                        <h3 className="font-bold text-base mb-1">{option.title}</h3>
+                        <h3 className="font-bold text-base mb-1">{option.name[currentLang]}</h3>
                         {option.desc && <p className="text-muted-foreground text-xs flex-grow">{option.desc}</p>}
                     </Card>
                 ))}
@@ -732,26 +673,27 @@ export function YL01Dialog({
       case 4: return renderNameInputStepDialog();
       case 5: return renderCompanyNameStepDialog();
       case 6:
-        const visaOptions = visaTypeContent[currentLang].options.map(o => ({...o, name: {vi: o.title, ja: o.title, en: o.title}}));
-        return renderMultiSelectStepDialog(6, 'Bạn muốn tuyển loại Visa nào?', 'Chọn một hoặc nhiều loại visa theo thứ tự ưu tiên.', visaOptions, selectedVisa, setSelectedVisa, 7, 5, 'md:grid-cols-3');
+        const visaOptions = visaTypeContent[currentLang].options.map(o => ({...o, name: visaTypeContent['vi'].options.find(v => v.id === o.id)!.title}));
+        return renderMultiSelectStepDialog(6, 'Bạn muốn tuyển loại Visa nào?', 'Chọn một hoặc nhiều loại visa theo thứ tự ưu tiên.', visaOptions as any, selectedVisa, setSelectedVisa, 7, selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2, 'md:grid-cols-3');
       case 7:
         const visaDetailOptions = selectedVisa.flatMap(vSlug => visaDetailsByVisaType[vSlug] || []).map(o => ({id: o.slug, title: o.name, name: {vi: o.name, ja: o.name, en: o.name}}));
-        return renderMultiSelectStepDialog(7, 'Chọn chi tiết loại hình visa', 'Bạn có thể chọn nhiều loại hình chi tiết.', visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
+        return renderMultiSelectStepDialog(7, 'Chọn chi tiết loại hình visa', 'Bạn có thể chọn nhiều loại hình chi tiết, sắp xếp theo thứ tự ưu tiên.', visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
       case 8:
-        const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug] || []).map(item => [item.slug, item])).values()).map(o => ({id: o.slug, title: o.name[currentLang], name: o.name}));
-        return renderMultiSelectStepDialog(8, 'Chọn ngành nghề', 'Lựa chọn các ngành nghề bạn muốn tuyển.', industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
+        const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({id: o.slug, title: o.name[currentLang], name: o.name}));
+        return renderMultiSelectStepDialog(8, industryContent[currentLang].title, industryContent[currentLang].description, industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
       case 9:
          const regionOptions = japanRegions.map(r => ({id: r.toLowerCase(), title: r, name: {vi:r, ja: r, en:r}}));
+         const content = regionContent[currentLang];
          return (
              <>
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-headline text-center">Chọn khu vực làm việc</DialogTitle>
-                    <DialogDescription className="text-center">Bạn có thể chọn nhiều khu vực.</DialogDescription>
+                    <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                    <DialogDescription className="text-center">{content.description}</DialogDescription>
                 </DialogHeader>
                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                      {regionOptions.map(option => (
-                        <Card 
-                            key={option.id} 
+                        <Card
+                            key={option.id}
                             onClick={() => handleMultiSelect(option.id, selectedRegion, setSelectedRegion)}
                             className={cn(
                                 "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
@@ -768,13 +710,13 @@ export function YL01Dialog({
                     ))}
                 </div>
                 <div className="flex justify-center items-center mt-6 gap-4">
-                    <Button variant="link" onClick={() => setStep(8)}>Quay lại</Button>
+                    <Button variant="link" onClick={() => setStep(8)}>{content.backButton}</Button>
                     <Button 
                         className="bg-accent-orange text-white hover:bg-accent-orange/90"
                         onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion)} 
                         disabled={selectedRegion.length === 0}
                     >
-                        Hoàn tất & Xem trang đối tác
+                        {content.completeButton}
                     </Button>
                 </div>
             </>
@@ -795,3 +737,4 @@ export function YL01Dialog({
   );
 }
 
+    
