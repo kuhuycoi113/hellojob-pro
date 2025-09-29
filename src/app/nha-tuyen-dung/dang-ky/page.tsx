@@ -188,15 +188,7 @@ const contentByLang = {
         phoneLabel: 'Số điện thoại',
         zaloLabel: 'Zalo',
         messengerLabel: 'Facebook Messenger',
-        messengerPlaceholder: 'Dán link Facebook / Messenger hoặc username',
-        messengerHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
-        lineLabel: 'Line',
-        linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
-        lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
-        notUpdated: 'Chưa có thông tin',
-        clickToUpdate: 'Nhấn để cập nhật',
-        headerTitle: 'Thông tin chung',
-        namePlaceholder: 'Ví dụ: Nguyễn Văn An',
+        messengerPlaceholder: 'Ví dụ: Nguyễn Văn An',
         companyNamePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
         typePlaceholder: 'Ví dụ: Công ty phái cử',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
@@ -211,6 +203,15 @@ const contentByLang = {
         visaTitle: 'Loại hình và Visa',
         visaTypeLabel: 'Loại hình',
         visaDetailLabel: 'Chi tiết loại hình visa',
+        messengerHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
+        lineLabel: 'Line',
+        linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
+        lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
+        notUpdated: 'Chưa có thông tin',
+        clickToUpdate: 'Nhấn để cập nhật',
+        headerTitle: 'Thông tin chung',
+        namePlaceholder: 'Ví dụ: Nguyễn Văn An',
+
     },
     ja: {
         edit: '編集',
@@ -249,6 +250,9 @@ const contentByLang = {
         visaTitle: '種別とビザ',
         visaTypeLabel: '種別',
         visaDetailLabel: 'ビザ詳細',
+        messengerHelper: 'システムが自動的にユーザー名を取得します。',
+        linePlaceholder: 'LineのリンクまたはIDを入力してください',
+        lineHelper: 'システムが自動的にユーザー名を取得します。',
     },
     en: {
         edit: 'Edit',
@@ -287,6 +291,9 @@ const contentByLang = {
         visaTitle: 'Type and Visa',
         visaTypeLabel: 'Type',
         visaDetailLabel: 'Visa Details',
+        messengerHelper: 'The system will automatically extract your username.',
+        linePlaceholder: 'Paste Line link or enter your ID',
+        lineHelper: 'The system will automatically extract your username.',
     }
 };
 
@@ -368,6 +375,14 @@ const roleTexts: Record<string, Record<Language, string>> = {
   'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
 };
 
+const interestTexts: Record<string, Record<Language, string>> = {
+    'post-job': { vi: 'Đăng việc làm', ja: '求人掲載', en: 'Post a Job' },
+    'refer-candidate': { vi: 'Giới thiệu ứng viên', ja: '候補者紹介', en: 'Refer a Candidate' },
+    'post-and-refer': { vi: 'Đăng việc làm & Giới thiệu ứng viên', ja: '求人掲載と候補者紹介', en: 'Post Job & Refer Candidate' },
+    'refer-and-post': { vi: 'Giới thiệu ứng viên & Đăng việc làm', ja: '候補者紹介と求人掲載', en: 'Refer Candidate & Post Job' },
+};
+
+
 
 const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void }) => (
     <Card className={cn("shadow-lg", className)}>
@@ -381,7 +396,7 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
         </CardHeader>
         <CardContent>{children}</CardContent>
     </Card>
-);
+)
 
 const formatPhoneNumberInput = (value: string, country: string): string => {
     if (!value) return '';
@@ -421,12 +436,38 @@ export default function EmployerDetailPage() {
   const [roleFromUrl, setRoleFromUrl] = useState<string | null>(null);
   const [isIndividual, setIsIndividual] = useState(false);
   const [displayName, setDisplayName] = useState('');
+  const [roleText, setRoleText] = useState('');
   
+  const handleLangChange = (lang: Language) => {
+    setLang(lang);
+    
+    if (isIndividual) {
+        const interestParam = searchParams.get('interest');
+        const roleParam = searchParams.get('role');
+        const companyNameParam = searchParams.get('company_name');
+        
+        const interestText = (interestParam && interestTexts[interestParam]) ? interestTexts[interestParam][lang] : '';
+        const roleText = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][lang] : '';
+        const companyText = companyNameParam || '';
+        
+        let combinedRoleText = interestText;
+        if(roleText) combinedRoleText += ` - ${roleText}`;
+        if(companyText) combinedRoleText += ` - ${companyText}`;
+        setRoleText(combinedRoleText);
+    } else {
+        const roleParam = searchParams.get('role');
+        const organizationRoleText = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][lang] : '';
+        setRoleText(organizationRoleText);
+    }
+  };
+
   useEffect(() => {
     const langFromParams = (searchParams.get('lang') || 'vi') as Language;
     const roleParam = searchParams.get('role');
+    const subRoleParam = searchParams.get('sub_role');
     const nameParam = searchParams.get('name');
     const companyNameParam = searchParams.get('company_name');
+    const interestParam = searchParams.get('interest');
     
     setLang(langFromParams);
     setRoleFromUrl(roleParam);
@@ -446,13 +487,25 @@ export default function EmployerDetailPage() {
     if (isIndividualRole) {
         employerData.name = { vi: nameParam, ja: nameParam, en: nameParam };
         setDisplayName(nameParam || '');
+        // Construct composite role text for individuals
+        const interestText = (interestParam && interestTexts[interestParam]) ? interestTexts[interestParam][langFromParams] : '';
+        const roleText = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][langFromParams] : '';
+        const subRoleText = (subRoleParam && roleTexts[subRoleParam]) ? roleTexts[subRoleParam][langFromParams] : '';
+        const companyText = companyNameParam || '';
+        
+        let combinedRoleText = interestText;
+        if(roleText) combinedRoleText += ` - ${roleText}`;
+        // If subRole exists, it might be more specific. Let's decide how to show it.
+        // For this logic, let's just append the company name.
+        if(companyText) combinedRoleText += ` - ${companyText}`;
+        setRoleText(combinedRoleText);
+
     } else {
         employerData.name = { vi: companyNameParam, ja: companyNameParam, en: companyNameParam };
         setDisplayName(companyNameParam || '');
-    }
-
-    if (roleParam && roleTexts[roleParam]) {
-        employerData.type = roleTexts[roleParam];
+        // For organizations, the role is just the type
+        const organizationRoleText = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][langFromParams] : '';
+        setRoleText(organizationRoleText);
     }
     
     const visaTypes = searchParams.getAll('visa_type');
@@ -491,7 +544,7 @@ export default function EmployerDetailPage() {
   const [phoneCountry, setPhoneCountry] = useState('+84');
   const [zaloCountry, setZaloCountry] = useState('+84');
   const { toast } = useToast();
-  const [errors, setErrors] = useState<{ email?: string; messenger?: string, line?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; messenger?: string, line?: string }>();
 
   const handleTempArrayMultiLangChange = useCallback((index: number, field: string, value: string) => {
     setTempContent((prev: any[]) => {
@@ -508,11 +561,10 @@ export default function EmployerDetailPage() {
   }, [lang]);
 
   if (!employer) {
-      return <div>Loading...</div>; // Or a skeleton loader
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
   
   const t = contentByLang[lang] || contentByLang['vi'];
-  const roleText = (roleFromUrl && roleTexts[roleFromUrl]) ? roleTexts[roleFromUrl][lang] : employer.type[lang];
   const headerName = isIndividual ? (displayName || `[${t.namePlaceholder}]`) : (displayName || `[${t.companyNamePlaceholder}]`);
 
   const validateEmail = (email: string) => {
@@ -754,9 +806,9 @@ export default function EmployerDetailPage() {
                                      setErrors(prev => ({...prev, email: undefined}));
                                   }
                                 }}
-                                className={cn(errors.email && "border-destructive")}
+                                className={cn(errors?.email && "border-destructive")}
                               />
-                               {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                               {errors?.email && <p className="text-xs text-destructive">{errors.email}</p>}
                            </div>
                           <div className="space-y-2">
                               <Label htmlFor="phone" className="flex items-center gap-2">
@@ -798,10 +850,10 @@ export default function EmployerDetailPage() {
                                 value={tempContent.messenger}
                                 onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})}
                                 onBlur={(e) => validateField('messenger', e.target.value)}
-                                className={cn(errors.messenger && "border-destructive")}
+                                className={cn(errors?.messenger && "border-destructive")}
                             />
-                            {!errors.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
-                            {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
+                            {!errors?.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
+                            {errors?.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                          <div className="space-y-1">
                             <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
@@ -811,10 +863,10 @@ export default function EmployerDetailPage() {
                                 value={tempContent.line}
                                 onChange={(e) => setTempContent({...tempContent, line: e.target.value})}
                                 onBlur={(e) => validateField('line', e.target.value)}
-                                className={cn(errors.line && "border-destructive")}
+                                className={cn(errors?.line && "border-destructive")}
                             />
-                            {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
-                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
+                            {!errors?.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
+                             {errors?.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                       </div>
                       <div className="text-center mt-4">
@@ -822,7 +874,7 @@ export default function EmployerDetailPage() {
                       </div>
                   </div>
                 </div>
-            );
+             );
         case 'benefits':
              return (
                 <div className="space-y-4">
@@ -1105,7 +1157,11 @@ export default function EmployerDetailPage() {
       
       return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
     }
-     return <button className="italic text-primary underline" onClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>{t.clickToUpdate}</button>
+    const editTitle = fieldKey === 'industries' ? t.industriesTitle : t.visaTitle;
+    const editField = fieldKey === 'industries' ? 'industries' : 'visa';
+    const editData = fieldKey === 'industries' ? employer.industries : { visaType: employer.visaType, visaDetail: employer.visaDetail };
+
+    return <button className="italic text-primary underline" onClick={() => handleEditClick(editTitle, editData, editField)}>{t.clickToUpdate}</button>
   };
 
 
@@ -1128,7 +1184,7 @@ export default function EmployerDetailPage() {
                   </Label>
                 </div>
                 <div className="p-6 bg-card">
-                  <div className="flex items-start gap-4 -mt-24 md:-mt-20">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-24 md:-mt-20">
                       <div className="relative flex-shrink-0">
                         <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
                             <AvatarImage src={employer.logo} />
@@ -1139,13 +1195,24 @@ export default function EmployerDetailPage() {
                            </Label>
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
-                      <div className="flex-grow pt-24 md:pt-20 flex justify-between items-start">
-                          <div>
-                            <h1 id="DKY004&5" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                            <p className="font-semibold text-primary">{roleText}</p>
-                            <p className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
+                      <div className="flex-grow pt-4 sm:pt-0 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left w-full">
+                           <div className="flex flex-wrap justify-center sm:justify-start items-center gap-y-2 gap-x-4 mb-4 sm:mb-0 w-full">
+                                <div className="flex-grow">
+                                  <h1 id="DKY004&5" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
+                                  <p id="DKY001&2&5" className="font-semibold text-primary">{roleText}</p>
+                                  <p className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                     <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
+                                          <TabsList className="grid w-full grid-cols-3">
+                                              <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon className="w-4 h-4"/> <span className="hidden sm:inline">Tiếng Việt</span></TabsTrigger>
+                                              <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon className="w-4 h-4"/> <span className="hidden sm:inline">日本語</span></TabsTrigger>
+                                              <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon className="w-4 h-4"/> <span className="hidden sm:inline">English</span></TabsTrigger>
+                                          </TabsList>
+                                      </Tabs>
+                                 <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: employer.type, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
+                                </div>
                           </div>
-                           <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: employer.type, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
                       </div>
                   </div>
                 </div>
@@ -1263,7 +1330,7 @@ export default function EmployerDetailPage() {
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
-             <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="pt-4">
+             <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="pt-4">
                 <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="vi" className="flex items-center gap-2"><VnFlagIcon /> Tiếng Việt</TabsTrigger>
                     <TabsTrigger value="ja" className="flex items-center gap-2"><JpFlagIcon /> 日本語</TabsTrigger>
