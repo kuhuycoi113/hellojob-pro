@@ -1,7 +1,7 @@
-
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import * as React from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import * as chatData from '@/lib/chat-data';
 import type { CandidateProfile } from '@/ai/schemas';
 
