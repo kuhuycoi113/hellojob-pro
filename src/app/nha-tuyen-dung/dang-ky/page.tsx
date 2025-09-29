@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, use, useEffect, useCallback } from 'react';
@@ -779,7 +778,7 @@ export default function EmployerDetailPage() {
                                         <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, ''))} />
+                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
                                 <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
@@ -816,85 +815,6 @@ export default function EmployerDetailPage() {
                         <div className="text-sm text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                       </div>
                   </div>
-                </div>
-             );
-        case 'industries':
-            const currentMainIndustries = Array.isArray(tempContent.main[lang]) ? tempContent.main[lang] : [];
-            const currentSecondaryIndustries = Array.isArray(tempContent.secondary[lang]) ? tempContent.secondary[lang] : [];
-
-            const handleMainIndustryChange = (checked: boolean, industrySlug: string) => {
-                const newSelection = checked 
-                    ? [...currentMainIndustries, industrySlug] 
-                    : currentMainIndustries.filter((i: string) => i !== industrySlug);
-                setTempContent({ ...tempContent, main: { ...tempContent.main, [lang]: newSelection } });
-            };
-            
-            const handleSecondaryIndustryChange = (checked: boolean, regionSlug: string) => {
-                const newSelection = checked 
-                    ? [...currentSecondaryIndustries, regionSlug] 
-                    : currentSecondaryIndustries.filter((r: string) => r !== regionSlug);
-                setTempContent({ ...tempContent, secondary: { ...tempContent.secondary, [lang]: newSelection } });
-            };
-            const allIndustriesList = Object.values(industriesByJobType).flat();
-
-            return (
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label>{t.mainIndustriesLabel}</Label>
-                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                    {currentMainIndustries.length > 0 ? (
-                                        <div className="flex flex-wrap gap-1">
-                                            {currentMainIndustries.map((slug: string) => <Badge key={slug} variant="secondary">{(allIndustriesList.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)}
-                                        </div>
-                                    ) : `Chọn ${t.mainIndustriesLabel}`}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn ngành nghề</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {allIndustriesList.map(ind => (
-                                     <DropdownMenuCheckboxItem
-                                        key={ind.slug}
-                                        checked={currentMainIndustries.includes(ind.slug)}
-                                        onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleMainIndustryChange(checked, ind.slug)}
-                                    >
-                                        {ind.name[lang]}
-                                    </DropdownMenuCheckboxItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                     <div className="space-y-2">
-                        <Label>{t.secondaryIndustriesLabel}</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                    {currentSecondaryIndustries.length > 0 ? (
-                                        <div className="flex flex-wrap gap-1">
-                                            {currentSecondaryIndustries.map((slug: string) => <Badge key={slug} variant="secondary">{(japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)}
-                                        </div>
-                                    ) : `Chọn ${t.secondaryIndustriesLabel}`}
-                                </Button>
-                            </DropdownMenuTrigger>
-                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn khu vực</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {japanRegions.map(region => (
-                                     <DropdownMenuCheckboxItem
-                                        key={region.slug}
-                                        checked={currentSecondaryIndustries.includes(region.slug)}
-                                        onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleSecondaryIndustryChange(checked, region.slug)}
-                                    >
-                                        {region.name}
-                                    </DropdownMenuCheckboxItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
                 </div>
             );
         case 'benefits':
@@ -982,7 +902,7 @@ export default function EmployerDetailPage() {
                                         key={type.slug}
                                         checked={currentVisaTypes.includes(type.slug)}
                                         onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleVisaTypeChange(checked, type.slug)}
+                                        onCheckedChange={(checked) => handleVisaTypeChange(Boolean(checked), type.slug)}
                                     >
                                         {type.name}
                                     </DropdownMenuCheckboxItem>
@@ -1019,7 +939,7 @@ export default function EmployerDetailPage() {
                                                     key={detail.slug}
                                                     checked={currentVisaDetails.includes(detail.slug)}
                                                     onSelect={(e) => e.preventDefault()}
-                                                    onCheckedChange={(checked) => handleDetailCheckboxChange(checked, detail.slug)}
+                                                    onCheckedChange={(checked) => handleDetailCheckboxChange(Boolean(checked), detail.slug)}
                                                 >
                                                     {detail.name[lang]}
                                                 </DropdownMenuCheckboxItem>
@@ -1066,10 +986,13 @@ export default function EmployerDetailPage() {
       
       return value.map(slug => {
           const item = allItems.find((i: any) => i.slug === slug);
-          if (item && item.name && typeof item.name === 'object') {
+          if (item && 'name' in item && typeof item.name === 'object') {
             return item.name[lang];
           }
-          return item?.name || slug;
+          if (item && 'name' in item && typeof item.name === 'string') {
+             return item.name;
+          }
+          return slug;
       }).join(', ');
     }
     return '...';
