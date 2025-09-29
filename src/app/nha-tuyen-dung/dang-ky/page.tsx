@@ -30,7 +30,7 @@ import {
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
-import { Industry, industriesByJobType } from '@/lib/industry-data';
+import { Industry, industriesByJobType, allIndustries } from '@/lib/industry-data';
 import { japanRegions, allJapanLocations } from '@/lib/location-data';
 
 
@@ -1063,10 +1063,8 @@ export default function EmployerDetailPage() {
       
       const allVisaTypes = japanJobTypes;
       const allVisaDetails = Object.values(visaDetailsByVisaType).flat();
-      const allIndustriesList = Array.from(new Map(Object.values(industriesByJobType).flat().map(item => [item.slug, item])).values());
-      const allRegions = japanRegions;
       
-      const allItems = [...allVisaTypes, ...allVisaDetails, ...allIndustriesList, ...allRegions];
+      const allItems = [...allVisaTypes, ...allVisaDetails, ...allIndustries, ...japanRegions];
       
       return value.map(slug => {
           const item = allItems.find((i: any) => i.slug === slug);
