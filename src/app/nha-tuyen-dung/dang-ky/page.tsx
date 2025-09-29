@@ -1,7 +1,8 @@
 
+
 'use client';
 
-import { useState, use, useEffect } from 'react';
+import { useState, use, useEffect, useCallback } from 'react';
 import { notFound, useSearchParams, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
+import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { Industry, industriesByJobType } from '@/lib/industry-data';
+import { japanRegions, allJapanLocations } from '@/lib/location-data';
 
 
 const employersData: { [key: string]: any } = {
@@ -45,14 +49,14 @@ const employersData: { [key: string]: any } = {
             en: 'Dispatch Company'
         },
         visaType: {
-            vi: 'Thực tập sinh & Đặc định',
-            ja: '技能実習・特定技能',
-            en: 'Trainee & Specified Skilled Worker'
+            vi: ['thuc-tap-sinh-ky-nang', 'ky-nang-dac-dinh'],
+            ja: ['thuc-tap-sinh-ky-nang', 'ky-nang-dac-dinh'],
+            en: ['thuc-tap-sinh-ky-nang', 'ky-nang-dac-dinh']
         },
         visaDetail: {
-            vi: 'TTS 3 năm, Đặc định ngành Thực phẩm, Đặc định ngành Xây dựng',
-            ja: '技能実習3年、特定技能（飲食料品製造業）',
-            en: '3-Year Trainee, SSW (Food & Beverage Manufacturing)'
+            vi: ['thuc-tap-sinh-3-nam', 'dac-dinh-thuc-pham', 'dac-dinh-xay-dung'],
+            ja: ['thuc-tap-sinh-3-nam', 'dac-dinh-thuc-pham', 'dac-dinh-xay-dung'],
+            en: ['thuc-tap-sinh-3-nam', 'dac-dinh-thuc-pham', 'dac-dinh-xay-dung']
         },
         location: {
             vi: 'Hà Nội, Việt Nam',
@@ -91,8 +95,8 @@ const employersData: { [key: string]: any } = {
         },
 
         industries: {
-            main: { vi: '', ja: '', en: '' },
-            secondary: { vi: '', ja: '', en: '' },
+            main: { vi: [], ja: [], en: [] },
+            secondary: { vi: [], ja: [], en: [] },
         },
 
         benefits: [
@@ -108,21 +112,6 @@ const placeholderEmployerData = {
         vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
         ja: 'ABC派遣会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。長年の経験により、私たちは何千人ものベトナム人労働者の夢を支援してきたことを誇りに思っています...',
         en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\' dreams take flight...'
-    },
-    visaDetailsByVisaType: {
-        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
-    },
-    visaType: {
-        vi: 'Thực tập sinh, Kỹ năng đặc định',
-        ja: '技能実習、特定技能',
-        en: 'Technical Intern, Specified Skilled Worker'
-    },
-    visaDetail: {
-        vi: 'TTS 3 năm, Đặc định ngành Thực phẩm, Đặc định ngành Xây dựng',
-        ja: '技能実習3年、特定技能（飲食料品）、特定技能（建設）',
-        en: '3-Year Intern, SSW (Food), SSW (Construction)'
     },
     images: [
         { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
@@ -143,8 +132,8 @@ const placeholderEmployerData = {
         website: 'https://abc-corp.co.jp',
     },
     industries: {
-        main: { vi: 'Xây dựng, Cơ khí, Nông nghiệp, Thực phẩm', ja: '建設、機械、農業、食品', en: 'Construction, Machinery, Agriculture, Food' },
-        secondary: { vi: 'Dệt may, Điện tử', ja: '繊維、電子', en: 'Textiles, Electronics' },
+        main: { vi: ['xay-dung', 'co-khi-che-tao-may-tokutei'], ja: ['xay-dung', 'co-khi-che-tao-may-tokutei'], en: ['xay-dung', 'co-khi-che-tao-may-tokutei'] },
+        secondary: { vi: ['kanto'], ja: ['kanto'], en: ['kanto'] },
     },
     benefits: [
         { vi: 'Môi trường làm việc chuyên nghiệp, thân thiện.', ja: 'プロフェッショナルでフレンドリーな職場環境。', en: 'Professional and friendly working environment.' },
@@ -164,8 +153,9 @@ const emptyEmployerData = {
     id: 'Z000',
     name: { vi: '', ja: '', en: '' },
     type: { vi: '', ja: '', en: '' },
-    visaType: { vi: '', ja: '', en: '' },
-    visaDetail: { vi: '', ja: '', en: '' },
+    visaType: { vi: [], ja: [], en: [] }, // Changed to array
+    visaDetail: { vi: [], ja: [], en: [] }, // Changed to array
+    industries: { main: { vi: [], ja: [], en: [] }, secondary: { vi: [], ja: [], en: [] } },
     location: { vi: '', ja: '', en: '' },
     logo: '/img/viet-img/company3.png',
     banner: '/img/viet-img/anh-bia.jpg',
@@ -178,7 +168,6 @@ const emptyEmployerData = {
     ],
     history: [],
     info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '', phone: '', zalo: '', messenger: '', line: '', email: '' },
-    industries: { main: { vi: '', ja: '', en: '' }, secondary: { vi: '', ja: '', en: '' } },
     benefits: [],
     valueInterest: [],
 };
@@ -439,13 +428,9 @@ export default function EmployerDetailPage() {
     let employerData;
     // Set initial data based on whether there are query params
     if (Array.from(searchParams.keys()).length > 0) {
-        employerData = {
-          ...placeholderEmployerData,
-          logo: emptyEmployerData.logo,
-          banner: emptyEmployerData.banner
-        };
+        employerData = JSON.parse(JSON.stringify(emptyEmployerData));
     } else {
-        employerData = placeholderEmployerData;
+        employerData = JSON.parse(JSON.stringify(placeholderEmployerData));
     }
 
     const finalEmployerData = { ...employerData };
@@ -458,36 +443,37 @@ export default function EmployerDetailPage() {
     const visaTypes = searchParams.getAll('visa_type');
     if (visaTypes.length > 0) {
         finalEmployerData.visaType = {
-            vi: visaTypes.join(', '),
-            ja: visaTypes.join(', '),
-            en: visaTypes.join(', ')
+            vi: visaTypes,
+            ja: visaTypes,
+            en: visaTypes,
         };
     }
     
     const visaDetails = searchParams.getAll('visa_detail');
     if (visaDetails.length > 0) {
         finalEmployerData.visaDetail = {
-            vi: visaDetails.join(', '),
-            ja: visaDetails.join(', '),
-            en: visaDetails.join(', ')
+            vi: visaDetails,
+            ja: visaDetails,
+            en: visaDetails,
         };
     }
     
+    const allIndustriesList = Object.values(industriesByJobType).flat();
     const industries = searchParams.getAll('industry');
     if (industries.length > 0) {
         finalEmployerData.industries.main = {
-            vi: industries.join(', '),
-            ja: industries.join(', '),
-            en: industries.join(', ')
+            vi: industries,
+            ja: industries,
+            en: industries,
         };
     }
 
     const locations = searchParams.getAll('location');
     if (locations.length > 0) {
         finalEmployerData.industries.secondary = {
-            vi: locations.join(', '),
-            ja: locations.join(', '),
-            en: locations.join(', ')
+             vi: locations,
+             ja: locations,
+             en: locations,
         };
     }
     
@@ -508,6 +494,20 @@ export default function EmployerDetailPage() {
   const [zaloCountry, setZaloCountry] = useState('+84');
   const { toast } = useToast();
   const [errors, setErrors] = useState<{ email?: string; messenger?: string, line?: string }>({});
+
+  const handleTempArrayMultiLangChange = useCallback((index: number, field: string, value: string) => {
+    setTempContent((prev: any[]) => {
+      const newArray = [...prev];
+      newArray[index] = {
+        ...newArray[index],
+        [field]: {
+          ...newArray[index][field],
+          [lang]: value
+        }
+      };
+      return newArray;
+    });
+  }, [lang]);
 
   if (!employer) {
       return <div>Loading...</div>; // Or a skeleton loader
@@ -587,8 +587,8 @@ export default function EmployerDetailPage() {
             if (finalInfo.zalo) finalInfo.zalo = parseZaloInput(finalInfo.zalo);
             newState[field] = finalInfo;
         } else if (field === 'visa') {
-             newState.visaType = { ...newState.visaType, [lang]: Array.isArray(tempContent.visaType) ? tempContent.visaType.join(', ') : tempContent.visaType };
-             newState.visaDetail = { ...newState.visaDetail, [lang]: Array.isArray(tempContent.visaDetail) ? tempContent.visaDetail.join(', ') : tempContent.visaDetail };
+             newState.visaType = tempContent.visaType;
+             newState.visaDetail = tempContent.visaDetail;
         } else if (field === 'valueInterest') {
             newState.valueInterest = tempContent.split('\n').map((item: string) => ({ vi: item, ja: item, en: item }));
         } else {
@@ -779,7 +779,7 @@ export default function EmployerDetailPage() {
                                         <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, ''))} />
                                 <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
@@ -819,10 +819,82 @@ export default function EmployerDetailPage() {
                 </div>
              );
         case 'industries':
+            const currentMainIndustries = Array.isArray(tempContent.main[lang]) ? tempContent.main[lang] : [];
+            const currentSecondaryIndustries = Array.isArray(tempContent.secondary[lang]) ? tempContent.secondary[lang] : [];
+
+            const handleMainIndustryChange = (checked: boolean, industrySlug: string) => {
+                const newSelection = checked 
+                    ? [...currentMainIndustries, industrySlug] 
+                    : currentMainIndustries.filter((i: string) => i !== industrySlug);
+                setTempContent({ ...tempContent, main: { ...tempContent.main, [lang]: newSelection } });
+            };
+            
+            const handleSecondaryIndustryChange = (checked: boolean, regionSlug: string) => {
+                const newSelection = checked 
+                    ? [...currentSecondaryIndustries, regionSlug] 
+                    : currentSecondaryIndustries.filter((r: string) => r !== regionSlug);
+                setTempContent({ ...tempContent, secondary: { ...tempContent.secondary, [lang]: newSelection } });
+            };
+            const allIndustriesList = Object.values(industriesByJobType).flat();
+
             return (
                 <div className="space-y-4">
-                    <div className="space-y-2"><Label>{t.mainIndustriesLabel}</Label><Textarea className="min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.main[lang]}`} value={tempContent.main[lang] || ''} onChange={(e) => setTempContent(prev => ({...prev, main: {...prev.main, [lang]: e.target.value}}))} /></div>
-                    <div className="space-y-2"><Label>{t.secondaryIndustriesLabel}</Label><Textarea className="min-h-[40px]" placeholder={`Ví dụ: ${placeholderEmployerData.industries.secondary[lang]}`} value={tempContent.secondary[lang] || ''} onChange={(e) => setTempContent(prev => ({...prev, secondary: {...prev.secondary, [lang]: e.target.value}}))} /></div>
+                    <div className="space-y-2">
+                        <Label>{t.mainIndustriesLabel}</Label>
+                         <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                    {currentMainIndustries.length > 0 ? (
+                                        <div className="flex flex-wrap gap-1">
+                                            {currentMainIndustries.map((slug: string) => <Badge key={slug} variant="secondary">{(allIndustriesList.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)}
+                                        </div>
+                                    ) : `Chọn ${t.mainIndustriesLabel}`}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn ngành nghề</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {allIndustriesList.map(ind => (
+                                     <DropdownMenuCheckboxItem
+                                        key={ind.slug}
+                                        checked={currentMainIndustries.includes(ind.slug)}
+                                        onSelect={(e) => e.preventDefault()}
+                                        onCheckedChange={(checked) => handleMainIndustryChange(checked, ind.slug)}
+                                    >
+                                        {ind.name[lang]}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                     <div className="space-y-2">
+                        <Label>{t.secondaryIndustriesLabel}</Label>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                    {currentSecondaryIndustries.length > 0 ? (
+                                        <div className="flex flex-wrap gap-1">
+                                            {currentSecondaryIndustries.map((slug: string) => <Badge key={slug} variant="secondary">{(japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)}
+                                        </div>
+                                    ) : `Chọn ${t.secondaryIndustriesLabel}`}
+                                </Button>
+                            </DropdownMenuTrigger>
+                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn khu vực</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {japanRegions.map(region => (
+                                     <DropdownMenuCheckboxItem
+                                        key={region.slug}
+                                        checked={currentSecondaryIndustries.includes(region.slug)}
+                                        onSelect={(e) => e.preventDefault()}
+                                        onCheckedChange={(checked) => handleSecondaryIndustryChange(checked, region.slug)}
+                                    >
+                                        {region.name}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
             );
         case 'benefits':
@@ -861,24 +933,29 @@ export default function EmployerDetailPage() {
                 </div>
              );
         case 'visa':
-            const currentVisaTypes = Array.isArray(tempContent.visaType?.[lang])
-                ? tempContent.visaType[lang]
-                : (tempContent.visaType?.[lang] || '').split(',').map((s:string) => s.trim()).filter(Boolean);
-
-            const handleCheckboxChange = (checked: boolean, type: string) => {
+            const currentVisaTypes = Array.isArray(tempContent.visaType?.[lang]) ? tempContent.visaType[lang] : [];
+            const handleVisaTypeChange = (checked: boolean, typeSlug: string) => {
                 const newSelection = checked
-                    ? [...currentVisaTypes, type]
-                    : currentVisaTypes.filter((item: string) => item !== type);
-                setTempContent({ ...tempContent, visaType: { ...tempContent.visaType, [lang]: newSelection } });
+                    ? [...currentVisaTypes, typeSlug]
+                    : currentVisaTypes.filter((slug: string) => slug !== typeSlug);
+
+                const newVisaDetails = tempContent.visaDetail[lang].filter((detailSlug: string) => 
+                    newSelection.some(visaSlug => 
+                        (visaDetailsByVisaType[visaSlug] || []).some(detail => detail.slug === detailSlug)
+                    )
+                );
+
+                setTempContent({
+                    visaType: { ...tempContent.visaType, [lang]: newSelection },
+                    visaDetail: { ...tempContent.visaDetail, [lang]: newVisaDetails }
+                });
             };
-            const currentVisaDetails = Array.isArray(tempContent.visaDetail?.[lang])
-                ? tempContent.visaDetail[lang]
-                : (tempContent.visaDetail?.[lang] || '').split(',').map((s: string) => s.trim()).filter(Boolean);
 
-            const handleDetailCheckboxChange = (checked: boolean, detail: string) => {
+            const currentVisaDetails = Array.isArray(tempContent.visaDetail?.[lang]) ? tempContent.visaDetail[lang] : [];
+            const handleDetailCheckboxChange = (checked: boolean, detailSlug: string) => {
                 const newSelection = checked
-                    ? [...currentVisaDetails, detail]
-                    : currentVisaDetails.filter((item: string) => item !== detail);
+                    ? [...currentVisaDetails, detailSlug]
+                    : currentVisaDetails.filter((slug: string) => slug !== detailSlug);
                 setTempContent({ ...tempContent, visaDetail: { ...tempContent.visaDetail, [lang]: newSelection } });
             };
 
@@ -892,7 +969,7 @@ export default function EmployerDetailPage() {
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
                                     {currentVisaTypes.length > 0 ? (
                                         <div className="flex flex-wrap gap-1">
-                                            {currentVisaTypes.map((visa: string) => <Badge key={visa} variant="secondary">{visa}</Badge>)}
+                                            {currentVisaTypes.map((slug: string) => <Badge key={slug} variant="secondary">{(japanJobTypes.find(t => t.slug === slug))?.name || slug}</Badge>)}
                                         </div>
                                     ) : `Chọn ${t.visaTypeLabel}`}
                                 </Button>
@@ -900,14 +977,14 @@ export default function EmployerDetailPage() {
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
                                 <DropdownMenuLabel>Chọn loại hình</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {['Thực tập sinh kỹ năng', 'Kỹ năng đặc định', 'Kỹ sư, tri thức'].map(type => (
+                                {japanJobTypes.map(type => (
                                      <DropdownMenuCheckboxItem
-                                        key={type}
-                                        checked={currentVisaTypes.includes(type)}
+                                        key={type.slug}
+                                        checked={currentVisaTypes.includes(type.slug)}
                                         onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleCheckboxChange(checked, type)}
+                                        onCheckedChange={(checked) => handleVisaTypeChange(checked, type.slug)}
                                     >
-                                        {type}
+                                        {type.name}
                                     </DropdownMenuCheckboxItem>
                                 ))}
                             </DropdownMenuContent>
@@ -920,7 +997,10 @@ export default function EmployerDetailPage() {
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0}>
                                     {currentVisaDetails.length > 0 ? (
                                         <div className="flex flex-wrap gap-1">
-                                            {currentVisaDetails.map((detail: string) => <Badge key={detail} variant="secondary">{detail}</Badge>)}
+                                            {currentVisaDetails.map((slug: string) => {
+                                                const detail = Object.values(visaDetailsByVisaType).flat().find(d => d.slug === slug);
+                                                return <Badge key={slug} variant="secondary">{detail?.name[lang] || slug}</Badge>
+                                            })}
                                         </div>
                                     ) : `Chọn ${t.visaDetailLabel}`}
                                 </Button>
@@ -928,21 +1008,25 @@ export default function EmployerDetailPage() {
                              <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
                                 <DropdownMenuLabel>Chọn chi tiết</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {currentVisaTypes.map((visaType: string) => (
-                                    <DropdownMenuGroup key={visaType}>
-                                        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">{visaType}</DropdownMenuLabel>
-                                        {(placeholderEmployerData.visaDetailsByVisaType[visaType] || []).map((detail: string) => (
-                                             <DropdownMenuCheckboxItem
-                                                key={detail}
-                                                checked={currentVisaDetails.includes(detail)}
-                                                onSelect={(e) => e.preventDefault()}
-                                                onCheckedChange={(checked) => handleDetailCheckboxChange(checked, detail)}
-                                            >
-                                                {detail}
-                                            </DropdownMenuCheckboxItem>
-                                        ))}
-                                    </DropdownMenuGroup>
-                                ))}
+                                {currentVisaTypes.map((visaTypeSlug: string) => {
+                                    const visaType = japanJobTypes.find(t => t.slug === visaTypeSlug);
+                                    if (!visaType) return null;
+                                    return (
+                                        <DropdownMenuGroup key={visaTypeSlug}>
+                                            <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">{visaType.name}</DropdownMenuLabel>
+                                            {(visaDetailsByVisaType[visaTypeSlug] || []).map((detail: any) => (
+                                                <DropdownMenuCheckboxItem
+                                                    key={detail.slug}
+                                                    checked={currentVisaDetails.includes(detail.slug)}
+                                                    onSelect={(e) => e.preventDefault()}
+                                                    onCheckedChange={(checked) => handleDetailCheckboxChange(checked, detail.slug)}
+                                                >
+                                                    {detail.name[lang]}
+                                                </DropdownMenuCheckboxItem>
+                                            ))}
+                                        </DropdownMenuGroup>
+                                    )
+                                })}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -966,6 +1050,31 @@ export default function EmployerDetailPage() {
       }
       return phone;
   }
+
+  const getArrayValue = (field: any) => {
+    const value = field?.[lang] || [];
+    if (Array.isArray(value) && value.length > 0) {
+      if (typeof value[0] === 'object') {
+        return value.map(item => item[lang]).join(', ');
+      }
+      const allItems = [
+        ...japanJobTypes, 
+        ...Object.values(visaDetailsByVisaType).flat(), 
+        ...Object.values(industriesByJobType).flat(), 
+        ...japanRegions
+      ];
+      
+      return value.map(slug => {
+          const item = allItems.find((i: any) => i.slug === slug);
+          if (item && item.name && typeof item.name === 'object') {
+            return item.name[lang];
+          }
+          return item?.name || slug;
+      }).join(', ');
+    }
+    return '...';
+  };
+
 
   return (
     <>
@@ -1017,7 +1126,7 @@ export default function EmployerDetailPage() {
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
-                   <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest.map((i: any) => i.vi).join('\n'), 'valueInterest')}>
+                   <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest.map((i: any) => i[lang]).join('\n'), 'valueInterest')}>
                     {employer.valueInterest?.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
                             {employer.valueInterest.map((item: any, index: number) => (
@@ -1099,14 +1208,14 @@ export default function EmployerDetailPage() {
                   </SectionCard>
                   <SectionCard title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
-                          <p><strong>{t.visaTypeLabel}:</strong> {employer.visaType[lang] || '...'}</p>
-                          <p><strong>{t.visaDetailLabel}:</strong> {employer.visaDetail[lang] || '...'}</p>
+                          <p><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType)}</p>
+                          <p><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail)}</p>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <p><strong>{t.mainIndustriesLabel}:</strong> {employer.industries.main[lang] || '...'}</p>
-                          <p><strong>{t.secondaryIndustriesLabel}:</strong> {employer.industries.secondary[lang] || '...'}</p>
+                          <p><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main)}</p>
+                          <p><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary)}</p>
                       </div>
                   </SectionCard>
               </div>
@@ -1145,4 +1254,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
