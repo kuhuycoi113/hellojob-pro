@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
-import { Industry, allIndustries } from '@/lib/industry-data';
+import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { japanRegions } from '@/lib/location-data';
 
 
@@ -1044,7 +1044,7 @@ export default function EmployerDetailPage() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                     <div className="space-y-2">
+                     <div className="space-y-2" id="DKY009">
                         <Label>{t.secondaryIndustriesLabel}</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -1298,3 +1298,4 @@ export default function EmployerDetailPage() {
     </>
   );
 }
+
