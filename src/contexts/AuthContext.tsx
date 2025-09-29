@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, type ReactNode, useEffect, useCallback, useState } from 'react';
+import React, { createContext, useContext, type ReactNode, useEffect, useCallback } from 'react';
 import * as chatData from '@/lib/chat-data';
 import type { CandidateProfile } from '@/ai/schemas';
 
@@ -135,11 +135,11 @@ const partialCandidateProfile: Partial<CandidateProfile> = {
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [role, setInternalRole] = useState<Role>('guest');
-  const [postLoginAction, setPostLoginAction] = useState<PostLoginAction>(null);
-  const [profileName, setProfileName] = useState<string | null>(null);
-  const [profileHeadline, setProfileHeadline] = useState<string | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [role, setInternalRole] = React.useState<Role>('guest');
+  const [postLoginAction, setPostLoginAction] = React.useState<PostLoginAction>(null);
+  const [profileName, setProfileName] = React.useState<string | null>(null);
+  const [profileHeadline, setProfileHeadline] = React.useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = React.useState<string | null>(null);
   const isLoggedIn = role !== 'guest';
 
   const updateProfileInfoFromStorage = useCallback(() => {
