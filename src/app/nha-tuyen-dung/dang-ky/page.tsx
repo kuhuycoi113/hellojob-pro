@@ -30,8 +30,8 @@ import {
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
-import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
+import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
 
 
@@ -318,37 +318,38 @@ const valueInterestOptions = {
 };
 
 const visaTypeContent = {
-  vi: {
-    title: 'Bạn muốn tuyển loại Visa nào?',
-    description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
-    description_single: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
-    options: [
-      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
-      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Kỹ sư, tri thức', desc: 'Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.', color: 'green' },
-    ]
-  },
-  ja: {
-    title: 'どのビザタイプを募集しますか？',
-    description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
-    description_single: '採用ニーズに最も適したビザタイプを選択してください。',
-    options: [
-      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
-      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門知識を持つ専門家を採用。', color: 'green' },
-    ]
-  },
-  en: {
-    title: 'Which Visa Type do you want to recruit?',
-    description: 'You can select multiple items. The first selection is priority #1.',
-    description_single: 'Please select the visa type that best suits your recruitment needs.',
-    options: [
-      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
-      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
-    ]
-  }
+    vi: {
+        title: 'Bạn muốn tuyển loại Visa nào?',
+        description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
+        description_single: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
+        options: [
+        { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
+        { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
+        { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Kỹ sư, tri thức', desc: 'Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.', color: 'green' },
+        ]
+    },
+    ja: {
+        title: 'どのビザタイプを募集しますか？',
+        description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
+        description_single: '採用ニーズに最も適したビザタイプを選択してください。',
+        options: [
+        { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
+        { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
+        { id: 'ky-su-tri-thuc', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門知識を持つ専門家を採用。', color: 'green' },
+        ]
+    },
+    en: {
+        title: 'Which Visa Type do you want to recruit?',
+        description: 'You can select multiple items. The first selection is priority #1.',
+        description_single: 'Please select the visa type that best suits your recruitment needs.',
+        options: [
+        { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
+        { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
+        { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
+        ]
+    }
 };
+
 
 
 type Language = keyof typeof contentByLang;
@@ -959,25 +960,32 @@ export default function EmployerDetailPage() {
                 <div className="space-y-4">
                      <div className="space-y-2" id="DKY006">
                         <Label>{t.visaTypeLabel}</Label>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                           {visaTypeContent[lang].options.map(option => {
-                                const isSelected = currentVisaTypes.includes(option.id);
-                                const selectionOrder = isSelected ? currentVisaTypes.indexOf(option.id) + 1 : 0;
-                                const iconColors = { orange: 'text-orange-500', blue: 'text-blue-500', green: 'text-green-500' };
-                                return (
-                                    <Card 
-                                        key={option.id} 
-                                        onClick={() => handleVisaTypeChange(!isSelected, option.id)}
-                                        className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative", isSelected && "ring-2 ring-primary border-primary bg-primary/10")}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                    {currentVisaTypes.length > 0 ? (
+                                        <div className="flex flex-wrap gap-1">
+                                            {currentVisaTypes.map((slug: string, index: number) => <Badge key={slug} variant="secondary">{index + 1}. {(japanJobTypes.find(t => t.slug === slug))?.name}</Badge>)}
+                                        </div>
+                                    ) : `Chọn ${t.visaTypeLabel}`}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn loại hình</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {japanJobTypes.map(type => (
+                                    <DropdownMenuCheckboxItem
+                                        key={type.slug}
+                                        checked={currentVisaTypes.includes(type.slug)}
+                                        onSelect={(e) => e.preventDefault()}
+                                        onCheckedChange={(checked) => handleVisaTypeChange(Boolean(checked), type.slug)}
                                     >
-                                        {isSelected && <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">{selectionOrder}</Badge>}
-                                        <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
-                                        <h3 className="font-bold text-base mb-1">{option.title}</h3>
-                                        <p className="text-muted-foreground text-xs flex-grow">{option.desc}</p>
-                                    </Card>
-                                );
-                           })}
-                        </div>
+                                       <span className="font-bold w-6 mr-2">{currentVisaTypes.includes(type.slug) ? `${currentVisaTypes.indexOf(type.slug) + 1}.` : ''}</span>
+                                        {type.name}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                      <div className="space-y-2" id="DKY007">
                         <Label>{t.visaDetailLabel}</Label>
@@ -1153,7 +1161,7 @@ export default function EmployerDetailPage() {
           );
       });
       
-      return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
+      return <p className="flex flex-wrap gap-1 mt-1">{content}</p>;
     }
     return <span className="italic text-muted-foreground">{t.notUpdated}</span>;
   };
@@ -1291,14 +1299,14 @@ export default function EmployerDetailPage() {
                   </SectionCard>
                   <SectionCard title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
-                          <div className="space-y-1"><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType)}</div>
-                          <div className="space-y-1"><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail)}</div>
+                          <div><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType)}</div>
+                          <div><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail)}</div>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <div className="space-y-1"><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main)}</div>
-                          <div className="space-y-1"><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary)}</div>
+                          <div><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main)}</div>
+                          <div><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary)}</div>
                       </div>
                   </SectionCard>
               </div>
