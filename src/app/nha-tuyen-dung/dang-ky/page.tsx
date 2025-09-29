@@ -986,9 +986,9 @@ export default function EmployerDetailPage() {
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0}>
                                     {currentVisaDetails.length > 0 ? (
                                         <div className="flex flex-wrap gap-1">
-                                            {currentVisaDetails.map((slug: string) => {
+                                            {currentVisaDetails.map((slug: string, index: number) => {
                                                 const detail = Object.values(visaDetailsByVisaType).flat().find(d => d.slug === slug);
-                                                return <Badge key={slug} variant="secondary">{detail?.name[lang] || slug}</Badge>
+                                                return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{detail?.name[lang] || slug}</Badge>
                                             })}
                                         </div>
                                     ) : `Chọn ${t.visaDetailLabel}`}
@@ -1010,6 +1010,7 @@ export default function EmployerDetailPage() {
                                                     onSelect={(e) => e.preventDefault()}
                                                     onCheckedChange={(checked) => handleDetailCheckboxChange(Boolean(checked), detail.slug)}
                                                 >
+                                                   <span className="font-bold w-6 mr-2">{currentVisaDetails.includes(detail.slug) ? `${currentVisaDetails.indexOf(detail.slug) + 1}.` : ''}</span>
                                                     {detail.name[lang]}
                                                 </DropdownMenuCheckboxItem>
                                             ))}
@@ -1135,7 +1136,7 @@ export default function EmployerDetailPage() {
       
       const allItems = [...allVisaTypes, ...allVisaDetails, ...allIndustries, ...japanRegions];
       
-      return value.map((slug, index) => {
+      const content = value.map((slug, index) => {
           const item = allItems.find((i: any) => i.slug === slug);
           let name = slug;
           if (item && 'name' in item && typeof item.name === 'object') {
@@ -1151,6 +1152,8 @@ export default function EmployerDetailPage() {
             </Badge>
           );
       });
+      
+      return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
     }
     return <span className="italic text-muted-foreground">{t.notUpdated}</span>;
   };
@@ -1288,14 +1291,14 @@ export default function EmployerDetailPage() {
                   </SectionCard>
                   <SectionCard title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
-                          <p><strong>{t.visaTypeLabel}:</strong> <span className="flex flex-wrap gap-1 mt-1">{getArrayValue(employer.visaType)}</span></p>
-                          <p><strong>{t.visaDetailLabel}:</strong> <span className="flex flex-wrap gap-1 mt-1">{getArrayValue(employer.visaDetail)}</span></p>
+                          <div className="space-y-1"><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType)}</div>
+                          <div className="space-y-1"><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail)}</div>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <p><strong>{t.mainIndustriesLabel}:</strong> <span className="flex flex-wrap gap-1 mt-1">{getArrayValue(employer.industries.main)}</span></p>
-                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <span className="flex flex-wrap gap-1 mt-1">{getArrayValue(employer.industries.secondary)}</span></p>
+                          <div className="space-y-1"><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main)}</div>
+                          <div className="space-y-1"><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary)}</div>
                       </div>
                   </SectionCard>
               </div>
@@ -1334,4 +1337,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
