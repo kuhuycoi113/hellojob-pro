@@ -87,7 +87,10 @@ const employersData: { [key: string]: any } = {
 
         benefits: [
         ],
-        valueInterest: [],
+        valueInterest: [
+            { vi: 'Ứng viên nhiều và nhanh nhất', ja: '最も多く、最も速い候補者', en: 'Most & Fastest Candidates' },
+            { vi: 'Ứng viên chất lượng', ja: '質の高い候補者', en: 'Quality Candidates' },
+        ],
     },
 };
 
@@ -137,8 +140,8 @@ const placeholderEmployerData = {
         { vi: 'Hỗ trợ toàn diện cho người lao động tại Nhật Bản.', ja: '日本での労働者に対する包括的なサポート。', en: 'Comprehensive support for workers in Japan.' },
     ],
     valueInterest: [
-      { vi: 'Ứng viên nhiều và nhanh nhất', ja: '最も多く、最も速い候補者', en: 'Most & Fastest Candidates' },
-      { vi: 'Ứng viên chất lượng', ja: '質の高い候補者', en: 'Quality Candidates' },
+        { vi: 'Ứng viên nhiều và nhanh nhất', ja: '最も多く、最も速い候補者', en: 'Most & Fastest Candidates' },
+        { vi: 'Ứng viên chất lượng', ja: '質の高い候補者', en: 'Quality Candidates' },
     ],
 };
 
@@ -409,17 +412,15 @@ const parseLineInput = (input: string): string => {
 
 
 
-export default function EmployerDetailPage({ params }: { params: { id: string } }) {
-  const resolvedParams = use(params);
+export default function EmployerDetailPage() {
+  const id = 'Z000';
   const searchParams = useSearchParams();
-  const id = resolvedParams.id;
+  const langFromParams = (searchParams.get('lang') || 'vi') as Language;
+  const roleFromParams = searchParams.get('role');
   
   const [employer, setEmployer] = useState<any | null>(null);
   const [lang, setLang] = useState<Language>('vi');
   const [role, setRole] = useState<string | null>(null);
-  
-  const langFromParams = (searchParams.get('lang') || 'vi') as Language;
-  const roleFromParams = searchParams.get('role');
   
   useEffect(() => {
     const employerData = employersData[id];
@@ -846,53 +847,8 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-              {/* Central Column */}
-              <div className="lg:col-span-2 space-y-8">
-                  <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
-                  </SectionCard>
-                  <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest.map((i: any) => i.vi).join('\n'), 'valueInterest')}>
-                    {employer.valueInterest?.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                            {employer.valueInterest.map((item: any, index: number) => (
-                                <Badge key={index} variant="secondary">{item[lang]}</Badge>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, '', 'valueInterest')}>{t.clickToUpdate}</button>.</p>
-                    )}
-                  </SectionCard>
-                  <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
-                       <ul className="space-y-4">
-                          {employer.history.length > 0 ? employer.history.map((item: any, index: number) => (
-                              <li key={index} className="relative pl-6">
-                                  <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
-                                  <p className="font-bold text-primary mb-1">{item.year}</p>
-                                  <p className="text-sm text-muted-foreground">{item.event[lang]}</p>
-                              </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
-                      </ul>
-                  </SectionCard>
-                   <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          {employer.images.map((img: any, index: number) => (
-                              <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
-                                  <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover" />
-                                   <Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                                        <Camera className="h-6 w-6 text-white"/>
-                                   </Label>
-                                   <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} />
-                                   <Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
-                                        <Trash2 className="h-3 w-3"/>
-                                   </Button>
-                              </div>
-                          ))}
-                      </div>
-                  </SectionCard>
-              </div>
-              
-              {/* Right Column */}
-              <div className="lg:order-first lg:col-span-1 space-y-6 lg:sticky lg:top-24">
+              {/* Right Column (order-first on desktop) */}
+              <div className="lg:order-last lg:col-span-1 space-y-6 lg:sticky lg:top-24">
                   <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
                           <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || '...'}</p>
@@ -934,6 +890,51 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           <p><strong>{t.secondaryIndustriesLabel}:</strong> {employer.industries.secondary[lang] || '...'}</p>
                       </div>
                   </SectionCard>
+              </div>
+
+              {/* Left Column */}
+              <div className="lg:col-span-2 space-y-8">
+                  <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
+                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
+                  </SectionCard>
+                  <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest.map((i: any) => i.vi).join('\n'), 'valueInterest')}>
+                    {employer.valueInterest?.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {employer.valueInterest.map((item: any, index: number) => (
+                                <Badge key={index} variant="secondary">{item[lang]}</Badge>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, '', 'valueInterest')}>{t.clickToUpdate}</button>.</p>
+                    )}
+                  </SectionCard>
+                  <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
+                       <ul className="space-y-4">
+                          {employer.history.length > 0 ? employer.history.map((item: any, index: number) => (
+                              <li key={index} className="relative pl-6">
+                                  <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
+                                  <p className="font-bold text-primary mb-1">{item.year}</p>
+                                  <p className="text-sm text-muted-foreground">{item.event[lang]}</p>
+                              </li>
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
+                      </ul>
+                  </SectionCard>
+                  <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {employer.images.map((img: any, index: number) => (
+                              <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
+                                  <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover" />
+                                   <Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                                        <Camera className="h-6 w-6 text-white"/>
+                                   </Label>
+                                   <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} />
+                                   <Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
+                                        <Trash2 className="h-3 w-3"/>
+                                   </Button>
+                              </div>
+                          ))}
+                      </div>
+                  </SectionCard>
                   <SectionCard title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
                       <ul className="space-y-2 text-sm">
                           {employer.benefits.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
@@ -943,8 +944,8 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                           )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
-                  <Button size="lg" className="w-full" onClick={() => console.log("Saving data:", employer)}>Lưu thay đổi</Button>
               </div>
+              
             </div>
           </div>
         </div>
@@ -978,5 +979,3 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
     </>
   );
 }
-
-    
