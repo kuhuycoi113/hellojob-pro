@@ -235,6 +235,8 @@ export function YL01Dialog({
       setCompanyName('');
       setSelectedVisa(null);
       setSelectedVisaDetail(null);
+      setSelectedIndustry(null);
+      setSelectedRegion(null);
     }
   }, [isOpen, initialStep]);
   
@@ -243,7 +245,7 @@ export function YL01Dialog({
       onLanguageChange(lang);
   }
 
-  const navigateToEmployerPage = (roleId: string, interest: string, subRoleId?: string, name?: string, company?: string, visa?: string, visaDetail?: string) => {
+  const navigateToEmployerPage = (roleId: string, interest: string, subRoleId?: string, name?: string, company?: string, visa?: string, visaDetail?: string, industry?: string, region?: string) => {
     const params = new URLSearchParams();
     params.set('role', roleId);
     params.set('interest', interest)
@@ -263,6 +265,13 @@ export function YL01Dialog({
     if (visaDetail) {
         params.set('visa_detail', visaDetail);
     }
+     if (industry) {
+        params.set('industry', industry);
+    }
+    if (region) {
+        params.set('location', region);
+    }
+
     router.push(`/nha-tuyen-dung/Z000?${params.toString()}`);
     onOpenChange(false);
   };
@@ -661,7 +670,7 @@ export function YL01Dialog({
                 {content.options.map(option => (
                     <Button 
                         key={option.id}
-                        onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === option.id)!); setStep(7); }}
+                        onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === option.id)!); setStep(7); }} 
                         variant="outline" 
                         className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                         <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
@@ -702,7 +711,7 @@ export function YL01Dialog({
         </DialogHeader>
         <div className={cn("grid grid-cols-1 pt-4 gap-4", content.options.length > 2 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-2xl mx-auto")}>
             {content.options.map(option => (
-                <Card key={option.id} onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa!.slug, option.id)}
+                <Card key={option.id} onClick={() => { setSelectedVisaDetail(option.id); setStep(8); }}
                     className={cn("text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center")}>
                     <div className={cn("rounded-full p-3 w-fit mb-4", currentIconColor)}>
                         <option.icon className="h-8 w-8" />
@@ -717,6 +726,36 @@ export function YL01Dialog({
         </Button>
         </>
     )
+  };
+  
+  const renderIndustryStepDialog = () => {
+    const parentVisaSlug = selectedVisa?.slug;
+    if (!parentVisaSlug) return null;
+    const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
+    
+    let screenIdComment = `// Screen: Y008-${parentVisaSlug === 'thuc-tap-sinh-ky-nang' ? '1' : parentVisaSlug === 'ky-nang-dac-dinh' ? '2' : '3'}`;
+    
+    const content = industryContent[currentLang];
+
+    return (
+        <>
+            <span className="hidden">{screenIdComment}</span>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                {industries.map(industry => (
+                    <Button key={industry.slug} onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa!.slug, selectedVisaDetail!, industry.slug)} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <p className="font-semibold text-sm">{industry.name[currentLang]}</p>
+                    </Button>
+                ))}
+            </div>
+            <Button variant="link" onClick={() => setStep(7)} className="mt-4 mx-auto block">
+                {content.backButton}
+            </Button>
+        </>
+    );
   };
 
 
@@ -736,6 +775,8 @@ export function YL01Dialog({
         return renderVisaTypeStepDialog();
       case 7:
         return renderVisaDetailStepDialog();
+      case 8:
+        return renderIndustryStepDialog();
       default: return <PartnerRoleStepDialog />;
     }
   }
@@ -744,10 +785,12 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1_Y003-2_Y004_Y005_Y006_Y007">
+          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1_Y003-2_Y004_Y005_Y006_Y007_Y008">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
     </>
   );
 }
+
+    
