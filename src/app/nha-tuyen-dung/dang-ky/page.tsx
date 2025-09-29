@@ -88,8 +88,6 @@ const employersData: { [key: string]: any } = {
         benefits: [
         ],
         valueInterest: [
-            { vi: 'Ứng viên nhiều và nhanh nhất', ja: '最も多く、最も速い候補者', en: 'Most & Fastest Candidates' },
-            { vi: 'Ứng viên chất lượng', ja: '質の高い候補者', en: 'Quality Candidates' },
         ],
     },
 };
@@ -415,23 +413,77 @@ const parseLineInput = (input: string): string => {
 export default function EmployerDetailPage() {
   const id = 'Z000';
   const searchParams = useSearchParams();
-  const langFromParams = (searchParams.get('lang') || 'vi') as Language;
-  const roleFromParams = searchParams.get('role');
   
   const [employer, setEmployer] = useState<any | null>(null);
   const [lang, setLang] = useState<Language>('vi');
   const [role, setRole] = useState<string | null>(null);
   
   useEffect(() => {
-    const employerData = employersData[id];
-    if (!employerData) {
-        notFound();
-        return;
-    }
+    const langFromParams = (searchParams.get('lang') || 'vi') as Language;
+    const roleFromParams = searchParams.get('role');
     setLang(langFromParams);
     setRole(roleFromParams);
-    setEmployer({ ...employerData });
-  }, [id, langFromParams, roleFromParams]);
+    
+    let employerData;
+    // Set initial data based on whether there are query params
+    if (searchParams.toString()) {
+        employerData = emptyEmployerData;
+    } else {
+        employerData = placeholderEmployerData;
+    }
+
+    const finalEmployerData = { ...employerData };
+    
+    // Apply preferences from query params
+    if (roleFromParams && roleTexts[roleFromParams]) {
+        finalEmployerData.type = roleTexts[roleFromParams];
+    }
+    
+    const visaTypes = searchParams.getAll('visa_type');
+    if (visaTypes.length > 0) {
+        finalEmployerData.visaType = {
+            vi: visaTypes.join(', '),
+            ja: visaTypes.join(', '),
+            en: visaTypes.join(', ')
+        };
+    }
+    
+    const visaDetails = searchParams.getAll('visa_detail');
+    if (visaDetails.length > 0) {
+        finalEmployerData.visaDetail = {
+            vi: visaDetails.join(', '),
+            ja: visaDetails.join(', '),
+            en: visaDetails.join(', ')
+        };
+    }
+    
+    const industries = searchParams.getAll('industry');
+    if (industries.length > 0) {
+        finalEmployerData.industries.main = {
+            vi: industries.join(', '),
+            ja: industries.join(', '),
+            en: industries.join(', ')
+        };
+    }
+
+    const locations = searchParams.getAll('location');
+    if (locations.length > 0) {
+        finalEmployerData.industries.secondary = {
+            vi: locations.join(', '),
+            ja: locations.join(', '),
+            en: locations.join(', ')
+        };
+    }
+    
+    const interest = searchParams.get('interest');
+    if (interest) {
+         finalEmployerData.valueInterest = placeholderEmployerData.valueInterest.filter((v:any) => v.vi.toLowerCase().includes(interest.substring(0,3)));
+    }
+
+
+    setEmployer(finalEmployerData);
+
+  }, [searchParams]);
   
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<{title: string, field: string } | null>(null);
@@ -446,7 +498,7 @@ export default function EmployerDetailPage() {
   }
   
   const t = contentByLang[lang] || contentByLang['vi'];
-  const roleText = role && roleTexts[role] ? roleTexts[role][lang] : employer.type[lang];
+  const roleText = (role && roleTexts[role]) ? roleTexts[role][lang] : employer.type[lang];
 
   const validateField = (field: 'messenger' | 'line' | 'email', value: string) => {
     if (!value) {
@@ -488,7 +540,7 @@ export default function EmployerDetailPage() {
     
     let allValid = true;
     if (editingModule.field === 'info') {
-        if (!validateField('email', tempContent.email || '')) allValid = false;
+        if (!validateEmail(tempContent.email || '')) allValid = false;
         if (!validateField('messenger', tempContent.messenger || '')) allValid = false;
         if (!validateField('line', tempContent.line || '')) allValid = false;
     }
@@ -847,57 +899,12 @@ export default function EmployerDetailPage() {
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-              {/* Right Column (order-first on desktop) */}
-              <div className="lg:order-last lg:col-span-1 space-y-6 lg:sticky lg:top-24">
-                  <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
-                      <div className="space-y-3 text-sm">
-                          <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || '...'}</p>
-                          <p><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || '...'}</p>
-                          <p><strong>{t.licenseLabel}:</strong> {employer.info.license || '...'}</p>
-                          <p><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || '...'}</a></p>
-                      </div>
-                      {hasContactInfo ? (
-                          <div id="HIENTHILIENHE04" className="mt-6 border-t pt-4 space-y-2">
-                             {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                             {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
-                             {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                             {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
-                             {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
-                          </div>
-                      ) : (
-                          <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
-                            <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
-                                <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
-                                <ZaloIcon className="h-6 w-6" />
-                                <MessengerIcon className="h-6 w-6" />
-                                <LineIcon className="h-6 w-6" />
-                            </div>
-                            <div className="text-center text-sm">
-                               <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
-                            </div>
-                          </div>
-                      )}
-                  </SectionCard>
-                  <SectionCard title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
-                      <div className="space-y-3 text-sm">
-                          <p><strong>{t.visaTypeLabel}:</strong> {employer.visaType[lang] || '...'}</p>
-                          <p><strong>{t.visaDetailLabel}:</strong> {employer.visaDetail[lang] || '...'}</p>
-                      </div>
-                  </SectionCard>
-                  <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
-                     <div className="space-y-3 text-sm">
-                          <p><strong>{t.mainIndustriesLabel}:</strong> {employer.industries.main[lang] || '...'}</p>
-                          <p><strong>{t.secondaryIndustriesLabel}:</strong> {employer.industries.secondary[lang] || '...'}</p>
-                      </div>
-                  </SectionCard>
-              </div>
-
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
-                  <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest.map((i: any) => i.vi).join('\n'), 'valueInterest')}>
+                   <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest.map((i: any) => i.vi).join('\n'), 'valueInterest')}>
                     {employer.valueInterest?.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
                             {employer.valueInterest.map((item: any, index: number) => (
@@ -945,6 +952,52 @@ export default function EmployerDetailPage() {
                       </ul>
                   </SectionCard>
               </div>
+              
+                {/* Right Column (order-first on desktop) */}
+              <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
+                  <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
+                      <div className="space-y-3 text-sm">
+                          <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || '...'}</p>
+                          <p><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || '...'}</p>
+                          <p><strong>{t.licenseLabel}:</strong> {employer.info.license || '...'}</p>
+                          <p><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || '...'}</a></p>
+                      </div>
+                      {hasContactInfo ? (
+                          <div id="HIENTHILIENHE04" className="mt-6 border-t pt-4 space-y-2">
+                             {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
+                             {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
+                             {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
+                             {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
+                             {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
+                          </div>
+                      ) : (
+                          <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
+                            <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
+                                <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
+                                <ZaloIcon className="h-6 w-6" />
+                                <MessengerIcon className="h-6 w-6" />
+                                <LineIcon className="h-6 w-6" />
+                            </div>
+                            <div className="text-center text-sm">
+                               <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                            </div>
+                          </div>
+                      )}
+                  </SectionCard>
+                  <SectionCard title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
+                      <div className="space-y-3 text-sm">
+                          <p><strong>{t.visaTypeLabel}:</strong> {employer.visaType[lang] || '...'}</p>
+                          <p><strong>{t.visaDetailLabel}:</strong> {employer.visaDetail[lang] || '...'}</p>
+                      </div>
+                  </SectionCard>
+                  <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
+                     <div className="space-y-3 text-sm">
+                          <p><strong>{t.mainIndustriesLabel}:</strong> {employer.industries.main[lang] || '...'}</p>
+                          <p><strong>{t.secondaryIndustriesLabel}:</strong> {employer.industries.secondary[lang] || '...'}</p>
+                      </div>
+                  </SectionCard>
+              </div>
+
               
             </div>
           </div>
