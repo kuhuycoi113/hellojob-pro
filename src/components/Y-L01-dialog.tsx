@@ -102,7 +102,7 @@ export function YL01Dialog({
 
   const handleSubRoleSelect = (subRoleId: string) => {
     setSelectedSubRole(subRoleId);
-    setStep(3); // Proceed to name input
+    setStep(3); // Proceed to name input (Y003)
   };
   
   const handleNameContinue = () => {
@@ -197,7 +197,7 @@ export function YL01Dialog({
                 </Tabs>
             </>
         );
-  };
+  }
 
   const SendingCompanySubRoleStepDialog = () => {
     const content = {
