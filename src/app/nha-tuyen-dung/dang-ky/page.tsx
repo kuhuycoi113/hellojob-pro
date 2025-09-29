@@ -6,7 +6,7 @@ import { notFound, useSearchParams, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, QrCode, CheckCircle, FileSignature } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, QrCode, CheckCircle, FileSignature, HardHat, UserCheck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -30,8 +30,8 @@ import {
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
-import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
-import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
+import { japanJobTypes } from '@/lib/visa-data';
+import { Industry, allIndustries } from '@/lib/industry-data';
 import { japanRegions } from '@/lib/location-data';
 
 
@@ -316,6 +316,40 @@ const valueInterestOptions = {
       { id: 'cham-soc-khach-hang', title: 'Best Customer Care Service' },
     ]
 };
+
+const visaTypeContent = {
+  vi: {
+    title: 'Bạn muốn tuyển loại Visa nào?',
+    description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
+    description_single: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Kỹ sư, tri thức', desc: 'Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.', color: 'green' },
+    ]
+  },
+  ja: {
+    title: 'どのビザタイプを募集しますか？',
+    description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
+    description_single: '採用ニーズに最も適したビザタイプを選択してください。',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門知識を持つ専門家を採用。', color: 'green' },
+    ]
+  },
+  en: {
+    title: 'Which Visa Type do you want to recruit?',
+    description: 'You can select multiple items. The first selection is priority #1.',
+    description_single: 'Please select the visa type that best suits your recruitment needs.',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
+    ]
+  }
+};
+
 
 type Language = keyof typeof contentByLang;
 
@@ -1108,18 +1142,24 @@ export default function EmployerDetailPage() {
       
       const allItems = [...allVisaTypes, ...allVisaDetails, ...allIndustries, ...japanRegions];
       
-      return value.map(slug => {
+      return value.map((slug, index) => {
           const item = allItems.find((i: any) => i.slug === slug);
+          let name = slug;
           if (item && 'name' in item && typeof item.name === 'object') {
-            return item.name[lang];
+            name = item.name[lang];
           }
-          if (item && 'name' in item && typeof item.name === 'string') {
-             return item.name;
+          else if (item && 'name' in item && typeof item.name === 'string') {
+             name = item.name;
           }
-          return slug;
-      }).join(', ');
+          return (
+            <Badge key={slug} variant="secondary" className="font-normal">
+              <span className="font-bold mr-1.5">{index + 1}.</span>
+              {name}
+            </Badge>
+          );
+      });
     }
-    return '...';
+    return <span className="italic text-muted-foreground">{t.notUpdated}</span>;
   };
 
 
@@ -1255,14 +1295,14 @@ export default function EmployerDetailPage() {
                   </SectionCard>
                   <SectionCard title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
-                          <p><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType)}</p>
-                          <p><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail)}</p>
+                          <p><strong>{t.visaTypeLabel}:</strong> <span className="flex flex-wrap gap-1 mt-1">{getArrayValue(employer.visaType)}</span></p>
+                          <p><strong>{t.visaDetailLabel}:</strong> <span className="flex flex-wrap gap-1 mt-1">{getArrayValue(employer.visaDetail)}</span></p>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <p><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main)}</p>
-                          <p><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary)}</p>
+                          <p><strong>{t.mainIndustriesLabel}:</strong> <span className="flex flex-wrap gap-1 mt-1">{getArrayValue(employer.industries.main)}</span></p>
+                          <p><strong>{t.secondaryIndustriesLabel}:</strong> <span className="flex flex-wrap gap-1 mt-1">{getArrayValue(employer.industries.secondary)}</span></p>
                       </div>
                   </SectionCard>
               </div>
@@ -1301,4 +1341,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
