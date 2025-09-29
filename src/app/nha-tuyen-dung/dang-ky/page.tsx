@@ -428,9 +428,9 @@ export default function EmployerDetailPage() {
     // Set initial data based on whether there are query params
     if (Array.from(searchParams.keys()).length > 0) {
         employerData = {
-          ...placeholderEmployerData, // Start with placeholder for structure
-          logo: emptyEmployerData.logo, // But use default logo
-          banner: emptyEmployerData.banner // And default banner
+          ...placeholderEmployerData,
+          logo: emptyEmployerData.logo,
+          banner: emptyEmployerData.banner
         };
     } else {
         employerData = placeholderEmployerData;
@@ -546,7 +546,12 @@ export default function EmployerDetailPage() {
     
     let allValid = true;
     if (editingModule.field === 'info') {
-        if (!validateEmail(tempContent.email || '')) allValid = false;
+        if (!validateEmail(tempContent.email || '')) {
+             setErrors(prev => ({ ...prev, email: "Email không hợp lệ." }));
+             allValid = false;
+        } else {
+            setErrors(prev => ({ ...prev, email: undefined }));
+        }
         if (!validateField('messenger', tempContent.messenger || '')) allValid = false;
         if (!validateField('line', tempContent.line || '')) allValid = false;
     }
@@ -725,7 +730,13 @@ export default function EmployerDetailPage() {
                                 placeholder="contact@company.com" 
                                 value={tempContent.email} 
                                 onChange={(e) => setTempContent({...tempContent, email: e.target.value})} 
-                                onBlur={(e) => validateField('email', e.target.value)}
+                                onBlur={(e) => {
+                                  if (!validateEmail(e.target.value)) {
+                                    setErrors(prev => ({...prev, email: "Email không hợp lệ"}));
+                                  } else {
+                                     setErrors(prev => ({...prev, email: undefined}));
+                                  }
+                                }}
                                 className={cn(errors.email && "border-destructive")}
                               />
                                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
@@ -756,7 +767,7 @@ export default function EmployerDetailPage() {
                                         <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, ''))} />
+                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
                                 <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
@@ -821,17 +832,20 @@ export default function EmployerDetailPage() {
         case 'valueInterest':
              return (
                 <div className="space-y-4">
-                     {tempContent.map((item: any, index: number) => (
+                     {tempContent.split('\n').map((item: any, index: number) => (
                         <div key={index} className="flex items-center gap-2">
-                            <Input placeholder={`Ví dụ: Ứng viên chất lượng`} value={item[lang] || ''} onChange={(e) => {
-                                const newValues = [...tempContent];
-                                newValues[index] = {...newValues[index], [lang]: e.target.value};
-                                setTempContent(newValues);
+                            <Input placeholder={`Ví dụ: Ứng viên chất lượng`} value={item} onChange={(e) => {
+                                const newValues = tempContent.split('\n');
+                                newValues[index] = e.target.value;
+                                setTempContent(newValues.join('\n'));
                             }} />
-                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                             <Button variant="ghost" size="icon" onClick={() => {
+                                 const newValues = tempContent.split('\n').filter((_:any, i:number) => i !== index);
+                                 setTempContent(newValues.join('\n'));
+                             }}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
-                    <Button variant="outline" onClick={() => addTempArrayItem('valueInterest')}><PlusCircle className="mr-2"/> Thêm giá trị</Button>
+                    <Button variant="outline" onClick={() => setTempContent(tempContent + '\n')}><PlusCircle className="mr-2"/> Thêm giá trị</Button>
                 </div>
              );
         case 'visa':
@@ -1038,5 +1052,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
-    
