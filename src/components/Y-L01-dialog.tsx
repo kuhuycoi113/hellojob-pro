@@ -49,6 +49,40 @@ interface YL01DialogProps {
   initialLang?: Language;
 }
 
+const visaTypeContent = {
+  vi: {
+    title: 'Bạn muốn tuyển loại Visa nào?',
+    description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
+    description_single: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Kỹ sư, tri thức', desc: 'Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.', color: 'green' },
+    ]
+  },
+  ja: {
+    title: 'どのビザタイプを募集しますか？',
+    description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
+    description_single: '採用ニーズに最も適したビザタイプを選択してください。',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門知識を持つ専門家を採用。', color: 'green' },
+    ]
+  },
+  en: {
+    title: 'Which Visa Type do you want to recruit?',
+    description: 'You can select multiple items. The first selection is priority #1.',
+    description_single: 'Please select the visa type that best suits your recruitment needs.',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
+    ]
+  }
+};
+
+
 const visaDetailContentMultiLang = {
     vi: {
       title: 'Chọn chi tiết loại hình visa',
@@ -67,6 +101,48 @@ const visaDetailContentMultiLang = {
       description: 'You can select multiple items. The first selection is priority #1.',
       backButton: 'Back',
       continueButton: 'Continue',
+    }
+};
+
+const industryContent = {
+    vi: {
+        title: "Chọn ngành nghề muốn tuyển dụng",
+        description: "Lựa chọn các ngành nghề bạn muốn tuyển, sắp xếp theo thứ tự ưu tiên.",
+        backButton: "Quay lại",
+        continueButton: "Tiếp tục"
+    },
+    ja: {
+        title: "募集したい業種を選択",
+        description: "募集したい業種を優先順位で選択してください。",
+        backButton: "戻る",
+        continueButton: "続ける"
+    },
+    en: {
+        title: "Select Industries to Recruit",
+        description: "Select the industries you want to recruit for, in order of priority.",
+        backButton: "Back",
+        continueButton: "Continue"
+    },
+};
+
+const regionContent = {
+    vi: {
+        title: 'Chọn khu vực làm việc',
+        description: 'Lựa chọn các khu vực bạn muốn tuyển dụng, sắp xếp theo thứ tự ưu tiên.',
+        backButton: 'Quay lại',
+        completeButton: 'Hoàn tất và xem trang đối tác'
+    },
+    ja: {
+        title: '希望勤務地を選択',
+        description: '募集したい地域を優先順位で選択してください。',
+        backButton: '戻る',
+        completeButton: '完了してパートナーページを表示'
+    },
+    en: {
+        title: 'Select Work Regions',
+        description: 'Choose the regions you want to recruit in, in order of priority.',
+        backButton: 'Back',
+        completeButton: 'Complete and View Partner Page'
     }
 };
 
@@ -116,85 +192,6 @@ const valueInterestContent = {
       backButton: 'Back',
       completeButton: 'Complete and View Partner Page'
     }
-};
-
-const industryContent = {
-    vi: {
-        title: "Chọn ngành nghề muốn tuyển dụng",
-        description: "Lựa chọn các ngành nghề bạn muốn tuyển, sắp xếp theo thứ tự ưu tiên.",
-        backButton: "Quay lại",
-        continueButton: "Tiếp tục"
-    },
-    ja: {
-        title: "募集したい業種を選択",
-        description: "募集したい業種を優先順位で選択してください。",
-        backButton: "戻る",
-        continueButton: "続ける"
-    },
-    en: {
-        title: "Select Industries to Recruit",
-        description: "Select the industries you want to recruit for, in order of priority.",
-        backButton: "Back",
-        continueButton: "Continue"
-    },
-};
-
-const regionContent = {
-    vi: {
-        title: 'Chọn khu vực làm việc',
-        description: 'Lựa chọn các khu vực bạn muốn tuyển dụng, sắp xếp theo thứ tự ưu tiên.',
-        backButton: 'Quay lại',
-        completeButton: 'Hoàn tất và xem trang đối tác'
-    },
-    ja: {
-        title: '希望勤務地を選択',
-        description: '募集したい地域を優先順位で選択してください。',
-        backButton: '戻る',
-        completeButton: '完了してパートナーページを表示'
-    },
-    en: {
-        title: 'Select Work Regions',
-        description: 'Choose the regions you want to recruit in, in order of priority.',
-        backButton: 'Back',
-        completeButton: 'Complete and View Partner Page'
-    }
-};
-
-const visaTypeContent = {
-  vi: {
-    title: 'Bạn muốn tuyển loại Visa nào?',
-    description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
-    description_single: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
-    options: [
-      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
-      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Kỹ sư, tri thức', desc: 'Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.', color: 'green' },
-    ],
-    backButton: 'Quay lại',
-    continueButton: 'Tiếp tục',
-  },
-  ja: {
-    title: 'どのビザタイプを募集しますか？',
-    description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
-    description_single: '採用ニーズに最も適したビザタイプを選択してください。',
-    options: [
-      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
-      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門知識を持つ専門家を採用。', color: 'green' },
-    ],
-    backButton: '戻る',
-    continueButton: '続ける',
-  },
-  en: {
-    title: 'Which Visa Type do you want to recruit?',
-    description: 'You can select multiple items. The first selection is priority #1.',
-    description_single: 'Please select the visa type that best suits your recruitment needs.',
-    options: [
-      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
-      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
-    ]
-  }
 };
 
 
@@ -426,6 +423,34 @@ export function YL01Dialog({
         </>
     )
   }
+
+  const ValueInterestStepDialog = () => {
+    const content = valueInterestContent[currentLang];
+    return (
+        <>
+            {/* Screen: Y010 */}
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                {content.options.map(option => (
+                    <Card
+                        key={option.id}
+                        onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion)}
+                        className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
+                    >
+                        <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                        <h3 className="font-bold text-base">{option.title}</h3>
+                    </Card>
+                ))}
+            </div>
+            <div className="text-center mt-4">
+                 <Button variant="link" onClick={() => setStep(9)}>{content.backButton}</Button>
+            </div>
+        </>
+    )
+  };
 
   const SendingCompanySubRoleStepDialog = () => {
     const content = {
@@ -769,42 +794,15 @@ export function YL01Dialog({
                     <Button variant="link" onClick={() => setStep(8)}>{content.backButton}</Button>
                     <Button 
                         className="bg-accent-orange text-white hover:bg-accent-orange/90"
-                        onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion)} 
+                        onClick={() => setStep(10)} 
                         disabled={selectedRegion.length === 0}
                     >
-                        {content.completeButton}
+                        Tiếp tục
                     </Button>
                 </div>
             </>
          );
-        case 10: // Y010
-            const valueContent = valueInterestContent[currentLang];
-            return (
-                <>
-                <DialogHeader>
-                    <DialogTitle className="text-2xl font-headline text-center">{valueContent.title}</DialogTitle>
-                    <DialogDescription className="text-center">{valueContent.description}</DialogDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-                    {valueContent.options.map(option => (
-                        <Card
-                            key={option.id}
-                            onClick={() => {
-                                // For now, just complete the flow. This can be updated later to save the value.
-                                navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion);
-                            }}
-                            className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
-                        >
-                            <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                            <h3 className="font-bold text-base">{option.title}</h3>
-                        </Card>
-                    ))}
-                </div>
-                <div className="text-center mt-4">
-                    <Button variant="link" onClick={() => setStep(9)}>{valueContent.backButton}</Button>
-                </div>
-                </>
-            );
+        case 10: return <ValueInterestStepDialog />;
       default: return <PartnerRoleStepDialog />;
     }
   }
