@@ -79,7 +79,6 @@ const visaTypeContent = {
   }
 };
 
-
 const visaDetailContentMultiLang = {
     vi: {
       title: 'Chọn chi tiết loại hình visa',
@@ -546,6 +545,41 @@ export function YL01Dialog({
     )
   }
   
+  const VisaTypeSingleSelectStepDialog = () => {
+    const content = visaTypeContent[currentLang];
+    const iconColors = {
+        orange: 'text-orange-500',
+        blue: 'text-blue-500',
+        green: 'text-green-500',
+    };
+
+    return (
+        <>
+            {/* Screen: Y016 */}
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                {content.options.map(option => (
+                    <Button 
+                        key={option.id}
+                        onClick={() => { setSelectedVisa([option.id]); setStep(7); }} 
+                        variant="outline" 
+                        className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
+                        <h3 className="font-bold text-base mb-1">{option.title}</h3>
+                        <p className="text-muted-foreground text-xs">{option.desc}</p>
+                    </Button>
+                ))}
+            </div>
+            <Button variant="link" onClick={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2)} className="mt-4 mx-auto block">
+                {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
+            </Button>
+        </>
+    );
+  };
+  
   const renderMultiSelectStepDialog = (
     stepNumber: number,
     title: string,
@@ -605,9 +639,8 @@ export function YL01Dialog({
         return <PartnerRoleStepDialog />; // Fallback
       case 4: return renderNameInputStepDialog();
       case 5: return renderCompanyNameStepDialog();
-      case 6: // Y006
-        const visaOptions = japanJobTypes.map(o => ({...o, title: o.name, id: o.slug, icon: o.slug.includes('thuc-tap-sinh-ky-nang') ? HardHat : o.slug.includes('ky-nang-dac-dinh') ? UserCheck : Briefcase, name: { vi: o.name, ja: o.name, en: o.name } }));
-        return renderMultiSelectStepDialog(6, visaTypeContent[currentLang].title, visaTypeContent[currentLang].description, visaOptions, selectedVisa, setSelectedVisa, 7, selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2, 'md:grid-cols-3');
+      case 6: // Y016 - new single select screen
+        return <VisaTypeSingleSelectStepDialog />;
       case 7: // Y007
         const visaDetailOptions = selectedVisa.flatMap(vSlug => visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name[currentLang] }));
         return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
