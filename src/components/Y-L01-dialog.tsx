@@ -49,27 +49,6 @@ interface YL01DialogProps {
   initialLang?: Language;
 }
 
-const visaDetailContentMultiLang = {
-    vi: {
-      title: 'Chọn chi tiết loại hình visa',
-      description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
-      backButton: 'Quay lại',
-      continueButton: 'Tiếp tục',
-    },
-    ja: {
-      title: 'ビザの詳細を選択',
-      description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
-      backButton: '戻る',
-      continueButton: '続ける',
-    },
-    en: {
-      title: 'Select Visa Details',
-      description: 'You can select multiple items. The first selection is priority #1.',
-      backButton: 'Back',
-      continueButton: 'Continue',
-    }
-};
-
 const visaTypeContent = {
   vi: {
     title: 'Bạn muốn tuyển loại Visa nào?',
@@ -99,6 +78,30 @@ const visaTypeContent = {
     ]
   }
 };
+
+
+const visaDetailContentMultiLang = {
+    vi: {
+      title: 'Chọn chi tiết loại hình visa',
+      description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
+      backButton: 'Quay lại',
+      continueButton: 'Tiếp tục',
+    },
+    ja: {
+      title: 'ビザの詳細を選択',
+      description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
+      backButton: '戻る',
+      continueButton: '続ける',
+    },
+    en: {
+      title: 'Select Visa Details',
+      description: 'You can select multiple items. The first selection is priority #1.',
+      backButton: 'Back',
+      continueButton: 'Continue',
+    }
+};
+
+
 
 const industryContent = {
     vi: {
@@ -599,19 +602,19 @@ export function YL01Dialog({
       case 3:
         if (selectedRole === 'nhan-vien-phai-cu') return <SendingCompanySubRoleStepDialog />;
         if (selectedRole === 'nhan-vien-nhan-luc-nhat') return <JapaneseHrSubRoleStepDialog />;
-        return <PartnerRoleStepDialog />;
+        return <PartnerRoleStepDialog />; // Fallback
       case 4: return renderNameInputStepDialog();
       case 5: return renderCompanyNameStepDialog();
-      case 6:
+      case 6: // Y006
         const visaOptions = japanJobTypes.map(o => ({...o, title: o.name, id: o.slug, icon: o.slug.includes('thuc-tap-sinh-ky-nang') ? HardHat : o.slug.includes('ky-nang-dac-dinh') ? UserCheck : Briefcase, name: { vi: o.name, ja: o.name, en: o.name } }));
-        return renderMultiSelectStepDialog(6, visaTypeContent[currentLang].title, visaTypeContent[currentLang].description, visaOptions as any, selectedVisa, setSelectedVisa, 7, selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2, 'md:grid-cols-3');
-      case 7:
+        return renderMultiSelectStepDialog(6, visaTypeContent[currentLang].title, visaTypeContent[currentLang].description, visaOptions, selectedVisa, setSelectedVisa, 7, selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2, 'md:grid-cols-3');
+      case 7: // Y007
         const visaDetailOptions = selectedVisa.flatMap(vSlug => visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name[currentLang] }));
         return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
-      case 8:
+      case 8: // Y008
         const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name[currentLang]}));
         return renderMultiSelectStepDialog(8, industryContent[currentLang].title, industryContent[currentLang].description, industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
-      case 9:
+      case 9: // Y009
          const regionOptions = japanRegions.map(r => ({id: r.toLowerCase(), title: r, name: {vi:r, ja: r, en:r}}));
          const content = regionContent[currentLang];
          const regionKanjiMap: { [key: string]: string } = {
