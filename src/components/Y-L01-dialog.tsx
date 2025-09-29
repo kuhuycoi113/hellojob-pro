@@ -188,16 +188,19 @@ const regionContent = {
         title: 'Chọn khu vực làm việc',
         description: 'Lựa chọn khu vực bạn muốn tuyển dụng.',
         backButton: 'Quay lại',
+        completeButton: 'Hoàn tất và xem trang đối tác'
     },
     ja: {
         title: '希望勤務地を選択',
         description: '募集したい地域を選択してください。',
         backButton: '戻る',
+        completeButton: '完了してパートナーページを表示'
     },
     en: {
         title: 'Select Work Region',
         description: 'Choose the region you want to recruit in.',
         backButton: 'Back',
+        completeButton: 'Complete and View Partner Page'
     }
 };
 
@@ -331,7 +334,7 @@ export function YL01Dialog({
                                 <Card 
                                     key={role.id} 
                                     onClick={() => { setSelectedRole(role.id); setStep(2); }}
-                                    className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center")}
+                                    className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
                                 >
                                     <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
                                     <h3 className="font-bold text-base mb-1">{role.title}</h3>
@@ -712,7 +715,7 @@ export function YL01Dialog({
         <div className={cn("grid grid-cols-1 pt-4 gap-4", content.options.length > 2 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-2xl mx-auto")}>
             {content.options.map(option => (
                 <Card key={option.id} onClick={() => { setSelectedVisaDetail(option.id); setStep(8); }}
-                    className={cn("text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center")}>
+                    className={cn("text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedVisaDetail === option.id && "ring-2 ring-primary border-primary")}>
                     <div className={cn("rounded-full p-3 w-fit mb-4", currentIconColor)}>
                         <option.icon className="h-8 w-8" />
                     </div>
@@ -746,7 +749,7 @@ export function YL01Dialog({
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                 {industries.map(industry => (
-                    <Button key={industry.slug} onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa!.slug, selectedVisaDetail!, industry.slug)} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                    <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setStep(9);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                         <p className="font-semibold text-sm">{industry.name[currentLang]}</p>
                     </Button>
                 ))}
@@ -757,6 +760,57 @@ export function YL01Dialog({
         </>
     );
   };
+  
+  const renderRegionStepDialog = () => {
+    const content = regionContent[currentLang];
+    const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
+    const regionKanjiMap: { [key: string]: string } = {
+      Hokkaido: '北海道',
+      Tohoku: '東北',
+      Kanto: '関東',
+      Chubu: '中部',
+      Kansai: '関西',
+      Chugoku: '中国',
+      Shikoku: '四国',
+      Kyushu: '九州',
+      Okinawa: '沖縄',
+    };
+    
+    return (
+         <>
+            {/* Screen: Y009 */}
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                 {japanRegions.map(region => (
+                    <Button 
+                        key={region} 
+                        variant="outline"
+                        onClick={() => setSelectedRegion(region)} 
+                        className={cn(
+                            "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary",
+                            selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
+                        )}
+                    >
+                        <p className="font-semibold text-sm">{currentLang === 'ja' ? regionKanjiMap[region] : region}</p>
+                    </Button>
+                ))}
+            </div>
+            <div className="flex justify-center items-center mt-6 gap-4">
+                <Button variant="link" onClick={() => setStep(8)}>{content.backButton}</Button>
+                <Button 
+                    className="bg-accent-orange text-white hover:bg-accent-orange/90"
+                    onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa!.slug, selectedVisaDetail!, selectedIndustry!.slug, selectedRegion!)} 
+                    disabled={!selectedRegion}
+                >
+                    {content.completeButton}
+                </Button>
+            </div>
+        </>
+    )
+  }
 
 
   const renderDialogContent = () => {
@@ -777,6 +831,8 @@ export function YL01Dialog({
         return renderVisaDetailStepDialog();
       case 8:
         return renderIndustryStepDialog();
+      case 9:
+        return renderRegionStepDialog();
       default: return <PartnerRoleStepDialog />;
     }
   }
@@ -785,12 +841,10 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1_Y003-2_Y004_Y005_Y006_Y007_Y008">
+          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1_Y003-2_Y004_Y005_Y006_Y007_Y008_Y009">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
     </>
   );
 }
-
-    
