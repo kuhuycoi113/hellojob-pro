@@ -227,6 +227,7 @@ export function YL01Dialog({
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   useEffect(() => {
@@ -385,6 +386,8 @@ export function YL01Dialog({
         },
     }[currentLang];
 
+    const organizationRoles = ['sending', 'support', 'company', 'supervising-organization', 'paid-placement-agency', 'haken'];
+
     return (
         <>
             {/* Screen: Y002 */}
@@ -398,10 +401,10 @@ export function YL01Dialog({
                         key={option.id}
                         onClick={() => {
                             setSelectedInterest(option.id);
-                            if (selectedRole === 'nhan-vien-phai-cu' || selectedRole === 'nhan-vien-nhan-luc-nhat') {
-                                setStep(3);
+                            if (selectedRole && organizationRoles.includes(selectedRole)) {
+                                setStep(6); // Skip to Visa Type selection
                             } else {
-                                navigateToEmployerPage(selectedRole!, option.id);
+                                setStep(3); // Proceed to Sub-role selection for individuals
                             }
                         }}
                         className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
@@ -682,7 +685,14 @@ export function YL01Dialog({
                     </Button>
                 ))}
             </div>
-            <Button variant="link" onClick={() => setStep(5)} className="mt-4 mx-auto block">
+            <Button variant="link" onClick={() => {
+                const organizationRoles = ['sending', 'support', 'company', 'supervising-organization', 'paid-placement-agency', 'haken'];
+                if (selectedRole && organizationRoles.includes(selectedRole)) {
+                    setStep(2); // Go back to Interest Selection
+                } else {
+                    setStep(5); // Go back to Company Name
+                }
+            }} className="mt-4 mx-auto block">
                 {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
             </Button>
         </>
@@ -820,7 +830,7 @@ export function YL01Dialog({
       case 3:
         if (selectedRole === 'nhan-vien-phai-cu') return <SendingCompanySubRoleStepDialog />;
         if (selectedRole === 'nhan-vien-nhan-luc-nhat') return <JapaneseHrSubRoleStepDialog />;
-        return <PartnerRoleStepDialog />; // Fallback
+        return <PartnerRoleStepDialog />; // Fallback, should not happen in normal flow
       case 4:
         return renderNameInputStepDialog();
       case 5:
