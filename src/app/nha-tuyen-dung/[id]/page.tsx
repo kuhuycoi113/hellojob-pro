@@ -86,7 +86,8 @@ const employersData: { [key: string]: any } = {
         },
 
         benefits: [
-        ]
+        ],
+        valueInterest: [],
     },
 };
 
@@ -134,7 +135,11 @@ const placeholderEmployerData = {
         { vi: 'Chế độ đãi ngộ, phúc lợi cạnh tranh.', ja: '競争力のある報酬と福利厚生制度。', en: 'Competitive salary and benefits package.' },
         { vi: 'Nhiều cơ hội đào tạo và phát triển sự nghiệp.', ja: '多くのトレーニングとキャリア開発の機会。', en: 'Many opportunities for training and career development.' },
         { vi: 'Hỗ trợ toàn diện cho người lao động tại Nhật Bản.', ja: '日本での労働者に対する包括的なサポート。', en: 'Comprehensive support for workers in Japan.' },
-    ]
+    ],
+    valueInterest: [
+      { vi: 'Ứng viên nhiều và nhanh nhất', ja: '最も多く、最も速い候補者', en: 'Most & Fastest Candidates' },
+      { vi: 'Ứng viên chất lượng', ja: '質の高い候補者', en: 'Quality Candidates' },
+    ],
 };
 
 
@@ -158,7 +163,8 @@ const emptyEmployerData = {
     history: [],
     info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '', phone: '', zalo: '', messenger: '', line: '', email: '' },
     industries: { main: { vi: '', ja: '', en: '' }, secondary: { vi: '', ja: '', en: '' } },
-    benefits: []
+    benefits: [],
+    valueInterest: [],
 };
 
 
@@ -192,6 +198,7 @@ const contentByLang = {
         mainIndustriesLabel: 'Ngành nghề',
         secondaryIndustriesLabel: 'Khu vực',
         benefitsTitle: 'Phúc lợi & Môi trường',
+        valueInterestTitle: 'Giá trị mong muốn',
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
@@ -228,6 +235,7 @@ const contentByLang = {
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: 'その他の業種',
         benefitsTitle: '福利厚生と環境',
+        valueInterestTitle: '希望する価値',
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
         registerAction: '登録',
@@ -264,6 +272,7 @@ const contentByLang = {
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Other Industries',
         benefitsTitle: 'Benefits & Environment',
+        valueInterestTitle: 'Desired Values',
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
         registerAction: 'Register',
@@ -504,6 +513,8 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
         } else if (field === 'visa') {
              newState.visaType = tempContent.visaType;
              newState.visaDetail = tempContent.visaDetail;
+        } else if (field === 'valueInterest') {
+            newState.valueInterest = tempContent.split('\n').map((item: string) => ({ vi: item, ja: item, en: item }));
         } else {
             newState[field] = tempContent;
         }
@@ -748,6 +759,22 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                     <Button variant="outline" onClick={() => addTempArrayItem('benefits')}><PlusCircle className="mr-2"/> Thêm phúc lợi</Button>
                 </div>
              );
+        case 'valueInterest':
+             return (
+                <div className="space-y-4">
+                     {tempContent.map((item: any, index: number) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <Input placeholder={`Ví dụ: Ứng viên chất lượng`} value={item[lang] || ''} onChange={(e) => {
+                                const newValues = [...tempContent];
+                                newValues[index] = {...newValues[index], [lang]: e.target.value};
+                                setTempContent(newValues);
+                            }} />
+                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                        </div>
+                    ))}
+                    <Button variant="outline" onClick={() => addTempArrayItem('valueInterest')}><PlusCircle className="mr-2"/> Thêm giá trị</Button>
+                </div>
+             );
         case 'visa':
             return (
                 <div className="space-y-4">
@@ -824,7 +851,29 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
-                  <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
+                  <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest, 'valueInterest')}>
+                    {employer.valueInterest?.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {employer.valueInterest.map((item: any, index: number) => (
+                                <Badge key={index} variant="secondary">{item[lang]}</Badge>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest, 'valueInterest')}>{t.clickToUpdate}</button>.</p>
+                    )}
+                  </SectionCard>
+                  <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
+                       <ul className="space-y-4">
+                          {employer.history.length > 0 ? employer.history.map((item: any, index: number) => (
+                              <li key={index} className="relative pl-6">
+                                  <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
+                                  <p className="font-bold text-primary mb-1">{item.year}</p>
+                                  <p className="text-sm text-muted-foreground">{item.event[lang]}</p>
+                              </li>
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
+                      </ul>
+                  </SectionCard>
+                   <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {employer.images.map((img: any, index: number) => (
                               <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
@@ -839,17 +888,6 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                               </div>
                           ))}
                       </div>
-                  </SectionCard>
-                  <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
-                       <ul className="space-y-4">
-                          {employer.history.length > 0 ? employer.history.map((item: any, index: number) => (
-                              <li key={index} className="relative pl-6">
-                                  <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
-                                  <p className="font-bold text-primary mb-1">{item.year}</p>
-                                  <p className="text-sm text-muted-foreground">{item.event[lang]}</p>
-                              </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
-                      </ul>
                   </SectionCard>
               </div>
               
