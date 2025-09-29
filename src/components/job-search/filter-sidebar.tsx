@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
@@ -284,7 +283,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         
         const filtersToApply = { ...filters };
         const industryObject = allIndustries.find(i => i.slug === filtersToApply.industry);
-        const industryName = industryObject?.name || filtersToApply.industry;
+        const industryName = industryObject?.name.vi || filtersToApply.industry;
         const feeLimit = parseSalary(filtersToApply.netFee);
         const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
         const interviewLocationName = allInterviewLocations.find(l => l.slug === filtersToApply.interviewLocation)?.name;
@@ -307,7 +306,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
              let visaMatch = true;
             if (filtersToApply.visaDetail && filtersToApply.visaDetail !== 'all-details') {
                 const targetVisaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === filtersToApply.visaDetail)?.name;
-                visaMatch = job.visaDetail === targetVisaName;
+                visaMatch = job.visaDetail === targetVisaName?.vi;
             } else if (filtersToApply.visa && filtersToApply.visa !== 'all') {
                  const targetVisaTypeObject = japanJobTypes.find(v => v.slug === filtersToApply.visa);
                  visaMatch = job.visaType === targetVisaTypeObject?.name;
@@ -462,7 +461,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         );
 
         const industries = parentVisaSlug ? (industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
-        const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
+        const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name.vi, item])).values());
         setAvailableIndustries(uniqueIndustries);
 
         if (filters.industry && filters.industry !== 'all') {
@@ -607,7 +606,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                 <SelectGroup key={type.slug}>
                                                     <SelectLabel>{type.name}</SelectLabel>
                                                     {(visaDetailsByVisaType[type.slug] || []).map(detail => (
-                                                        <SelectItem key={detail.slug} value={detail.slug}>{detail.name}</SelectItem>
+                                                        <SelectItem key={detail.slug} value={detail.slug}>{detail.name.vi}</SelectItem>
                                                     ))}
                                                 </SelectGroup>
                                             ))}
@@ -628,7 +627,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                         <SelectTrigger className={cn(filters.industry && filters.industry !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn ngành nghề"/></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                                            {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name}</SelectItem>)}
+                                            {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name.vi}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -1215,3 +1214,5 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         </div>
     );
 }
+
+    
