@@ -1,4 +1,5 @@
 
+'use client';
 
 import { consultants } from './consultant-data';
 import type { User } from './chat-data';
@@ -274,7 +275,7 @@ const createJobList = (): Job[] => {
 
                     const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
                     if (feeVisas.includes(detail.slug) && jobIndex % 5 < 4) { // 80% have fees
-                        const maxFee = feeLimits[detail.name];
+                        const maxFee = feeLimits[detail.name.vi];
                         const feeValue = 1000 + Math.floor(((jobIndex * 137) % (maxFee - 1000)));
 
                         if (['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam'].includes(detail.slug)) {
@@ -323,7 +324,7 @@ const createJobList = (): Job[] => {
                         backFee: `${(jobIndex % 5) + 1}tr`,
                         tags: [industry.name.vi, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
                         visaType: visaType.name,
-                        visaDetail: detail.name,
+                        visaDetail: detail.name.vi,
                         industry: industry.name.vi,
                         workLocation: location,
                         interviewLocation: getRandomItem(interviewLocations, jobIndex),
@@ -446,7 +447,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
 
             const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
             if (feeVisas.includes(detail.slug) && jobIndex % 5 < 4) { // 80% have fees
-                const maxFee = feeLimits[detail.name];
+                const maxFee = feeLimits[detail.name.vi];
                 const feeValue = 1000 + Math.floor(((jobIndex * 137) % (maxFee - 1000)));
 
                 if (['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam'].includes(detail.slug)) {
@@ -494,7 +495,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 backFee: `${(jobIndex % 5) + 1}tr`,
                 tags: [industry.name.vi, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
                 visaType: visaType.name,
-                visaDetail: detail.name,
+                visaDetail: detail.name.vi,
                 industry: industry.name.vi,
                 workLocation: location,
                 interviewLocation: getRandomItem(interviewLocations, jobIndex),
