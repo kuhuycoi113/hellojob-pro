@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, use, useEffect } from 'react';
@@ -27,6 +28,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 
 
@@ -49,7 +51,7 @@ const employersData: { [key: string]: any } = {
             en: 'Trainee & Specified Skilled Worker'
         },
         visaDetail: {
-            vi: 'TTS 3 năm, Đặc định ngành Thực phẩm',
+            vi: 'TTS 3 năm, Đặc định ngành Thực phẩm, Đặc định ngành Xây dựng',
             ja: '技能実習3年、特定技能（飲食料品製造業）',
             en: '3-Year Trainee, SSW (Food & Beverage Manufacturing)'
         },
@@ -583,7 +585,7 @@ export default function EmployerDetailPage() {
             newState[field] = finalInfo;
         } else if (field === 'visa') {
              newState.visaType = { ...newState.visaType, [lang]: Array.isArray(tempContent.visaType) ? tempContent.visaType.join(', ') : tempContent.visaType };
-             newState.visaDetail = { ...newState.visaDetail, [lang]: tempContent.visaDetail };
+             newState.visaDetail = { ...newState.visaDetail, [lang]: Array.isArray(tempContent.visaDetail) ? tempContent.visaDetail.join(', ') : tempContent.visaDetail };
         } else if (field === 'valueInterest') {
             newState.valueInterest = tempContent.split('\n').map((item: string) => ({ vi: item, ja: item, en: item }));
         } else {
@@ -612,11 +614,11 @@ export default function EmployerDetailPage() {
   
   const addTempArrayItem = (field: string) => {
     if (field === 'history') {
-      setTempContent((prev: any[]) => [...prev, { year: new Date().getFullYear().toString(), event: { vi: '', ja: '', en: '' } }]);
+      setTempContent((prev: any[]) => [...prev, { year: new Date().getFullYear().toString(), event: { vi: '', ja: '', en: '' } }])
     } else if (field === 'benefits') {
-       setTempContent((prev: any[]) => [...prev, { vi: '', ja: '', en: '' }]);
+       setTempContent((prev: any[]) => [...prev, { vi: '', ja: '', en: '' }])
     } else if (field === 'images') {
-       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới', ja: '新しい写真', en: 'New Photo' }, dataAiHint: 'new image' }]);
+       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới', ja: '新しい写真', en: 'New Photo' }, dataAiHint: 'new image' }])
     }
   };
 
@@ -860,9 +862,27 @@ export default function EmployerDetailPage() {
                 ? tempContent.visaType[lang]
                 : (tempContent.visaType?.[lang] || '').split(',').map((s:string) => s.trim()).filter(Boolean);
 
+            const handleCheckboxChange = (checked: boolean, type: string) => {
+                const newSelection = checked
+                    ? [...currentVisaTypes, type]
+                    : currentVisaTypes.filter((item: string) => item !== type);
+                setTempContent({ ...tempContent, visaType: { ...tempContent.visaType, [lang]: newSelection } });
+            };
+            const currentVisaDetails = Array.isArray(tempContent.visaDetail?.[lang])
+                ? tempContent.visaDetail[lang]
+                : (tempContent.visaDetail?.[lang] || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+
+            const handleDetailCheckboxChange = (checked: boolean, detail: string) => {
+                const newSelection = checked
+                    ? [...currentVisaDetails, detail]
+                    : currentVisaDetails.filter((item: string) => item !== detail);
+                setTempContent({ ...tempContent, visaDetail: { ...tempContent.visaDetail, [lang]: newSelection } });
+            };
+
+
             return (
                 <div className="space-y-4">
-                    <div className="space-y-2">
+                     <div className="space-y-2" id="DKY006">
                         <Label>{t.visaTypeLabel}</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -877,17 +897,12 @@ export default function EmployerDetailPage() {
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
                                 <DropdownMenuLabel>Chọn loại hình</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {['Thực tập sinh', 'Kỹ năng đặc định', 'Kỹ sư, tri thức'].map(type => (
+                                {['Thực tập sinh kỹ năng', 'Kỹ năng đặc định', 'Kỹ sư, tri thức'].map(type => (
                                      <DropdownMenuCheckboxItem
                                         key={type}
                                         checked={currentVisaTypes.includes(type)}
                                         onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => {
-                                            const newSelection = checked
-                                                ? [...currentVisaTypes, type]
-                                                : currentVisaTypes.filter((item: string) => item !== type);
-                                            setTempContent({ ...tempContent, visaType: { ...tempContent.visaType, [lang]: newSelection } });
-                                        }}
+                                        onCheckedChange={(checked) => handleCheckboxChange(checked, type)}
                                     >
                                         {type}
                                     </DropdownMenuCheckboxItem>
@@ -895,14 +910,38 @@ export default function EmployerDetailPage() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                    <div className="space-y-2">
+                     <div className="space-y-2" id="DKY007">
                         <Label>{t.visaDetailLabel}</Label>
-                        <Textarea 
-                            className="min-h-[60px]" 
-                            placeholder={placeholderEmployerData.visaDetail[lang]} 
-                            value={tempContent.visaDetail[lang] || ''} 
-                            onChange={(e) => setTempContent({ ...tempContent, visaDetail: { ...tempContent.visaDetail, [lang]: e.target.value } })} 
-                        />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0}>
+                                    {currentVisaDetails.length > 0 ? (
+                                        <div className="flex flex-wrap gap-1">
+                                            {currentVisaDetails.map((detail: string) => <Badge key={detail} variant="secondary">{detail}</Badge>)}
+                                        </div>
+                                    ) : `Chọn ${t.visaDetailLabel}`}
+                                </Button>
+                            </DropdownMenuTrigger>
+                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn chi tiết</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {currentVisaTypes.map((visaType: string) => (
+                                    <DropdownMenuGroup key={visaType}>
+                                        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">{visaType}</DropdownMenuLabel>
+                                        {(placeholderEmployerData.visaDetailsByVisaType[visaType] || []).map((detail: string) => (
+                                             <DropdownMenuCheckboxItem
+                                                key={detail}
+                                                checked={currentVisaDetails.includes(detail)}
+                                                onSelect={(e) => e.preventDefault()}
+                                                onCheckedChange={(checked) => handleDetailCheckboxChange(checked, detail)}
+                                            >
+                                                {detail}
+                                            </DropdownMenuCheckboxItem>
+                                        ))}
+                                    </DropdownMenuGroup>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             );
@@ -1103,3 +1142,5 @@ export default function EmployerDetailPage() {
     </>
   );
 }
+
+
