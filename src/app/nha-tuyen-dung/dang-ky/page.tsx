@@ -872,7 +872,7 @@ export default function EmployerDetailPage() {
                 if (!interestObject) return;
 
                 const newSelection = checked
-                    ? [...tempContent, { id: interestObject.id, vi: interestObject.title, ja: interestObject.title, en: interestObject.title }]
+                    ? [...tempContent, { id: interestObject.id, vi: valueInterestOptions['vi'].find(o=>o.id===interestId)?.title, ja: valueInterestOptions['ja'].find(o=>o.id===interestId)?.title, en: valueInterestOptions['en'].find(o=>o.id===interestId)?.title }]
                     : tempContent.filter((item: any) => item.id !== interestId);
                 setTempContent(newSelection);
             };
@@ -930,7 +930,7 @@ export default function EmployerDetailPage() {
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
                                     {currentVisaTypes.length > 0 ? (
                                         <div className="flex flex-wrap gap-1">
-                                            {currentVisaTypes.map((slug: string) => <Badge key={slug} variant="secondary">{(japanJobTypes.find(t => t.slug === slug))?.name || slug}</Badge>)}
+                                            {currentVisaTypes.map((slug: string, index: number) => <Badge key={slug} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanJobTypes.find(t => t.slug === slug))?.name || slug}</Badge>)}
                                         </div>
                                     ) : `Chọn ${t.visaTypeLabel}`}
                                 </Button>
@@ -945,6 +945,7 @@ export default function EmployerDetailPage() {
                                         onSelect={(e) => e.preventDefault()}
                                         onCheckedChange={(checked) => handleVisaTypeChange(Boolean(checked), type.slug)}
                                     >
+                                        <span className="font-bold w-6 mr-2">{currentVisaTypes.includes(type.slug) ? `${currentVisaTypes.indexOf(type.slug) + 1}.` : ''}</span>
                                         {type.name}
                                     </DropdownMenuCheckboxItem>
                                 ))}
@@ -1023,7 +1024,7 @@ export default function EmployerDetailPage() {
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={availableIndustries.length === 0}>
                                     {currentIndustries.length > 0 ? (
                                         <div className="flex flex-wrap gap-1">
-                                            {currentIndustries.map((slug: string) => <Badge key={slug} variant="secondary">{(allIndustries.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)}
+                                            {currentIndustries.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(allIndustries.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)}
                                         </div>
                                     ) : `Chọn ${t.mainIndustriesLabel}`}
                                 </Button>
@@ -1038,6 +1039,7 @@ export default function EmployerDetailPage() {
                                         onSelect={(e) => e.preventDefault()}
                                         onCheckedChange={(checked) => handleIndustryChange(Boolean(checked), industry.slug)}
                                     >
+                                        <span className="font-bold w-6 mr-2">{currentIndustries.includes(industry.slug) ? `${currentIndustries.indexOf(industry.slug) + 1}.` : ''}</span>
                                         {industry.name[lang]}
                                     </DropdownMenuCheckboxItem>
                                 ))}
@@ -1051,7 +1053,7 @@ export default function EmployerDetailPage() {
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
                                     {currentRegions.length > 0 ? (
                                         <div className="flex flex-wrap gap-1">
-                                            {currentRegions.map((slug: string) => <Badge key={slug} variant="secondary">{(japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)}
+                                            {currentRegions.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)}
                                         </div>
                                     ) : `Chọn ${t.secondaryIndustriesLabel}`}
                                 </Button>
@@ -1066,6 +1068,7 @@ export default function EmployerDetailPage() {
                                         onSelect={(e) => e.preventDefault()}
                                         onCheckedChange={(checked) => handleRegionChange(Boolean(checked), region.slug)}
                                     >
+                                        <span className="font-bold w-6 mr-2">{currentRegions.includes(region.slug) ? `${currentRegions.indexOf(region.slug) + 1}.` : ''}</span>
                                         {region.name}
                                     </DropdownMenuCheckboxItem>
                                 ))}
