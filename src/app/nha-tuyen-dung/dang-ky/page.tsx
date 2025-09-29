@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, use, useEffect } from 'react';
@@ -109,6 +108,11 @@ const placeholderEmployerData = {
         vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
         ja: 'ABC派遣会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。長年の経験により、私たちは何千人ものベトナム人労働者の夢を支援してきたことを誇りに思っています...',
         en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\' dreams take flight...'
+    },
+    visaDetailsByVisaType: {
+        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
+        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
+        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
     },
     visaType: {
         vi: 'Thực tập sinh, Kỹ năng đặc định',
@@ -350,7 +354,6 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 
     return cleanValue;
 };
-
 
 const parseMessengerInput = (input: string): string => {
     if (!input) return '';
@@ -614,11 +617,11 @@ export default function EmployerDetailPage() {
   
   const addTempArrayItem = (field: string) => {
     if (field === 'history') {
-      setTempContent((prev: any[]) => [...prev, { year: new Date().getFullYear().toString(), event: { vi: '', ja: '', en: '' } }])
+      setTempContent((prev: any[]) => [...prev, { year: new Date().getFullYear().toString(), event: { vi: '', ja: '', en: '' } }]);
     } else if (field === 'benefits') {
-       setTempContent((prev: any[]) => [...prev, { vi: '', ja: '', en: '' }])
+       setTempContent((prev: any[]) => [...prev, { vi: '', ja: '', en: '' }]);
     } else if (field === 'images') {
-       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới', ja: '新しい写真', en: 'New Photo' }, dataAiHint: 'new image' }])
+       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới', ja: '新しい写真', en: 'New Photo' }, dataAiHint: 'new image' }]);
     }
   };
 
@@ -1142,5 +1145,4 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
 
