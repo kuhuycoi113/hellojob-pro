@@ -49,6 +49,93 @@ interface YL01DialogProps {
   initialLang?: Language;
 }
 
+const visaDetailContent = {
+  'thuc-tap-sinh-ky-nang': {
+    vi: {
+      title: 'Chọn chương trình Thực tập sinh',
+      description: 'Vui lòng chọn loại chương trình thực tập sinh phù hợp.',
+      options: [
+        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: 'Thực tập sinh 3 năm', desc: 'Chương trình phổ biến nhất, làm việc tại Nhật trong 3 năm.' },
+        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: 'Thực tập sinh 1 năm', desc: 'Chương trình ngắn hạn dành cho một số ngành nghề nhất định.' },
+        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: 'Thực tập sinh 3 Go', desc: 'Dành cho người đã hoàn thành TTS 3 năm và muốn quay lại.' },
+      ]
+    },
+    ja: {
+      title: '技能実習プログラムを選択',
+      description: '適切な技能実習プログラムを選択してください。',
+      options: [
+        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: '技能実習3年', desc: '最も一般的なプログラムで、日本で3年間働きます。' },
+        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: '技能実習1年', desc: '特定の職種向けの短期プログラム。' },
+        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: '技能実習3号', desc: '3年間の技能実習を修了し、再入国を希望する方向け。' },
+      ]
+    },
+    en: {
+      title: 'Select Trainee Program',
+      description: 'Please select the appropriate technical intern training program.',
+      options: [
+        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: '3-Year Technical Intern', desc: 'The most common program, working in Japan for 3 years.' },
+        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: '1-Year Technical Intern', desc: 'A short-term program for specific job types.' },
+        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: 'Technical Intern No. 3', desc: 'For those who have completed the 3-year program and wish to return.' },
+      ]
+    }
+  },
+  'ky-nang-dac-dinh': {
+    vi: {
+        title: 'Chọn loại Kỹ năng đặc định',
+        description: 'Chọn chương trình Kỹ năng đặc định bạn muốn tuyển.',
+        options: [
+          { id: 'dac-dinh-dau-nhat', icon: Users, title: 'Đặc định đầu Nhật', desc: 'Để tuyển ứng viên ở Nhật' },
+          { id: 'dac-dinh-dau-viet', icon: Plane, title: 'Đặc định đầu Việt', desc: 'Để tuyển ứng viên từ Việt Nam' },
+          { id: 'dac-dinh-di-moi', icon: UserPlus, title: 'Đặc định đi mới', desc: 'Để tuyển ứng viên mới' },
+        ]
+    },
+    ja: {
+        title: '特定技能の種類を選択',
+        description: '募集したい特定技能プログラムを選択してください。',
+        options: [
+          { id: 'dac-dinh-dau-nhat', icon: Users, title: '国内（日本在住者）', desc: '日本在住の候補者を採用' },
+          { id: 'dac-dinh-dau-viet', icon: Plane, title: '国外（ベトナム在住者）', desc: 'ベトナムから候補者を採用' },
+          { id: 'dac-dinh-di-moi', icon: UserPlus, title: '新規（未経験者）', desc: '新規の候補者を採用' },
+        ]
+    },
+    en: {
+        title: 'Select Specified Skilled Worker Type',
+        description: 'Choose the Specified Skilled Worker program you want to recruit for.',
+        options: [
+          { id: 'dac-dinh-dau-nhat', icon: Users, title: 'Domestic (in Japan)', desc: 'To recruit candidates already in Japan' },
+          { id: 'dac-dinh-dau-viet', icon: Plane, title: 'Overseas (in Vietnam)', desc: 'To recruit candidates from Vietnam' },
+          { id: 'dac-dinh-di-moi', icon: UserPlus, title: 'New Candidates', desc: 'To recruit new candidates' },
+        ]
+    }
+  },
+  'ky-su-tri-thuc': {
+    vi: {
+        title: 'Chọn loại Kỹ sư, tri thức',
+        description: 'Chọn chương trình Kỹ sư bạn muốn tuyển.',
+        options: [
+          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: 'Kỹ sư, tri thức đầu Nhật', desc: 'Để tuyển kỹ sư ở Nhật' },
+          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: 'Kỹ sư, tri thức đầu Việt', desc: 'Để tuyển kỹ sư từ Việt Nam' },
+        ]
+    },
+    ja: {
+        title: '技術・人文知識・国際業務の種類を選択',
+        description: '募集したいプログラムを選択してください。',
+        options: [
+          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: '国内エンジニア', desc: '日本での経験があるエンジニアを採用' },
+          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: '国外エンジニア', desc: 'ベトナムからエンジニアを採用' },
+        ]
+    },
+    en: {
+        title: 'Select Engineer/Specialist Type',
+        description: 'Choose the program you want to recruit for.',
+        options: [
+          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: 'Engineer (In Japan)', desc: 'Recruit engineers with experience in Japan' },
+          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: 'Engineer (In Vietnam)', desc: 'Recruit engineers from Vietnam' },
+        ]
+    }
+  }
+};
+
 const visaTypeContent = {
   vi: {
     title: 'Bạn muốn tuyển loại Visa nào?',
@@ -82,27 +169,6 @@ const visaTypeContent = {
   }
 };
 
-
-const visaDetailContentMultiLang = {
-    vi: {
-      title: 'Chọn chi tiết loại hình visa',
-      description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
-      backButton: 'Quay lại',
-      continueButton: 'Tiếp tục',
-    },
-    ja: {
-      title: 'ビザの詳細を選択',
-      description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
-      backButton: '戻る',
-      continueButton: '続ける',
-    },
-    en: {
-      title: 'Select Visa Details',
-      description: 'You can select multiple items. The first selection is priority #1.',
-      backButton: 'Back',
-      continueButton: 'Continue',
-    }
-};
 
 const industryContent = {
     vi: {
@@ -149,7 +215,7 @@ const regionContent = {
 const valueInterestContent = {
     vi: {
       title: "Bạn quan tâm đến những giá trị nào nhất?",
-      description: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.",
+      description: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.",
       options: [
         { id: 'ung-vien-nhieu-nhanh', icon: FastForward, title: 'Ứng viên nhiều và nhanh nhất' },
         { id: 'ung-vien-chat-luong', icon: UserCheck, title: 'Ứng viên chất lượng' },
@@ -164,7 +230,7 @@ const valueInterestContent = {
     },
     ja: {
       title: "どの価値観に最も関心がありますか？",
-      description: "最高のエクスペリエンスのために、あなたの主な目標を教えてください。",
+      description: "最高のエクスペリエンスのために、あなたの主な目標を教えてください。複数選択可能です。",
       options: [
         { id: 'ung-vien-nhieu-nhanh', icon: FastForward, title: '最も多く、最も速い候補者' },
         { id: 'ung-vien-chat-luong', icon: UserCheck, title: '質の高い候補者' },
@@ -179,7 +245,7 @@ const valueInterestContent = {
     },
     en: {
       title: 'Which values are you most interested in?',
-      description: 'Tell us your main goal for the best experience.',
+      description: 'Tell us your main goal for the best experience. You can select multiple items.',
       options: [
         { id: 'ung-vien-nhieu-nhanh', icon: FastForward, title: 'Most & Fastest Candidates' },
         { id: 'ung-vien-chat-luong', icon: UserCheck, title: 'Quality Candidates' },
@@ -206,9 +272,7 @@ export function YL01Dialog({
     initialLang = 'vi'
 }: YL01DialogProps) {
   const router = useRouter();
-  const { role, setRole, isLoggedIn } = useAuth();
   const [step, setStep] = useState(initialStep);
-  const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedSubRole, setSelectedSubRole] = useState<string | null>(null);
   const [fullName, setFullName] = useState('');
@@ -217,6 +281,7 @@ export function YL01Dialog({
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string[]>([]);
   const [selectedIndustry, setSelectedIndustry] = useState<string[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string[]>([]);
+  const [selectedInterest, setSelectedInterest] = useState<string[]>([]);
   const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   useEffect(() => {
@@ -230,6 +295,7 @@ export function YL01Dialog({
       setSelectedVisaDetail([]);
       setSelectedIndustry([]);
       setSelectedRegion([]);
+      setSelectedInterest([]);
     }
   }, [isOpen, initialStep]);
   
@@ -238,10 +304,10 @@ export function YL01Dialog({
       onLanguageChange(lang);
   }
 
-  const navigateToEmployerPage = (roleId: string, interest: string, subRoleId?: string, name?: string, company?: string, visa?: string[], visaDetail?: string[], industry?: string[], region?: string[]) => {
+  const navigateToEmployerPage = (roleId: string, interests: string[], subRoleId?: string, name?: string, company?: string, visa?: string[], visaDetail?: string[], industry?: string[], region?: string[]) => {
     const params = new URLSearchParams();
     params.set('role', roleId);
-    params.set('interest', interest)
+    interests.forEach(interest => params.append('interest', interest));
     params.set('lang', currentLang);
     if (subRoleId) {
       params.set('sub_role', subRoleId);
@@ -405,7 +471,7 @@ export function YL01Dialog({
                     <Card
                         key={option.id}
                         onClick={() => {
-                            setSelectedInterest(option.id);
+                            setSelectedInterest([option.id]);
                             const isOrganization = selectedRole && organizationRoles.includes(selectedRole);
                             const nextStep = isOrganization ? 5 : 3;
                             setStep(nextStep);
@@ -437,9 +503,16 @@ export function YL01Dialog({
                 {content.options.map(option => (
                     <Card
                         key={option.id}
-                        onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion)}
-                        className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
+                        onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
+                        className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
+                            selectedInterest.includes(option.id) && "ring-2 ring-primary border-primary bg-primary/10"
+                        )}
                     >
+                        {selectedInterest.includes(option.id) && (
+                            <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                                {selectedInterest.indexOf(option.id) + 1}
+                            </Badge>
+                        )}
                         <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
                         <h3 className="font-bold text-base">{option.title}</h3>
                     </Card>
@@ -447,7 +520,7 @@ export function YL01Dialog({
             </div>
             <div className="text-center mt-4 flex justify-center gap-4">
                  <Button variant="link" onClick={() => setStep(9)}>{content.backButton}</Button>
-                 <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion)}>{content.completeButton}</Button>
+                 <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" disabled={selectedInterest.length === 0} onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest, selectedSubRole!, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion)}>{content.completeButton}</Button>
             </div>
         </>
     )
