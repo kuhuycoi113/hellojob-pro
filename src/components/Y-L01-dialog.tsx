@@ -11,6 +11,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Globe, Users2, FastForward, ListChecks, HardHat, UserCheck, GraduationCap, Pencil, Sparkles, Building, Plane, Handshake, Briefcase, Users, UserSquare, UserCog, UserPlus } from 'lucide-react';
@@ -77,8 +87,8 @@ export function YL01Dialog({
 
   const handleRoleSelect = (roleId: string) => {
     setSelectedRole(roleId);
-    if (roleId === 'nhan-vien-phai-cu') {
-      setStep(2); // Move to sub-role selection
+    if (roleId === 'nhan-vien-phai-cu' || roleId === 'nhan-vien-nhan-luc-nhat') {
+      setStep(2); // Move to sub-role selection for both
     } else {
       navigateToEmployerPage(roleId);
     }
@@ -171,7 +181,7 @@ export function YL01Dialog({
         );
   };
 
-  const SubRoleStepDialog = () => {
+  const SendingCompanySubRoleStepDialog = () => {
     const content = {
         vi: {
             title: "Bạn có vai trò gì ở Công ty phái cử?",
@@ -225,21 +235,82 @@ export function YL01Dialog({
             </div>
         </>
     )
-  }
+  };
+  
+  const JapaneseHrSubRoleStepDialog = () => {
+    const content = {
+        vi: {
+            title: "Bạn có vai trò gì ở Công ty/Pháp nhân/Tổ chức nhân lực Nhật Bản?",
+            description: "Vui lòng chọn vai trò của bạn để tiếp tục.",
+            options: [
+                { id: 'nguoi-nhat', icon: UserCog, title: 'Nhân viên người Nhật'},
+                { id: 'nguoi-viet', icon: UserCog, title: 'Nhân viên người Việt'},
+            ],
+            backButton: 'Quay lại',
+        },
+        ja: {
+            title: "日本の人材会社/法人/団体でのあなたの役割は何ですか？",
+            description: "続けるためにあなたの役割を選択してください。",
+            options: [
+                { id: 'nguoi-nhat', icon: UserCog, title: '日本人スタッフ'},
+                { id: 'nguoi-viet', icon: UserCog, title: 'ベトナム人スタッフ'},
+            ],
+            backButton: '戻る',
+        },
+        en: {
+            title: 'What is your role at the Japanese HR Company/Entity/Organization?',
+            description: 'Please select your role to continue.',
+            options: [
+                { id: 'nguoi-nhat', icon: UserCog, title: 'Japanese Staff'},
+                { id: 'nguoi-viet', icon: UserCog, title: 'Vietnamese Staff'},
+            ],
+            backButton: 'Back',
+        },
+    }[currentLang];
+
+    return (
+        <>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                {content.options.map(option => (
+                     <Card 
+                        key={option.id} 
+                        onClick={() => handleSubRoleSelect(option.id)}
+                        className="text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
+                    >
+                        <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                        <h3 className="font-bold text-lg mb-1">{option.title}</h3>
+                    </Card>
+                ))}
+            </div>
+            <div className="text-center mt-4">
+                 <Button variant="link" onClick={() => setStep(1)}>{content.backButton}</Button>
+            </div>
+        </>
+    )
+  };
 
   const renderDialogContent = () => {
-    switch (step) {
-      case 1: return <PartnerRoleStepDialog />;
-      case 2: return <SubRoleStepDialog />;
-      default: return <PartnerRoleStepDialog />;
+    if (step === 1) {
+        return <PartnerRoleStepDialog />;
     }
+    if (step === 2 && selectedRole === 'nhan-vien-phai-cu') {
+        return <SendingCompanySubRoleStepDialog />;
+    }
+    if (step === 2 && selectedRole === 'nhan-vien-nhan-luc-nhat') {
+        return <JapaneseHrSubRoleStepDialog />;
+    }
+    return <PartnerRoleStepDialog />; // Fallback
   }
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1">
+          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1_Y003-2">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
