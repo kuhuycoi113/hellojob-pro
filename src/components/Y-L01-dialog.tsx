@@ -196,19 +196,19 @@ const regionContent = {
         title: 'Chọn khu vực làm việc',
         description: 'Lựa chọn các khu vực bạn muốn tuyển dụng, sắp xếp theo thứ tự ưu tiên.',
         backButton: 'Quay lại',
-        completeButton: 'Hoàn tất và xem trang đối tác'
+        completeButton: 'Tiếp tục'
     },
     ja: {
         title: '希望勤務地を選択',
         description: '募集したい地域を優先順位で選択してください。',
         backButton: '戻る',
-        completeButton: '完了してパートナーページを表示'
+        completeButton: '続ける'
     },
     en: {
         title: 'Select Work Regions',
         description: 'Choose the regions you want to recruit in, in order of priority.',
         backButton: 'Back',
-        completeButton: 'Complete and View Partner Page'
+        completeButton: 'Continue'
     }
 };
 
@@ -272,15 +272,19 @@ export function YL01Dialog({
     initialLang = 'vi'
 }: YL01DialogProps) {
   const router = useRouter();
+  const { role, setRole, isLoggedIn } = useAuth();
   const [step, setStep] = useState(initialStep);
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [selectedSubRole, setSelectedSubRole] = useState<string | null>(null);
-  const [fullName, setFullName] = useState('');
-  const [companyName, setCompanyName] = useState('');
+  const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [selectedVisa, setSelectedVisa] = useState<string[]>([]);
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string[]>([]);
   const [selectedIndustry, setSelectedIndustry] = useState<string[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string[]>([]);
+  const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [selectedSubRole, setSelectedSubRole] = useState<string | null>(null);
+  const [fullName, setFullName] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [selectedInterest, setSelectedInterest] = useState<string[]>([]);
   const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
@@ -820,6 +824,11 @@ export function YL01Dialog({
         return <VisaTypeMultiSelectStepDialog />;
       case 7: // Y007
         const visaDetailOptions = selectedVisa.flatMap(vSlug => (visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name.vi})));
+        const visaDetailContentMultiLang = {
+            vi: { title: 'Chọn chi tiết loại hình visa', description: 'Bạn có thể chọn nhiều mục, lựa chọn đầu tiên là ưu tiên số 1.' },
+            ja: { title: 'ビザの詳細を選択', description: '複数の項目を選択できます。最初の選択が優先順位1番になります。' },
+            en: { title: 'Select Visa Details', description: 'You can select multiple items. The first selection is priority #1.' },
+        };
         return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
       case 8: // Y008
         const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name.vi}));
@@ -871,7 +880,7 @@ export function YL01Dialog({
                         onClick={() => setStep(10)} 
                         disabled={selectedRegion.length === 0}
                     >
-                        Tiếp tục
+                        {content.completeButton}
                     </Button>
                 </div>
             </>

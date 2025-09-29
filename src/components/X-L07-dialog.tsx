@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -69,8 +69,6 @@ export function XL07Dialog({ isOpen, onOpenChange, onSelect, onBack, lang }: XL0
   
   const content = contentByLang[lang];
   const dialogId = "X007";
-  const continueText = isMobile ? (lang === 'ja' ? '続ける' : (lang === 'en' ? 'Continue' : 'Tiếp tục')) : (lang === 'ja' ? '保存して結果を表示し、連絡先を残す' : (lang === 'en' ? 'Save, view results, and leave contact information' : 'Lưu, xem kết quả và để lại thông tin liên hệ'));
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -100,7 +98,7 @@ export function XL07Dialog({ isOpen, onOpenChange, onSelect, onBack, lang }: XL0
                 {content.backButton}
             </Button>
             <Button onClick={handleSelect}>
-                {isMobile ? content.continueButton : 'Lưu, xem kết quả và để lại thông tin liên hệ'}
+                {content.continueButton}
             </Button>
         </div>
       </DialogContent>
