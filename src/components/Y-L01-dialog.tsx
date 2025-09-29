@@ -27,13 +27,25 @@ import { Globe, Users2, FastForward, ListChecks, HardHat, UserCheck, GraduationC
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
-import { Industry, industriesByJobType } from '@/lib/industry-data';
+import { Industry, industriesByJobType, allIndustries } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from './custom-icons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Badge } from './ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
+} from "@/components/ui/dropdown-menu"
+import { Checkbox } from './ui/checkbox';
+import { japanRegions } from '@/lib/location-data';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -504,23 +516,28 @@ export function YL01Dialog({
                 <DialogDescription className="text-center">{content.description}</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-                {content.options.map(option => (
-                    <Card
-                        key={option.id}
-                        onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
-                        className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
-                            selectedInterest.includes(option.id) && "ring-2 ring-primary border-primary bg-primary/10"
-                        )}
-                    >
-                        {selectedInterest.includes(option.id) && (
-                            <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
-                                {selectedInterest.indexOf(option.id) + 1}
-                            </Badge>
-                        )}
-                        <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                        <h3 className="font-bold text-base">{option.title}</h3>
-                    </Card>
-                ))}
+                {content.options.map(option => {
+                    const isSelected = selectedInterest.includes(option.id);
+                    const selectionOrder = isSelected ? selectedInterest.indexOf(option.id) + 1 : 0;
+                    return (
+                        <Card
+                            key={option.id}
+                            onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
+                            className={cn(
+                                "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
+                                isSelected && "ring-2 ring-primary border-primary bg-primary/10"
+                            )}
+                        >
+                            {isSelected && (
+                                <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                                    {selectionOrder}
+                                </Badge>
+                            )}
+                            <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                            <h3 className="font-bold text-base">{option.title}</h3>
+                        </Card>
+                    )
+                })}
             </div>
             <div className="text-center mt-4 flex justify-center gap-4">
                  <Button variant="link" onClick={() => setStep(9)}>{content.backButton}</Button>
