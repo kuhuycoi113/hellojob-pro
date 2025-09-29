@@ -31,8 +31,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
-import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { japanJobTypes } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
+import { visaDetailsByVisaType } from '@/lib/visa-data';
 
 
 const employersData: { [key: string]: any } = {
@@ -196,7 +197,8 @@ const contentByLang = {
         notUpdated: 'Chưa có thông tin',
         clickToUpdate: 'Nhấn để cập nhật',
         headerTitle: 'Thông tin chung',
-        namePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
+        namePlaceholder: 'Ví dụ: Nguyễn Văn An',
+        companyNamePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
         typePlaceholder: 'Ví dụ: Công ty phái cử',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
         industriesTitle: 'Ngành nghề & Khu vực',
@@ -233,7 +235,8 @@ const contentByLang = {
         notUpdated: '情報がありません',
         clickToUpdate: 'クリックして更新',
         headerTitle: '一般情報',
-        namePlaceholder: '例: ABC株式会社',
+        namePlaceholder: '例: グエン・ヴァン・アン',
+        companyNamePlaceholder: '例: ABC株式会社',
         typePlaceholder: '例: 送り出し機関',
         locationPlaceholder: '例: ベトナム、ハノイ',
         industriesTitle: '業種と分野',
@@ -270,7 +273,8 @@ const contentByLang = {
         notUpdated: 'Not available',
         clickToUpdate: 'Click to update',
         headerTitle: 'General Information',
-        namePlaceholder: 'E.g., ABC Corporation',
+        namePlaceholder: 'E.g., An Nguyen Van',
+        companyNamePlaceholder: 'E.g., ABC Corporation',
         typePlaceholder: 'E.g., Dispatch Company',
         locationPlaceholder: 'E.g., Hanoi, Vietnam',
         industriesTitle: 'Industries & Sectors',
@@ -409,145 +413,76 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
     return cleanValue;
 };
 
-const parseMessengerInput = (input: string): string => {
-    if (!input) return '';
-    const trimmedInput = input.trim();
-    try {
-        if (trimmedInput.startsWith('http') || trimmedInput.includes('facebook.com') || trimmedInput.includes('m.me')) {
-            const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
-            
-            if (url.hostname.includes('facebook.com') || url.hostname.includes('m.facebook.com')) {
-                const id = url.searchParams.get('id');
-                if (id && /^\d+$/.test(id)) {
-                    return id; // Return numeric ID if found in profile.php
-                }
-                // For vanity URLs like facebook.com/username
-                const pathParts = url.pathname.split('/').filter(part => part && part !== 'profile.php' && part !== 'people');
-                if (pathParts.length > 0) {
-                    return pathParts[pathParts.length - 1];
-                }
-            }
-             if (url.hostname.includes('m.me')) {
-                const pathParts = url.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0) {
-                     return pathParts[pathParts.length - 1];
-                }
-            }
-        }
-    } catch (error) {
-        // Not a valid URL, treat as a potential username
-        console.warn("Could not parse Messenger input as URL, treating as username:", error);
-    }
-    // Fallback: treat as username, remove any URL-like parts
-    return trimmedInput.split('/').pop() || trimmedInput;
-};
-
-const parseZaloInput = (input: string): string => {
-    if (!input) return '';
-    const trimmedInput = input.trim();
-    if (trimmedInput.includes('zalo.me/')) {
-        const parts = trimmedInput.split('/');
-        return parts.pop()?.replace(/\D/g, '') || '';
-    }
-    return trimmedInput.replace(/\D/g, '');
-};
-
-const parseLineInput = (input: string): string => {
-  if (!input) return '';
-  const trimmedInput = input.trim();
-  try {
-      if (trimmedInput.startsWith('http') && trimmedInput.includes('line.me/')) {
-          const url = new URL(trimmedInput);
-          const pathParts = url.pathname.split('/');
-          let potentialId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
-          if (potentialId) {
-             // Remove query parameters
-             potentialId = potentialId.split('?')[0];
-             // Remove leading ~ or @ if present
-             return potentialId.replace(/^[~@]/, '');
-          }
-      }
-  } catch (error) {
-       console.warn("Could not parse Line input as URL, treating as ID:", error);
-  }
-  // Fallback to treat the whole input as an ID, removing potential URL parts and special characters
-  return trimmedInput.split('/').pop()?.replace(/^[~@]/, '') || trimmedInput.replace(/^[~@]/, '');
-};
-
-
 
 export default function EmployerDetailPage() {
-  const id = 'Z000';
   const searchParams = useSearchParams();
   
   const [employer, setEmployer] = useState<any | null>(null);
   const [lang, setLang] = useState<Language>('vi');
-  const [role, setRole] = useState<string | null>(null);
+  const [roleFromUrl, setRoleFromUrl] = useState<string | null>(null);
+  const [isIndividual, setIsIndividual] = useState(false);
+  const [displayName, setDisplayName] = useState('');
   
   useEffect(() => {
     const langFromParams = (searchParams.get('lang') || 'vi') as Language;
-    const roleFromParams = searchParams.get('role');
+    const roleParam = searchParams.get('role');
+    const nameParam = searchParams.get('name');
+    const companyNameParam = searchParams.get('company_name');
+    
     setLang(langFromParams);
-    setRole(roleFromParams);
+    setRoleFromUrl(roleParam);
     
     let employerData;
-    // Set initial data based on whether there are query params
-    if (Array.from(searchParams.keys()).length > 0) {
+    const hasParams = Array.from(searchParams.keys()).length > 0;
+    
+    if (hasParams) {
         employerData = JSON.parse(JSON.stringify(emptyEmployerData));
     } else {
         employerData = JSON.parse(JSON.stringify(placeholderEmployerData));
     }
-
-    const finalEmployerData = { ...employerData };
     
-    // Apply preferences from query params
-    if (roleFromParams && roleTexts[roleFromParams]) {
-        finalEmployerData.type = roleTexts[roleFromParams];
+    const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
+    setIsIndividual(isIndividualRole);
+
+    if (isIndividualRole) {
+        employerData.name = { vi: nameParam, ja: nameParam, en: nameParam };
+        setDisplayName(nameParam || '');
+    } else {
+        employerData.name = { vi: companyNameParam, ja: companyNameParam, en: companyNameParam };
+        setDisplayName(companyNameParam || '');
+    }
+
+    if (roleParam && roleTexts[roleParam]) {
+        employerData.type = roleTexts[roleParam];
     }
     
     const visaTypes = searchParams.getAll('visa_type');
     if (visaTypes.length > 0) {
-        finalEmployerData.visaType = {
-            vi: visaTypes,
-            ja: visaTypes,
-            en: visaTypes,
-        };
+        employerData.visaType = { vi: visaTypes, ja: visaTypes, en: visaTypes };
     }
     
     const visaDetails = searchParams.getAll('visa_detail');
     if (visaDetails.length > 0) {
-        finalEmployerData.visaDetail = {
-            vi: visaDetails,
-            ja: visaDetails,
-            en: visaDetails,
-        };
+        employerData.visaDetail = { vi: visaDetails, ja: visaDetails, en: visaDetails };
     }
     
     const industries = searchParams.getAll('industry');
     if (industries.length > 0) {
-        finalEmployerData.industries.main = {
-            vi: industries,
-            ja: industries,
-            en: industries,
-        };
+        employerData.industries.main = { vi: industries, ja: industries, en: industries };
     }
 
     const locations = searchParams.getAll('location');
     if (locations.length > 0) {
-        finalEmployerData.industries.secondary = {
-             vi: locations,
-             ja: locations,
-             en: locations,
-        };
+        employerData.industries.secondary = { vi: locations, ja: locations, en: locations };
     }
     
     const interest = searchParams.get('interest');
     const allInterests = valueInterestOptions[langFromParams];
     if (interest) {
-         finalEmployerData.valueInterest = allInterests.filter(opt => interest.includes(opt.id));
+         employerData.valueInterest = allInterests.filter(opt => interest.includes(opt.id));
     }
 
-    setEmployer(finalEmployerData);
+    setEmployer(employerData);
 
   }, [searchParams]);
   
@@ -578,7 +513,8 @@ export default function EmployerDetailPage() {
   }
   
   const t = contentByLang[lang] || contentByLang['vi'];
-  const roleText = (role && roleTexts[role]) ? roleTexts[role][lang] : employer.type[lang];
+  const roleText = (roleFromUrl && roleTexts[roleFromUrl]) ? roleTexts[roleFromUrl][lang] : employer.type[lang];
+  const headerName = isIndividual ? (displayName || `[${t.namePlaceholder}]`) : (displayName || `[${t.companyNamePlaceholder}]`);
 
   const validateEmail = (email: string) => {
     if (!email) return true; // Not required, but if present must be valid
@@ -737,9 +673,13 @@ export default function EmployerDetailPage() {
 
     switch(editingModule.field) {
         case 'header':
+            const nameLabel = isIndividual ? t.namePlaceholder : t.companyNamePlaceholder;
             return (
                  <div className="space-y-4">
-                    <div className="space-y-2"><Label>{t.namePlaceholder}</Label><Input placeholder={placeholderEmployerData.name[lang]} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} /></div>
+                    <div className="space-y-2">
+                        <Label>{isIndividual ? "Họ và tên" : "Tên công ty/pháp nhân"}</Label>
+                        <Input placeholder={nameLabel} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} />
+                    </div>
                     <div className="space-y-2"><Label>{t.typePlaceholder}</Label><Input placeholder={placeholderEmployerData.type[lang]} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
                     <div className="space-y-2"><Label>{t.locationPlaceholder}</Label><Input placeholder={placeholderEmployerData.location[lang]} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
                 </div>
@@ -1137,11 +1077,11 @@ export default function EmployerDetailPage() {
     if (Array.isArray(value) && value.length > 0) {
       if (typeof value[0] === 'object' && value[0] !== null && 'id' in value[0]) { // For valueInterest
         return (
-          <div className="flex flex-wrap gap-1 mt-1">
+          <p className="flex flex-wrap gap-1 mt-1">
             {value.map((item: any, index: number) => (
               <Badge key={index} variant="secondary" className="font-normal">{item[lang]}</Badge>
             ))}
-          </div>
+          </p>
         );
       }
       
@@ -1167,7 +1107,7 @@ export default function EmployerDetailPage() {
           );
       });
       
-      return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
+      return <p className="flex flex-wrap gap-1 mt-1">{content}</p>;
     }
     return <span className="italic text-muted-foreground">{t.notUpdated}</span>;
   };
@@ -1204,7 +1144,7 @@ export default function EmployerDetailPage() {
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
                       <div className="flex-grow pt-16 md:pt-20">
-                          <h1 className="text-2xl md:text-3xl font-headline font-bold">{employer.name[lang] || `[${t.namePlaceholder}]`}</h1>
+                          <h1 id="DKY004&5" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
                           <p className="font-semibold text-primary">{roleText}</p>
                           <p className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                       </div>
