@@ -201,6 +201,7 @@ export default function AboutPage() {
       </section>
 
       {/* Team Section */}
+      {/*
       <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
@@ -228,6 +229,7 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+      */}
 
        {/* CTA Section */}
       <section className="w-full py-20 md:py-28">
