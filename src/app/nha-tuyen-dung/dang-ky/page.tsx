@@ -31,9 +31,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
-import { japanJobTypes } from '@/lib/visa-data';
+import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
-import { visaDetailsByVisaType } from '@/lib/visa-data';
 
 
 const employersData: { [key: string]: any } = {
@@ -115,10 +114,10 @@ const placeholderEmployerData = {
         en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\' dreams take flight...'
     },
     images: [
-        { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
-        { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 2', ja: '新しい写真 2', en: 'New Photo 2' }, dataAiHint: 'new image 2' },
-        { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 3', ja: '新しい写真 3', en: 'New Photo 3' }, dataAiHint: 'new image 3' },
-        { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 4', ja: '新しい写真 4', en: 'New Photo 4' }, dataAiHint: 'new image 4' },
+      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
+      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 2', ja: '新しい写真 2', en: 'New Photo 2' }, dataAiHint: 'new image 2' },
+      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 3', ja: '新しい写真 3', en: 'New Photo 3' }, dataAiHint: 'new image 3' },
+      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 4', ja: '新しい写真 4', en: 'New Photo 4' }, dataAiHint: 'new image 4' },
     ],
     history: [
         { year: '2010', event: { vi: 'Thành lập công ty cổ phần ABC.', ja: 'ABC株式会社設立。', en: 'Established ABC Corporation.' } },
@@ -1077,11 +1076,11 @@ export default function EmployerDetailPage() {
     if (Array.isArray(value) && value.length > 0) {
       if (typeof value[0] === 'object' && value[0] !== null && 'id' in value[0]) { // For valueInterest
         return (
-          <p className="flex flex-wrap gap-1 mt-1">
+          <div className="flex flex-wrap gap-1 mt-1">
             {value.map((item: any, index: number) => (
               <Badge key={index} variant="secondary" className="font-normal">{item[lang]}</Badge>
             ))}
-          </p>
+          </div>
         );
       }
       
@@ -1107,7 +1106,7 @@ export default function EmployerDetailPage() {
           );
       });
       
-      return <p className="flex flex-wrap gap-1 mt-1">{content}</p>;
+      return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
     }
     return <span className="italic text-muted-foreground">{t.notUpdated}</span>;
   };
@@ -1291,3 +1290,4 @@ export default function EmployerDetailPage() {
     </>
   );
 }
+
