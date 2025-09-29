@@ -48,17 +48,92 @@ interface YL01DialogProps {
   initialLang?: Language;
 }
 
-const roleTexts: Record<string, Record<Language, string>> = {
-  'nhan-vien-phai-cu': { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
-  'nhan-vien-nhan-luc-nhat': { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
-  'sending': { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
-  'support': { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
-  'company': { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
-  'supervising-organization': { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
-  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Placement Agency' },
-  'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
+const visaDetailContent = {
+  'thuc-tap-sinh-ky-nang': {
+    vi: {
+      title: 'Chọn chương trình Thực tập sinh',
+      description: 'Vui lòng chọn loại chương trình thực tập sinh phù hợp.',
+      options: [
+        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: 'Thực tập sinh 3 năm', desc: 'Chương trình phổ biến nhất, làm việc tại Nhật trong 3 năm.' },
+        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: 'Thực tập sinh 1 năm', desc: 'Chương trình ngắn hạn dành cho một số ngành nghề nhất định.' },
+        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: 'Thực tập sinh 3 Go', desc: 'Dành cho người đã hoàn thành TTS 3 năm và muốn quay lại.' },
+      ]
+    },
+    ja: {
+      title: '技能実習プログラムを選択',
+      description: '適切な技能実習プログラムを選択してください。',
+      options: [
+        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: '技能実習3年', desc: '最も一般的なプログラムで、日本で3年間働きます。' },
+        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: '技能実習1年', desc: '特定の職種向けの短期プログラム。' },
+        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: '技能実習3号', desc: '3年間の技能実習を修了し、再入国を希望する方向け。' },
+      ]
+    },
+    en: {
+      title: 'Select Trainee Program',
+      description: 'Please select the appropriate technical intern training program.',
+      options: [
+        { id: 'thuc-tap-sinh-3-nam', icon: HardHat, title: '3-Year Technical Intern', desc: 'The most common program, working in Japan for 3 years.' },
+        { id: 'thuc-tap-sinh-1-nam', icon: HardHat, title: '1-Year Technical Intern', desc: 'A short-term program for specific job types.' },
+        { id: 'thuc-tap-sinh-3-go', icon: HardHat, title: 'Technical Intern No. 3', desc: 'For those who have completed the 3-year program and wish to return.' },
+      ]
+    }
+  },
+  'ky-nang-dac-dinh': {
+    vi: {
+        title: 'Chọn loại Kỹ năng đặc định',
+        description: 'Chọn chương trình Kỹ năng đặc định bạn muốn tuyển.',
+        options: [
+          { id: 'dac-dinh-dau-nhat', icon: Users, title: 'Đặc định đầu Nhật', desc: 'Để tuyển ứng viên ở Nhật' },
+          { id: 'dac-dinh-dau-viet', icon: Plane, title: 'Đặc định đầu Việt', desc: 'Để tuyển ứng viên từ Việt Nam' },
+          { id: 'dac-dinh-di-moi', icon: UserPlus, title: 'Đặc định đi mới', desc: 'Để tuyển ứng viên mới' },
+        ]
+    },
+    ja: {
+        title: '特定技能の種類を選択',
+        description: '募集したい特定技能プログラムを選択してください。',
+        options: [
+          { id: 'dac-dinh-dau-nhat', icon: Users, title: '国内（日本在住者）', desc: '日本在住の候補者を採用' },
+          { id: 'dac-dinh-dau-viet', icon: Plane, title: '国外（ベトナム在住者）', desc: 'ベトナムから候補者を採用' },
+          { id: 'dac-dinh-di-moi', icon: UserPlus, title: '新規（未経験者）', desc: '新規の候補者を採用' },
+        ]
+    },
+    en: {
+        title: 'Select Specified Skilled Worker Type',
+        description: 'Choose the Specified Skilled Worker program you want to recruit for.',
+        options: [
+          { id: 'dac-dinh-dau-nhat', icon: Users, title: 'Domestic (in Japan)', desc: 'To recruit candidates already in Japan' },
+          { id: 'dac-dinh-dau-viet', icon: Plane, title: 'Overseas (in Vietnam)', desc: 'To recruit candidates from Vietnam' },
+          { id: 'dac-dinh-di-moi', icon: UserPlus, title: 'New Candidates', desc: 'To recruit new candidates' },
+        ]
+    }
+  },
+  'ky-su-tri-thuc': {
+    vi: {
+        title: 'Chọn loại Kỹ sư, tri thức',
+        description: 'Chọn chương trình Kỹ sư bạn muốn tuyển.',
+        options: [
+          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: 'Kỹ sư, tri thức đầu Nhật', desc: 'Để tuyển kỹ sư ở Nhật' },
+          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: 'Kỹ sư, tri thức đầu Việt', desc: 'Để tuyển kỹ sư từ Việt Nam' },
+        ]
+    },
+    ja: {
+        title: '技術・人文知識・国際業務の種類を選択',
+        description: '募集したいプログラムを選択してください。',
+        options: [
+          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: '国内エンジニア', desc: '日本での経験があるエンジニアを採用' },
+          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: '国外エンジニア', desc: 'ベトナムからエンジニアを採用' },
+        ]
+    },
+    en: {
+        title: 'Select Engineer/Specialist Type',
+        description: 'Choose the program you want to recruit for.',
+        options: [
+          { id: 'ky-su-tri-thuc-dau-nhat', icon: Users, title: 'Engineer (In Japan)', desc: 'Recruit engineers with experience in Japan' },
+          { id: 'ky-su-tri-thuc-dau-viet', icon: Plane, title: 'Engineer (In Vietnam)', desc: 'Recruit engineers from Vietnam' },
+        ]
+    }
+  }
 };
-
 
 const visaTypeContent = {
   vi: {
@@ -90,7 +165,6 @@ const visaTypeContent = {
   }
 };
 
-
 export function YL01Dialog({ 
     children, 
     isOpen, 
@@ -107,7 +181,8 @@ export function YL01Dialog({
   const [selectedSubRole, setSelectedSubRole] = useState<string | null>(null);
   const [fullName, setFullName] = useState('');
   const [companyName, setCompanyName] = useState('');
-  const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
+  const [selectedVisa, setSelectedVisa] = useState<{name: { vi: string, ja: string, en: string }, slug: string} | null>(null);
+  const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
   const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   useEffect(() => {
@@ -118,6 +193,7 @@ export function YL01Dialog({
       setFullName('');
       setCompanyName('');
       setSelectedVisa(null);
+      setSelectedVisaDetail(null);
     }
   }, [isOpen, initialStep]);
   
@@ -154,12 +230,20 @@ export function YL01Dialog({
     setStep(5);
   };
 
-  const handleVisaTypeSelect = (visaType: string) => {
-      setSelectedVisa(visaType);
-      navigateToEmployerPage(selectedRole!, selectedSubRole!, fullName, companyName, visaType);
+  const handleVisaTypeSelect = (visaTypeSlug: string) => {
+      const visa = japanJobTypes.find(t => t.slug === visaTypeSlug);
+      if (visa) {
+        setSelectedVisa(visa);
+        setStep(6);
+      }
   }
 
-  const navigateToEmployerPage = (roleId: string, subRoleId?: string, name?: string, company?: string, visa?: string) => {
+  const handleVisaDetailSelect = (visaDetailSlug: string) => {
+     setSelectedVisaDetail(visaDetailSlug);
+     navigateToEmployerPage(selectedRole!, selectedSubRole!, fullName, companyName, selectedVisa!.slug, visaDetailSlug);
+  }
+
+  const navigateToEmployerPage = (roleId: string, subRoleId?: string, name?: string, company?: string, visa?: string, visaDetail?: string) => {
     const params = new URLSearchParams();
     params.set('role', roleId);
     params.set('lang', currentLang);
@@ -174,6 +258,9 @@ export function YL01Dialog({
     }
     if (visa) {
         params.set('visa_type', visa);
+    }
+    if (visaDetail) {
+        params.set('visa_detail', visaDetail);
     }
     router.push(`/nha-tuyen-dung/Z000?${params.toString()}`);
     onOpenChange(false);
@@ -519,6 +606,48 @@ export function YL01Dialog({
         </>
     );
   };
+  
+  const renderVisaDetailStepDialog = () => {
+    if (!selectedVisa) return null;
+    
+    const contentData = visaDetailContent[selectedVisa.slug as keyof typeof visaDetailContent];
+    if (!contentData) return null;
+
+    const content = contentData[currentLang];
+    const iconColors = {
+        'thuc-tap-sinh-ky-nang': 'bg-orange-100 text-orange-500',
+        'ky-nang-dac-dinh': 'bg-blue-100 text-blue-500',
+        'ky-su-tri-thuc': 'bg-green-100 text-green-500',
+    };
+    const currentIconColor = iconColors[selectedVisa.slug as keyof typeof iconColors] || 'bg-gray-100 text-gray-500';
+
+    const screenId = `Y006-${selectedVisa.slug === 'thuc-tap-sinh-ky-nang' ? '1' : selectedVisa.slug === 'ky-nang-dac-dinh' ? '2' : '3'}`;
+
+    return (
+        <>
+        <span className="hidden">// Screen: {screenId}</span>
+        <DialogHeader>
+            <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+            <DialogDescription className="text-center">{content.description}</DialogDescription>
+        </DialogHeader>
+        <div className={cn("grid grid-cols-1 pt-4 gap-4", content.options.length > 2 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-2xl mx-auto")}>
+            {content.options.map(option => (
+                <Card key={option.id} onClick={() => handleVisaDetailSelect(option.id)}
+                    className={cn("text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center")}>
+                    <div className={cn("rounded-full p-3 w-fit mb-4", currentIconColor)}>
+                        <option.icon className="h-8 w-8" />
+                    </div>
+                    <h3 className="font-bold text-lg mb-2">{option.title}</h3>
+                    <p className="text-muted-foreground text-sm flex-grow">{option.desc}</p>
+                </Card>
+            ))}
+        </div>
+        <Button variant="link" onClick={() => setStep(5)} className="mt-4 mx-auto block">
+             {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
+        </Button>
+        </>
+    )
+  };
 
 
   const renderDialogContent = () => {
@@ -534,6 +663,8 @@ export function YL01Dialog({
         return renderCompanyNameStepDialog();
       case 5:
         return renderVisaTypeStepDialog();
+      case 6:
+        return renderVisaDetailStepDialog();
       default: return <PartnerRoleStepDialog />;
     }
   }
@@ -542,7 +673,7 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002-1_Y002-2_Y003_Y004_Y005">
+          <DialogContent className="sm:max-w-4xl" id="Y001_Y002-1_Y002-2_Y003_Y004_Y005_Y006">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
