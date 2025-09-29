@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from './ui/button';
 import { Card } from './ui/card';
-import { Globe, Users2, FastForward, ListChecks, HardHat, UserCheck, GraduationCap, Pencil, Sparkles, Building, Plane, Handshake, Briefcase, Users, UserSquare, UserCog, UserPlus } from 'lucide-react';
+import { Globe, Users2, FastForward, ListChecks, HardHat, UserCheck, GraduationCap, Pencil, Sparkles, Building, Plane, Handshake, Briefcase, Users, UserSquare, UserCog, UserPlus, FileSignature } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
@@ -160,10 +160,47 @@ const visaTypeContent = {
     options: [
       { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
       { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist in Humanities', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
     ]
   }
 };
+
+const industryContent = {
+    vi: {
+        title: "Chọn ngành nghề muốn tuyển dụng",
+        description: "Lựa chọn ngành nghề bạn muốn tuyển dụng.",
+        backButton: "Quay lại",
+    },
+    ja: {
+        title: "募集したい業種を選択",
+        description: "募集したい業種を選択してください。",
+        backButton: "戻る",
+    },
+    en: {
+        title: "Select Industry to Recruit",
+        description: "Select the industry you want to recruit for.",
+        backButton: "Back",
+    },
+};
+
+const regionContent = {
+    vi: {
+        title: 'Chọn khu vực làm việc',
+        description: 'Lựa chọn khu vực bạn muốn tuyển dụng.',
+        backButton: 'Quay lại',
+    },
+    ja: {
+        title: '希望勤務地を選択',
+        description: '募集したい地域を選択してください。',
+        backButton: '戻る',
+    },
+    en: {
+        title: 'Select Work Region',
+        description: 'Choose the region you want to recruit in.',
+        backButton: 'Back',
+    }
+};
+
 
 export function YL01Dialog({ 
     children, 
@@ -176,13 +213,17 @@ export function YL01Dialog({
     initialLang = 'vi'
 }: YL01DialogProps) {
   const router = useRouter();
+  const { role, setRole, isLoggedIn } = useAuth();
   const [step, setStep] = useState(initialStep);
+  const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedSubRole, setSelectedSubRole] = useState<string | null>(null);
   const [fullName, setFullName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [selectedVisa, setSelectedVisa] = useState<{name: { vi: string, ja: string, en: string }, slug: string} | null>(null);
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
+  const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   useEffect(() => {
@@ -202,50 +243,10 @@ export function YL01Dialog({
       onLanguageChange(lang);
   }
 
-  const handleRoleSelect = (roleId: string) => {
-    setSelectedRole(roleId);
-    if (roleId === 'nhan-vien-phai-cu' || roleId === 'nhan-vien-nhan-luc-nhat') {
-      setStep(2); 
-    } else {
-      navigateToEmployerPage(roleId);
-    }
-  };
-
-  const handleSubRoleSelect = (subRoleId: string) => {
-    setSelectedSubRole(subRoleId);
-    setStep(3);
-  };
-  
-  const handleNameContinue = () => {
-      if (fullName.trim() === '') {
-          return;
-      }
-      setStep(4);
-  }
-  
-  const handleCompanyContinue = () => {
-    if (companyName.trim() === '') {
-        return;
-    }
-    setStep(5);
-  };
-
-  const handleVisaTypeSelect = (visaTypeSlug: string) => {
-      const visa = japanJobTypes.find(t => t.slug === visaTypeSlug);
-      if (visa) {
-        setSelectedVisa(visa);
-        setStep(6);
-      }
-  }
-
-  const handleVisaDetailSelect = (visaDetailSlug: string) => {
-     setSelectedVisaDetail(visaDetailSlug);
-     navigateToEmployerPage(selectedRole!, selectedSubRole!, fullName, companyName, selectedVisa!.slug, visaDetailSlug);
-  }
-
-  const navigateToEmployerPage = (roleId: string, subRoleId?: string, name?: string, company?: string, visa?: string, visaDetail?: string) => {
+  const navigateToEmployerPage = (roleId: string, interest: string, subRoleId?: string, name?: string, company?: string, visa?: string, visaDetail?: string) => {
     const params = new URLSearchParams();
     params.set('role', roleId);
+    params.set('interest', interest)
     params.set('lang', currentLang);
     if (subRoleId) {
       params.set('sub_role', subRoleId);
@@ -265,7 +266,6 @@ export function YL01Dialog({
     router.push(`/nha-tuyen-dung/Z000?${params.toString()}`);
     onOpenChange(false);
   };
-
 
   const PartnerRoleStepDialog = () => {
         const roles = {
@@ -321,7 +321,7 @@ export function YL01Dialog({
                             {roles[currentLang].map((role) => (
                                 <Card 
                                     key={role.id} 
-                                    onClick={() => handleRoleSelect(role.id)}
+                                    onClick={() => { setSelectedRole(role.id); setStep(2); }}
                                     className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center")}
                                 >
                                     <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -334,6 +334,76 @@ export function YL01Dialog({
                 </Tabs>
             </>
         );
+  }
+
+  const InterestStepDialog = () => {
+    const interests = {
+        vi: {
+            title: "Bạn quan tâm đến điều gì?",
+            description: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.",
+            options: [
+                { id: 'post-job', icon: FileSignature, title: 'Đăng việc làm' },
+                { id: 'refer-candidate', icon: Users2, title: 'Giới thiệu ứng viên' },
+                { id: 'post-and-refer', icon: Briefcase, title: 'Đăng việc làm & Giới thiệu ứng viên' },
+                { id: 'refer-and-post', icon: Handshake, title: 'Giới thiệu ứng viên & Đăng việc làm' },
+            ],
+            backButton: 'Quay lại',
+        },
+        ja: {
+            title: "何に興味がありますか？",
+            description: "最高の体験のために、あなたの主な目標を教えてください。",
+            options: [
+                { id: 'post-job', icon: FileSignature, title: '求人掲載' },
+                { id: 'refer-candidate', icon: Users2, title: '候補者紹介' },
+                { id: 'post-and-refer', icon: Briefcase, title: '求人掲載と候補者紹介' },
+                { id: 'refer-and-post', icon: Handshake, title: '候補者紹介と求人掲載' },
+            ],
+            backButton: '戻る',
+        },
+        en: {
+            title: 'What are you interested in?',
+            description: 'Tell us your main goal for the best experience.',
+            options: [
+                { id: 'post-job', icon: FileSignature, title: 'Post a Job' },
+                { id: 'refer-candidate', icon: Users2, title: 'Refer a Candidate' },
+                { id: 'post-and-refer', icon: Briefcase, title: 'Post Job & Refer Candidate' },
+                { id: 'refer-and-post', icon: Handshake, title: 'Refer Candidate & Post Job' },
+            ],
+            backButton: 'Back',
+        },
+    }[currentLang];
+
+    return (
+        <>
+            {/* Screen: Y002 */}
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">{interests.title}</DialogTitle>
+                <DialogDescription className="text-center">{interests.description}</DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                {interests.options.map(option => (
+                    <Card
+                        key={option.id}
+                        onClick={() => {
+                            setSelectedInterest(option.id);
+                            if (selectedRole === 'nhan-vien-phai-cu' || selectedRole === 'nhan-vien-nhan-luc-nhat') {
+                                setStep(3);
+                            } else {
+                                navigateToEmployerPage(selectedRole!, option.id);
+                            }
+                        }}
+                        className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
+                    >
+                        <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                        <h3 className="font-bold text-base">{option.title}</h3>
+                    </Card>
+                ))}
+            </div>
+            <div className="text-center mt-4">
+                 <Button variant="link" onClick={() => setStep(1)}>{interests.backButton}</Button>
+            </div>
+        </>
+    )
   }
 
   const SendingCompanySubRoleStepDialog = () => {
@@ -369,7 +439,7 @@ export function YL01Dialog({
 
     return (
         <>
-            {/* Screen: Y002-1 */}
+            {/* Screen: Y003-1 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                 <DialogDescription className="text-center">{content.description}</DialogDescription>
@@ -378,7 +448,7 @@ export function YL01Dialog({
                 {content.options.map(option => (
                      <Card 
                         key={option.id} 
-                        onClick={() => handleSubRoleSelect(option.id)}
+                        onClick={() => { setSelectedSubRole(option.id); setStep(4);}}
                         className="text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
                     >
                         <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -387,7 +457,7 @@ export function YL01Dialog({
                 ))}
             </div>
             <div className="text-center mt-4">
-                 <Button variant="link" onClick={() => setStep(1)}>{content.backButton}</Button>
+                 <Button variant="link" onClick={() => setStep(2)}>{content.backButton}</Button>
             </div>
         </>
     )
@@ -426,7 +496,7 @@ export function YL01Dialog({
 
     return (
         <>
-             {/* Screen: Y002-2 */}
+             {/* Screen: Y003-2 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                 <DialogDescription className="text-center">{content.description}</DialogDescription>
@@ -435,7 +505,7 @@ export function YL01Dialog({
                 {content.options.map(option => (
                      <Card 
                         key={option.id} 
-                        onClick={() => handleSubRoleSelect(option.id)}
+                        onClick={() => { setSelectedSubRole(option.id); setStep(4);}}
                         className="text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
                     >
                         <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -444,7 +514,7 @@ export function YL01Dialog({
                 ))}
             </div>
             <div className="text-center mt-4">
-                 <Button variant="link" onClick={() => setStep(1)}>{content.backButton}</Button>
+                 <Button variant="link" onClick={() => setStep(2)}>{content.backButton}</Button>
             </div>
         </>
     )
@@ -480,7 +550,7 @@ export function YL01Dialog({
 
     return (
          <>
-            {/* Screen: Y003 */}
+            {/* Screen: Y004 */}
             <DialogHeader className="text-center items-center">
                 <div className="p-3 bg-primary/10 rounded-full w-fit">
                     <UserSquare className="h-8 w-8 text-primary"/>
@@ -499,10 +569,10 @@ export function YL01Dialog({
                 />
             </div>
              <div className="mt-6 flex justify-center gap-2">
-                <Button variant="outline" onClick={() => setStep(2)}>
+                <Button variant="outline" onClick={() => setStep(3)}>
                     {content.backButton}
                 </Button>
-                <Button onClick={handleNameContinue} disabled={!fullName.trim()}>
+                <Button onClick={() => { if (fullName.trim()) setStep(5); }} disabled={!fullName.trim()}>
                     {content.continueButton}
                 </Button>
             </div>
@@ -540,7 +610,7 @@ export function YL01Dialog({
 
     return (
          <>
-            {/* Screen: Y004 */}
+            {/* Screen: Y005 */}
             <DialogHeader className="text-center items-center">
                 <div className="p-3 bg-primary/10 rounded-full w-fit">
                     <Building className="h-8 w-8 text-primary"/>
@@ -559,10 +629,10 @@ export function YL01Dialog({
                 />
             </div>
              <div className="mt-6 flex justify-center gap-2">
-                <Button variant="outline" onClick={() => setStep(3)}>
+                <Button variant="outline" onClick={() => setStep(4)}>
                     {content.backButton}
                 </Button>
-                <Button onClick={handleCompanyContinue} disabled={!companyName.trim()}>
+                <Button onClick={() => { if (companyName.trim()) setStep(6); }} disabled={!companyName.trim()}>
                     {content.continueButton}
                 </Button>
             </div>
@@ -580,7 +650,7 @@ export function YL01Dialog({
 
     return (
         <>
-            {/* Screen: Y005 */}
+            {/* Screen: Y006 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                 <DialogDescription className="text-center">
@@ -591,7 +661,7 @@ export function YL01Dialog({
                 {content.options.map(option => (
                     <Button 
                         key={option.id}
-                        onClick={() => handleVisaTypeSelect(option.id)} 
+                        onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === option.id)!); setStep(7); }}
                         variant="outline" 
                         className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                         <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
@@ -600,7 +670,7 @@ export function YL01Dialog({
                     </Button>
                 ))}
             </div>
-            <Button variant="link" onClick={() => setStep(4)} className="mt-4 mx-auto block">
+            <Button variant="link" onClick={() => setStep(5)} className="mt-4 mx-auto block">
                 {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
             </Button>
         </>
@@ -621,7 +691,7 @@ export function YL01Dialog({
     };
     const currentIconColor = iconColors[selectedVisa.slug as keyof typeof iconColors] || 'bg-gray-100 text-gray-500';
 
-    const screenId = `Y006-${selectedVisa.slug === 'thuc-tap-sinh-ky-nang' ? '1' : selectedVisa.slug === 'ky-nang-dac-dinh' ? '2' : '3'}`;
+    const screenId = `Y007-${selectedVisa.slug === 'thuc-tap-sinh-ky-nang' ? '1' : selectedVisa.slug === 'ky-nang-dac-dinh' ? '2' : '3'}`;
 
     return (
         <>
@@ -632,7 +702,7 @@ export function YL01Dialog({
         </DialogHeader>
         <div className={cn("grid grid-cols-1 pt-4 gap-4", content.options.length > 2 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-2xl mx-auto")}>
             {content.options.map(option => (
-                <Card key={option.id} onClick={() => handleVisaDetailSelect(option.id)}
+                <Card key={option.id} onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest!, selectedSubRole!, fullName, companyName, selectedVisa!.slug, option.id)}
                     className={cn("text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center")}>
                     <div className={cn("rounded-full p-3 w-fit mb-4", currentIconColor)}>
                         <option.icon className="h-8 w-8" />
@@ -642,7 +712,7 @@ export function YL01Dialog({
                 </Card>
             ))}
         </div>
-        <Button variant="link" onClick={() => setStep(5)} className="mt-4 mx-auto block">
+        <Button variant="link" onClick={() => setStep(6)} className="mt-4 mx-auto block">
              {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
         </Button>
         </>
@@ -653,17 +723,18 @@ export function YL01Dialog({
   const renderDialogContent = () => {
     switch (step) {
       case 1: return <PartnerRoleStepDialog />;
-      case 2:
+      case 2: return <InterestStepDialog />;
+      case 3:
         if (selectedRole === 'nhan-vien-phai-cu') return <SendingCompanySubRoleStepDialog />;
         if (selectedRole === 'nhan-vien-nhan-luc-nhat') return <JapaneseHrSubRoleStepDialog />;
         return <PartnerRoleStepDialog />; // Fallback
-      case 3:
-        return renderNameInputStepDialog();
       case 4:
-        return renderCompanyNameStepDialog();
+        return renderNameInputStepDialog();
       case 5:
-        return renderVisaTypeStepDialog();
+        return renderCompanyNameStepDialog();
       case 6:
+        return renderVisaTypeStepDialog();
+      case 7:
         return renderVisaDetailStepDialog();
       default: return <PartnerRoleStepDialog />;
     }
@@ -673,7 +744,7 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002-1_Y002-2_Y003_Y004_Y005_Y006">
+          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1_Y003-2_Y004_Y005_Y006_Y007">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
