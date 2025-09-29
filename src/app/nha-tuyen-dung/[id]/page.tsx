@@ -47,10 +47,10 @@ const employersData: { [key: string]: any } = {
         },
         
         images: [
-            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Văn phòng làm việc', ja: 'オフィス', en: 'Office Space' }, dataAiHint: 'modern office interior' },
-            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Hoạt động đội nhóm', ja: 'チーム活動', en: 'Team Activity' }, dataAiHint: 'team building activity' },
-            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Lễ ký kết hợp tác', ja: 'パートナーシップ調印式', en: 'Partnership Signing Ceremony' }, dataAiHint: 'partnership signing ceremony' },
-            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Đào tạo nhân viên', ja: '従業員研修', en: 'Employee Training' }, dataAiHint: 'employee training session' },
+            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
+            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 2', ja: '新しい写真 2', en: 'New Photo 2' }, dataAiHint: 'new image 2' },
+            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 3', ja: '新しい写真 3', en: 'New Photo 3' }, dataAiHint: 'new image 3' },
+            { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 4', ja: '新しい写真 4', en: 'New Photo 4' }, dataAiHint: 'new image 4' },
         ],
 
         history: [
@@ -81,9 +81,9 @@ const employersData: { [key: string]: any } = {
 const placeholderEmployerData = {
     ...employersData['Z000'],
     about: {
-        vi: '',
-        ja: '',
-        en: ''
+        vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
+        ja: 'ABC派遣会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。長年の経験により、私たちは何千人ものベトナム人労働者の夢を支援してきたことを誇りに思っています...',
+        en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\' dreams take flight...'
     },
     images: [
         { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
@@ -91,18 +91,28 @@ const placeholderEmployerData = {
         { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 3', ja: '新しい写真 3', en: 'New Photo 3' }, dataAiHint: 'new image 3' },
         { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 4', ja: '新しい写真 4', en: 'New Photo 4' }, dataAiHint: 'new image 4' },
     ],
-    history: [],
+    history: [
+        { year: '2010', event: { vi: 'Thành lập công ty cổ phần ABC.', ja: 'ABC株式会社設立。', en: 'Established ABC Corporation.' } },
+        { year: '2015', event: { vi: 'Đạt mốc 1.000 lao động được phái cử thành công.', ja: '派遣労働者1,000人達成。', en: 'Reached the milestone of 1,000 successfully dispatched workers.' } },
+        { year: '2020', event: { vi: 'Mở rộng văn phòng đại diện tại Tokyo, Nhật Bản.', ja: '東京に駐在員事務所を開設。', en: 'Opened representative office in Tokyo, Japan.' } },
+        { year: '2023', event: { vi: 'Nhận giải thưởng "Công ty phái cử uy tín của năm".', ja: '「今年の信頼できる派遣会社」賞を受賞。', en: '"Reputable Dispatch Company of the Year" award.' } }
+    ],
     info: {
-        founded: '',
-        size: { vi: '', ja: '', en: '' },
-        license: '',
-        website: '',
+        founded: '2010',
+        size: { vi: '50 - 100 nhân viên', ja: '50～100名', en: '50 - 100 employees' },
+        license: 'Số 123/LĐTBXH-GP',
+        website: 'https://abc-corp.co.jp',
     },
     industries: {
-        main: { vi: '', ja: '', en: '' },
-        secondary: { vi: '', ja: '', en: '' },
+        main: { vi: 'Xây dựng, Cơ khí, Nông nghiệp, Thực phẩm', ja: '建設、機械、農業、食品', en: 'Construction, Machinery, Agriculture, Food' },
+        secondary: { vi: 'Dệt may, Điện tử', ja: '繊維、電子', en: 'Textiles, Electronics' },
     },
-    benefits: []
+    benefits: [
+        { vi: 'Môi trường làm việc chuyên nghiệp, thân thiện.', ja: 'プロフェッショナルでフレンドリーな職場環境。', en: 'Professional and friendly working environment.' },
+        { vi: 'Chế độ đãi ngộ, phúc lợi cạnh tranh.', ja: '競争力のある報酬と福利厚生制度。', en: 'Competitive salary and benefits package.' },
+        { vi: 'Nhiều cơ hội đào tạo và phát triển sự nghiệp.', ja: '多くのトレーニングとキャリア開発の機会。', en: 'Many opportunities for training and career development.' },
+        { vi: 'Hỗ trợ toàn diện cho người lao động tại Nhật Bản.', ja: '日本での労働者に対する包括的なサポート。', en: 'Comprehensive support for workers in Japan.' },
+    ]
 };
 
 
@@ -233,14 +243,14 @@ const contentByLang = {
 type Language = keyof typeof contentByLang;
 
 const roleTexts: Record<string, Record<Language, string>> = {
-  haken_staff: { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
-  jp_hr_staff: { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
-  dispatch: { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
-  support: { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
-  enterprise: { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
-  union: { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
-  shokai: { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Placement Agency' },
-  haken: { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
+  'nhan-vien-phai-cu': { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
+  'nhan-vien-nhan-luc-nhat': { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
+  'sending': { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
+  'support': { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
+  'company': { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
+  'supervising-organization': { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
+  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Placement Agency' },
+  'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
 };
 
 
@@ -511,7 +521,7 @@ export default function EmployerDetailPage({ params }: { params: { id: string } 
                     {tempContent.map((item: any, index: number) => (
                         <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
                             <Input placeholder="Năm" value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
-                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang] || ''}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
+                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
