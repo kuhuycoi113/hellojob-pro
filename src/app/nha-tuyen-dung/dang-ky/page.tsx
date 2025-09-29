@@ -716,7 +716,7 @@ export default function EmployerDetailPage() {
                     {tempContent.map((item: any, index: number) => (
                         <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
                             <Input placeholder="Năm" value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
-                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
+                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayMultiLangChange(index, 'event', e.target.value)} />
                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
@@ -1071,7 +1071,7 @@ export default function EmployerDetailPage() {
       return phone;
   }
 
-  const getArrayValue = (field: any) => {
+  const getArrayValue = (field: any, fieldKey: string) => {
     const value = field?.[lang] || [];
     if (Array.isArray(value) && value.length > 0) {
       if (typeof value[0] === 'object' && value[0] !== null && 'id' in value[0]) { // For valueInterest
@@ -1084,10 +1084,7 @@ export default function EmployerDetailPage() {
         );
       }
       
-      const allVisaTypes = japanJobTypes;
-      const allVisaDetails = Object.values(visaDetailsByVisaType).flat();
-      
-      const allItems = [...allVisaTypes, ...allVisaDetails, ...allIndustries, ...japanRegions];
+      const allItems = [...japanJobTypes, ...Object.values(visaDetailsByVisaType).flat(), ...allIndustries, ...japanRegions];
       
       const content = value.map((slug: string, index: number) => {
           const item = allItems.find((i: any) => i.slug === slug);
@@ -1108,7 +1105,7 @@ export default function EmployerDetailPage() {
       
       return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
     }
-    return <span className="italic text-muted-foreground">{t.notUpdated}</span>;
+     return <button className="italic text-primary underline" onClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>{t.clickToUpdate}</button>
   };
 
 
@@ -1131,7 +1128,7 @@ export default function EmployerDetailPage() {
                   </Label>
                 </div>
                 <div className="p-6 bg-card">
-                  <div className="flex flex-col md:flex-row gap-6 items-start -mt-24 md:-mt-20 relative">
+                  <div className="flex items-start gap-4 -mt-24 md:-mt-20">
                       <div className="relative flex-shrink-0">
                         <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
                             <AvatarImage src={employer.logo} />
@@ -1142,13 +1139,13 @@ export default function EmployerDetailPage() {
                            </Label>
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
-                      <div className="flex-grow pt-16 md:pt-20">
-                          <h1 id="DKY004&5" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                          <p className="font-semibold text-primary">{roleText}</p>
-                          <p className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
-                      </div>
-                      <div className="absolute top-0 right-0 md:pt-20">
-                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: employer.type, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
+                      <div className="flex-grow pt-24 md:pt-20 flex justify-between items-start">
+                          <div>
+                            <h1 id="DKY004&5" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
+                            <p className="font-semibold text-primary">{roleText}</p>
+                            <p className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
+                          </div>
+                           <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: employer.type, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
                       </div>
                   </div>
                 </div>
@@ -1244,14 +1241,14 @@ export default function EmployerDetailPage() {
                   </SectionCard>
                   <SectionCard title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
-                          <div><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType)}</div>
-                          <div><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail)}</div>
+                          <div><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
+                          <div><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <div><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main)}</div>
-                          <div><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary)}</div>
+                          <div><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
+                          <div><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
                       </div>
                   </SectionCard>
               </div>
@@ -1290,4 +1287,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
