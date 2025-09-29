@@ -60,6 +60,37 @@ const roleTexts: Record<string, Record<Language, string>> = {
 };
 
 
+const visaTypeContent = {
+  vi: {
+    title: 'Bạn muốn tuyển loại Visa nào?',
+    description: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Kỹ sư, tri thức', desc: 'Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.', color: 'green' },
+    ]
+  },
+  ja: {
+    title: 'どのビザタイプを募集しますか？',
+    description: '採用ニーズに最も適したビザタイプを選択してください。',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門知識を持つ専門家を採用。', color: 'green' },
+    ]
+  },
+  en: {
+    title: 'Which Visa Type do you want to recruit?',
+    description: 'Please select the visa type that best suits your recruitment needs.',
+    options: [
+      { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
+      { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
+    ]
+  }
+};
+
+
 export function YL01Dialog({ 
     children, 
     isOpen, 
@@ -76,6 +107,7 @@ export function YL01Dialog({
   const [selectedSubRole, setSelectedSubRole] = useState<string | null>(null);
   const [fullName, setFullName] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
   const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   useEffect(() => {
@@ -85,6 +117,7 @@ export function YL01Dialog({
       setSelectedSubRole(null);
       setFullName('');
       setCompanyName('');
+      setSelectedVisa(null);
     }
   }, [isOpen, initialStep]);
   
@@ -104,27 +137,29 @@ export function YL01Dialog({
 
   const handleSubRoleSelect = (subRoleId: string) => {
     setSelectedSubRole(subRoleId);
-    setStep(3); // Proceed to name input
+    setStep(3);
   };
   
   const handleNameContinue = () => {
       if (fullName.trim() === '') {
-          // You might want to add a toast or error message here
           return;
       }
-      setStep(4); // Proceed to company name input
+      setStep(4);
   }
   
   const handleCompanyContinue = () => {
     if (companyName.trim() === '') {
         return;
     }
-    if (selectedRole) {
-        navigateToEmployerPage(selectedRole, selectedSubRole || undefined, fullName, companyName);
-    }
+    setStep(5);
   };
 
-  const navigateToEmployerPage = (roleId: string, subRoleId?: string, name?: string, company?: string) => {
+  const handleVisaTypeSelect = (visaType: string) => {
+      setSelectedVisa(visaType);
+      navigateToEmployerPage(selectedRole!, selectedSubRole!, fullName, companyName, visaType);
+  }
+
+  const navigateToEmployerPage = (roleId: string, subRoleId?: string, name?: string, company?: string, visa?: string) => {
     const params = new URLSearchParams();
     params.set('role', roleId);
     params.set('lang', currentLang);
@@ -137,8 +172,11 @@ export function YL01Dialog({
     if (company) {
         params.set('company_name', company);
     }
+    if (visa) {
+        params.set('visa_type', visa);
+    }
     router.push(`/nha-tuyen-dung/Z000?${params.toString()}`);
-    onOpenChange(false); // Close the dialog after navigation
+    onOpenChange(false);
   };
 
 
@@ -393,7 +431,7 @@ export function YL01Dialog({
             label: "Tên công ty",
             placeholder: "Ví dụ: Công ty TNHH HelloJob",
             backButton: "Quay lại",
-            continueButton: "Hoàn tất"
+            continueButton: "Tiếp tục"
         },
         ja: {
             title: "会社名/法人名/団体名を入力してください",
@@ -401,7 +439,7 @@ export function YL01Dialog({
             label: "会社名",
             placeholder: "例: 株式会社HelloJob",
             backButton: "戻る",
-            continueButton: "完了"
+            continueButton: "続ける"
         },
         en: {
             title: "Please enter your Company/Entity/Organization name",
@@ -409,7 +447,7 @@ export function YL01Dialog({
             label: "Company Name",
             placeholder: "E.g., HelloJob Co., Ltd.",
             backButton: "Back",
-            continueButton: "Complete"
+            continueButton: "Continue"
         },
     }[currentLang];
 
@@ -445,6 +483,43 @@ export function YL01Dialog({
     )
   }
 
+  const renderVisaTypeStepDialog = () => {
+    const content = visaTypeContent[currentLang];
+    const iconColors = {
+        orange: 'text-orange-500',
+        blue: 'text-blue-500',
+        green: 'text-green-500',
+    };
+
+    return (
+        <>
+            {/* Screen: Y005 */}
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">
+                    {content.description}
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                {content.options.map(option => (
+                    <Button 
+                        key={option.id}
+                        onClick={() => handleVisaTypeSelect(option.id)} 
+                        variant="outline" 
+                        className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
+                        <h3 className="font-bold text-base mb-1">{option.title}</h3>
+                        <p className="text-muted-foreground text-xs">{option.desc}</p>
+                    </Button>
+                ))}
+            </div>
+            <Button variant="link" onClick={() => setStep(4)} className="mt-4 mx-auto block">
+                {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
+            </Button>
+        </>
+    );
+  };
+
 
   const renderDialogContent = () => {
     switch (step) {
@@ -457,6 +532,8 @@ export function YL01Dialog({
         return renderNameInputStepDialog();
       case 4:
         return renderCompanyNameStepDialog();
+      case 5:
+        return renderVisaTypeStepDialog();
       default: return <PartnerRoleStepDialog />;
     }
   }
@@ -465,12 +542,10 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002-1_Y002-2_Y003_Y004">
+          <DialogContent className="sm:max-w-4xl" id="Y001_Y002-1_Y002-2_Y003_Y004_Y005">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
     </>
   );
 }
-
-    
