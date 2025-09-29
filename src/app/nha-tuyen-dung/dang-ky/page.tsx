@@ -30,8 +30,8 @@ import {
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
-import { Industry, industriesByJobType, allIndustries } from '@/lib/industry-data';
-import { japanRegions, allJapanLocations } from '@/lib/location-data';
+import { Industry, allIndustries } from '@/lib/industry-data';
+import { japanRegions } from '@/lib/location-data';
 
 
 const employersData: { [key: string]: any } = {
@@ -141,8 +141,8 @@ const placeholderEmployerData = {
         { vi: 'Hỗ trợ toàn diện cho người lao động tại Nhật Bản.', ja: '日本での労働者に対する包括的なサポート。', en: 'Comprehensive support for workers in Japan.' },
     ],
     valueInterest: [
-        { vi: 'Ứng viên nhiều và nhanh nhất', ja: '最も多く、最も速い候補者', en: 'Most & Fastest Candidates' },
-        { vi: 'Ứng viên chất lượng', ja: '質の高い候補者', en: 'Quality Candidates' },
+        { id: 'ung-vien-chat-luong', vi: 'Ứng viên chất lượng', ja: '質の高い候補者', en: 'Quality Candidates' },
+        { id: 'chi-phi-thap', vi: 'Chi phí tuyển dụng thấp nhất', ja: '最低の採用コスト', en: 'Lowest Recruitment Cost' },
     ],
 };
 
@@ -199,10 +199,10 @@ const contentByLang = {
         typePlaceholder: 'Ví dụ: Công ty phái cử',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
         industriesTitle: 'Ngành nghề & Khu vực',
-        mainIndustriesLabel: 'Ngành nghề chính',
+        mainIndustriesLabel: 'Ngành nghề tuyển dụng chính',
         secondaryIndustriesLabel: 'Khu vực tuyển dụng chính',
         benefitsTitle: 'Phúc lợi & Môi trường',
-        valueInterestTitle: 'Giá trị mong muốn',
+        valueInterestTitle: 'Giá trị quan tâm',
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
@@ -239,7 +239,7 @@ const contentByLang = {
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: '主な採用地域',
         benefitsTitle: '福利厚生と環境',
-        valueInterestTitle: '希望する価値',
+        valueInterestTitle: '関心のある価値',
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
         registerAction: '登録',
@@ -284,6 +284,36 @@ const contentByLang = {
         visaTypeLabel: 'Type',
         visaDetailLabel: 'Visa Details',
     }
+};
+
+const valueInterestOptions = {
+    vi: [
+      { id: 'ung-vien-nhieu-nhanh', title: 'Ứng viên nhiều và nhanh nhất' },
+      { id: 'ung-vien-chat-luong', title: 'Ứng viên chất lượng' },
+      { id: 'viec-lam-ro-rang', title: 'Việc làm rõ ràng và chất lượng' },
+      { id: 'chi-phi-thap', title: 'Chi phí tuyển dụng thấp nhất' },
+      { id: 'loi-nhuan-cao', title: 'Lợi nhuận cao nhất' },
+      { id: 'quan-ly-ho-tro', title: 'Dịch vụ quản lý hỗ trợ tốt nhất' },
+      { id: 'cham-soc-khach-hang', title: 'Dịch vụ chăm sóc khách hàng tốt nhất' },
+    ],
+    ja: [
+      { id: 'ung-vien-nhieu-nhanh', title: '最も多く、最も速い候補者' },
+      { id: 'ung-vien-chat-luong', title: '質の高い候補者' },
+      { id: 'viec-lam-ro-rang', title: '明確で質の高い求人' },
+      { id: 'chi-phi-thap', title: '最低の採用コスト' },
+      { id: 'loi-nhuan-cao', title: '最高の利益' },
+      { id: 'quan-ly-ho-tro', title: '最高の管理サポートサービス' },
+      { id: 'cham-soc-khach-hang', title: '最高の顧客ケアサービス' },
+    ],
+    en: [
+      { id: 'ung-vien-nhieu-nhanh', title: 'Most & Fastest Candidates' },
+      { id: 'ung-vien-chat-luong', title: 'Quality Candidates' },
+      { id: 'viec-lam-ro-rang', title: 'Clear & Quality Jobs' },
+      { id: 'chi-phi-thap', title: 'Lowest Recruitment Cost' },
+      { id: 'loi-nhuan-cao', title: 'Highest Profit' },
+      { id: 'quan-ly-ho-tro', title: 'Best Support Management Service' },
+      { id: 'cham-soc-khach-hang', title: 'Best Customer Care Service' },
+    ]
 };
 
 type Language = keyof typeof contentByLang;
@@ -457,7 +487,6 @@ export default function EmployerDetailPage() {
         };
     }
     
-    const allIndustriesList = Object.values(industriesByJobType).flat();
     const industries = searchParams.getAll('industry');
     if (industries.length > 0) {
         finalEmployerData.industries.main = {
@@ -477,10 +506,10 @@ export default function EmployerDetailPage() {
     }
     
     const interest = searchParams.get('interest');
+    const allInterests = valueInterestOptions[langFromParams];
     if (interest) {
-         finalEmployerData.valueInterest = placeholderEmployerData.valueInterest.filter((v:any) => v.vi.toLowerCase().includes(interest.substring(0,3)));
+         finalEmployerData.valueInterest = allInterests.filter(opt => interest.includes(opt.id));
     }
-
 
     setEmployer(finalEmployerData);
 
@@ -558,7 +587,7 @@ export default function EmployerDetailPage() {
     let allValid = true;
     if (editingModule.field === 'info') {
         if (!validateEmail(tempContent.email || '')) {
-             setErrors(prev => ({ ...prev, email: "Email không hợp lệ." }));
+             setErrors(prev => ({ ...prev, email: "Email không hợp lệ" }));
              allValid = false;
         } else {
             setErrors(prev => ({ ...prev, email: undefined }));
@@ -589,7 +618,7 @@ export default function EmployerDetailPage() {
              newState.visaType = tempContent.visaType;
              newState.visaDetail = tempContent.visaDetail;
         } else if (field === 'valueInterest') {
-            newState.valueInterest = tempContent.split('\n').map((item: string) => ({ vi: item, ja: item, en: item }));
+            newState.valueInterest = tempContent;
         } else if (field === 'industries') {
             newState.industries = tempContent;
         } else {
@@ -836,24 +865,33 @@ export default function EmployerDetailPage() {
                 </div>
              );
         case 'valueInterest':
-             return (
-                <div className="space-y-4">
-                     {tempContent.split('\n').map((item: any, index: number) => (
-                        <div key={index} className="flex items-center gap-2">
-                            <Input placeholder={`Ví dụ: Ứng viên chất lượng`} value={item} onChange={(e) => {
-                                const newValues = tempContent.split('\n');
-                                newValues[index] = e.target.value;
-                                setTempContent(newValues.join('\n'));
-                            }} />
-                             <Button variant="ghost" size="icon" onClick={() => {
-                                 const newValues = tempContent.split('\n').filter((_:any, i:number) => i !== index);
-                                 setTempContent(newValues.join('\n'));
-                             }}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+            const currentInterests = Array.isArray(tempContent) ? tempContent.map(item => item.id) : [];
+            const handleInterestChange = (checked: boolean, interestId: string) => {
+                const interestObject = valueInterestOptions[lang].find(opt => opt.id === interestId);
+                if (!interestObject) return;
+
+                const newSelection = checked
+                    ? [...tempContent, { id: interestObject.id, vi: interestObject.title, ja: interestObject.title, en: interestObject.title }]
+                    : tempContent.filter((item: any) => item.id !== interestId);
+                setTempContent(newSelection);
+            };
+
+            return (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {valueInterestOptions[lang].map(option => (
+                        <div key={option.id} className="flex items-start space-x-2 rounded-md border p-4 hover:bg-accent/50 transition-colors">
+                            <Checkbox
+                                id={`interest-${option.id}`}
+                                checked={currentInterests.includes(option.id)}
+                                onCheckedChange={(checked) => handleInterestChange(Boolean(checked), option.id)}
+                            />
+                            <Label htmlFor={`interest-${option.id}`} className="font-normal cursor-pointer">
+                                {option.title}
+                            </Label>
                         </div>
                     ))}
-                    <Button variant="outline" onClick={() => setTempContent(tempContent + '\n')}><PlusCircle className="mr-2"/> Thêm giá trị</Button>
                 </div>
-             );
+            );
         case 'visa':
             const currentVisaTypes = Array.isArray(tempContent.visaType?.[lang]) ? tempContent.visaType[lang] : [];
             const handleVisaTypeChange = (checked: boolean, typeSlug: string) => {
@@ -972,7 +1010,7 @@ export default function EmployerDetailPage() {
             };
             
             const availableIndustries = Array.from(new Map(
-                (employer?.visaType?.[lang] || []).flatMap((vSlug: string) => industriesByJobType[vSlug] || []).map((item: Industry) => [item.slug, item])
+                (employer?.visaType?.[lang] || []).flatMap((vSlug: string) => (industriesByJobType[vSlug] || []).map((i: Industry) => ({...i, name: i.name[lang]}))).map((item: Industry) => [item.slug, item])
             ).values());
 
             return (
@@ -999,7 +1037,7 @@ export default function EmployerDetailPage() {
                                         onSelect={(e) => e.preventDefault()}
                                         onCheckedChange={(checked) => handleIndustryChange(Boolean(checked), industry.slug)}
                                     >
-                                        {industry.name[lang]}
+                                        {industry.name}
                                     </DropdownMenuCheckboxItem>
                                 ))}
                             </DropdownMenuContent>
@@ -1057,7 +1095,7 @@ export default function EmployerDetailPage() {
   const getArrayValue = (field: any) => {
     const value = field?.[lang] || [];
     if (Array.isArray(value) && value.length > 0) {
-      if (typeof value[0] === 'object') {
+      if (typeof value[0] === 'object' && value[0] !== null && 'id' in value[0]) { // For valueInterest
         return value.map(item => item[lang]).join(', ');
       }
       
@@ -1131,7 +1169,7 @@ export default function EmployerDetailPage() {
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
-                   <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest.map((i: any) => i[lang]).join('\n'), 'valueInterest')}>
+                   <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest, 'valueInterest')}>
                     {employer.valueInterest?.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
                             {employer.valueInterest.map((item: any, index: number) => (
@@ -1139,7 +1177,7 @@ export default function EmployerDetailPage() {
                             ))}
                         </div>
                     ) : (
-                        <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, '', 'valueInterest')}>{t.clickToUpdate}</button>.</p>
+                        <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, [], 'valueInterest')}>{t.clickToUpdate}</button>.</p>
                     )}
                   </SectionCard>
                   <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
@@ -1259,4 +1297,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
