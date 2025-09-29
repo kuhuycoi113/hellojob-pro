@@ -31,6 +31,8 @@ import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from './custom-icons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -71,12 +73,16 @@ export function YL01Dialog({
   const router = useRouter();
   const [step, setStep] = useState(initialStep);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [selectedSubRole, setSelectedSubRole] = useState<string | null>(null);
+  const [fullName, setFullName] = useState('');
   const [currentLang, setCurrentLang] = useState<Language>(initialLang);
 
   useEffect(() => {
     if (isOpen) {
       setStep(initialStep);
       setSelectedRole(null);
+      setSelectedSubRole(null);
+      setFullName('');
     }
   }, [isOpen, initialStep]);
   
@@ -88,24 +94,36 @@ export function YL01Dialog({
   const handleRoleSelect = (roleId: string) => {
     setSelectedRole(roleId);
     if (roleId === 'nhan-vien-phai-cu' || roleId === 'nhan-vien-nhan-luc-nhat') {
-      setStep(2); // Move to sub-role selection for both
+      setStep(2); 
     } else {
       navigateToEmployerPage(roleId);
     }
   };
 
   const handleSubRoleSelect = (subRoleId: string) => {
-    if (selectedRole) {
-      navigateToEmployerPage(selectedRole, subRoleId);
-    }
+    setSelectedSubRole(subRoleId);
+    setStep(3); // Proceed to name input
   };
+  
+  const handleNameContinue = () => {
+      if (fullName.trim() === '') {
+          // You might want to add a toast or error message here
+          return;
+      }
+      if (selectedRole) {
+          navigateToEmployerPage(selectedRole, selectedSubRole || undefined, fullName);
+      }
+  }
 
-  const navigateToEmployerPage = (roleId: string, subRoleId?: string) => {
+  const navigateToEmployerPage = (roleId: string, subRoleId?: string, name?: string) => {
     const params = new URLSearchParams();
     params.set('role', roleId);
     params.set('lang', currentLang);
     if (subRoleId) {
       params.set('sub_role', subRoleId);
+    }
+    if (name) {
+        params.set('name', name);
     }
     router.push(`/nha-tuyen-dung/Z000?${params.toString()}`);
     onOpenChange(false); // Close the dialog after navigation
@@ -293,24 +311,83 @@ export function YL01Dialog({
     )
   };
 
+  const renderNameInputStepDialog = () => {
+    const content = {
+        vi: {
+            title: "Vui lòng nhập họ tên của bạn",
+            description: "Thông tin này sẽ được dùng để cá nhân hóa tài khoản đối tác của bạn.",
+            label: "Họ và tên",
+            placeholder: "Ví dụ: Nguyễn Văn An",
+            backButton: "Quay lại",
+            continueButton: "Tiếp tục"
+        },
+        ja: {
+            title: "氏名を入力してください",
+            description: "この情報はパートナーアカウントをパーソナライズするために使用されます。",
+            label: "氏名",
+            placeholder: "例: グエン・ヴァン・アン",
+            backButton: "戻る",
+            continueButton: "続ける"
+        },
+        en: {
+            title: "Please enter your full name",
+            description: "This information will be used to personalize your partner account.",
+            label: "Full Name",
+            placeholder: "E.g., An Nguyen Van",
+            backButton: "Back",
+            continueButton: "Continue"
+        },
+    }[currentLang];
+
+    return (
+         <>
+            <DialogHeader className="text-center items-center">
+                <div className="p-3 bg-primary/10 rounded-full w-fit">
+                    <UserSquare className="h-8 w-8 text-primary"/>
+                </div>
+                <DialogTitle className="text-2xl font-headline">{content.title}</DialogTitle>
+                <DialogDescription>{content.description}</DialogDescription>
+            </DialogHeader>
+            <div className="pt-4 max-w-sm mx-auto w-full">
+                <Label htmlFor="full-name">{content.label}</Label>
+                <Input
+                    id="full-name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder={content.placeholder}
+                    className="mt-2"
+                />
+            </div>
+             <div className="mt-6 flex justify-center gap-2">
+                <Button variant="outline" onClick={() => setStep(2)}>
+                    {content.backButton}
+                </Button>
+                <Button onClick={handleNameContinue} disabled={!fullName.trim()}>
+                    {content.continueButton}
+                </Button>
+            </div>
+        </>
+    )
+  }
+
   const renderDialogContent = () => {
-    if (step === 1) {
-        return <PartnerRoleStepDialog />;
+    switch (step) {
+      case 1: return <PartnerRoleStepDialog />;
+      case 2:
+        if (selectedRole === 'nhan-vien-phai-cu') return <SendingCompanySubRoleStepDialog />;
+        if (selectedRole === 'nhan-vien-nhan-luc-nhat') return <JapaneseHrSubRoleStepDialog />;
+        return <PartnerRoleStepDialog />; // Fallback
+      case 3:
+        return <renderNameInputStepDialog />;
+      default: return <PartnerRoleStepDialog />;
     }
-    if (step === 2 && selectedRole === 'nhan-vien-phai-cu') {
-        return <SendingCompanySubRoleStepDialog />;
-    }
-    if (step === 2 && selectedRole === 'nhan-vien-nhan-luc-nhat') {
-        return <JapaneseHrSubRoleStepDialog />;
-    }
-    return <PartnerRoleStepDialog />; // Fallback
   }
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1_Y003-2">
+          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1_Y003-2_Y004">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
