@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState, use, useEffect, useCallback, React } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { notFound, useSearchParams, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -433,11 +434,11 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 export default function EmployerDetailPage() {
   const searchParams = useSearchParams();
   
-  const [employer, setEmployer] = useState<any | null>(null);
-  const [lang, setLang] = useState<Language>('vi');
-  const [isIndividual, setIsIndividual] = useState(false);
-  const [displayName, setDisplayName] = useState('');
-  const [roleText, setRoleText] = useState('');
+  const [employer, setEmployer] = React.useState<any | null>(null);
+  const [lang, setLang] = React.useState<Language>('vi');
+  const [isIndividual, setIsIndividual] = React.useState(false);
+  const [displayName, setDisplayName] = React.useState('');
+  const [roleText, setRoleText] = React.useState('');
   
   const handleLangChange = (lang: Language) => {
     setLang(lang);
@@ -463,7 +464,7 @@ export default function EmployerDetailPage() {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const langFromParams = (searchParams.get('lang') || 'vi') as Language;
     const roleParam = searchParams.get('role');
     const subRoleParam = searchParams.get('sub_role');
@@ -534,15 +535,15 @@ export default function EmployerDetailPage() {
 
   }, [searchParams]);
   
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingModule, setEditingModule] = useState<{title: string, field: string } | null>(null);
-  const [tempContent, setTempContent] = useState<any>('');
-  const [phoneCountry, setPhoneCountry] = useState('+84');
-  const [zaloCountry, setZaloCountry] = useState('+84');
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+  const [editingModule, setEditingModule] = React.useState<{title: string, field: string } | null>(null);
+  const [tempContent, setTempContent] = React.useState<any>('');
+  const [phoneCountry, setPhoneCountry] = React.useState('+84');
+  const [zaloCountry, setZaloCountry] = React.useState('+84');
   const { toast } = useToast();
-  const [errors, setErrors] = useState<{ email?: string; messenger?: string, line?: string }>();
+  const [errors, setErrors] = React.useState<{ email?: string; messenger?: string, line?: string }>();
 
-  const handleTempArrayMultiLangChange = useCallback((index: number, field: string, value: string) => {
+  const handleTempArrayMultiLangChange = React.useCallback((index: number, field: string, value: string) => {
     setTempContent((prev: any[]) => {
       const newArray = [...prev];
       newArray[index] = {
@@ -1124,11 +1125,11 @@ export default function EmployerDetailPage() {
     if (Array.isArray(value) && value.length > 0) {
       if (typeof value[0] === 'object' && value[0] !== null && 'id' in value[0]) { // For valueInterest
         return (
-          <div className="flex flex-wrap gap-1 mt-1">
-            {value.map((item: any, index: number) => (
-              <Badge key={index} variant="secondary" className="font-normal">{item[lang]}</Badge>
-            ))}
-          </div>
+            <ol className="list-decimal list-inside space-y-1">
+                {value.map((item: any, index: number) => (
+                    <li key={index} className="text-muted-foreground">{item[lang]}</li>
+                ))}
+            </ol>
         );
       }
       
@@ -1222,11 +1223,11 @@ export default function EmployerDetailPage() {
                   </SectionCard>
                    <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest, 'valueInterest')}>
                     {employer.valueInterest?.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
+                        <ol className="list-decimal list-inside space-y-1">
                             {employer.valueInterest.map((item: any, index: number) => (
-                                <Badge key={index} variant="secondary">{item[lang]}</Badge>
+                                <li key={index} className="text-muted-foreground">{item[lang]}</li>
                             ))}
-                        </div>
+                        </ol>
                     ) : (
                         <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, [], 'valueInterest')}>{t.clickToUpdate}</button>.</p>
                     )}
@@ -1302,14 +1303,14 @@ export default function EmployerDetailPage() {
                   </SectionCard>
                   <SectionCard title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
-                          <div><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
-                          <div><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
+                          <div id="DKY006"><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
+                          <div id="DKY007"><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
                       </div>
                   </SectionCard>
                   <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <div><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
-                          <div><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
+                          <div id="DKY008"><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
+                          <div id="DKY009"><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
                       </div>
                   </SectionCard>
               </div>
@@ -1341,5 +1342,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
-    

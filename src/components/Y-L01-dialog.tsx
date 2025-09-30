@@ -2,7 +2,6 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Dialog,
@@ -28,7 +27,7 @@ import { Globe, Users2, FastForward, ListChecks, HardHat, UserCheck, GraduationC
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
-import { Industry, industriesByJobType, allIndustries } from '@/lib/industry-data';
+import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from './custom-icons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -800,24 +799,28 @@ export function YL01Dialog({
                     <DialogDescription className="text-center">{content.description}</DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
-                    {content.options.map(option => (
-                        <Card
-                            key={option.id}
-                            onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
-                            className={cn(
-                                "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
-                                selectedInterest.includes(option.id) && "ring-2 ring-primary border-primary bg-primary/10"
-                            )}
-                        >
-                             {selectedInterest.includes(option.id) && (
-                                <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
-                                    <Check className="h-4 w-4 text-white" />
-                                </div>
-                            )}
-                            <option.icon className="h-8 w-8 text-primary mx-auto mb-3" />
-                            <h3 className="font-semibold text-sm">{option.title}</h3>
-                        </Card>
-                    ))}
+                    {content.options.map(option => {
+                        const isSelected = selectedInterest.includes(option.id);
+                        const selectionOrder = isSelected ? selectedInterest.indexOf(option.id) + 1 : 0;
+                        return (
+                            <Card
+                                key={option.id}
+                                onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
+                                className={cn(
+                                    "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
+                                    isSelected && "ring-2 ring-primary border-primary bg-primary/10"
+                                )}
+                            >
+                                {isSelected && (
+                                    <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                                        {selectionOrder}
+                                    </Badge>
+                                )}
+                                <option.icon className="h-8 w-8 text-primary mx-auto mb-3" />
+                                <h3 className="font-semibold text-sm">{option.title}</h3>
+                            </Card>
+                        )
+                    })}
                 </div>
                 <div className="flex justify-center items-center mt-6 gap-4">
                     <Button variant="link" onClick={() => setStep(9)}>{content.backButton}</Button>
