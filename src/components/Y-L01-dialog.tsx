@@ -273,6 +273,39 @@ const valueInterestContent = {
     }
 };
 
+const partnerRoles = {
+  vi: [
+      { id: 'nhan-vien-phai-cu', icon: UserSquare, title: 'Nhân viên phái cử', desc: 'Nhân viên tuyển dụng/đối ngoại của Công ty XKLĐ.' },
+      { id: 'nhan-vien-nhan-luc-nhat', icon: UserCog, title: 'Nhân viên Nhân lực Nhật', desc: 'Nhân viên tại Nghiệp đoàn, Shien, Shokai, Haken.' },
+      { id: 'sending', icon: Plane, title: 'Công ty phái cử', desc: 'Tuyển và phái cử lao động từ Việt Nam.' },
+      { id: 'support', icon: UserCheck, title: 'Cơ quan hỗ trợ (Shien Kikan)', desc: 'Hỗ trợ các công ty và người lao động.' },
+      { id: 'company', icon: Building, title: 'Xí nghiệp tiếp nhận', desc: 'Trực tiếp tuyển dụng và sử dụng lao động.' },
+      { id: 'supervising-organization', icon: Handshake, title: 'Nghiệp đoàn (Kumiai)', desc: 'Quản lý và hỗ trợ thực tập sinh.' },
+      { id: 'paid-placement-agency', icon: Users, title: 'Công ty giới thiệu có phí (Yuryo Shokai)', desc: 'Cung cấp dịch vụ giới thiệu việc làm có tính phí.' },
+      { id: 'haken', icon: Briefcase, title: 'Công ty Haken', desc: 'Cung cấp dịch vụ phái cử lao động tạm thời.' },
+  ],
+  ja: [
+      { id: 'nhan-vien-phai-cu', icon: UserSquare, title: '送り出し機関の社員', desc: '送り出し機関の採用・渉外担当者。' },
+      { id: 'nhan-vien-nhan-luc-nhat', icon: UserCog, title: '日本人材法人の社員', desc: '監理団体、支援機関、職業紹介所、派遣会社の社員。' },
+      { id: 'sending', icon: Plane, title: '送り出し機関', desc: 'ベトナムから労働者を募集・派遣する。' },
+      { id: 'support', icon: UserCheck, title: '支援機関', desc: '企業と労働者を支援する。' },
+      { id: 'company', icon: Building, title: '受け入れ企業', desc: '労働者を直接雇用・使用する。' },
+      { id: 'supervising-organization', icon: Handshake, title: '監理団体 (組合)', desc: '技能実習生を管理・支援する。' },
+      { id: 'paid-placement-agency', icon: Users, title: '有料職業紹介事業所', desc: '有料の職業紹介サービスを提供する。' },
+      { id: 'haken', icon: Briefcase, title: '派遣会社', desc: '一時的な労働者派遣サービスを提供する。' },
+  ],
+  en: [
+      { id: 'nhan-vien-phai-cu', icon: UserSquare, title: 'Sending Company Staff', desc: 'Recruitment/external affairs staff of a sending company.' },
+      { id: 'nhan-vien-nhan-luc-nhat', icon: UserCog, title: 'Japan-side HR Staff', desc: 'Staff at a supervising, support, placement, or staffing agency.' },
+      { id: 'sending', icon: Plane, title: 'Sending Company', desc: 'Recruit and dispatch workers from Vietnam.' },
+      { id: 'support', icon: UserCheck, title: 'Support Organization (Shien Kikan)', desc: 'Support companies and workers.' },
+      { id: 'company', icon: Building, title: 'Accepting Company', desc: 'Directly recruit and employ workers.' },
+      { id: 'supervising-organization', icon: Handshake, title: 'Supervising Organization (Kumiai)', desc: 'Manage and support technical interns.' },
+      { id: 'paid-placement-agency', icon: Users, title: 'Paid Employment Placement Agency', desc: 'Provide paid job placement services.' },
+      { id: 'haken', icon: Briefcase, title: 'Temporary Staffing Agency (Haken)', desc: 'Provide temporary worker dispatch services.' },
+  ],
+};
+
 
 
 export function YL01Dialog({ 
@@ -357,47 +390,17 @@ export function YL01Dialog({
   };
 
   const PartnerRoleStepDialog = () => {
-        const roles = {
-            vi: [
-                { id: 'nhan-vien-phai-cu', icon: UserSquare, title: 'Nhân viên phái cử', desc: 'Nhân viên tuyển dụng/đối ngoại của Công ty XKLĐ.' },
-                { id: 'nhan-vien-nhan-luc-nhat', icon: UserCog, title: 'Nhân viên Nhân lực Nhật', desc: 'Nhân viên tại Nghiệp đoàn, Shien, Shokai, Haken.' },
-                { id: 'sending', icon: Plane, title: 'Công ty phái cử', desc: 'Tuyển và phái cử lao động từ Việt Nam.' },
-                { id: 'support', icon: UserCheck, title: 'Cơ quan hỗ trợ (Shien Kikan)', desc: 'Hỗ trợ các công ty và người lao động.' },
-                { id: 'company', icon: Building, title: 'Xí nghiệp tiếp nhận', desc: 'Trực tiếp tuyển dụng và sử dụng lao động.' },
-                { id: 'supervising-organization', icon: Handshake, title: 'Nghiệp đoàn (Kumiai)', desc: 'Quản lý và hỗ trợ thực tập sinh.' },
-                { id: 'paid-placement-agency', icon: Users, title: 'Công ty giới thiệu có phí (Yuryo Shokai)', desc: 'Cung cấp dịch vụ giới thiệu việc làm có tính phí.' },
-                { id: 'haken', icon: Briefcase, title: 'Công ty Haken', desc: 'Cung cấp dịch vụ phái cử lao động tạm thời.' },
-            ],
-            ja: [
-                { id: 'nhan-vien-phai-cu', icon: UserSquare, title: '送り出し機関の社員', desc: '送り出し機関の採用・渉外担当者。' },
-                { id: 'nhan-vien-nhan-luc-nhat', icon: UserCog, title: '日本人材法人の社員', desc: '監理団体、支援機関、職業紹介所、派遣会社の社員。' },
-                { id: 'sending', icon: Plane, title: '送り出し機関', desc: 'ベトナムから労働者を募集・派遣する。' },
-                { id: 'support', icon: UserCheck, title: '支援機関', desc: '企業と労働者を支援する。' },
-                { id: 'company', icon: Building, title: '受け入れ企業', desc: '労働者を直接雇用・使用する。' },
-                { id: 'supervising-organization', icon: Handshake, title: '監理団体 (組合)', desc: '技能実習生を管理・支援する。' },
-                { id: 'paid-placement-agency', icon: Users, title: '有料職業紹介事業所', desc: '有料の職業紹介サービスを提供する。' },
-                { id: 'haken', icon: Briefcase, title: '派遣会社', desc: '一時的な労働者派遣サービスを提供する。' },
-            ],
-            en: [
-                { id: 'nhan-vien-phai-cu', icon: UserSquare, title: 'Sending Company Staff', desc: 'Recruitment/external affairs staff of a sending company.' },
-                { id: 'nhan-vien-nhan-luc-nhat', icon: UserCog, title: 'Japan-side HR Staff', desc: 'Staff at a supervising, support, placement, or staffing agency.' },
-                { id: 'sending', icon: Plane, title: 'Sending Company', desc: 'Recruit and dispatch workers from Vietnam.' },
-                { id: 'support', icon: UserCheck, title: 'Support Organization (Shien Kikan)', desc: 'Support companies and workers.' },
-                { id: 'company', icon: Building, title: 'Accepting Company', desc: 'Directly recruit and employ workers.' },
-                { id: 'supervising-organization', icon: Handshake, title: 'Supervising Organization (Kumiai)', desc: 'Manage and support technical interns.' },
-                { id: 'paid-placement-agency', icon: Users, title: 'Paid Employment Placement Agency', desc: 'Provide paid job placement services.' },
-                { id: 'haken', icon: Briefcase, title: 'Temporary Staffing Agency (Haken)', desc: 'Provide temporary worker dispatch services.' },
-            ],
-        };
-
-        const dialogTitles = { vi: 'Bạn là ai?', ja: 'あなたの役割をお選びください', en: 'What is your role?' };
-        const dialogDescriptions = { vi: 'Chọn vai trò phù hợp nhất với bạn để chúng tôi có thể hỗ trợ tốt hơn.', ja: 'より良いサポートを提供するために、あなたに最も適した役割を選択してください。', en: 'Select the role that best fits you so we can provide better support.' };
+        const content = {
+            vi: { title: 'Bạn là ai?', description: 'Chọn vai trò phù hợp nhất với bạn để chúng tôi có thể hỗ trợ tốt hơn.' },
+            ja: { title: 'あなたの役割をお選びください', description: 'より良いサポートを提供するために、あなたに最も適した役割を選択してください。' },
+            en: { title: 'What is your role?', description: 'Select the role that best fits you so we can provide better support.' }
+        }[currentLang];
 
         return (
             <>
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-headline text-center">{dialogTitles[currentLang]}</DialogTitle>
-                    <DialogDescription className="text-center">{dialogDescriptions[currentLang]}</DialogDescription>
+                    <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                    <DialogDescription className="text-center">{content.description}</DialogDescription>
                     {showLanguageSwitcher && step === 1 && (
                         <div className="flex justify-center mt-4">
                             <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)}>
@@ -412,10 +415,17 @@ export function YL01Dialog({
                 </DialogHeader>
                 <div className="pt-6 max-h-[60vh] overflow-y-auto">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {roles[currentLang].map((role) => (
+                        {partnerRoles[currentLang].map((role) => (
                             <Card 
                                 key={role.id} 
-                                onClick={() => { setSelectedRole(role.id); setStep(2); }}
+                                onClick={() => { 
+                                    setSelectedRole(role.id);
+                                    if(role.id === 'nhan-vien-nhan-luc-nhat'){
+                                        setStep(1.5);
+                                    } else {
+                                        setStep(2); 
+                                    }
+                                }}
                                 className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
                             >
                                 <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -428,6 +438,44 @@ export function YL01Dialog({
             </>
         );
   }
+
+  const JapaneseHrSubRoleStepDialog = () => {
+    const content = {
+        vi: { title: "Công ty/Pháp nhân/Tổ chức của bạn tại Nhật thuộc loại hình nào?", description: "Vui lòng chọn loại hình tổ chức bạn đang làm việc tại Nhật.", backButton: "Quay lại" },
+        ja: { title: "日本の会社/法人/団体はどの種類に属しますか？", description: "日本でお勤めの組織の種類を選択してください。", backButton: "戻る" },
+        en: { title: "What type of company/entity/organization do you belong to in Japan?", description: "Please select the type of organization you work for in Japan.", backButton: "Back" },
+    }[currentLang];
+
+    const organizationRoles = partnerRoles[currentLang].filter(role => !['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(role.id));
+
+    return (
+        <>
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
+            </DialogHeader>
+            <div className="pt-6 max-h-[60vh] overflow-y-auto">
+                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {organizationRoles.map((role) => (
+                        <Card 
+                            key={role.id} 
+                            onClick={() => { setSelectedSubRole(role.id); setStep(2); }}
+                            className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
+                        >
+                            <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                            <h3 className="font-bold text-base mb-1">{role.title}</h3>
+                            <p className="text-muted-foreground text-xs flex-grow">{role.desc}</p>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+             <div className="text-center mt-4">
+                <Button variant="link" onClick={() => setStep(1)}>{content.backButton}</Button>
+            </div>
+        </>
+    );
+  };
+
 
   const InterestStepDialog = () => {
     const interests = {
@@ -556,35 +604,11 @@ export function YL01Dialog({
     )
   };
   
-  const JapaneseHrSubRoleStepDialog = () => {
+  const JapaneseHrSubRoleStepDialogFromY001_5 = () => {
     const content = {
-        vi: {
-            title: "Bạn có vai trò gì ở Công ty/Pháp nhân/Tổ chức nhân lực Nhật Bản?",
-            description: "Vui lòng chọn vai trò của bạn để tiếp tục.",
-            options: [
-                { id: 'nguoi-nhat', icon: UserCog, title: 'Nhân viên người Nhật'},
-                { id: 'nguoi-viet', icon: UserCog, title: 'Nhân viên người Việt'},
-            ],
-            backButton: 'Quay lại',
-        },
-        ja: {
-            title: "日本の人材会社/法人/団体でのあなたの役割は何ですか？",
-            description: "続けるためにあなたの役割を選択してください。",
-            options: [
-                { id: 'nguoi-nhat', icon: UserCog, title: '日本人スタッフ'},
-                { id: 'nguoi-viet', icon: UserCog, title: 'ベトナム人スタッフ'},
-            ],
-            backButton: '戻る',
-        },
-        en: {
-            title: 'What is your role at the Japanese HR Company/Entity/Organization?',
-            description: 'Please select your role to continue.',
-            options: [
-                { id: 'nguoi-nhat', icon: UserCog, title: 'Japanese Staff'},
-                { id: 'nguoi-viet', icon: UserCog, title: 'Vietnamese Staff'},
-            ],
-            backButton: 'Back',
-        },
+        vi: { title: "Bạn có vai trò gì ở Công ty/Pháp nhân/Tổ chức nhân lực Nhật Bản?", description: "Vui lòng chọn vai trò của bạn để tiếp tục.", options: [{ id: 'nguoi-nhat', icon: UserCog, title: 'Nhân viên người Nhật'}, { id: 'nguoi-viet', icon: UserCog, title: 'Nhân viên người Việt'}], backButton: 'Quay lại', },
+        ja: { title: "日本の人材会社/法人/団体でのあなたの役割は何ですか？", description: "続けるためにあなたの役割を選択してください。", options: [{ id: 'nguoi-nhat', icon: UserCog, title: '日本人スタッフ'}, { id: 'nguoi-viet', icon: UserCog, title: 'ベトナム人スタッフ'}], backButton: '戻る', },
+        en: { title: 'What is your role at the Japanese HR Company/Entity/Organization?', description: 'Please select your role to continue.', options: [{ id: 'nguoi-nhat', icon: UserCog, title: 'Japanese Staff'}, { id: 'nguoi-viet', icon: UserCog, title: 'Vietnamese Staff'}], backButton: 'Back', },
     }[currentLang];
 
     return (
@@ -607,7 +631,7 @@ export function YL01Dialog({
                 ))}
             </div>
             <div className="text-center mt-4">
-                 <Button variant="link" onClick={() => setStep(2)}>{content.backButton}</Button>
+                 <Button variant="link" onClick={() => setStep(1.5)}>{content.backButton}</Button>
             </div>
         </>
     )
@@ -826,10 +850,11 @@ export function YL01Dialog({
   const renderDialogContent = () => {
     switch (step) {
       case 1: return <PartnerRoleStepDialog />;
+      case 1.5: return <JapaneseHrSubRoleStepDialog />;
       case 2: return <InterestStepDialog />;
       case 3:
         if (selectedRole === 'nhan-vien-phai-cu') return <SendingCompanySubRoleStepDialog />;
-        if (selectedRole === 'nhan-vien-nhan-luc-nhat') return <JapaneseHrSubRoleStepDialog />;
+        if (selectedRole === 'nhan-vien-nhan-luc-nhat') return <JapaneseHrSubRoleStepDialogFromY001_5 />;
         return <PartnerRoleStepDialog />; // Fallback
       case 4: return renderNameInputStepDialog();
       case 5: return renderCompanyNameStepDialog();
