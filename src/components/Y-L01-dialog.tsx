@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState, useEffect, React } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Dialog,
@@ -789,8 +790,6 @@ export function YL01Dialog({
     );
   };
   
-    const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
-
   const ValueInterestStepDialog = () => {
         const content = valueInterestContent[currentLang];
 

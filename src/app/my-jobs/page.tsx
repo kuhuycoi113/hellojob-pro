@@ -631,12 +631,8 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: string[] } = {
-        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
-    };
-    const visaTypes = Object.keys(visaDetailsOptions);
+    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = visaDetailsByVisaType;
+    const visaTypes = Object.keys(visaDetailsByVisaType);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
@@ -699,7 +695,7 @@ const LoggedInView = () => {
                        ) : suggestedJobs.length > 0 ? (
                             <>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                    {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} /> ))}
                                 </div>
                                 {visibleJobsCount < suggestedJobs.length && (
                                     <div className="text-center mt-8">
@@ -740,7 +736,7 @@ const LoggedInView = () => {
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {appliedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                            {appliedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true}/> ))}
                         </div>
                     </AccordionContent>
                 </AccordionItem>
@@ -755,7 +751,7 @@ const LoggedInView = () => {
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                        {savedJobs.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true}/> ))}
                             </div>
                         ) : (
                              <div className="text-center py-8 text-muted-foreground">
@@ -784,7 +780,7 @@ const LoggedInView = () => {
                        ) : behavioralSuggestedJobs.length > 0 ? (
                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {behavioralSuggestedJobs.map((item) => (
-                                    <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
+                                    <JobCard key={item.job.id} job={item.job} showRecruiterName={false} showPostedTime={true}/>
                                 ))}
                             </div>
                        ) : (
@@ -1278,7 +1274,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
