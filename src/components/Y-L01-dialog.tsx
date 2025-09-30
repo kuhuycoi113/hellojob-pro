@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from './ui/button';
 import { Card } from './ui/card';
-import { Globe, Users2, FastForward, ListChecks, HardHat, UserCheck, GraduationCap, Pencil, Sparkles, Building, Plane, Handshake, Briefcase, Users, UserSquare, UserCog, UserPlus, FileSignature } from 'lucide-react';
+import { Globe, Users2, FastForward, ListChecks, HardHat, UserCheck, GraduationCap, Pencil, Sparkles, Building, Plane, Handshake, Briefcase, Users, UserSquare, UserCog, UserPlus, FileSignature, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
@@ -288,22 +288,22 @@ export function YL01Dialog({
 }: YL01DialogProps) {
   const router = useRouter();
   const { role, setRole, isLoggedIn } = useAuth();
-  const [step, setStep] = useState(initialStep);
-  const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
-  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-  const [selectedVisa, setSelectedVisa] = useState<string[]>([]);
-  const [selectedVisaDetail, setSelectedVisaDetail] = useState<string[]>([]);
-  const [selectedIndustry, setSelectedIndustry] = useState<string[]>([]);
-  const [selectedRegion, setSelectedRegion] = useState<string[]>([]);
-  const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [selectedSubRole, setSelectedSubRole] = useState<string | null>(null);
-  const [fullName, setFullName] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [selectedInterest, setSelectedInterest] = useState<string[]>([]);
-  const [currentLang, setCurrentLang] = useState<Language>(initialLang);
+  const [step, setStep] = React.useState(initialStep);
+  const [isConfirmLoginOpen, setIsConfirmLoginOpen] = React.useState(false);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = React.useState(false);
+  const [selectedVisa, setSelectedVisa] = React.useState<string[]>([]);
+  const [selectedVisaDetail, setSelectedVisaDetail] = React.useState<string[]>([]);
+  const [selectedIndustry, setSelectedIndustry] = React.useState<string[]>([]);
+  const [selectedRegion, setSelectedRegion] = React.useState<string[]>([]);
+  const [isCreateDetailOpen, setIsCreateDetailOpen] = React.useState(false);
+  const [selectedRole, setSelectedRole] = React.useState<string | null>(null);
+  const [selectedSubRole, setSelectedSubRole] = React.useState<string | null>(null);
+  const [fullName, setFullName] = React.useState('');
+  const [companyName, setCompanyName] = React.useState('');
+  const [selectedInterest, setSelectedInterest] = React.useState<string[]>([]);
+  const [currentLang, setCurrentLang] = React.useState<Language>(initialLang);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isOpen) {
       setStep(initialStep);
       setSelectedRole(null);
@@ -878,23 +878,27 @@ export function YL01Dialog({
                     <DialogDescription className="text-center">{content.description}</DialogDescription>
                 </DialogHeader>
                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
-                     {regionOptions.map(option => (
-                        <Card
-                            key={option.id}
-                            onClick={() => handleMultiSelect(option.id, selectedRegion, setSelectedRegion)}
-                            className={cn(
-                                "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
-                                selectedRegion.includes(option.id) && "ring-2 ring-primary border-primary bg-primary/10"
-                            )}
-                        >
-                             {selectedRegion.includes(option.id) && (
-                                <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
-                                    {selectedRegion.indexOf(option.id) + 1}
-                                </Badge>
-                            )}
-                            <h3 className="font-bold text-base mb-1">{currentLang === 'ja' ? regionKanjiMap[option.title] : option.title}</h3>
-                        </Card>
-                    ))}
+                     {regionOptions.map((option) => {
+                         const isSelected = selectedRegion.includes(option.id);
+                         const selectionOrder = isSelected ? selectedRegion.indexOf(option.id) + 1 : 0;
+                         return (
+                            <Card
+                                key={option.id}
+                                onClick={() => handleMultiSelect(option.id, selectedRegion, setSelectedRegion)}
+                                className={cn(
+                                    "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
+                                    isSelected && "ring-2 ring-primary border-primary bg-primary/10"
+                                )}
+                            >
+                                {isSelected && (
+                                    <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                                        {selectionOrder}
+                                    </Badge>
+                                )}
+                                <h3 className="font-bold text-base mb-1">{currentLang === 'ja' ? regionKanjiMap[option.title] : option.title}</h3>
+                            </Card>
+                         )
+                     })}
                 </div>
                 <div className="flex justify-center items-center mt-6 gap-4">
                     <Button variant="link" onClick={() => setStep(8)}>{content.backButton}</Button>
