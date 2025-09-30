@@ -214,8 +214,8 @@ export const MainContent = () => (
                 <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
                   <Link href="/nha-tuyen-dung">
                     <div className="text-center">
-                        <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
-                        <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                        <span className="font-semibold">Tìm hiểu ngay</span>
+                        <div className="text-xs opacity-80">詳細を確認 / Learn More</div>
                     </div>
                   </Link>
                 </Button>
@@ -244,3 +244,5 @@ export const MainContent = () => (
       </section>
     </>
   );
+
+    
