@@ -243,7 +243,7 @@ const valueInterestContent = {
     },
     ja: {
       title: "どの価値観に最も関心がありますか？",
-      description: "最高のエクスペリエンスのために、あなたの主な目標を教えてください。複数選択可能です。",
+      description: "最高の体験のために、あなたの主な目標を教えてください。複数選択可能です。",
       options: [
         { id: 'ung-vien-nhieu-nhanh', icon: FastForward, title: '最も多く、最も速い候補者' },
         { id: 'ung-vien-chat-luong', icon: UserCheck, title: '質の高い候補者' },
@@ -411,6 +411,17 @@ export function YL01Dialog({
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-headline text-center">{dialogTitles[currentLang]}</DialogTitle>
                     <DialogDescription className="text-center">{dialogDescriptions[currentLang]}</DialogDescription>
+                    {showLanguageSwitcher && step === 1 && (
+                        <div className="flex justify-center mt-4">
+                            <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)}>
+                                <TabsList className="grid w-full grid-cols-3">
+                                    <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> Tiếng Việt</TabsTrigger>
+                                    <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> 日本語</TabsTrigger>
+                                    <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> English</TabsTrigger>
+                                </TabsList>
+                            </Tabs>
+                        </div>
+                    )}
                 </DialogHeader>
                 <div className="pt-6 max-h-[60vh] overflow-y-auto">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -908,17 +919,6 @@ export function YL01Dialog({
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
           <DialogContent className="sm:max-w-4xl">
-              {showLanguageSwitcher && step === 1 && (
-                  <div className="absolute top-4 right-16">
-                      <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)}>
-                          <TabsList className="grid grid-cols-3">
-                              <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span></TabsTrigger>
-                              <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="hidden sm:inline">日本語</span></TabsTrigger>
-                              <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="hidden sm:inline">English</span></TabsTrigger>
-                          </TabsList>
-                      </Tabs>
-                  </div>
-              )}
               {renderDialogContent()}
           </DialogContent>
       </Dialog>

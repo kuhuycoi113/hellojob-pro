@@ -44,7 +44,7 @@ interface XL01DialogProps {
   onBack?: () => void;
   onLanguageChange: (lang: Language) => void;
   initialLang?: Language;
-  showLanguageSwitcher?: boolean; // Add this prop
+  showLanguageSwitcher?: boolean; 
 }
 
 const visaDetailContent = {
@@ -187,16 +187,19 @@ const regionContent = {
         title: 'Chọn khu vực làm việc',
         description: 'Lựa chọn khu vực bạn muốn tuyển dụng.',
         backButton: 'Quay lại',
+        completeButton: 'Tiếp tục'
     },
     ja: {
         title: '希望勤務地を選択',
         description: '募集したい地域を選択してください。',
         backButton: '戻る',
+        completeButton: '続ける'
     },
     en: {
         title: 'Select Work Region',
         description: 'Choose the region you want to recruit in.',
         backButton: 'Back',
+        completeButton: 'Continue'
     }
 };
 
@@ -210,14 +213,14 @@ export function XL01Dialog({
     onBack,
     onLanguageChange,
     initialLang = 'vi',
-    showLanguageSwitcher = true, // Default to true
+    showLanguageSwitcher = true,
 }: XL01DialogProps) {
   const router = useRouter();
   const { role, setRole, isLoggedIn } = useAuth();
-  const [profileCreationStep, setProfileCreationStep] = useState(initialStep);
+  const [step, setStep] = useState(initialStep);
   const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-  const [selectedVisa, setSelectedVisa] = useState<{name: { vi: string, ja: string, en: string }, slug: string} | null>(null);
+  const [selectedVisa, setSelectedVisa] = useState<{name: string, slug: string} | null>(null);
   const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -227,7 +230,7 @@ export function XL01Dialog({
 
   useEffect(() => {
     if (isOpen) {
-      setProfileCreationStep(initialStep);
+      setStep(initialStep);
     }
   }, [isOpen, initialStep]);
   
@@ -239,7 +242,7 @@ export function XL01Dialog({
   const handleComplete = () => {
     const preferences = {
       role: selectedRole,
-      desiredVisaType: selectedVisa?.name[currentLang] || undefined,
+      desiredVisaType: selectedVisa?.name || undefined,
       desiredVisaDetail: selectedVisaDetail || undefined,
       desiredIndustry: selectedIndustry?.name[currentLang] || undefined,
       desiredLocation: selectedRegion || undefined,
@@ -292,13 +295,24 @@ export function XL01Dialog({
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-headline text-center">{dialogTitles[currentLang]}</DialogTitle>
                     <DialogDescription className="text-center">{dialogDescriptions[currentLang]}</DialogDescription>
+                    {showLanguageSwitcher && step === 1 && (
+                        <div className="flex justify-center mt-4">
+                            <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)}>
+                                <TabsList className="grid w-full grid-cols-3">
+                                    <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> Tiếng Việt</TabsTrigger>
+                                    <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> 日本語</TabsTrigger>
+                                    <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> English</TabsTrigger>
+                                </TabsList>
+                            </Tabs>
+                        </div>
+                    )}
                 </DialogHeader>
                 <div className="pt-6 max-h-[60vh] overflow-y-auto">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {roles[currentLang].map((role) => (
                             <Card 
                                 key={role.id} 
-                                onClick={() => { setSelectedRole(role.id); setProfileCreationStep(2); }}
+                                onClick={() => { setSelectedRole(role.id); setStep(2); }}
                                 className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
                             >
                                 <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -333,7 +347,7 @@ export function XL01Dialog({
                 {content.options.map(option => (
                     <Button 
                         key={option.id}
-                        onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === option.id)!); setProfileCreationStep(3); }} 
+                        onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === option.id)!); setStep(3); }} 
                         variant="outline" 
                         className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                         <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
@@ -342,7 +356,7 @@ export function XL01Dialog({
                     </Button>
                 ))}
             </div>
-            <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">
+            <Button variant="link" onClick={() => setStep(1)} className="mt-4 mx-auto block">
                 {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
             </Button>
         </>
@@ -372,7 +386,7 @@ export function XL01Dialog({
         </DialogHeader>
         <div className={cn("grid grid-cols-1 pt-4 gap-4", content.options.length > 2 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-2xl mx-auto")}>
             {content.options.map(option => (
-                <Card key={option.id} onClick={() => { setSelectedVisaDetail(option.id); setProfileCreationStep(4); }}
+                <Card key={option.id} onClick={() => { setSelectedVisaDetail(option.id); setStep(4); }}
                     className={cn("text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedVisaDetail === option.id && "ring-2 ring-primary border-primary")}>
                     <div className={cn("rounded-full p-3 w-fit mb-4", currentIconColor)}>
                         <option.icon className="h-8 w-8" />
@@ -382,7 +396,7 @@ export function XL01Dialog({
                 </Card>
             ))}
         </div>
-        <Button variant="link" onClick={() => setProfileCreationStep(2)} className="mt-4 mx-auto block">
+        <Button variant="link" onClick={() => setStep(2)} className="mt-4 mx-auto block">
              {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
         </Button>
         </>
@@ -411,12 +425,12 @@ export function XL01Dialog({
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                 {industries.map(industry => (
-                    <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                    <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                         <p className="font-semibold text-sm">{industry.name[currentLang]}</p>
                     </Button>
                 ))}
             </div>
-            <Button variant="link" onClick={() => setProfileCreationStep(3)} className="mt-4 mx-auto block">
+            <Button variant="link" onClick={() => setStep(3)} className="mt-4 mx-auto block">
                 {content.backButton}
             </Button>
         </>
@@ -461,14 +475,14 @@ export function XL01Dialog({
                 ))}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setProfileCreationStep(4)}>{content.backButton}</Button>
+                <Button variant="link" onClick={() => setStep(4)}>{content.backButton}</Button>
             </div>
         </>
     )
   }
 
   const renderDialogContent = () => {
-    switch (profileCreationStep) {
+    switch (step) {
       case 1: return <PartnerRoleStepDialog />;
       case 2: return <QuickCreateStepDialog />;
       case 3: return <VisaDetailStepDialog />;
@@ -480,20 +494,9 @@ export function XL01Dialog({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setProfileCreationStep(1); }}>
+      <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
           <DialogContent className="sm:max-w-4xl">
-              {showLanguageSwitcher && profileCreationStep === 1 && (
-                  <div className="absolute top-4 right-16">
-                      <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)}>
-                          <TabsList className="grid grid-cols-3">
-                              <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /></TabsTrigger>
-                              <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /></TabsTrigger>
-                              <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /></TabsTrigger>
-                          </TabsList>
-                      </Tabs>
-                  </div>
-              )}
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
