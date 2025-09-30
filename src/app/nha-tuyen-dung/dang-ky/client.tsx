@@ -330,39 +330,6 @@ const valueInterestOptions = {
     ]
 };
 
-const visaTypeContent = {
-    vi: {
-        title: 'Bạn muốn tuyển loại Visa nào?',
-        description: 'Bạn có thể chọn nhiều mục. Lựa chọn đầu tiên là ưu tiên số 1.',
-        description_single: 'Hãy chọn loại visa phù hợp với nhu cầu tuyển dụng của bạn.',
-        options: [
-        { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Thực tập sinh kỹ năng', desc: 'Tuyển dụng lao động phổ thông, chi phí thấp.', color: 'orange' },
-        { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Kỹ năng đặc định', desc: 'Tuyển dụng lao động có tay nghề, làm việc dài hạn.', color: 'blue' },
-        { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Kỹ sư, tri thức', desc: 'Tuyển dụng chuyên gia có bằng cấp, chuyên môn cao.', color: 'green' },
-        ]
-    },
-    ja: {
-        title: 'どのビザタイプを募集しますか？',
-        description: '複数の項目を選択できます。最初の選択が優先順位1番になります。',
-        description_single: '採用ニーズに最も適したビザタイプを選択してください。',
-        options: [
-        { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: '技能実習', desc: '一般労働者を低コストで採用。', color: 'orange' },
-        { id: 'ky-nang-dac-dinh', icon: UserCheck, title: '特定技能', desc: '長期雇用のための熟練労働者を採用。', color: 'blue' },
-        { id: 'ky-su-tri-thuc', icon: Briefcase, title: '技術・人文知識・国際業務', desc: '高度な資格と専門知識を持つ専門家を採用。', color: 'green' },
-        ]
-    },
-    en: {
-        title: 'Which Visa Type do you want to recruit?',
-        description: 'You can select multiple items. The first selection is priority #1.',
-        description_single: 'Please select the visa type that best suits your recruitment needs.',
-        options: [
-        { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
-        { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
-        { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
-        ]
-    }
-};
-
 
 
 type Language = keyof typeof contentByLang;
@@ -902,18 +869,27 @@ export default function EmployerDetailPage() {
 
             return (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {valueInterestOptions[lang].map(option => (
-                        <div key={option.id} className="flex items-start space-x-2 rounded-md border p-4 hover:bg-accent/50 transition-colors">
-                            <Checkbox
-                                id={`interest-${option.id}`}
-                                checked={currentInterests.includes(option.id)}
-                                onCheckedChange={(checked) => handleInterestChange(Boolean(checked), option.id)}
-                            />
-                            <Label htmlFor={`interest-${option.id}`} className="font-normal cursor-pointer">
-                                {option.title}
-                            </Label>
-                        </div>
-                    ))}
+                    {valueInterestOptions[lang].map((option, index) => {
+                        const isSelected = currentInterests.includes(option.id);
+                        const selectionOrder = isSelected ? currentInterests.indexOf(option.id) + 1 : 0;
+                        return (
+                            <Card
+                                key={option.id}
+                                onClick={() => handleInterestChange(!isSelected, option.id)}
+                                className={cn(
+                                    "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
+                                    isSelected && "ring-2 ring-primary border-primary bg-primary/10"
+                                )}
+                            >
+                                {isSelected && (
+                                    <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                                        {selectionOrder}
+                                    </Badge>
+                                )}
+                                <h3 className="font-semibold text-sm">{option.title}</h3>
+                            </Card>
+                        );
+                    })}
                 </div>
             );
         case 'visa':
@@ -1125,11 +1101,13 @@ export default function EmployerDetailPage() {
     if (Array.isArray(value) && value.length > 0) {
       if (typeof value[0] === 'object' && value[0] !== null && 'id' in value[0]) { // For valueInterest
         return (
-            <ol className="list-decimal list-inside space-y-1">
-                {value.map((item: any, index: number) => (
-                    <li key={index} className="text-muted-foreground">{item[lang]}</li>
+            <div id="DKY010" className="flex flex-wrap gap-2 mt-1">
+                 {value.map((item: any, index: number) => (
+                    <Badge key={item.id} variant="secondary" className="font-normal bg-accent-blue/10 text-accent-blue border-accent-blue/20">
+                        <span className="font-bold mr-1.5">{index + 1}.</span>{item[lang]}
+                    </Badge>
                 ))}
-            </ol>
+            </div>
         );
       }
       

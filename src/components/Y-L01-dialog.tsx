@@ -177,7 +177,7 @@ const visaTypeContent = {
     options: [
       { id: 'thuc-tap-sinh-ky-nang', icon: HardHat, title: 'Technical Intern Trainee', desc: 'Recruit general workers at a low cost.', color: 'orange' },
       { id: 'ky-nang-dac-dinh', icon: UserCheck, title: 'Specified Skilled Worker', desc: 'Recruit skilled workers for long-term employment.', color: 'blue' },
-      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
+      { id: 'ky-su-tri-thuc', icon: Briefcase, title: 'Engineer/Specialist in Humanities', desc: 'Recruit highly qualified and specialized professionals.', color: 'green' },
     ]
   }
 };
