@@ -222,14 +222,16 @@ export const MainContent = () => (
               </div>
             </div>
              <div className="md:w-1/2 flex justify-center">
-              <Image
-                src="/img/viet-img/phong-van (3).jpg"
-                alt="Hợp tác tuyển dụng tại Nhật"
-                width={500}
-                height={350}
-                className="rounded-lg shadow-xl"
-                data-ai-hint="recruitment partnership japan"
-              />
+              <Link href="/nha-tuyen-dung" className="group block rounded-lg overflow-hidden shadow-xl">
+                <Image
+                  src="/img/viet-img/phong-van (3).jpg"
+                  alt="Hợp tác tuyển dụng tại Nhật"
+                  width={500}
+                  height={350}
+                  className="rounded-lg transition-transform duration-300 group-hover:scale-105"
+                  data-ai-hint="recruitment partnership japan"
+                />
+              </Link>
             </div>
           </div>
         </div>
