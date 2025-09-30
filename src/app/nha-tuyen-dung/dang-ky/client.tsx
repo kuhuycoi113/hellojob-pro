@@ -866,7 +866,7 @@ export default function EmployerDetailPage() {
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
-                            {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
+                             {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                       </div>
@@ -1331,13 +1331,6 @@ export default function EmployerDetailPage() {
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
-             <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="pt-4">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="vi" className="flex items-center gap-2"><VnFlagIcon /> Tiếng Việt</TabsTrigger>
-                    <TabsTrigger value="ja" className="flex items-center gap-2"><JpFlagIcon /> 日本語</TabsTrigger>
-                    <TabsTrigger value="en" className="flex items-center gap-2"><EnFlagIcon /> English</TabsTrigger>
-                </TabsList>
-            </Tabs>
           </DialogHeader>
            <div className="py-4 max-h-[60vh] overflow-y-auto pr-4">
               {renderEditContent()}

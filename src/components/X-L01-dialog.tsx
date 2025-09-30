@@ -291,28 +291,21 @@ export function XL01Dialog({
                     <DialogTitle className="text-2xl font-headline text-center">{dialogTitles[currentLang]}</DialogTitle>
                     <DialogDescription className="text-center">{dialogDescriptions[currentLang]}</DialogDescription>
                 </DialogHeader>
-                <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)} className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="vi" className="flex items-center gap-2"><VnFlagIcon /> Tiếng Việt</TabsTrigger>
-                        <TabsTrigger value="ja" className="flex items-center gap-2"><JpFlagIcon /> 日本語</TabsTrigger>
-                        <TabsTrigger value="en" className="flex items-center gap-2"><EnFlagIcon /> English</TabsTrigger>
-                    </TabsList>
-                    <div className="pt-6 max-h-[60vh] overflow-y-auto">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {roles[currentLang].map((role) => (
-                                <Card 
-                                    key={role.id} 
-                                    onClick={() => { setSelectedRole(role.id); setProfileCreationStep(2); }}
-                                    className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
-                                >
-                                    <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                                    <h3 className="font-bold text-base mb-1">{role.title}</h3>
-                                    <p className="text-muted-foreground text-xs flex-grow">{role.desc}</p>
-                                </Card>
-                            ))}
-                        </div>
+                <div className="pt-6 max-h-[60vh] overflow-y-auto">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {roles[currentLang].map((role) => (
+                            <Card 
+                                key={role.id} 
+                                onClick={() => { setSelectedRole(role.id); setProfileCreationStep(2); }}
+                                className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
+                            >
+                                <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                                <h3 className="font-bold text-base mb-1">{role.title}</h3>
+                                <p className="text-muted-foreground text-xs flex-grow">{role.desc}</p>
+                            </Card>
+                        ))}
                     </div>
-                </Tabs>
+                </div>
             </>
         );
   }

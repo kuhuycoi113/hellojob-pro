@@ -410,28 +410,21 @@ export function YL01Dialog({
                     <DialogTitle className="text-2xl font-headline text-center">{dialogTitles[currentLang]}</DialogTitle>
                     <DialogDescription className="text-center">{dialogDescriptions[currentLang]}</DialogDescription>
                 </DialogHeader>
-                <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)} className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="vi" className="flex items-center gap-2"><VnFlagIcon /> Tiếng Việt</TabsTrigger>
-                        <TabsTrigger value="ja" className="flex items-center gap-2"><JpFlagIcon /> 日本語</TabsTrigger>
-                        <TabsTrigger value="en" className="flex items-center gap-2"><EnFlagIcon /> English</TabsTrigger>
-                    </TabsList>
-                    <div className="pt-6 max-h-[60vh] overflow-y-auto">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {roles[currentLang].map((role) => (
-                                <Card 
-                                    key={role.id} 
-                                    onClick={() => { setSelectedRole(role.id); setStep(2); }}
-                                    className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
-                                >
-                                    <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                                    <h3 className="font-bold text-base mb-1">{role.title}</h3>
-                                    <p className="text-muted-foreground text-xs flex-grow">{role.desc}</p>
-                                </Card>
-                            ))}
-                        </div>
+                <div className="pt-6 max-h-[60vh] overflow-y-auto">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {roles[currentLang].map((role) => (
+                            <Card 
+                                key={role.id} 
+                                onClick={() => { setSelectedRole(role.id); setStep(2); }}
+                                className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
+                            >
+                                <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                                <h3 className="font-bold text-base mb-1">{role.title}</h3>
+                                <p className="text-muted-foreground text-xs flex-grow">{role.desc}</p>
+                            </Card>
+                        ))}
                     </div>
-                </Tabs>
+                </div>
             </>
         );
   }
@@ -505,47 +498,6 @@ export function YL01Dialog({
         </>
     )
   }
-
-  const ValueInterestStepDialog = () => {
-    const content = valueInterestContent[currentLang];
-    return (
-        <>
-            {/* Screen: Y010 */}
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                <DialogDescription className="text-center">{content.description}</DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-                {content.options.map(option => {
-                    const isSelected = selectedInterest.includes(option.id);
-                    const selectionOrder = isSelected ? selectedInterest.indexOf(option.id) + 1 : 0;
-                    return (
-                        <Card
-                            key={option.id}
-                            onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
-                            className={cn(
-                                "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
-                                isSelected && "ring-2 ring-primary border-primary bg-primary/10"
-                            )}
-                        >
-                            {isSelected && (
-                                <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
-                                    {selectionOrder}
-                                </Badge>
-                            )}
-                            <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                            <h3 className="font-bold text-base">{option.title}</h3>
-                        </Card>
-                    )
-                })}
-            </div>
-            <div className="text-center mt-4 flex justify-center gap-4">
-                 <Button variant="link" onClick={() => setStep(9)}>{content.backButton}</Button>
-                 <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" disabled={selectedInterest.length === 0} onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest, selectedSubRole!, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion)}>{content.completeButton}</Button>
-            </div>
-        </>
-    )
-  };
 
   const SendingCompanySubRoleStepDialog = () => {
     const content = {
@@ -911,12 +863,10 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y001_Y002_Y003-1_Y003-2_Y004_Y005_Y006_Y007_Y008_Y009">
+          <DialogContent className="sm:max-w-4xl">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
     </>
   );
 }
-
-    
