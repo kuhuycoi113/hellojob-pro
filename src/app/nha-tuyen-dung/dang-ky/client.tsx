@@ -1174,7 +1174,7 @@ export default function EmployerDetailPage() {
             {/* Header Section */}
             <Card className="shadow-2xl overflow-hidden mb-8">
               <CardHeader className="p-0 relative">
-                <div className="relative w-full h-48 md:h-64">
+                <div className="relative w-full h-48">
                   <Image src={employer.banner} alt={`${employer.name[lang] || ''} banner`} fill className="object-cover" />
                   <div className="absolute inset-0 bg-black/40" />
                   <Label htmlFor="banner-upload" className="absolute top-4 right-4 z-10 cursor-pointer">
@@ -1199,8 +1199,8 @@ export default function EmployerDetailPage() {
                       <div className="flex-grow pt-4 sm:pt-0 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left w-full">
                           <div className="flex flex-wrap justify-center sm:justify-start items-center gap-y-2 gap-x-4 mb-4 sm:mb-0 w-full">
                                 <div className="flex-grow">
-                                  <h1 id="DKY004&5" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                                  <p id="DKY001&2&5" className="font-semibold text-primary">{roleText}</p>
+                                  <h1 id="DKY004" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
+                                  <p id="DKY005" className="font-semibold text-primary">{roleText}</p>
                                   <p className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                                 </div>
                                 <div className="flex items-center gap-2">
