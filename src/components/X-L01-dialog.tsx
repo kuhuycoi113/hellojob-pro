@@ -44,6 +44,7 @@ interface XL01DialogProps {
   onBack?: () => void;
   onLanguageChange: (lang: Language) => void;
   initialLang?: Language;
+  showLanguageSwitcher?: boolean; // Add this prop
 }
 
 const visaDetailContent = {
@@ -208,7 +209,8 @@ export function XL01Dialog({
     onComplete, 
     onBack,
     onLanguageChange,
-    initialLang = 'vi'
+    initialLang = 'vi',
+    showLanguageSwitcher = true, // Default to true
 }: XL01DialogProps) {
   const router = useRouter();
   const { role, setRole, isLoggedIn } = useAuth();
@@ -481,6 +483,17 @@ export function XL01Dialog({
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setProfileCreationStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
           <DialogContent className="sm:max-w-4xl">
+              {showLanguageSwitcher && profileCreationStep === 1 && (
+                  <div className="absolute top-4 right-16">
+                      <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)}>
+                          <TabsList className="grid grid-cols-3">
+                              <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /></TabsTrigger>
+                              <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /></TabsTrigger>
+                              <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /></TabsTrigger>
+                          </TabsList>
+                      </Tabs>
+                  </div>
+              )}
               {renderDialogContent()}
           </DialogContent>
       </Dialog>

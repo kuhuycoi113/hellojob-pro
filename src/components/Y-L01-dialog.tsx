@@ -59,6 +59,7 @@ interface YL01DialogProps {
   onBack?: () => void;
   onLanguageChange: (lang: Language) => void;
   initialLang?: Language;
+  showLanguageSwitcher?: boolean; // Add this prop
 }
 
 const visaDetailContent = {
@@ -281,7 +282,8 @@ export function YL01Dialog({
     onComplete, 
     onBack,
     onLanguageChange,
-    initialLang = 'vi'
+    initialLang = 'vi',
+    showLanguageSwitcher = true,
 }: YL01DialogProps) {
   const router = useRouter();
   const { role, setRole, isLoggedIn } = useAuth();
@@ -778,7 +780,49 @@ export function YL01Dialog({
   
     const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
 
+  const ValueInterestStepDialog = () => {
+        const content = valueInterestContent[currentLang];
 
+        return (
+            <>
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                    <DialogDescription className="text-center">{content.description}</DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                    {content.options.map(option => (
+                        <Card
+                            key={option.id}
+                            onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
+                            className={cn(
+                                "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
+                                selectedInterest.includes(option.id) && "ring-2 ring-primary border-primary bg-primary/10"
+                            )}
+                        >
+                             {selectedInterest.includes(option.id) && (
+                                <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
+                                    <Check className="h-4 w-4 text-white" />
+                                </div>
+                            )}
+                            <option.icon className="h-8 w-8 text-primary mx-auto mb-3" />
+                            <h3 className="font-semibold text-sm">{option.title}</h3>
+                        </Card>
+                    ))}
+                </div>
+                <div className="flex justify-center items-center mt-6 gap-4">
+                    <Button variant="link" onClick={() => setStep(9)}>{content.backButton}</Button>
+                    <Button 
+                        className="bg-accent-orange text-white hover:bg-accent-orange/90"
+                        onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest, selectedSubRole, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion)} 
+                        disabled={selectedInterest.length === 0}
+                    >
+                        {content.completeButton}
+                    </Button>
+                </div>
+            </>
+        )
+  }
+  
   const renderDialogContent = () => {
     switch (step) {
       case 1: return <PartnerRoleStepDialog />;
@@ -803,7 +847,7 @@ export function YL01Dialog({
         const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name.vi}));
         return renderMultiSelectStepDialog(8, industryContent[currentLang].title, industryContent[currentLang].description, industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
       case 9: // Y009
-         const regionOptions = japanRegions.map(r => ({id: r.toLowerCase(), title: r, name: {vi:r, ja: r, en:r}}));
+         const regionOptions = japanRegions.map(r => ({id: r.slug, title: r.name, name: {vi:r.name, ja: r.name, en:r.name}}));
          const content = regionContent[currentLang];
          const regionKanjiMap: { [key: string]: string } = {
           Hokkaido: '北海道',
@@ -864,6 +908,17 @@ export function YL01Dialog({
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
           <DialogContent className="sm:max-w-4xl">
+              {showLanguageSwitcher && step === 1 && (
+                  <div className="absolute top-4 right-16">
+                      <Tabs defaultValue={currentLang} onValueChange={(value) => handleLangChange(value as Language)}>
+                          <TabsList className="grid grid-cols-3">
+                              <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span></TabsTrigger>
+                              <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="hidden sm:inline">日本語</span></TabsTrigger>
+                              <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="hidden sm:inline">English</span></TabsTrigger>
+                          </TabsList>
+                      </Tabs>
+                  </div>
+              )}
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
