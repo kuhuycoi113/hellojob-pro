@@ -323,38 +323,24 @@ export function YL01Dialog({
       onLanguageChange(lang);
   }
 
-  const navigateToEmployerPage = (roleId: string, interests: string[], subRoleId?: string, name?: string, company?: string, visa?: string[], visaDetail?: string[], industry?: string[], region?: string[]) => {
-    const params = new URLSearchParams();
-    params.set('role', roleId);
-    interests.forEach(interest => params.append('interest', interest));
-    params.set('lang', currentLang);
-    if (subRoleId) {
-      params.set('sub_role', subRoleId);
+  const handleComplete = () => {
+    if (onComplete) {
+      onComplete({
+        role: selectedRole,
+        sub_role: selectedSubRole,
+        name: fullName,
+        company_name: companyName,
+        interest: selectedInterest,
+        visaType: selectedVisa,
+        visaDetail: selectedVisaDetail,
+        industry: selectedIndustry,
+        location: selectedRegion,
+        lang: currentLang,
+      });
     }
-    if (name) {
-        params.set('name', name);
-    }
-    if (company) {
-        params.set('company_name', company);
-    }
-    if (visa && visa.length > 0) {
-        visa.forEach(v => params.append('visa_type', v));
-    }
-    if (visaDetail && visaDetail.length > 0) {
-        visaDetail.forEach(vd => params.append('visa_detail', vd));
-    }
-     if (industry && industry.length > 0) {
-        industry.forEach(i => params.append('industry', i));
-    }
-    if (region && region.length > 0) {
-        region.forEach(r => params.append('location', r));
-    }
-
-    router.push(`/nha-tuyen-dung/dang-ky?${''}`);
-    onOpenChange(false);
   };
-  
-   const handleMultiSelect = (
+
+  const handleMultiSelect = (
     value: string,
     state: string[],
     setter: React.Dispatch<React.SetStateAction<string[]>>
@@ -827,7 +813,7 @@ export function YL01Dialog({
                     <Button variant="link" onClick={() => setStep(9)}>{content.backButton}</Button>
                     <Button 
                         className="bg-accent-orange text-white hover:bg-accent-orange/90"
-                        onClick={() => navigateToEmployerPage(selectedRole!, selectedInterest, selectedSubRole, fullName, companyName, selectedVisa, selectedVisaDetail, selectedIndustry, selectedRegion)} 
+                        onClick={handleComplete} 
                         disabled={selectedInterest.length === 0}
                     >
                         {content.completeButton}
@@ -932,4 +918,3 @@ export function YL01Dialog({
     </>
   );
 }
-
