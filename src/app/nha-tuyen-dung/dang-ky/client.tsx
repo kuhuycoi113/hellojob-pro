@@ -396,7 +396,7 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { 
         </CardHeader>
         <CardContent>{children}</CardContent>
     </Card>
-)
+);
 
 const formatPhoneNumberInput = (value: string, country: string): string => {
     if (!value) return '';
@@ -441,21 +441,22 @@ export default function EmployerDetailPage() {
   const handleLangChange = (lang: Language) => {
     setLang(lang);
     
-    if (isIndividual) {
+    const roleParam = searchParams.get('role');
+    const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
+
+    if (isIndividualRole) {
         const interestParam = searchParams.get('interest');
-        const roleParam = searchParams.get('role');
         const companyNameParam = searchParams.get('company_name');
         
         const interestText = (interestParam && interestTexts[interestParam]) ? interestTexts[interestParam][lang] : '';
-        const roleText = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][lang] : '';
+        const roleTextContent = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][lang] : '';
         const companyText = companyNameParam || '';
         
         let combinedRoleText = interestText;
-        if(roleText) combinedRoleText += ` - ${roleText}`;
+        if(roleTextContent) combinedRoleText += ` - ${roleTextContent}`;
         if(companyText) combinedRoleText += ` - ${companyText}`;
         setRoleText(combinedRoleText);
     } else {
-        const roleParam = searchParams.get('role');
         const organizationRoleText = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][lang] : '';
         setRoleText(organizationRoleText);
     }
@@ -489,12 +490,12 @@ export default function EmployerDetailPage() {
         setDisplayName(nameParam || '');
         // Construct composite role text for individuals
         const interestText = (interestParam && interestTexts[interestParam]) ? interestTexts[interestParam][langFromParams] : '';
-        const roleText = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][langFromParams] : '';
+        const roleTextContent = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][langFromParams] : '';
         const subRoleText = (subRoleParam && roleTexts[subRoleParam]) ? roleTexts[subRoleParam][langFromParams] : '';
         const companyText = companyNameParam || '';
         
         let combinedRoleText = interestText;
-        if(roleText) combinedRoleText += ` - ${roleText}`;
+        if(roleTextContent) combinedRoleText += ` - ${roleTextContent}`;
         // If subRole exists, it might be more specific. Let's decide how to show it.
         // For this logic, let's just append the company name.
         if(companyText) combinedRoleText += ` - ${companyText}`;
@@ -850,10 +851,10 @@ export default function EmployerDetailPage() {
                                 value={tempContent.messenger}
                                 onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})}
                                 onBlur={(e) => validateField('messenger', e.target.value)}
-                                className={cn(errors?.messenger && "border-destructive")}
+                                className={cn(errors.messenger && "border-destructive")}
                             />
-                            {!errors?.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
-                            {errors?.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
+                            {!errors.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
+                            {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                          <div className="space-y-1">
                             <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
@@ -863,10 +864,10 @@ export default function EmployerDetailPage() {
                                 value={tempContent.line}
                                 onChange={(e) => setTempContent({...tempContent, line: e.target.value})}
                                 onBlur={(e) => validateField('line', e.target.value)}
-                                className={cn(errors?.line && "border-destructive")}
+                                className={cn(errors.line && "border-destructive")}
                             />
-                            {!errors?.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
-                             {errors?.line && <p className="text-xs text-destructive">{errors.line}</p>}
+                            {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
+                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                       </div>
                       <div className="text-center mt-4">
@@ -1224,7 +1225,7 @@ export default function EmployerDetailPage() {
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
+                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
                    <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest, 'valueInterest')}>
                     {employer.valueInterest?.length > 0 ? (
