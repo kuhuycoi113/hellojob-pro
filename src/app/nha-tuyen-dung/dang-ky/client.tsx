@@ -1171,7 +1171,7 @@ export default function EmployerDetailPage() {
                            </Label>
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
-                      <div className="flex-grow pt-4 sm:pt-0 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left w-full">
+                      <div id="THONGTINCOBANNTD02" className="flex-grow pt-4 sm:pt-0 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left w-full">
                           <div className="flex-grow min-w-0">
                             <h1 id="DKY001" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
                             <p id="DKY002VAITRO" className="font-semibold text-primary">{roleText || t.rolePlaceholder}</p>
@@ -1316,4 +1316,3 @@ export default function EmployerDetailPage() {
   );
 }
 
-    
