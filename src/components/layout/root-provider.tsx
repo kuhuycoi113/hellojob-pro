@@ -15,6 +15,7 @@ import { validateProfileForApplication } from '@/lib/utils';
 import type { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from '../candidate-edit-dialog';
 import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
+import { CtaViecLamGoiY } from '../cta-viec-lam-goi-y';
 
 
 function LayoutManager({ children }: { children: React.ReactNode }) {
@@ -28,8 +29,8 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
 
-    const excludedCtaPages = ['/', '/nha-tuyen-dung', '/gioi-thieu', '/nhuong-quyen'];
-    const showCta = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
+    const excludedCtaPages = ['/', '/nha-tuyen-dung', '/gioi-thieu', '/nhuong-quyen', '/tim-viec-lam'];
+    const showCta = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname) && !pathname.startsWith('/viec-lam/');
 
 
     React.useEffect(() => {
@@ -47,7 +48,8 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
 
             if (profileRaw) {
                 const profile: CandidateProfile = JSON.parse(profileRaw);
-                if (validateProfileForApplication(profile)) {
+                const missingFields = validateProfileForApplication(profile);
+                if (missingFields.length === 0) {
                     // Profile is valid, proceed with application
                     const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
                     if (!appliedJobs.includes(jobId)) {
@@ -88,7 +90,12 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
         <>
             {!isCallPage && !isPartnerPage && <Header />}
             <main className="min-h-screen">{children}</main>
-            {showCta && <CtaNhaTuyenDung />}
+            {showCta && (
+                <div className="space-y-20 md:space-y-28 py-20 md:py-28">
+                    <CtaViecLamGoiY />
+                    <CtaNhaTuyenDung />
+                </div>
+            )}
             {!isCallPage && !isPartnerPage && <Footer />}
             {!isCallPage && !isPartnerPage && <FloatingChatWidget />}
             <Toaster />
