@@ -869,7 +869,7 @@ export default function EmployerDetailPage() {
 
             return (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {valueInterestOptions[lang].map((option, index) => {
+                    {valueInterestOptions[lang].map((option) => {
                         const isSelected = currentInterests.includes(option.id);
                         const selectionOrder = isSelected ? currentInterests.indexOf(option.id) + 1 : 0;
                         return (
@@ -1101,11 +1101,9 @@ export default function EmployerDetailPage() {
     if (Array.isArray(value) && value.length > 0) {
       if (typeof value[0] === 'object' && value[0] !== null && 'id' in value[0]) { // For valueInterest
         return (
-            <div id="DKY010" className="flex flex-wrap gap-2 mt-1">
+            <div id="DKY010" className="space-y-1 text-sm mt-1">
                  {value.map((item: any, index: number) => (
-                    <Badge key={item.id} variant="secondary" className="font-normal bg-accent-blue/10 text-accent-blue border-accent-blue/20">
-                        <span className="font-bold mr-1.5">{index + 1}.</span>{item[lang]}
-                    </Badge>
+                    <p key={item.id} className="text-muted-foreground"><span className="font-bold text-foreground mr-1.5">{index + 1}.</span>{item[lang]}</p>
                 ))}
             </div>
         );
@@ -1197,28 +1195,20 @@ export default function EmployerDetailPage() {
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
+                       <p className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
                    <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest, 'valueInterest')}>
-                    <div id="DKY010">
-                        {employer.valueInterest?.length > 0 ? (
-                            <ol className="list-decimal list-inside space-y-1">
-                                {employer.valueInterest.map((item: any, index: number) => (
-                                    <li key={index} className="text-muted-foreground">{item[lang]}</li>
-                                ))}
-                            </ol>
-                        ) : (
-                            <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, [], 'valueInterest')}>{t.clickToUpdate}</button>.</p>
-                        )}
+                    <div id="DKY010" className="text-sm">
+                        {getArrayValue(employer.valueInterest, 'valueInterest')}
                     </div>
                   </SectionCard>
                   <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
-                       <ul className="space-y-4">
+                       <ul className="space-y-4 text-sm">
                           {employer.history.length > 0 ? employer.history.map((item: any, index: number) => (
                               <li key={index} className="relative pl-6">
                                   <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
                                   <p className="font-bold text-primary mb-1">{item.year}</p>
-                                  <p className="text-sm text-muted-foreground">{item.event[lang]}</p>
+                                  <p className="text-muted-foreground">{item.event[lang]}</p>
                               </li>
                           )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
@@ -1243,7 +1233,7 @@ export default function EmployerDetailPage() {
                       <ul className="space-y-2 text-sm">
                           {employer.benefits.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
                               <li key={index} className="flex items-start gap-2">
-                                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span>{benefit[lang]}</span>
+                                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
                               </li>
                           )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
@@ -1323,4 +1313,3 @@ export default function EmployerDetailPage() {
   );
 }
 
-    

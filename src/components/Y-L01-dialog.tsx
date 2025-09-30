@@ -274,6 +274,7 @@ const valueInterestContent = {
 };
 
 
+
 export function YL01Dialog({ 
     children, 
     isOpen, 
@@ -349,7 +350,7 @@ export function YL01Dialog({
         region.forEach(r => params.append('location', r));
     }
 
-    router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
+    router.push(`/nha-tuyen-dung/dang-ky?${''}`);
     onOpenChange(false);
   };
   
@@ -774,7 +775,7 @@ export function YL01Dialog({
                                     {selectionOrder}
                                 </Badge>
                             )}
-                            {option.icon && <option.icon className={cn("h-8 w-8 mx-auto mb-2", option.color ? `text-${option.color}-500` : 'text-primary')} />}
+                            {option.icon && <option.icon className={cn("h-8 w-8 mx-auto mb-2", option.color ? `text-${''}` : 'text-primary')} />}
                             <h3 className="font-bold text-base mb-1">{option.name[currentLang]}</h3>
                             {option.desc && <p className="text-muted-foreground text-xs flex-grow">{option.desc}</p>}
                         </Card>
@@ -931,3 +932,4 @@ export function YL01Dialog({
     </>
   );
 }
+
