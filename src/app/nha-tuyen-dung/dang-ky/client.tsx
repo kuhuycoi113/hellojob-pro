@@ -214,6 +214,7 @@ const contentByLang = {
         clickToUpdate: 'Nhấn để cập nhật',
         headerTitle: 'Thông tin chung',
         namePlaceholder: 'Ví dụ: Nguyễn Văn An',
+        rolePlaceholder: '[Vai trò/Chức danh đối tác]...'
 
     },
     ja: {
@@ -256,6 +257,7 @@ const contentByLang = {
         messengerHelper: 'システムが自動的にユーザー名を取得します。',
         linePlaceholder: 'LineのリンクまたはIDを入力してください',
         lineHelper: 'システムが自動的にユーザー名を取得します。',
+        rolePlaceholder: '[パートナーの役割/役職]...'
     },
     en: {
         edit: 'Edit',
@@ -297,6 +299,7 @@ const contentByLang = {
         messengerHelper: 'The system will automatically extract your username.',
         linePlaceholder: 'Paste Line link or enter your ID',
         lineHelper: 'The system will automatically extract your username.',
+        rolePlaceholder: '[Partner Role/Title]...'
     }
 };
 
@@ -1171,7 +1174,7 @@ export default function EmployerDetailPage() {
                       <div className="flex-grow pt-4 sm:pt-0 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left w-full">
                           <div className="flex-grow min-w-0">
                             <h1 id="DKY001" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                            <p id="DKY002" className="font-semibold text-primary">{roleText}</p>
+                            <p id="DKY002VAITRO" className="font-semibold text-primary">{roleText || t.rolePlaceholder}</p>
                             <p id="DKY005" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                           </div>
                           <div className="flex items-center gap-2 mt-4 sm:mt-0">
@@ -1313,3 +1316,4 @@ export default function EmployerDetailPage() {
   );
 }
 
+    
