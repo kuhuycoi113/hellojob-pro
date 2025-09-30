@@ -246,33 +246,27 @@ export default function AboutPage() {
                 <span className="block text-sm opacity-80 mt-1">Access thousands of high-quality Technical Intern Trainees, Skilled Workers, and Engineers from Vietnam. Post jobs for free and connect with talent today.</span>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
+                <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 px-12" id="DANGTINTUYENDUNG01">
                   <Link href="/nha-tuyen-dung">
                     <div className="text-center">
-                        <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
-                        <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
-                    </div>
-                  </Link>
-                </Button>
-                 <Button asChild size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" id="DANGKYDOITAC01">
-                  <Link href="/nha-tuyen-dung">
-                     <div className="text-center">
-                        <span className="font-semibold">Đăng ký đối tác</span>
-                        <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                        <span className="font-semibold">Tìm hiểu ngay</span>
+                        <div className="text-xs opacity-80">詳細を確認 / Learn More</div>
                     </div>
                   </Link>
                 </Button>
               </div>
             </div>
              <div className="md:w-1/2 flex justify-center">
-              <Image
-                src="/img/viet-img/phong-van (3).jpg"
-                alt="Hợp tác tuyển dụng tại Nhật"
-                width={500}
-                height={350}
-                className="rounded-lg shadow-xl"
-                data-ai-hint="recruitment partnership japan"
-              />
+              <Link href="/nha-tuyen-dung" className="group block rounded-lg overflow-hidden shadow-xl">
+                <Image
+                  src="/img/viet-img/phong-van (3).jpg"
+                  alt="Hợp tác tuyển dụng tại Nhật"
+                  width={500}
+                  height={350}
+                  className="rounded-lg transition-transform duration-300 group-hover:scale-105"
+                  data-ai-hint="recruitment partnership japan"
+                />
+              </Link>
             </div>
           </div>
         </div>
