@@ -13,6 +13,7 @@ import { XL07Dialog } from '@/components/X-L07-dialog';
 import { XL08Dialog } from '@/components/X-L08-dialog';
 import { XL09Dialog } from '@/components/X-L09-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
+import { useRouter } from 'next/navigation';
 
 
 const partnerBenefits = [
@@ -55,6 +56,7 @@ const partnerBenefits = [
 ];
 
 export default function NhaTuyenDungPage() {
+  const router = useRouter();
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
   const [isXL06DialogOpen, setIsXL06DialogOpen] = useState(false);
   const [isXL07DialogOpen, setIsXL07DialogOpen] = useState(false);
@@ -99,6 +101,24 @@ export default function NhaTuyenDungPage() {
     setRecruitmentPrefs(null);
     setContactInfo(null);
     setSelectedLang('vi');
+  };
+
+  const navigateToEmployerPage = (data: any) => {
+    const params = new URLSearchParams();
+    if (data.role) params.set('role', data.role);
+    if (data.sub_role) params.set('sub_role', data.sub_role);
+    if (data.name) params.set('name', data.name);
+    if (data.company_name) params.set('company_name', data.company_name);
+    if (data.lang) params.set('lang', data.lang);
+
+    (data.interest || []).forEach((item: string) => params.append('interest', item));
+    (data.visaType || []).forEach((item: string) => params.append('visa_type', item));
+    (data.visaDetail || []).forEach((item: string) => params.append('visa_detail', item));
+    (data.industry || []).forEach((item: string) => params.append('industry', item));
+    (data.location || []).forEach((item: string) => params.append('location', item));
+    
+    router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
+    setIsYL01DialogOpen(false);
   };
 
 
@@ -280,10 +300,7 @@ export default function NhaTuyenDungPage() {
         onLanguageChange={setSelectedLang}
         initialLang={selectedLang}
         initialStep={1}
-        onComplete={(data) => {
-            console.log('Y-L01 finished', data);
-            setIsYL01DialogOpen(false);
-        }}
+        onComplete={navigateToEmployerPage}
         onBack={() => {
             setIsYL01DialogOpen(false);
         }}
