@@ -435,7 +435,6 @@ export default function EmployerDetailPage() {
   
   const [employer, setEmployer] = useState<any | null>(null);
   const [lang, setLang] = useState<Language>('vi');
-  const [roleFromUrl, setRoleFromUrl] = useState<string | null>(null);
   const [isIndividual, setIsIndividual] = useState(false);
   const [displayName, setDisplayName] = useState('');
   const [roleText, setRoleText] = useState('');
@@ -473,17 +472,12 @@ export default function EmployerDetailPage() {
     const interestParam = searchParams.get('interest');
     
     setLang(langFromParams);
-    setRoleFromUrl(roleParam);
     
     let employerData;
     const hasParams = Array.from(searchParams.keys()).length > 0;
     
-    // Change this line
-    if (hasParams) {
-        employerData = JSON.parse(JSON.stringify(emptyEmployerData));
-    } else {
-        employerData = JSON.parse(JSON.stringify(emptyEmployerData)); // Always use empty data by default
-    }
+    // Always use empty data by default for this page
+    employerData = JSON.parse(JSON.stringify(emptyEmployerData));
     
     const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
     setIsIndividual(isIndividualRole);
@@ -1185,7 +1179,7 @@ export default function EmployerDetailPage() {
                      <Input id="banner-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'banner')} />
                   </Label>
                 </div>
-                <div className="p-6 bg-card">
+                <div id="THONGTINCOBANNTD01" className="p-6 bg-card">
                   <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-24 md:-mt-20">
                       <div className="relative flex-shrink-0">
                         <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
@@ -1198,22 +1192,20 @@ export default function EmployerDetailPage() {
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
                       <div className="flex-grow pt-4 sm:pt-0 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left w-full">
-                          <div className="flex flex-wrap justify-center sm:justify-start items-center gap-y-2 gap-x-4 mb-4 sm:mb-0 w-full">
-                                <div className="flex-grow">
-                                  <h1 id="DKY001" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                                  <p id="DKY002" className="font-semibold text-primary">{roleText}</p>
-                                  <p id="DKY005" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                     <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
-                                          <TabsList className="grid w-full grid-cols-3">
-                                              <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span></TabsTrigger>
-                                              <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="hidden sm:inline">日本語</span></TabsTrigger>
-                                              <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="hidden sm:inline">English</span></TabsTrigger>
-                                          </TabsList>
-                                      </Tabs>
-                                 <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: employer.type, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
-                                </div>
+                          <div className="flex-grow min-w-0">
+                            <h1 id="DKY001" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
+                            <p id="DKY002" className="font-semibold text-primary">{roleText}</p>
+                            <p id="DKY005" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
+                          </div>
+                          <div className="flex items-center gap-2 mt-4 sm:mt-0">
+                               <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
+                                    <TabsList className="grid w-full grid-cols-3">
+                                        <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span></TabsTrigger>
+                                        <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="hidden sm:inline">日本語</span></TabsTrigger>
+                                        <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="hidden sm:inline">English</span></TabsTrigger>
+                                    </TabsList>
+                                </Tabs>
+                             <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
                           </div>
                       </div>
                   </div>
@@ -1349,3 +1341,5 @@ export default function EmployerDetailPage() {
     </>
   );
 }
+
+    
