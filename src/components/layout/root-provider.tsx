@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { validateProfileForApplication } from '@/lib/utils';
 import type { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from '../candidate-edit-dialog';
+import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
 
 
 function LayoutManager({ children }: { children: React.ReactNode }) {
@@ -26,6 +27,10 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
     
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
+
+    const excludedCtaPages = ['/', '/nha-tuyen-dung', '/gioi-thieu', '/nhuong-quyen'];
+    const showCta = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
+
 
     React.useEffect(() => {
       if (isLoggedIn && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
@@ -83,6 +88,7 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
         <>
             {!isCallPage && !isPartnerPage && <Header />}
             <main className="min-h-screen">{children}</main>
+            {showCta && <CtaNhaTuyenDung />}
             {!isCallPage && !isPartnerPage && <Footer />}
             {!isCallPage && !isPartnerPage && <FloatingChatWidget />}
             <Toaster />
