@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Dialog,
@@ -217,18 +217,18 @@ export function XL01Dialog({
 }: XL01DialogProps) {
   const router = useRouter();
   const { role, setRole, isLoggedIn } = useAuth();
-  const [step, setStep] = useState(initialStep);
-  const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
-  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-  const [selectedVisa, setSelectedVisa] = useState<{name: string, slug: string} | null>(null);
-  const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
-  const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-  const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [currentLang, setCurrentLang] = useState<Language>(initialLang);
+  const [step, setStep] = React.useState(initialStep);
+  const [isConfirmLoginOpen, setIsConfirmLoginOpen] = React.useState(false);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = React.useState(false);
+  const [selectedVisa, setSelectedVisa] = React.useState<{name: string, slug: string} | null>(null);
+  const [selectedVisaDetail, setSelectedVisaDetail] = React.useState<string | null>(null);
+  const [selectedIndustry, setSelectedIndustry] = React.useState<Industry | null>(null);
+  const [selectedRegion, setSelectedRegion] = React.useState<string | null>(null);
+  const [isCreateDetailOpen, setIsCreateDetailOpen] = React.useState(false);
+  const [selectedRole, setSelectedRole] = React.useState<string | null>(null);
+  const [currentLang, setCurrentLang] = React.useState<Language>(initialLang);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isOpen) {
       setStep(initialStep);
     }
