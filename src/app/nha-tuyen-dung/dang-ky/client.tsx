@@ -1222,15 +1222,17 @@ export default function EmployerDetailPage() {
                        <p className="text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
                    <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest, 'valueInterest')}>
-                    {employer.valueInterest?.length > 0 ? (
-                        <ol className="list-decimal list-inside space-y-1">
-                            {employer.valueInterest.map((item: any, index: number) => (
-                                <li key={index} className="text-muted-foreground">{item[lang]}</li>
-                            ))}
-                        </ol>
-                    ) : (
-                        <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, [], 'valueInterest')}>{t.clickToUpdate}</button>.</p>
-                    )}
+                    <div id="DKY010">
+                        {employer.valueInterest?.length > 0 ? (
+                            <ol className="list-decimal list-inside space-y-1">
+                                {employer.valueInterest.map((item: any, index: number) => (
+                                    <li key={index} className="text-muted-foreground">{item[lang]}</li>
+                                ))}
+                            </ol>
+                        ) : (
+                            <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.valueInterestTitle, [], 'valueInterest')}>{t.clickToUpdate}</button>.</p>
+                        )}
+                    </div>
                   </SectionCard>
                   <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
                        <ul className="space-y-4">
