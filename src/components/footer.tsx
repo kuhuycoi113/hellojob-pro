@@ -1,5 +1,4 @@
 
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -10,7 +9,7 @@ const Logo = () => (
 
 export function Footer() {
   return (
-    <footer className="bg-secondary text-secondary-foreground">
+    <footer id="CHANTRANG01" className="bg-secondary text-secondary-foreground">
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
