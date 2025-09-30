@@ -33,6 +33,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
+import { XL01Dialog } from '@/components/X-L01-dialog';
+import { YL01Dialog } from '@/components/Y-L01-dialog';
 
 
 const employersData: { [key: string]: any } = {
@@ -207,7 +209,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
         lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
-        notUpdated: 'Chưa có thông tin',
+        notUpdated: '[Chưa có thông tin]',
         clickToUpdate: 'Nhấn để cập nhật',
         headerTitle: 'Thông tin chung',
         namePlaceholder: 'Ví dụ: Nguyễn Văn An',
@@ -232,7 +234,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'LineのリンクまたはIDを入力してください',
         lineHelper: 'システムが自動的にユーザー名を取得します。',
-        notUpdated: '情報がありません',
+        notUpdated: '[情報がありません]',
         clickToUpdate: 'クリックして更新',
         headerTitle: '一般情報',
         namePlaceholder: '例: グエン・ヴァン・アン',
@@ -273,7 +275,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'Paste Line link or enter your ID',
         lineHelper: 'The system will automatically extract your username.',
-        notUpdated: 'Not available',
+        notUpdated: '[Not available]',
         clickToUpdate: 'Click to update',
         headerTitle: 'General Information',
         namePlaceholder: 'E.g., An Nguyen Van',
@@ -476,10 +478,11 @@ export default function EmployerDetailPage() {
     let employerData;
     const hasParams = Array.from(searchParams.keys()).length > 0;
     
+    // Change this line
     if (hasParams) {
         employerData = JSON.parse(JSON.stringify(emptyEmployerData));
     } else {
-        employerData = JSON.parse(JSON.stringify(placeholderEmployerData));
+        employerData = JSON.parse(JSON.stringify(emptyEmployerData)); // Always use empty data by default
     }
     
     const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
@@ -496,8 +499,6 @@ export default function EmployerDetailPage() {
         
         let combinedRoleText = interestText;
         if(roleTextContent) combinedRoleText += ` - ${roleTextContent}`;
-        // If subRole exists, it might be more specific. Let's decide how to show it.
-        // For this logic, let's just append the company name.
         if(companyText) combinedRoleText += ` - ${companyText}`;
         setRoleText(combinedRoleText);
 
@@ -1199,9 +1200,9 @@ export default function EmployerDetailPage() {
                       <div className="flex-grow pt-4 sm:pt-0 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left w-full">
                           <div className="flex flex-wrap justify-center sm:justify-start items-center gap-y-2 gap-x-4 mb-4 sm:mb-0 w-full">
                                 <div className="flex-grow">
-                                  <h1 id="DKY004" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                                  <p id="DKY005" className="font-semibold text-primary">{roleText}</p>
-                                  <p className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
+                                  <h1 id="DKY001" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
+                                  <p id="DKY002" className="font-semibold text-primary">{roleText}</p>
+                                  <p id="DKY005" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                                 </div>
                                 <div className="flex items-center gap-2">
                                      <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
@@ -1280,10 +1281,10 @@ export default function EmployerDetailPage() {
               <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
                   <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
-                          <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || '...'}</p>
-                          <p><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || '...'}</p>
-                          <p><strong>{t.licenseLabel}:</strong> {employer.info.license || '...'}</p>
-                          <p><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || '...'}</a></p>
+                          <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
+                          <p><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
+                          <p><strong>{t.licenseLabel}:</strong> {employer.info.license || t.notUpdated}</p>
+                          <p><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || t.notUpdated}</a></p>
                       </div>
                       {hasContactInfo ? (
                           <div id="HIENTHILIENHE04" className="mt-6 border-t pt-4 space-y-2">
