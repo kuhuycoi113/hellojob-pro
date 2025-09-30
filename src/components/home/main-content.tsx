@@ -219,14 +219,6 @@ export const MainContent = () => (
                     </div>
                   </Link>
                 </Button>
-                 <Button asChild size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" id="DANGKYDOITAC01">
-                  <Link href="/nha-tuyen-dung">
-                     <div className="text-center">
-                        <span className="font-semibold">Đăng ký đối tác</span>
-                        <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
-                    </div>
-                  </Link>
-                </Button>
               </div>
             </div>
              <div className="md:w-1/2 flex justify-center">
