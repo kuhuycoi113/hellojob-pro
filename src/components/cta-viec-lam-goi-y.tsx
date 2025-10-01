@@ -18,15 +18,16 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { cn } from '@/lib/utils';
 
 
 const CTAForGuest = ({ onLoginClick }: { onLoginClick: () => void }) => (
-    <Card className="text-center py-12 px-6 shadow-lg">
+    <Card className="text-center py-12 px-6 shadow-lg col-span-full">
         <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
-            <Briefcase className="h-10 w-10 text-primary"/>
+            <UserPlus className="h-10 w-10 text-primary"/>
         </div>
-        <p className="font-semibold text-lg">Xem gợi ý việc làm dành riêng cho bạn</p>
-        <p className="text-muted-foreground mt-2 mb-6">Đăng nhập hoặc tạo hồ sơ để nhận được những gợi ý phù hợp nhất từ HelloJob AI.</p>
+        <p className="font-semibold text-lg">Đăng ký để nhận gợi ý việc làm phù hợp</p>
+        <p className="text-muted-foreground mt-2 mb-6">Tạo hồ sơ của bạn để AI của chúng tôi có thể tìm ra những cơ hội tốt nhất dành cho bạn.</p>
         <Button onClick={onLoginClick}>
             <LogIn className="mr-2 h-4 w-4" />
             Đăng nhập / Đăng ký
@@ -192,16 +193,13 @@ const CTAForEmptyProfile = () => {
     };
 
     const IndustryStepDialog = () => {
-        const parentVisaSlug = selectedVisa?.slug;
-
-        if (!parentVisaSlug) return null;
-
-        const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
+        if (!selectedVisa) return null;
+        const industries = industriesByJobType[selectedVisa.slug as keyof typeof industriesByJobType] || [];
         
         let screenIdComment = '';
-        if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-        else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-        else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+        if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+        else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+        else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
 
         return (
             <>
@@ -273,7 +271,7 @@ const CTAForEmptyProfile = () => {
     
     return (
         <>
-            <Card className="text-center py-12 px-6 shadow-lg">
+            <Card className="text-center py-12 px-6 shadow-lg col-span-full">
                  <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
                     <UserPlus className="h-10 w-10 text-primary" />
                 </div>
@@ -349,28 +347,42 @@ export function CtaViecLamGoiY() {
   const [suggestions, setSuggestions] = useState<Job[]>([]);
 
   const fetchSuggestions = useCallback(async () => {
-    if (role === 'candidate' || role === 'candidate-full-profile') {
-        setIsLoading(true);
-        try {
-            const storedProfile = localStorage.getItem('generatedCandidateProfile');
-            if (storedProfile) {
-                const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-                const matchResults = await matchJobsToProfile(profile, 'related');
-                setSuggestions(matchResults.map(r => r.job).slice(0, 4));
-            } else {
-                setSuggestions(jobData.slice(0, 4));
-            }
-        } catch (error) {
-            console.error("Failed to fetch job suggestions for CTA:", error);
-            setSuggestions(jobData.slice(0, 4)); // Fallback
-        } finally {
-            setIsLoading(false);
+    if (role === 'guest' || role === 'candidate-empty-profile') {
+        setIsLoading(false);
+        return;
+    }
+    
+    setIsLoading(true);
+    try {
+        const storedProfile = localStorage.getItem('generatedCandidateProfile');
+        if (storedProfile) {
+            const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+            const matchResults = await matchJobsToProfile(profile, 'related');
+            setSuggestions(matchResults.map(r => r.job).slice(0, 4));
+        } else {
+            // Fallback for logged-in users without a profile somehow
+            setSuggestions(jobData.slice(0, 4));
         }
+    } catch (error) {
+        console.error("Failed to fetch job suggestions for CTA:", error);
+        setSuggestions(jobData.slice(0, 4)); // Fallback on error
+    } finally {
+        setIsLoading(false);
     }
   }, [role]);
 
   useEffect(() => {
     fetchSuggestions();
+     // Re-fetch when profile changes
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'generatedCandidateProfile' || event.key === null) {
+        fetchSuggestions();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [fetchSuggestions]);
   
   const handleLoginClick = () => {
@@ -384,23 +396,27 @@ export function CtaViecLamGoiY() {
     if (role === 'candidate-empty-profile') {
         return <CTAForEmptyProfile />;
     }
-    if (role === 'candidate' || role === 'candidate-full-profile') {
-      if (isLoading) {
-          return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
+    if (isLoading) {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
+          </div>
+        );
+    }
+    if (suggestions.length === 0) {
+        return (
+            <div className="col-span-full">
+                <CTAForEmptyProfile />
             </div>
-          );
-      }
-      return (
+        );
+    }
+    return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {suggestions.map((job) => (
                 <JobCard key={job.id} job={job} />
             ))}
         </div>
-      );
-    }
-    return null;
+    );
   };
   
   return (
