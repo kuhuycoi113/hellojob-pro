@@ -25,8 +25,14 @@ const pageContent = {
             ]
         },
         heroDescription: "Nền tảng HelloJob cung cấp giải pháp công nghệ toàn diện, giúp Nghiệp đoàn của bạn giải quyết các bài toán cốt lõi và phát triển mạnh mẽ.",
-        ctaPostJob: "Đăng tin tuyển dụng ngay",
-        ctaRegisterPartner: "Đăng ký đối tác",
+        ctaPostJob: {
+            main: "Đăng tin tuyển dụng ngay",
+            sub: "求人を掲載 / Post Job Now"
+        },
+        ctaRegisterPartner: {
+            main: "Đăng ký đối tác",
+            sub: "パートナー登録 / Register as Partner"
+        },
         painPointsTitle: "Chúng tôi thấu hiểu những thách thức của bạn",
         painPointsDescription: "HelloJob nhận diện rõ những \"nỗi đau\" mà các Nghiệp đoàn đang đối mặt hàng ngày.",
         painPoints: [
@@ -79,8 +85,14 @@ const pageContent = {
         ],
         finalCtaTitle: "Sẵn sàng nâng tầm hoạt động của Nghiệp đoàn?",
         finalCtaDescription: "Trở thành đối tác của HelloJob ngay hôm nay để bắt đầu tối ưu hóa quy trình, giảm chi phí và tiếp cận nguồn ứng viên chất lượng cao.",
-        finalCtaRegister: "Đăng ký đối tác ngay",
-        finalCtaPost: "Đăng tin tuyển dụng"
+        finalCtaRegister: {
+            main: "Đăng ký đối tác",
+            sub: "パートナー登録 / Register as Partner"
+        },
+        finalCtaPost: {
+            main: "Đăng tin tuyển dụng ngay",
+            sub: "求人を掲載 / Post Job Now"
+        },
     },
     ja: {
         heroTitle: {
@@ -92,8 +104,14 @@ const pageContent = {
             ]
         },
         heroDescription: "HelloJobプラットフォームは包括的な技術ソリューションを提供し、組合が中心的な課題を解決し、力強く成長するのを支援します。",
-        ctaPostJob: "今すぐ求人を掲載",
-        ctaRegisterPartner: "パートナー登録",
+        ctaPostJob: {
+            main: "今すぐ求人を掲載",
+            sub: "Post Job Now"
+        },
+        ctaRegisterPartner: {
+            main: "パートナー登録",
+            sub: "Register as Partner"
+        },
         painPointsTitle: "私たちはあなたの課題を理解しています",
         painPointsDescription: "HelloJobは、組合が日常的に直面している「痛み」を明確に認識しています。",
         painPoints: [
@@ -146,8 +164,14 @@ const pageContent = {
         ],
         finalCtaTitle: "組合の活動を向上させる準備はできましたか？",
         finalCtaDescription: "今すぐHelloJobのパートナーになり、プロセスの最適化、コストの削減、質の高い候補者へのアクセスを開始しましょう。",
-        finalCtaRegister: "今すぐパートナー登録",
-        finalCtaPost: "求人を掲載"
+        finalCtaRegister: {
+            main: "今すぐパートナー登録",
+            sub: "Register as Partner Now"
+        },
+        finalCtaPost: {
+            main: "求人を掲載",
+            sub: "Post a Job"
+        },
     },
     en: {
         heroTitle: {
@@ -159,8 +183,14 @@ const pageContent = {
             ]
         },
         heroDescription: "The HelloJob platform provides comprehensive technology solutions, helping your Union solve core problems and grow strongly.",
-        ctaPostJob: "Post a Job Now",
-        ctaRegisterPartner: "Register as a Partner",
+        ctaPostJob: {
+            main: "Post a Job Now",
+            sub: "無料で求人掲載"
+        },
+        ctaRegisterPartner: {
+            main: "Register as a Partner",
+            sub: "パートナー登録"
+        },
         painPointsTitle: "We Understand Your Challenges",
         painPointsDescription: "HelloJob clearly identifies the \"pain points\" that Unions face daily.",
         painPoints: [
@@ -213,8 +243,14 @@ const pageContent = {
         ],
         finalCtaTitle: "Ready to Elevate Your Union's Operations?",
         finalCtaDescription: "Become a HelloJob partner today to start optimizing processes, reducing costs, and accessing a high-quality candidate pool.",
-        finalCtaRegister: "Register as a Partner Now",
-        finalCtaPost: "Post a Job"
+        finalCtaRegister: {
+            main: "Register as a Partner Now",
+            sub: "今すぐパートナー登録"
+        },
+        finalCtaPost: {
+            main: "Post a Job",
+            sub: "求人を掲載"
+        },
     }
 };
 
@@ -230,7 +266,7 @@ export default function UnionLandingPage() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid md:grid-cols-2 gap-12 items-end">
             <div className="text-center md:text-left">
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
+                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
                     {t.heroTitle.main}
                 </h1>
                 <ul className="space-y-2 mb-6">
@@ -248,23 +284,23 @@ export default function UnionLandingPage() {
                 <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
                   <Link href="/nha-tuyen-dung">
                       <div className="text-center">
-                          <span className="font-semibold">{t.ctaPostJob}</span>
-                          <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                          <span className="font-semibold">{t.ctaPostJob.main}</span>
+                          <div className="text-xs opacity-80">{t.ctaPostJob.sub}</div>
                       </div>
                   </Link>
                 </Button>
                 <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
                     <Link href="/nha-tuyen-dung?action=register">
                         <div className="text-center">
-                            <span className="font-semibold">{t.ctaRegisterPartner}</span>
-                            <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                            <span className="font-semibold">{t.ctaRegisterPartner.main}</span>
+                            <div className="text-xs opacity-80">{t.ctaRegisterPartner.sub}</div>
                         </div>
                     </Link>
                 </Button>
               </div>
             </div>
-             <div className="flex-col hidden md:flex">
-                <div className="flex justify-end mb-4">
+             <div className="relative flex-col hidden md:flex">
+                 <div className="flex justify-end mb-4">
                     <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
                         <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
                             <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
@@ -273,7 +309,7 @@ export default function UnionLandingPage() {
                         </TabsList>
                     </Tabs>
                 </div>
-                 <div className="relative aspect-[5/3]">
+                 <div className="relative aspect-[4/3] max-h-[350px]">
                     <Image
                         src="/img/NTD/ND.jpg"
                         alt="Hợp tác cùng phát triển với HelloJob"
@@ -353,11 +389,21 @@ export default function UnionLandingPage() {
             {t.finalCtaDescription}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-              <Link href="/nha-tuyen-dung?action=register">{t.finalCtaRegister}</Link>
+             <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
+                <Link href="/nha-tuyen-dung">
+                    <div className="text-center">
+                        <span className="font-semibold">{t.finalCtaPost.main}</span>
+                        <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
+                    </div>
+                </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 hover:text-white">
-              <Link href="/nha-tuyen-dung">{t.finalCtaPost}</Link>
+            <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
+                <Link href="/nha-tuyen-dung?action=register">
+                     <div className="text-center">
+                        <span className="font-semibold">{t.finalCtaRegister.main}</span>
+                        <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
+                    </div>
+                </Link>
             </Button>
           </div>
         </div>
@@ -365,5 +411,3 @@ export default function UnionLandingPage() {
     </div>
   );
 }
-
-    
