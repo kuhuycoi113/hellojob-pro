@@ -2,7 +2,7 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
-import { jobData, type Job, publicFeeLimits } from '@/lib/mock-data';
+import { jobData, type Job, publicFeeLimits, controlledFeeVisas } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { JsonLdScript } from '@/components/json-ld-script';
-import { validateProfileForApplication } from '@/lib/utils';
+import { validateProfileForApplication } from '@/lib/validators';
 import { CtaViecLamGoiY } from '@/components/cta-viec-lam-goi-y';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
@@ -87,15 +87,36 @@ const convertCurrency = (value?: string, from: 'JPY' | 'USD' = 'JPY') => {
     return `≈ ${vndValue.toLocaleString('vi-VN')} VNĐ`;
 };
 
-
-// List of visa details that have special fee handling
-const controlledFeeVisas = [
-  'Thực tập sinh 3 năm',
-  'Thực tập sinh 1 năm',
-  'Đặc định đi mới',
-  'Kỹ sư, tri thức đầu Việt',
-  'Đặc định đầu Việt'
+const visasForVndDisplay = [
+    'Thực tập sinh 3 năm',
+    'Thực tập sinh 1 năm',
+    'Đặc định đi mới',
+    'Kỹ sư, tri thức đầu Việt',
 ];
+
+const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): string => {
+    if (!salaryValue) return 'N/A';
+
+    const numericValue = parseInt(salaryValue.replace(/[^0-9]/g, ''), 10);
+    if (isNaN(numericValue)) return salaryValue;
+
+    if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
+        const vndValue = numericValue * JPY_VND_RATE;
+        const valueInMillions = vndValue / 1000000;
+        
+        if (valueInMillions % 1 === 0) {
+            return `${valueInMillions.toLocaleString('vi-VN')}tr`;
+        }
+        
+        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        });
+        return `${formattedVnd.replace('.',',')}tr`;
+    }
+    
+    return `${formatCurrency(salaryValue)} JPY`;
+};
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
@@ -176,6 +197,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         } else {
             savedJobs.push(job.id);
             localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+            setIsSaved(true);
         }
         window.dispatchEvent(new Event('storage'));
     };
@@ -206,6 +228,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     setIsProfileIncompleteAlertOpen(true);
                 }
             } else {
+                 // No profile found, show alert to update
                  setIsProfileIncompleteAlertOpen(true);
             }
         }
@@ -422,11 +445,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             <CardContent className="space-y-4">
                                <div className="space-y-2">
                                     <p className="text-sm text-muted-foreground">Lương cơ bản</p>
-                                    <p className="text-2xl font-bold text-accent-green">{formatCurrency(job.salary.basic, 'JPY')}</p>
+                                    <p className="text-2xl font-bold text-accent-green">{formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</p>
                                     {job.salary.basic && <p className="text-xs text-muted-foreground">{convertCurrency(job.salary.basic, 'JPY')}</p>}
                                     {job.salary.actual && (
                                         <div className="pt-2">
-                                            <p className="font-semibold text-muted-foreground">Thực lĩnh: ~{formatCurrency(job.salary.actual, 'JPY')}</p>
+                                            <p className="font-semibold text-muted-foreground">Thực lĩnh: ~{formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</p>
                                             {job.salary.actual && <p className="text-xs text-muted-foreground">{convertCurrency(job.salary.actual, 'JPY')}</p>}
                                         </div>
                                     )}
@@ -492,9 +515,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                     <AlertDialogCancel>Để sau</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleConfirmLogin}>
-                        Đồng ý
-                    </AlertDialogAction>
+                    <AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -526,6 +547,5 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             />
         </div>
     );
-}
 
     
