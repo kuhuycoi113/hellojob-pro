@@ -29,6 +29,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuGroup,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
@@ -202,7 +204,7 @@ const contentByLang = {
         mainIndustriesLabel: 'Ngành nghề tuyển dụng chính',
         secondaryIndustriesLabel: 'Khu vực tuyển dụng chính',
         benefitsTitle: 'Phúc lợi & Môi trường',
-        valueInterestTitle: 'Giá trị & Quan tâm',
+        valueInterestTitle: 'Giá trị, Quan tâm',
         interestLabel: "Quan tâm",
         valueInterestLabel: "Giá trị quan tâm",
         contactTitle: 'Thông tin liên hệ',
@@ -470,17 +472,17 @@ export default function EmployerDetailPage() {
     const subRoleKey = subRoleParam || '';
     const nationalityKey = nationalityParam || '';
 
-    if (isIndividualRole && roleTexts[roleKey] && (subRoleTexts[subRoleKey] || roleTexts[subRoleKey])) {
-        if (roleKey === 'nhan-vien-phai-cu') { // Case 1
+    if (isIndividualRole && roleTexts[roleKey]) {
+        if (roleKey === 'nhan-vien-phai-cu' && subRoleTexts[subRoleKey]) {
             finalRoleText = `${subRoleTexts[subRoleKey][langFromParams]}; ${roleTexts[roleKey][langFromParams]}; ${companyNameParam}`;
-        } else if (roleKey === 'nhan-vien-nhan-luc-nhat') { // Case 2
-            const nationalityText = subRoleTexts[nationalityKey] ? subRoleTexts[nationalityKey][langFromParams] : nationalityKey;
-            const orgTypeText = roleTexts[subRoleKey] ? roleTexts[subRoleKey][langFromParams] : subRoleKey;
-            finalRoleText = `${nationalityText}; ${orgTypeText}; ${companyNameParam}`;
+        } else if (roleKey === 'nhan-vien-nhan-luc-nhat' && subRoleTexts[nationalityKey] && roleTexts[subRoleKey]) {
+            finalRoleText = `${subRoleTexts[nationalityKey][langFromParams]}; ${roleTexts[subRoleKey][langFromParams]}; ${companyNameParam}`;
         }
-    } else if (!isIndividualRole && roleTexts[roleKey]) { // Case 3
+    } else if (!isIndividualRole && roleTexts[roleKey]) {
         finalRoleText = roleTexts[roleKey][langFromParams];
-    } else {
+    }
+    
+    if (!finalRoleText) {
         finalRoleText = '[Loại hình/Vai trò/Chức danh...]';
     }
     setRoleText(finalRoleText);
@@ -537,7 +539,7 @@ export default function EmployerDetailPage() {
   const [phoneCountry, setPhoneCountry] = React.useState('+84');
   const [zaloCountry, setZaloCountry] = React.useState('+84');
   const { toast } = useToast();
-  const [errors, setErrors] = React.useState<{ email?: string; messenger?: string, line?: string }>();
+  const [errors, setErrors] = React.useState<{ email?: string; messenger?: string, line?: string }>({});
 
   const handleTempArrayMultiLangChange = React.useCallback((index: number, field: string, value: string) => {
     setTempContent((prev: any[]) => {
@@ -886,12 +888,9 @@ export default function EmployerDetailPage() {
                 </div>
              );
         case 'valueInterest':
-            const currentInterests = Array.isArray(tempContent.interest?.[lang]) ? tempContent.interest[lang] : [];
-            const handleInterestChange = (checked: boolean, interestId: string) => {
-                const newSelection = checked
-                    ? [...currentInterests, interestId]
-                    : currentInterests.filter((id: string) => id !== interestId);
-                setTempContent({ ...tempContent, interest: { ...tempContent.interest, [lang]: newSelection }});
+            const currentInterest = tempContent.interest?.[lang]?.[0] || null;
+            const handleInterestChange = (value: string) => {
+                setTempContent({ ...tempContent, interest: { ...tempContent.interest, [lang]: [value] }});
             };
             const currentValueInterests = Array.isArray(tempContent.valueInterest) ? tempContent.valueInterest.map((item:any) => item.id) : [];
             const handleValueInterestChange = (checked: boolean, interestId: string) => {
@@ -905,27 +904,58 @@ export default function EmployerDetailPage() {
                 <div className="space-y-6">
                     <div className="space-y-2">
                         <Label className="font-semibold text-base">{t.interestLabel}</Label>
-                        <p className="text-sm text-muted-foreground">Bạn quan tâm đến điều gì?</p>
-                        <div className="grid grid-cols-2 gap-4 pt-2">
-                            {interestOptions[lang].map((option) => (
-                                <div key={option.id} className="flex items-center space-x-2">
-                                    <Checkbox id={`interest-${option.id}`} checked={currentInterests.includes(option.id)} onCheckedChange={(checked) => handleInterestChange(Boolean(checked), option.id)} />
-                                    <Label htmlFor={`interest-${option.id}`} className="font-normal cursor-pointer">{option.title}</Label>
-                                </div>
-                            ))}
-                        </div>
+                        <p className="text-sm text-muted-foreground">Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.</p>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                    <div className="flex flex-wrap gap-1">
+                                    {currentInterest ? (
+                                        <Badge variant="secondary" className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>{(interestOptions[lang].find(i => i.id === currentInterest))?.title}</Badge>
+                                    ) : `Chọn ${t.interestLabel}`}
+                                    </div>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn mục tiêu</DropdownMenuLabel>
+                                <DropdownMenuRadioGroup value={currentInterest || ''} onValueChange={handleInterestChange}>
+                                    {interestOptions[lang].map((option) => (
+                                        <DropdownMenuRadioItem key={option.id} value={option.id}>
+                                            {option.title}
+                                        </DropdownMenuRadioItem>
+                                    ))}
+                                </DropdownMenuRadioGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                     <div className="space-y-2">
                         <Label className="font-semibold text-base">{t.valueInterestLabel}</Label>
                         <p className="text-sm text-muted-foreground">Điều gì là quan trọng nhất với bạn khi hợp tác?</p>
-                        <div className="grid grid-cols-2 gap-4 pt-2">
-                            {valueInterestOptions[lang].map((option) => (
-                                <div key={option.id} className="flex items-center space-x-2">
-                                    <Checkbox id={`value-interest-${option.id}`} checked={currentValueInterests.includes(option.id)} onCheckedChange={(checked) => handleValueInterestChange(Boolean(checked), option.id)} />
-                                    <Label htmlFor={`value-interest-${option.id}`} className="font-normal cursor-pointer">{option.title}</Label>
-                                </div>
-                            ))}
-                        </div>
+                        <DropdownMenu>
+                           <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                    <div className="flex flex-wrap gap-1">
+                                    {currentValueInterests.length > 0 ? (
+                                        currentValueInterests.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(valueInterestOptions[lang].find(o => o.id === id))?.title}</Badge>)
+                                    ) : `Chọn ${t.valueInterestLabel}`}
+                                    </div>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn giá trị</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {valueInterestOptions[lang].map((option) => (
+                                     <DropdownMenuCheckboxItem
+                                        key={option.id}
+                                        checked={currentValueInterests.includes(option.id)}
+                                        onSelect={(e) => e.preventDefault()}
+                                        onCheckedChange={(checked) => handleValueInterestChange(Boolean(checked), option.id)}
+                                    >
+                                        <span className="font-bold w-6 mr-2">{currentValueInterests.includes(option.id) ? `${currentValueInterests.indexOf(option.id) + 1}.` : ''}</span>
+                                        {option.title}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             );
@@ -1137,11 +1167,8 @@ export default function EmployerDetailPage() {
     const value = field?.[lang] || [];
     if (Array.isArray(value) && value.length > 0) {
       if (fieldKey === 'interest') {
-        const content = value.map((slug: string, index: number) => {
-          const item = interestOptions[lang].find(i => i.id === slug);
-          return item ? <Badge key={slug} variant="secondary" className="font-normal">{item.title}</Badge> : null;
-        }).filter(Boolean);
-        return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
+        const item = interestOptions[lang].find(i => i.id === value[0]);
+        return item ? <Badge variant="secondary" className="font-normal">{item.title}</Badge> : null;
       }
       
       const allItems = [...japanJobTypes, ...Object.values(visaDetailsByVisaType).flat(), ...allIndustries, ...japanRegions];
@@ -1217,7 +1244,7 @@ export default function EmployerDetailPage() {
                       <div id="THONGTINCOBANNTD02" className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16">
                           <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
                             <h1 id="DKY001" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                            <p id="DKY002VAITRO" className="font-semibold text-primary">{roleText || t.rolePlaceholder}</p>
+                            <p id="DKY002VAITRO" className="font-semibold text-primary">{roleText}</p>
                             <p id="DKY005" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                           </div>
                           <div id="CHUYENDOINGONNGUNTD01" className="flex items-center gap-2 mt-4 md:mt-0 flex-shrink-0 md:ml-auto">
