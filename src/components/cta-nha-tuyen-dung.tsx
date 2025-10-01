@@ -1,37 +1,11 @@
-
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Briefcase } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { YL01Dialog } from './Y-L01-dialog'; // Import the dialog
 
 export function CtaNhaTuyenDung() {
-    const router = useRouter();
-    const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false);
-    const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
-
-    const navigateToEmployerPage = (data: any) => {
-        const params = new URLSearchParams();
-        if (data.role) params.set('role', data.role);
-        if (data.sub_role) params.set('sub_role', data.sub_role);
-        if (data.name) params.set('name', data.name);
-        if (data.company_name) params.set('company_name', data.company_name);
-        if (data.lang) params.set('lang', data.lang);
-
-        (data.interest || []).forEach((item: string) => params.append('interest', item));
-        (data.visaType || []).forEach((item: string) => params.append('visa_type', item));
-        (data.visaDetail || []).forEach((item: string) => params.append('visa_detail', item));
-        (data.industry || []).forEach((item: string) => params.append('industry', item));
-        (data.location || []).forEach((item: string) => params.append('location', item));
-        
-        router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
-        setIsYL01DialogOpen(false);
-    };
-
     return (
         <>
             <section id="NHATUYENDUNG01" className="w-full py-20 md:py-28 bg-background">
@@ -56,11 +30,13 @@ export function CtaNhaTuyenDung() {
                             </div>
                           </Link>
                         </Button>
-                        <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
-                          <div className="text-center">
-                              <span className="font-semibold">Đăng ký ngay</span>
-                              <div className="text-xs opacity-80">今すぐ登録 / Register Now</div>
-                          </div>
+                         <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
+                           <Link href="/nha-tuyen-dung?action=register">
+                            <div className="text-center">
+                                <span className="font-semibold">Đăng ký ngay</span>
+                                <div className="text-xs opacity-80">今すぐ登録 / Register Now</div>
+                            </div>
+                          </Link>
                         </Button>
                     </div>
                     </div>
@@ -79,15 +55,6 @@ export function CtaNhaTuyenDung() {
                 </div>
                 </div>
           </section>
-          <YL01Dialog 
-            isOpen={isYL01DialogOpen} 
-            onOpenChange={setIsYL01DialogOpen}
-            onLanguageChange={setSelectedLang}
-            initialLang={selectedLang}
-            initialStep={1}
-            onComplete={navigateToEmployerPage}
-            onBack={() => setIsYL01DialogOpen(false)}
-          />
       </>
     )
 }

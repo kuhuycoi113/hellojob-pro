@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -6,14 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldCheck, Users, FileSignature, BarChart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 import { XL06Dialog } from '@/components/X-L06-dialog';
 import { XL07Dialog } from '@/components/X-L07-dialog';
 import { XL08Dialog } from '@/components/X-L08-dialog';
 import { XL09Dialog } from '@/components/X-L09-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 
 const partnerBenefits = [
@@ -57,15 +56,22 @@ const partnerBenefits = [
 
 export default function NhaTuyenDungPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
   const [isXL06DialogOpen, setIsXL06DialogOpen] = useState(false);
   const [isXL07DialogOpen, setIsXL07DialogOpen] = useState(false);
   const [isXL08DialogOpen, setIsXL08DialogOpen] = useState(false);
   const [isXL09DialogOpen, setIsXL09DialogOpen] = useState(false);
-  const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false); // State for the new Y001 dialog
+  const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false); 
   const [selectedLang, setSelectedLang] = useState<'vi' | 'ja' | 'en'>('vi');
   const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
   const [contactInfo, setContactInfo] = useState<any>(null);
+  
+  useEffect(() => {
+    if (searchParams.get('action') === 'register') {
+      setIsYL01DialogOpen(true);
+    }
+  }, [searchParams]);
 
   const handleXL01Complete = (preferences: any) => {
     console.log("X-L01 Completed with:", preferences);
@@ -308,5 +314,3 @@ export default function NhaTuyenDungPage() {
     </>
   );
 }
-
-    
