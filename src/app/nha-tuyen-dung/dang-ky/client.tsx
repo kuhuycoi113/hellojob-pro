@@ -174,6 +174,7 @@ const emptyEmployerData = {
     info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '', phone: '', zalo: '', messenger: '', line: '', email: '' },
     benefits: [],
     valueInterest: [],
+    interest: { vi: [], ja: [], en: [] }, // Add new field for Y003
 };
 
 
@@ -201,7 +202,9 @@ const contentByLang = {
         mainIndustriesLabel: 'Ngành nghề tuyển dụng chính',
         secondaryIndustriesLabel: 'Khu vực tuyển dụng chính',
         benefitsTitle: 'Phúc lợi & Môi trường',
-        valueInterestTitle: 'Giá trị quan tâm',
+        valueInterestTitle: 'Giá trị & Quan tâm',
+        interestLabel: "Quan tâm",
+        valueInterestLabel: "Giá trị quan tâm",
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
@@ -249,7 +252,9 @@ const contentByLang = {
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: '主な採用地域',
         benefitsTitle: '福利厚生と環境',
-        valueInterestTitle: '関心のある価値',
+        valueInterestTitle: '価値観と関心事',
+        interestLabel: "関心事",
+        valueInterestLabel: "関心のある価値",
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
         registerAction: '登録',
@@ -291,7 +296,9 @@ const contentByLang = {
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Main Recruitment Areas',
         benefitsTitle: 'Benefits & Environment',
-        valueInterestTitle: 'Desired Values',
+        valueInterestTitle: 'Values & Interests',
+        interestLabel: "Interests",
+        valueInterestLabel: "Desired Values",
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
         registerAction: 'Register',
@@ -303,6 +310,27 @@ const contentByLang = {
         lineHelper: 'The system will automatically extract your username.',
         rolePlaceholder: '[Type/Role/Title...]'
     }
+};
+
+const interestOptions = {
+    vi: [
+        { id: 'post-job', title: 'Đăng việc làm' },
+        { id: 'refer-candidate', title: 'Giới thiệu ứng viên' },
+        { id: 'post-and-refer', title: 'Đăng việc làm & Giới thiệu ứng viên' },
+        { id: 'refer-and-post', title: 'Giới thiệu ứng viên & Đăng việc làm' },
+    ],
+    ja: [
+        { id: 'post-job', title: '求人掲載' },
+        { id: 'refer-candidate', title: '候補者紹介' },
+        { id: 'post-and-refer', title: '求人掲載と候補者紹介' },
+        { id: 'refer-and-post', title: '候補者紹介と求人掲載' },
+    ],
+    en: [
+        { id: 'post-job', title: 'Post a Job' },
+        { id: 'refer-candidate', title: 'Refer a Candidate' },
+        { id: 'post-and-refer', title: 'Post Job & Refer Candidate' },
+        { id: 'refer-and-post', title: 'Refer Candidate & Post Job' },
+    ]
 };
 
 const valueInterestOptions = {
@@ -429,25 +457,24 @@ export default function EmployerDetailPage() {
 
     const roleParam = searchParams.get('role');
     const subRoleParam = searchParams.get('sub_role');
+    const nationalityParam = searchParams.get('nationality');
     const companyNameParam = searchParams.get('company_name');
     const nameParam = searchParams.get('name');
     const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
     
-    // Set display name based on role
     setDisplayName(isIndividualRole ? (nameParam || '') : (companyNameParam || ''));
     setIsIndividual(isIndividualRole);
 
     let finalRoleText = '';
     const roleKey = roleParam || '';
     const subRoleKey = subRoleParam || '';
-    
-    if (isIndividualRole && roleTexts[roleKey] && subRoleTexts[subRoleKey]) {
+    const nationalityKey = nationalityParam || '';
+
+    if (isIndividualRole && roleTexts[roleKey] && (subRoleTexts[subRoleKey] || roleTexts[subRoleKey])) {
         if (roleKey === 'nhan-vien-phai-cu') { // Case 1
-            finalRoleText = `${roleTexts[roleKey][langFromParams]}; ${subRoleTexts[subRoleKey][langFromParams]}; ${companyNameParam}`;
+            finalRoleText = `${subRoleTexts[subRoleKey][langFromParams]}; ${roleTexts[roleKey][langFromParams]}; ${companyNameParam}`;
         } else if (roleKey === 'nhan-vien-nhan-luc-nhat') { // Case 2
-            // The logic here is tricky. Y002-2 is nationality. Y001-a is organization type.
-            const nationalityText = subRoleTexts[subRoleKey] ? subRoleTexts[subRoleKey][langFromParams] : subRoleKey;
-            // The `sub_role` from Y001a is now the actual "role" of the organization they work for.
+            const nationalityText = subRoleTexts[nationalityKey] ? subRoleTexts[nationalityKey][langFromParams] : nationalityKey;
             const orgTypeText = roleTexts[subRoleKey] ? roleTexts[subRoleKey][langFromParams] : subRoleKey;
             finalRoleText = `${nationalityText}; ${orgTypeText}; ${companyNameParam}`;
         }
@@ -458,7 +485,6 @@ export default function EmployerDetailPage() {
     }
     setRoleText(finalRoleText);
     
-    // Populate employer data from params
     let employerData = JSON.parse(JSON.stringify(emptyEmployerData));
 
     employerData.name[langFromParams] = companyNameParam;
@@ -483,10 +509,22 @@ export default function EmployerDetailPage() {
         employerData.industries.secondary = { vi: locations, ja: locations, en: locations };
     }
     
-    const interest = searchParams.get('interest');
-    const allInterests = valueInterestOptions[langFromParams];
-    if (interest) {
-         employerData.valueInterest = allInterests.filter(opt => interest.includes(opt.id));
+    const interests = searchParams.getAll('interest');
+    if (interests.length > 0) {
+        employerData.interest = { vi: interests, ja: interests, en: interests };
+    }
+    
+    const valueInterests = searchParams.getAll('value_interest');
+    if (valueInterests.length > 0) {
+         employerData.valueInterest = valueInterests.map(id => {
+            const viOption = valueInterestOptions['vi'].find(o => o.id === id);
+            return {
+                id: id,
+                vi: viOption?.title,
+                ja: valueInterestOptions['ja'].find(o => o.id === id)?.title,
+                en: valueInterestOptions['en'].find(o => o.id === id)?.title
+            }
+        }).filter(Boolean);
     }
 
     setEmployer(employerData);
@@ -596,7 +634,8 @@ export default function EmployerDetailPage() {
              newState.visaType = tempContent.visaType;
              newState.visaDetail = tempContent.visaDetail;
         } else if (field === 'valueInterest') {
-            newState.valueInterest = tempContent;
+             newState.interest = { ...newState.interest, [lang]: tempContent.interest[lang] };
+             newState.valueInterest = tempContent.valueInterest;
         } else if (field === 'industries') {
             newState.industries = tempContent;
         } else {
@@ -847,40 +886,47 @@ export default function EmployerDetailPage() {
                 </div>
              );
         case 'valueInterest':
-            const currentInterests = Array.isArray(tempContent) ? tempContent.map(item => item.id) : [];
+            const currentInterests = Array.isArray(tempContent.interest?.[lang]) ? tempContent.interest[lang] : [];
             const handleInterestChange = (checked: boolean, interestId: string) => {
-                const interestObject = valueInterestOptions[lang].find(opt => opt.id === interestId);
-                if (!interestObject) return;
-
                 const newSelection = checked
-                    ? [...tempContent, { id: interestObject.id, vi: valueInterestOptions['vi'].find(o=>o.id===interestId)?.title, ja: valueInterestOptions['ja'].find(o=>o.id===interestId)?.title, en: valueInterestOptions['en'].find(o=>o.id===interestId)?.title }]
-                    : tempContent.filter((item: any) => item.id !== interestId);
-                setTempContent(newSelection);
+                    ? [...currentInterests, interestId]
+                    : currentInterests.filter((id: string) => id !== interestId);
+                setTempContent({ ...tempContent, interest: { ...tempContent.interest, [lang]: newSelection }});
+            };
+            const currentValueInterests = Array.isArray(tempContent.valueInterest) ? tempContent.valueInterest.map((item:any) => item.id) : [];
+            const handleValueInterestChange = (checked: boolean, interestId: string) => {
+                const newSelection = checked
+                    ? [...tempContent.valueInterest, { id: interestId, vi: valueInterestOptions['vi'].find(o=>o.id===interestId)?.title, ja: valueInterestOptions['ja'].find(o=>o.id===interestId)?.title, en: valueInterestOptions['en'].find(o=>o.id===interestId)?.title }]
+                    : tempContent.valueInterest.filter((item: any) => item.id !== interestId);
+                setTempContent({ ...tempContent, valueInterest: newSelection });
             };
 
             return (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {valueInterestOptions[lang].map((option) => {
-                        const isSelected = currentInterests.includes(option.id);
-                        const selectionOrder = isSelected ? currentInterests.indexOf(option.id) + 1 : 0;
-                        return (
-                            <Card
-                                key={option.id}
-                                onClick={() => handleInterestChange(!isSelected, option.id)}
-                                className={cn(
-                                    "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
-                                    isSelected && "ring-2 ring-primary border-primary bg-primary/10"
-                                )}
-                            >
-                                {isSelected && (
-                                    <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
-                                        {selectionOrder}
-                                    </Badge>
-                                )}
-                                <h3 className="font-semibold text-sm">{option.title}</h3>
-                            </Card>
-                        );
-                    })}
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <Label className="font-semibold text-base">{t.interestLabel}</Label>
+                        <p className="text-sm text-muted-foreground">Bạn quan tâm đến điều gì?</p>
+                        <div className="grid grid-cols-2 gap-4 pt-2">
+                            {interestOptions[lang].map((option) => (
+                                <div key={option.id} className="flex items-center space-x-2">
+                                    <Checkbox id={`interest-${option.id}`} checked={currentInterests.includes(option.id)} onCheckedChange={(checked) => handleInterestChange(Boolean(checked), option.id)} />
+                                    <Label htmlFor={`interest-${option.id}`} className="font-normal cursor-pointer">{option.title}</Label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="font-semibold text-base">{t.valueInterestLabel}</Label>
+                        <p className="text-sm text-muted-foreground">Điều gì là quan trọng nhất với bạn khi hợp tác?</p>
+                        <div className="grid grid-cols-2 gap-4 pt-2">
+                            {valueInterestOptions[lang].map((option) => (
+                                <div key={option.id} className="flex items-center space-x-2">
+                                    <Checkbox id={`value-interest-${option.id}`} checked={currentValueInterests.includes(option.id)} onCheckedChange={(checked) => handleValueInterestChange(Boolean(checked), option.id)} />
+                                    <Label htmlFor={`value-interest-${option.id}`} className="font-normal cursor-pointer">{option.title}</Label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             );
         case 'visa':
@@ -1090,20 +1136,18 @@ export default function EmployerDetailPage() {
   const getArrayValue = (field: any, fieldKey: string) => {
     const value = field?.[lang] || [];
     if (Array.isArray(value) && value.length > 0) {
-      if (typeof value[0] === 'object' && value[0] !== null && 'id' in value[0]) { // For valueInterest
-        return (
-            <div id="DKY010" className="space-y-1 text-sm mt-1">
-                 {value.map((item: any, index: number) => (
-                    <p key={item.id} className="text-muted-foreground"><span className="font-bold text-foreground mr-1.5">{index + 1}.</span>{item[lang]}</p>
-                ))}
-            </div>
-        );
+      if (fieldKey === 'interest') {
+        const content = value.map((slug: string, index: number) => {
+          const item = interestOptions[lang].find(i => i.id === slug);
+          return item ? <Badge key={slug} variant="secondary" className="font-normal">{item.title}</Badge> : null;
+        }).filter(Boolean);
+        return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
       }
       
       const allItems = [...japanJobTypes, ...Object.values(visaDetailsByVisaType).flat(), ...allIndustries, ...japanRegions];
       
       const content = value.map((slug: string, index: number) => {
-          const item = allItems.find((i: any) => i.slug === slug);
+          const item: any = allItems.find((i: any) => i.slug === slug);
           let name = slug;
           if (item && 'name' in item && typeof item.name === 'object') {
             name = item.name[lang];
@@ -1121,11 +1165,22 @@ export default function EmployerDetailPage() {
       
       return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
     }
-    const editTitle = fieldKey === 'industries' ? t.industriesTitle : t.visaTitle;
-    const editField = fieldKey === 'industries' ? 'industries' : 'visa';
-    const editData = fieldKey === 'industries' ? employer.industries : { visaType: employer.visaType, visaDetail: employer.visaDetail };
+
+    const editTitle = fieldKey === 'industries' ? t.industriesTitle : (fieldKey === 'interest' ? t.valueInterestTitle : t.visaTitle);
+    const editField = fieldKey === 'interest' ? 'valueInterest' : (fieldKey === 'industries' ? 'industries' : 'visa');
+    const editData = fieldKey === 'interest' ? { interest: employer.interest, valueInterest: employer.valueInterest } : (fieldKey === 'industries' ? employer.industries : { visaType: employer.visaType, visaDetail: employer.visaDetail });
 
     return <button className="italic text-primary underline" onClick={() => handleEditClick(editTitle, editData, editField)}>{t.clickToUpdate}</button>
+  };
+
+  const getValueInterestValue = (value: any) => {
+      if (Array.isArray(value) && value.length > 0) {
+          const content = value.map((item: any, index: number) => {
+              return <Badge key={item.id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item[lang]}</Badge>
+          });
+          return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
+      }
+      return <button className="italic text-primary underline" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>{t.clickToUpdate}</button>
   };
 
 
@@ -1188,9 +1243,16 @@ export default function EmployerDetailPage() {
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
-                   <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, employer.valueInterest, 'valueInterest')}>
-                    <div id="DKY010" className="text-sm">
-                        {getArrayValue(employer.valueInterest, 'valueInterest')}
+                  <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
+                    <div className="space-y-3">
+                        <div>
+                            <p className="font-semibold text-sm mb-1">{t.interestLabel}:</p>
+                            {getArrayValue(employer.interest, 'interest')}
+                        </div>
+                        <div>
+                            <p className="font-semibold text-sm mb-1">{t.valueInterestLabel}:</p>
+                            {getValueInterestValue(employer.valueInterest)}
+                        </div>
                     </div>
                   </SectionCard>
                   <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
