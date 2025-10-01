@@ -33,8 +33,8 @@ export function CtaNhaTuyenDung() {
                     <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
                       <Link href="/nha-tuyen-dung">
                         <div className="text-center">
-                            <span className="font-semibold">Đăng ký đối tác</span>
-                            <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                            <span className="font-semibold">Đăng ký ngay</span>
+                            <div className="text-xs opacity-80">今すぐ登録 / Register Now</div>
                         </div>
                       </Link>
                     </Button>
