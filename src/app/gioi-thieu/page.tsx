@@ -1,4 +1,5 @@
 
+
 import { Button } from '@/components/ui/button';
 import type { Metadata } from 'next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,6 +7,8 @@ import { Lightbulb, Target, Users, TrendingUp, Handshake, BarChart, FileSignatur
 import Image from 'next/image';
 import Link from 'next/link';
 import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
+import { CtaViecLamPhuHop } from '@/components/cta-viec-lam-phu-hop';
+import { CtaViecLamGoiY } from '@/components/cta-viec-lam-goi-y';
 
 export const metadata: Metadata = {
   title: 'Về HelloJob',
@@ -233,7 +236,11 @@ export default function AboutPage() {
       */}
 
        {/* CTA Section */}
-      <CtaNhaTuyenDung />
+       <div className="space-y-20 md:space-y-28 py-20 md:py-28">
+        <CtaViecLamPhuHop />
+        <CtaViecLamGoiY />
+        <CtaNhaTuyenDung />
+      </div>
     </>
   );
 }
