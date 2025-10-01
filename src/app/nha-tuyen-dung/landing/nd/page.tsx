@@ -16,7 +16,14 @@ type Language = 'vi' | 'ja' | 'en';
 
 const pageContent = {
     vi: {
-        heroTitle: "giúp Nghiệp đoàn Có nguồn cung ứng viên phong phú - Tối ưu lợi nhuận - Phát triển khách hàng",
+        heroTitle: {
+            main: "Giải pháp cho Nghiệp đoàn",
+            points: [
+                "Có nguồn cung ứng viên phong phú",
+                "Tối ưu chi phí, lợi nhuận",
+                "Phát triển khách hàng"
+            ]
+        },
         heroDescription: "Nền tảng HelloJob cung cấp giải pháp công nghệ toàn diện, giúp Nghiệp đoàn của bạn giải quyết các bài toán cốt lõi và phát triển mạnh mẽ.",
         ctaPostJob: "Đăng tin tuyển dụng ngay",
         ctaRegisterPartner: "Đăng ký đối tác",
@@ -76,7 +83,14 @@ const pageContent = {
         finalCtaPost: "Đăng tin tuyển dụng"
     },
     ja: {
-        heroTitle: "組合の豊富な候補者供給源、利益の最適化、顧客開発を支援します",
+        heroTitle: {
+            main: "組合向けソリューション",
+            points: [
+                "豊富な候補者供給源",
+                "コストと利益の最適化",
+                "顧客基盤の育成"
+            ]
+        },
         heroDescription: "HelloJobプラットフォームは包括的な技術ソリューションを提供し、組合が中心的な課題を解決し、力強く成長するのを支援します。",
         ctaPostJob: "今すぐ求人を掲載",
         ctaRegisterPartner: "パートナー登録",
@@ -136,7 +150,14 @@ const pageContent = {
         finalCtaPost: "求人を掲載"
     },
     en: {
-        heroTitle: "Helping Unions Source Abundant Candidates, Optimize Profits, and Develop Customers",
+        heroTitle: {
+            main: "Solutions for Unions",
+            points: [
+                "Abundant, quality candidate sources",
+                "Optimize costs and profits",
+                "Sustainable client development"
+            ]
+        },
         heroDescription: "The HelloJob platform provides comprehensive technology solutions, helping your Union solve core problems and grow strongly.",
         ctaPostJob: "Post a Job Now",
         ctaRegisterPartner: "Register as a Partner",
@@ -207,20 +228,19 @@ export default function UnionLandingPage() {
       {/* Hero Section */}
       <section className="w-full bg-gradient-to-br from-primary to-accent text-primary-foreground py-20 md:py-28">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-6">
-            <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
-                <TabsList className="bg-white/20">
-                    <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary"><VnFlagIcon className="mr-2 h-4 w-4" /> VI</TabsTrigger>
-                    <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary"><JpFlagIcon className="mr-2 h-4 w-4" /> JA</TabsTrigger>
-                    <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary"><EnFlagIcon className="mr-2 h-4 w-4" /> EN</TabsTrigger>
-                </TabsList>
-            </Tabs>
-          </div>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
-                {t.heroTitle}
-              </h1>
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
+                    {t.heroTitle.main}
+                </h1>
+                <ul className="space-y-2 mb-6">
+                    {t.heroTitle.points.map((point, index) => (
+                        <li key={index} className="flex items-center justify-center md:justify-start">
+                            <span className="text-2xl text-white/90 mr-2">・</span>
+                            <span className="text-lg md:text-xl text-white/90">{point}</span>
+                        </li>
+                    ))}
+                </ul>
               <p className="text-lg text-primary-foreground/80 mb-8">
                 {t.heroDescription}
               </p>
@@ -237,15 +257,23 @@ export default function UnionLandingPage() {
                   </Button>
               </div>
             </div>
-            <div className="relative hidden md:block">
+            <div className="relative hidden md:block aspect-[3/2]">
               <Image
                 src="/img/NTD/ND.jpg"
                 alt="Hợp tác cùng phát triển với HelloJob"
-                width={600}
-                height={400}
-                className="rounded-lg shadow-2xl"
+                fill
+                className="object-cover rounded-lg shadow-2xl"
                 data-ai-hint="business people shaking hands"
               />
+              <div className="absolute top-4 right-4 z-10">
+                <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
+                    <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
+                        <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><VnFlagIcon className="mr-2 h-4 w-4" /> Tiếng Việt</TabsTrigger>
+                        <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><JpFlagIcon className="mr-2 h-4 w-4" /> 日本語</TabsTrigger>
+                        <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><EnFlagIcon className="mr-2 h-4 w-4" /> English</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+              </div>
             </div>
           </div>
         </div>
