@@ -151,6 +151,7 @@ const placeholderEmployerData = {
 };
 
 
+
 // Initial empty state for the form
 const emptyEmployerData = {
     id: 'Z000',
@@ -962,7 +963,7 @@ export default function EmployerDetailPage() {
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0}>
                                      <div className="flex flex-wrap gap-1">
                                         {currentVisaDetails.length > 0 ? (
-                                            currentVisaDetails.map((slug: string, index: number) => {
+                                            currentVisaDetails.map((slug: string, index: number) {
                                                 const detail = Object.values(visaDetailsByVisaType).flat().find(d => d.slug === slug);
                                                 return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{detail?.name[lang] || slug}</Badge>
                                             })
@@ -1161,7 +1162,7 @@ export default function EmployerDetailPage() {
                   </Label>
                 </div>
                 <div id="THONGTINCOBANNTD01" className="p-6 bg-card">
-                  <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-24 md:-mt-20">
+                  <div className="flex flex-col sm:flex-row items-start gap-4 -mt-24 md:-mt-20">
                       <div className="relative flex-shrink-0">
                         <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
                             <AvatarImage src={employer.logo} />
@@ -1172,8 +1173,8 @@ export default function EmployerDetailPage() {
                            </Label>
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
-                      <div id="THONGTINCOBANNTD02" className="flex flex-col md:flex-row flex-grow items-center md:items-end w-full">
-                          <div className="flex-grow min-w-0 text-center md:text-left">
+                      <div id="THONGTINCOBANNTD02" className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16">
+                          <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
                             <h1 id="DKY001" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
                             <p id="DKY002VAITRO" className="font-semibold text-primary">{roleText || t.rolePlaceholder}</p>
                             <p id="DKY005" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
@@ -1317,3 +1318,4 @@ export default function EmployerDetailPage() {
   );
 }
 
+    
