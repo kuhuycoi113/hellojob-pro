@@ -424,9 +424,9 @@ export function YL01Dialog({
                                     if(role.id === 'nhan-vien-phai-cu'){
                                         setStep(2); // Y002-1
                                     } else if(role.id === 'nhan-vien-nhan-luc-nhat'){
-                                        setStep(2.5); // Y002-2
+                                        setStep(1.5); // Y001-a
                                     } else {
-                                        setStep(3); // Y003
+                                        setStep(3); // Y003 (Old Y002)
                                     }
                                 }}
                                 className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
@@ -460,7 +460,7 @@ export function YL01Dialog({
                 {content.options.map(option => (
                      <Card 
                         key={option.id} 
-                        onClick={() => { setSelectedSubRole(option.id); setStep(3);}}
+                        onClick={() => { setSelectedSubRole(option.id); setStep(3); }}
                         className="text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
                     >
                         <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -482,7 +482,7 @@ export function YL01Dialog({
         en: { title: "What type of company/entity/organization do you belong to in Japan?", description: "Please select the type of organization you work for in Japan.", backButton: "Back" },
     }[currentLang];
 
-    const organizationRoles = partnerRoles[currentLang].filter(role => !['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(role.id));
+    const organizationRoles = partnerRoles[currentLang].filter(role => !['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat', 'sending'].includes(role.id));
 
     return (
         <>
@@ -551,8 +551,6 @@ export function YL01Dialog({
         },
     }[currentLang];
 
-    const organizationRoles = ['sending', 'support', 'company', 'supervising-organization', 'paid-placement-agency', 'haken'];
-
     return (
         <>
             {/* Screen: Y003 */}
@@ -578,7 +576,7 @@ export function YL01Dialog({
                 ))}
             </div>
             <div className="text-center mt-4">
-                 <Button variant="link" onClick={() => setStep(2)}>{interests.backButton}</Button>
+                 <Button variant="link" onClick={() => setStep(selectedRole === 'nhan-vien-phai-cu' ? 2 : 1)}>{interests.backButton}</Button>
             </div>
         </>
     )
@@ -655,7 +653,7 @@ export function YL01Dialog({
     
     return (
         <>
-            {/* Screen: Y016 (Replaces Y006) */}
+            {/* Screen: Y006 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                 <DialogDescription className="text-center">{content.description}</DialogDescription>
@@ -686,7 +684,7 @@ export function YL01Dialog({
                 })}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 2)} className="mx-auto block">
+                <Button variant="link" onClick={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 3)} className="mx-auto block">
                     {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
                 </Button>
                 <Button onClick={() => setStep(7)} disabled={selectedVisa.length === 0}>
@@ -797,16 +795,8 @@ export function YL01Dialog({
   const renderDialogContent = () => {
     switch (step) {
       case 1: return <PartnerRoleStepDialog />;
-      case 1.5: return <JapaneseHrSubRoleStepDialog />;
-      case 2: // New step for sub-roles
-          if (selectedRole === 'nhan-vien-phai-cu') return <SendingCompanySubRoleStepDialog />;
-          // Other roles like 'sending' directly go to step 3 (Interest)
-          setStep(3);
-          return null;
-      case 2.5: // New step for sub-roles
-          if (selectedRole === 'nhan-vien-nhan-luc-nhat') return <JapaneseHrSubRoleStepDialogFromY001_5 />;
-          setStep(3);
-          return null;
+      case 1.5: return <JapaneseHrSubRoleStepDialogFromY001_5 />;
+      case 2: return <SendingCompanySubRoleStepDialog />;
       case 3: return <InterestStepDialog />;
       case 4: return renderNameInputStepDialog();
       case 5: return renderCompanyNameStepDialog();
