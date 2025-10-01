@@ -20,7 +20,7 @@ const painPoints = [
     {
         icon: DollarSign,
         title: 'Chi phí cao, lợi nhuận giảm',
-        description: 'Phí từ doanh nghiệp tiếp nhận bị ép xuống, trong khi chi phí quản lý (nhà ở, hỗ trợ, pháp lý) ngày càng tăng.',
+        description: 'Phí từ doanh nghiệp tiếp nhận bị ép xuống, trong khi chi phí quản lý (nhà ở, hỗ trợ, nhân sự, pháp lý) ngày càng tăng.',
     },
     {
         icon: Search,
@@ -69,7 +69,7 @@ export default function UnionLandingPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-center md:text-left">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
-                Lựa chọn nguồn cung ứng viên dồi dào, chất lượng - Tối ưu chi phí, lợi nhuận - Phát triển khách hàng tiếp nhận bền vững
+                giúp Nghiệp đoàn Có nguồn cung ứng viên phong phú - Tối ưu lợi nhuận - Phát triển khách hàng
               </h1>
               <p className="text-lg text-primary-foreground/80 mb-8">
                 Nền tảng HelloJob cung cấp giải pháp công nghệ toàn diện, giúp Nghiệp đoàn của bạn giải quyết các bài toán cốt lõi và phát triển mạnh mẽ.
