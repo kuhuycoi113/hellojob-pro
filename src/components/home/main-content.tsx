@@ -7,6 +7,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
+import { CtaViecLamPhuHop } from '../cta-viec-lam-phu-hop';
+import { CtaViecLamGoiY } from '../cta-viec-lam-goi-y';
 
 const featuredEmployers = [
   { id: 'samsung', name: 'Samsung', logo: '/img/taitro1.jpg', dataAiHint: 'samsung logo' },
@@ -198,8 +200,10 @@ export const MainContent = () => (
       </section>
 
       {/* For Employers & Partners */}
-      <CtaNhaTuyenDung />
+      <div className="space-y-20 md:space-y-28 py-20 md:py-28">
+        <CtaViecLamPhuHop />
+        <CtaViecLamGoiY />
+        <CtaNhaTuyenDung />
+      </div>
     </>
   );
-
-    
