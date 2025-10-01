@@ -18,27 +18,27 @@ const featuredEmployers = [
   { id: 'canon', name: 'Canon', logo: '/img/taitro5.jpg', dataAiHint: 'canon logo' },
 ];
 
-const featuredCourses = [
+const featuredHandbookArticles = [
    {
-    id: 'tieng-nhat-giao-tiep',
-    title: 'Tiếng Nhật giao tiếp cho người đi làm',
-    category: 'Ngoại ngữ',
-    image: '/img/giao_tiep.jpg?v=1',
-    dataAiHint: 'Japanese language',
+    id: 'tokutei-ginou-la-gi',
+    title: 'Kỹ năng đặc định (Tokutei Ginou) là gì? Toàn bộ thông tin cần biết 2024',
+    category: 'Kỹ năng đặc định',
+    image: '/img/bai_viet1.jpg',
+    dataAiHint: 'tokyo city japan',
   },
   {
-    id: 'ky-nang-lam-viec-nhom',
-    title: 'Kỹ năng làm việc nhóm hiệu quả',
-    category: 'Kỹ năng mềm',
-    image: '/img/teamwork.jpg?v=1',
-    dataAiHint: 'teamwork collaboration',
+    id: 'kinh-nghiem-phong-van-tokutei',
+    title: '5 Kinh nghiệm phỏng vấn Tokutei Ginou chắc chắn đậu',
+    category: 'Kinh nghiệm phỏng vấn',
+    image: '/img/bai_viet2.jpg',
+    dataAiHint: 'job interview japan',
   },
   {
-    id: 'an-toan-lao-dong',
-    title: 'An toàn lao động trong sản xuất',
-    category: 'Kỹ thuật',
-    image: '/img/an_toan_lao_dong.jpg?v=1',
-    dataAiHint: 'factory safety',
+    id: 'chi-phi-sinh-hoat-o-nhat',
+    title: 'Chi phí sinh hoạt ở Nhật Bản hết bao nhiêu một tháng?',
+    category: 'Cuộc sống ở Nhật',
+    image: '/img/bai_viet3.jpg',
+    dataAiHint: 'japanese food market',
   },
 ]
 
@@ -153,39 +153,39 @@ export const MainContent = () => (
         </div>
       </section>
 
-      {/* Featured E-Learning Courses */}
+      {/* Featured Handbook Articles Section */}
       <section className="w-full py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4 md:px-6">
            <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold">Nâng cao kỹ năng với E-Learning</h2>
+            <h2 className="text-3xl md:text-4xl font-headline font-bold">Cẩm nang nổi bật</h2>
             <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-              Đầu tư vào bản thân với các khóa học được thiết kế riêng, giúp bạn thăng tiến trong sự nghiệp tại Nhật.
+              Trang bị kiến thức về cuộc sống, công việc và các thủ tục cần thiết để thành công tại Nhật Bản.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredCourses.map(course => (
-              <Card key={course.id} className="flex flex-col overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
+            {featuredHandbookArticles.map(article => (
+              <Card key={article.id} className="flex flex-col overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
                 <CardHeader className="p-0">
-                   <Link href={`/hoc-tap/${course.id}`} className="block">
+                   <Link href={`/cam-nang/${article.id}`} className="block">
                       <Image
-                        src={course.image}
-                        alt={course.title}
+                        src={article.image}
+                        alt={article.title}
                         width={600}
                         height={400}
                         className="w-full h-48 object-cover"
-                        data-ai-hint={course.dataAiHint}
+                        data-ai-hint={article.dataAiHint}
                       />
                    </Link>
                 </CardHeader>
                 <CardContent className="p-6 flex-grow">
-                  <p className="text-sm font-bold mb-2 text-primary">{course.category}</p>
-                  <Link href={`/hoc-tap/${course.id}`}>
-                      <CardTitle className="font-headline text-xl mb-2 h-14 group-hover:text-primary transition-colors">{course.title}</CardTitle>
+                  <p className="text-sm font-bold mb-2 text-primary">{article.category}</p>
+                  <Link href={`/cam-nang/${article.id}`}>
+                      <CardTitle className="font-headline text-xl mb-2 h-14 group-hover:text-primary transition-colors">{article.title}</CardTitle>
                   </Link>
                 </CardContent>
                 <CardFooter className="p-6 pt-0 mt-auto">
-                   <Link href={`/hoc-tap/${course.id}`} className="font-bold text-primary hover:underline flex items-center">
-                    Tìm hiểu thêm <ArrowRight className="ml-2" />
+                   <Link href={`/cam-nang/${article.id}`} className="font-bold text-primary hover:underline flex items-center">
+                    Đọc thêm <ArrowRight className="ml-2" />
                   </Link>
                 </CardFooter>
               </Card>
@@ -193,7 +193,7 @@ export const MainContent = () => (
           </div>
            <div className="text-center mt-16">
             <Button asChild size="lg">
-              <Link href="/hoc-tap">Khám phá tất cả khóa học <BookOpen /></Link>
+              <Link href="/cam-nang">Xem tất cả bài viết <BookOpen /></Link>
             </Button>
           </div>
         </div>
@@ -207,3 +207,5 @@ export const MainContent = () => (
       </div>
     </>
   );
+
+    
