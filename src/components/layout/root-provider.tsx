@@ -30,8 +30,8 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
 
-    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen'];
-    const showCtas = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname) && pathname !== '/viec-lam';
+    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam'];
+    const showCtas = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
 
 
     React.useEffect(() => {
@@ -162,5 +162,3 @@ export function RootProvider({
         </AuthProvider>
     );
 }
-
-    
