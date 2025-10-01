@@ -16,6 +16,7 @@ import type { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from '../candidate-edit-dialog';
 import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
 import { CtaViecLamGoiY } from '../cta-viec-lam-goi-y';
+import { CtaViecLamPhuHop } from '../cta-viec-lam-phu-hop';
 
 
 function LayoutManager({ children }: { children: React.ReactNode }) {
@@ -29,8 +30,8 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
 
-    const excludedCtaPages = ['/', '/nha-tuyen-dung', '/gioi-thieu', '/nhuong-quyen', '/tim-viec-lam'];
-    const showCta = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname) && !pathname.startsWith('/viec-lam/');
+    const excludedCtaPages = ['/'];
+    const showCtas = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
 
 
     React.useEffect(() => {
@@ -90,8 +91,9 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
         <>
             {!isCallPage && !isPartnerPage && <Header />}
             <main className="min-h-screen">{children}</main>
-            {showCta && (
+            {showCtas && (
                 <div className="space-y-20 md:space-y-28 py-20 md:py-28">
+                    <CtaViecLamPhuHop />
                     <CtaViecLamGoiY />
                     <CtaNhaTuyenDung />
                 </div>
