@@ -204,8 +204,8 @@ const contentByLang = {
         mainIndustriesLabel: 'Ngành nghề tuyển dụng chính',
         secondaryIndustriesLabel: 'Khu vực tuyển dụng chính',
         benefitsTitle: 'Phúc lợi & Môi trường',
-        valueInterestTitle: 'Giá trị, Quan tâm',
-        interestLabel: "Quan tâm",
+        valueInterestTitle: 'Nghiệp vụ, giá trị quan tâm',
+        interestLabel: "Nghiệp vụ quan tâm",
         valueInterestLabel: "Giá trị quan tâm",
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
@@ -254,8 +254,8 @@ const contentByLang = {
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: '主な採用地域',
         benefitsTitle: '福利厚生と環境',
-        valueInterestTitle: '価値観と関心事',
-        interestLabel: "関心事",
+        valueInterestTitle: '業務、価値観',
+        interestLabel: "関心のある業務",
         valueInterestLabel: "関心のある価値",
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
@@ -298,8 +298,8 @@ const contentByLang = {
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Main Recruitment Areas',
         benefitsTitle: 'Benefits & Environment',
-        valueInterestTitle: 'Values & Interests',
-        interestLabel: "Interests",
+        valueInterestTitle: 'Operations & Values',
+        interestLabel: "Operations of Interest",
         valueInterestLabel: "Desired Values",
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
@@ -908,11 +908,9 @@ export default function EmployerDetailPage() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                    <div className="flex flex-wrap gap-1">
                                     {currentInterest ? (
                                         <Badge variant="secondary" className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>{(interestOptions[lang].find(i => i.id === currentInterest))?.title}</Badge>
                                     ) : `Chọn ${t.interestLabel}`}
-                                    </div>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
@@ -941,7 +939,7 @@ export default function EmployerDetailPage() {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn giá trị</DropdownMenuLabel>
+                                <DropdownMenuLabel>Chọn giá trị (sắp xếp theo ưu tiên)</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {valueInterestOptions[lang].map((option) => (
                                      <DropdownMenuCheckboxItem
