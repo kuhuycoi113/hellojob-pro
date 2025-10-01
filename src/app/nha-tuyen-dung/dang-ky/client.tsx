@@ -216,7 +216,7 @@ const contentByLang = {
         clickToUpdate: 'Nhấn để cập nhật',
         headerTitle: 'Thông tin chung',
         namePlaceholder: 'Ví dụ: Nguyễn Văn An',
-        rolePlaceholder: '[Vai trò/Chức danh đối tác]...'
+        rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]'
 
     },
     ja: {
@@ -259,7 +259,7 @@ const contentByLang = {
         messengerHelper: 'システムが自動的にユーザー名を取得します。',
         linePlaceholder: 'LineのリンクまたはIDを入力してください',
         lineHelper: 'システムが自動的にユーザー名を取得します。',
-        rolePlaceholder: '[パートナーの役割/役職]...'
+        rolePlaceholder: '[種別/役割/役職...]'
     },
     en: {
         edit: 'Edit',
@@ -301,7 +301,7 @@ const contentByLang = {
         messengerHelper: 'The system will automatically extract your username.',
         linePlaceholder: 'Paste Line link or enter your ID',
         lineHelper: 'The system will automatically extract your username.',
-        rolePlaceholder: '[Partner Role/Title]...'
+        rolePlaceholder: '[Type/Role/Title...]'
     }
 };
 
@@ -414,68 +414,26 @@ export default function EmployerDetailPage() {
   
   const handleLangChange = (lang: Language) => {
     setLang(lang);
-    
-    const roleParam = searchParams.get('role');
-    const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
-
-    if (isIndividualRole) {
-        const interestParam = searchParams.get('interest');
-        const companyNameParam = searchParams.get('company_name');
-        
-        const interestText = (interestParam && interestTexts[interestParam]) ? interestTexts[interestParam][lang] : '';
-        const roleTextContent = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][lang] : '';
-        const companyText = companyNameParam || '';
-        
-        let combinedRoleText = interestText;
-        if(roleTextContent) combinedRoleText += ` - ${roleTextContent}`;
-        if(companyText) combinedRoleText += ` - ${companyText}`;
-        setRoleText(combinedRoleText);
-    } else {
-        const organizationRoleText = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][lang] : '';
-        setRoleText(organizationRoleText);
-    }
   };
 
   React.useEffect(() => {
     const langFromParams = (searchParams.get('lang') || 'vi') as Language;
-    const roleParam = searchParams.get('role');
-    const subRoleParam = searchParams.get('sub_role');
-    const nameParam = searchParams.get('name');
-    const companyNameParam = searchParams.get('company_name');
-    const interestParam = searchParams.get('interest');
-    
     setLang(langFromParams);
-    
-    let employerData;
-    const hasParams = Array.from(searchParams.keys()).length > 0;
-    
-    // Always use empty data by default for this page
-    employerData = JSON.parse(JSON.stringify(emptyEmployerData));
-    
+
+    const companyNameParam = searchParams.get('company_name');
+    const roleParam = searchParams.get('role');
     const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
+    
+    // Set display name based on role
+    const nameParam = searchParams.get('name');
+    setDisplayName(isIndividualRole ? (nameParam || '') : (companyNameParam || ''));
     setIsIndividual(isIndividualRole);
+    setRoleText('[Loại hình/Vai trò/Chức danh...]');
 
-    if (isIndividualRole) {
-        employerData.name = { vi: nameParam, ja: nameParam, en: nameParam };
-        setDisplayName(nameParam || '');
-        // Construct composite role text for individuals
-        const interestText = (interestParam && interestTexts[interestParam]) ? interestTexts[interestParam][langFromParams] : '';
-        const roleTextContent = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][langFromParams] : '';
-        const subRoleText = (subRoleParam && roleTexts[subRoleParam]) ? roleTexts[subRoleParam][langFromParams] : '';
-        const companyText = companyNameParam || '';
-        
-        let combinedRoleText = interestText;
-        if(roleTextContent) combinedRoleText += ` - ${roleTextContent}`;
-        if(companyText) combinedRoleText += ` - ${companyText}`;
-        setRoleText(combinedRoleText);
+    // Populate employer data from params
+    let employerData = JSON.parse(JSON.stringify(emptyEmployerData));
 
-    } else {
-        employerData.name = { vi: companyNameParam, ja: companyNameParam, en: companyNameParam };
-        setDisplayName(companyNameParam || '');
-        // For organizations, the role is just the type
-        const organizationRoleText = (roleParam && roleTexts[roleParam]) ? roleTexts[roleParam][langFromParams] : '';
-        setRoleText(organizationRoleText);
-    }
+    employerData.name = { vi: companyNameParam, ja: companyNameParam, en: companyNameParam };
     
     const visaTypes = searchParams.getAll('visa_type');
     if (visaTypes.length > 0) {
@@ -534,7 +492,7 @@ export default function EmployerDetailPage() {
   }
   
   const t = contentByLang[lang] || contentByLang['vi'];
-  const headerName = isIndividual ? (displayName || `[${t.namePlaceholder}]`) : (displayName || `[${t.companyNamePlaceholder}]`);
+  const headerName = displayName || (isIndividual ? `[${t.namePlaceholder}]` : `[${t.companyNamePlaceholder}]`);
 
   const validateEmail = (email: string) => {
     if (!email) return true; // Not required, but if present must be valid
