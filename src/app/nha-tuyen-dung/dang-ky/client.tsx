@@ -114,7 +114,7 @@ const placeholderEmployerData = {
     about: {
         vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
         ja: 'ABC派遣会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。長年の経験により、私たちは何千人ものベトナム人労働者の夢を支援してきたことを誇りに思っています...',
-        en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\' dreams take flight...'
+        en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\'\'\' dreams take flight...'
     },
     images: [
       { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
@@ -963,7 +963,7 @@ export default function EmployerDetailPage() {
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0}>
                                      <div className="flex flex-wrap gap-1">
                                         {currentVisaDetails.length > 0 ? (
-                                            currentVisaDetails.map((slug: string, index: number) {
+                                            currentVisaDetails.map((slug: string, index: number) => {
                                                 const detail = Object.values(visaDetailsByVisaType).flat().find(d => d.slug === slug);
                                                 return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{detail?.name[lang] || slug}</Badge>
                                             })
@@ -1317,5 +1317,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
-    
