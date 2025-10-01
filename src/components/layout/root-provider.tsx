@@ -1,4 +1,5 @@
-"use client";
+
+'use client';
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
@@ -29,7 +30,7 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
 
-    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam'];
+    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky'];
     const showCtas = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
 
 
