@@ -2,7 +2,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookCopy, BookOpen, Briefcase, GraduationCap, MapIcon, TrendingUp } from 'lucide-react';
+import { BookCopy, BookOpen, Briefcase, GraduationCap, MapIcon, TrendingUp, BrainCircuit } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -67,13 +67,13 @@ export const MainContent = () => (
             <Card className="text-center shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2">
               <CardHeader>
                 <div className="mx-auto bg-orange-100 rounded-full p-4 w-fit">
-                  <GraduationCap className="h-10 w-10 text-orange-500" />
+                  <BrainCircuit className="h-10 w-10 text-orange-500" />
                 </div>
-                <CardTitle className="font-headline mt-4">Nâng cao kỹ năng</CardTitle>
+                <CardTitle className="font-headline mt-4">Gợi ý thông minh</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Tham gia các khóa học E-learning miễn phí về tiếng Nhật, văn hóa và kỹ năng làm việc để chuẩn bị tốt nhất.
+                  Hệ thống AI sẽ phân tích hồ sơ và hành vi của bạn để gợi ý những công việc phù hợp nhất.
                 </p>
               </CardContent>
             </Card>
