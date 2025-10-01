@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -8,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark, Phone, LogIn, Star, FileText } from 'lucide-react';
-import { Job, publicFeeLimits } from '@/lib/mock-data';
+import { Job, publicFeeLimits, controlledFeeVisas } from '@/lib/mock-data';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -36,6 +37,7 @@ import { useToast } from '@/hooks/use-toast';
 import { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from './candidate-edit-dialog';
 import type { SearchFilters } from './job-search/search-results';
+import { validateProfileForApplication } from '@/lib/validators';
 
 
 const formatCurrency = (value?: string) => {
@@ -76,26 +78,6 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
     }
 };
 
-const validateProfileForApplication = (profile: CandidateProfile): boolean => {
-    if (!profile || !profile.personalInfo) return false;
-
-    const { name, personalInfo } = profile;
-    const { gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = personalInfo;
-
-    const hasRequiredPersonalInfo = name && gender && height && weight && tattooStatus && hepatitisBStatus;
-    const hasContactInfo = phone || zalo || messenger || line;
-
-    return !!hasRequiredPersonalInfo && !!hasContactInfo;
-};
-
-// List of visa details that have special fee handling
-const controlledFeeVisas = [
-  'Thực tập sinh 3 năm',
-  'Thực tập sinh 1 năm',
-  'Đặc định đi mới',
-  'Kỹ sư, tri thức đầu Việt',
-  'Đặc định đầu Việt'
-];
 
 const JPY_VND_RATE = 180; // Example rate
 const USD_VND_RATE = 26300; // Example rate
@@ -219,7 +201,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         const profileRaw = localStorage.getItem('generatedCandidateProfile');
         if (profileRaw) {
             const profile: CandidateProfile = JSON.parse(profileRaw);
-            if (validateProfileForApplication(profile)) {
+            const missingFields = validateProfileForApplication(profile);
+            if (missingFields.length === 0) {
                  const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
                  appliedJobs.push(job.id);
                  localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));

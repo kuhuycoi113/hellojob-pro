@@ -64,7 +64,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { locations } from '@/lib/location-data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { EditProfileDialog } from '@/components/candidate-edit-dialog';
-import { validateProfileForApplication } from '@/lib/utils';
+import { validateProfileForApplication } from '@/lib/validators';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
 

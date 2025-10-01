@@ -11,7 +11,7 @@ import { FloatingChatWidget } from '@/components/chat/floating-chat-widget';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { validateProfileForApplication } from '@/lib/utils';
+import { validateProfileForApplication } from '@/lib/validators';
 import type { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from '../candidate-edit-dialog';
 import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
