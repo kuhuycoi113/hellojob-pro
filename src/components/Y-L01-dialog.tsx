@@ -421,9 +421,9 @@ export function YL01Dialog({
                                 key={role.id} 
                                 onClick={() => { 
                                     setSelectedRole(role.id);
-                                    if(role.id === 'nhan-vien-phai-cu'){
+                                    if (role.id === 'nhan-vien-phai-cu') {
                                         setStep(2); // Y002-1
-                                    } else if(role.id === 'nhan-vien-nhan-luc-nhat'){
+                                    } else if (role.id === 'nhan-vien-nhan-luc-nhat') {
                                         setStep(1.5); // Y001-a
                                     } else {
                                         setStep(3); // Y003 (Old Y002)
@@ -441,6 +441,38 @@ export function YL01Dialog({
             </>
         );
   }
+
+    const JapaneseStaffNationalityStepDialog = () => {
+        const content = {
+            vi: { title: "Bạn là nhân viên người Việt hay người Nhật?", description: "Vui lòng chọn quốc tịch của bạn.", options: [{ id: 'vietnamese', title: 'Nhân viên người Việt'}, { id: 'japanese', title: 'Nhân viên người Nhật'}], backButton: 'Quay lại' },
+            ja: { title: "あなたはベトナム人スタッフですか、それとも日本人スタッフですか？", description: "国籍を選択してください。", options: [{ id: 'vietnamese', title: 'ベトナム人スタッフ'}, { id: 'japanese', title: '日本人スタッフ'}], backButton: '戻る' },
+            en: { title: 'Are you a Vietnamese or Japanese staff member?', description: 'Please select your nationality.', options: [{ id: 'vietnamese', title: 'Vietnamese Staff'}, { id: 'japanese', title: 'Japanese Staff'}], backButton: 'Back' },
+        }[currentLang];
+
+        return (
+             <>
+                {/* Screen: Y002-2 */}
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                    <DialogDescription className="text-center">{content.description}</DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                     {content.options.map(option => (
+                         <Card 
+                            key={option.id} 
+                            onClick={() => { setSelectedSubRole(option.id); setStep(3); }}
+                            className="text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
+                        >
+                            <h3 className="font-bold text-lg mb-1">{option.title}</h3>
+                        </Card>
+                    ))}
+                </div>
+                <div className="text-center mt-4">
+                     <Button variant="link" onClick={() => setStep(1.5)}>{content.backButton}</Button>
+                </div>
+            </>
+        )
+    }
   
   const SendingCompanySubRoleStepDialog = () => {
     const content = {
@@ -496,7 +528,7 @@ export function YL01Dialog({
                     {organizationRoles.map((role) => (
                         <Card 
                             key={role.id} 
-                            onClick={() => { setSelectedSubRole(role.id); setStep(2); }}
+                            onClick={() => { setSelectedSubRole(role.id); setStep(2.5); }}
                             className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
                         >
                             <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -794,83 +826,86 @@ export function YL01Dialog({
   
   const renderDialogContent = () => {
     switch (step) {
-      case 1: return <PartnerRoleStepDialog />;
-      case 1.5: return <JapaneseHrSubRoleStepDialogFromY001_5 />;
-      case 2: return <SendingCompanySubRoleStepDialog />;
-      case 3: return <InterestStepDialog />;
-      case 4: return renderNameInputStepDialog();
-      case 5: return renderCompanyNameStepDialog();
-      case 6: return <VisaTypeMultiSelectStepDialog />;
-      case 7:
-        const visaDetailOptions = selectedVisa.flatMap(vSlug => (visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name.vi})));
-        const visaDetailContentMultiLang = {
-            vi: { title: 'Chọn chi tiết loại hình visa', description: 'Bạn có thể chọn nhiều mục, lựa chọn đầu tiên là ưu tiên số 1.' },
-            ja: { title: 'ビザの詳細を選択', description: '複数の項目を選択できます。最初の選択が優先順位1番になります。' },
-            en: { title: 'Select Visa Details', description: 'You can select multiple items. The first selection is priority #1.' },
-        };
-        return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
-      case 8:
-        const allIndustries = Object.values(industriesByJobType).flat();
-        const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name.vi}));
-        return renderMultiSelectStepDialog(8, industryContent[currentLang].title, industryContent[currentLang].description, industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
-      case 9:
-         const regionOptions = japanRegions.map(r => ({id: r.slug, title: r.name, name: {vi:r.name, ja: r.name, en:r.name}}));
-         const content = regionContent[currentLang];
-         const regionKanjiMap: { [key: string]: string } = {
-          Hokkaido: '北海道',
-          Tohoku: '東北',
-          Kanto: '関東',
-          Chubu: '中部',
-          Kansai: '関西',
-          Chugoku: '中国',
-          Shikoku: '四国',
-          Kyushu: '九州',
-          Okinawa: '沖縄',
-        };
-         return (
-             <>
-                {/* Screen: Y009 */}
-                <DialogHeader>
-                    <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                    <DialogDescription className="text-center">{content.description}</DialogDescription>
-                </DialogHeader>
-                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
-                     {regionOptions.map((option) => {
-                         const isSelected = selectedRegion.includes(option.id);
-                         const selectionOrder = isSelected ? selectedRegion.indexOf(option.id) + 1 : 0;
-                         return (
-                            <Card
-                                key={option.id}
-                                onClick={() => handleMultiSelect(option.id, selectedRegion, setSelectedRegion)}
-                                className={cn(
-                                    "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
-                                    isSelected && "ring-2 ring-primary border-primary bg-primary/10"
-                                )}
-                            >
-                                {isSelected && (
-                                    <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
-                                        {selectionOrder}
-                                    </Badge>
-                                )}
-                                <h3 className="font-bold text-base mb-1">{currentLang === 'ja' ? regionKanjiMap[option.title] : option.title}</h3>
-                            </Card>
-                         )
-                     })}
-                </div>
-                <div className="flex justify-center items-center mt-6 gap-4">
-                    <Button variant="link" onClick={() => setStep(8)}>{content.backButton}</Button>
-                    <Button 
-                        className="bg-accent-orange text-white hover:bg-accent-orange/90"
-                        onClick={() => setStep(10)} 
-                        disabled={selectedRegion.length === 0}
-                    >
-                        {content.completeButton}
-                    </Button>
-                </div>
-            </>
-         );
+        case 1: return <PartnerRoleStepDialog />;
+        case 1.5: return <JapaneseHrSubRoleStepDialogFromY001_5 />;
+        case 2:
+            return selectedRole === 'nhan-vien-phai-cu' ? <SendingCompanySubRoleStepDialog /> : <JapaneseStaffNationalityStepDialog />;
+        case 2.5: // New step for nationality selection after org type
+            return <JapaneseStaffNationalityStepDialog />;
+        case 3: return <InterestStepDialog />;
+        case 4: return renderNameInputStepDialog();
+        case 5: return renderCompanyNameStepDialog();
+        case 6: return <VisaTypeMultiSelectStepDialog />;
+        case 7:
+            const visaDetailOptions = selectedVisa.flatMap(vSlug => (visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name.vi})));
+            const visaDetailContentMultiLang = {
+                vi: { title: 'Chọn chi tiết loại hình visa', description: 'Bạn có thể chọn nhiều mục, lựa chọn đầu tiên là ưu tiên số 1.' },
+                ja: { title: 'ビザの詳細を選択', description: '複数の項目を選択できます。最初の選択が優先順位1番になります。' },
+                en: { title: 'Select Visa Details', description: 'You can select multiple items. The first selection is priority #1.' },
+            };
+            return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
+        case 8:
+            const allIndustries = Object.values(industriesByJobType).flat();
+            const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name.vi}));
+            return renderMultiSelectStepDialog(8, industryContent[currentLang].title, industryContent[currentLang].description, industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
+        case 9:
+             const regionOptions = japanRegions.map(r => ({id: r.slug, title: r.name, name: {vi:r.name, ja: r.name, en:r.name}}));
+             const content = regionContent[currentLang];
+             const regionKanjiMap: { [key: string]: string } = {
+              Hokkaido: '北海道',
+              Tohoku: '東北',
+              Kanto: '関東',
+              Chubu: '中部',
+              Kansai: '関西',
+              Chugoku: '中国',
+              Shikoku: '四国',
+              Kyushu: '九州',
+              Okinawa: '沖縄',
+            };
+             return (
+                 <>
+                    {/* Screen: Y009 */}
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                        <DialogDescription className="text-center">{content.description}</DialogDescription>
+                    </DialogHeader>
+                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                         {regionOptions.map((option) => {
+                             const isSelected = selectedRegion.includes(option.id);
+                             const selectionOrder = isSelected ? selectedRegion.indexOf(option.id) + 1 : 0;
+                             return (
+                                <Card
+                                    key={option.id}
+                                    onClick={() => handleMultiSelect(option.id, selectedRegion, setSelectedRegion)}
+                                    className={cn(
+                                        "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
+                                        isSelected && "ring-2 ring-primary border-primary bg-primary/10"
+                                    )}
+                                >
+                                    {isSelected && (
+                                        <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                                            {selectionOrder}
+                                        </Badge>
+                                    )}
+                                    <h3 className="font-bold text-base mb-1">{currentLang === 'ja' ? regionKanjiMap[option.title] : option.title}</h3>
+                                </Card>
+                             )
+                         })}
+                    </div>
+                    <div className="flex justify-center items-center mt-6 gap-4">
+                        <Button variant="link" onClick={() => setStep(8)}>{content.backButton}</Button>
+                        <Button 
+                            className="bg-accent-orange text-white hover:bg-accent-orange/90"
+                            onClick={() => setStep(10)} 
+                            disabled={selectedRegion.length === 0}
+                        >
+                            {content.completeButton}
+                        </Button>
+                    </div>
+                </>
+             );
         case 10: return <ValueInterestStepDialog />;
-      default: return <PartnerRoleStepDialog />;
+        default: return <PartnerRoleStepDialog />;
     }
   }
 
@@ -885,3 +920,5 @@ export function YL01Dialog({
     </>
   );
 }
+
+    
