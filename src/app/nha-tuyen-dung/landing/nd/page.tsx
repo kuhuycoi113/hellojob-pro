@@ -245,29 +245,35 @@ export default function UnionLandingPage() {
                 {t.heroDescription}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                  <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
-                      <Link href="/nha-tuyen-dung">
-                          {t.ctaPostJob}
-                      </Link>
-                  </Button>
-                  <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
-                      <Link href="/nha-tuyen-dung?action=register">
-                          {t.ctaRegisterPartner}
-                      </Link>
-                  </Button>
+                <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
+                  <Link href="/nha-tuyen-dung">
+                      <div className="text-center">
+                          <span className="font-semibold">{t.ctaPostJob}</span>
+                          <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                      </div>
+                  </Link>
+                </Button>
+                <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
+                    <Link href="/nha-tuyen-dung?action=register">
+                        <div className="text-center">
+                            <span className="font-semibold">{t.ctaRegisterPartner}</span>
+                            <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                        </div>
+                    </Link>
+                </Button>
               </div>
             </div>
              <div className="flex-col hidden md:flex">
                 <div className="flex justify-end mb-4">
                     <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
                         <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
-                            <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><VnFlagIcon className="mr-2 h-4 w-4" /> Tiếng Việt</TabsTrigger>
-                            <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><JpFlagIcon className="mr-2 h-4 w-4" /> 日本語</TabsTrigger>
-                            <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><EnFlagIcon className="mr-2 h-4 w-4" /> English</TabsTrigger>
+                            <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
+                            <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><JpFlagIcon className="h-4 w-4" /> 日本語</TabsTrigger>
+                            <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><EnFlagIcon className="h-4 w-4" /> English</TabsTrigger>
                         </TabsList>
                     </Tabs>
                 </div>
-                 <div className="relative aspect-[2/1]">
+                 <div className="relative aspect-[5/3]">
                     <Image
                         src="/img/NTD/ND.jpg"
                         alt="Hợp tác cùng phát triển với HelloJob"
@@ -359,3 +365,5 @@ export default function UnionLandingPage() {
     </div>
   );
 }
+
+    
