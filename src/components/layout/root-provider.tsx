@@ -30,8 +30,8 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
 
-    const excludedCtaPages = ['/'];
-    const showCtas = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
+    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen'];
+    const showCtas = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname) && pathname !== '/viec-lam';
 
 
     React.useEffect(() => {
@@ -74,8 +74,8 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
                     setIsProfileIncompleteAlertOpen(true);
                 }
             } else {
-                // No profile found, show alert to update
-                setIsProfileIncompleteAlertOpen(true);
+                 // No profile found, show alert to update
+                 setIsProfileIncompleteAlertOpen(true);
             }
         }
         
@@ -162,3 +162,5 @@ export function RootProvider({
         </AuthProvider>
     );
 }
+
+    

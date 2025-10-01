@@ -206,7 +206,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     setIsProfileIncompleteAlertOpen(true);
                 }
             } else {
-                 setMissingProfileFields(['Hồ sơ']);
                  setIsProfileIncompleteAlertOpen(true);
             }
         }
@@ -481,24 +480,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         </Card>
                     </aside>
                 </div>
-                <div className="mt-16 pt-12 border-t space-y-12">
-                     <section id="behavioral-suggestions">
-                        <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
-                        {isLoadingBehavioral ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
-                            </div>
-                        ) : behavioralSuggestions.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {behavioralSuggestions.map((item) => (
-                                    <JobCard key={item.job.id} job={item.job} />
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-muted-foreground">Không có gợi ý nào. Hãy xem thêm các công việc khác để chúng tôi hiểu bạn hơn!</p>
-                        )}
-                    </section>
-                </div>
             </div>
             <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
             <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
@@ -546,3 +527,5 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 }
+
+    
