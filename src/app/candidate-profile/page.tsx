@@ -40,7 +40,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { CandidateProfile } from '@/ai/schemas';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import { cn, parseMessengerInput, parseZaloInput, parseLineInput } from '@/lib/utils';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
@@ -230,7 +230,7 @@ const emptyCandidate: EnrichedCandidateProfile = {
         desiredJobDetail: 'Vận hành máy CNC',
         financialAbility: 'Không yêu cầu',
         interviewLocation: 'Thành phố Hồ Chí Minh',
-        specialAspirations: 'Mong muốn có nhiều cơ hội làm thêm giờ và được hỗ trợ đào tạo chuyên sâu về kỹ năng quản lý.',
+        specialAspirations: 'Mong muốn có nhiều cơ hội làm thêm giờ và được hỗ trợ đào tạo chuyên sâu.',
     },
     notes: 'Đã có kinh nghiệm phỏng vấn với công ty Nhật 2 lần, mong muốn tìm đơn hàng bay nhanh trong vòng 3 tháng tới. Có thể đóng phí ngay.',
     interests: ['Cơ khí', 'Tự động hóa', 'Sản xuất'],
@@ -263,178 +263,6 @@ const commonSkills = ['Vận hành máy CNC', 'AutoCAD', 'Kiểm tra chất lư�
 const commonInterests = ['Cơ khí', 'Điện tử', 'IT', 'Logistics', 'Dệt may', 'Chế biến thực phẩm'];
 
 const allIndustries = Object.values(industriesByJobType).flat().filter((v,i,a)=>a.findIndex(t=>(t.name === v.name))===i);
-
-const parseMessengerInput = (input: string): string => {
-    if (!input) return '';
-    const trimmedInput = input.trim();
-    try {
-        if (trimmedInput.startsWith('http') || trimmedInput.startsWith('www.')) {
-            const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
-            
-            if (url.hostname.includes('facebook.com') || url.hostname.includes('m.facebook.com')) {
-                if (url.pathname.includes('profile.php')) {
-                    const id = url.searchParams.get('id');
-                    if (id) return id;
-                }
-                const pathParts = url.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0) {
-                    const lastPart = pathParts[pathParts.length - 1];
-                    // Avoid returning generic paths
-                    if (lastPart !== 'profile.php' && lastPart !== 'home.php') {
-                        return lastPart;
-                    }
-                }
-            }
-             if (url.hostname.includes('m.me')) {
-                const pathParts = url.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0) {
-                     return pathParts[pathParts.length - 1];
-                }
-            }
-        }
-    } catch (error) {
-        console.warn("Could not parse input as URL, treating as username:", error);
-    }
-    // Fallback: remove any potential URL parts and treat as username
-    return trimmedInput.split('/').pop() || trimmedInput;
-};
-
-const parseZaloInput = (input: string): string => {
-    if (!input) return '';
-    const trimmedInput = input.trim();
-    if (trimmedInput.includes('zalo.me/')) {
-        const parts = trimmedInput.split('/');
-        return parts.pop()?.replace(/\D/g, '') || '';
-    }
-    // Keep only numbers
-    return trimmedInput.replace(/\D/g, '');
-};
-
-const parseLineInput = (input: string): string => {
-    if (!input) return '';
-    return input.trim();
-};
-
-
-const EditDialog = ({
-  children,
-  title,
-  onSave,
-  renderContent,
-  description,
-  candidate,
-  dialogId,
-}: {
-  children: React.ReactNode;
-  title: string;
-  onSave: (updatedCandidate: EnrichedCandidateProfile) => void;
-  renderContent: (
-    tempData: EnrichedCandidateProfile,
-    handleTempChange: (
-      section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
-      ...args: any[]
-    ) => void
-  ) => React.ReactNode;
-  description?: string;
-  candidate: EnrichedCandidateProfile;
-  dialogId?: string;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile>(candidate);
-
-  useEffect(() => {
-    if (isOpen) {
-      setTempCandidate(JSON.parse(JSON.stringify(candidate)));
-    }
-  }, [isOpen, candidate]);
-
-  const handleSave = () => {
-    onSave(tempCandidate);
-    setIsOpen(false);
-  };
-
-  const handleTempChange = (
-    section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
-    ...args: any[]
-  ) => {
-    setTempCandidate(prev => {
-      const newCandidate = { ...prev! };
-
-      if (section === 'personalInfo' || section === 'aspirations') {
-        const [field, value] = args;
-        
-        if (section === 'personalInfo' && field === 'messenger') {
-             newCandidate[section] = { ...newCandidate[section]!, [field]: parseMessengerInput(value) };
-        } else if (section === 'personalInfo' && field === 'zalo') {
-            newCandidate[section] = { ...newCandidate[section]!, [field]: parseZaloInput(value) };
-        } else if (section === 'personalInfo' && field === 'line') {
-             newCandidate[section] = { ...newCandidate[section]!, [field]: parseLineInput(value) };
-        } else {
-             // @ts-ignore
-             newCandidate[section] = { ...newCandidate[section], [field]: value };
-        }
-
-        if (section === 'aspirations' && field === 'desiredVisaType') {
-            newCandidate.aspirations!.desiredVisaDetail = '';
-            newCandidate.aspirations!.desiredJobDetail = ''; 
-        }
-        if (section === 'aspirations' && field === 'desiredIndustry') {
-            newCandidate.aspirations!.desiredJobDetail = '';
-        }
-      } else if (section === 'documents') {
-          const [docType, index, value] = args;
-          // @ts-ignore
-          newCandidate.documents[docType][index] = value;
-      } else if (['experience', 'education'].includes(section)) {
-        const [index, field, value] = args;
-        // @ts-ignore
-        newCandidate[section][index][field] = value;
-      } else if (section === 'certifications') {
-         const [index, value] = args;
-         newCandidate.certifications[index] = value;
-      } else if (['skills', 'interests'].includes(section)) {
-          const [value, isAdding] = args;
-          // @ts-ignore
-          const currentValues = newCandidate[section];
-          // @ts-ignore
-          newCandidate[section] = isAdding
-              ? [...currentValues, value]
-              : currentValues.filter((item: string) => item !== value);
-      } else {
-        const [value] = args;
-        // @ts-ignore
-        newCandidate[section] = value;
-      }
-
-      return newCandidate;
-    });
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]" id={dialogId}>
-        <DialogHeader>
-          <DialogTitle className="font-headline text-2xl">{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
-        <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
-          {renderContent(tempCandidate, handleTempChange)}
-        </div>
-        <DialogFooter>
-           <DialogClose asChild>
-                <Button variant="outline">Hủy</Button>
-            </DialogClose>
-          <Button type="submit" onClick={handleSave} className="bg-primary text-white">
-            Lưu thay đổi
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-
 
 const formatYen = (value?: string | number) => {
     if (value === null || value === undefined || value === '') return 'Chưa cập nhật';
@@ -1430,59 +1258,7 @@ export default function CandidateProfilePage() {
     );
   };
   
-    const DownloadProfileDialog = ({children}: {children: React.ReactNode}) => (
-        <Dialog>
-            <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-                <DialogHeader>
-                    <DialogTitle className="font-headline text-2xl">Tải hồ sơ xuống</DialogTitle>
-                    <DialogDescription>
-                        Chọn định dạng bạn muốn tải xuống.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-                    <Card className="hover:bg-secondary cursor-pointer">
-                        <CardContent className="p-4 flex items-center gap-4">
-                            <FileCode className="h-10 w-10 text-blue-500 shrink-0"/>
-                            <div>
-                                <p className="font-semibold">Dạng HTML</p>
-                                <p className="text-xs text-muted-foreground">Tải xuống như giao diện Web.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="hover:bg-secondary cursor-pointer">
-                         <CardContent className="p-4 flex items-center gap-4">
-                            <FileText className="h-10 w-10 text-red-500 shrink-0"/>
-                            <div>
-                                <p className="font-semibold">Dạng PDF</p>
-                                <p className="text-xs text-muted-foreground">Lý tưởng để gửi qua email hoặc in ấn.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                     <Card className="hover:bg-secondary cursor-pointer">
-                         <CardContent className="p-4 flex items-center gap-4">
-                            <FileType className="h-10 w-10 text-sky-600 shrink-0"/>
-                            <div>
-                                <p className="font-semibold">Dạng Docx</p>
-                                <p className="text-xs text-muted-foreground">Dễ dàng chỉnh sửa bằng Microsoft Word.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                     <Card className="hover:bg-secondary cursor-pointer">
-                         <CardContent className="p-4 flex items-center gap-4">
-                            <Sheet className="h-10 w-10 text-green-600 shrink-0"/>
-                            <div>
-                                <p className="font-semibold">Dạng Excel</p>
-                                <p className="text-xs text-muted-foreground">Phù hợp để quản lý và phân tích dữ liệu.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </DialogContent>
-        </Dialog>
-    )
-
-  const editButtonText = isNewProfile ? 'Tạo hồ sơ' : 'Sửa hồ sơ';
+    const editButtonText = isNewProfile ? 'Tạo hồ sơ' : 'Sửa hồ sơ';
 
   const formatPhoneNumber = (phone: string | undefined): string => {
     if (!phone) return 'Chưa cập nhật';
@@ -1900,3 +1676,4 @@ export default function CandidateProfilePage() {
     </div>
   );
 }
+
