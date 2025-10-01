@@ -43,6 +43,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuGroup,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from './ui/checkbox';
 import { japanRegions } from '@/lib/location-data';
@@ -331,9 +333,11 @@ export function YL01Dialog({
   const [isCreateDetailOpen, setIsCreateDetailOpen] = React.useState(false);
   const [selectedRole, setSelectedRole] = React.useState<string | null>(null);
   const [selectedSubRole, setSelectedSubRole] = React.useState<string | null>(null);
+  const [selectedNationality, setSelectedNationality] = React.useState<string | null>(null);
   const [fullName, setFullName] = React.useState('');
   const [companyName, setCompanyName] = React.useState('');
   const [selectedInterest, setSelectedInterest] = React.useState<string[]>([]);
+  const [selectedValueInterests, setSelectedValueInterests] = React.useState<string[]>([]);
   const [currentLang, setCurrentLang] = React.useState<Language>(initialLang);
 
   React.useEffect(() => {
@@ -341,6 +345,7 @@ export function YL01Dialog({
       setStep(initialStep);
       setSelectedRole(null);
       setSelectedSubRole(null);
+      setSelectedNationality(null);
       setFullName('');
       setCompanyName('');
       setSelectedVisa([]);
@@ -348,6 +353,7 @@ export function YL01Dialog({
       setSelectedIndustry([]);
       setSelectedRegion([]);
       setSelectedInterest([]);
+      setSelectedValueInterests([]);
     }
   }, [isOpen, initialStep]);
   
@@ -361,9 +367,11 @@ export function YL01Dialog({
       onComplete({
         role: selectedRole,
         sub_role: selectedSubRole,
+        nationality: selectedNationality,
         name: fullName,
         company_name: companyName,
         interest: selectedInterest,
+        value_interest: selectedValueInterests,
         visaType: selectedVisa,
         visaDetail: selectedVisaDetail,
         industry: selectedIndustry,
@@ -422,7 +430,7 @@ export function YL01Dialog({
                                 onClick={() => { 
                                     setSelectedRole(role.id);
                                     if (role.id === 'nhan-vien-phai-cu') {
-                                        setStep(2); // Y002-1
+                                        setStep(2.1); // Y002-1
                                     } else if (role.id === 'nhan-vien-nhan-luc-nhat') {
                                         setStep(1.5); // Y001-a
                                     } else {
@@ -460,7 +468,7 @@ export function YL01Dialog({
                      {content.options.map(option => (
                          <Button 
                             key={option.id} 
-                            onClick={() => { setSelectedSubRole(option.id); setStep(3); }}
+                            onClick={() => { setSelectedNationality(option.id); setStep(3); }}
                             variant="outline"
                             className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary"
                         >
@@ -533,7 +541,7 @@ export function YL01Dialog({
                     {organizationRoles.map((role) => (
                         <Card 
                             key={role.id} 
-                            onClick={() => { setSelectedSubRole(role.id); setStep(2); }}
+                            onClick={() => { setSelectedSubRole(role.id); setStep(2.2); }}
                             className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
                         >
                             <role.icon className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -552,7 +560,7 @@ export function YL01Dialog({
 
 
   const InterestStepDialog = () => {
-    // Screen: Y002 (New)
+    // Screen: Y003
     const interests = {
         vi: {
             title: "Bạn quan tâm đến điều gì?",
@@ -613,7 +621,11 @@ export function YL01Dialog({
                 ))}
             </div>
             <div className="text-center mt-4">
-                 <Button variant="link" onClick={() => setStep(selectedRole === 'nhan-vien-phai-cu' || selectedRole === 'nhan-vien-nhan-luc-nhat' ? 2 : 1)}>{interests.backButton}</Button>
+                 <Button variant="link" onClick={() => {
+                     if (selectedRole === 'nhan-vien-phai-cu') setStep(2.1);
+                     else if (selectedRole === 'nhan-vien-nhan-luc-nhat') setStep(2.2);
+                     else setStep(1);
+                 }}>{interests.backButton}</Button>
             </div>
         </>
     )
@@ -793,12 +805,12 @@ export function YL01Dialog({
                 </DialogHeader>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                     {content.options.map(option => {
-                        const isSelected = selectedInterest.includes(option.id);
-                        const selectionOrder = isSelected ? selectedInterest.indexOf(option.id) + 1 : 0;
+                        const isSelected = selectedValueInterests.includes(option.id);
+                        const selectionOrder = isSelected ? selectedValueInterests.indexOf(option.id) + 1 : 0;
                         return (
                             <Card
                                 key={option.id}
-                                onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
+                                onClick={() => handleMultiSelect(option.id, selectedValueInterests, setSelectedValueInterests)}
                                 className={cn(
                                     "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
                                     isSelected && "ring-2 ring-primary border-primary bg-primary/10"
@@ -820,7 +832,7 @@ export function YL01Dialog({
                     <Button 
                         className="bg-accent-orange text-white hover:bg-accent-orange/90"
                         onClick={handleComplete} 
-                        disabled={selectedInterest.length === 0}
+                        disabled={selectedValueInterests.length === 0}
                     >
                         {content.completeButton}
                     </Button>
@@ -833,14 +845,8 @@ export function YL01Dialog({
     switch (step) {
       case 1: return <PartnerRoleStepDialog />;
       case 1.5: return <JapaneseHrSubRoleStepDialogFromY001_a />;
-      case 2:
-        if (selectedRole === 'nhan-vien-phai-cu') {
-            return <SendingCompanySubRoleStepDialog />;
-        }
-        if (selectedRole === 'nhan-vien-nhan-luc-nhat') {
-            return <JapaneseStaffNationalityStepDialog />;
-        }
-        return <PartnerRoleStepDialog />;
+      case 2.1: return <SendingCompanySubRoleStepDialog />;
+      case 2.2: return <JapaneseStaffNationalityStepDialog />;
       case 3: return <InterestStepDialog />;
       case 4: return renderNameInputStepDialog();
       case 5: return renderCompanyNameStepDialog();

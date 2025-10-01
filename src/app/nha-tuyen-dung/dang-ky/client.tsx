@@ -477,6 +477,8 @@ export default function EmployerDetailPage() {
             finalRoleText = `${subRoleTexts[subRoleKey][langFromParams]}; ${roleTexts[roleKey][langFromParams]}; ${companyNameParam}`;
         } else if (roleKey === 'nhan-vien-nhan-luc-nhat' && subRoleTexts[nationalityKey] && roleTexts[subRoleKey]) {
             finalRoleText = `${subRoleTexts[nationalityKey][langFromParams]}; ${roleTexts[subRoleKey][langFromParams]}; ${companyNameParam}`;
+        } else if (roleKey === 'nhan-vien-nhan-luc-nhat' && roleTexts[subRoleKey]) {
+             finalRoleText = `${roleTexts[subRoleKey][langFromParams]}; ${companyNameParam}`;
         }
     } else if (!isIndividualRole && roleTexts[roleKey]) {
         finalRoleText = roleTexts[roleKey][langFromParams];
@@ -749,7 +751,7 @@ export default function EmployerDetailPage() {
                         <Input 
                             placeholder={`Ví dụ: ${placeholderEmployerData.images[index]?.alt[lang] || 'Văn phòng hiện đại'}`}
                             value={img.alt[lang] || ''}
-                            onChange={(e) => handleTempArrayChange(index, 'alt', e.target.value)}
+                            onChange={(e) => handleTempArrayMultiLangChange(index, 'alt', e.target.value)}
                         />
                         <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                     </div>
@@ -890,13 +892,17 @@ export default function EmployerDetailPage() {
         case 'valueInterest':
             const currentInterest = tempContent.interest?.[lang]?.[0] || null;
             const handleInterestChange = (value: string) => {
-                setTempContent({ ...tempContent, interest: { ...tempContent.interest, [lang]: [value] }});
+                setTempContent({ ...tempContent, interest: { vi: [value], ja: [value], en: [value] } });
             };
+            
             const currentValueInterests = Array.isArray(tempContent.valueInterest) ? tempContent.valueInterest.map((item:any) => item.id) : [];
             const handleValueInterestChange = (checked: boolean, interestId: string) => {
-                const newSelection = checked
-                    ? [...tempContent.valueInterest, { id: interestId, vi: valueInterestOptions['vi'].find(o=>o.id===interestId)?.title, ja: valueInterestOptions['ja'].find(o=>o.id===interestId)?.title, en: valueInterestOptions['en'].find(o=>o.id===interestId)?.title }]
-                    : tempContent.valueInterest.filter((item: any) => item.id !== interestId);
+                let newSelection;
+                if (checked) {
+                    newSelection = [...tempContent.valueInterest, { id: interestId, vi: valueInterestOptions['vi'].find(o=>o.id===interestId)?.title, ja: valueInterestOptions['ja'].find(o=>o.id===interestId)?.title, en: valueInterestOptions['en'].find(o=>o.id===interestId)?.title }];
+                } else {
+                    newSelection = tempContent.valueInterest.filter((item: any) => item.id !== interestId);
+                }
                 setTempContent({ ...tempContent, valueInterest: newSelection });
             };
 
@@ -904,17 +910,17 @@ export default function EmployerDetailPage() {
                 <div className="space-y-6">
                     <div className="space-y-2">
                         <Label className="font-semibold text-base">{t.interestLabel}</Label>
-                        <p className="text-sm text-muted-foreground">Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.</p>
+                         <p className="text-sm text-muted-foreground">Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.</p>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
                                     {currentInterest ? (
-                                        <Badge variant="secondary" className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>{(interestOptions[lang].find(i => i.id === currentInterest))?.title}</Badge>
+                                        <Badge variant="secondary" className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>{interestOptions[lang].find(i => i.id === currentInterest)?.title}</Badge>
                                     ) : `Chọn ${t.interestLabel}`}
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn mục tiêu</DropdownMenuLabel>
+                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn nghiệp vụ</DropdownMenuLabel>
                                 <DropdownMenuRadioGroup value={currentInterest || ''} onValueChange={handleInterestChange}>
                                     {interestOptions[lang].map((option) => (
                                         <DropdownMenuRadioItem key={option.id} value={option.id}>
