@@ -1,4 +1,6 @@
 
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Handshake, DollarSign, Users, Search, CheckCircle, TrendingUp, BarChart, FileSignature, ShieldCheck } from 'lucide-react';
@@ -52,7 +54,7 @@ const solutions = [
         icon: Handshake,
         title: 'Mở rộng & Giữ chân khách hàng',
         details: [
-            'Được xây dựng profile doanh nghiệp chuyên nghiệp, hiện đại để quảng bá đến khách hàng những dịch vụ tốt nhất.',
+            'Được xây dựng profile doanh nghiệp chuyên nghiệp, hiện đại để quảng bá đến khách hàng những dịch vụ tốt nhất của mình.',
             'Được tự do xây dựng các bài viết, nội dung để thu hút khách hàng vào gian hàng của mình.',
             'Được tiếp cận với những khách hàng tiềm năng trong khu vực của mình trong tương lai.',
         ],
@@ -89,7 +91,7 @@ export default function UnionLandingPage() {
             </div>
             <div className="relative hidden md:block">
               <Image
-                src="/img/viet-img/nghiep_doan.jpg"
+                src="/img/NTD/ND.jpg"
                 alt="Hợp tác cùng phát triển với HelloJob"
                 width={600}
                 height={400}
