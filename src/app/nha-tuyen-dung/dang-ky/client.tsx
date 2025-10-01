@@ -176,6 +176,7 @@ const emptyEmployerData = {
 };
 
 
+
 const contentByLang = {
     vi: {
         edit: 'Sửa',
@@ -1171,13 +1172,13 @@ export default function EmployerDetailPage() {
                            </Label>
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
-                      <div id="THONGTINCOBANNTD02" className="flex-grow pt-4 sm:pt-0 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left w-full">
-                          <div className="flex-grow min-w-0 md:flex-shrink">
+                      <div id="THONGTINCOBANNTD02" className="flex flex-col md:flex-row flex-grow items-center md:items-end w-full">
+                          <div className="flex-grow min-w-0 text-center md:text-left">
                             <h1 id="DKY001" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
                             <p id="DKY002VAITRO" className="font-semibold text-primary">{roleText || t.rolePlaceholder}</p>
                             <p id="DKY005" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                           </div>
-                          <div id="CHUYENDOINGONNGUNTD01" className="flex items-center gap-2 mt-4 sm:mt-0">
+                          <div id="CHUYENDOINGONNGUNTD01" className="flex items-center gap-2 mt-4 md:mt-0 flex-shrink-0 md:ml-auto">
                                <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
                                     <TabsList className="grid w-full grid-cols-3">
                                         <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span></TabsTrigger>
