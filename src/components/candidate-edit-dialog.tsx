@@ -32,7 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { validateProfileForApplication } from '@/lib/utils';
+import { validateProfileForApplication } from '@/lib/validators';
 
 
 type EnrichedCandidateProfile = CandidateProfile & { avatarUrl?: string };
@@ -700,3 +700,5 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
         </>
     );
 }
+
+    
