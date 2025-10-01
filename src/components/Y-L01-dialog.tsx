@@ -398,6 +398,7 @@ export function YL01Dialog({
 
         return (
             <>
+                {/* Screen: Y001 */}
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                     <DialogDescription className="text-center">{content.description}</DialogDescription>
@@ -420,10 +421,12 @@ export function YL01Dialog({
                                 key={role.id} 
                                 onClick={() => { 
                                     setSelectedRole(role.id);
-                                    if(role.id === 'nhan-vien-nhan-luc-nhat'){
-                                        setStep(1.5);
+                                    if(role.id === 'nhan-vien-phai-cu'){
+                                        setStep(2); // Y002-1
+                                    } else if(role.id === 'nhan-vien-nhan-luc-nhat'){
+                                        setStep(2.5); // Y002-2
                                     } else {
-                                        setStep(2); 
+                                        setStep(3); // Y003
                                     }
                                 }}
                                 className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedRole === role.id && "ring-2 ring-primary border-primary")}
@@ -438,8 +441,41 @@ export function YL01Dialog({
             </>
         );
   }
+  
+  const SendingCompanySubRoleStepDialog = () => {
+    const content = {
+        vi: { title: "Bạn có vai trò gì ở Công ty phái cử?", description: "Vui lòng chọn vai trò cụ thể của bạn để tiếp tục.", options: [{ id: 'phu-trach-doi-ngoai', icon: Globe, title: 'Phụ trách đối ngoại'}, { id: 'phu-trach-tuyen-dung', icon: Users2, title: 'Phụ trách tuyển dụng'}], backButton: 'Quay lại', },
+        ja: { title: "送り出し機関でのあなたの役割は何ですか？", description: "続けるためにあなたの具体的な役割を選択してください。", options: [{ id: 'phu-trach-doi-ngoai', icon: Globe, title: '渉外担当'}, { id: 'phu-trach-tuyen-dung', icon: Users2, title: '採用担当'}], backButton: '戻る', },
+        en: { title: 'What is your role at the Sending Company?', description: 'Please select your specific role to continue.', options: [{ id: 'phu-trach-doi-ngoai', icon: Globe, title: 'External Relations'}, { id: 'phu-trach-tuyen-dung', icon: Users2, title: 'Recruitment'}], backButton: 'Back', },
+    }[currentLang];
 
-  const JapaneseHrSubRoleStepDialog = () => {
+    return (
+        <>
+            {/* Screen: Y002-1 */}
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                {content.options.map(option => (
+                     <Card 
+                        key={option.id} 
+                        onClick={() => { setSelectedSubRole(option.id); setStep(3);}}
+                        className="text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
+                    >
+                        <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
+                        <h3 className="font-bold text-lg mb-1">{option.title}</h3>
+                    </Card>
+                ))}
+            </div>
+            <div className="text-center mt-4">
+                 <Button variant="link" onClick={() => setStep(1)}>{content.backButton}</Button>
+            </div>
+        </>
+    )
+  };
+
+  const JapaneseHrSubRoleStepDialogFromY001_5 = () => {
     const content = {
         vi: { title: "Công ty/Pháp nhân/Tổ chức của bạn tại Nhật thuộc loại hình nào?", description: "Vui lòng chọn loại hình tổ chức bạn đang làm việc tại Nhật.", backButton: "Quay lại" },
         ja: { title: "日本の会社/法人/団体はどの種類に属しますか？", description: "日本でお勤めの組織の種類を選択してください。", backButton: "戻る" },
@@ -450,6 +486,7 @@ export function YL01Dialog({
 
     return (
         <>
+            {/* Screen: Y001-a */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                 <DialogDescription className="text-center">{content.description}</DialogDescription>
@@ -518,7 +555,7 @@ export function YL01Dialog({
 
     return (
         <>
-            {/* Screen: Y002 */}
+            {/* Screen: Y003 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{interests.title}</DialogTitle>
                 <DialogDescription className="text-center">{interests.description}</DialogDescription>
@@ -529,8 +566,8 @@ export function YL01Dialog({
                         key={option.id}
                         onClick={() => {
                             setSelectedInterest([option.id]);
-                            const isOrganization = selectedRole && organizationRoles.includes(selectedRole);
-                            const nextStep = isOrganization ? 5 : 3;
+                            const isIndividual = selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole);
+                            const nextStep = isIndividual ? 4 : 5;
                             setStep(nextStep);
                         }}
                         className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
@@ -541,101 +578,11 @@ export function YL01Dialog({
                 ))}
             </div>
             <div className="text-center mt-4">
-                 <Button variant="link" onClick={() => setStep(1)}>{interests.backButton}</Button>
+                 <Button variant="link" onClick={() => setStep(2)}>{interests.backButton}</Button>
             </div>
         </>
     )
   }
-
-  const SendingCompanySubRoleStepDialog = () => {
-    const content = {
-        vi: {
-            title: "Bạn có vai trò gì ở Công ty phái cử?",
-            description: "Vui lòng chọn vai trò cụ thể của bạn để tiếp tục.",
-            options: [
-                { id: 'phu-trach-doi-ngoai', icon: Globe, title: 'Phụ trách đối ngoại'},
-                { id: 'phu-trach-tuyen-dung', icon: Users2, title: 'Phụ trách tuyển dụng'},
-            ],
-            backButton: 'Quay lại',
-        },
-        ja: {
-            title: "送り出し機関でのあなたの役割は何ですか？",
-            description: "続けるためにあなたの具体的な役割を選択してください。",
-            options: [
-                { id: 'phu-trach-doi-ngoai', icon: Globe, title: '渉外担当'},
-                { id: 'phu-trach-tuyen-dung', icon: Users2, title: '採用担当'},
-            ],
-            backButton: '戻る',
-        },
-        en: {
-            title: 'What is your role at the Sending Company?',
-            description: 'Please select your specific role to continue.',
-            options: [
-                { id: 'phu-trach-doi-ngoai', icon: Globe, title: 'External Relations'},
-                { id: 'phu-trach-tuyen-dung', icon: Users2, title: 'Recruitment'},
-            ],
-            backButton: 'Back',
-        },
-    }[currentLang];
-
-    return (
-        <>
-            {/* Screen: Y003-1 */}
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                <DialogDescription className="text-center">{content.description}</DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                {content.options.map(option => (
-                     <Card 
-                        key={option.id} 
-                        onClick={() => { setSelectedSubRole(option.id); setStep(4);}}
-                        className="text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
-                    >
-                        <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                        <h3 className="font-bold text-lg mb-1">{option.title}</h3>
-                    </Card>
-                ))}
-            </div>
-            <div className="text-center mt-4">
-                 <Button variant="link" onClick={() => setStep(2)}>{content.backButton}</Button>
-            </div>
-        </>
-    )
-  };
-  
-  const JapaneseHrSubRoleStepDialogFromY001_5 = () => {
-    const content = {
-        vi: { title: "Bạn có vai trò gì ở Công ty/Pháp nhân/Tổ chức nhân lực Nhật Bản?", description: "Vui lòng chọn vai trò của bạn để tiếp tục.", options: [{ id: 'nguoi-nhat', icon: UserCog, title: 'Nhân viên người Nhật'}, { id: 'nguoi-viet', icon: UserCog, title: 'Nhân viên người Việt'}], backButton: 'Quay lại', },
-        ja: { title: "日本の人材会社/法人/団体でのあなたの役割は何ですか？", description: "続けるためにあなたの役割を選択してください。", options: [{ id: 'nguoi-nhat', icon: UserCog, title: '日本人スタッフ'}, { id: 'nguoi-viet', icon: UserCog, title: 'ベトナム人スタッフ'}], backButton: '戻る', },
-        en: { title: 'What is your role at the Japanese HR Company/Entity/Organization?', description: 'Please select your role to continue.', options: [{ id: 'nguoi-nhat', icon: UserCog, title: 'Japanese Staff'}, { id: 'nguoi-viet', icon: UserCog, title: 'Vietnamese Staff'}], backButton: 'Back', },
-    }[currentLang];
-
-    return (
-        <>
-             {/* Screen: Y003-2 */}
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
-                <DialogDescription className="text-center">{content.description}</DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                {content.options.map(option => (
-                     <Card 
-                        key={option.id} 
-                        onClick={() => { setSelectedSubRole(option.id); setStep(4);}}
-                        className="text-center p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
-                    >
-                        <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                        <h3 className="font-bold text-lg mb-1">{option.title}</h3>
-                    </Card>
-                ))}
-            </div>
-            <div className="text-center mt-4">
-                 <Button variant="link" onClick={() => setStep(1.5)}>{content.backButton}</Button>
-            </div>
-        </>
-    )
-  };
 
   const renderNameInputStepDialog = () => {
     const content = {
@@ -690,7 +637,7 @@ export function YL01Dialog({
              <div className="mt-6 flex justify-center gap-2">
                 <Button variant="outline" onClick={() => {
                     const isIndividual = selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole);
-                    setStep(isIndividual ? 4 : 2);
+                    setStep(isIndividual ? 4 : 3);
                 }}>{content.backButton}</Button>
                 <Button onClick={() => { if (companyName.trim()) setStep(6); }} disabled={!companyName.trim()}>{content.continueButton}</Button>
             </div>
@@ -851,16 +798,20 @@ export function YL01Dialog({
     switch (step) {
       case 1: return <PartnerRoleStepDialog />;
       case 1.5: return <JapaneseHrSubRoleStepDialog />;
-      case 2: return <InterestStepDialog />;
-      case 3:
-        if (selectedRole === 'nhan-vien-phai-cu') return <SendingCompanySubRoleStepDialog />;
-        if (selectedRole === 'nhan-vien-nhan-luc-nhat') return <JapaneseHrSubRoleStepDialogFromY001_5 />;
-        return <PartnerRoleStepDialog />; // Fallback
+      case 2: // New step for sub-roles
+          if (selectedRole === 'nhan-vien-phai-cu') return <SendingCompanySubRoleStepDialog />;
+          // Other roles like 'sending' directly go to step 3 (Interest)
+          setStep(3);
+          return null;
+      case 2.5: // New step for sub-roles
+          if (selectedRole === 'nhan-vien-nhan-luc-nhat') return <JapaneseHrSubRoleStepDialogFromY001_5 />;
+          setStep(3);
+          return null;
+      case 3: return <InterestStepDialog />;
       case 4: return renderNameInputStepDialog();
       case 5: return renderCompanyNameStepDialog();
-      case 6: // Y016 (replaces Y006)
-        return <VisaTypeMultiSelectStepDialog />;
-      case 7: // Y007
+      case 6: return <VisaTypeMultiSelectStepDialog />;
+      case 7:
         const visaDetailOptions = selectedVisa.flatMap(vSlug => (visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name.vi})));
         const visaDetailContentMultiLang = {
             vi: { title: 'Chọn chi tiết loại hình visa', description: 'Bạn có thể chọn nhiều mục, lựa chọn đầu tiên là ưu tiên số 1.' },
@@ -868,11 +819,11 @@ export function YL01Dialog({
             en: { title: 'Select Visa Details', description: 'You can select multiple items. The first selection is priority #1.' },
         };
         return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
-      case 8: // Y008
+      case 8:
         const allIndustries = Object.values(industriesByJobType).flat();
         const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name.vi}));
         return renderMultiSelectStepDialog(8, industryContent[currentLang].title, industryContent[currentLang].description, industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
-      case 9: // Y009
+      case 9:
          const regionOptions = japanRegions.map(r => ({id: r.slug, title: r.name, name: {vi:r.name, ja: r.name, en:r.name}}));
          const content = regionContent[currentLang];
          const regionKanjiMap: { [key: string]: string } = {
@@ -944,5 +895,3 @@ export function YL01Dialog({
     </>
   );
 }
-
-    
