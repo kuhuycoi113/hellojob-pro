@@ -191,11 +191,82 @@ const CTAForEmptyProfile = () => {
         )
     };
 
+    const IndustryStepDialog = () => {
+        const parentVisaSlug = selectedVisa?.slug;
+
+        if (!parentVisaSlug) return null;
+
+        const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
+        
+        let screenIdComment = '';
+        if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+        else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+        else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+
+        return (
+            <>
+                <span className="hidden">{screenIdComment}</span>
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
+                    <DialogDescription className="text-center">
+                        Lựa chọn ngành nghề bạn quan tâm nhất để chúng tôi gợi ý việc làm chính xác hơn.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                    {industries.map(industry => (
+                        <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                            <p className="font-semibold text-sm">{industry.name.vi}</p>
+                        </Button>
+                    ))}
+                </div>
+                <Button variant="link" onClick={() => setProfileCreationStep(3)} className="mt-4 mx-auto block">Quay lại</Button>
+            </>
+        );
+    };
+    
+    const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
+
+    const RegionStepDialog = () => {
+        return (
+             <>
+                {/* Screen: THSN005 */}
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-headline text-center">Chọn khu vực làm việc</DialogTitle>
+                    <DialogDescription className="text-center">
+                        Lựa chọn khu vực bạn muốn làm việc tại Nhật Bản.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
+                     {japanRegions.map(region => (
+                        <Button 
+                            key={region} 
+                            variant="outline"
+                            onClick={() => setSelectedRegion(region)} 
+                            className={cn(
+                                "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary",
+                                selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
+                            )}
+                        >
+                            <p className="font-semibold text-sm">{region}</p>
+                        </Button>
+                    ))}
+                </div>
+                <div className="flex justify-center items-center mt-4 gap-4">
+                    <Button variant="link" onClick={() => setProfileCreationStep(4)}>Quay lại</Button>
+                    <Button variant="secondary" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleCreateProfileRedirect}>Lưu và xem việc làm phù hợp</Button>
+                </div>
+            </>
+        )
+    }
+
+
     const renderDialogContent = () => {
-        switch(profileCreationStep) {
+        switch (profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
+            case 4: return <IndustryStepDialog />;
+            case 5: return <RegionStepDialog />;
             default: return <FirstStepDialog />;
         }
     }
@@ -335,7 +406,7 @@ export function CtaViecLamGoiY() {
   return (
     <section id="VIECLAMGOIY01" className="w-full">
         <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-3xl font-headline font-bold text-center mb-12">
+            <h2 className="text-2xl font-headline font-bold text-left mb-8">
                 <Star className="inline-block mr-3 text-yellow-500 h-8 w-8" />
                 Gợi ý việc làm dành cho bạn
             </h2>
