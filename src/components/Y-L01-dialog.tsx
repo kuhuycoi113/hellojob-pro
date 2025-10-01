@@ -59,7 +59,7 @@ interface YL01DialogProps {
   onBack?: () => void;
   onLanguageChange: (lang: Language) => void;
   initialLang?: Language;
-  showLanguageSwitcher?: boolean; // Add this prop
+  showLanguageSwitcher?: boolean; 
 }
 
 const visaDetailContent = {
@@ -929,5 +929,3 @@ export function YL01Dialog({
     </>
   );
 }
-
-    

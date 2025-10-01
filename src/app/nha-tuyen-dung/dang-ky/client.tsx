@@ -350,6 +350,13 @@ const roleTexts: Record<string, Record<Language, string>> = {
   'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
 };
 
+const subRoleTexts: Record<string, Record<Language, string>> = {
+    'phu-trach-doi-ngoai': { vi: 'Phụ trách đối ngoại', ja: '渉外担当', en: 'External Relations' },
+    'phu-trach-tuyen-dung': { vi: 'Phụ trách tuyển dụng', ja: '採用担当', en: 'Recruitment' },
+    'vietnamese': { vi: 'Nhân viên người Việt', ja: 'ベトナム人スタッフ', en: 'Vietnamese Staff' },
+    'japanese': { vi: 'Nhân viên người Nhật', ja: '日本人スタッフ', en: 'Japanese Staff' }
+};
+
 const interestTexts: Record<string, Record<Language, string>> = {
     'post-job': { vi: 'Đăng việc làm', ja: '求人掲載', en: 'Post a Job' },
     'refer-candidate': { vi: 'Giới thiệu ứng viên', ja: '候補者紹介', en: 'Refer a Candidate' },
@@ -420,20 +427,41 @@ export default function EmployerDetailPage() {
     const langFromParams = (searchParams.get('lang') || 'vi') as Language;
     setLang(langFromParams);
 
-    const companyNameParam = searchParams.get('company_name');
     const roleParam = searchParams.get('role');
+    const subRoleParam = searchParams.get('sub_role');
+    const companyNameParam = searchParams.get('company_name');
+    const nameParam = searchParams.get('name');
     const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
     
     // Set display name based on role
-    const nameParam = searchParams.get('name');
     setDisplayName(isIndividualRole ? (nameParam || '') : (companyNameParam || ''));
     setIsIndividual(isIndividualRole);
-    setRoleText('[Loại hình/Vai trò/Chức danh...]');
 
+    let finalRoleText = '';
+    const roleKey = roleParam || '';
+    const subRoleKey = subRoleParam || '';
+    
+    if (isIndividualRole && roleTexts[roleKey] && subRoleTexts[subRoleKey]) {
+        if (roleKey === 'nhan-vien-phai-cu') { // Case 1
+            finalRoleText = `${roleTexts[roleKey][langFromParams]}; ${subRoleTexts[subRoleKey][langFromParams]}; ${companyNameParam}`;
+        } else if (roleKey === 'nhan-vien-nhan-luc-nhat') { // Case 2
+            // The logic here is tricky. Y002-2 is nationality. Y001-a is organization type.
+            const nationalityText = subRoleTexts[subRoleKey] ? subRoleTexts[subRoleKey][langFromParams] : subRoleKey;
+            // The `sub_role` from Y001a is now the actual "role" of the organization they work for.
+            const orgTypeText = roleTexts[subRoleKey] ? roleTexts[subRoleKey][langFromParams] : subRoleKey;
+            finalRoleText = `${nationalityText}; ${orgTypeText}; ${companyNameParam}`;
+        }
+    } else if (!isIndividualRole && roleTexts[roleKey]) { // Case 3
+        finalRoleText = roleTexts[roleKey][langFromParams];
+    } else {
+        finalRoleText = '[Loại hình/Vai trò/Chức danh...]';
+    }
+    setRoleText(finalRoleText);
+    
     // Populate employer data from params
     let employerData = JSON.parse(JSON.stringify(emptyEmployerData));
 
-    employerData.name = { vi: companyNameParam, ja: companyNameParam, en: companyNameParam };
+    employerData.name[langFromParams] = companyNameParam;
     
     const visaTypes = searchParams.getAll('visa_type');
     if (visaTypes.length > 0) {
