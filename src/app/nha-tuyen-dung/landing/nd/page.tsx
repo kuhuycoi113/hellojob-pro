@@ -228,6 +228,15 @@ export default function UnionLandingPage() {
       {/* Hero Section */}
       <section className="w-full bg-gradient-to-br from-primary to-accent text-primary-foreground py-20 md:py-28">
         <div className="container mx-auto px-4 md:px-6">
+           <div className="flex justify-end mb-4 md:hidden">
+                <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
+                    <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
+                        <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><VnFlagIcon className="mr-2 h-4 w-4" /> Tiếng Việt</TabsTrigger>
+                        <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><JpFlagIcon className="mr-2 h-4 w-4" /> 日本語</TabsTrigger>
+                        <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><EnFlagIcon className="mr-2 h-4 w-4" /> English</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+              </div>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-center md:text-left">
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
@@ -257,23 +266,25 @@ export default function UnionLandingPage() {
                   </Button>
               </div>
             </div>
-            <div className="relative hidden md:block aspect-[3/2]">
-              <Image
-                src="/img/NTD/ND.jpg"
-                alt="Hợp tác cùng phát triển với HelloJob"
-                fill
-                className="object-cover rounded-lg shadow-2xl"
-                data-ai-hint="business people shaking hands"
-              />
-              <div className="absolute top-4 right-4 z-10">
-                <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
-                    <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
-                        <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><VnFlagIcon className="mr-2 h-4 w-4" /> Tiếng Việt</TabsTrigger>
-                        <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><JpFlagIcon className="mr-2 h-4 w-4" /> 日本語</TabsTrigger>
-                        <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><EnFlagIcon className="mr-2 h-4 w-4" /> English</TabsTrigger>
-                    </TabsList>
-                </Tabs>
-              </div>
+             <div className="flex-col hidden md:flex">
+                <div className="flex justify-end mb-4">
+                    <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
+                        <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
+                            <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><VnFlagIcon className="mr-2 h-4 w-4" /> Tiếng Việt</TabsTrigger>
+                            <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><JpFlagIcon className="mr-2 h-4 w-4" /> 日本語</TabsTrigger>
+                            <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3"><EnFlagIcon className="mr-2 h-4 w-4" /> English</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                </div>
+                 <div className="relative aspect-[3/2]">
+                    <Image
+                        src="/img/NTD/ND.jpg"
+                        alt="Hợp tác cùng phát triển với HelloJob"
+                        fill
+                        className="object-cover rounded-lg shadow-2xl"
+                        data-ai-hint="business people shaking hands"
+                    />
+                </div>
             </div>
           </div>
         </div>
