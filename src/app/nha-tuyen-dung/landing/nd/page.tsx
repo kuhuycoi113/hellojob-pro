@@ -6,85 +6,233 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Handshake, DollarSign, Users, Search, CheckCircle, TrendingUp, BarChart, FileSignature, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Metadata } from 'next';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export const metadata: Metadata = {
-  title: 'Giải pháp cho Nghiệp đoàn tại Nhật | HelloJob',
-  description: 'Tối ưu chi phí, nâng cao chất lượng Thực tập sinh và phát triển khách hàng bền vững cùng nền tảng công nghệ của HelloJob.',
+
+type Language = 'vi' | 'ja' | 'en';
+
+const pageContent = {
+    vi: {
+        heroTitle: "giúp Nghiệp đoàn Có nguồn cung ứng viên phong phú - Tối ưu lợi nhuận - Phát triển khách hàng",
+        heroDescription: "Nền tảng HelloJob cung cấp giải pháp công nghệ toàn diện, giúp Nghiệp đoàn của bạn giải quyết các bài toán cốt lõi và phát triển mạnh mẽ.",
+        ctaPostJob: "Đăng tin tuyển dụng ngay",
+        ctaRegisterPartner: "Đăng ký đối tác",
+        painPointsTitle: "Chúng tôi thấu hiểu những thách thức của bạn",
+        painPointsDescription: "HelloJob nhận diện rõ những \"nỗi đau\" mà các Nghiệp đoàn đang đối mặt hàng ngày.",
+        painPoints: [
+            {
+                icon: Users,
+                title: 'Thiếu nguồn TTS chất lượng',
+                description: 'Khó tìm ứng viên đạt chuẩn, không đáp ứng chỉ tiêu, rủi ro ứng viên bỏ trốn/nghỉ việc, tăng chi phí.',
+            },
+            {
+                icon: DollarSign,
+                title: 'Chi phí cao, lợi nhuận giảm',
+                description: 'Phí từ doanh nghiệp tiếp nhận bị ép xuống, trong khi chi phí quản lý (nhà ở, hỗ trợ, nhân sự, pháp lý) ngày càng tăng.',
+            },
+            {
+                icon: Search,
+                title: 'Khó phát triển khách hàng',
+                description: 'Cạnh tranh gay gắt trong việc tìm doanh nghiệp mới và giữ chân khách hàng cũ với nguồn cung không ổn định.',
+            },
+        ],
+        solutionsTitle: "Giải pháp của HelloJob dành cho Nghiệp đoàn",
+        solutionsDescription: "Chúng tôi biến mỗi thách thức của bạn thành một cơ hội tăng trưởng bằng công nghệ.",
+        solutions: [
+            {
+                icon: Users,
+                title: 'Nguồn ứng viên dồi dào và chất lượng',
+                details: [
+                    'Danh sách hàng trăm công ty phái cử với dịch vụ nguồn ứng viên đa dạng.',
+                    'Nguồn ứng viên trực tiếp từ hệ thống công nghệ của HelloJob, chủ động tìm đến nền tảng.',
+                    'Ứng viên được trang bị kiến thức thông qua hệ thống cẩm nang, nâng cao chất lượng cung cấp đến khách hàng.',
+                ],
+            },
+            {
+                icon: TrendingUp,
+                title: 'Tối ưu hóa chi phí & Quản lý hiệu quả',
+                details: [
+                    'Được tự do đấu giá mức phí giới thiệu thấp nhất.',
+                    'Được đề xuất lựa chọn các dịch vụ quản lý, đối ứng phù hợp nhất để bảo đảm hiệu quả kinh doanh.',
+                    'Nền tảng số hóa quản lý ứng viên, công việc, phỏng vấn, giảm thiểu giấy tờ và quy trình thủ công.',
+                ],
+            },
+            {
+                icon: Handshake,
+                title: 'Mở rộng & Giữ chân khách hàng',
+                details: [
+                    'Được xây dựng profile doanh nghiệp chuyên nghiệp, hiện đại để quảng bá đến khách hàng những dịch vụ tốt nhất của mình.',
+                    'Được tự do xây dựng các bài viết, nội dung để thu hút khách hàng vào gian hàng của mình.',
+                    'Được tiếp cận với những khách hàng tiềm năng trong khu vực của mình trong tương lai.',
+                ],
+            },
+        ],
+        finalCtaTitle: "Sẵn sàng nâng tầm hoạt động của Nghiệp đoàn?",
+        finalCtaDescription: "Trở thành đối tác của HelloJob ngay hôm nay để bắt đầu tối ưu hóa quy trình, giảm chi phí và tiếp cận nguồn ứng viên chất lượng cao.",
+        finalCtaRegister: "Đăng ký đối tác ngay",
+        finalCtaPost: "Đăng tin tuyển dụng"
+    },
+    ja: {
+        heroTitle: "組合の豊富な候補者供給源、利益の最適化、顧客開発を支援します",
+        heroDescription: "HelloJobプラットフォームは包括的な技術ソリューションを提供し、組合が中心的な課題を解決し、力強く成長するのを支援します。",
+        ctaPostJob: "今すぐ求人を掲載",
+        ctaRegisterPartner: "パートナー登録",
+        painPointsTitle: "私たちはあなたの課題を理解しています",
+        painPointsDescription: "HelloJobは、組合が日常的に直面している「痛み」を明確に認識しています。",
+        painPoints: [
+            {
+                icon: Users,
+                title: '質の高い実習生の不足',
+                description: '基準を満たす候補者を見つけるのが難しく、目標を達成できず、候補者の失踪/離職のリスク、研修費用が増加します。',
+            },
+            {
+                icon: DollarSign,
+                title: '高コスト、低利益',
+                description: '受け入れ企業からの費用は圧迫され、管理費用（住居、サポート、人事、法務）は増加しています。',
+            },
+            {
+                icon: Search,
+                title: '顧客開拓の難しさ',
+                description: '不安定な供給源では、新規の受け入れ企業を見つけ、既存の顧客を維持することは困難です。',
+            },
+        ],
+        solutionsTitle: "組合向けのHelloJobソリューション",
+        solutionsDescription: "私たちはテクノロジーによってあなたの各課題を成長の機会に変えます。",
+        solutions: [
+            {
+                icon: Users,
+                title: '豊富で質の高い候補者源',
+                details: [
+                    '多様な候補者源を持つ数百の送り出し機関のリスト。',
+                    'HelloJobの技術システムからの直接の候補者源、積極的にプラットフォームにアクセス。',
+                    '候補者はハンドブックシステムを通じて知識を身につけ、顧客への提供品質を向上させます。',
+                ],
+            },
+            {
+                icon: TrendingUp,
+                title: 'コスト最適化と効率的な管理',
+                details: [
+                    '最低の紹介料を自由にオークションにかけることができます。',
+                    'ビジネス効率を確保するために、最適な管理および対応サービスを提案されます。',
+                    '候補者、仕事、面接を管理するためのデジタルプラットフォーム、紙や手動プロセスを削減します。',
+                ],
+            },
+            {
+                icon: Handshake,
+                title: '顧客の拡大と維持',
+                details: [
+                    'プロフェッショナルで現代的な企業プロフィールを構築し、最高のサービスを顧客に宣伝します。',
+                    '自由に記事やコンテンツを作成し、顧客を自分のブースに引き付けます。',
+                    '将来的には、あなたの地域の潜在的な顧客にアクセスできるようになります。',
+                ],
+            },
+        ],
+        finalCtaTitle: "組合の活動を向上させる準備はできましたか？",
+        finalCtaDescription: "今すぐHelloJobのパートナーになり、プロセスの最適化、コストの削減、質の高い候補者へのアクセスを開始しましょう。",
+        finalCtaRegister: "今すぐパートナー登録",
+        finalCtaPost: "求人を掲載"
+    },
+    en: {
+        heroTitle: "Helping Unions Source Abundant Candidates, Optimize Profits, and Develop Customers",
+        heroDescription: "The HelloJob platform provides comprehensive technology solutions, helping your Union solve core problems and grow strongly.",
+        ctaPostJob: "Post a Job Now",
+        ctaRegisterPartner: "Register as a Partner",
+        painPointsTitle: "We Understand Your Challenges",
+        painPointsDescription: "HelloJob clearly identifies the \"pain points\" that Unions face daily.",
+        painPoints: [
+            {
+                icon: Users,
+                title: 'Lack of Quality Trainees',
+                description: 'Difficulty finding candidates who meet standards, failing to meet quotas, risk of candidates absconding/quitting, increased training costs.',
+            },
+            {
+                icon: DollarSign,
+                title: 'High Costs, Reduced Profits',
+                description: 'Fees from receiving companies are squeezed, while management costs (housing, support, HR, legal) are increasing.',
+            },
+            {
+                icon: Search,
+                title: 'Difficulty Developing Customers',
+                description: 'Intense competition in finding new receiving companies and retaining old ones with an unstable supply.',
+            },
+        ],
+        solutionsTitle: "HelloJob's Solutions for Unions",
+        solutionsDescription: "We turn each of your challenges into a growth opportunity with technology.",
+        solutions: [
+            {
+                icon: Users,
+                title: 'Abundant and Quality Candidate Pool',
+                details: [
+                    'A list of hundreds of sending agencies with diverse candidate sourcing services.',
+                    'Direct candidate sources from HelloJob\'s technology system, proactively coming to the platform.',
+                    'Candidates are equipped with knowledge through the handbook system, enhancing the quality provided to customers.',
+                ],
+            },
+            {
+                icon: TrendingUp,
+                title: 'Cost Optimization & Efficient Management',
+                details: [
+                    'Freedom to bid for the lowest referral fees.',
+                    'Recommendations for the most suitable management and support services to ensure business efficiency.',
+                    'A digital platform to manage candidates, jobs, and interviews, reducing paperwork and manual processes.',
+                ],
+            },
+            {
+                icon: Handshake,
+                title: 'Customer Expansion & Retention',
+                details: [
+                    'Build a professional, modern company profile to promote your best services to customers.',
+                    'Freedom to create articles and content to attract customers to your booth.',
+                    'Gain access to potential customers in your area in the future.',
+                ],
+            },
+        ],
+        finalCtaTitle: "Ready to Elevate Your Union's Operations?",
+        finalCtaDescription: "Become a HelloJob partner today to start optimizing processes, reducing costs, and accessing a high-quality candidate pool.",
+        finalCtaRegister: "Register as a Partner Now",
+        finalCtaPost: "Post a Job"
+    }
 };
-
-const painPoints = [
-    {
-        icon: Users,
-        title: 'Thiếu nguồn TTS chất lượng',
-        description: 'Khó tìm ứng viên đạt chuẩn, không đáp ứng chỉ tiêu, rủi ro ứng viên bỏ trốn/nghỉ việc, tăng chi phí.',
-    },
-    {
-        icon: DollarSign,
-        title: 'Chi phí cao, lợi nhuận giảm',
-        description: 'Phí từ doanh nghiệp tiếp nhận bị ép xuống, trong khi chi phí quản lý (nhà ở, hỗ trợ, nhân sự, pháp lý) ngày càng tăng.',
-    },
-    {
-        icon: Search,
-        title: 'Khó phát triển khách hàng',
-        description: 'Cạnh tranh gay gắt trong việc tìm doanh nghiệp mới và giữ chân khách hàng cũ với nguồn cung không ổn định.',
-    },
-];
-
-const solutions = [
-    {
-        icon: Users,
-        title: 'Nguồn ứng viên dồi dào và chất lượng',
-        details: [
-            'Danh sách hàng trăm công ty phái cử với dịch vụ nguồn ứng viên đa dạng.',
-            'Nguồn ứng viên trực tiếp từ hệ thống công nghệ của HelloJob, chủ động tìm đến nền tảng.',
-            'Ứng viên được trang bị kiến thức thông qua hệ thống cẩm nang, nâng cao chất lượng cung cấp đến khách hàng.',
-        ],
-    },
-    {
-        icon: TrendingUp,
-        title: 'Tối ưu hóa chi phí & Quản lý hiệu quả',
-        details: [
-            'Được tự do đấu giá mức phí giới thiệu thấp nhất.',
-            'Được đề xuất lựa chọn các dịch vụ quản lý, đối ứng phù hợp nhất để bảo đảm hiệu quả kinh doanh.',
-            'Nền tảng số hóa quản lý ứng viên, công việc, phỏng vấn, giảm thiểu giấy tờ và quy trình thủ công.',
-        ],
-    },
-    {
-        icon: Handshake,
-        title: 'Mở rộng & Giữ chân khách hàng',
-        details: [
-            'Được xây dựng profile doanh nghiệp chuyên nghiệp, hiện đại để quảng bá đến khách hàng những dịch vụ tốt nhất của mình.',
-            'Được tự do xây dựng các bài viết, nội dung để thu hút khách hàng vào gian hàng của mình.',
-            'Được tiếp cận với những khách hàng tiềm năng trong khu vực của mình trong tương lai.',
-        ],
-    },
-];
 
 
 export default function UnionLandingPage() {
+  const [lang, setLang] = useState<Language>('vi');
+  const t = pageContent[lang];
+
   return (
     <div className="bg-background">
       {/* Hero Section */}
       <section className="w-full bg-gradient-to-br from-primary to-accent text-primary-foreground py-20 md:py-28">
         <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-6">
+            <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
+                <TabsList className="bg-white/20">
+                    <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary"><VnFlagIcon className="mr-2 h-4 w-4" /> VI</TabsTrigger>
+                    <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary"><JpFlagIcon className="mr-2 h-4 w-4" /> JA</TabsTrigger>
+                    <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary"><EnFlagIcon className="mr-2 h-4 w-4" /> EN</TabsTrigger>
+                </TabsList>
+            </Tabs>
+          </div>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-center md:text-left">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
-                giúp Nghiệp đoàn Có nguồn cung ứng viên phong phú - Tối ưu lợi nhuận - Phát triển khách hàng
+                {t.heroTitle}
               </h1>
               <p className="text-lg text-primary-foreground/80 mb-8">
-                Nền tảng HelloJob cung cấp giải pháp công nghệ toàn diện, giúp Nghiệp đoàn của bạn giải quyết các bài toán cốt lõi và phát triển mạnh mẽ.
+                {t.heroDescription}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                   <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
                       <Link href="/nha-tuyen-dung">
-                          Đăng tin tuyển dụng ngay
+                          {t.ctaPostJob}
                       </Link>
                   </Button>
                   <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
                       <Link href="/nha-tuyen-dung?action=register">
-                          Đăng ký đối tác
+                          {t.ctaRegisterPartner}
                       </Link>
                   </Button>
               </div>
@@ -107,13 +255,13 @@ export default function UnionLandingPage() {
       <section className="py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold">Chúng tôi thấu hiểu những thách thức của bạn</h2>
+            <h2 className="text-3xl md:text-4xl font-headline font-bold">{t.painPointsTitle}</h2>
             <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-              HelloJob nhận diện rõ những "nỗi đau" mà các Nghiệp đoàn đang đối mặt hàng ngày.
+              {t.painPointsDescription}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {painPoints.map((point) => (
+            {t.painPoints.map((point) => (
               <Card key={point.title} className="text-center p-8 shadow-lg bg-background">
                 <div className="mx-auto bg-destructive/10 rounded-full p-4 w-fit mb-4">
                   <point.icon className="h-10 w-10 text-destructive" />
@@ -130,13 +278,13 @@ export default function UnionLandingPage() {
        <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 md:px-6">
            <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">Giải pháp của HelloJob dành cho Nghiệp đoàn</h2>
+            <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">{t.solutionsTitle}</h2>
             <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-              Chúng tôi biến mỗi thách thức của bạn thành một cơ hội tăng trưởng bằng công nghệ.
+              {t.solutionsDescription}
             </p>
           </div>
           <div className="space-y-12">
-            {solutions.map((solution, index) => (
+            {t.solutions.map((solution, index) => (
               <div key={index} className={`grid md:grid-cols-2 gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
                 <div className={`relative h-80 rounded-lg shadow-xl overflow-hidden ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
                     <Image src="https://placehold.co/600x400.png" alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
@@ -164,16 +312,16 @@ export default function UnionLandingPage() {
       {/* Final CTA Section */}
       <section className="bg-accent text-white py-20 md:py-28">
         <div className="container mx-auto px-4 md:px-6 text-center">
-          <h2 className="text-3xl font-headline font-bold mb-4">Sẵn sàng nâng tầm hoạt động của Nghiệp đoàn?</h2>
+          <h2 className="text-3xl font-headline font-bold mb-4">{t.finalCtaTitle}</h2>
           <p className="text-white/80 mb-8 max-w-2xl mx-auto text-lg">
-            Trở thành đối tác của HelloJob ngay hôm nay để bắt đầu tối ưu hóa quy trình, giảm chi phí và tiếp cận nguồn ứng viên chất lượng cao.
+            {t.finalCtaDescription}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-              <Link href="/nha-tuyen-dung?action=register">Đăng ký đối tác ngay</Link>
+              <Link href="/nha-tuyen-dung?action=register">{t.finalCtaRegister}</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 hover:text-white">
-              <Link href="/nha-tuyen-dung">Đăng tin tuyển dụng</Link>
+              <Link href="/nha-tuyen-dung">{t.finalCtaPost}</Link>
             </Button>
           </div>
         </div>
