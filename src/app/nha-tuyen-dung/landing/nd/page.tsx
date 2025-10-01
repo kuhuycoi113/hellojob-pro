@@ -267,7 +267,7 @@ export default function UnionLandingPage() {
                         </TabsList>
                     </Tabs>
                 </div>
-                 <div className="relative aspect-[3/2]">
+                 <div className="relative aspect-[2/1]">
                     <Image
                         src="/img/NTD/ND.jpg"
                         alt="Hợp tác cùng phát triển với HelloJob"
