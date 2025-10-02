@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -228,7 +227,7 @@ const pageContent = {
                 image: '/img/NTD/ND05.jpg',
                 details: [
                     'A list of hundreds of sending agencies with diverse candidate sourcing services.',
-                    'Direct candidate sources from HelloJob\'s technology system, proactively coming to the platform.',
+                    'Direct candidate sources from HelloJob\'\'s technology system, proactively coming to the platform.',
                     'Candidates are equipped with knowledge through the handbook system, enhancing the quality provided to customers.',
                 ],
             },
@@ -305,7 +304,7 @@ export default function UnionLandingPage() {
     <>
       <div className="bg-background">
         {/* Hero Section */}
-        <section className="w-full bg-gradient-to-br from-primary to-accent text-primary-foreground py-20 md:py-28">
+        <section id="ND_HERO_SECTION" className="w-full bg-gradient-to-br from-primary to-accent text-primary-foreground py-20 md:py-28">
           <div className="container mx-auto px-4 md:px-6">
              <div className="flex justify-end mb-4">
                 <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
@@ -364,7 +363,7 @@ export default function UnionLandingPage() {
         </section>
 
         {/* Pain Points Section */}
-        <section className="py-20 md:py-28 bg-secondary">
+        <section id="ND_PAINPOINTS_SECTION" className="py-20 md:py-28 bg-secondary">
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-headline font-bold">{t.painPointsTitle}</h2>
@@ -387,7 +386,7 @@ export default function UnionLandingPage() {
         </section>
         
         {/* Solutions Section */}
-         <section className="py-20 md:py-28 bg-background">
+         <section id="ND_SOLUTIONS_SECTION" className="py-20 md:py-28 bg-background">
           <div className="container mx-auto px-4 md:px-6">
              <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">{t.solutionsTitle}</h2>
@@ -422,7 +421,7 @@ export default function UnionLandingPage() {
          </section>
 
         {/* Final CTA Section */}
-        <section className="bg-accent text-white py-20 md:py-28">
+        <section id="ND_FINAL_CTA_SECTION" className="bg-accent text-white py-20 md:py-28">
           <div className="container mx-auto px-4 md:px-6 text-center">
             <h2 className="text-3xl font-headline font-bold mb-4">{t.finalCtaTitle}</h2>
             <p className="text-white/80 mb-8 max-w-2xl mx-auto text-lg">
