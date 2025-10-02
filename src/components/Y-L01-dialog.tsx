@@ -563,37 +563,34 @@ export function YL01Dialog({
     // Screen: Y003
     const interests = {
         vi: {
-            title: "Bạn quan tâm đến điều gì?",
-            description: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.",
+            title: "Bạn quan tâm đến những nghiệp vụ nào?",
+            description: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.",
             options: [
                 { id: 'post-job', icon: FileSignature, title: 'Đăng việc làm' },
                 { id: 'refer-candidate', icon: Users2, title: 'Giới thiệu ứng viên' },
-                { id: 'post-and-refer', icon: Briefcase, title: 'Đăng việc làm & Giới thiệu ứng viên' },
-                { id: 'refer-and-post', icon: Handshake, title: 'Giới thiệu ứng viên & Đăng việc làm' },
             ],
             backButton: 'Quay lại',
+            continueButton: 'Tiếp tục'
         },
         ja: {
-            title: "何に興味がありますか？",
-            description: "最高の体験のために、あなたの主な目標を教えてください。",
+            title: "どの業務に興味がありますか？",
+            description: "最高の体験のために、あなたの主な目標を教えてください。複数選択可能です。",
             options: [
                 { id: 'post-job', icon: FileSignature, title: '求人掲載' },
                 { id: 'refer-candidate', icon: Users2, title: '候補者紹介' },
-                { id: 'post-and-refer', icon: Briefcase, title: '求人掲載と候補者紹介' },
-                { id: 'refer-and-post', icon: Handshake, title: '候補者紹介と求人掲載' },
             ],
             backButton: '戻る',
+            continueButton: '続ける'
         },
         en: {
-            title: 'What are you interested in?',
-            description: 'Tell us your main goal for the best experience.',
+            title: 'Which operations are you interested in?',
+            description: 'Tell us your main goal for the best experience. You can select multiple items.',
             options: [
                 { id: 'post-job', icon: FileSignature, title: 'Post a Job' },
                 { id: 'refer-candidate', icon: Users2, title: 'Refer a Candidate' },
-                { id: 'post-and-refer', icon: Briefcase, title: 'Post Job & Refer Candidate' },
-                { id: 'refer-and-post', icon: Handshake, title: 'Refer Candidate & Post Job' },
             ],
             backButton: 'Back',
+            continueButton: 'Continue'
         },
     }[currentLang];
 
@@ -603,29 +600,29 @@ export function YL01Dialog({
                 <DialogTitle className="text-2xl font-headline text-center">{interests.title}</DialogTitle>
                 <DialogDescription className="text-center">{interests.description}</DialogDescription>
             </DialogHeader>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+            <div className="grid grid-cols-2 gap-4 pt-4">
                 {interests.options.map(option => (
-                    <Card
+                     <Card
                         key={option.id}
-                        onClick={() => {
-                            setSelectedInterest([option.id]);
-                            const isIndividual = selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole);
-                            const nextStep = isIndividual ? 4 : 5;
-                            setStep(nextStep);
-                        }}
-                        className="text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center"
+                        onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
+                        className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedInterest.includes(option.id) && "ring-2 ring-primary border-primary")}
                     >
                         <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
                         <h3 className="font-bold text-base">{option.title}</h3>
                     </Card>
                 ))}
             </div>
-            <div className="text-center mt-4">
+            <div className="flex justify-center items-center mt-4 gap-4">
                  <Button variant="link" onClick={() => {
                      if (selectedRole === 'nhan-vien-phai-cu') setStep(2.1);
                      else if (selectedRole === 'nhan-vien-nhan-luc-nhat') setStep(2.2);
                      else setStep(1);
                  }}>{interests.backButton}</Button>
+                 <Button onClick={() => {
+                     const isIndividual = selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole);
+                     const nextStep = isIndividual ? 4 : 5;
+                     setStep(nextStep);
+                 }} disabled={selectedInterest.length === 0}>{interests.continueButton}</Button>
             </div>
         </>
     )
@@ -694,12 +691,7 @@ export function YL01Dialog({
   
   const VisaTypeMultiSelectStepDialog = () => {
     const content = visaTypeContent[currentLang];
-    const iconColors = {
-        orange: 'text-orange-500',
-        blue: 'text-blue-500',
-        green: 'text-green-500',
-    };
-    
+
     return (
         <>
             {/* Screen: Y006 */}
@@ -725,7 +717,7 @@ export function YL01Dialog({
                                     {selectionOrder}
                                 </Badge>
                             )}
-                            <option.icon className={cn("h-8 w-8 mx-auto mb-2", iconColors[option.color as keyof typeof iconColors])} />
+                             <option.icon className="h-8 w-8 mx-auto mb-2" />
                             <h3 className="font-bold text-base mb-1">{option.title}</h3>
                             <p className="text-muted-foreground text-xs">{option.desc}</p>
                         </Card>
@@ -928,7 +920,7 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl">
+          <DialogContent id="Y-L01-VT02" className="sm:max-w-4xl">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
