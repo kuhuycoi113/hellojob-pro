@@ -906,7 +906,7 @@ export function YL01Dialog({
                           onClick={() => setStep(10)} 
                           disabled={selectedRegion.length === 0}
                       >
-                          {content.completeButton}
+                          {content.continueButton}
                       </Button>
                   </div>
               </>
@@ -920,7 +920,7 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y-L01-VT06">
+          <DialogContent className="sm:max-w-4xl" id="Y-L01-VT07">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
