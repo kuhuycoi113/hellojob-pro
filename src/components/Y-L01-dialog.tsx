@@ -920,7 +920,7 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent id="Y-L01-VT02" className="sm:max-w-4xl">
+          <DialogContent id="Y-L01-VT01" className="sm:max-w-4xl">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
