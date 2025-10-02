@@ -1278,10 +1278,10 @@ export default function EmployerDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
-                  <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
+                  <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
-                  <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')} id="DKNGHIEPVUGIATRIQUANTAM">
+                  <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
                     <div className="space-y-3 text-sm">
                         <div>
                             <p className="font-semibold mb-1">{t.interestLabel}:</p>
@@ -1293,7 +1293,7 @@ export default function EmployerDetailPage() {
                         </div>
                     </div>
                   </SectionCard>
-                  <SectionCard title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
+                  <SectionCard id="DKLICHSU" title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
                        <ul className="space-y-4 text-sm">
                           {employer.history.length > 0 ? employer.history.map((item: any, index: number) => (
                               <li key={index} className="relative pl-6">
@@ -1304,7 +1304,7 @@ export default function EmployerDetailPage() {
                           )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
-                  <SectionCard title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
+                  <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {employer.images.map((img: any, index: number) => (
                               <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
@@ -1320,7 +1320,7 @@ export default function EmployerDetailPage() {
                           ))}
                       </div>
                   </SectionCard>
-                  <SectionCard title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
+                  <SectionCard id="DKPHUCLOI" title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
                       <ul className="space-y-2 text-sm">
                           {employer.benefits.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
                               <li key={index} className="flex items-start gap-2">
@@ -1333,7 +1333,7 @@ export default function EmployerDetailPage() {
               
                 {/* Right Column (order-first on desktop) */}
               <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
-                  <SectionCard title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
+                  <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
                           <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
                           <p><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
@@ -1341,7 +1341,7 @@ export default function EmployerDetailPage() {
                           <p><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || t.notUpdated}</a></p>
                       </div>
                       {hasContactInfo ? (
-                          <div id="HIENTHILIENHE04" className="mt-6 border-t pt-4 space-y-2">
+                          <div id="DKTHONGTINLIENHE" className="mt-6 border-t pt-4 space-y-2">
                              {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
                              {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
                              {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
@@ -1362,13 +1362,13 @@ export default function EmployerDetailPage() {
                           </div>
                       )}
                   </SectionCard>
-                  <SectionCard title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
+                  <SectionCard id="DKLOAIHINHVISA" title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
                           <div id="DKY006"><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
                           <div id="DKY007"><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
                       </div>
                   </SectionCard>
-                  <SectionCard title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
+                  <SectionCard id="DKNGANHNGHEKHUVUC" title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
                           <div id="DKY008"><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
                           <div id="DKY009"><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
