@@ -717,7 +717,7 @@ export function YL01Dialog({
                                     {selectionOrder}
                                 </Badge>
                             )}
-                             <option.icon className="h-8 w-8 mx-auto mb-2" />
+                             <option.icon className={cn("h-8 w-8 mx-auto mb-2", option.color ? `text-${option.color}-500` : 'text-primary')} />
                             <h3 className="font-bold text-base mb-1">{option.title}</h3>
                             <p className="text-muted-foreground text-xs">{option.desc}</p>
                         </Card>
@@ -920,7 +920,7 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent id="Y-L01-VT03" className="sm:max-w-4xl">
+          <DialogContent id="Y-L01-VT04" className="sm:max-w-4xl">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
