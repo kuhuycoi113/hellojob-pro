@@ -1,7 +1,7 @@
 
 'use client';
 
-import * as React from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Dialog,
@@ -587,7 +587,6 @@ export function YL01Dialog({
 
 
   const InterestStepDialog = () => {
-    // Screen: Y003
     const content = {
         vi: {
             title: "Bạn quan tâm đến những nghiệp vụ nào?",
@@ -637,7 +636,7 @@ export function YL01Dialog({
                 {content.options.map(option => (
                      <Card
                         key={option.id}
-                        onClick={()={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}}
+                        onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
                         className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedInterest.includes(option.id) && "ring-2 ring-primary border-primary")}
                     >
                         <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -647,12 +646,12 @@ export function YL01Dialog({
                 ))}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                 <Button variant="link" onClick={()={() => {
+                 <Button variant="link" onClick={() => {
                      if (selectedRole === 'nhan-vien-phai-cu') setStep(2.1);
                      else if (selectedRole === 'nhan-vien-nhan-luc-nhat') setStep(2.2);
                      else setStep(1);
                  }}>{content.backButton}</Button>
-                 <Button onClick={()={() => {
+                 <Button onClick={() => {
                      const isIndividual = selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole);
                      const nextStep = isIndividual ? 4 : 5;
                      setStep(nextStep);
@@ -684,8 +683,8 @@ export function YL01Dialog({
                 <Input id="full-name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={content.placeholder} className="mt-2" />
             </div>
              <div className="mt-6 flex justify-center gap-2">
-                <Button variant="outline" onClick={()={() => setStep(3)}}>{content.backButton}</Button>
-                <Button onClick={()={() => { if (fullName.trim()) setStep(5); }} disabled={!fullName.trim()}>{content.continueButton}</Button>
+                <Button variant="outline" onClick={() => setStep(3)}>{content.backButton}</Button>
+                <Button onClick={() => { if (fullName.trim()) setStep(5); }} disabled={!fullName.trim()}>{content.continueButton}</Button>
             </div>
         </>
     )
@@ -713,11 +712,11 @@ export function YL01Dialog({
                 <Input id="company-name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder={content.placeholder} className="mt-2" />
             </div>
              <div className="mt-6 flex justify-center gap-2">
-                <Button variant="outline" onClick={()={() => {
+                <Button variant="outline" onClick={() => {
                     const isIndividual = selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole);
                     setStep(isIndividual ? 4 : 3);
                 }}>{content.backButton}</Button>
-                <Button onClick={()={() => { if (companyName.trim()) setStep(6); }} disabled={!companyName.trim()}>{content.continueButton}</Button>
+                <Button onClick={() => { if (companyName.trim()) setStep(6); }} disabled={!companyName.trim()}>{content.continueButton}</Button>
             </div>
         </>
     )
@@ -740,7 +739,7 @@ export function YL01Dialog({
                     return (
                         <Card 
                             key={option.id}
-                            onClick={()={() => handleMultiSelect(option.id, selectedVisa, setSelectedVisa)} }
+                            onClick={() => handleMultiSelect(option.id, selectedVisa, setSelectedVisa)}
                             className={cn(
                                 "h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary relative",
                                 isSelected && "ring-2 ring-primary border-primary bg-primary/10"
@@ -759,10 +758,10 @@ export function YL01Dialog({
                 })}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={()={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 3)} className="mx-auto block">
+                <Button variant="link" onClick={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 3)} className="mx-auto block">
                     {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
                 </Button>
-                <Button onClick={()={() => setStep(7)} disabled={selectedVisa.length === 0}>
+                <Button onClick={() => setStep(7)} disabled={selectedVisa.length === 0}>
                     {currentLang === 'ja' ? '続ける' : currentLang === 'en' ? 'Continue' : 'Tiếp tục'}
                 </Button>
             </div>
@@ -795,7 +794,7 @@ export function YL01Dialog({
                     return (
                         <Card
                             key={option.id}
-                            onClick={()={() => handleMultiSelect(option.id, selectedItems, setter)} }
+                            onClick={() => handleMultiSelect(option.id, selectedItems, setter)}
                             className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
                                 isSelected && "ring-2 ring-primary border-primary bg-primary/10"
                             )}
@@ -813,8 +812,8 @@ export function YL01Dialog({
                 })}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={()={() => setStep(prevStep)}}>Quay lại</Button>
-                <Button onClick={()={() => setStep(nextStep)} disabled={selectedItems.length === 0}>Tiếp tục</Button>
+                <Button variant="link" onClick={() => setStep(prevStep)}>Quay lại</Button>
+                <Button onClick={() => setStep(nextStep)} disabled={selectedItems.length === 0}>Tiếp tục</Button>
             </div>
         </>
     );
@@ -836,7 +835,7 @@ export function YL01Dialog({
                         return (
                             <Card
                                 key={option.id}
-                                onClick={()={() => handleMultiSelect(option.id, selectedValueInterests, setSelectedValueInterests)} }
+                                onClick={() => handleMultiSelect(option.id, selectedValueInterests, setSelectedValueInterests)}
                                 className={cn(
                                     "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
                                     isSelected && "ring-2 ring-primary border-primary bg-primary/10"
@@ -854,7 +853,7 @@ export function YL01Dialog({
                     })}
                 </div>
                 <div className="flex justify-center items-center mt-6 gap-4">
-                    <Button variant="link" onClick={()={() => setStep(9)}}>{content.backButton}</Button>
+                    <Button variant="link" onClick={() => setStep(9)}>{content.backButton}</Button>
                     <Button 
                         className="bg-accent-orange text-white hover:bg-accent-orange/90"
                         onClick={handleComplete} 
@@ -917,7 +916,7 @@ export function YL01Dialog({
                            return (
                               <Card
                                   key={option.id}
-                                  onClick={()={() => handleMultiSelect(option.id, selectedRegion, setSelectedRegion)}}
+                                  onClick={() => handleMultiSelect(option.id, selectedRegion, setSelectedRegion)}
                                   className={cn(
                                       "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
                                       isSelected && "ring-2 ring-primary border-primary bg-primary/10"
@@ -934,10 +933,10 @@ export function YL01Dialog({
                        })}
                   </div>
                   <div className="flex justify-center items-center mt-6 gap-4">
-                      <Button variant="link" onClick={()={() => setStep(8)}}>{content.backButton}</Button>
+                      <Button variant="link" onClick={() => setStep(8)}>{content.backButton}</Button>
                       <Button 
                           className="bg-accent-orange text-white hover:bg-accent-orange/90"
-                          onClick={()={() => setStep(10)}} 
+                          onClick={() => setStep(10)} 
                           disabled={selectedRegion.length === 0}
                       >
                           {content.completeButton}
@@ -961,3 +960,5 @@ export function YL01Dialog({
     </>
   );
 }
+
+    
