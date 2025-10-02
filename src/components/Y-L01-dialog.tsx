@@ -217,13 +217,13 @@ const regionContent = {
         title: '希望勤務地を選択',
         description: '募集したい地域を優先順位で選択してください。',
         backButton: '戻る',
-        continueButton: '続ける'
+        completeButton: '続ける'
     },
     en: {
         title: 'Select Work Regions',
         description: 'Choose the regions you want to recruit in, in order of priority.',
         backButton: 'Back',
-        continueButton: 'Continue'
+        completeButton: 'Continue'
     }
 };
 
@@ -317,7 +317,7 @@ const roleTexts: Record<string, Record<Language, string>> = {
   'support': { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
   'company': { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
   'supervising-organization': { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
-  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Placement Agency' },
+  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Employment Placement Agency' },
   'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
 };
 
@@ -329,10 +329,10 @@ const subRoleTexts: Record<string, Record<Language, string>> = {
 };
 
 const interestTexts: Record<string, Record<Language, string>> = {
-    'post-job': { vi: 'Đăng việc làm', ja: '求人掲載', en: 'Post a Job' },
-    'refer-candidate': { vi: 'Giới thiệu ứng viên', ja: '候補者紹介', en: 'Refer a Candidate' },
-    'post-and-refer': { vi: 'Đăng việc làm & Giới thiệu ứng viên', ja: '求人掲載と候補者紹介', en: 'Post Job & Refer Candidate' },
-    'refer-and-post': { vi: 'Giới thiệu ứng viên & Đăng việc làm', ja: '候補者紹介と求人掲載', en: 'Refer Candidate & Post Job' },
+    'post-job': { vi: 'Đăng việc làm để tìm ứng viên', ja: '候補者を見つけるために求人を掲載する', en: 'Post jobs to find candidates' },
+    'refer-candidate': { vi: 'Tìm kiếm đối tác nhân lực phù hợp', ja: '適切な人材パートナーを探す', en: 'Find suitable HR partners' },
+    'post-and-refer': { vi: 'Hợp tác quảng bá hệ thống đến ứng viên', ja: '候補者へのシステム広報協力', en: 'Collaborate to promote the system to candidates' },
+    'refer-and-post': { vi: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng', ja: '採用担当者へのシステム広報協力', en: 'Collaborate to promote the system to employers' },
 };
 
 
@@ -588,13 +588,15 @@ export function YL01Dialog({
 
   const InterestStepDialog = () => {
     // Screen: Y003
-    const interests = {
+    const content = {
         vi: {
             title: "Bạn quan tâm đến những nghiệp vụ nào?",
             description: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.",
             options: [
-                { id: 'post-job', icon: FileSignature, title: 'Đăng việc làm' },
-                { id: 'refer-candidate', icon: Users2, title: 'Giới thiệu ứng viên' },
+                { id: 'post-job', icon: Briefcase, title: 'Đăng việc làm để tìm ứng viên', desc: '(Đăng việc làm để tìm ứng viên phù hợp cho)' },
+                { id: 'refer-candidate', icon: Handshake, title: 'Tìm kiếm đối tác nhân lực phù hợp', desc: '(Tìm kiếm đối tác nhân lực phù hợp với nhu cầu tuyển dụng hoặc giới thiệu của tôi)' },
+                { id: 'post-and-refer', icon: UserPlus, title: 'Hợp tác quảng bá hệ thống đến ứng viên', desc: '(Hợp tác với nền tảng để quảng bá, thu hút ứng viên cho hệ thống)' },
+                { id: 'refer-and-post', icon: Building, title: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng', desc: '(Hợp tác với nền tảng để quảng bá, thu hút nhà tuyển dụng cho hệ thống)' }
             ],
             backButton: 'Quay lại',
             continueButton: 'Tiếp tục'
@@ -603,8 +605,10 @@ export function YL01Dialog({
             title: "どの業務に興味がありますか？",
             description: "最高の体験のために、あなたの主な目標を教えてください。複数選択可能です。",
             options: [
-                { id: 'post-job', icon: FileSignature, title: '求人掲載' },
-                { id: 'refer-candidate', icon: Users2, title: '候補者紹介' },
+                { id: 'post-job', icon: Briefcase, title: '候補者を見つけるために求人を掲載する', desc: '(候補者を見つけるために求人を掲載する)' },
+                { id: 'refer-candidate', icon: Handshake, title: '適切な人材パートナーを探す', desc: '(私の採用または紹介のニーズに合った人材パートナーを探す)' },
+                { id: 'post-and-refer', icon: UserPlus, title: '候補者へのシステム広報協力', desc: '(プラットフォームと協力して、候補者を引き付けるための広報活動を行う)' },
+                { id: 'refer-and-post', icon: Building, title: '採用担当者へのシステム広報協力', desc: '(プラットフォームと協力して、採用担当者を引き付けるための広報活動を行う)' }
             ],
             backButton: '戻る',
             continueButton: '続ける'
@@ -613,8 +617,10 @@ export function YL01Dialog({
             title: 'Which operations are you interested in?',
             description: 'Tell us your main goal for the best experience. You can select multiple items.',
             options: [
-                { id: 'post-job', icon: FileSignature, title: 'Post a Job' },
-                { id: 'refer-candidate', icon: Users2, title: 'Refer a Candidate' },
+                { id: 'post-job', icon: Briefcase, title: 'Post jobs to find candidates', desc: '(Post jobs to find suitable candidates)' },
+                { id: 'refer-candidate', icon: Handshake, title: 'Find suitable HR partners', desc: '(Find HR partners that match my recruitment or referral needs)' },
+                { id: 'post-and-refer', icon: UserPlus, title: 'Collaborate to promote the system to candidates', desc: '(Collaborate with the platform to promote and attract candidates to the system)' },
+                { id: 'refer-and-post', icon: Building, title: 'Collaborate to promote the system to employers', desc: '(Collaborate with the platform to promote and attract employers to the system)' }
             ],
             backButton: 'Back',
             continueButton: 'Continue'
@@ -624,32 +630,33 @@ export function YL01Dialog({
     return (
         <>
             <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">{interests.title}</DialogTitle>
-                <DialogDescription className="text-center">{interests.description}</DialogDescription>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-4 pt-4">
-                {interests.options.map(option => (
+                {content.options.map(option => (
                      <Card
                         key={option.id}
-                        onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
+                        onClick={()={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}}
                         className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedInterest.includes(option.id) && "ring-2 ring-primary border-primary")}
                     >
                         <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
                         <h3 className="font-bold text-base">{option.title}</h3>
+                        <p className="text-muted-foreground text-xs">{option.desc}</p>
                     </Card>
                 ))}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                 <Button variant="link" onClick={() => {
+                 <Button variant="link" onClick={()={() => {
                      if (selectedRole === 'nhan-vien-phai-cu') setStep(2.1);
                      else if (selectedRole === 'nhan-vien-nhan-luc-nhat') setStep(2.2);
                      else setStep(1);
-                 }}>{interests.backButton}</Button>
-                 <Button onClick={() => {
+                 }}>{content.backButton}</Button>
+                 <Button onClick={()={() => {
                      const isIndividual = selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole);
                      const nextStep = isIndividual ? 4 : 5;
                      setStep(nextStep);
-                 }} disabled={selectedInterest.length === 0}>{interests.continueButton}</Button>
+                 }} disabled={selectedInterest.length === 0}>{content.continueButton}</Button>
             </div>
         </>
     )
@@ -677,8 +684,8 @@ export function YL01Dialog({
                 <Input id="full-name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={content.placeholder} className="mt-2" />
             </div>
              <div className="mt-6 flex justify-center gap-2">
-                <Button variant="outline" onClick={() => setStep(3)}>{content.backButton}</Button>
-                <Button onClick={() => { if (fullName.trim()) setStep(5); }} disabled={!fullName.trim()}>{content.continueButton}</Button>
+                <Button variant="outline" onClick={()={() => setStep(3)}}>{content.backButton}</Button>
+                <Button onClick={()={() => { if (fullName.trim()) setStep(5); }} disabled={!fullName.trim()}>{content.continueButton}</Button>
             </div>
         </>
     )
@@ -706,11 +713,11 @@ export function YL01Dialog({
                 <Input id="company-name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder={content.placeholder} className="mt-2" />
             </div>
              <div className="mt-6 flex justify-center gap-2">
-                <Button variant="outline" onClick={() => {
+                <Button variant="outline" onClick={()={() => {
                     const isIndividual = selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole);
                     setStep(isIndividual ? 4 : 3);
                 }}>{content.backButton}</Button>
-                <Button onClick={() => { if (companyName.trim()) setStep(6); }} disabled={!companyName.trim()}>{content.continueButton}</Button>
+                <Button onClick={()={() => { if (companyName.trim()) setStep(6); }} disabled={!companyName.trim()}>{content.continueButton}</Button>
             </div>
         </>
     )
@@ -733,7 +740,7 @@ export function YL01Dialog({
                     return (
                         <Card 
                             key={option.id}
-                            onClick={() => handleMultiSelect(option.id, selectedVisa, setSelectedVisa)}
+                            onClick={()={() => handleMultiSelect(option.id, selectedVisa, setSelectedVisa)} }
                             className={cn(
                                 "h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary relative",
                                 isSelected && "ring-2 ring-primary border-primary bg-primary/10"
@@ -752,10 +759,10 @@ export function YL01Dialog({
                 })}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 3)} className="mx-auto block">
+                <Button variant="link" onClick={()={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 3)} className="mx-auto block">
                     {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
                 </Button>
-                <Button onClick={() => setStep(7)} disabled={selectedVisa.length === 0}>
+                <Button onClick={()={() => setStep(7)} disabled={selectedVisa.length === 0}>
                     {currentLang === 'ja' ? '続ける' : currentLang === 'en' ? 'Continue' : 'Tiếp tục'}
                 </Button>
             </div>
@@ -788,7 +795,7 @@ export function YL01Dialog({
                     return (
                         <Card
                             key={option.id}
-                            onClick={() => handleMultiSelect(option.id, selectedItems, setter)}
+                            onClick={()={() => handleMultiSelect(option.id, selectedItems, setter)} }
                             className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
                                 isSelected && "ring-2 ring-primary border-primary bg-primary/10"
                             )}
@@ -806,8 +813,8 @@ export function YL01Dialog({
                 })}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setStep(prevStep)}>Quay lại</Button>
-                <Button onClick={() => setStep(nextStep)} disabled={selectedItems.length === 0}>Tiếp tục</Button>
+                <Button variant="link" onClick={()={() => setStep(prevStep)}}>Quay lại</Button>
+                <Button onClick={()={() => setStep(nextStep)} disabled={selectedItems.length === 0}>Tiếp tục</Button>
             </div>
         </>
     );
@@ -829,7 +836,7 @@ export function YL01Dialog({
                         return (
                             <Card
                                 key={option.id}
-                                onClick={() => handleMultiSelect(option.id, selectedValueInterests, setSelectedValueInterests)}
+                                onClick={()={() => handleMultiSelect(option.id, selectedValueInterests, setSelectedValueInterests)} }
                                 className={cn(
                                     "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
                                     isSelected && "ring-2 ring-primary border-primary bg-primary/10"
@@ -847,7 +854,7 @@ export function YL01Dialog({
                     })}
                 </div>
                 <div className="flex justify-center items-center mt-6 gap-4">
-                    <Button variant="link" onClick={() => setStep(9)}>{content.backButton}</Button>
+                    <Button variant="link" onClick={()={() => setStep(9)}}>{content.backButton}</Button>
                     <Button 
                         className="bg-accent-orange text-white hover:bg-accent-orange/90"
                         onClick={handleComplete} 
@@ -910,7 +917,7 @@ export function YL01Dialog({
                            return (
                               <Card
                                   key={option.id}
-                                  onClick={() => handleMultiSelect(option.id, selectedRegion, setSelectedRegion)}
+                                  onClick={()={() => handleMultiSelect(option.id, selectedRegion, setSelectedRegion)}}
                                   className={cn(
                                       "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
                                       isSelected && "ring-2 ring-primary border-primary bg-primary/10"
@@ -927,13 +934,13 @@ export function YL01Dialog({
                        })}
                   </div>
                   <div className="flex justify-center items-center mt-6 gap-4">
-                      <Button variant="link" onClick={() => setStep(8)}>{content.backButton}</Button>
+                      <Button variant="link" onClick={()={() => setStep(8)}}>{content.backButton}</Button>
                       <Button 
                           className="bg-accent-orange text-white hover:bg-accent-orange/90"
-                          onClick={() => setStep(10)} 
+                          onClick={()={() => setStep(10)}} 
                           disabled={selectedRegion.length === 0}
                       >
-                          {content.continueButton}
+                          {content.completeButton}
                       </Button>
                   </div>
               </>
@@ -954,5 +961,3 @@ export function YL01Dialog({
     </>
   );
 }
-
-    
