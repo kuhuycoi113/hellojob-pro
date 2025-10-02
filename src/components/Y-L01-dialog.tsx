@@ -480,7 +480,7 @@ export function YL01Dialog({
     const JapaneseStaffNationalityStepDialog = () => {
         // Screen: Y002-2
         const content = {
-            vi: { title: "Bạn có vai trò gì ở Công ty/Pháp nhân/Tổ chức nhân lực Nhật Bản?", description: "Vui lòng chọn vai trò của bạn để tiếp tục.", options: [{ id: 'vietnamese', icon: UserIcon, title: 'Nhân sự người Việt', desc: 'Nhân sự của Nhân lực Nhật và là người Việt'}, { id: 'japanese', icon: UserCog, title: 'Nhân sự của Nhân lực Nhật và là người Nhật'}], backButton: 'Quay lại' },
+            vi: { title: "Bạn có vai trò gì ở Công ty/Pháp nhân/Tổ chức nhân lực Nhật Bản?", description: "Vui lòng chọn vai trò của bạn để tiếp tục.", options: [{ id: 'vietnamese', icon: UserIcon, title: 'Nhân sự người Việt', desc: 'Nhân sự của Nhân lực Nhật và là người Việt'}, { id: 'japanese', icon: UserCog, title: 'Nhân sự người Nhật', desc: 'Nhân sự của Nhân lực Nhật và là người Nhật'}], backButton: 'Quay lại' },
             ja: { title: "日本の会社/法人/団体でのあなたの役割は何ですか？", description: "続けるためにあなたの役割を選択してください。", options: [{ id: 'vietnamese', icon: UserIcon, title: 'ベトナム人事', desc: '日本人材法人のベトナム人スタッフ'}, { id: 'japanese', icon: UserCog, title: '日本人事', desc: '日本人材法人の日本人スタッフ'}], backButton: '戻る' },
             en: { title: 'What is your role at the Japanese HR Company/Entity/Organization?', description: 'Please select your role to continue.', options: [{ id: 'vietnamese', icon: UserIcon, title: 'Vietnamese Staff', desc: 'Staff of a Japan-side HR entity and is Vietnamese'}, { id: 'japanese', icon: UserCog, title: 'Japanese Staff', desc: 'Staff of a Japan-side HR entity and is Japanese'}], backButton: 'Back' },
         }[currentLang];
