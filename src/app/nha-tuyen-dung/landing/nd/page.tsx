@@ -499,12 +499,6 @@ export default function UnionLandingPage() {
           </div>
          </section>
 
-        {/* CTA Section */}
-        <div className="space-y-20 md:space-y-28 py-20 md:py-28 bg-secondary">
-          <CtaViecLamPhuHopCustom />
-          <CtaNhaTuyenDung />
-        </div>
-
         {/* Final CTA Section */}
         <section className="bg-accent text-white py-20 md:py-28">
           <div className="container mx-auto px-4 md:px-6 text-center">
@@ -528,6 +522,12 @@ export default function UnionLandingPage() {
             </div>
           </div>
         </section>
+
+        {/* CTA Section */}
+        <div className="space-y-20 md:space-y-28 py-20 md:py-28 bg-secondary">
+          <CtaNhaTuyenDung />
+          <CtaViecLamPhuHopCustom />
+        </div>
       </div>
        <XL01Dialog 
         isOpen={isXL01DialogOpen} 
