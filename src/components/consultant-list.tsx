@@ -4,18 +4,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Star, PieChart, MessageSquare } from 'lucide-react';
+import { Star, PieChart } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { useChat } from '@/contexts/ChatContext';
-import { consultants as consultantChatData } from '@/lib/consultant-data';
-import { ContactButtons } from '../contact-buttons';
+import { ContactButtons } from './contact-buttons';
+import { consultants } from '@/lib/consultant-data';
+import type { User as Consultant } from '@/lib/chat-data';
 
 
-const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[0] }) => {
-    // Find the corresponding full consultant data for the chat context
-    const chatConsultant = consultantChatData.find(c => c.id === consultant.id);
-
+const ConsultantCard = ({ consultant }: { consultant: Consultant }) => {
     return (
         <Card className="shadow-xl text-center p-6 flex flex-col h-full transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
             <Link href={`/tu-van-vien/${consultant.id}`} className="block h-full flex flex-col flex-grow">
@@ -36,28 +32,18 @@ const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[
                 </div>
             </Link>
             <div className="mt-4 pt-4 border-t">
-                {chatConsultant && <ContactButtons contact={chatConsultant} />}
+                <ContactButtons contact={consultant} />
             </div>
         </Card>
     );
 };
 
-export default function ConsultantListPage() {
+export function ConsultantList() {
   return (
-    <div className="bg-secondary">
-      <div className="container mx-auto px-4 md:px-6 py-16">
-        <div className="text-center mb-12">
-            <h1 className="text-4xl font-headline font-bold text-accent">Đội ngũ tư vấn viên chuyên nghiệp</h1>
-            <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-                Những chuyên gia tận tâm sẽ đồng hành cùng bạn trên con đường chinh phục sự nghiệp tại Nhật Bản.
-            </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
-            {consultantChatData.map((consultant) => (
-                <ConsultantCard key={consultant.id} consultant={consultant} />
-            ))}
-        </div>
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
+        {consultants.map((consultant) => (
+            <ConsultantCard key={consultant.id} consultant={consultant} />
+        ))}
     </div>
   );
 }

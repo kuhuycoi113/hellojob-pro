@@ -2,7 +2,7 @@
 'use client';
 
 import { JobRecommendationResponse } from "@/ai/schemas/recommend-jobs-schema";
-import { consultants } from "./consultant-data";
+import { consultants } from "./consultant-data"; // Corrected import
 import { Job } from "./mock-data";
 
 export type User = {
@@ -87,6 +87,3 @@ export const conversations: Conversation[] = [
     ],
   },
 ];
-
-// Re-export consultants to be used by client components
-export { consultants };
