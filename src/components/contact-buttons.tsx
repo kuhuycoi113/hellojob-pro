@@ -24,9 +24,10 @@ interface ContactButtonsProps {
     contact: ContactPerson;
     job?: Job; // Make job optional
     variant?: 'default' | 'compact';
+    showChatText?: boolean;
 }
 
-export function ContactButtons({ contact, job, variant = 'default' }: ContactButtonsProps) {
+export function ContactButtons({ contact, job, variant = 'default', showChatText = false }: ContactButtonsProps) {
   const { openChat } = useChat();
   const [isClient, setIsClient] = useState(false);
 
@@ -65,7 +66,7 @@ export function ContactButtons({ contact, job, variant = 'default' }: ContactBut
                 onClick={handleChatClick}
             >
                 <MessageSquare className="h-4 w-4"/>
-                 <span className={cn('ml-2', variant === 'compact' ? 'hidden' : 'inline')}>
+                 <span className={cn('ml-2', (variant === 'compact' || !showChatText) ? 'hidden' : 'inline')}>
                   Chat với Tư vấn viên
                 </span>
             </Button>

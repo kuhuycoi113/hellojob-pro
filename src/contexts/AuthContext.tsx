@@ -1,7 +1,8 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
-import * as chatData from '@/lib/chat-data';
+import { guestUser, loggedInUser, type User } from '@/lib/chat-data';
 import type { CandidateProfile } from '@/ai/schemas';
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest' | 'candidate-full-profile';
@@ -17,6 +18,7 @@ export type PostLoginAction = {
 
 interface AuthContextType {
   role: Role;
+  currentUser: User;
   isLoggedIn: boolean;
   profileName: string | null;
   profileHeadline: string | null;
@@ -135,6 +137,7 @@ const partialCandidateProfile: Partial<CandidateProfile> = {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [role, setInternalRole] = useState<Role>('guest');
+  const [currentUser, setCurrentUser] = useState<User>(guestUser);
   const [postLoginAction, setPostLoginAction] = useState<PostLoginAction>(null);
   const [profileName, setProfileName] = useState<string | null>(null);
   const [profileHeadline, setProfileHeadline] = useState<string | null>(null);
@@ -150,25 +153,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setProfileName(profile.name || null);
         setProfileHeadline(profile.headline || null);
         setAvatarUrl(profile.avatarUrl || null);
+        
+        // Update user object
+        const updatedUser = {...loggedInUser, name: profile.name || loggedInUser.name, avatarUrl: profile.avatarUrl || loggedInUser.avatarUrl };
+        setCurrentUser(updatedUser);
+
       } catch (e) {
         console.error("Failed to parse profile from localStorage", e);
         setProfileName(null);
         setProfileHeadline(null);
         setAvatarUrl(null);
+        setCurrentUser(loggedInUser); // Fallback
       }
     } else {
       setProfileName(null);
       setProfileHeadline(null);
       setAvatarUrl(null);
+      setCurrentUser(isLoggedIn ? loggedInUser : guestUser);
     }
-  }, []);
+  }, [isLoggedIn]);
 
   const setRole = (newRole: Role) => {
     if (newRole === 'guest') {
-        chatData.setCurrentUser(chatData.guestUser);
+        setCurrentUser(guestUser);
         localStorage.removeItem('generatedCandidateProfile');
     } else { 
-        chatData.setCurrentUser(chatData.loggedInUser);
         if (newRole === 'candidate-full-profile') {
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(fullCandidateProfile));
         } else if (newRole === 'candidate') {
@@ -178,7 +187,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
     }
     setInternalRole(newRole);
-    updateProfileInfoFromStorage();
+    // updateProfileInfoFromStorage will be triggered by the useEffect below
   };
   
   const clearPostLoginAction = () => {
@@ -199,6 +208,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [updateProfileInfoFromStorage]);
 
   useEffect(() => {
+    // This effect runs whenever the role changes, including after setRole is called.
+    updateProfileInfoFromStorage();
+
     const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
     if (role === 'candidate-empty-profile' && preferencesRaw) {
         try {
@@ -217,19 +229,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             };
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
             sessionStorage.removeItem('onboardingPreferences');
-            setRole('candidate');
+            setRole('candidate'); // Transition to the 'candidate' role
         } catch(e) {
             console.error("Failed to apply onboarding preferences:", e);
             sessionStorage.removeItem('onboardingPreferences');
         }
-    } else if (role === 'candidate-empty-profile' && !preferencesRaw) {
-        localStorage.removeItem('generatedCandidateProfile');
-        updateProfileInfoFromStorage();
     }
   }, [role, updateProfileInfoFromStorage]);
 
   const value = {
     role,
+    currentUser,
     isLoggedIn,
     profileName,
     profileHeadline,
