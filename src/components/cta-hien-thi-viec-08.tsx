@@ -20,6 +20,8 @@ import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { cn } from '@/lib/utils';
 
+type Language = 'vi' | 'ja' | 'en';
+
 
 const CTAForGuest = ({ onLoginClick }: { onLoginClick: () => void }) => (
     <Card className="text-center py-12 px-6 shadow-lg col-span-full">
@@ -341,8 +343,11 @@ const CTAForEmptyProfile = () => {
     );
 };
 
+interface CtaHienThiViec08Props {
+  lang: Language;
+}
 
-export function CtaHienThiViec08() {
+export function CtaHienThiViec08({ lang }: CtaHienThiViec08Props) {
   const { role, isLoggedIn } = useAuth();
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -355,12 +360,10 @@ export function CtaHienThiViec08() {
         const storedProfile = localStorage.getItem('generatedCandidateProfile');
         const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
 
-        // API is called for all users. If profile & signals are null/empty, it returns default jobs.
         const matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
         setSuggestions(matchResults.slice(0, 4));
     } catch (error) {
         console.error("Failed to fetch behavioral suggestions for CTA:", error);
-        // Fallback to generic popular jobs on error
         setSuggestions(jobData.slice(4, 8).map(job => ({ job })));
     } finally {
         setIsLoading(false);
@@ -391,9 +394,7 @@ export function CtaHienThiViec08() {
       );
     }
     
-    // Always show suggestions regardless of login state for this component
     if (suggestions.length === 0) {
-        // If logged in, show the empty profile CTA. If guest, show the login CTA.
         if (isLoggedIn) {
             return <CTAForEmptyProfile />;
         }
@@ -407,16 +408,30 @@ export function CtaHienThiViec08() {
     );
   };
   
+  const content = {
+    vi: {
+        title: "Mẫu hiển thị việc cho ứng viên",
+        subtitle: "応募者向け求人表示 / Job Display for Candidates"
+    },
+    ja: {
+        title: "応募者向け求人表示",
+        subtitle: "Mẫu hiển thị việc cho ứng viên / Job Display for Candidates"
+    },
+    en: {
+        title: "Job Display for Candidates",
+        subtitle: "Mẫu hiển thị việc cho ứng viên / 応募者向け求人表示"
+    },
+  }[lang];
+
+
   return (
     <section id="HIENTHIVIEC08" className="w-full">
         <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-2xl font-headline font-bold text-left mb-8 flex items-center gap-3">
+            <h2 className="text-2xl font-headline font-bold text-left mb-2 flex items-center gap-3">
                 <Briefcase className="h-8 w-8 text-primary" />
-                <span>
-                    Mẫu hiển thị việc cho ứng viên
-                    <span className="block text-lg font-normal text-muted-foreground mt-1">応募者向け求人表示 / Job Display for Candidates</span>
-                </span>
+                <span>{content.title}</span>
             </h2>
+            <p className="text-muted-foreground text-left mb-8 ml-12">{content.subtitle}</p>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {renderContent()}
             </div>

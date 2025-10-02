@@ -445,10 +445,7 @@ export default function UnionLandingPage() {
           </div>
         </section>
 
-        {/* HIENTHIVIEC08 */}
-        <div className="py-20 md:py-28">
-          <CtaHienThiViec08 />
-        </div>
+        <CtaHienThiViec08 lang={lang}/>
 
       </div>
        <XL01Dialog 
