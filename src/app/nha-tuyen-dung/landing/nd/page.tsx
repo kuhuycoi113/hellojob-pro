@@ -13,14 +13,6 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
-import { useAuth } from '@/contexts/AuthContext';
-import { AuthDialog } from '@/components/auth-dialog';
-import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
-import type { CandidateProfile } from '@/ai/schemas';
-import { Skeleton } from '@/components/ui/skeleton';
-import { jobData, type Job } from '@/lib/mock-data';
-import { JobCard } from '@/components/job-card';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -28,7 +20,7 @@ type Language = 'vi' | 'ja' | 'en';
 const pageContent = {
     vi: {
         heroTitle: {
-            main: "協同組合向けソリューション",
+            main: "Giải pháp cho Nghiệp đoàn",
             points: [
                 "Có nguồn cung ứng viên phong phú",
                 "Tối ưu chi phí, lợi nhuận",
@@ -265,77 +257,6 @@ const pageContent = {
     }
 };
 
-const CtaViecLamPhuHopCustom = () => {
-    const { role, isLoggedIn } = useAuth();
-    const [isLoading, setIsLoading] = useState(true);
-    const [suggestions, setSuggestions] = useState<any[]>([]);
-    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-  
-    const fetchSuggestions = useCallback(async () => {
-      setIsLoading(true);
-      try {
-          const storedProfile = localStorage.getItem('generatedCandidateProfile');
-          const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-          const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
-          const matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
-          setSuggestions(matchResults.slice(0, 4));
-      } catch (error) {
-          console.error("Failed to fetch behavioral suggestions for CTA:", error);
-          setSuggestions(jobData.slice(4, 8).map(job => ({ job })));
-      } finally {
-          setIsLoading(false);
-      }
-    }, []);
-  
-    useEffect(() => {
-      fetchSuggestions();
-      const handleStorageChange = (event: StorageEvent) => {
-          if (event.key === 'behavioralSignals' || event.key === 'generatedCandidateProfile' || event.key === null) {
-              fetchSuggestions();
-          }
-      };
-      window.addEventListener('storage', handleStorageChange);
-      return () => window.removeEventListener('storage', handleStorageChange);
-    }, [fetchSuggestions]);
-    
-    const handleLoginClick = () => {
-        setIsAuthDialogOpen(true);
-    }
-  
-    const renderContent = () => {
-      if (isLoading) {
-        return (
-           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)
-        );
-      }
-      
-      if (suggestions.length === 0) {
-        return null;
-      }
-  
-      return (
-          suggestions.map((item) => (
-              <JobCard key={item.job.id} job={item.job} />
-          ))
-      );
-    };
-    
-    return (
-      <section id="HIENTHIVIEC08" className="w-full">
-          <div className="container mx-auto px-4 md:px-6">
-              <h2 className="text-2xl font-headline font-bold text-left mb-8 flex items-center gap-3">
-                  <Briefcase className="h-7 w-7 text-primary" />
-                  Hiển thị việc làm/求人表示/Jobs display
-              </h2>
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {renderContent()}
-              </div>
-              <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-          </div>
-      </section>
-    )
-}
-
 export default function UnionLandingPage() {
   const [lang, setLang] = useState<Language>('vi');
   const t = pageContent[lang];
@@ -522,11 +443,6 @@ export default function UnionLandingPage() {
             </div>
           </div>
         </section>
-
-        {/* CTA Section */}
-        <div className="space-y-20 md:space-y-28 py-20 md:py-28 bg-secondary">
-          <CtaViecLamPhuHopCustom />
-        </div>
       </div>
        <XL01Dialog 
         isOpen={isXL01DialogOpen} 
@@ -553,5 +469,3 @@ export default function UnionLandingPage() {
     </>
   );
 }
-
-    
