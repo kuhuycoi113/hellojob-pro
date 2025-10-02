@@ -99,11 +99,11 @@ const pageContent = {
         finalCtaDescription: "Trở thành đối tác của HelloJob ngay hôm nay để bắt đầu tối ưu hóa quy trình, giảm chi phí và tiếp cận nguồn ứng viên chất lượng cao.",
         finalCtaRegister: {
             main: "Đăng ký đối tác",
-            sub: "パートナー登録 / Register as Partner"
+            sub: "パートナー登録 / Register as Partner Now"
         },
         finalCtaPost: {
             main: "Đăng tin tuyển dụng ngay",
-            sub: "求人を掲載 / Post Job Now"
+            sub: "求人を掲載 / Post a Job"
         },
     },
     ja: {
@@ -409,16 +409,7 @@ export default function UnionLandingPage() {
                 </div>
               </div>
                <div className="relative flex flex-col">
-                  <div className="hidden md:flex justify-end mb-4">
-                      <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
-                          <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
-                              <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
-                              <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><JpFlagIcon className="h-4 w-4" /> 日本語</TabsTrigger>
-                              <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><EnFlagIcon className="h-4 w-4" /> English</TabsTrigger>
-                          </TabsList>
-                      </Tabs>
-                  </div>
-                   <div className="md:hidden flex justify-center mb-4">
+                  <div className="md:hidden flex justify-center mb-4">
                         <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
                             <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
                                 <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /></TabsTrigger>
@@ -427,6 +418,15 @@ export default function UnionLandingPage() {
                             </TabsList>
                         </Tabs>
                     </div>
+                     <div className="hidden md:flex justify-end mb-4">
+                      <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
+                          <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
+                              <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
+                              <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><JpFlagIcon className="h-4 w-4" /> 日本語</TabsTrigger>
+                              <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><EnFlagIcon className="h-4 w-4" /> English</TabsTrigger>
+                          </TabsList>
+                      </Tabs>
+                  </div>
                   <div className="relative aspect-[4/3] max-h-[350px]">
                       <Image
                           src="/img/NTD/ND.jpg"
@@ -502,7 +502,7 @@ export default function UnionLandingPage() {
         {/* CTA Section */}
         <div className="space-y-20 md:space-y-28 py-20 md:py-28 bg-secondary">
           <CtaViecLamPhuHopCustom />
-          <CtaViecLamGoiY />
+          <CtaNhaTuyenDung />
         </div>
 
         {/* Final CTA Section */}
@@ -513,16 +513,16 @@ export default function UnionLandingPage() {
               {t.finalCtaDescription}
             </p>
              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                 <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01-footer" onClick={() => setIsXL01DialogOpen(true)}>
-                    <div className="text-center">
-                        <span className="font-semibold">{t.finalCtaPost.main}</span>
-                        <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
-                    </div>
-                </Button>
                  <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01-footer" onClick={() => setIsYL01DialogOpen(true)}>
                     <div className="text-center">
                         <span className="font-semibold">{t.finalCtaRegister.main}</span>
                         <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
+                    </div>
+                </Button>
+                <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01-footer" onClick={() => setIsXL01DialogOpen(true)}>
+                    <div className="text-center">
+                        <span className="font-semibold">{t.finalCtaPost.main}</span>
+                        <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
                     </div>
                 </Button>
             </div>
