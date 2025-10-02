@@ -1,4 +1,5 @@
 
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { HardHat, School, Star, Plane, UserCheck, ShieldCheck, TrendingUp, Briefcase, MapIcon, Compass, Building, ChevronRight } from 'lucide-react';
 import React from 'react';
@@ -54,7 +55,7 @@ const roadmapSteps = [
     description: 'Làm các bài test về Văn hoá doanh nghiệp (CTT) để hiểu rõ giá trị bản thân, từ đó tìm kiếm và lựa chọn những công ty có môi trường và văn hoá phù hợp nhất với bạn.',
     salary: 'Tăng sự hài lòng',
     color: 'green',
-    image: '/img/van_hoa_cong_ty.jpg',
+    image: '/img/ANH CHUNG/van_hoa_cong_ty(3)-min.jpg',
     dataAiHint: 'corporate culture test',
   },
   {
