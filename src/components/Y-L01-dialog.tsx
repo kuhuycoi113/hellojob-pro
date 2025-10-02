@@ -310,6 +310,33 @@ const partnerRoles = {
 
 
 
+const roleTexts: Record<string, Record<Language, string>> = {
+  'nhan-vien-phai-cu': { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
+  'nhan-vien-nhan-luc-nhat': { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
+  'sending': { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
+  'support': { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
+  'company': { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
+  'supervising-organization': { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
+  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Placement Agency' },
+  'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
+};
+
+const subRoleTexts: Record<string, Record<Language, string>> = {
+    'phu-trach-doi-ngoai': { vi: 'Phụ trách đối ngoại', ja: '渉外担当', en: 'External Relations' },
+    'phu-trach-tuyen-dung': { vi: 'Phụ trách tuyển dụng', ja: '採用担当', en: 'Recruitment' },
+    'vietnamese': { vi: 'Nhân viên người Việt', ja: 'ベトナム人スタッフ', en: 'Vietnamese Staff' },
+    'japanese': { vi: 'Nhân viên người Nhật', ja: '日本人スタッフ', en: 'Japanese Staff' }
+};
+
+const interestTexts: Record<string, Record<Language, string>> = {
+    'post-job': { vi: 'Đăng việc làm', ja: '求人掲載', en: 'Post a Job' },
+    'refer-candidate': { vi: 'Giới thiệu ứng viên', ja: '候補者紹介', en: 'Refer a Candidate' },
+    'post-and-refer': { vi: 'Đăng việc làm & Giới thiệu ứng viên', ja: '求人掲載と候補者紹介', en: 'Post Job & Refer Candidate' },
+    'refer-and-post': { vi: 'Giới thiệu ứng viên & Đăng việc làm', ja: '候補者紹介と求人掲載', en: 'Refer Candidate & Post Job' },
+};
+
+
+
 export function YL01Dialog({ 
     children, 
     isOpen, 
@@ -927,3 +954,5 @@ export function YL01Dialog({
     </>
   );
 }
+
+    
