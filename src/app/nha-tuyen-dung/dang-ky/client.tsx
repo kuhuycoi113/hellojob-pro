@@ -396,8 +396,8 @@ const interestTexts: Record<string, Record<Language, string>> = {
 
 
 
-const SectionCard = ({ title, icon: Icon, children, className, onEditClick }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void }) => (
-    <Card className={cn("shadow-lg", className)}>
+const SectionCard = ({ title, icon: Icon, children, className, onEditClick, ...props }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, [key: string]: any }) => (
+    <Card className={cn("shadow-lg", className)} {...props}>
         <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="font-headline text-xl flex items-center gap-3">
                 <Icon className="text-primary h-6 w-6"/>{title}
@@ -1281,14 +1281,14 @@ export default function EmployerDetailPage() {
                   <SectionCard title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
-                  <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
-                    <div className="space-y-3">
+                  <SectionCard title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')} id="DKNGHIEPVUGIATRIQUANTAM">
+                    <div className="space-y-3 text-sm">
                         <div>
-                            <p className="font-semibold text-sm mb-1">{t.interestLabel}:</p>
+                            <p className="font-semibold mb-1">{t.interestLabel}:</p>
                             {getArrayValue(employer.interest, 'interest')}
                         </div>
                         <div>
-                            <p className="font-semibold text-sm mb-1">{t.valueInterestLabel}:</p>
+                            <p className="font-semibold mb-1">{t.valueInterestLabel}:</p>
                             {getValueInterestValue(employer.valueInterest)}
                         </div>
                     </div>
@@ -1403,5 +1403,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
-    
