@@ -1279,7 +1279,7 @@ export default function EmployerDetailPage() {
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
+                       <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                   </SectionCard>
                   <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
                     <div className="space-y-3 text-sm">
