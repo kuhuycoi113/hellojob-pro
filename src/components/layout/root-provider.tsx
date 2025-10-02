@@ -26,13 +26,21 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
     const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = useState(false);
     const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
     
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
     const isNtdLandingNdPage = pathname === '/nha-tuyen-dung/landing/nd';
 
     const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky', '/nha-tuyen-dung/landing/nd'];
-    const showCtas = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
+    
+    // Determine whether to show CTAs based on client-side path
+    const showDefaultCtas = isClient && !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
+    const showNtdLandingCta = isClient && isNtdLandingNdPage;
 
 
     useEffect(() => {
@@ -92,14 +100,14 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
         <>
             {!isCallPage && !isPartnerPage && <Header />}
             <main className="min-h-screen">{children}</main>
-            {showCtas && (
+            {showDefaultCtas && (
                 <div className="space-y-20 md:space-y-28 py-20 md:py-28">
                     <CtaViecLamPhuHop />
                     <CtaViecLamGoiY />
                     <CtaNhaTuyenDung />
                 </div>
             )}
-             {isNtdLandingNdPage && (
+             {showNtdLandingCta && (
                 <div className="space-y-20 md:space-y-28 py-20 md:py-28">
                     <CtaNhaTuyenDung />
                 </div>
