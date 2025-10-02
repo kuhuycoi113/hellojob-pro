@@ -1,7 +1,7 @@
 
 'use client';
 
-import * as React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Mic, MicOff, PhoneOff, Video as VideoIcon, VideoOff, AlertTriangle } from 'lucide-react';
@@ -17,13 +17,13 @@ interface VideoCallDialogProps {
 
 export function VideoCallDialog({ isOpen, onClose }: VideoCallDialogProps) {
   const { toast } = useToast();
-  const [hasPermission, setHasPermission] = React.useState<boolean | null>(null);
-  const [isMicMuted, setIsMicMuted] = React.useState(false);
-  const [isVideoOff, setIsVideoOff] = React.useState(false);
-  const userVideoRef = React.useRef<HTMLVideoElement>(null);
-  const streamRef = React.useRef<MediaStream | null>(null);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [isMicMuted, setIsMicMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+  const userVideoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isOpen) {
       // Stop media tracks when dialog is closed
       streamRef.current?.getTracks().forEach(track => track.stop());

@@ -1,7 +1,7 @@
 
 'use client';
 
-import * as React from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { guestUser, loggedInUser, type User } from '@/lib/chat-data';
 import type { CandidateProfile } from '@/ai/schemas';
 
@@ -29,10 +29,10 @@ interface AuthContextType {
   clearPostLoginAction: () => void;
 }
 
-const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
-  const context = React.useContext(AuthContext);
+  const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
@@ -136,15 +136,15 @@ const partialCandidateProfile: Partial<CandidateProfile> = {
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [role, setInternalRole] = React.useState<Role>('guest');
-  const [currentUser, setCurrentUser] = React.useState<User>(guestUser);
-  const [postLoginAction, setPostLoginAction] = React.useState<PostLoginAction>(null);
-  const [profileName, setProfileName] = React.useState<string | null>(null);
-  const [profileHeadline, setProfileHeadline] = React.useState<string | null>(null);
-  const [avatarUrl, setAvatarUrl] = React.useState<string | null>(null);
+  const [role, setInternalRole] = useState<Role>('guest');
+  const [currentUser, setCurrentUser] = useState<User>(guestUser);
+  const [postLoginAction, setPostLoginAction] = useState<PostLoginAction>(null);
+  const [profileName, setProfileName] = useState<string | null>(null);
+  const [profileHeadline, setProfileHeadline] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const isLoggedIn = role !== 'guest';
 
-  const updateProfileInfoFromStorage = React.useCallback(() => {
+  const updateProfileInfoFromStorage = useCallback(() => {
     if (typeof window === 'undefined') return;
     const storedProfile = localStorage.getItem('generatedCandidateProfile');
     if (storedProfile) {
@@ -194,7 +194,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setPostLoginAction(null);
   };
   
-  React.useEffect(() => {
+  useEffect(() => {
     updateProfileInfoFromStorage();
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === 'generatedCandidateProfile' || event.key === null) {
@@ -207,7 +207,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
   }, [updateProfileInfoFromStorage]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // This effect runs whenever the role changes, including after setRole is called.
     updateProfileInfoFromStorage();
 
@@ -252,5 +252,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-    

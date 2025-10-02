@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -23,9 +23,9 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const { toast } = useToast();
     const { isLoggedIn, postLoginAction, clearPostLoginAction } = useAuth();
-    const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = React.useState(false);
-    const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = React.useState(false);
-    const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = React.useState(false);
+    const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = useState(false);
+    const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
+    const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
@@ -34,7 +34,7 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
     const showCtas = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
 
 
-    React.useEffect(() => {
+    useEffect(() => {
       if (isLoggedIn && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
         setIsPostLoginApplyDialogOpen(true);
       }
