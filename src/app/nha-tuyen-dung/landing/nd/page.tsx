@@ -61,6 +61,7 @@ const pageContent = {
             {
                 icon: Users,
                 title: 'Nguồn ứng viên dồi dào và chất lượng',
+                image: '/img/NTD/ND06.jpg',
                 details: [
                     'Danh sách hàng trăm công ty phái cử với dịch vụ nguồn ứng viên đa dạng.',
                     'Nguồn ứng viên trực tiếp từ hệ thống công nghệ của HelloJob, chủ động tìm đến nền tảng.',
@@ -70,6 +71,7 @@ const pageContent = {
             {
                 icon: TrendingUp,
                 title: 'Tối ưu hóa chi phí & Quản lý hiệu quả',
+                image: '/img/NTD/ND07.jpg',
                 details: [
                     'Được tự do đấu giá mức phí giới thiệu thấp nhất.',
                     'Được đề xuất lựa chọn các dịch vụ quản lý, đối ứng phù hợp nhất để bảo đảm hiệu quả kinh doanh.',
@@ -79,6 +81,7 @@ const pageContent = {
             {
                 icon: Handshake,
                 title: 'Mở rộng & Giữ chân khách hàng',
+                image: '/img/NTD/ND08.jpg',
                 details: [
                     'Được xây dựng profile doanh nghiệp chuyên nghiệp, hiện đại để quảng bá đến khách hàng những dịch vụ tốt nhất của mình.',
                     'Được tự do xây dựng các bài viết, nội dung để thu hút khách hàng vào gian hàng của mình.',
@@ -140,6 +143,7 @@ const pageContent = {
             {
                 icon: Users,
                 title: '豊富で質の高い候補者源',
+                image: '/img/NTD/ND06.jpg',
                 details: [
                     '多様な候補者源を持つ数百の送り出し機関のリスト。',
                     'HelloJobの技術システムからの直接の候補者源、積極的にプラットフォームにアクセス。',
@@ -149,6 +153,7 @@ const pageContent = {
             {
                 icon: TrendingUp,
                 title: 'コスト最適化と効率的な管理',
+                image: '/img/NTD/ND07.jpg',
                 details: [
                     '最低の紹介料を自由にオークションにかけることができます。',
                     'ビジネス効率を確保するために、最適な管理および対応サービスを提案されます。',
@@ -158,6 +163,7 @@ const pageContent = {
             {
                 icon: Handshake,
                 title: '顧客の拡大と維持',
+                image: '/img/NTD/ND08.jpg',
                 details: [
                     'プロフェッショナルで現代的な企業プロフィールを構築し、最高のサービスを顧客に宣伝します。',
                     '自由に記事やコンテンツを作成し、顧客を自分のブースに引き付けます。',
@@ -219,6 +225,7 @@ const pageContent = {
             {
                 icon: Users,
                 title: 'Abundant and Quality Candidate Pool',
+                image: '/img/NTD/ND06.jpg',
                 details: [
                     'A list of hundreds of sending agencies with diverse candidate sourcing services.',
                     'Direct candidate sources from HelloJob\'s technology system, proactively coming to the platform.',
@@ -228,6 +235,7 @@ const pageContent = {
             {
                 icon: TrendingUp,
                 title: 'Cost Optimization & Efficient Management',
+                image: '/img/NTD/ND07.jpg',
                 details: [
                     'Freedom to bid for the lowest referral fees.',
                     'Recommendations for the most suitable management and support services to ensure business efficiency.',
@@ -237,6 +245,7 @@ const pageContent = {
             {
                 icon: Handshake,
                 title: 'Customer Expansion & Retention',
+                image: '/img/NTD/ND08.jpg',
                 details: [
                     'Build a professional, modern company profile to promote your best services to customers.',
                     'Freedom to create articles and content to attract customers to your booth.',
@@ -398,7 +407,7 @@ export default function UnionLandingPage() {
               {t.solutions.map((solution, index) => (
                 <div key={index} className={`grid md:grid-cols-2 gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
                   <div className={`relative h-80 rounded-lg shadow-xl overflow-hidden ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
-                      <Image src="https://placehold.co/600x400.png" alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
+                      <Image src={solution.image} alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
                   </div>
                   <div className="space-y-4">
                       <div className="inline-block bg-primary/10 p-3 rounded-full mb-4">
@@ -469,5 +478,3 @@ export default function UnionLandingPage() {
     </>
   );
 }
-
-    
