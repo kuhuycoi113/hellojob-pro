@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,9 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { XL01Dialog } from '@/components/X-L01-dialog';
+import { YL01Dialog } from '@/components/Y-L01-dialog';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -96,7 +98,7 @@ const pageContent = {
     },
     ja: {
         heroTitle: {
-            main: "組合向けソリューション",
+            main: "協同組合向けソリューション",
             points: [
                 "豊富な候補者供給源",
                 "コストと利益の最適化",
@@ -259,155 +261,210 @@ export default function UnionLandingPage() {
   const [lang, setLang] = useState<Language>('vi');
   const t = pageContent[lang];
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
+  const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false); 
+  const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
+
+  const handleXL01Complete = (preferences: any) => {
+    console.log("X-L01 Completed with:", preferences);
+    setRecruitmentPrefs(preferences);
+    setIsXL01DialogOpen(false);
+  };
+  
+  const navigateToEmployerPage = (data: any) => {
+    const params = new URLSearchParams();
+    if (data.role) params.set('role', data.role);
+    if (data.sub_role) params.set('sub_role', data.sub_role);
+    if (data.name) params.set('name', data.name);
+    if (data.company_name) params.set('company_name', data.company_name);
+    if (data.lang) params.set('lang', data.lang);
+
+    (data.interest || []).forEach((item: string) => params.append('interest', item));
+    (data.value_interest || []).forEach((item: string) => params.append('value_interest', item));
+    (data.visaType || []).forEach((item: string) => params.append('visa_type', item));
+    (data.visaDetail || []).forEach((item: string) => params.append('visa_detail', item));
+    (data.industry || []).forEach((item: string) => params.append('industry', item));
+    (data.location || []).forEach((item: string) => params.append('location', item));
+    
+    router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
+    setIsYL01DialogOpen(false);
+  };
+
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="w-full bg-gradient-to-br from-primary to-accent text-primary-foreground py-20 md:py-28">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-end">
-            <div className="text-center md:text-left">
-                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
-                    {t.heroTitle.main}
-                </h1>
-                <ul className="space-y-2 mb-6">
-                    {t.heroTitle.points.map((point, index) => (
-                        <li key={index} className="flex items-center justify-center md:justify-start">
-                            <span className="text-2xl text-white/90 mr-2">・</span>
-                            <span className="text-lg md:text-xl text-white/90">{point}</span>
-                        </li>
-                    ))}
-                </ul>
-              <p className="text-lg text-primary-foreground/80 mb-8">
-                {t.heroDescription}
+    <>
+      <div className="bg-background">
+        {/* Hero Section */}
+        <section className="w-full bg-gradient-to-br from-primary to-accent text-primary-foreground py-20 md:py-28">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="grid md:grid-cols-2 gap-12 items-end">
+              <div className="text-center md:text-left">
+                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
+                      {t.heroTitle.main}
+                  </h1>
+                  <ul className="space-y-2 mb-6">
+                      {t.heroTitle.points.map((point, index) => (
+                          <li key={index} className="flex items-center justify-center md:justify-start">
+                              <span className="text-2xl text-white/90 mr-2">・</span>
+                              <span className="text-lg md:text-xl text-white/90">{point}</span>
+                          </li>
+                      ))}
+                  </ul>
+                <p className="text-lg text-primary-foreground/80 mb-8">
+                  {t.heroDescription}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
+                      <Link href="/nha-tuyen-dung/dang-tin-tuyen-dung">
+                        <div className="text-center">
+                            <span className="font-semibold">{t.ctaPostJob.main}</span>
+                            <div className="text-xs opacity-80">{t.ctaPostJob.sub}</div>
+                        </div>
+                      </Link>
+                    </Button>
+                    <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
+                        <Link href="/nha-tuyen-dung?action=register">
+                            <div className="text-center">
+                                <span className="font-semibold">{t.ctaRegisterPartner.main}</span>
+                                <div className="text-xs opacity-80">{t.ctaRegisterPartner.sub}</div>
+                            </div>
+                        </Link>
+                    </Button>
+                </div>
+              </div>
+               <div className="relative flex flex-col">
+                  <div className="flex justify-end mb-4">
+                      <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
+                          <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
+                              <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
+                              <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><JpFlagIcon className="h-4 w-4" /> 日本語</TabsTrigger>
+                              <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><EnFlagIcon className="h-4 w-4" /> English</TabsTrigger>
+                          </TabsList>
+                      </Tabs>
+                  </div>
+                  <div className="relative aspect-[4/3] max-h-[350px]">
+                      <Image
+                          src="/img/NTD/ND.jpg"
+                          alt="Hợp tác cùng phát triển với HelloJob"
+                          fill
+                          className="object-cover rounded-lg shadow-2xl"
+                          data-ai-hint="business people shaking hands"
+                      />
+                  </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pain Points Section */}
+        <section className="py-20 md:py-28 bg-secondary">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-headline font-bold">{t.painPointsTitle}</h2>
+              <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
+                {t.painPointsDescription}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
-                  <Link href="/nha-tuyen-dung">
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {t.painPoints.map((point) => (
+                <Card key={point.title} className="text-center p-8 shadow-lg bg-background">
+                  <div className="mx-auto bg-destructive/10 rounded-full p-4 w-fit mb-4">
+                    <point.icon className="h-10 w-10 text-destructive" />
+                  </div>
+                  <h3 className="text-xl font-bold font-headline mb-3">{point.title}</h3>
+                  <p className="text-muted-foreground">{point.description}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        {/* Solutions Section */}
+         <section className="py-20 md:py-28 bg-background">
+          <div className="container mx-auto px-4 md:px-6">
+             <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">{t.solutionsTitle}</h2>
+              <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
+                {t.solutionsDescription}
+              </p>
+            </div>
+            <div className="space-y-12">
+              {t.solutions.map((solution, index) => (
+                <div key={index} className={`grid md:grid-cols-2 gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
+                  <div className={`relative h-80 rounded-lg shadow-xl overflow-hidden ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
+                      <Image src="https://placehold.co/600x400.png" alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
+                  </div>
+                  <div className="space-y-4">
+                      <div className="inline-block bg-primary/10 p-3 rounded-full mb-4">
+                          <solution.icon className="h-8 w-8 text-primary"/>
+                      </div>
+                      <h3 className="text-2xl font-bold font-headline">{solution.title}</h3>
+                      <ul className="space-y-3">
+                          {solution.details.map((detail, i) => (
+                              <li key={i} className="flex items-start gap-3">
+                                  <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0"/>
+                                  <span className="text-muted-foreground">{detail}</span>
+                              </li>
+                          ))}
+                      </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+         </section>
+
+        {/* Final CTA Section */}
+        <section className="bg-accent text-white py-20 md:py-28">
+          <div className="container mx-auto px-4 md:px-6 text-center">
+            <h2 className="text-3xl font-headline font-bold mb-4">{t.finalCtaTitle}</h2>
+            <p className="text-white/80 mb-8 max-w-2xl mx-auto text-lg">
+              {t.finalCtaDescription}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+               <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
+                  <Link href="/nha-tuyen-dung/dang-tin-tuyen-dung">
                       <div className="text-center">
-                          <span className="font-semibold">{t.ctaPostJob.main}</span>
-                          <div className="text-xs opacity-80">{t.ctaPostJob.sub}</div>
+                          <span className="font-semibold">{t.finalCtaPost.main}</span>
+                          <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
                       </div>
                   </Link>
-                </Button>
-                <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
-                    <Link href="/nha-tuyen-dung?action=register">
-                        <div className="text-center">
-                            <span className="font-semibold">{t.ctaRegisterPartner.main}</span>
-                            <div className="text-xs opacity-80">{t.ctaRegisterPartner.sub}</div>
-                        </div>
-                    </Link>
-                </Button>
-              </div>
-            </div>
-             <div className="relative flex-col hidden md:flex">
-                 <div className="flex justify-end mb-4">
-                    <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
-                        <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
-                            <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
-                            <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><JpFlagIcon className="h-4 w-4" /> 日本語</TabsTrigger>
-                            <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><EnFlagIcon className="h-4 w-4" /> English</TabsTrigger>
-                        </TabsList>
-                    </Tabs>
-                </div>
-                 <div className="relative aspect-[4/3] max-h-[350px]">
-                    <Image
-                        src="/img/NTD/ND.jpg"
-                        alt="Hợp tác cùng phát triển với HelloJob"
-                        fill
-                        className="object-cover rounded-lg shadow-2xl"
-                        data-ai-hint="business people shaking hands"
-                    />
-                </div>
+              </Button>
+              <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
+                  <Link href="/nha-tuyen-dung?action=register">
+                       <div className="text-center">
+                          <span className="font-semibold">{t.finalCtaRegister.main}</span>
+                          <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
+                      </div>
+                  </Link>
+              </Button>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Pain Points Section */}
-      <section className="py-20 md:py-28 bg-secondary">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold">{t.painPointsTitle}</h2>
-            <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-              {t.painPointsDescription}
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {t.painPoints.map((point) => (
-              <Card key={point.title} className="text-center p-8 shadow-lg bg-background">
-                <div className="mx-auto bg-destructive/10 rounded-full p-4 w-fit mb-4">
-                  <point.icon className="h-10 w-10 text-destructive" />
-                </div>
-                <h3 className="text-xl font-bold font-headline mb-3">{point.title}</h3>
-                <p className="text-muted-foreground">{point.description}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      {/* Solutions Section */}
-       <section className="py-20 md:py-28 bg-background">
-        <div className="container mx-auto px-4 md:px-6">
-           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">{t.solutionsTitle}</h2>
-            <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-              {t.solutionsDescription}
-            </p>
-          </div>
-          <div className="space-y-12">
-            {t.solutions.map((solution, index) => (
-              <div key={index} className={`grid md:grid-cols-2 gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
-                <div className={`relative h-80 rounded-lg shadow-xl overflow-hidden ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
-                    <Image src="https://placehold.co/600x400.png" alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
-                </div>
-                <div className="space-y-4">
-                    <div className="inline-block bg-primary/10 p-3 rounded-full mb-4">
-                        <solution.icon className="h-8 w-8 text-primary"/>
-                    </div>
-                    <h3 className="text-2xl font-bold font-headline">{solution.title}</h3>
-                    <ul className="space-y-3">
-                        {solution.details.map((detail, i) => (
-                            <li key={i} className="flex items-start gap-3">
-                                <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0"/>
-                                <span className="text-muted-foreground">{detail}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-       </section>
-
-      {/* Final CTA Section */}
-      <section className="bg-accent text-white py-20 md:py-28">
-        <div className="container mx-auto px-4 md:px-6 text-center">
-          <h2 className="text-3xl font-headline font-bold mb-4">{t.finalCtaTitle}</h2>
-          <p className="text-white/80 mb-8 max-w-2xl mx-auto text-lg">
-            {t.finalCtaDescription}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-             <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                <Link href="/nha-tuyen-dung">
-                    <div className="text-center">
-                        <span className="font-semibold">{t.finalCtaPost.main}</span>
-                        <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
-                    </div>
-                </Link>
-            </Button>
-            <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
-                <Link href="/nha-tuyen-dung?action=register">
-                     <div className="text-center">
-                        <span className="font-semibold">{t.finalCtaRegister.main}</span>
-                        <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
-                    </div>
-                </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+       <XL01Dialog 
+        isOpen={isXL01DialogOpen} 
+        onOpenChange={setIsXL01DialogOpen}
+        onLanguageChange={setLang}
+        initialLang={lang}
+        initialStep={1}
+        onComplete={handleXL01Complete}
+        onBack={() => {
+            setIsXL01DialogOpen(false);
+        }}
+      />
+       <YL01Dialog 
+        isOpen={isYL01DialogOpen} 
+        onOpenChange={setIsYL01DialogOpen}
+        onLanguageChange={setLang}
+        initialLang={lang}
+        initialStep={1}
+        onComplete={navigateToEmployerPage}
+        onBack={() => {
+            setIsYL01DialogOpen(false);
+        }}
+      />
+    </>
   );
 }
