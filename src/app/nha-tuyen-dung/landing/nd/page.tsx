@@ -350,7 +350,7 @@ export default function UnionLandingPage() {
                   </div>
                   <div className="relative aspect-video">
                       <Image
-                          src="/img/NTD/ND.jpg"
+                          src="/img/NTD/ND05.jpg"
                           alt="Hợp tác cùng phát triển với HelloJob"
                           fill
                           className="object-cover rounded-lg shadow-2xl"
@@ -469,3 +469,5 @@ export default function UnionLandingPage() {
     </>
   );
 }
+
+    
