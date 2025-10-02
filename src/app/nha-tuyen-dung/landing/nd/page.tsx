@@ -429,16 +429,16 @@ export default function UnionLandingPage() {
               {t.finalCtaDescription}
             </p>
              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                 <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01-footer" onClick={() => setIsYL01DialogOpen(true)}>
-                    <div className="text-center">
-                        <span className="font-semibold">{t.finalCtaRegister.main}</span>
-                        <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
-                    </div>
-                </Button>
                 <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01-footer" onClick={() => setIsXL01DialogOpen(true)}>
                     <div className="text-center">
                         <span className="font-semibold">{t.finalCtaPost.main}</span>
                         <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
+                    </div>
+                </Button>
+                <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01-footer" onClick={() => setIsYL01DialogOpen(true)}>
+                    <div className="text-center">
+                        <span className="font-semibold">{t.finalCtaRegister.main}</span>
+                        <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
                     </div>
                 </Button>
             </div>
