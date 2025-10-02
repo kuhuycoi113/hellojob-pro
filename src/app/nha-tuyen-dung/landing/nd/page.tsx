@@ -445,7 +445,7 @@ export default function UnionLandingPage() {
           </div>
         </section>
 
-        <CtaHienThiViec08 lang={lang}/>
+        <CtaHienThiViec08 lang={lang} prioritizedVisaType="Thực tập sinh kỹ năng" />
 
       </div>
        <XL01Dialog 

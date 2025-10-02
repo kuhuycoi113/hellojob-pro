@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, LogIn, UserPlus, Sparkles, Star } from 'lucide-react';
+import { Briefcase, LogIn, UserPlus, Sparkles, Star, PlusCircle } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { jobData, type Job } from '@/lib/mock-data';
 import Link from 'next/link';
@@ -14,6 +14,7 @@ import { AuthDialog } from './auth-dialog';
 import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
 import type { CandidateProfile } from '@/ai/schemas';
 import { Skeleton } from './ui/skeleton';
+import { CreateProfileDialog } from './create-profile-dialog';
 
 const CTAForGuest = ({ onLoginClick }: { onLoginClick: () => void }) => (
     <Card className="text-center py-12 px-6 shadow-lg col-span-full">
@@ -30,8 +31,6 @@ const CTAForGuest = ({ onLoginClick }: { onLoginClick: () => void }) => (
 );
 
 const CTAForEmptyProfile = () => {
-  const router = useRouter();
-
   return (
     <Card className="text-center py-12 px-6 shadow-lg col-span-full">
         <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
@@ -40,13 +39,13 @@ const CTAForEmptyProfile = () => {
         <p className="font-semibold text-lg">Tạo hồ sơ để được hiển thị việc làm phù hợp</p>
         <p className="text-muted-foreground mt-2 mb-6">Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.</p>
         <div className="flex flex-wrap gap-4 justify-center">
-            <Button asChild className="bg-accent-orange hover:bg-accent-orange/90 text-white">
-                <Link href="/tao-ho-so-ai">
+            <CreateProfileDialog>
+                <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
                     <Sparkles className="mr-2 h-4 w-4" />
                     Tạo hồ sơ nhanh bằng AI
-                </Link>
-            </Button>
-            <Button asChild>
+                </Button>
+            </CreateProfileDialog>
+             <Button asChild>
                 <Link href="/dang-ky">
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Tạo hồ sơ chi tiết
@@ -59,9 +58,10 @@ const CTAForEmptyProfile = () => {
 
 interface CtaHienThiViec08Props {
   lang: 'vi' | 'ja' | 'en';
+  prioritizedVisaType?: string;
 }
 
-export function CtaHienThiViec08({ lang }: CtaHienThiViec08Props) {
+export function CtaHienThiViec08({ lang, prioritizedVisaType }: CtaHienThiViec08Props) {
   const { role, isLoggedIn } = useAuth();
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,7 +74,19 @@ export function CtaHienThiViec08({ lang }: CtaHienThiViec08Props) {
         const storedProfile = localStorage.getItem('generatedCandidateProfile');
         const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
 
-        const matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
+        let matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
+        
+        // If a prioritizedVisaType is provided, sort the results
+        if (prioritizedVisaType) {
+            matchResults.sort((a, b) => {
+                const aIsPrioritized = a.job.visaType === prioritizedVisaType;
+                const bIsPrioritized = b.job.visaType === prioritizedVisaType;
+                if (aIsPrioritized && !bIsPrioritized) return -1;
+                if (!aIsPrioritized && bIsPrioritized) return 1;
+                return 0; // Keep original order for same-type items
+            });
+        }
+        
         setSuggestions(matchResults.slice(0, 4));
     } catch (error) {
         console.error("Failed to fetch behavioral suggestions for CTA:", error);
@@ -82,7 +94,7 @@ export function CtaHienThiViec08({ lang }: CtaHienThiViec08Props) {
     } finally {
         setIsLoading(false);
     }
-  }, []);
+  }, [prioritizedVisaType]);
 
   useEffect(() => {
     fetchSuggestions();
@@ -117,7 +129,7 @@ export function CtaHienThiViec08({ lang }: CtaHienThiViec08Props) {
 
     return (
         suggestions.map((item) => (
-            <JobCard key={item.job.id} job={item.job} />
+            <JobCard key={item.job.id} job={item.job} showRecruiterName={true} />
         ))
     );
   };
@@ -141,8 +153,8 @@ export function CtaHienThiViec08({ lang }: CtaHienThiViec08Props) {
   return (
     <section id="HIENTHIVIEC08" className="w-full mt-20 md:mt-28">
         <div className="container mx-auto px-4 md:px-6">
-             <div className="mb-8 text-center md:text-left">
-                <div className="flex items-center gap-3 justify-center md:justify-start">
+             <div className="mb-8 text-center md:text-left flex flex-col items-center md:items-start">
+                <div className="flex items-center gap-3">
                     <Briefcase className="h-8 w-8 text-primary" />
                     <h2 className="text-2xl font-headline font-bold">{content.title}</h2>
                 </div>
