@@ -217,7 +217,7 @@ const regionContent = {
         title: '希望勤務地を選択',
         description: '募集したい地域を優先順位で選択してください。',
         backButton: '戻る',
-        completeButton: '続ける'
+        continueButton: '続ける'
     },
     en: {
         title: 'Select Work Regions',
@@ -920,7 +920,7 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent id="Y-L01-VT01" className="sm:max-w-4xl">
+          <DialogContent id="Y-L01-VT03" className="sm:max-w-4xl">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
