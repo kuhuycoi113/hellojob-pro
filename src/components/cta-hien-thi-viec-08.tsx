@@ -137,11 +137,13 @@ export function CtaHienThiViec08({ lang }: CtaHienThiViec08Props) {
   return (
     <section id="HIENTHIVIEC08" className="w-full mt-20 md:mt-28">
         <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-2xl font-headline font-bold text-left mb-2 flex items-center gap-3">
-                <Briefcase className="h-8 w-8 text-primary" />
-                <span>{content.title}</span>
-            </h2>
-            <p className="text-muted-foreground text-left mb-8 ml-12">{content.subtitle}</p>
+             <div className="mb-8">
+                <h2 className="text-2xl font-headline font-bold text-left mb-2 flex items-center gap-3">
+                    <Briefcase className="h-8 w-8 text-primary" />
+                    <span>{content.title}</span>
+                </h2>
+                <p className="text-muted-foreground text-left">{content.subtitle}</p>
+            </div>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {renderContent()}
             </div>
