@@ -29,7 +29,10 @@ const CTAForGuest = ({ onLoginClick }: { onLoginClick: () => void }) => (
     </Card>
 );
 
-const CTAForEmptyProfile = () => (
+const CTAForEmptyProfile = () => {
+  const router = useRouter();
+
+  return (
     <Card className="text-center py-12 px-6 shadow-lg col-span-full">
         <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
             <UserPlus className="h-10 w-10 text-primary" />
@@ -51,7 +54,8 @@ const CTAForEmptyProfile = () => (
             </Button>
         </div>
     </Card>
-);
+  )
+};
 
 interface CtaHienThiViec08Props {
   lang: 'vi' | 'ja' | 'en';
@@ -120,16 +124,16 @@ export function CtaHienThiViec08({ lang }: CtaHienThiViec08Props) {
   
   const content = {
     vi: {
-        title: "Mẫu hiển thị việc cho ứng viên",
-        subtitle: "応募者向け求人表示 / Job Display for Candidates"
+        title: "Mẫu hiển thị việc Thực tập sinh kỹ năng cho ứng viên",
+        subtitle: "応募者向けの技能実習生の求人表示 / Job Display for Technical Intern Trainee Applicants"
     },
     ja: {
-        title: "応募者向け求人表示",
-        subtitle: "Mẫu hiển thị việc cho ứng viên / Job Display for Candidates"
+        title: "応募者向けの技能実習生の求人表示",
+        subtitle: "Mẫu hiển thị việc Thực tập sinh kỹ năng cho ứng viên / Job Display for Technical Intern Trainee Applicants"
     },
     en: {
-        title: "Job Display for Candidates",
-        subtitle: "Mẫu hiển thị việc cho ứng viên / 応募者向け求人表示"
+        title: "Job Display for Technical Intern Trainee Applicants",
+        subtitle: "Mẫu hiển thị việc Thực tập sinh kỹ năng cho ứng viên / 応募者向けの技能実習生の求人表示"
     },
   }[lang];
 
@@ -137,12 +141,12 @@ export function CtaHienThiViec08({ lang }: CtaHienThiViec08Props) {
   return (
     <section id="HIENTHIVIEC08" className="w-full mt-20 md:mt-28">
         <div className="container mx-auto px-4 md:px-6">
-             <div className="mb-8">
-                <h2 className="text-2xl font-headline font-bold text-left mb-2 flex items-center gap-3">
+             <div className="mb-8 text-center md:text-left">
+                <div className="flex items-center gap-3 justify-center md:justify-start">
                     <Briefcase className="h-8 w-8 text-primary" />
-                    <span>{content.title}</span>
-                </h2>
-                <p className="text-muted-foreground text-left">{content.subtitle}</p>
+                    <h2 className="text-2xl font-headline font-bold">{content.title}</h2>
+                </div>
+                <p className="text-muted-foreground">{content.subtitle}</p>
             </div>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {renderContent()}
