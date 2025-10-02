@@ -396,8 +396,8 @@ const interestTexts: Record<string, Record<Language, string>> = {
 
 
 
-const SectionCard = ({ title, icon: Icon, children, className, onEditClick, ...props }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, [key: string]: any }) => (
-    <Card className={cn("shadow-lg", className)} {...props}>
+const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, id?: string }) => (
+    <Card className={cn("shadow-lg", className)} id={id}>
         <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="font-headline text-xl flex items-center gap-3">
                 <Icon className="text-primary h-6 w-6"/>{title}
