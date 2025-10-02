@@ -348,7 +348,7 @@ export default function UnionLandingPage() {
                           </TabsList>
                       </Tabs>
                   </div>
-                  <div className="relative aspect-[4/3] max-h-[350px]">
+                  <div className="relative aspect-video">
                       <Image
                           src="/img/NTD/ND.jpg"
                           alt="Hợp tác cùng phát triển với HelloJob"
