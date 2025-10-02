@@ -315,21 +315,17 @@ export default function UnionLandingPage() {
                   {t.heroDescription}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
-                      <Link href="/nha-tuyen-dung/dang-tin-tuyen-dung">
+                    <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
                         <div className="text-center">
                             <span className="font-semibold">{t.ctaPostJob.main}</span>
                             <div className="text-xs opacity-80">{t.ctaPostJob.sub}</div>
                         </div>
-                      </Link>
                     </Button>
-                    <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
-                        <Link href="/nha-tuyen-dung?action=register">
-                            <div className="text-center">
-                                <span className="font-semibold">{t.ctaRegisterPartner.main}</span>
-                                <div className="text-xs opacity-80">{t.ctaRegisterPartner.sub}</div>
-                            </div>
-                        </Link>
+                    <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
+                        <div className="text-center">
+                            <span className="font-semibold">{t.ctaRegisterPartner.main}</span>
+                            <div className="text-xs opacity-80">{t.ctaRegisterPartner.sub}</div>
+                        </div>
                     </Button>
                 </div>
               </div>
@@ -423,21 +419,17 @@ export default function UnionLandingPage() {
               {t.finalCtaDescription}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-               <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
-                  <Link href="/nha-tuyen-dung/dang-tin-tuyen-dung">
-                      <div className="text-center">
-                          <span className="font-semibold">{t.finalCtaPost.main}</span>
-                          <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
-                      </div>
-                  </Link>
+               <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
+                  <div className="text-center">
+                      <span className="font-semibold">{t.finalCtaPost.main}</span>
+                      <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
+                  </div>
               </Button>
-              <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
-                  <Link href="/nha-tuyen-dung?action=register">
-                       <div className="text-center">
-                          <span className="font-semibold">{t.finalCtaRegister.main}</span>
-                          <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
-                      </div>
-                  </Link>
+              <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
+                   <div className="text-center">
+                      <span className="font-semibold">{t.finalCtaRegister.main}</span>
+                      <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
+                  </div>
               </Button>
             </div>
           </div>
