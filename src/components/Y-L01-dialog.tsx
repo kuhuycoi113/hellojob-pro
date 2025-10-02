@@ -223,7 +223,7 @@ const regionContent = {
         title: 'Select Work Regions',
         description: 'Choose the regions you want to recruit in, in order of priority.',
         backButton: 'Back',
-        completeButton: 'Continue'
+        continueButton: 'Continue'
     }
 };
 
@@ -920,7 +920,7 @@ export function YL01Dialog({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => { onOpenChange(open); if (!open) setStep(1); }}>
           {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-          <DialogContent className="sm:max-w-4xl" id="Y-L01-VT07">
+          <DialogContent className="sm:max-w-4xl" id="Y-L01-VT08">
               {renderDialogContent()}
           </DialogContent>
       </Dialog>
