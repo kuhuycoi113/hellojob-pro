@@ -29,8 +29,9 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
     
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
+    const isNtdLandingNdPage = pathname === '/nha-tuyen-dung/landing/nd';
 
-    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky'];
+    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky', '/nha-tuyen-dung/landing/nd'];
     const showCtas = !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
 
 
@@ -95,6 +96,11 @@ function LayoutManager({ children }: { children: React.ReactNode }) {
                 <div className="space-y-20 md:space-y-28 py-20 md:py-28">
                     <CtaViecLamPhuHop />
                     <CtaViecLamGoiY />
+                    <CtaNhaTuyenDung />
+                </div>
+            )}
+             {isNtdLandingNdPage && (
+                <div className="space-y-20 md:space-y-28 py-20 md:py-28">
                     <CtaNhaTuyenDung />
                 </div>
             )}
