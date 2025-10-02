@@ -13,6 +13,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { CtaHienThiViec08 } from '@/components/cta-hien-thi-viec-08';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -443,6 +444,12 @@ export default function UnionLandingPage() {
             </div>
           </div>
         </section>
+
+        {/* HIENTHIVIEC08 */}
+        <div className="py-20 md:py-28">
+          <CtaHienThiViec08 />
+        </div>
+
       </div>
        <XL01Dialog 
         isOpen={isXL01DialogOpen} 
