@@ -64,7 +64,7 @@ const roadmapSteps = [
     description: 'Bắt đầu hành trình tại Nhật với vai trò Thực tập sinh kỹ năng. Đây là giai đoạn để bạn làm quen với môi trường, văn hóa làm việc chuyên nghiệp và tích lũy kinh nghiệm nền tảng đầu tiên.',
     salary: '~30 triệu VNĐ/tháng',
     color: 'light-blue',
-    image: 'public/img/ANH CHUNG/TTS-3-nam.jpg',
+    image: '/img/ANH CHUNG/TTS-3-nam.jpg',
     dataAiHint: 'trainee learning japan',
   },
   {
