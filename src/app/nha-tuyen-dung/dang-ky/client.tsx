@@ -128,7 +128,7 @@ const placeholderEmployerData = {
         { year: '2010', event: { vi: 'Thành lập công ty cổ phần ABC.', ja: 'ABC株式会社設立。', en: 'Established ABC Corporation.' } },
         { year: '2015', event: { vi: 'Đạt mốc 1.000 lao động được phái cử thành công.', ja: '派遣労働者1,000人達成。', en: 'Reached the milestone of 1,000 successfully dispatched workers.' } },
         { year: '2020', event: { vi: 'Mở rộng văn phòng đại diện tại Tokyo, Nhật Bản.', ja: '東京に駐在員事務所を開設。', en: 'Opened representative office in Tokyo, Japan.' } },
-        { year: '2023', event: { vi: 'Nhận giải thưởng "Công ty phái cử uy tín của năm".', ja: '「今年の信頼できる派遣会社」賞を受賞。', en: '"Reputable Dispatch Company of the Year" award.' } }
+        { year: '2023', event: { vi: 'Nhận giải thưởng "Công ty phái cử uy tín của năm".', ja: '「今年の信頼できる派遣会社」賞を受賞。', en: '\'\'\'Reputable Dispatch Company of the Year\'\'\' award.' } }
     ],
     info: {
         founded: '2010',
@@ -1243,7 +1243,7 @@ export default function EmployerDetailPage() {
                 <div id="DKTHONGTINCHUNG" className="p-6 bg-card">
                   <div className="flex flex-col sm:flex-row items-start gap-4 -mt-24 md:-mt-20">
                       <div className="relative flex-shrink-0">
-                        <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
+                        <Avatar id="DKTC_AVATAR" className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
                             <AvatarImage src={employer.logo} />
                             <AvatarFallback>{(employer.name[lang] || 'A').charAt(0)}</AvatarFallback>
                           </Avatar>
@@ -1252,13 +1252,13 @@ export default function EmployerDetailPage() {
                            </Label>
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
                       </div>
-                      <div id="THONGTINCOBANNTD02" className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16">
+                      <div className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16">
                           <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
-                            <h1 id="DKY001" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                            <p id="DKY002VAITRO" className="font-semibold text-primary">{roleText}</p>
-                            <p id="DKY005" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
+                            <h1 id="DKTC_TEN" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
+                            <p id="DKTC_VAITRO" className="font-semibold text-primary">{roleText}</p>
+                            <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                           </div>
-                          <div id="CHUYENDOINGONNGUNTD01" className="flex items-center gap-2 mt-4 md:mt-0 flex-shrink-0 md:ml-auto">
+                          <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 md:mt-0 flex-shrink-0 md:ml-auto">
                                <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
                                     <TabsList className="grid w-full grid-cols-3">
                                         <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span></TabsTrigger>
@@ -1364,14 +1364,14 @@ export default function EmployerDetailPage() {
                   </SectionCard>
                   <SectionCard id="DKLOAIHINHVISA" title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
-                          <div id="DKY006"><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
-                          <div id="DKY007"><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
+                          <div><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
+                          <div><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
                       </div>
                   </SectionCard>
                   <SectionCard id="DKNGANHNGHEKHUVUC" title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <div id="DKY008"><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
-                          <div id="DKY009"><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
+                          <div><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
+                          <div><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
                       </div>
                   </SectionCard>
               </div>
