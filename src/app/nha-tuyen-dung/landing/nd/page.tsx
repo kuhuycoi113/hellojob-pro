@@ -3,16 +3,25 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Handshake, DollarSign, Users, Search, CheckCircle, TrendingUp, BarChart, FileSignature, ShieldCheck } from 'lucide-react';
+import { Handshake, DollarSign, Users, Search, CheckCircle, TrendingUp, BarChart, FileSignature, ShieldCheck, BrainCircuit } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
+import { CtaViecLamGoiY } from '@/components/cta-viec-lam-goi-y';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthDialog } from '@/components/auth-dialog';
+import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
+import type { CandidateProfile } from '@/ai/schemas';
+import { Skeleton } from '@/components/ui/skeleton';
+import { jobData, type Job } from '@/lib/mock-data';
+import { JobCard } from '@/components/job-card';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -20,7 +29,7 @@ type Language = 'vi' | 'ja' | 'en';
 const pageContent = {
     vi: {
         heroTitle: {
-            main: "Giải pháp cho Nghiệp đoàn",
+            main: "協同組合向けソリューション",
             points: [
                 "Có nguồn cung ứng viên phong phú",
                 "Tối ưu chi phí, lợi nhuận",
@@ -257,6 +266,75 @@ const pageContent = {
     }
 };
 
+const CtaViecLamPhuHopCustom = () => {
+    const { role, isLoggedIn } = useAuth();
+    const [isLoading, setIsLoading] = useState(true);
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  
+    const fetchSuggestions = useCallback(async () => {
+      setIsLoading(true);
+      try {
+          const storedProfile = localStorage.getItem('generatedCandidateProfile');
+          const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+          const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
+          const matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
+          setSuggestions(matchResults.slice(0, 4));
+      } catch (error) {
+          console.error("Failed to fetch behavioral suggestions for CTA:", error);
+          setSuggestions(jobData.slice(4, 8).map(job => ({ job })));
+      } finally {
+          setIsLoading(false);
+      }
+    }, []);
+  
+    useEffect(() => {
+      fetchSuggestions();
+      const handleStorageChange = (event: StorageEvent) => {
+          if (event.key === 'behavioralSignals' || event.key === 'generatedCandidateProfile' || event.key === null) {
+              fetchSuggestions();
+          }
+      };
+      window.addEventListener('storage', handleStorageChange);
+      return () => window.removeEventListener('storage', handleStorageChange);
+    }, [fetchSuggestions]);
+    
+    const handleLoginClick = () => {
+        setIsAuthDialogOpen(true);
+    }
+  
+    const renderContent = () => {
+      if (isLoading) {
+        return (
+           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)
+        );
+      }
+      
+      if (suggestions.length === 0) {
+        return null;
+      }
+  
+      return (
+          suggestions.map((item) => (
+              <JobCard key={item.job.id} job={item.job} />
+          ))
+      );
+    };
+    
+    return (
+      <section id="HIENTHIVIEC08" className="w-full">
+          <div className="container mx-auto px-4 md:px-6">
+              <h2 className="text-2xl font-headline font-bold text-left mb-8">
+                  Hiển thị việc làm/求人表示/Jobs display
+              </h2>
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {renderContent()}
+              </div>
+              <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+          </div>
+      </section>
+    )
+}
 
 export default function UnionLandingPage() {
   const [lang, setLang] = useState<Language>('vi');
@@ -299,15 +377,6 @@ export default function UnionLandingPage() {
         {/* Hero Section */}
         <section className="w-full bg-gradient-to-br from-primary to-accent text-primary-foreground py-20 md:py-28">
           <div className="container mx-auto px-4 md:px-6">
-             <div className="md:hidden flex justify-end mb-4">
-              <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
-                <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
-                    <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
-                    <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><JpFlagIcon className="h-4 w-4" /> 日本語</TabsTrigger>
-                    <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><EnFlagIcon className="h-4 w-4" /> English</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
             <div className="grid md:grid-cols-2 gap-12 items-end">
               <div className="text-center md:text-left">
                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
@@ -349,6 +418,15 @@ export default function UnionLandingPage() {
                           </TabsList>
                       </Tabs>
                   </div>
+                   <div className="md:hidden flex justify-center mb-4">
+                        <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
+                            <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
+                                <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /></TabsTrigger>
+                                <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><JpFlagIcon className="h-4 w-4" /></TabsTrigger>
+                                <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><EnFlagIcon className="h-4 w-4" /></TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+                    </div>
                   <div className="relative aspect-[4/3] max-h-[350px]">
                       <Image
                           src="/img/NTD/ND.jpg"
@@ -421,6 +499,12 @@ export default function UnionLandingPage() {
           </div>
          </section>
 
+        {/* CTA Section */}
+        <div className="space-y-20 md:space-y-28 py-20 md:py-28 bg-secondary">
+          <CtaViecLamPhuHopCustom />
+          <CtaViecLamGoiY />
+        </div>
+
         {/* Final CTA Section */}
         <section className="bg-accent text-white py-20 md:py-28">
           <div className="container mx-auto px-4 md:px-6 text-center">
@@ -429,7 +513,7 @@ export default function UnionLandingPage() {
               {t.finalCtaDescription}
             </p>
              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01-footer" onClick={() => setIsXL01DialogOpen(true)}>
+                 <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01-footer" onClick={() => setIsXL01DialogOpen(true)}>
                     <div className="text-center">
                         <span className="font-semibold">{t.finalCtaPost.main}</span>
                         <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
