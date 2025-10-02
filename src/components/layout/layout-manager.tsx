@@ -3,10 +3,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Toaster } from '@/components/ui/toaster';
-import { FloatingChatWidget } from '@/components/chat/floating-chat-widget';
 import { useAuth } from '@/contexts/AuthContext';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
@@ -16,6 +16,8 @@ import { EditProfileDialog } from '../candidate-edit-dialog';
 import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
 import { CtaViecLamGoiY } from '../cta-viec-lam-goi-y';
 import { CtaViecLamPhuHop } from '../cta-viec-lam-phu-hop';
+
+const FloatingChatWidget = dynamic(() => import('@/components/chat/floating-chat-widget').then(mod => mod.FloatingChatWidget), { ssr: false });
 
 
 export function LayoutManager({ children }: { children: React.ReactNode }) {
