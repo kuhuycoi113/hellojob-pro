@@ -71,7 +71,7 @@ const pageContent = {
             {
                 icon: TrendingUp,
                 title: 'Tối ưu hóa chi phí & Quản lý hiệu quả',
-                image: '/img/NTD/ND07.jpg',
+                image: '/img/NTD/ND06.jpg',
                 details: [
                     'Được tự do đấu giá mức phí giới thiệu thấp nhất.',
                     'Được đề xuất lựa chọn các dịch vụ quản lý, đối ứng phù hợp nhất để bảo đảm hiệu quả kinh doanh.',
@@ -153,7 +153,7 @@ const pageContent = {
             {
                 icon: TrendingUp,
                 title: 'コスト最適化と効率的な管理',
-                image: '/img/NTD/ND07.jpg',
+                image: '/img/NTD/ND06.jpg',
                 details: [
                     '最低の紹介料を自由にオークションにかけることができます。',
                     'ビジネス効率を確保するために、最適な管理および対応サービスを提案されます。',
@@ -235,7 +235,7 @@ const pageContent = {
             {
                 icon: TrendingUp,
                 title: 'Cost Optimization & Efficient Management',
-                image: '/img/NTD/ND07.jpg',
+                image: '/img/NTD/ND06.jpg',
                 details: [
                     'Freedom to bid for the lowest referral fees.',
                     'Recommendations for the most suitable management and support services to ensure business efficiency.',
@@ -307,7 +307,7 @@ export default function UnionLandingPage() {
         {/* Hero Section */}
         <section className="w-full bg-gradient-to-br from-primary to-accent text-primary-foreground py-20 md:py-28">
           <div className="container mx-auto px-4 md:px-6">
-             <div className="md:hidden flex justify-end mb-4">
+             <div className="flex justify-end mb-4">
                 <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
                     <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
                         <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
@@ -348,15 +348,7 @@ export default function UnionLandingPage() {
                 </div>
               </div>
                <div className="relative flex flex-col">
-                  <div className="hidden md:flex justify-end mb-4">
-                      <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
-                          <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
-                              <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
-                              <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><JpFlagIcon className="h-4 w-4" /> 日本語</TabsTrigger>
-                              <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><EnFlagIcon className="h-4 w-4" /> English</TabsTrigger>
-                          </TabsList>
-                      </Tabs>
-                  </div>
+                  
                   <div className="relative aspect-video">
                       <Image
                           src="/img/NTD/ND05.jpg"
