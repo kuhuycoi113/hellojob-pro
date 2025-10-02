@@ -61,7 +61,7 @@ const pageContent = {
             {
                 icon: Users,
                 title: 'Nguồn ứng viên dồi dào và chất lượng',
-                image: '/img/NTD/ND06.jpg',
+                image: '/img/NTD/ND05.jpg',
                 details: [
                     'Danh sách hàng trăm công ty phái cử với dịch vụ nguồn ứng viên đa dạng.',
                     'Nguồn ứng viên trực tiếp từ hệ thống công nghệ của HelloJob, chủ động tìm đến nền tảng.',
@@ -143,7 +143,7 @@ const pageContent = {
             {
                 icon: Users,
                 title: '豊富で質の高い候補者源',
-                image: '/img/NTD/ND06.jpg',
+                image: '/img/NTD/ND05.jpg',
                 details: [
                     '多様な候補者源を持つ数百の送り出し機関のリスト。',
                     'HelloJobの技術システムからの直接の候補者源、積極的にプラットフォームにアクセス。',
@@ -225,7 +225,7 @@ const pageContent = {
             {
                 icon: Users,
                 title: 'Abundant and Quality Candidate Pool',
-                image: '/img/NTD/ND06.jpg',
+                image: '/img/NTD/ND05.jpg',
                 details: [
                     'A list of hundreds of sending agencies with diverse candidate sourcing services.',
                     'Direct candidate sources from HelloJob\'s technology system, proactively coming to the platform.',
