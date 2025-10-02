@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -317,10 +318,10 @@ export default function UnionLandingPage() {
             </div>
             <div className="grid md:grid-cols-2 gap-12 items-end">
               <div className="text-center md:text-left">
-                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
+                   <h1 id="ND_HERO_TITLE" className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
                       {t.heroTitle.main}
                   </h1>
-                  <ul className="space-y-2 mb-6">
+                  <ul id="ND_HERO_POINTS_LIST" className="space-y-2 mb-6">
                       {t.heroTitle.points.map((point, index) => (
                           <li key={index} className="flex items-center justify-center md:justify-start">
                               <span className="text-2xl text-white/90 mr-2">・</span>
@@ -328,17 +329,17 @@ export default function UnionLandingPage() {
                           </li>
                       ))}
                   </ul>
-                <p className="text-lg text-primary-foreground/80 mb-8">
+                <p id="ND_HERO_DESCRIPTION" className="text-lg text-primary-foreground/80 mb-8">
                   {t.heroDescription}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
+                    <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="ND_HERO_CTA_POSTJOB" onClick={() => setIsXL01DialogOpen(true)}>
                         <div className="text-center">
                             <span className="font-semibold">{t.ctaPostJob.main}</span>
                             <div className="text-xs opacity-80">{t.ctaPostJob.sub}</div>
                         </div>
                     </Button>
-                    <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
+                    <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="ND_HERO_CTA_REGISTER" onClick={() => setIsYL01DialogOpen(true)}>
                         <div className="text-center">
                             <span className="font-semibold">{t.ctaRegisterPartner.main}</span>
                             <div className="text-xs opacity-80">{t.ctaRegisterPartner.sub}</div>
@@ -346,8 +347,7 @@ export default function UnionLandingPage() {
                     </Button>
                 </div>
               </div>
-               <div className="relative flex flex-col">
-                  
+               <div id="ND_HERO_IMAGE" className="relative flex flex-col">
                   <div className="relative aspect-video">
                       <Image
                           src="/img/NTD/ND2.jpg"
@@ -366,14 +366,14 @@ export default function UnionLandingPage() {
         <section id="ND_PAINPOINTS_SECTION" className="py-20 md:py-28 bg-secondary">
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-headline font-bold">{t.painPointsTitle}</h2>
-              <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
+              <h2 id="ND_PAINPOINTS_TITLE" className="text-3xl md:text-4xl font-headline font-bold">{t.painPointsTitle}</h2>
+              <p id="ND_PAINPOINTS_DESCRIPTION" className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
                 {t.painPointsDescription}
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {t.painPoints.map((point) => (
-                <Card key={point.title} className="text-center p-8 shadow-lg bg-background">
+            <div id="ND_PAINPOINTS_GRID" className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {t.painPoints.map((point, index) => (
+                <Card key={point.title} id={`ND_PAINPOINT_${index + 1}`} className="text-center p-8 shadow-lg bg-background">
                   <div className="mx-auto bg-destructive/10 rounded-full p-4 w-fit mb-4">
                     <point.icon className="h-10 w-10 text-destructive" />
                   </div>
@@ -389,14 +389,14 @@ export default function UnionLandingPage() {
          <section id="ND_SOLUTIONS_SECTION" className="py-20 md:py-28 bg-background">
           <div className="container mx-auto px-4 md:px-6">
              <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">{t.solutionsTitle}</h2>
-              <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
+              <h2 id="ND_SOLUTIONS_TITLE" className="text-3xl md:text-4xl font-headline font-bold text-primary">{t.solutionsTitle}</h2>
+              <p id="ND_SOLUTIONS_DESCRIPTION" className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
                 {t.solutionsDescription}
               </p>
             </div>
-            <div className="space-y-12">
+            <div id="ND_SOLUTIONS_LIST" className="space-y-12">
               {t.solutions.map((solution, index) => (
-                <div key={index} className={`grid md:grid-cols-2 gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
+                <div key={index} id={`ND_SOLUTION_${index + 1}`} className={`grid md:grid-cols-2 gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
                   <div className={`relative h-80 rounded-lg shadow-xl overflow-hidden ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
                       <Image src={solution.image} alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
                   </div>
@@ -423,18 +423,18 @@ export default function UnionLandingPage() {
         {/* Final CTA Section */}
         <section id="ND_FINAL_CTA_SECTION" className="bg-accent text-white py-20 md:py-28">
           <div className="container mx-auto px-4 md:px-6 text-center">
-            <h2 className="text-3xl font-headline font-bold mb-4">{t.finalCtaTitle}</h2>
-            <p className="text-white/80 mb-8 max-w-2xl mx-auto text-lg">
+            <h2 id="ND_FINALCTA_TITLE" className="text-3xl font-headline font-bold mb-4">{t.finalCtaTitle}</h2>
+            <p id="ND_FINALCTA_DESCRIPTION" className="text-white/80 mb-8 max-w-2xl mx-auto text-lg">
               {t.finalCtaDescription}
             </p>
              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01-footer" onClick={() => setIsXL01DialogOpen(true)}>
+                <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="ND_FINALCTA_POSTJOB" onClick={() => setIsXL01DialogOpen(true)}>
                     <div className="text-center">
                         <span className="font-semibold">{t.finalCtaPost.main}</span>
                         <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
                     </div>
                 </Button>
-                <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01-footer" onClick={() => setIsYL01DialogOpen(true)}>
+                <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="ND_FINALCTA_REGISTER" onClick={() => setIsYL01DialogOpen(true)}>
                     <div className="text-center">
                         <span className="font-semibold">{t.finalCtaRegister.main}</span>
                         <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
