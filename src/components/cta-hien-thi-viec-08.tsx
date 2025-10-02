@@ -353,12 +353,14 @@ export function CtaHienThiViec08() {
     try {
         const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
         const storedProfile = localStorage.getItem('generatedCandidateProfile');
-        const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : {};
+        const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
 
+        // API is called for all users. If profile & signals are null/empty, it returns default jobs.
         const matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
         setSuggestions(matchResults.slice(0, 4));
     } catch (error) {
         console.error("Failed to fetch behavioral suggestions for CTA:", error);
+        // Fallback to generic popular jobs on error
         setSuggestions(jobData.slice(4, 8).map(job => ({ job })));
     } finally {
         setIsLoading(false);
@@ -391,11 +393,11 @@ export function CtaHienThiViec08() {
     
     // Always show suggestions regardless of login state for this component
     if (suggestions.length === 0) {
-        return (
-             <div className="col-span-full">
-                <CTAForEmptyProfile />
-            </div>
-        );
+        // If logged in, show the empty profile CTA. If guest, show the login CTA.
+        if (isLoggedIn) {
+            return <CTAForEmptyProfile />;
+        }
+        return <CTAForGuest onLoginClick={handleLoginClick} />;
     }
 
     return (
@@ -408,9 +410,12 @@ export function CtaHienThiViec08() {
   return (
     <section id="HIENTHIVIEC08" className="w-full">
         <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-2xl font-headline font-bold text-left mb-8">
-                Mẫu hiển thị việc cho ứng viên
-                <span className="block text-lg font-normal text-muted-foreground mt-1">応募者向け求人表示 / Job Display for Candidates</span>
+            <h2 className="text-2xl font-headline font-bold text-left mb-8 flex items-center gap-3">
+                <Briefcase className="h-8 w-8 text-primary" />
+                <span>
+                    Mẫu hiển thị việc cho ứng viên
+                    <span className="block text-lg font-normal text-muted-foreground mt-1">応募者向け求人表示 / Job Display for Candidates</span>
+                </span>
             </h2>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {renderContent()}
