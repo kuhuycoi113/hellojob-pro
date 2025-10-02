@@ -525,7 +525,6 @@ export default function UnionLandingPage() {
 
         {/* CTA Section */}
         <div className="space-y-20 md:space-y-28 py-20 md:py-28 bg-secondary">
-          <CtaNhaTuyenDung />
           <CtaViecLamPhuHopCustom />
         </div>
       </div>
@@ -554,3 +553,5 @@ export default function UnionLandingPage() {
     </>
   );
 }
+
+    
