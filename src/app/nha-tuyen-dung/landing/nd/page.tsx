@@ -108,12 +108,12 @@ const pageContent = {
         },
         heroDescription: "HelloJobプラットフォームは包括的な技術ソリューションを提供し、組合が中心的な課題を解決し、力強く成長するのを支援します。",
         ctaPostJob: {
-            main: "今すぐ求人を掲載",
-            sub: "Post Job Now"
+            main: "求人を掲載",
+            sub: "Đăng tin tuyển dụng ngay / Post Job Now"
         },
         ctaRegisterPartner: {
             main: "パートナー登録",
-            sub: "Register as Partner"
+            sub: "Đăng ký đối tác / Register as Partner"
         },
         painPointsTitle: "私たちはあなたの課題を理解しています",
         painPointsDescription: "HelloJobは、組合が日常的に直面している「痛み」を明確に認識しています。",
@@ -168,12 +168,12 @@ const pageContent = {
         finalCtaTitle: "組合の活動を向上させる準備はできましたか？",
         finalCtaDescription: "今すぐHelloJobのパートナーになり、プロセスの最適化、コストの削減、質の高い候補者へのアクセスを開始しましょう。",
         finalCtaRegister: {
-            main: "今すぐパートナー登録",
-            sub: "Register as Partner Now"
+            main: "パートナー登録",
+            sub: "Đăng ký đối tác / Register as Partner Now"
         },
         finalCtaPost: {
             main: "求人を掲載",
-            sub: "Post a Job"
+            sub: "Đăng tin tuyển dụng ngay / Post a Job"
         },
     },
     en: {
@@ -188,11 +188,11 @@ const pageContent = {
         heroDescription: "The HelloJob platform provides comprehensive technology solutions, helping your Union solve core problems and grow strongly.",
         ctaPostJob: {
             main: "Post a Job Now",
-            sub: "無料で求人掲載"
+            sub: "Đăng tin tuyển dụng ngay / 求人を掲載"
         },
         ctaRegisterPartner: {
             main: "Register as a Partner",
-            sub: "パートナー登録"
+            sub: "Đăng ký đối tác / パートナー登録"
         },
         painPointsTitle: "We Understand Your Challenges",
         painPointsDescription: "HelloJob clearly identifies the \"pain points\" that Unions face daily.",
@@ -248,11 +248,11 @@ const pageContent = {
         finalCtaDescription: "Become a HelloJob partner today to start optimizing processes, reducing costs, and accessing a high-quality candidate pool.",
         finalCtaRegister: {
             main: "Register as a Partner Now",
-            sub: "今すぐパートナー登録"
+            sub: "Đăng ký đối tác / パートナー登録"
         },
         finalCtaPost: {
             main: "Post a Job",
-            sub: "求人を掲載"
+            sub: "Đăng tin tuyển dụng ngay / 求人を掲載"
         },
     }
 };
@@ -428,19 +428,19 @@ export default function UnionLandingPage() {
             <p className="text-white/80 mb-8 max-w-2xl mx-auto text-lg">
               {t.finalCtaDescription}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-               <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
-                  <div className="text-center">
-                      <span className="font-semibold">{t.finalCtaPost.main}</span>
-                      <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
-                  </div>
-              </Button>
-              <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
-                   <div className="text-center">
-                      <span className="font-semibold">{t.finalCtaRegister.main}</span>
-                      <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
-                  </div>
-              </Button>
+             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01-footer" onClick={() => setIsXL01DialogOpen(true)}>
+                    <div className="text-center">
+                        <span className="font-semibold">{t.finalCtaPost.main}</span>
+                        <div className="text-xs opacity-80">{t.finalCtaPost.sub}</div>
+                    </div>
+                </Button>
+                 <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01-footer" onClick={() => setIsYL01DialogOpen(true)}>
+                    <div className="text-center">
+                        <span className="font-semibold">{t.finalCtaRegister.main}</span>
+                        <div className="text-xs opacity-80">{t.finalCtaRegister.sub}</div>
+                    </div>
+                </Button>
             </div>
           </div>
         </section>
