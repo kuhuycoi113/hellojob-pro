@@ -1240,7 +1240,7 @@ export default function EmployerDetailPage() {
                      <Input id="banner-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'banner')} />
                   </Label>
                 </div>
-                <div id="THONGTINCOBANNTD01" className="p-6 bg-card">
+                <div id="DKTHONGTINCHUNG" className="p-6 bg-card">
                   <div className="flex flex-col sm:flex-row items-start gap-4 -mt-24 md:-mt-20">
                       <div className="relative flex-shrink-0">
                         <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
