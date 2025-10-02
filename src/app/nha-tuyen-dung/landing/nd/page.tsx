@@ -307,6 +307,15 @@ export default function UnionLandingPage() {
         {/* Hero Section */}
         <section className="w-full bg-gradient-to-br from-primary to-accent text-primary-foreground py-20 md:py-28">
           <div className="container mx-auto px-4 md:px-6">
+             <div className="md:hidden flex justify-end mb-4">
+                <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
+                    <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
+                        <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
+                        <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><JpFlagIcon className="h-4 w-4" /> 日本語</TabsTrigger>
+                        <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><EnFlagIcon className="h-4 w-4" /> English</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+            </div>
             <div className="grid md:grid-cols-2 gap-12 items-end">
               <div className="text-center md:text-left">
                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
@@ -339,16 +348,7 @@ export default function UnionLandingPage() {
                 </div>
               </div>
                <div className="relative flex flex-col">
-                  <div className="md:hidden flex justify-center mb-4">
-                        <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
-                            <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
-                                <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /></TabsTrigger>
-                                <TabsTrigger value="ja" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><JpFlagIcon className="h-4 w-4" /></TabsTrigger>
-                                <TabsTrigger value="en" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><EnFlagIcon className="h-4 w-4" /></TabsTrigger>
-                            </TabsList>
-                        </Tabs>
-                    </div>
-                     <div className="hidden md:flex justify-end mb-4">
+                  <div className="hidden md:flex justify-end mb-4">
                       <Tabs defaultValue={lang} onValueChange={(value) => setLang(value as Language)} className="inline-block">
                           <TabsList className="bg-black/30 backdrop-blur-sm border border-white/20">
                               <TabsTrigger value="vi" className="text-primary-foreground data-[state=active]:bg-white data-[state=active]:text-primary px-3 flex items-center gap-2"><VnFlagIcon className="h-4 w-4" /> Tiếng Việt</TabsTrigger>
