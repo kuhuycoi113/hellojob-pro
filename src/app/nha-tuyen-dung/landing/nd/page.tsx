@@ -29,8 +29,8 @@ const pageContent = {
         },
         heroDescription: "Nền tảng HelloJob cung cấp giải pháp công nghệ toàn diện, giúp Nghiệp đoàn của bạn giải quyết các bài toán cốt lõi và phát triển mạnh mẽ.",
         ctaPostJob: {
-            main: "Đăng tin tuyển dụng ngay",
-            sub: "求人を掲載 / Post Job Now"
+            main: "Đăng tin tuyển dụng miễn phí",
+            sub: "無料で求人掲載 / Post Jobs for Free"
         },
         ctaRegisterPartner: {
             main: "Đăng ký đối tác",
@@ -96,8 +96,8 @@ const pageContent = {
             sub: "パートナー登録 / Register as Partner Now"
         },
         finalCtaPost: {
-            main: "Đăng tin tuyển dụng ngay",
-            sub: "求人を掲載 / Post a Job"
+            main: "Đăng tin tuyển dụng miễn phí",
+            sub: "無料で求人掲載 / Post Jobs for Free"
         },
     },
     ja: {
@@ -111,8 +111,8 @@ const pageContent = {
         },
         heroDescription: "HelloJobプラットフォームは包括的な技術ソリューションを提供し、組合が中心的な課題を解決し、力強く成長するのを支援します。",
         ctaPostJob: {
-            main: "求人を掲載",
-            sub: "Đăng tin tuyển dụng ngay / Post Job Now"
+            main: "無料で求人掲載",
+            sub: "Đăng tin tuyển dụng miễn phí / Post Jobs for Free"
         },
         ctaRegisterPartner: {
             main: "パートナー登録",
@@ -178,8 +178,8 @@ const pageContent = {
             sub: "Đăng ký đối tác / Register as Partner Now"
         },
         finalCtaPost: {
-            main: "求人を掲載",
-            sub: "Đăng tin tuyển dụng ngay / Post a Job"
+            main: "無料で求人掲載",
+            sub: "Đăng tin tuyển dụng miễn phí / Post Jobs for Free"
         },
     },
     en: {
@@ -193,8 +193,8 @@ const pageContent = {
         },
         heroDescription: "The HelloJob platform provides comprehensive technology solutions, helping your Union solve core problems and grow strongly.",
         ctaPostJob: {
-            main: "Post a Job Now",
-            sub: "Đăng tin tuyển dụng ngay / 求人を掲載"
+            main: "Post Jobs for Free",
+            sub: "Đăng tin tuyển dụng miễn phí / 無料で求人掲載"
         },
         ctaRegisterPartner: {
             main: "Register as a Partner",
@@ -228,7 +228,7 @@ const pageContent = {
                 image: '/img/NTD/ND05.jpg',
                 details: [
                     'A list of hundreds of sending agencies with diverse candidate sourcing services.',
-                    'Direct candidate sources from HelloJob\'\'s technology system, proactively coming to the platform.',
+                    'Direct candidate sources from HelloJob\'s technology system, proactively coming to the platform.',
                     'Candidates are equipped with knowledge through the handbook system, enhancing the quality provided to customers.',
                 ],
             },
@@ -260,8 +260,8 @@ const pageContent = {
             sub: "Đăng ký đối tác / パートナー登録"
         },
         finalCtaPost: {
-            main: "Post a Job",
-            sub: "Đăng tin tuyển dụng ngay / 求人を掲載"
+            main: "Post Jobs for Free",
+            sub: "Đăng tin tuyển dụng miễn phí / 無料で求人掲載"
         },
     }
 };
