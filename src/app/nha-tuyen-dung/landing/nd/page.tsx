@@ -3,7 +3,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Handshake, DollarSign, Users, Search, CheckCircle, TrendingUp, BarChart, FileSignature, ShieldCheck, BrainCircuit } from 'lucide-react';
+import { Handshake, DollarSign, Users, Search, CheckCircle, TrendingUp, BarChart, FileSignature, ShieldCheck, BrainCircuit, Briefcase } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
@@ -14,7 +14,6 @@ import { XL01Dialog } from '@/components/X-L01-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
-import { CtaViecLamGoiY } from '@/components/cta-viec-lam-goi-y';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from '@/components/auth-dialog';
 import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
@@ -324,7 +323,8 @@ const CtaViecLamPhuHopCustom = () => {
     return (
       <section id="HIENTHIVIEC08" className="w-full">
           <div className="container mx-auto px-4 md:px-6">
-              <h2 className="text-2xl font-headline font-bold text-left mb-8">
+              <h2 className="text-2xl font-headline font-bold text-left mb-8 flex items-center gap-3">
+                  <Briefcase className="h-7 w-7 text-primary" />
                   Hiển thị việc làm/求人表示/Jobs display
               </h2>
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
