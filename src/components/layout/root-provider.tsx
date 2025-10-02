@@ -2,11 +2,8 @@
 'use client';
 
 import React from 'react';
-import { Toaster } from '@/components/ui/toaster';
-import { ChatProvider } from '@/contexts/ChatContext';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { LayoutManager } from './layout-manager';
-
+import { ChatProvider } from '@/contexts/ChatContext';
 
 export function RootProvider({
     children,
@@ -16,7 +13,7 @@ export function RootProvider({
     return (
         <AuthProvider>
             <ChatProvider>
-                <LayoutManager>{children}</LayoutManager>
+                {children}
             </ChatProvider>
         </AuthProvider>
     );
