@@ -1280,21 +1280,24 @@ export default function EmployerDetailPage() {
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
+                       <Button id="DKGT_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
                   <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
                     <div className="space-y-3 text-sm">
-                        <div>
+                        <div id="DKNV_NGHIEPVU">
                             <p className="font-semibold mb-1">{t.interestLabel}:</p>
                             {getArrayValue(employer.interest, 'interest')}
                         </div>
-                        <div>
+                        <div id="DKNV_GIATRI">
                             <p className="font-semibold mb-1">{t.valueInterestLabel}:</p>
                             {getValueInterestValue(employer.valueInterest)}
                         </div>
                     </div>
+                    <Button id="DKNV_TIEUDE" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
+                    <CardTitle id="DKNV_NUTSUA" className="absolute top-4 right-4 font-headline text-xl flex items-center gap-3"><Edit className="h-4 w-4" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')} /></CardTitle>
                   </SectionCard>
                   <SectionCard id="DKLICHSU" title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
-                       <ul className="space-y-4 text-sm">
+                       <ul id="DKLS_DANHSACH" className="space-y-4 text-sm">
                           {employer.history.length > 0 ? employer.history.map((item: any, index: number) => (
                               <li key={index} className="relative pl-6">
                                   <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
@@ -1303,9 +1306,11 @@ export default function EmployerDetailPage() {
                               </li>
                           )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
+                       <CardTitle id="DKLS_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><History className="text-primary h-6 w-6"/>{t.historyTitle}</CardTitle>
+                       <Button id="DKLS_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
                   <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div id="DKHA_LUOIANH" className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {employer.images.map((img: any, index: number) => (
                               <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
                                   <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover" />
@@ -1319,15 +1324,19 @@ export default function EmployerDetailPage() {
                               </div>
                           ))}
                       </div>
+                      <CardTitle id="DKHA_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><ImageIcon className="text-primary h-6 w-6"/>{t.imagesTitle}</CardTitle>
+                      <Button id="DKHA_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
                   <SectionCard id="DKPHUCLOI" title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
-                      <ul className="space-y-2 text-sm">
+                      <ul id="DKPL_DANHSACH" className="space-y-2 text-sm">
                           {employer.benefits.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
                               <li key={index} className="flex items-start gap-2">
                                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
                               </li>
                           )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
+                      <CardTitle id="DKPL_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><Award className="text-primary h-6 w-6"/>{t.benefitsTitle}</CardTitle>
+                      <Button id="DKPL_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
               </div>
               
@@ -1335,18 +1344,21 @@ export default function EmployerDetailPage() {
               <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
                   <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
                       <div className="space-y-3 text-sm">
-                          <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
-                          <p><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
-                          <p><strong>{t.licenseLabel}:</strong> {employer.info.license || t.notUpdated}</p>
-                          <p><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || t.notUpdated}</a></p>
+                          <p id="DKDN_NAMTHANHLAP"><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
+                          <p id="DKDN_QUYMO"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
+                          <p id="DKDN_GIAYPHEP"><strong>{t.licenseLabel}:</strong> {employer.info.license || t.notUpdated}</p>
+                          <p id="DKDN_WEBSITE"><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || t.notUpdated}</a></p>
                       </div>
+                      <CardTitle id="DKDN_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><Building className="text-primary h-6 w-6"/>{t.infoTitle}</CardTitle>
+                      <Button id="DKDN_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
+
                       {hasContactInfo ? (
                           <div id="DKTHONGTINLIENHE" className="mt-6 border-t pt-4 space-y-2">
-                             {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                             {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
-                             {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                             {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
-                             {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
+                             {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
+                             {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
+                             {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
+                             {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
+                             {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
                           </div>
                       ) : (
                           <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
@@ -1364,15 +1376,19 @@ export default function EmployerDetailPage() {
                   </SectionCard>
                   <SectionCard id="DKLOAIHINHVISA" title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
-                          <div><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
-                          <div><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
+                          <div id="DKLV_LOAIHINH"><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
+                          <div id="DKLV_CHITIETVISA"><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
                       </div>
+                      <CardTitle id="DKLV_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><FileSignature className="text-primary h-6 w-6"/>{t.visaTitle}</CardTitle>
+                      <Button id="DKLV_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
                   <SectionCard id="DKNGANHNGHEKHUVUC" title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <div><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
-                          <div><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
+                          <div id="DKNK_NGANHNGHE"><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
+                          <div id="DKNK_KHUVUC"><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
                       </div>
+                      <CardTitle id="DKNK_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><Briefcase className="text-primary h-6 w-6"/>{t.industriesTitle}</CardTitle>
+                      <Button id="DKNK_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
               </div>
 
