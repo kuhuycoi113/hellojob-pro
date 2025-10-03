@@ -348,7 +348,7 @@ const LoggedOutContent = () => {
                             </CreateProfileDialog>
 
                              <Button asChild>
-                                <Link href="/viec-lam-cua-toi">Trang việc làm</Link>
+                                <Link href="/viec-lam-cua-toi">Việc của tôi</Link>
                             </Button>
                            
                             <MainMenu />
