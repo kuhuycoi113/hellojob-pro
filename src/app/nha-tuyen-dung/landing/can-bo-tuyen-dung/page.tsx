@@ -452,7 +452,7 @@ export default function UnionLandingPage() {
 
         <CtaHienThiViec08 lang={lang} prioritizedVisaType="Thực tập sinh kỹ năng" />
         
-        <ActivityPhotos />
+        <ActivityPhotos id="HINHANHHOATDONG02" />
 
       </div>
        <XL01Dialog 
