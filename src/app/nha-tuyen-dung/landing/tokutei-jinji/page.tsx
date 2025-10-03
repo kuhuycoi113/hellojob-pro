@@ -14,6 +14,7 @@ import { XL01Dialog } from '@/components/X-L01-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
 import { useRouter } from 'next/navigation';
 import { CtaHienThiViec08 } from '@/components/cta-hien-thi-viec-08';
+import { ActivityPhotos } from '@/components/activity-photos';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -23,12 +24,12 @@ const pageContent = {
         heroTitle: {
             main: "Giải Pháp Toàn Diện Cho Tuyển Dụng Kỹ Năng Đặc Định",
             points: [
-                "Nền tảng ứng viên 4.0 - Giải quyết bài toán nguồn ứng viên.",
-                "Tự động hóa quy trình, giảm áp lực pháp lý.",
-                "Giảm gánh nặng hỗ trợ, tập trung vào nghiệp vụ cốt lõi, gia tăng lợi nhuận cho Shien."
+                "Nền tảng ứng viên 4.0, giải quyết nỗi lo nguồn.",
+                "Tối ưu quy trình, giảm áp lực pháp lý.",
+                "Tăng tốc độ tuyển dụng, tối đa hóa lợi nhuận, giảm sức ép hai đầu."
             ]
         },
-        heroDescription: "HelloJob mang đến giải pháp công nghệ toàn diện, giúp các chuyên viên tại Shien Kikan vượt qua mọi rào cản, tối ưu hiệu suất tuyển dụng, và giảm tải áp lực hỗ trợ sau khi ứng viên sang Nhật.",
+        heroDescription: "HelloJob mang đến giải pháp công nghệ toàn diện, giúp các chuyên viên tuyển dụng Kỹ năng đặc định vượt qua mọi rào cản, tự chủ nguồn ứng viên chất lượng và vận hành hiệu quả trong môi trường pháp lý phức tạp.",
         ctaPostJob: {
             main: "Đăng tin tuyển dụng miễn phí",
             sub: "無料で求人掲載 / Post Jobs for Free"
@@ -37,61 +38,61 @@ const pageContent = {
             main: "Đăng ký đối tác",
             sub: "パートナー登録 / Register as Partner"
         },
-        painPointsTitle: "Thách Thức của Nhân sự Shien Kikan: Chúng Tôi Thấu Hiểu",
-        painPointsDescription: "HelloJob nhận diện rõ những \"nỗi đau\" mà bạn đang đối mặt hàng ngày trong vai trò cầu nối giữa ứng viên Việt Nam và doanh nghiệp Nhật Bản.",
+        painPointsTitle: "Thách Thức Của Nhà Tuyển Dụng Tokutei: Chúng Tôi Thấu Hiểu",
+        painPointsDescription: "HelloJob nhận diện rõ những \"nỗi đau\" mà bạn đang đối mặt hàng ngày trong một lĩnh vực đầy tiềm năng nhưng cũng vô cùng thách thức.",
         painPoints: [
             {
                 icon: Users,
-                title: 'Khan hiếm Ứng viên & Lợi nhuận thấp',
-                description: 'Nguồn ứng viên chất lượng (đủ tay nghề, tiếng Nhật, hồ sơ hợp lệ) ngày càng ít. Cạnh tranh cao, chi phí lớn nhưng lợi nhuận cho Shien lại không tương xứng.',
+                title: 'Khan hiếm Ứng viên Chất lượng',
+                description: 'Nguồn ứng viên không chỉ ít mà còn không đúng yêu cầu. Mỗi hồ sơ không đạt chuẩn là một lần lãng phí công sức, chi phí và uy tín.',
             },
             {
                 icon: FileSignature,
-                title: 'Áp lực Pháp lý & Thủ tục phức tạp',
-                description: 'Quy định về COE, visa, skill test từ Cục Xuất nhập cảnh (Nyukan) thay đổi nhanh chóng, hồ sơ giấy tờ phức tạp, tốn thời gian và dễ xảy ra sai sót.',
+                title: 'Áp lực Pháp lý & Quy định',
+                description: 'Các quy định về COE, ngành nghề liên tục thay đổi, hồ sơ phức tạp. Một sai sót nhỏ có thể ảnh hưởng đến cả quá trình.',
             },
             {
                 icon: Handshake,
-                title: 'Gánh nặng Hỗ trợ sau Tuyển dụng',
-                description: 'Nhân sự Shien phải kiêm nhiệm quá nhiều việc: từ xử lý tranh chấp, hỗ trợ đời sống cho đến việc ứng viên bỏ việc giữa chừng, gây ảnh hưởng uy tín.',
+                title: 'Sức ép từ Hai phía',
+                description: 'Bị kẹt giữa kỳ vọng của ứng viên và yêu cầu khắt khe từ đối tác Nhật, khiến công việc luôn căng thẳng, dễ dẫn đến kiệt sức và chán nản.',
             },
         ],
-        solutionsTitle: "Giải pháp Công nghệ của HelloJob cho Tổ chức Hỗ trợ",
+        solutionsTitle: "Giải Pháp Công Nghệ Của HelloJob Dành Cho Bạn",
         solutionsDescription: "Chúng tôi biến mỗi thách thức của bạn thành một cơ hội tăng trưởng bằng các công cụ mạnh mẽ và tự động.",
         solutions: [
             {
                 icon: Users,
-                title: 'Nguồn Ứng viên Dồi dào, Chất lượng, Gia tăng lợi nhuận',
+                title: 'Nền tảng Ứng viên Tokutei 4.0: Chủ động & Đúng Chuẩn',
                 image: '/img/NTD/CTBV01.jpg',
                 details: [
-                    'Tiếp cận nguồn ứng viên đã được sàng lọc ban đầu về kỹ năng và trình độ từ HelloJob hoặc các Công ty phái cử tham gia hệ thống.',
-                    'Hệ thống AI tự động gợi ý ứng viên phù hợp nhất với yêu cầu từ doanh nghiệp tiếp nhận.',
-                    'Tăng uy tín với doanh nghiệp Nhật nhờ nguồn cung ứng viên ổn định và chất lượng, đem lại lợi nhuận lâu dài.',
+                    'Tiếp cận nguồn ứng viên đã được sàng lọc ban đầu về kỹ năng và trình độ tiếng Nhật.',
+                    'Hệ thống AI tự động gợi ý ứng viên phù hợp nhất với yêu cầu đơn hàng của bạn.',
+                    'Xây dựng "phễu" ứng viên chất lượng của riêng bạn, nâng cao tính tự chủ trong khai thác ứng viên.',
                 ],
             },
             {
                 icon: TrendingUp,
-                title: 'Tối ưu hóa Quy trình & Giảm tải Thủ tục',
+                title: 'Tự động hóa & Tối ưu Quy trình',
                 image: '/img/NTD/CTBV02.jpg',
                 details: [
-                    'Cung cấp bộ công cụ số hóa để quản lý hồ sơ ứng viên, lịch phỏng vấn và theo dõi tiến độ.',
-                    'Giảm thiểu sai sót giấy tờ, đẩy nhanh tốc độ xử lý hồ sơ COE và visa.',
-                    'Giải phóng nhân sự khỏi các công việc hành chính lặp đi lặp lại để tập trung vào nghiệp vụ quan trọng.',
+                    'Đăng tin tuyển dụng miễn phí, không giới hạn để tối đa hóa cơ hội tìm kiếm.',
+                    'Cung cấp bộ công cụ số hóa để quản lý ứng viên, lịch phỏng vấn và theo dõi tiến độ hồ sơ.',
+                    'Cập nhật liên tục các thay đổi về luật, quy định của cả Việt Nam và Nhật Bản cũng như của Công ty phái cử, để làm đúng quy định mà vẫn tạo được lợi nhuận bền vững.',
                 ],
             },
             {
                 icon: ShieldCheck,
-                title: 'Giảm gánh nặng Hỗ trợ & Nâng cao Hiệu quả',
+                title: 'Nâng cao Uy tín, Giảm Áp lực, Gia tăng lợi nhuận',
                 image: '/img/NTD/CTBV03.jpg',
                 details: [
-                    'Cung cấp các bài viết, khóa học online về văn hóa, pháp luật Nhật Bản giúp ứng viên hòa nhập tốt hơn, giảm thiểu các vấn đề phát sinh.',
-                    'Xây dựng cộng đồng người Việt tại Nhật để hỗ trợ lẫn nhau, giảm áp lực trực tiếp lên nhân sự Shien.',
-                    'Giúp bạn tập trung vào việc phát triển quan hệ với doanh nghiệp và mở rộng kinh doanh.',
+                    'Hồ sơ ứng viên được chuẩn hóa, giúp quá trình xử lý với đối tác Nhật nhanh chóng và chính xác hơn, giảm sức ép hai đầu.',
+                    'Tăng uy tín và tỷ lệ thành công, tạo cơ sở để đàm phán tốt hơn, gia tăng lợi nhuận.',
+                    'Nâng cao hình ảnh chuyên nghiệp của bạn với trang profile riêng trên nền tảng của chúng tôi.',
                 ],
             },
         ],
-        finalCtaTitle: "Nâng cao hiệu suất cho Tổ chức của bạn ngay hôm nay",
-        finalCtaDescription: "Trở thành đối tác của HelloJob để bắt đầu tối ưu hóa quy trình, giảm chi phí và tiếp cận nguồn ứng viên chất lượng cao cho các doanh nghiệp tiếp nhận.",
+        finalCtaTitle: "Sẵn sàng Bứt phá trong Tuyển dụng Tokutei?",
+        finalCtaDescription: "Trở thành đối tác của HelloJob ngay hôm nay để tự chủ nguồn ứng viên, làm việc hiệu quả hơn và đạt được thành công lớn hơn.",
         finalCtaRegister: {
             main: "Đăng ký đối tác",
             sub: "パートナー登録 / Register as Partner Now"
@@ -101,121 +102,169 @@ const pageContent = {
             sub: "無料で求人掲載 / Post Jobs for Free"
         },
     },
-    ja: {
+     ja: { // Example Translation - can be refined
         heroTitle: {
             main: "特定技能採用担当者向けの包括的ソリューション",
             points: [
                 "候補者プラットフォーム4.0、人材不足の悩みを解決。",
                 "プロセスを最適化し、法的圧力を軽減。",
-                "採用後のサポート負担を軽減し、中核業務に集中し、支援機関の利益を増加。"
+                "採用スピードを上げ、利益を最大化し、双方からの圧力を軽減。"
             ]
         },
-        heroDescription: "HelloJobは包括的な技術ソリューションを提供し、支援機関の専門家が障壁を乗り越え、採用効率を最適化し、候補者の来日後のサポート負担を軽減するのを支援します。",
-        ctaPostJob: { main: "無料で求人掲載", sub: "Post Jobs for Free" },
-        ctaRegisterPartner: { main: "パートナー登録", sub: "Register as Partner" },
-        painPointsTitle: "支援機関の皆様の課題：私たちは理解しています",
-        painPointsDescription: "HelloJobは、ベトナム人候補者と日本の受け入れ企業との架け橋として、皆様が日々直面している「痛み」を明確に認識しています。",
+        heroDescription: "HelloJobは包括的な技術ソリューションを提供し、特定技能の採用担当者が法的複雑性の中で効率的に業務を遂行し、質の高い候補者を確保し、ブレークスルーを達成するのを支援します。",
+        ctaPostJob: {
+            main: "無料で求人掲載",
+            sub: "Đăng tin tuyển dụng miễn phí / Post Jobs for Free"
+        },
+        ctaRegisterPartner: {
+            main: "パートナー登録",
+            sub: "Đăng ký đối tác / Register as Partner"
+        },
+        painPointsTitle: "特定技能採用担当者の課題：私たちは理解しています",
+        painPointsDescription: "HelloJobは、このポテンシャルに満ちた、しかし非常に挑戦的な分野であなたが日々直面している「痛み」を明確に認識しています。",
         painPoints: [
-            { icon: Users, title: '質の高い候補者の不足と低利益', description: 'スキル、日本語能力、有効な書類を持つ質の高い候補者がますます少なくなっています。高い競争とコストにもかかわらず、支援機関の利益は見合っていません。' },
-            { icon: FileSignature, title: '複雑で絶えず変化する法的手続き', description: '在留資格認定証明書（COE）、ビザ、技能試験に関する出入国在留管理庁（入管）の規制は頻繁に変更され、書類は複雑で時間がかかり、ミスが発生しやすいです。' },
-            { icon: Handshake, title: '採用後のサポートの負担', description: '支援機関のスタッフは、紛争処理から生活支援（住居、銀行）まで、多くの業務を兼務し、候補者が途中で仕事を辞めるリスクも抱え、信頼に影響を与えます。' }
+            {
+                icon: Users,
+                title: '質の高い候補者の不足',
+                description: '候補者源が少ないだけでなく、要件を満たしていない。基準を満たさない書類はすべて、労力、コスト、信用の無駄です。',
+            },
+            {
+                icon: FileSignature,
+                title: '法的・規制上の圧力',
+                description: '在留資格認定証明書（COE）や職種に関する規制は絶えず変化し、書類は複雑です。小さなミスがプロセス全体に影響を与える可能性があります。',
+            },
+            {
+                icon: Handshake,
+                title: '双方からの圧力',
+                description: '候補者の期待と日本のパートナーからの厳しい要求の間に挟まれ、仕事は常にストレスが多く、燃え尽きやすい。',
+            },
         ],
-        solutionsTitle: "支援機関のためのHelloJobの技術ソリューション",
+        solutionsTitle: "あなたのためのHelloJobの技術ソリューション",
         solutionsDescription: "私たちは強力で自動化されたツールによって、あなたの各課題を成長の機会に変えます。",
         solutions: [
             {
                 icon: Users,
-                title: '豊富で質の高い候補者源、利益の増加',
+                title: '特定技能候補者プラットフォーム4.0：主体的で基準を満たす',
                 image: '/img/NTD/CTBV01.jpg',
                 details: [
-                    'HelloJobまたはシステムに参加している送り出し機関から、スキルと日本語能力について事前にスクリーニングされた候補者源にアクセス。',
-                    'AIシステムが受け入れ企業の要件に最適な候補者を自動的に提案します。',
-                    '安定した質の高い候補者供給により、日本の受け入れ企業との信頼を高め、長期的な利益をもたらします。'
-                ]
+                    'スキルと日本語レベルについて事前にスクリーニングされた候補者源にアクセス。',
+                    'AIシステムが求人要件に最適な候補者を自動的に提案します。',
+                    '独自の質の高い候補者ファネルを構築し、自主性を高めます。',
+                ],
             },
             {
                 icon: TrendingUp,
-                title: 'プロセスの最適化と手続きの負担軽減',
+                title: 'プロセスの自動化と最適化',
                 image: '/img/NTD/CTBV02.jpg',
                 details: [
-                    '候補者プロフィール、面接スケジュール、書類進捗を管理するためのデジタルツールセットを提供。',
-                    '書類のミスを最小限に抑え、COEおよびビザ申請プロセスの処理速度を向上させます。',
-                    '反復的な管理業務からスタッフを解放し、より重要な業務に集中させます。'
-                ]
+                    '機会を最大化するための無制限の無料求人掲載。',
+                    '候補者、面接スケジュール、書類進捗を管理するためのデジタルツールセットを提供。',
+                    'ベトナムと日本の法律、規制、および送り出し機関の変更点を継続的に更新し、規制を遵守しながら持続可能な利益を生み出します。',
+                ],
             },
             {
                 icon: ShieldCheck,
-                title: 'サポート負担の軽減と効率の向上',
+                title: '信頼性の向上、圧力の軽減、利益の増加',
                 image: '/img/NTD/CTBV03.jpg',
                 details: [
-                    '日本の文化、法律に関する記事やオンラインコースを提供し、候補者の適応を助け、発生する問題を最小限に抑えます。',
-                    '在日ベトナム人コミュニティを構築し、相互支援を促し、支援機関スタッフへの直接的な圧力を軽減します。',
-                    '企業との関係構築やビジネス拡大に集中できるよう支援します。'
-                ]
-            }
+                    '標準化された候補者プロフィールにより、日本のパートナーとの処理が迅速かつ正確になり、双方からの圧力が軽減されます。',
+                    '信頼性と成功率を高め、より良い交渉の基盤を築き、利益を増加させます。',
+                    '私たちのプラットフォーム上の専用プロフィールページで、あなたのプロフェッショナルなイメージを高めます。',
+                ],
+            },
         ],
-        finalCtaTitle: "組織のパフォーマンスを向上させる準備はできましたか？",
-        finalCtaDescription: "今すぐHelloJobのパートナーになり、プロセスの最適化、コストの削減、受け入れ企業向けの質の高い候補者へのアクセスを開始しましょう。",
-        finalCtaRegister: { main: "パートナー登録", sub: "Register as Partner Now" },
-        finalCtaPost: { main: "無料で求人掲載", sub: "Post Jobs for Free" },
+        finalCtaTitle: "特定技能採用で飛躍する準備はできましたか？",
+        finalCtaDescription: "今すぐHelloJobのパートナーになり、候補者源を自律的に管理し、より効率的に働き、より大きな成功を収めましょう。",
+        finalCtaRegister: {
+            main: "パートナー登録",
+            sub: "Đăng ký đối tác / Register as Partner Now"
+        },
+        finalCtaPost: {
+            main: "無料で求人掲載",
+            sub: "Đăng tin tuyển dụng miễn phí / Post Jobs for Free"
+        },
     },
     en: {
         heroTitle: {
             main: "Comprehensive Solution for Specified Skilled Worker Recruiters",
             points: [
-                "Candidate Platform 4.0 - Solving the candidate sourcing problem.",
-                "Automate processes, reduce legal pressure.",
-                "Reduce support burden, focus on core tasks, and increase profit for Shien organizations."
+                "Candidate Platform 4.0, solving sourcing issues.",
+                "Optimize processes, reduce legal pressure.",
+                "Increase hiring speed, maximize profit, reduce pressure from both sides."
             ]
         },
-        heroDescription: "HelloJob provides a comprehensive technology solution, helping specialists at Shien Kikan overcome all barriers, optimize recruitment efficiency, and reduce the support burden after candidates arrive in Japan.",
-        ctaPostJob: { main: "Post Jobs for Free", sub: "無料で求人掲載" },
-        ctaRegisterPartner: { main: "Register as a Partner", sub: "パートナー登録" },
-        painPointsTitle: "Challenges for Shien Kikan Staff: We Understand",
-        painPointsDescription: "HelloJob recognizes the \"pain points\" you face daily in your role as a bridge between Vietnamese candidates and Japanese companies.",
+        heroDescription: "HelloJob provides a comprehensive technology solution, helping Specified Skilled Worker recruiters overcome all barriers, gain control over quality candidate sources, and operate effectively in a complex legal environment.",
+        ctaPostJob: {
+            main: "Post Jobs for Free",
+            sub: "Đăng tin tuyển dụng miễn phí / 無料で求人掲載"
+        },
+        ctaRegisterPartner: {
+            main: "Register as a Partner",
+            sub: "Đăng ký đối tác / パートナー登録"
+        },
+        painPointsTitle: "Challenges of a Tokutei Recruiter: We Understand",
+        painPointsDescription: "HelloJob recognizes the \"pain points\" you face daily in a field full of potential but also immense challenges.",
         painPoints: [
-            { icon: Users, title: 'Scarcity of Quality Candidates & Low Profit', description: 'The pool of quality candidates (with adequate skills, Japanese level, and valid documents) is shrinking. High competition and costs do not translate to commensurate profits for Shien organizations.' },
-            { icon: FileSignature, title: 'Complex & Ever-Changing Legal Procedures', description: 'Regulations regarding COE, visas, and skill tests from the Immigration Services Agency (Nyukan) change frequently. Paperwork is complex, time-consuming, and prone to errors.' },
-            { icon: Handshake, title: 'Post-Recruitment Support Burden', description: 'Shien staff are often overwhelmed, handling everything from disputes and life support (housing, banking) to candidates quitting mid-term, which affects the organization\'s reputation.' }
+            {
+                icon: Users,
+                title: 'Scarcity of Quality Candidates',
+                description: 'Candidate sources are not only scarce but also unqualified. Every failed application is a waste of effort, cost, and credibility.',
+            },
+            {
+                icon: FileSignature,
+                title: 'Legal & Regulatory Pressure',
+                description: 'Regulations on COE and occupations change constantly, and paperwork is complex. A small mistake can affect the entire process.',
+            },
+            {
+                icon: Handshake,
+                title: 'Pressure from Both Sides',
+                description: 'Caught between candidate expectations and strict demands from Japanese partners, the job is always stressful and leads to burnout and frustration.',
+            },
         ],
-        solutionsTitle: "HelloJob\'s Tech Solutions for Support Organizations",
+        solutionsTitle: "HelloJob's Tech Solutions for You",
         solutionsDescription: "We turn your challenges into growth opportunities with powerful, automated tools.",
         solutions: [
             {
                 icon: Users,
-                title: 'Abundant, Quality Candidate Pool, Increased Profit',
+                title: 'Candidate Platform 4.0: Proactive & Standard-Compliant',
                 image: '/img/NTD/CTBV01.jpg',
                 details: [
-                    'Access a pre-screened candidate pool from HelloJob or participating Sending Companies for skills and language proficiency.',
-                    'Our AI system automatically suggests the most suitable candidates for your receiving company\'s requirements.',
-                    'Increase credibility with Japanese companies through a stable, high-quality candidate supply, leading to long-term profitability.'
-                ]
+                    'Access a pre-screened candidate pool for skills and Japanese language proficiency.',
+                    'Our AI system automatically suggests the most suitable candidates for your job orders.',
+                    'Build your own quality candidate funnel, enhancing autonomy in sourcing.',
+                ],
             },
             {
                 icon: TrendingUp,
-                title: 'Process Optimization & Reduced Paperwork',
+                title: 'Process Automation & Optimization',
                 image: '/img/NTD/CTBV02.jpg',
                 details: [
-                    'Provides a digital toolkit to manage candidate profiles, interview schedules, and document progress.',
-                    'Minimize paperwork errors and speed up the COE and visa application process.',
-                    'Free up your staff from repetitive administrative tasks to focus on more critical duties.'
-                ]
+                    'Post unlimited jobs for free to maximize sourcing opportunities.',
+                    'Provides a digital toolkit to manage candidates, interview schedules, and document progress.',
+                    'Continuously updated on legal and regulatory changes in both Vietnam and Japan, as well as from sending companies, to ensure compliance while creating sustainable profits.',
+                ],
             },
             {
                 icon: ShieldCheck,
-                title: 'Reduce Support Burden & Increase Efficiency',
+                title: 'Enhance Credibility, Reduce Pressure, Increase Profit',
                 image: '/img/NTD/CTBV03.jpg',
                 details: [
-                    'Provides articles and online courses on Japanese culture and laws to help candidates integrate better, minimizing potential issues.',
-                    'Builds a community for Vietnamese people in Japan for mutual support, reducing the direct pressure on Shien staff.',
-                    'Helps you focus on developing relationships with companies and expanding your business.'
-                ]
-            }
+                    'Standardized candidate profiles make processing with Japanese partners faster and more accurate, reducing pressure from both sides.',
+                    'Increase credibility and success rates, creating a basis for better negotiations and increased profits.',
+                    'Enhance your professional image with a dedicated profile page on our platform.',
+                ],
+            },
         ],
-        finalCtaTitle: "Ready to Elevate Your Organization's Performance?",
-        finalCtaDescription: "Partner with HelloJob today to start optimizing processes, reducing costs, and accessing a high-quality candidate pool for your receiving companies.",
-        finalCtaRegister: { main: "Register as a Partner Now", sub: "パートナー登録" },
-        finalCtaPost: { main: "Post Jobs for Free", sub: "無料で求人掲載" },
+        finalCtaTitle: "Ready to Level Up Your Tokutei Recruitment?",
+        finalCtaDescription: "Partner with HelloJob today to take control of your candidate source, work more effectively, and achieve greater success.",
+        finalCtaRegister: {
+            main: "Register as a Partner Now",
+            sub: "Đăng ký đối tác / パートナー登録"
+        },
+        finalCtaPost: {
+            main: "Post Jobs for Free",
+            sub: "Đăng tin tuyển dụng miễn phí / 無料で求人掲載"
+        },
     }
 };
 
@@ -224,6 +273,7 @@ export default function TuyenDungTokuteiLandingPage() {
   const t = pageContent[lang];
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
   const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false); 
   const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
@@ -396,6 +446,9 @@ export default function TuyenDungTokuteiLandingPage() {
         </section>
 
         <CtaHienThiViec08 lang={lang} prioritizedVisaType="Kỹ năng đặc định" />
+
+        <ActivityPhotos />
+
       </div>
        <XL01Dialog 
         isOpen={isXL01DialogOpen} 
@@ -404,7 +457,9 @@ export default function TuyenDungTokuteiLandingPage() {
         initialLang={lang}
         initialStep={1}
         onComplete={handleXL01Complete}
-        onBack={() => setIsXL01DialogOpen(false)}
+        onBack={() => {
+            setIsXL01DialogOpen(false);
+        }}
       />
        <YL01Dialog 
         isOpen={isYL01DialogOpen} 
@@ -413,7 +468,9 @@ export default function TuyenDungTokuteiLandingPage() {
         initialLang={lang}
         initialStep={1}
         onComplete={navigateToEmployerPage}
-        onBack={() => setIsYL01DialogOpen(false)}
+        onBack={() => {
+            setIsYL01DialogOpen(false);
+        }}
       />
     </>
   );
