@@ -398,7 +398,7 @@ export default function UnionLandingPage() {
             <div id="ND_SOLUTIONS_LIST" className="space-y-12">
               {t.solutions.map((solution, index) => (
                 <div key={index} id={`ND_SOLUTION_${index + 1}`} className={`grid md:grid-cols-2 gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
-                  <div className={`relative h-80 rounded-lg shadow-xl overflow-hidden ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
+                  <div className={`relative aspect-[12/7] md:h-80 rounded-lg shadow-xl overflow-hidden ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
                       <Image src={solution.image} alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
                   </div>
                   <div className="space-y-4">
