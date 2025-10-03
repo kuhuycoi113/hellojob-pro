@@ -318,8 +318,8 @@ export default function UnionLandingPage() {
                 </Tabs>
             </div>
             <div className="grid md:grid-cols-2 gap-12 items-end">
-              <div className="text-left md:text-left">
-                   <h1 id="ND_HERO_TITLE" className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
+              <div className="text-left">
+                   <h1 id="ND_HERO_TITLE" className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4 text-center md:text-left">
                       {t.heroTitle.main}
                   </h1>
                   <ul id="ND_HERO_POINTS_LIST" className="space-y-2 mb-6">
@@ -398,8 +398,8 @@ export default function UnionLandingPage() {
             <div id="ND_SOLUTIONS_LIST" className="space-y-16">
               {t.solutions.map((solution, index) => (
                 <div key={index} id={`ND_SOLUTION_${index + 1}`} className={`grid md:grid-cols-2 gap-8 md:gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
-                  <div className={`flex flex-col space-y-4 ${index % 2 !== 0 ? 'md:col-start-1' : ''}`}>
-                    <div className="inline-block bg-primary/10 p-3 rounded-full w-fit md:hidden">
+                  <div className={`flex flex-col space-y-4 ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
+                    <div className="inline-block bg-primary/10 p-3 rounded-full w-fit">
                         <solution.icon className="h-8 w-8 text-primary"/>
                     </div>
                     <div className={`relative aspect-[12/7] h-60 w-full md:h-80 rounded-lg shadow-xl overflow-hidden`}>
@@ -407,9 +407,6 @@ export default function UnionLandingPage() {
                     </div>
                   </div>
                   <div className={`space-y-4 ${index % 2 !== 0 ? 'md:col-start-1 md:row-start-1' : ''}`}>
-                      <div className="hidden md:inline-block bg-primary/10 p-3 rounded-full mb-4">
-                          <solution.icon className="h-8 w-8 text-primary"/>
-                      </div>
                       <h3 className="text-2xl font-bold font-headline">{solution.title}</h3>
                       <ul className="space-y-3">
                           {solution.details.map((detail, i) => (
