@@ -129,7 +129,7 @@ export function CtaHienThiViec08({ lang, prioritizedVisaType }: CtaHienThiViec08
 
     return (
         suggestions.map((item) => (
-            <JobCard key={item.job.id} job={item.job} showRecruiterName={true} />
+            <JobCard key={item.job.id} job={item.job} showRecruiterName={true} showPostedTime={true} />
         ))
     );
   };
