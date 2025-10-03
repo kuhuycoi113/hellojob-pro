@@ -268,7 +268,7 @@ const pageContent = {
 };
 
 export default function UnionLandingPage() {
-  const [lang, setLang] = useState<Language>('vi');
+  const [lang, setLang] = useState<Language>('ja');
   const t = pageContent[lang];
 
   const router = useRouter();
