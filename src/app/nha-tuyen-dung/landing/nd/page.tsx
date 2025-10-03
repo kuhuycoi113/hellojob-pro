@@ -318,13 +318,13 @@ export default function UnionLandingPage() {
                 </Tabs>
             </div>
             <div className="grid md:grid-cols-2 gap-12 items-end">
-              <div className="text-center md:text-left">
+              <div className="text-left md:text-left">
                    <h1 id="ND_HERO_TITLE" className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4">
                       {t.heroTitle.main}
                   </h1>
                   <ul id="ND_HERO_POINTS_LIST" className="space-y-2 mb-6">
                       {t.heroTitle.points.map((point, index) => (
-                          <li key={index} className="flex items-center justify-center md:justify-start">
+                          <li key={index} className="flex items-center justify-start">
                               <span className="text-2xl text-white/90 mr-2">・</span>
                               <span className="text-lg md:text-xl text-white/90">{point}</span>
                           </li>
@@ -333,7 +333,7 @@ export default function UnionLandingPage() {
                 <p id="ND_HERO_DESCRIPTION" className="text-lg text-primary-foreground/80 mb-8">
                   {t.heroDescription}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <div className="flex flex-col sm:flex-row gap-4 justify-start">
                     <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="ND_HERO_CTA_POSTJOB" onClick={() => setIsXL01DialogOpen(true)}>
                         <div className="text-center">
                             <span className="font-semibold">{t.ctaPostJob.main}</span>
@@ -398,18 +398,15 @@ export default function UnionLandingPage() {
             <div id="ND_SOLUTIONS_LIST" className="space-y-16">
               {t.solutions.map((solution, index) => (
                 <div key={index} id={`ND_SOLUTION_${index + 1}`} className={`grid md:grid-cols-2 gap-8 md:gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
-                  <div className={`flex flex-col space-y-4 md:hidden ${index % 2 !== 0 ? 'md:col-start-1' : ''}`}>
-                    <div className="inline-block bg-primary/10 p-3 rounded-full w-fit">
+                  <div className={`flex flex-col space-y-4 ${index % 2 !== 0 ? 'md:col-start-1' : ''}`}>
+                    <div className="inline-block bg-primary/10 p-3 rounded-full w-fit md:hidden">
                         <solution.icon className="h-8 w-8 text-primary"/>
                     </div>
                     <div className={`relative aspect-[12/7] h-60 w-full md:h-80 rounded-lg shadow-xl overflow-hidden`}>
                         <Image src={solution.image} alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
                     </div>
                   </div>
-                  <div className={`hidden md:block relative aspect-[12/7] md:h-80 rounded-lg shadow-xl overflow-hidden ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
-                      <Image src={solution.image} alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
-                  </div>
-                  <div className={`space-y-4 ${index % 2 !== 0 ? 'md:col-start-1' : ''}`}>
+                  <div className={`space-y-4 ${index % 2 !== 0 ? 'md:col-start-1 md:row-start-1' : ''}`}>
                       <div className="hidden md:inline-block bg-primary/10 p-3 rounded-full mb-4">
                           <solution.icon className="h-8 w-8 text-primary"/>
                       </div>
