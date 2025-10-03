@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -388,7 +387,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                      {showPostedTime && (
                         <div className="w-full px-3 pb-1">
                             <p className="flex items-center justify-end gap-1.5 text-right w-full" style={{ fontSize: '11px', color: '#9B999A' }}>
-                                <span className='text-primary'>Đăng lúc:</span>
+                                <span className='text-primary font-normal'>Đăng lúc:</span>
                                 <span>{postedTime ? postedTime.split(' ')[1] : '...'}</span>
                             </p>
                         </div>
@@ -488,7 +487,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                 {showPostedTime && (
                     <div className="w-full px-1 pt-1 mt-1 border-t">
                         <p className="flex items-center justify-end gap-1.5 text-right w-full" style={{ fontSize: '10px', color: '#9B999A' }}>
-                            <span className='text-primary font-semibold'>Đăng lúc:</span>
+                            <span className='text-primary font-normal'>Đăng lúc:</span>
                             <span>{postedTime ? postedTime.split(' ')[1] : '...'}</span>
                         </p>
                     </div>
@@ -561,7 +560,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
               {showPostedTime && (
                 <div className="w-full px-3 pb-1 bg-card">
                     <p className="flex items-center justify-end gap-1.5 text-right w-full" style={{ fontSize: '11px', color: '#9B999A' }}>
-                        <span className='text-primary font-semibold'>Đăng lúc:</span>
+                        <span className='text-primary font-normal'>Đăng lúc:</span>
                         <span>{postedTime ? postedTime.split(' ')[1] : '...'}</span>
                     </p>
                 </div>
