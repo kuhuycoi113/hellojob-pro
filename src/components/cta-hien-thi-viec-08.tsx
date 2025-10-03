@@ -153,12 +153,12 @@ export function CtaHienThiViec08({ lang, prioritizedVisaType }: CtaHienThiViec08
   return (
     <section id="HIENTHIVIEC08" className="w-full mt-20 md:mt-28">
         <div className="container mx-auto px-4 md:px-6">
-             <div className="mb-8 flex flex-col items-start md:text-left">
-                <div className="flex items-center gap-3">
-                    <Briefcase className="h-10 w-10 text-primary" />
+             <div className="mb-8 flex flex-col items-center text-center md:flex-row md:items-center md:gap-3 md:text-left">
+                <Briefcase className="h-10 w-10 text-primary mb-2 md:mb-0 md:h-8 md:w-8" />
+                <div>
                     <h2 className="text-2xl font-headline font-bold">{content.title}</h2>
+                    <p className="text-muted-foreground">{content.subtitle}</p>
                 </div>
-                <p className="text-muted-foreground">{content.subtitle}</p>
             </div>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {renderContent()}
