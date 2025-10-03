@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -452,7 +453,7 @@ export default function UnionLandingPage() {
 
         <CtaHienThiViec08 lang={lang} prioritizedVisaType="Thực tập sinh kỹ năng" />
         
-        <ActivityPhotos id="HINHANHHOATDONG02" />
+        <ActivityPhotos id="HINHANHHOATDONG02" lang={lang}/>
 
       </div>
        <XL01Dialog 

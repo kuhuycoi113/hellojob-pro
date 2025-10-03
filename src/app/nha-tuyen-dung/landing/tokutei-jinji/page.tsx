@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -273,7 +274,6 @@ export default function TuyenDungTokuteiLandingPage() {
   const t = pageContent[lang];
 
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
   const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false); 
   const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
@@ -451,7 +451,7 @@ export default function TuyenDungTokuteiLandingPage() {
 
         <CtaHienThiViec08 lang={lang} prioritizedVisaType="Kỹ năng đặc định" />
         
-        <ActivityPhotos id="HINHANHHOATDONG02" />
+        <ActivityPhotos id="HINHANHHOATDONG02" lang={lang} />
 
       </div>
        <XL01Dialog 

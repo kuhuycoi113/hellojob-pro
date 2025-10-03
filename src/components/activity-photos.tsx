@@ -32,17 +32,43 @@ const activityImages = [
 
 interface ActivityPhotosProps {
   id?: string;
+  lang?: 'vi' | 'ja' | 'en';
+  title_vi?: string;
+  subtitle_vi?: string;
+  title_ja?: string;
+  subtitle_ja?: string;
+  title_en?: string;
+  subtitle_en?: string;
 }
 
-export function ActivityPhotos({ id = 'HINHANHHOATDONG01' }: ActivityPhotosProps) {
+export function ActivityPhotos({ 
+    id = 'HINHANHHOATDONG01',
+    lang = 'vi',
+    title_vi = 'Hình ảnh hoạt động',
+    subtitle_vi = 'Những khoảnh khắc đáng nhớ trong hành trình phát triển và kết nối của HelloJob.',
+    title_ja = '活動写真',
+    subtitle_ja = 'HelloJobの発展と繋がりの思い出の瞬間',
+    title_en = 'Activity Photos',
+    subtitle_en = "Memorable moments in HelloJob's journey of development and connection.",
+}: ActivityPhotosProps) {
+
+  const content = {
+    vi: { title: title_vi, subtitle: subtitle_vi, others: `${title_ja} / ${title_en}` },
+    ja: { title: title_ja, subtitle: subtitle_ja, others: `${title_vi} / ${title_en}` },
+    en: { title: title_en, subtitle: subtitle_en, others: `${title_vi} / ${title_ja}` },
+  };
+
+  const currentContent = content[lang];
+
   return (
     <section id={id} className="py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-headline font-bold text-primary">Hình ảnh hoạt động</h2>
+            <h2 className="text-3xl font-headline font-bold text-primary">{currentContent.title}</h2>
             <p className="text-muted-foreground mt-4 max-w-3xl mx-auto text-lg">
-              Những khoảnh khắc đáng nhớ trong hành trình phát triển và kết nối của HelloJob.
+              {currentContent.subtitle}
             </p>
+            <p className="text-sm text-muted-foreground/70 mt-2">{currentContent.others}</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {activityImages.map((src, index) => (
