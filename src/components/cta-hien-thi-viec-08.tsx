@@ -1,11 +1,12 @@
 
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, LogIn, UserPlus, Sparkles, Star, PlusCircle } from 'lucide-react';
+import { Briefcase, LogIn, UserPlus, Sparkles, Star, FastForward, ListChecks, HardHat, UserCheck, GraduationCap, PlusCircle, Pencil } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
 import { jobData, type Job } from '@/lib/mock-data';
 import Link from 'next/link';

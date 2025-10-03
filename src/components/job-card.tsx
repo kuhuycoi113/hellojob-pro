@@ -502,7 +502,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   return (
     <>
         <Card id="HIENTHIVIEC02" className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-border shadow-sm transition-shadow duration-300 hover:shadow-lg")}>
-             <div className="group cursor-pointer" onClick={handleCardClick}>
+             <div className="group cursor-pointer flex flex-col h-full" onClick={handleCardClick}>
                 <div className="relative aspect-video w-full">
                      <Image src={job.image.src} alt={job.title} fill className="object-cover transition-transform group-hover:scale-105" />
                       <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
@@ -542,7 +542,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <span>{job.workLocation}</span>
                     </div>
 
-                    <div className="mt-auto">
+                    <div className="mt-auto pt-2 border-t">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                              <div className="flex items-center gap-1">
                                 <Link href={`/tu-van-vien/${job.recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -555,15 +555,17 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             </div>
                             {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                         </div>
-                        {showPostedTime && (
-                             <p className="mt-1 text-right text-xs">
-                                <span className='text-primary'>Đăng lúc:</span>
-                                <span className='text-muted-foreground'> {postedTime ? postedTime.split(' ')[1] : '...'}</span>
-                            </p>
-                        )}
                     </div>
                 </div>
              </div>
+              {showPostedTime && (
+                <div className="w-full px-3 pb-1 bg-card">
+                    <p className="flex items-center justify-end gap-1.5 text-right w-full" style={{ fontSize: '11px', color: '#9B999A' }}>
+                        <span className='text-primary font-semibold'>Đăng lúc:</span>
+                        <span>{postedTime ? postedTime.split(' ')[1] : '...'}</span>
+                    </p>
+                </div>
+            )}
         </Card>
         <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
         <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
