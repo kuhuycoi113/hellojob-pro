@@ -153,9 +153,9 @@ export function CtaHienThiViec08({ lang, prioritizedVisaType }: CtaHienThiViec08
   return (
     <section id="HIENTHIVIEC08" className="w-full mt-20 md:mt-28">
         <div className="container mx-auto px-4 md:px-6">
-             <div className="mb-8 text-center md:text-left flex flex-col items-center md:items-start">
+             <div className="mb-8 flex flex-col items-start md:text-left">
                 <div className="flex items-center gap-3">
-                    <Briefcase className="h-8 w-8 text-primary" />
+                    <Briefcase className="h-10 w-10 text-primary" />
                     <h2 className="text-2xl font-headline font-bold">{content.title}</h2>
                 </div>
                 <p className="text-muted-foreground">{content.subtitle}</p>
