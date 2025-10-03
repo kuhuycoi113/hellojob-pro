@@ -180,7 +180,7 @@ export default function AboutPage() {
       </section>
 
       {/* Activity Photos Section */}
-      <section className="py-20 md:py-28 bg-secondary">
+      <section id="HINHANHHOATDONG01" className="py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-headline font-bold text-primary">Hình ảnh hoạt động</h2>
