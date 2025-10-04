@@ -1,21 +1,21 @@
 
-
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Handshake, DollarSign, Users, FileSignature, CheckCircle, TrendingUp, ShieldCheck } from 'lucide-react';
+import { Handshake, DollarSign, Users, Search, CheckCircle, TrendingUp, BarChart, FileSignature, ShieldCheck, BrainCircuit, Briefcase } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { CtaHienThiViec08 } from '@/components/cta-hien-thi-viec-08';
 import { ActivityPhotos } from '@/components/activity-photos';
+import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -103,7 +103,7 @@ const pageContent = {
             sub: "無料で求人掲載 / Post Jobs for Free"
         },
     },
-     ja: { // Example Translation - can be refined
+     ja: {
         heroTitle: {
             main: "特定技能採用担当者向けの包括的ソリューション",
             points: [
@@ -279,6 +279,7 @@ export default function TuyenDungTokuteiLandingPage() {
   const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
 
   const handleXL01Complete = (preferences: any) => {
+    console.log("X-L01 Completed with:", preferences);
     setRecruitmentPrefs(preferences);
     setIsXL01DialogOpen(false);
   };
@@ -397,8 +398,8 @@ export default function TuyenDungTokuteiLandingPage() {
             </div>
             <div id="ND_SOLUTIONS_LIST" className="space-y-16">
               {t.solutions.map((solution, index) => (
-                <div key={index} id={`ND_SOLUTION_${index + 1}`} className={`grid md:grid-cols-2 gap-8 md:gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
-                   <div className={`flex flex-col space-y-4 ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
+                <div key={index} id={`ND_SOLUTION_${index + 1}`} className={cn("grid md:grid-cols-2 gap-8 md:gap-12 items-center")}>
+                   <div className={`flex flex-col space-y-4 ${index % 2 !== 0 ? 'md:order-last' : ''}`}>
                     <div className="flex flex-col items-center md:items-start text-center md:text-left">
                         <div className="inline-block bg-primary/10 p-3 rounded-full w-fit">
                             <solution.icon className="h-8 w-8 text-primary"/>
@@ -408,7 +409,7 @@ export default function TuyenDungTokuteiLandingPage() {
                         <Image src={solution.image} alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
                     </div>
                   </div>
-                  <div className={`space-y-4 ${index % 2 !== 0 ? 'md:col-start-1 md:row-start-1' : ''}`}>
+                  <div className={`space-y-4 ${index % 2 !== 0 ? 'md:order-first' : ''}`}>
                       <h3 className="text-2xl font-bold font-headline">{solution.title}</h3>
                       <ul className="space-y-3">
                           {solution.details.map((detail, i) => (
@@ -451,7 +452,9 @@ export default function TuyenDungTokuteiLandingPage() {
 
         <CtaHienThiViec08 lang={lang} prioritizedVisaType="Kỹ năng đặc định" />
         
-        <ActivityPhotos id="HINHANHHOATDONG02" lang={lang} />
+        <ActivityPhotos id="HINHANHHOATDONG02" lang={lang}/>
+
+        <CtaNhaTuyenDung />
 
       </div>
        <XL01Dialog 
