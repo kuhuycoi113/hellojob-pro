@@ -35,15 +35,19 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
     
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
-    const isNtdLandingNdPage = pathname === '/nha-tuyen-dung/landing/nd';
-    const isTuyenDungTokuteiPage = pathname === '/nha-tuyen-dung/landing/tuyen-dung-tokutei';
-
-
-    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky', '/nha-tuyen-dung/landing/nd', '/nha-tuyen-dung/landing/can-bo-tuyen-dung', '/nha-tuyen-dung/landing/tuyen-dung-tokutei'];
+    
+    const ntdLandingPagePaths = [
+        '/nha-tuyen-dung/landing/nd',
+        '/nha-tuyen-dung/landing/can-bo-tuyen-dung',
+        '/nha-tuyen-dung/landing/tuyen-dung-tokutei',
+        '/nha-tuyen-dung/landing/shien' // Added new page
+    ];
+    
+    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky', ...ntdLandingPagePaths];
     
     // Determine whether to show CTAs based on client-side path
     const showDefaultCtas = isClient && !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
-    const showNtdLandingCta = isClient && (isNtdLandingNdPage || isTuyenDungTokuteiPage);
+    const showNtdLandingCta = isClient && ntdLandingPagePaths.includes(pathname);
 
 
     useEffect(() => {
