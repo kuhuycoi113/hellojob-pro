@@ -3,16 +3,16 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Handshake, DollarSign, Users, Search, CheckCircle, TrendingUp, BarChart, FileSignature, ShieldCheck, BrainCircuit, Briefcase } from 'lucide-react';
+import { Handshake, DollarSign, Users, FileSignature, CheckCircle, TrendingUp, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { CtaHienThiViec08 } from '@/components/cta-hien-thi-viec-08';
 import { ActivityPhotos } from '@/components/activity-photos';
 
@@ -24,12 +24,13 @@ const pageContent = {
         heroTitle: {
             main: "Giải pháp Công nghệ cho Công ty Phái cử Việt Nam",
             points: [
-                "Kết nối trực tiếp với Nghiệp đoàn & Xí nghiệp Nhật Bản.",
-                "Tự động hóa quy trình, giảm chi phí, tối đa lợi nhuận.",
-                "Xây dựng thương hiệu phái cử uy tín trên nền tảng số."
+                "Mở rộng nguồn ứng viên dồi dào từ hệ sinh thái HelloJob và các đối tác.",
+                "Kết nối trực tiếp & xây dựng thương hiệu với đối tác Nhật Bản, gia tăng lợi nhuận.",
+                "Tối ưu hóa quy trình vận hành, giảm chi phí & rủi ro.",
+                "Cập nhật liên tục tri thức ngành và luật pháp."
             ]
         },
-        heroDescription: "HelloJob mang đến giải pháp công nghệ toàn diện, giúp các công ty phái cử (xuất khẩu lao động) vượt qua mọi thách thức, chủ động kết nối đối tác và đột phá trong kỷ nguyên số.",
+        heroDescription: "HelloJob mang đến giải pháp công nghệ toàn diện, giúp các công ty phái cử (xuất khẩu lao động) vượt qua mọi thách thức, chủ động kết nối đối tác, tự chủ nguồn ứng viên và đột phá trong kỷ nguyên số.",
         ctaPostJob: {
             main: "Đăng tin tuyển dụng miễn phí",
             sub: "無料で求人掲載 / Post Jobs for Free"
@@ -38,23 +39,28 @@ const pageContent = {
             main: "Đăng ký đối tác",
             sub: "パートナー登録 / Register as Partner"
         },
-        painPointsTitle: "3 Thách thức lớn nhất của Công ty Phái cử",
+        painPointsTitle: "4 Thách thức lớn nhất của Công ty Phái cử",
         painPointsDescription: "HelloJob nhận diện rõ những \"nỗi đau\" mà bạn đang đối mặt hàng ngày trong cuộc cạnh tranh khốc liệt.",
         painPoints: [
             {
                 icon: Users,
-                title: 'Nguồn lao động không đáp ứng yêu cầu',
-                description: 'Lao động thiếu tay nghề, ngoại ngữ; trong khi đối tác Nhật ngày càng nâng cao tiêu chuẩn, dẫn đến tỷ lệ trượt đơn hàng cao và lãng phí chi phí đào tạo.',
+                title: 'Khó khăn trong Tuyển dụng & Tìm kiếm Nguồn ứng viên',
+                description: 'Thị trường cạnh tranh khốc liệt, chi phí marketing cao nhưng nguồn ứng viên khan hiếm, không chất lượng. Lao động thiếu tay nghề và ngoại ngữ dẫn đến tỷ lệ trượt đơn hàng cao, lãng phí chi phí đào tạo.',
+            },
+            {
+                icon: Handshake,
+                title: 'Khó khăn trong Phát triển Khách hàng & Đối tác',
+                description: 'Gặp trở ngại khi tiếp cận và thuyết phục các nghiệp đoàn, xí nghiệp tiếp nhận mới do thiếu công cụ marketing chuyên nghiệp và thương hiệu chưa được biết đến rộng rãi tại Nhật.',
             },
             {
                 icon: FileSignature,
-                title: 'Rủi ro pháp lý & uy tín',
-                description: 'Quy định pháp luật thay đổi liên tục, rủi ro lao động bỏ trốn gây mất uy tín, ảnh hưởng đến giấy phép và các hợp đồng quốc tế.',
+                title: 'Quy trình thủ công & Chi phí vận hành cao',
+                description: 'Quản lý hồ sơ, lịch phỏng vấn, theo dõi tiến độ bằng các công cụ rời rạc (Excel, Zalo) gây tốn thời gian, dễ sai sót, tăng chi phí nhân sự và vận hành.',
             },
-            {
-                icon: DollarSign,
-                title: 'Áp lực tài chính & chi phí',
-                description: 'Doanh thu phụ thuộc phí dịch vụ bị siết chặt, trong khi chi phí tuyển dụng, đào tạo, quản lý ngày càng cao, gây khó khăn cho việc vận hành và tái đầu tư.',
+             {
+                icon: ShieldCheck,
+                title: 'Rủi ro Pháp lý & Thiếu thông tin',
+                description: 'Quy định pháp luật trong và ngoài nước thay đổi liên tục, thiếu nguồn thông tin chính thống và cập nhật, dẫn đến rủi ro trong việc tuân thủ và tư vấn cho người lao động.',
             },
         ],
         solutionsTitle: "Giải pháp Công nghệ từ HelloJob dành cho bạn",
@@ -62,31 +68,41 @@ const pageContent = {
         solutions: [
             {
                 icon: Users,
-                title: 'Mở rộng mạng lưới, Nâng cao chất lượng nguồn',
-                image: '/img/NTD/phaicu01.jpg',
+                title: 'Kênh Đối tác & Nguồn ứng viên 4.0',
+                image: '/img/NTD/CTBV01.jpg',
                 details: [
-                    'Kết nối trực tiếp với hàng trăm Nghiệp đoàn và Xí nghiệp tại Nhật đang có nhu cầu tuyển dụng.',
-                    'Đăng tin tuyển dụng miễn phí, không giới hạn để thu hút ứng viên chất lượng từ khắp nơi trên nền tảng của chúng tôi.',
-                    'Sử dụng hệ thống E-learning để chuẩn hóa đào tạo ngoại ngữ và kỹ năng cho lao động.',
+                    'Hiển thị việc làm của bạn đến hàng chục ngàn ứng viên trên HelloJob và mạng lưới đối tác tuyển dụng rộng khắp.',
+                    'Hệ thống AI tự động sàng lọc, gợi ý ứng viên phù hợp nhất, giúp bạn tập trung vào các hồ sơ tiềm năng.',
+                    'Xây dựng "phễu" ứng viên chất lượng cao của riêng bạn, nâng cao tính tự chủ và giảm sự phụ thuộc vào các kênh truyền thống.',
+                ],
+            },
+            {
+                icon: Handshake,
+                title: 'Xây dựng Thương hiệu & Kết nối Đối tác',
+                image: '/img/NTD/phaicu03.jpg',
+                details: [
+                    'Xây dựng profile doanh nghiệp chuyên nghiệp trên HelloJob để quảng bá năng lực và uy tín tới các đối tác Nhật Bản.',
+                    'Sử dụng nền tảng để đăng tải các bài viết, hoạt động, tạo niềm tin và trực tiếp thu hút sự quan tâm từ các đối tác Nhật Bản.',
+                    'Cơ hội tiếp cận các đơn hàng độc quyền và tham gia vào một hệ sinh thái đối tác minh bạch, hiệu quả.',
                 ],
             },
             {
                 icon: TrendingUp,
-                title: 'Tối ưu hóa vận hành & Tăng cường lợi nhuận',
-                image: '/img/NTD/phaicu02.jpg',
+                title: 'Tối ưu hóa Vận hành & Gia tăng Lợi nhuận',
+                image: '/img/NTD/CTBV02.jpg',
                 details: [
                     'Cung cấp bộ công cụ số hóa để quản lý ứng viên, lịch phỏng vấn và theo dõi tiến độ, giảm thiểu giấy tờ và quy trình thủ công.',
                     'Hệ thống báo cáo tự động giúp theo dõi hiệu quả, tối ưu chi phí và lợi nhuận trên từng đơn hàng.',
-                    'Giảm chi phí marketing và tuyển sinh nhờ nguồn ứng viên có sẵn trên nền tảng.',
+                    'Đăng tin miễn phí để giảm chi phí marketing, tối đa hóa lợi nhuận.',
                 ],
             },
             {
                 icon: ShieldCheck,
-                title: 'Xây dựng thương hiệu & Giảm thiểu rủi ro pháp lý',
-                image: '/img/NTD/phaicu03.jpg',
+                title: 'Công cụ & Tri thức đồng hành',
+                image: '/img/NTD/CTBV03.jpg',
                 details: [
-                    'Xây dựng profile doanh nghiệp chuyên nghiệp trên HelloJob để quảng bá năng lực và uy tín tới các đối tác Nhật Bản.',
-                    'Cập nhật liên tục các thay đổi về luật pháp, giúp bạn luôn tuân thủ và giảm rủi ro.',
+                    'Nền tảng cập nhật liên tục các thay đổi về luật pháp, giúp bạn luôn tuân thủ và giảm rủi ro.',
+                    'Cung cấp hệ thống cẩm nang và E-learning để bạn nâng cao chất lượng đào tạo và tư vấn cho người lao động.',
                     'Tăng cường minh bạch thông tin trong quá trình tuyển dụng để tạo niềm tin cho cả lao động và đối tác.',
                 ],
             },
@@ -105,24 +121,26 @@ const pageContent = {
     ja: {
         heroTitle: {
             main: "ベトナムの送り出し機関向け技術ソリューション",
-            points: ["日本の組合・企業と直接連携。", "プロセスを自動化し、コストを削減、利益を最大化。", "デジタルプラットフォーム上で信頼できるブランドを構築。"],
+            points: ["HelloJobエコシステムとパートナーから豊富な候補者源を拡大。", "日本のパートナーと直接連携し、ブランドを構築し、利益を増加させる。", "運用プロセスを最適化し、コストとリスクを削減。", "業界知識と法律を継続的に更新。"],
             description: "HelloJobは、送り出し機関（ベトナムの労働者派遣会社）があらゆる課題を克服し、主体的にパートナーと連携し、デジタル時代に飛躍するための包括的な技術ソリューションを提供します。"
         },
         ctaPostJob: { main: "無料で求人掲載", sub: "Đăng tin tuyển dụng miễn phí / Post Jobs for Free" },
         ctaRegisterPartner: { main: "パートナー登録", sub: "Đăng ký đối tác / Register as Partner" },
-        painPointsTitle: "送り出し機関の3大課題",
+        painPointsTitle: "送り出し機関の4大課題",
         painPointsDescription: "HelloJobは、あなたが熾烈な競争の中で日々直面している「痛み」を明確に認識しています。",
         painPoints: [
-            { icon: Users, title: '人材の質が要求に満たない', description: '労働者のスキル、語学力、規律意識が不足しており、日本のパートナーの基準は高まる一方で、不合格率が高く、研修費用が無駄になります。' },
-            { icon: FileSignature, title: '法的リスクと信用の問題', description: '国内外の法規制が絶えず変化し、労働者の失踪リスクが信用を損ない、ライセンスや国際契約に影響を与えます。' },
-            { icon: DollarSign, title: '財政的圧力とコスト', description: '手数料収入が厳しく規制される一方、採用、研修、管理コストは増加し、運営と再投資が困難になります。' }
+            { icon: Users, title: '採用と候補者ソースの確保の難しさ', description: '市場は競争が激しく、マーケティング費用は高いが、候補者源は希少で質が低い。労働者のスキルと語学力が不足しているため、不合格率が高く、研修費用が無駄になります。' },
+            { icon: Handshake, title: '顧客とパートナー開拓の難しさ', description: '専門的なマーケティングツールや日本での知名度不足のため、新しい組合や受け入れ企業へのアプローチと説得に障壁があります。' },
+            { icon: FileSignature, title: '手動プロセスと高い運営コスト', description: '書類管理、面接スケジュール、進捗追跡を別々のツール（Excel、Zalo）で行うことは、時間がかかり、ミスが発生しやすく、人件費と運営コストを増加させます。' },
+            { icon: ShieldCheck, title: '法的リスクと情報不足', description: '国内外の法規制が絶えず変化し、公式で最新の情報源が不足しているため、コンプライアンスや労働者への助言にリスクが生じます。' }
         ],
         solutionsTitle: "あなたのためのHelloJobの技術ソリューション",
         solutionsDescription: "私たちは強力で自動化されたツールによって、あなたの各課題を成長の機会に変えます。",
         solutions: [
-            { icon: Users, title: 'ネットワークの拡大と人材の質の向上', image: '/img/NTD/phaicu01.jpg', details: ['採用ニーズのある日本の数百の組合や企業と直接連携。', '無制限の無料求人掲載で、当社のプラットフォームから質の高い候補者を全国から集めます。', 'Eラーニングシステムを活用して、労働者の語学力とスキルを標準化します。'] },
-            { icon: TrendingUp, title: '運用の最適化と利益の向上', image: '/img/NTD/phaicu02.jpg', details: ['候補者管理、面接スケジュール、進捗追跡のためのデジタルツールセットを提供し、書類作業と手動プロセスを削減します。', '自動報告システムで各求人の効果を追跡し、コストと利益を最適化します。', 'プラットフォーム上の既存の候補者源のおかげで、マーケティングと採用コストを削減します。'] },
-            { icon: ShieldCheck, title: 'ブランド構築と法的リスクの軽減', image: '/img/NTD/phaicu03.jpg', details: ['HelloJobでプロフェッショナルな企業プロフィールを構築し、日本のパートナーに能力と信頼性をアピール。', '法改正を継続的に更新し、常にコンプライアンスを遵守し、リスクを低減します。', '採用プロセスにおける情報の透明性を高め、労働者とパートナーの双方から信頼を築きます。'] }
+            { icon: Users, title: 'パートナーチャネルと候補者プラットフォーム4.0', image: '/img/NTD/CTBV01.jpg', details: ['あなたの求人をHelloJob上の何万人もの候補者と幅広い採用パートナーネットワークに表示します。', 'AIシステムが自動的にスクリーニングし、最適な候補者を提案するため、最も可能性の高いプロフィールに集中できます。', '独自の質の高い候補者ファネルを構築し、自主性を高め、従来のチャネルへの依存を減らします。'] },
+            { icon: Handshake, title: 'ブランド構築とパートナー連携', image: '/img/NTD/phaicu03.jpg', details: ['HelloJobでプロフェッショナルな企業プロフィールを構築し、日本のパートナーに能力と信頼性をアピールします。', 'プラットフォームを利用して活動を投稿し、信頼を築き、日本のパートナーから直接関心を引き付けます。', '独占的な求人案件にアクセスし、透明で効率的なパートナーエコシステムに参加する機会。'] },
+            { icon: TrendingUp, title: '運用の最適化と利益の向上', image: '/img/NTD/CTBV02.jpg', details: ['候補者管理、面接スケジュール、進捗追跡のためのデジタルツールセットを提供し、書類作業と手動プロセスを削減します。', '自動報告システムで各求人の効果を追跡し、コストと利益を最適化します。', 'プラットフォーム上の既存の候補者源のおかげで、マーケティングコストを削減し、利益を最大化します。'] },
+            { icon: ShieldCheck, title: 'ツールと知識のパートナーシップ', image: '/img/NTD/CTBV03.jpg', details: ['法改正を継続的に更新し、常にコンプライアンスを遵守し、リスクを低減します。', 'ハンドブックとEラーニングシステムを提供し、研修の質を高め、労働者への助言を改善します。', '採用プロセスにおける情報の透明性を高め、労働者とパートナーの双方から信頼を築きます。'] }
         ],
         finalCtaTitle: "派遣業界でデジタル変革と飛躍を遂げる準備はできましたか？",
         finalCtaDescription: "今すぐHelloJobのパートナーになり、グローバルに連携し、プロセスを最適化し、信頼できる持続可能な派遣ブランドを構築しましょう。",
@@ -132,24 +150,26 @@ const pageContent = {
     en: {
         heroTitle: {
             main: "Tech Solution for Vietnamese Sending Companies",
-            points: ["Directly connect with Japanese Unions & Companies.", "Automate processes, reduce costs, maximize profits.", "Build a reputable brand on a digital platform."],
-            description: "HelloJob delivers a comprehensive technology solution, helping sending companies (labor export agencies) overcome all challenges, proactively connect with partners, and achieve breakthroughs in the digital era."
+            points: ["Expand abundant candidate sources from the HelloJob ecosystem and its partners.", "Directly connect & build your brand with Japanese partners, increasing profits.", "Optimize operational processes, reducing costs & risks.", "Continuously update industry knowledge and legal regulations."],
+            description: "HelloJob delivers a comprehensive technology solution, helping sending companies (labor export agencies) overcome all challenges, proactively connect with partners, take control of their candidate sources, and achieve breakthroughs in the digital era."
         },
         ctaPostJob: { main: "Post Jobs for Free", sub: "Đăng tin tuyển dụng miễn phí / 無料で求人掲載" },
         ctaRegisterPartner: { main: "Register as a Partner", sub: "Đăng ký đối tác / パートナー登録" },
-        painPointsTitle: "Top 3 Challenges for Sending Companies",
+        painPointsTitle: "4 Biggest Challenges for Sending Companies",
         painPointsDescription: "HelloJob recognizes the \"pain points\" you face daily in a fierce market.",
         painPoints: [
-            { icon: Users, title: 'Unqualified Labor Supply', description: 'Workers lack skills, language, and discipline, while Japanese partners raise standards, leading to high rejection rates and wasted training costs.' },
-            { icon: FileSignature, title: 'Legal & Reputational Risks', description: 'Constantly changing regulations and the risk of absconding workers damage reputation, affecting licenses and international contracts.' },
-            { icon: DollarSign, title: 'Financial Strain & Costs', description: 'Revenue is dependent on tightly regulated service fees, while recruitment, training, and management costs are rising, making operations and reinvestment difficult.' }
+            { icon: Users, title: 'Difficulty in Recruitment & Sourcing Candidates', description: 'Fierce market competition and high marketing costs, yet candidate sources are scarce and low-quality. Unskilled workers with poor language proficiency lead to high rejection rates and wasted training costs.' },
+            { icon: Handshake, title: 'Difficulty in Developing Clients & Partners', description: 'Struggling to approach and convince new unions and accepting companies due to a lack of professional marketing tools and brand recognition in Japan.' },
+            { icon: FileSignature, title: 'Manual Processes & High Operating Costs', description: 'Managing profiles, interview schedules, and tracking progress with disparate tools (Excel, Zalo) is time-consuming, prone to errors, and increases personnel and operational costs.' },
+            { icon: ShieldCheck, title: 'Legal Risks & Lack of Information', description: 'Constantly changing domestic and international regulations, coupled with a lack of official, updated information sources, leads to compliance risks and challenges in advising workers.' }
         ],
         solutionsTitle: "HelloJob's Tech Solutions for You",
         solutionsDescription: "We turn your challenges into growth opportunities with powerful, automated tools.",
         solutions: [
-            { icon: Users, title: 'Expand Network, Enhance Source Quality', image: '/img/NTD/phaicu01.jpg', details: ['Connect directly with hundreds of Japanese unions and companies with hiring needs.', 'Post unlimited free jobs to attract quality candidates from all over our platform.', 'Utilize our E-learning system to standardize language and skills training for workers.'] },
-            { icon: TrendingUp, title: 'Optimize Operations & Increase Profitability', image: '/img/NTD/phaicu02.jpg', details: ['Provides a digital toolkit to manage candidates, interview schedules, and track progress, reducing paperwork and manual processes.', 'Automatic reporting system helps track effectiveness, optimizing costs and profits for each order.', 'Reduce marketing and recruitment costs thanks to the existing candidate pool on the platform.'] },
-            { icon: ShieldCheck, title: 'Build Brand & Minimize Legal Risks', image: '/img/NTD/phaicu03.jpg', details: ['Build a professional company profile on HelloJob to promote your capabilities and credibility to Japanese partners.', 'Continuously update on legal changes, helping you stay compliant and reduce risks.', 'Enhance information transparency in the recruitment process to build trust with both workers and partners.'] }
+            { icon: Users, title: 'Partner Channel & Candidate Pool 4.0', image: '/img/NTD/CTBV01.jpg', details: ['Display your job listings to tens of thousands of candidates on HelloJob and across a wide network of recruitment partners.', 'Our AI system automatically screens and suggests the most suitable candidates, helping you focus on the most promising profiles.', 'Build your own high-quality candidate funnel, increasing autonomy and reducing dependency on traditional channels.'] },
+            { icon: Handshake, title: 'Brand Building & Partner Connection', image: '/img/NTD/phaicu03.jpg', details: ['Build a professional company profile on HelloJob to promote your capabilities and credibility to Japanese partners.', 'Use the platform to post activities and build trust, directly attracting interest from Japanese partners.', 'Access exclusive job orders and participate in a transparent, efficient partner ecosystem.'] },
+            { icon: TrendingUp, title: 'Optimize Operations & Increase Profitability', image: '/img/NTD/CTBV02.jpg', details: ['Provides a digital toolkit to manage candidates, interview schedules, and track progress, reducing paperwork and manual processes.', 'Automatic reporting system helps track effectiveness, optimizing costs and profits for each order.', 'Reduce marketing and recruitment costs thanks to the existing candidate pool on the platform.'] },
+            { icon: ShieldCheck, title: 'Accompanying Tools & Knowledge', image: '/img/NTD/CTBV03.jpg', details: ['The platform continuously updates on legal changes, helping you stay compliant and reduce risks.', 'Provides a handbook and E-learning system for you to enhance training quality and worker consultation.', 'Enhance information transparency in the recruitment process to build trust with both workers and partners.'] }
         ],
         finalCtaTitle: "Ready to Transform and Excel in the Sending Industry?",
         finalCtaDescription: "Partner with HelloJob today to connect globally, optimize processes, and build a reputable, sustainable sending brand.",
@@ -168,7 +188,6 @@ export default function PhaiCuLandingPage() {
   const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
 
   const handleXL01Complete = (preferences: any) => {
-    console.log("X-L01 Completed with:", preferences);
     setRecruitmentPrefs(preferences);
     setIsXL01DialogOpen(false);
   };
@@ -188,7 +207,7 @@ export default function PhaiCuLandingPage() {
     (data.industry || []).forEach((item: string) => params.append('industry', item));
     (data.location || []).forEach((item: string) => params.append('location', item));
     
-    router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
+    router.push(`/nha-tuyen-dung/dang-ky?${''}${params.toString()}`);
     setIsYL01DialogOpen(false);
   };
 
@@ -212,18 +231,18 @@ export default function PhaiCuLandingPage() {
                    <h1 id="ND_HERO_TITLE" className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold mb-4 text-center md:text-left">
                       {t.heroTitle.main}
                   </h1>
-                  <ul id="ND_HERO_POINTS_LIST" className="space-y-2 mb-6">
+                  <ul id="ND_HERO_POINTS_LIST" className="space-y-2 mb-6 text-center md:text-left">
                       {t.heroTitle.points.map((point, index) => (
-                          <li key={index} className="flex items-center justify-start">
+                          <li key={index} className="flex items-center justify-center md:justify-start">
                               <span className="text-2xl text-white/90 mr-2">・</span>
                               <span className="text-lg md:text-xl text-white/90">{point}</span>
                           </li>
                       ))}
                   </ul>
-                <p id="ND_HERO_DESCRIPTION" className="text-lg text-primary-foreground/80 mb-8">
+                <p id="ND_HERO_DESCRIPTION" className="text-lg text-primary-foreground/80 mb-8 text-center md:text-left">
                   {t.heroDescription}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-start">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                     <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="ND_HERO_CTA_POSTJOB" onClick={() => setIsXL01DialogOpen(true)}>
                         <div className="text-center">
                             <span className="font-semibold">{t.ctaPostJob.main}</span>
