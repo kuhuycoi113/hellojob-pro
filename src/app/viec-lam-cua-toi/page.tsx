@@ -430,8 +430,6 @@ const LoggedInView = () => {
                 nextUrl.searchParams.delete('highlight');
                 router.replace(nextUrl.toString(), { scroll: false });
             }, 100);
-        } else {
-            setOpenAccordion(['item-1']); // Default to open "Gợi ý cho bạn"
         }
         fetchAppliedJobs();
     }, [searchParams, router, clearApplicationCount, fetchAppliedJobs]);
@@ -442,7 +440,7 @@ const LoggedInView = () => {
             const storedProfile = localStorage.getItem('generatedCandidateProfile');
             if (storedProfile) {
                 const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-                const matchResults = await matchJobsToProfile(profile, 'related', []);
+                const matchResults = await matchJobsToProfile(profile, 'related', []); // Pass empty signals for profile-based suggestions
                 setSuggestedJobs(matchResults.map(r => r.job));
             } else {
                 setSuggestedJobs(jobData.slice(0, 20));
@@ -455,6 +453,7 @@ const LoggedInView = () => {
         }
     }, []);
 
+    // CANHANHOA01: New function to fetch behavior-based suggestions
     const fetchBehavioralSuggestions = useCallback(async () => {
         setIsLoadingBehavioral(true);
         try {
@@ -462,6 +461,7 @@ const LoggedInView = () => {
             if (storedProfile) {
                  const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
                  const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+                 // The flow will now receive signals. If signals are empty, it will fall back to profile-based matching.
                  const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
                  setBehavioralSuggestedJobs(matchResults);
             } else {
@@ -500,7 +500,7 @@ const LoggedInView = () => {
             return;
         }
         fetchSuggestedJobs();
-        fetchBehavioralSuggestions();
+        fetchBehavioralSuggestions(); // Fetch behavioral suggestions
         fetchSavedJobs();
         fetchAppliedJobs();
 
@@ -519,7 +519,7 @@ const LoggedInView = () => {
         setTimeout(() => {
             setVisibleJobsCount(prev => prev + 8);
             setIsLoadingMore(false);
-        }, 500);
+        }, 500); // Simulate network delay
     };
 
     const openEditAspirationsDialog = () => {
@@ -533,7 +533,7 @@ const LoggedInView = () => {
         if (storedPrinciple === 'salary' || storedPrinciple === 'fee' || storedPrinciple === 'company') {
             setSuggestionPrinciple(storedPrinciple);
         } else {
-            setSuggestionPrinciple(null);
+            setSuggestionPrinciple(null); // Set to null if nothing is stored
         }
          const storedType = localStorage.getItem('suggestionType');
         if(storedType === 'accurate' || storedType === 'related') {
@@ -558,14 +558,14 @@ const LoggedInView = () => {
         }
         localStorage.setItem('suggestionType', suggestionType);
         setIsAspirationsDialogOpen(false);
-        setForceUpdate(prev => prev + 1); 
+        setForceUpdate(prev => prev + 1); // Trigger a re-fetch
     };
 
     const openFeeDialog = () => {
         const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
         if (storedProfileRaw) {
             const profile = JSON.parse(storedProfileRaw);
-            setTempAspirations(profile.aspirations || {});
+            setTempAspirations(profile.aspirations || {}); // Load aspirations to get visa detail
             setTempFee(profile.aspirations?.financialAbility || '');
         }
         setIsFeeDialogOpen(true);
@@ -580,6 +580,7 @@ const LoggedInView = () => {
         });
     };
     
+    // Logic for the Fee Dialog (MPMM01)
     const getFeePlaceholder = () => {
         const visaDetail = tempAspirations.desiredVisaDetail;
         if (visaDetail === 'Thực tập sinh 1 năm') return "1000";
@@ -597,7 +598,7 @@ const LoggedInView = () => {
         }
 
         const visaDetail = tempAspirations.desiredVisaDetail;
-        let limit = 3800; 
+        let limit = 3800; // Default limit
         if (visaDetail === 'Thực tập sinh 1 năm') limit = 1400;
         if (visaDetail === 'Đặc định đầu Việt') limit = 2500;
 
@@ -633,8 +634,12 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: { name: string; slug: string }[] } = visaDetailsByVisaType;
-    const visaTypes = Object.keys(visaDetailsByVisaType);
+    const visaDetailsOptions: { [key: string]: string[] } = {
+        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
+        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
+        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
+    };
+    const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
@@ -659,7 +664,7 @@ const LoggedInView = () => {
             >
                 <AccordionItem value="item-1" className={cn(
                     "border-b-0 transition-all duration-500 ease-in-out border rounded-lg",
-                    openAccordion?.includes('item-1') && "ring-2 ring-accent-orange ring-offset-2 shadow-2xl bg-accent-orange/10"
+                    isSuggestionHighlighted && "ring-2 ring-accent-orange ring-offset-2 shadow-2xl bg-accent-orange/10"
                 )}>
                     <div className="flex items-center bg-background px-6 rounded-t-lg hover:no-underline">
                         <AccordionTrigger className="flex-grow py-4 font-semibold text-base">
@@ -681,10 +686,53 @@ const LoggedInView = () => {
                         </Button>
                     </div>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
-                       {/* Content for "Gợi ý cho bạn" */}
+                       {isLoadingSuggestions ? (
+                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {Array.from({ length: 4 }).map((_, i) => (
+                                    <Card key={i}>
+                                        <CardContent className="p-4 space-y-3">
+                                            <Skeleton className="h-28 w-full" />
+                                            <Skeleton className="h-4 w-3/4" />
+                                            <Skeleton className="h-4 w-1/2" />
+                                            <Skeleton className="h-4 w-full" />
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                       ) : suggestedJobs.length > 0 ? (
+                            <>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                </div>
+                                {visibleJobsCount < suggestedJobs.length && (
+                                    <div className="text-center mt-8">
+                                        <Button onClick={handleLoadMore} disabled={isLoadingMore}>
+                                            {isLoadingMore ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Đang tải...
+                                                </>
+                                            ) : (
+                                                'Xem thêm'
+                                            )}
+                                        </Button>
+                                    </div>
+                                )}
+                            </>
+                       ) : (
+                           <div className="text-center py-8 text-muted-foreground">
+                             <p>Không tìm thấy công việc nào phù hợp với hồ sơ của bạn.</p>
+                             <p className="text-sm mt-2">
+                                Hãy thử cập nhật{' '}
+                                <button onClick={openEditAspirationsDialog} className="text-primary underline">
+                                    hồ sơ và nguyện vọng
+                                </button>{' '}
+                                của bạn.
+                             </p>
+                           </div>
+                       )}
                     </AccordionContent>
                 </AccordionItem>
-
                  <AccordionItem value="item-2" className="border rounded-lg border-b-0" ref={appliedJobsRef}>
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
@@ -708,7 +756,6 @@ const LoggedInView = () => {
                         </div>
                     </AccordionContent>
                 </AccordionItem>
-
                  <AccordionItem value="item-3" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
@@ -718,10 +765,19 @@ const LoggedInView = () => {
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
-                       {/* Content for "Việc đã lưu" */}
+                       {savedJobs.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                            </div>
+                        ) : (
+                             <div className="text-center py-8 text-muted-foreground">
+                                <p>Bạn chưa lưu công việc nào.</p>
+                             </div>
+                        )}
                     </AccordionContent>
                 </AccordionItem>
 
+                 {/* CANHANHOA01: New Module */}
                  <AccordionItem value="item-4" id="behavioral-suggestions" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
@@ -731,20 +787,509 @@ const LoggedInView = () => {
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
-                       {/* Content for "Có thể bạn quan tâm" */}
+                       {isLoadingBehavioral ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {Array.from({ length: 4 }).map((_, i) => (
+                                    <Card key={i}><CardContent className="p-4 space-y-3"><Skeleton className="h-28 w-full" /><Skeleton className="h-4 w-3/4" /><Skeleton className="h-4 w-1/2" /></CardContent></Card>
+                                ))}
+                            </div>
+                       ) : behavioralSuggestedJobs.length > 0 ? (
+                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {behavioralSuggestedJobs.map((item) => (
+                                    <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
+                                ))}
+                            </div>
+                       ) : (
+                           <div className="text-center py-8 text-muted-foreground">
+                             <p>Hãy xem và lưu một vài công việc để chúng tôi có thể gợi ý tốt hơn cho bạn!</p>
+                             <Button asChild variant="link" className="mt-2"><Link href="/viec-lam">Bắt đầu tìm kiếm</Link></Button>
+                           </div>
+                       )}
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
         </div>
         
-        {/* Other sections... */}
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <StatCard title="Việc làm phù hợp/tuần" value="12" change="+5.2%" />
+            <StatCard title="Việc làm phù hợp/tháng" value="48" change="+8.1%" />
+            <StatCard title="Việc làm cùng ngành nghề" value="315" />
+            <StatCard title="Lượt xem hồ sơ" value={viewers.length} change="+12" />
+        </div>
+        
+        {/* Progress Tracker */}
+        <div className="mb-8">
+            <h2 className="text-xl font-bold font-headline mb-4">Tiến độ của bạn</h2>
+            <ProgressTracker />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <JobStatsChart data={chartData} />
+            <div className="lg:col-span-1">
+                {/* Aspirations Section */}
+                <div className="mb-8">
+                     <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold font-headline">Nguyện vọng tìm việc</h2>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        {aspirations.map(asp => (
+                            <Card key={asp.id} className="shadow-lg">
+                                <CardContent className="p-4 flex items-center justify-between">
+                                    <div>
+                                        <Badge className="mb-1">{asp.type}</Badge>
+                                        <p className="font-bold">{asp.title}</p>
+                                        <p className="text-sm text-green-600 font-semibold">{asp.salary}</p>
+                                    </div>
+                                    <Button variant="ghost" size="icon">
+                                        <Edit className="h-4 w-4"/>
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        ))}
+                         <Card className="shadow-lg border-dashed flex items-center justify-center hover:border-primary hover:text-primary transition-colors cursor-pointer min-h-[100px]">
+                            <CardContent className="p-4 text-center">
+                               <PlusCircle className="mx-auto h-6 w-6 text-muted-foreground mb-1"/>
+                               <p className="font-semibold text-sm">Thêm nguyện vọng</p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+                 <Card 
+                    className="shadow-lg md:col-span-1 cursor-pointer hover:bg-secondary/80 transition-colors"
+                    onClick={() => setIsViewersDialogOpen(true)}
+                >
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Nhà tuyển dụng đã xem hồ sơ</CardTitle>
+                        <Eye className="h-5 w-5 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{viewers.length}</div>
+                        <div className="flex items-center mt-2">
+                            <div className="flex -space-x-2 overflow-hidden">
+                                {viewers.slice(0, 5).map((viewer, index) => (
+                                    <Avatar key={index} className="inline-block h-6 w-6 border-2 border-background">
+                                        <AvatarImage src={viewer.src} />
+                                        <AvatarFallback>{viewer.name}</AvatarFallback>
+                                    </Avatar>
+                                ))}
+                            </div>
+                            {viewers.length > 5 && (
+                               <span className="text-xs font-semibold text-muted-foreground ml-3">+{viewers.length - 5}</span>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+        <ProfileViewersDialog isOpen={isViewersDialogOpen} onClose={() => setIsViewersDialogOpen(false)} />
+        <Dialog open={isAspirationsDialogOpen} onOpenChange={setIsAspirationsDialogOpen}>
+            <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>Sửa điều kiện gợi ý</DialogTitle>
+                    <DialogDescription>
+                        Thay đổi các nguyện vọng để nhận được gợi ý việc làm phù hợp hơn.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="visa-type-modal">Loại visa mong muốn</Label>
+                        <Select
+                            value={tempAspirations.desiredVisaType || ''}
+                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }))}
+                        >
+                            <SelectTrigger id="visa-type-modal"><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
+                            <SelectContent>
+                                {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="visa-detail-modal">Chi tiết visa</Label>
+                        <Select
+                            value={tempAspirations.desiredVisaDetail || ''}
+                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaDetail: value }))}
+                            disabled={!tempAspirations.desiredVisaType}
+                        >
+                            <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
+                            <SelectContent>
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="industry-modal">Ngành nghề mong muốn</Label>
+                        <Select
+                            value={tempDesiredIndustry}
+                            onValueChange={value => setTempDesiredIndustry(value)}
+                            disabled={!tempAspirations.desiredVisaType}
+                        >
+                             <SelectTrigger id="industry-modal">
+                                <SelectValue placeholder="Chọn ngành nghề" >
+                                    {tempDesiredIndustry || "Chọn ngành nghề"}
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="location-modal">Địa điểm mong muốn</Label>
+                        <Select
+                            value={tempAspirations.desiredLocation || ''}
+                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredLocation: value }))}
+                        >
+                            <SelectTrigger id="location-modal"><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
+                            <SelectContent className="max-h-[300px]">
+                                <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                                {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
+                                    <SelectGroup key={region}>
+                                        <SelectLabel>{region}</SelectLabel>
+                                        <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                        {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                    </SelectGroup>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2 pt-2">
+                        <Label className="font-semibold">Nguyên tắc gợi ý</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                             <Button 
+                                variant={suggestionType === 'accurate' ? 'default' : 'outline'}
+                                onClick={() => setSuggestionType('accurate')}
+                                className="justify-center text-left h-auto py-2"
+                            >
+                                Chính xác 100%
+                            </Button>
+                             <Button 
+                                variant={suggestionType === 'related' ? 'default' : 'outline'}
+                                onClick={() => setSuggestionType('related')}
+                                className="justify-center text-left h-auto py-2"
+                            >
+                               Thêm cả việc liên quan
+                            </Button>
+                        </div>
+                    </div>
+                    
+                    <div className="space-y-2 pt-2">
+                        <Label className="font-semibold">Ưu tiên tìm việc</Label>
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                             <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setSuggestionPrinciple('salary');
+                                }}
+                                className={cn(
+                                    "justify-start text-left h-auto py-2",
+                                    suggestionPrinciple === 'salary' && "ring-2 ring-primary border-primary bg-primary/10"
+                                )}
+                            >
+                                <div>
+                                    <p className="font-semibold">Lương tốt</p>
+                                    <p className="text-xs opacity-80 font-normal">Ưu tiên việc có lương cao</p>
+                                </div>
+                            </Button>
+                            <Button 
+                                variant="outline"
+                                onClick={() => {
+                                    setSuggestionPrinciple('fee');
+                                    openFeeDialog();
+                                }}
+                                 className={cn(
+                                    "justify-start text-left h-auto py-2",
+                                    suggestionPrinciple === 'fee' && "ring-2 ring-primary border-primary bg-primary/10"
+                                )}
+                            >
+                                 <div>
+                                    <p className="font-semibold">{feeButtonText}</p>
+                                    <p className="text-xs opacity-80 font-normal">Ưu tiên phí thấp / uy tín</p>
+                                </div>
+                            </Button>
+                            <Button 
+                                variant="outline"
+                                onClick={() => setSuggestionPrinciple('company')}
+                                className={cn(
+                                    "justify-start text-left h-auto py-2",
+                                    suggestionPrinciple === 'company' && "ring-2 ring-primary border-primary bg-primary/10"
+                                )}
+                            >
+                                 <div>
+                                    <p className="font-semibold">{companyButtonText}</p>
+                                    <p className="text-xs opacity-80 font-normal">Ưu tiên công ty uy tín</p>
+                                </div>
+                            </Button>
+                        </div>
+                    </div>
+                    <Collapsible>
+                        <CollapsibleTrigger asChild>
+                            <Button variant="outline" className="w-full justify-start text-left font-semibold">
+                                <ChevronDown className="mr-2 h-4 w-4" />
+                                Thêm điều kiện mở rộng
+                            </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pt-4 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Học vấn</Label>
+                                    <Select value={tempAspirations.educationRequirement} onValueChange={value => setTempAspirations(prev => ({...prev, educationRequirement: value}))}>
+                                        <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
+                                        <SelectContent>
+                                            {educationLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Trình độ tiếng Nhật</Label>
+                                    <Select value={tempAspirations.languageRequirement} onValueChange={value => setTempAspirations(prev => ({...prev, languageRequirement: value}))}>
+                                        <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
+                                        <SelectContent>
+                                            {languageLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
+                                    <Label>Số năm kinh nghiệm</Label>
+                                    <Select value={tempAspirations.yearsOfExperience} onValueChange={value => setTempAspirations(prev => ({...prev, yearsOfExperience: value}))}>
+                                        <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
+                                        <SelectContent>
+                                            {experienceYears.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="space-y-2 pt-2">
+                                <Label>Các điều kiện khác</Label>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2">
+                                     {allSpecialConditions.map(item => (
+                                        <div key={item} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`cond-modal-${item}`}
+                                                checked={tempAspirations.specialConditions?.includes(item)}
+                                                onCheckedChange={checked => {
+                                                    const current = tempAspirations.specialConditions || [];
+                                                    const newConditions = checked
+                                                        ? [...current, item]
+                                                        : current.filter(c => c !== item);
+                                                    setTempAspirations(prev => ({...prev, specialConditions: newConditions}));
+                                                }}
+                                            />
+                                            <Label htmlFor={`cond-modal-${item}`} className="text-sm font-normal cursor-pointer">{item}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </CollapsibleContent>
+                    </Collapsible>
+                </div>
+                <DialogFooter className="flex-row justify-end space-x-2">
+                    <DialogClose asChild>
+                        <Button variant="outline">Hủy</Button>
+                    </DialogClose>
+                    <Button onClick={handleSaveAspirations}>Lưu và tìm lại</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+        <Dialog open={isFeeDialogOpen} onOpenChange={setIsFeeDialogOpen}>
+            <DialogContent className="sm:max-w-md">
+                {/* MPMM01 */}
+                <DialogHeader>
+                    <DialogTitle>Mức phí mong muốn</DialogTitle>
+                    <DialogDescription>Nhập mức phí tối đa bạn sẵn sàng chi trả (USD).</DialogDescription>
+                </DialogHeader>
+                <div className="pt-4 space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="fee-usd">Phí tối đa (USD)</Label>
+                        <Input 
+                            id="fee-usd" 
+                            type="text" 
+                            placeholder={getFeePlaceholder()}
+                            value={getFeeDisplayValue(tempFee)}
+                            onChange={handleFeeInputChange}
+                        />
+                         <p className="text-xs text-muted-foreground">{getConvertedFeeValue(tempFee)}</p>
+                    </div>
+                </div>
+                <DialogFooter className="pt-4">
+                    <Button variant="outline" onClick={() => setIsFeeDialogOpen(false)}>Hủy</Button>
+                    <Button onClick={handleSaveFee}>Lưu thay đổi</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    </>
+    )
+}
+
+const LoggedOutView = () => {
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+
+    return (
+        <>
+        <div className="flex items-center justify-center text-center py-20">
+            <Card className="max-w-2xl p-8 shadow-2xl">
+                <CardHeader>
+                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
+                        <Briefcase className="h-12 w-12 text-primary"/>
+                    </div>
+                    <CardTitle className="text-3xl font-headline">Quản lý việc làm của bạn</CardTitle>
+                    <CardDescription className="text-base pt-2">
+                        Đăng nhập để xem các công việc được gợi ý riêng cho bạn, theo dõi các đơn đã ứng tuyển và quản lý các việc làm đã lưu.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button onClick={() => setIsAuthDialogOpen(true)} size="lg">
+                        <LogIn className="mr-2"/>Đăng ký / Đăng nhập
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+        <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
         </>
     )
 }
 
+const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+    const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
+    const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
+    const [transformStyle, setTransformStyle] = useState({});
+    const cardRef = useRef<HTMLDivElement>(null);
+  
+    useEffect(() => {
+        const vietnamVisaDetails = [
+            'Thực tập sinh 3 năm',
+            'Thực tập sinh 1 năm',
+            'Đặc định đầu Việt',
+            'Đặc định đi mới',
+            'Kỹ sư, tri thức đầu Việt'
+        ];
+        
+        const japanVisaDetails = [
+            'Đặc định đầu Nhật',
+            'Kỹ sư, tri thức đầu Nhật'
+        ];
+
+        try {
+            const storedProfile = localStorage.getItem('generatedCandidateProfile');
+            if (storedProfile) {
+                const profile = JSON.parse(storedProfile);
+                const userVisaDetail = profile.aspirations?.desiredVisaDetail;
+                if (userVisaDetail) {
+                   if (vietnamVisaDetails.includes(userVisaDetail)) {
+                       setCompanyButtonText('Công ty phái cử uy tín');
+                   } else if (japanVisaDetails.includes(userVisaDetail)) {
+                       setCompanyButtonText('Công ty tiếp nhận uy tín');
+                   }
+
+                   if (userVisaDetail === 'Thực tập sinh 3 Go') {
+                        setFeeButtonText('Nghiệp đoàn uy tín');
+                        setCompanyButtonText('Công ty tiếp nhận uy tín');
+                   } else if (userVisaDetail === "Kỹ sư, tri thức đầu Nhật") {
+                       setFeeButtonText("Shokai uy tín");
+                   } else if (userVisaDetail === "Đặc định đầu Nhật") {
+                       setFeeButtonText("Shien uy tín");
+                   }
+                }
+            }
+        } catch (e) {
+            console.error("Could not parse user profile from localStorage", e);
+        }
+        
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 2000); // Show after 2 seconds
+  
+      return () => {
+        clearTimeout(timer);
+      };
+    }, []);
+
+    const handleClose = () => {
+        const targetButton = document.getElementById('highlight-target-button');
+        const cardElement = cardRef.current;
+
+        if (targetButton && cardElement) {
+            const targetRect = targetButton.getBoundingClientRect();
+            const cardRect = cardElement.getBoundingClientRect();
+            
+            const translateX = targetRect.left - cardRect.left + (targetRect.width / 2) - (cardRect.width / 2);
+            const translateY = targetRect.top - cardRect.top + (targetRect.height / 2) - (cardRect.height / 2);
+
+            setTransformStyle({
+                transform: `translate(${translateX}px, ${translateY}px) scale(0.1)`,
+                opacity: 0,
+            });
+        }
+        
+        setIsClosing(true);
+        setTimeout(() => {
+            onHighlight();
+            setIsVisible(false); // Hide the component after animation
+        }, 700); // This duration must match the CSS transition duration
+    };
+  
+    useEffect(() => {
+        let closeTimer: NodeJS.Timeout;
+        if(isVisible && !isClosing) {
+            closeTimer = setTimeout(() => {
+                handleClose();
+            }, 3000); 
+        }
+        return () => clearTimeout(closeTimer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isVisible, isClosing]);
+  
+    if (!isVisible) {
+      return null;
+    }
+  
+    return (
+      <div
+        ref={cardRef}
+        style={isClosing ? transformStyle : {}}
+        className={cn(
+          "fixed bottom-24 left-4 z-50 transition-all duration-700",
+          !isClosing && "animate-in slide-in-from-bottom"
+        )}
+      >
+        { !isClosing && (
+            <Card className="shadow-2xl w-full max-w-sm">
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-bold flex items-center justify-between">
+                        <span>Ưu tiên tìm việc theo?</span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={handleClose}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2">
+                    <Button variant="outline" className="justify-start" onClick={handleClose}>
+                        <TrendingUp className="mr-2 h-4 w-4 text-accent-green" /> Lương tốt
+                    </Button>
+                    <Button variant="outline" className="justify-start" onClick={handleClose}>
+                        <ShieldCheck className="mr-2 h-4 w-4 text-primary" /> {feeButtonText}
+                    </Button>
+                    <Button variant="outline" className="justify-start" onClick={handleClose}>
+                        <ThumbsUp className="mr-2 h-4 w-4 text-accent-orange" /> {companyButtonText}
+                    </Button>
+                </CardContent>
+            </Card>
+        )}
+    </div>
+  );
+};
+
+
 function MyJobsDashboardPageContent() {
-    const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
+    const { role, isLoggedIn } = useAuth();
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
