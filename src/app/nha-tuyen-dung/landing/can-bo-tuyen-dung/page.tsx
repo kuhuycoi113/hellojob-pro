@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -353,7 +352,7 @@ export default function UnionLandingPage() {
                <div id="ND_HERO_IMAGE" className="relative flex flex-col">
                   <div className="relative aspect-video">
                       <Image
-                          src="/img/NTD/CTBV_HERO.jpg"
+                          src="/img/NTD/CBTD2.png"
                           alt="Hợp tác cùng phát triển với HelloJob"
                           fill
                           className="object-cover rounded-lg shadow-2xl"
