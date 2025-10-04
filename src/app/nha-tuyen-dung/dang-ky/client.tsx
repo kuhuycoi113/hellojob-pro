@@ -388,10 +388,10 @@ const subRoleTexts: Record<string, Record<Language, string>> = {
 };
 
 const interestTexts: Record<string, Record<Language, string>> = {
-    'post-job': { vi: 'Đăng việc làm', ja: '求人掲載', en: 'Post a Job' },
-    'refer-candidate': { vi: 'Giới thiệu ứng viên', ja: '候補者紹介', en: 'Refer a Candidate' },
-    'post-and-refer': { vi: 'Đăng việc làm & Giới thiệu ứng viên', ja: '求人掲載と候補者紹介', en: 'Post Job & Refer Candidate' },
-    'refer-and-post': { vi: 'Giới thiệu ứng viên & Đăng việc làm', ja: '候補者紹介と求人掲載', en: 'Refer Candidate & Post Job' },
+    'post-job': { vi: 'Đăng việc làm để tìm ứng viên', ja: '候補者を見つけるために求人を掲載する', en: 'Post jobs to find candidates' },
+    'refer-candidate': { vi: 'Tìm kiếm đối tác nhân lực phù hợp', ja: '適切な人材パートナーを探す', en: 'Find suitable HR partners' },
+    'post-and-refer': { vi: 'Hợp tác quảng bá hệ thống đến ứng viên', ja: '候補者へのシステム広報協力', en: 'Collaborate to promote the system to candidates' },
+    'refer-and-post': { vi: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng', ja: '採用担当者へのシステム広報協力', en: 'Collaborate to promote the system to employers' },
 };
 
 
@@ -1282,6 +1282,40 @@ export default function EmployerDetailPage() {
                        <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                        <Button id="DKGT_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
+                  
+                  {/* Info card for Mobile */}
+                  <div className="block lg:hidden">
+                    <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
+                        <div className="space-y-3 text-sm">
+                            <p id="DKDN_NAMTHANHLAP-mobile"><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
+                            <p id="DKDN_QUYMO-mobile"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
+                            <p id="DKDN_GIAYPHEP-mobile"><strong>{t.licenseLabel}:</strong> {employer.info.license || t.notUpdated}</p>
+                            <p id="DKDN_WEBSITE-mobile"><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || t.notUpdated}</a></p>
+                        </div>
+                        {hasContactInfo ? (
+                            <div id="DKTHONGTINLIENHE-mobile" className="mt-6 border-t pt-4 space-y-2">
+                               {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
+                               {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
+                               {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
+                               {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
+                               {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
+                            </div>
+                        ) : (
+                            <div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4">
+                                <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
+                                    <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
+                                    <ZaloIcon className="h-6 w-6" />
+                                    <MessengerIcon className="h-6 w-6" />
+                                    <LineIcon className="h-6 w-6" />
+                                </div>
+                                <div className="text-center text-sm">
+                                   <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                                </div>
+                            </div>
+                        )}
+                    </SectionCard>
+                  </div>
+
                   <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
                     <div className="space-y-3 text-sm">
                         <div id="DKNV_NGHIEPVU">
@@ -1342,38 +1376,40 @@ export default function EmployerDetailPage() {
               
                 {/* Right Column (order-first on desktop) */}
               <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
-                  <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
-                      <div className="space-y-3 text-sm">
-                          <p id="DKDN_NAMTHANHLAP"><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
-                          <p id="DKDN_QUYMO"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
-                          <p id="DKDN_GIAYPHEP"><strong>{t.licenseLabel}:</strong> {employer.info.license || t.notUpdated}</p>
-                          <p id="DKDN_WEBSITE"><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || t.notUpdated}</a></p>
-                      </div>
-                      <CardTitle id="DKDN_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><Building className="text-primary h-6 w-6"/>{t.infoTitle}</CardTitle>
-                      <Button id="DKDN_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
+                  <div className="hidden lg:block">
+                    <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
+                        <div className="space-y-3 text-sm">
+                            <p id="DKDN_NAMTHANHLAP"><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
+                            <p id="DKDN_QUYMO"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
+                            <p id="DKDN_GIAYPHEP"><strong>{t.licenseLabel}:</strong> {employer.info.license || t.notUpdated}</p>
+                            <p id="DKDN_WEBSITE"><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || t.notUpdated}</a></p>
+                        </div>
+                        <CardTitle id="DKDN_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><Building className="text-primary h-6 w-6"/>{t.infoTitle}</CardTitle>
+                        <Button id="DKDN_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
 
-                      {hasContactInfo ? (
-                          <div id="DKTHONGTINLIENHE" className="mt-6 border-t pt-4 space-y-2">
-                             {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                             {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
-                             {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                             {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
-                             {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
-                          </div>
-                      ) : (
-                          <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
-                            <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
-                                <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
-                                <ZaloIcon className="h-6 w-6" />
-                                <MessengerIcon className="h-6 w-6" />
-                                <LineIcon className="h-6 w-6" />
+                        {hasContactInfo ? (
+                            <div id="DKTHONGTINLIENHE" className="mt-6 border-t pt-4 space-y-2">
+                               {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
+                               {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
+                               {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
+                               {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
+                               {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
                             </div>
-                            <div className="text-center text-sm">
-                               <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                        ) : (
+                            <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
+                                <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
+                                    <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
+                                    <ZaloIcon className="h-6 w-6" />
+                                    <MessengerIcon className="h-6 w-6" />
+                                    <LineIcon className="h-6 w-6" />
+                                </div>
+                                <div className="text-center text-sm">
+                                   <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                                </div>
                             </div>
-                          </div>
-                      )}
-                  </SectionCard>
+                        )}
+                    </SectionCard>
+                  </div>
                   <SectionCard id="DKLOAIHINHVISA" title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
                           <div id="DKLV_LOAIHINH"><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
