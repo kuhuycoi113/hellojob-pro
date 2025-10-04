@@ -305,6 +305,8 @@ const LoggedOutContent = () => {
   const isEditing = role === 'candidate' || role === 'candidate-full-profile';
   const createProfileButtonText = isEditing ? 'Sửa hồ sơ' : 'Tạo hồ sơ';
   const createProfileButtonTextMobile = isEditing ? 'Sửa' : 'Tạo';
+  
+  const myJobsLink = applicationCount > 0 ? '/viec-lam-cua-toi?highlight=applied' : '/viec-lam-cua-toi';
 
   return (
     <>
@@ -348,8 +350,8 @@ const LoggedOutContent = () => {
                             </CreateProfileDialog>
 
                              <Button asChild className="relative">
-                                <Link href="/viec-lam-cua-toi">
-                                    Trang việc làm
+                                <Link href={myJobsLink}>
+                                    Việc của tôi
                                     {applicationCount > 0 && (
                                         <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
                                             {applicationCount > 9 ? '9+' : applicationCount}
@@ -376,7 +378,7 @@ const LoggedOutContent = () => {
                         </CreateProfileDialog>
 
                          <Button asChild variant="default" size="sm" className="relative">
-                            <Link href="/viec-lam-cua-toi">
+                            <Link href={myJobsLink}>
                                 Việc
                                 {applicationCount > 0 && (
                                     <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">

@@ -25,6 +25,7 @@ interface AuthContextType {
   avatarUrl: string | null;
   applicationCount: number;
   incrementApplicationCount: () => void;
+  clearApplicationCount: () => void;
   setRole: (role: Role) => void;
   postLoginAction: PostLoginAction;
   setPostLoginAction: (action: PostLoginAction) => void;
@@ -151,6 +152,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setApplicationCount(prev => prev + 1);
   }, []);
 
+  const clearApplicationCount = useCallback(() => {
+    setApplicationCount(0);
+  }, []);
+
   const updateProfileInfoFromStorage = useCallback(() => {
     if (typeof window === 'undefined') return;
     const storedProfile = localStorage.getItem('generatedCandidateProfile');
@@ -254,6 +259,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     avatarUrl,
     applicationCount,
     incrementApplicationCount,
+    clearApplicationCount,
     setRole,
     postLoginAction,
     setPostLoginAction,
