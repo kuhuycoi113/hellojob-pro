@@ -14,6 +14,7 @@ import { XL01Dialog } from '@/components/X-L01-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CtaHienThiViec08 } from '@/components/cta-hien-thi-viec-08';
+import { ActivityPhotos } from '@/components/activity-photos';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -272,7 +273,6 @@ export default function TuyenDungTokuteiLandingPage() {
   const t = pageContent[lang];
 
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
   const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false); 
   const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
@@ -397,18 +397,18 @@ export default function TuyenDungTokuteiLandingPage() {
             </div>
             <div id="ND_SOLUTIONS_LIST" className="space-y-16">
               {t.solutions.map((solution, index) => (
-                <div key={index} id={`ND_SOLUTION_${index + 1}`} className={`grid md:grid-cols-2 gap-8 md:gap-12 items-center ${index % 2 !== 0 ? 'md:grid-flow-row-dense' : ''}`}>
-                   <div className={`flex flex-col space-y-4 ${index % 2 !== 0 ? 'md:col-start-2' : ''}`}>
+                <div key={index} id={`ND_SOLUTION_${index + 1}`} className={cn("grid md:grid-cols-2 gap-8 md:gap-12 items-center")}>
+                   <div className={cn("flex flex-col space-y-4", index % 2 !== 0 ? 'md:col-start-2' : '')}>
                     <div className="flex flex-col items-center md:items-start text-center md:text-left">
                         <div className="inline-block bg-primary/10 p-3 rounded-full w-fit">
                             <solution.icon className="h-8 w-8 text-primary"/>
                         </div>
                     </div>
-                     <div className={`relative aspect-video h-60 w-full md:h-80 rounded-lg shadow-xl overflow-hidden`}>
+                     <div className={cn("relative aspect-video h-60 w-full md:h-80 rounded-lg shadow-xl overflow-hidden")}>
                         <Image src={solution.image} alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
                     </div>
                   </div>
-                  <div className={`space-y-4 ${index % 2 !== 0 ? 'md:col-start-1 md:row-start-1' : ''}`}>
+                  <div className={cn("space-y-4", index % 2 !== 0 ? 'md:col-start-1 md:row-start-1' : '')}>
                       <h3 className="text-2xl font-bold font-headline">{solution.title}</h3>
                       <ul className="space-y-3">
                           {solution.details.map((detail, i) => (
@@ -450,6 +450,8 @@ export default function TuyenDungTokuteiLandingPage() {
         </section>
 
         <CtaHienThiViec08 lang={lang} prioritizedVisaType="Kỹ năng đặc định" />
+        
+        <ActivityPhotos id="HINHANHHOATDONG02" lang={lang} />
 
       </div>
        <XL01Dialog 
