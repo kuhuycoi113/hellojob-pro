@@ -1,11 +1,12 @@
+
 'use client';
 
+import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Scroll, Timer, UserCircle, Briefcase, ChevronRight, Video, FileText, PlusCircle, ChevronDown, Newspaper, Image as ImageIcon, Smartphone, MapPin, DollarSign, Bookmark, Star, CalendarClock } from 'lucide-react';
 import Image from 'next/image';
 import { notFound, useRouter } from 'next/navigation';
-import { useEffect, useState, use } from 'react';
 import { articles, type HandbookArticle } from '@/lib/handbook-data';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -67,12 +68,12 @@ const ShareDialogContent = () => (
 
 
 export default function ArticlePage({ params }: { params: { slug: string } }) {
-  const [activeId, setActiveId] = useState('');
+  const [activeId, setActiveId] = React.useState('');
   
-  const resolvedParams = use(params);
+  const resolvedParams = React.use(params);
   const article = articles.find((a) => a.slug === resolvedParams.slug);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!article || article.type !== 'article' || !article.content) return;
 
     const observer = new IntersectionObserver(
@@ -298,3 +299,5 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
     </div>
   );
 }
+
+    

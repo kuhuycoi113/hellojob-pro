@@ -1,6 +1,7 @@
+
 "use client"
 
-import React, { Children, useMemo } from "react"
+import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker, DropdownProps } from "react-day-picker"
 
@@ -64,7 +65,7 @@ function Calendar({
           <ChevronRight className={cn("h-4 w-4", className)} {...props} />
         ),
         Dropdown: ({ value, onChange, children, ...props }: DropdownProps) => {
-          const options = Children.toArray(
+          const options = React.Children.toArray(
             children
           ) as React.ReactElement<React.HTMLProps<HTMLOptionElement>>[]
           const selected = options.find((child) => child.props.value === value)
@@ -107,3 +108,5 @@ function Calendar({
 Calendar.displayName = "Calendar"
 
 export { Calendar }
+
+    

@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,10 +16,10 @@ import Image from 'next/image';
 export default function CreateShortVideoPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const [caption, setCaption] = useState('');
-  const [videoPreview, setVideoPreview] = useState<string | null>(null);
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [caption, setCaption] = React.useState('');
+  const [videoPreview, setVideoPreview] = React.useState<string | null>(null);
+  const [videoFile, setVideoFile] = React.useState<File | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
 
   const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -135,3 +135,5 @@ export default function CreateShortVideoPage() {
     </div>
   );
 }
+
+    

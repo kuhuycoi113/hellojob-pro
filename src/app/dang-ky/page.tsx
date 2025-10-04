@@ -3,7 +3,7 @@
 'use client';
 import { RegisterForm } from '@/components/register-form';
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import * as React from 'react';
 
 const RegisterPageContent = () => {
   const searchParams = useSearchParams();
@@ -30,10 +30,12 @@ const RegisterPageContent = () => {
 
 export default function RegisterPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <React.Suspense fallback={<div>Loading...</div>}>
             <RegisterPageContent />
-        </Suspense>
+        </React.Suspense>
     )
 }
+
+    
 
     

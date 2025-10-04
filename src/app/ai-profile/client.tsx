@@ -1,13 +1,13 @@
 
 'use client';
 
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, FileText, FileUp, Sparkles, Send, Mic, Loader2, StopCircle, Pencil, Award, User, Briefcase, GraduationCap, Star, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
 import { createProfile } from "@/ai/flows/create-profile-flow";
 import { createProfileFromVoice } from "@/ai/flows/create-profile-from-voice-flow";
 import { type CandidateProfile } from "@/ai/schemas";
@@ -25,18 +25,18 @@ type RecordingStatus = 'idle' | 'recording' | 'processing' | 'error';
 export default function AiProfileClientPage() {
     const router = useRouter();
     const { toast } = useToast();
-    const [isLoading, setIsLoading] = useState(false);
-    const [loadingMessage, setLoadingMessage] = useState("Đang phân tích...");
-    const [fileInputKey, setFileInputKey] = useState(Date.now());
-    const [analysisResult, setAnalysisResult] = useState<ProfileWithAvatar | null>(null);
-    const [textInput, setTextInput] = useState('');
-    const [modelsLoaded, setModelsLoaded] = useState(false);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [loadingMessage, setLoadingMessage] = React.useState("Đang phân tích...");
+    const [fileInputKey, setFileInputKey] = React.useState(Date.now());
+    const [analysisResult, setAnalysisResult] = React.useState<ProfileWithAvatar | null>(null);
+    const [textInput, setTextInput] = React.useState('');
+    const [modelsLoaded, setModelsLoaded] = React.useState(false);
     
-    const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>('idle');
-    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-    const audioChunksRef = useRef<Blob[]>([]);
+    const [recordingStatus, setRecordingStatus] = React.useState<RecordingStatus>('idle');
+    const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+    const audioChunksRef = React.useRef<Blob[]>([]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const loadModels = async () => {
             try {
                 await Promise.all([
@@ -426,5 +426,7 @@ export default function AiProfileClientPage() {
         </div>
     );
 }
+
+    
 
     

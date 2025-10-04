@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,10 +16,10 @@ import Image from 'next/image';
 export default function CreateImagePostPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const [title, setTitle] = useState('');
-  const [caption, setCaption] = useState('');
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [title, setTitle] = React.useState('');
+  const [caption, setCaption] = React.useState('');
+  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+  const [imageFile, setImageFile] = React.useState<File | null>(null);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -147,3 +147,5 @@ export default function CreateImagePostPage() {
     </div>
   );
 }
+
+    

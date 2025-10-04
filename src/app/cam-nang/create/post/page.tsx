@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -34,9 +34,9 @@ const inspirationPrompts = [
 export default function CreateTextPostPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const [category, setCategory] = useState('');
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [category, setCategory] = React.useState('');
+  const [title, setTitle] = React.useState('');
+  const [content, setContent] = React.useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,3 +145,5 @@ export default function CreateTextPostPage() {
     </div>
   );
 }
+
+    

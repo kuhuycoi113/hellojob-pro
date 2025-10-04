@@ -1,7 +1,9 @@
+
 'use client';
 
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
+import * as React from 'react';
 
 const AiProfileClientPage = dynamic(() => import('@/app/ai-profile/client'), {
   ssr: false,
@@ -32,3 +34,5 @@ const AiProfileClientPage = dynamic(() => import('@/app/ai-profile/client'), {
 export default function AiProfilePage() {
   return <AiProfileClientPage />;
 }
+
+    

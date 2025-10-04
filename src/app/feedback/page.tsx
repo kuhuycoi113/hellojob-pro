@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,9 +15,9 @@ import { useRouter } from 'next/navigation';
 export default function FeedbackPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const [feedbackType, setFeedbackType] = useState('suggestion');
-  const [feedbackText, setFeedbackText] = useState('');
-  const [email, setEmail] = useState('');
+  const [feedbackType, setFeedbackType] = React.useState('suggestion');
+  const [feedbackText, setFeedbackText] = React.useState('');
+  const [email, setEmail] = React.useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,3 +133,5 @@ export default function FeedbackPage() {
     </div>
   );
 }
+
+    
