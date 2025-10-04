@@ -114,7 +114,7 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean }) => {
-  const { isLoggedIn, setPostLoginAction } = useAuth();
+  const { isLoggedIn, setPostLoginAction, incrementApplicationCount } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -206,16 +206,19 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                  appliedJobs.push(job.id);
                  localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
                  setHasApplied(true);
+                 incrementApplicationCount(); // Increment the count
                  toast({
                      title: 'Ứng tuyển thành công!',
                      description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
                      className: 'bg-green-500 text-white'
                  });
             } else {
-                setIsProfileIncompleteAlertOpen(true);
+                //setIsProfileIncompleteAlertOpen(true);
+                setIsProfileEditDialogOpen(true);
             }
         } else {
-            setIsProfileIncompleteAlertOpen(true);
+             // No profile found, show alert to update
+             setIsProfileEditDialogOpen(true);
         }
     }
   };
@@ -223,11 +226,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   const handleConfirmLogin = () => {
     setIsConfirmLoginOpen(false);
     setIsAuthDialogOpen(true);
-  };
-
-  const handleConfirmUpdateProfile = () => {
-    setIsProfileIncompleteAlertOpen(false);
-    setIsProfileEditDialogOpen(true);
   };
   
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -421,21 +419,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Để sau</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
+                        <AlertDialogAction onClick={() => {
+                            setIsProfileIncompleteAlertOpen(false);
+                            router.push('/ho-so-cua-toi');
+                        }}>Đồng ý, cập nhật</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <EditProfileDialog 
-                isOpen={isProfileEditDialogOpen} 
-                onOpenChange={setIsProfileEditDialogOpen} 
-                onSaveSuccess={() => {
-                    toast({
-                        title: 'Cập nhật thành công!',
-                        description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
-                        className: 'bg-green-500 text-white'
-                    });
-                }}
-            />
         </>
      );
   }
@@ -583,21 +573,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
-        <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
-            <AlertDialogContent id="UNGTUYEN-L02-B1">
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Để sau</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-         <EditProfileDialog 
+        <EditProfileDialog 
             isOpen={isProfileEditDialogOpen} 
             onOpenChange={setIsProfileEditDialogOpen} 
             onSaveSuccess={() => {
@@ -607,6 +583,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     className: 'bg-green-500 text-white'
                 });
             }}
+            source="application"
         />
     </>
   );

@@ -120,34 +120,22 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
-    const router = useRouter();
     const { toast } = useToast();
-    const { role, isLoggedIn, setPostLoginAction, incrementApplicationCount } = useAuth();
-    const job = jobData.find(j => j.id === resolvedParams.id);
     const [isClient, setIsClient] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
-    const [hasApplied, setHasApplied] = useState(false);
     const [behavioralSuggestions, setBehavioralSuggestions] = useState<any[]>([]);
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
-    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-    const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
-    const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
-    const [missingProfileFields, setMissingProfileFields] = useState<string[]>([]);
-    const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
-    const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
+    const job = jobData.find(j => j.id === resolvedParams.id);
     const appliedFilters: Partial<SearchFilters> = {};
-
 
     useEffect(() => {
         setIsClient(true);
         if (job) {
             const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
             setIsSaved(savedJobs.includes(job.id));
-            const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-            setHasApplied(appliedJobs.includes(job.id));
 
             // Safely calculate dates on the client to avoid hydration mismatch
             const today = new Date();
@@ -158,7 +146,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             const interviewFullDate = new Date(today);
             interviewFullDate.setDate(today.getDate() + job.interviewDateOffset);
             setInterviewDate(interviewFullDate.toISOString().split('T')[0]);
-
         }
 
         const fetchSuggestions = async () => {
@@ -201,49 +188,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         }
         window.dispatchEvent(new Event('storage'));
     };
-
-    const handleApplyClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        if (!isLoggedIn) {
-            setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: job.title } });
-            setIsConfirmLoginOpen(true);
-        } else {
-            const profileRaw = localStorage.getItem('generatedCandidateProfile');
-            if (profileRaw) {
-                const profile: CandidateProfile = JSON.parse(profileRaw);
-                const missingFields = validateProfileForApplication(profile);
-                if (missingFields.length === 0) {
-                     const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-                     appliedJobs.push(job.id);
-                     localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
-                     setHasApplied(true);
-                     incrementApplicationCount(); // Increment the count
-                     toast({
-                         title: 'Ứng tuyển thành công!',
-                         description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
-                         className: 'bg-green-500 text-white'
-                     });
-                } else {
-                    setMissingProfileFields(missingFields);
-                    setIsProfileIncompleteAlertOpen(true);
-                }
-            } else {
-                 // No profile found, show alert to update
-                 setIsProfileIncompleteAlertOpen(true);
-            }
-        }
-    };
-    
-    const handleConfirmLogin = () => {
-        setIsConfirmLoginOpen(false);
-        setIsAuthDialogOpen(true);
-    };
-
-    const handleConfirmUpdateProfile = () => {
-        setIsProfileIncompleteAlertOpen(false);
-        setIsProfileEditDialogOpen(true);
-    };
     
     const handleShare = async () => {
         const shareUrl = `https://vi.hellojob.jp/viec-lam/${job.id}`;
@@ -276,7 +220,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     };
 
     const assignedConsultant = job.recruiter;
-    const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay';
     
     const getFeeDisplay = (feeValue: string | undefined, feeLabel: string) => {
         const feeLimit = publicFeeLimits[job.visaDetail as keyof typeof publicFeeLimits];
@@ -338,11 +281,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             <CardContent>
                                 {isClient ? (
                                     <div className="flex flex-col sm:flex-row gap-4">
-                                        <Button size="lg" variant="outline" className={cn("w-full sm:w-auto", isSaved && "border-accent-orange text-accent-orange bg-accent-orange/5")} onClick={handleSaveJob}>
-                                            <Bookmark className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
-                                            {isSaved ? 'Việc đã lưu' : 'Lưu việc làm'}
-                                        </Button>
-                                        <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
+                                        <JobCard job={job} showApplyButtons={true} variant='grid-item' showRecruiterName={false} showLikes={false} showPostedTime={false} />
                                     </div>
                                 ) : (
                                     <div className="flex flex-col sm:flex-row gap-4">
@@ -505,48 +444,10 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     </aside>
                 </div>
             </div>
-            <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-            <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                    <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Bạn cần đăng nhập để ứng tuyển, bạn có muốn đăng nhập không?
-                    </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                    <AlertDialogCancel>Để sau</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-             <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
-                <AlertDialogContent id="UNGTUYEN-L02-B1">
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Để sau</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-            <EditProfileDialog 
-                isOpen={isProfileEditDialogOpen} 
-                onOpenChange={setIsProfileEditDialogOpen} 
-                onSaveSuccess={() => {
-                    toast({
-                        title: 'Cập nhật thành công!',
-                        description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
-                        className: 'bg-green-500 text-white'
-                    });
-                }}
-            />
+             {/* Behavioral Suggestions */}
+            <div className="container mx-auto px-4 md:px-6 py-12">
+                 <CtaViecLamGoiY />
+            </div>
         </div>
     );
-
-    
 }
