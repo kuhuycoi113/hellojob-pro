@@ -15,6 +15,7 @@ import { YL01Dialog } from '@/components/Y-L01-dialog';
 import { useRouter } from 'next/navigation';
 import { CtaHienThiViec08 } from '@/components/cta-hien-thi-viec-08';
 import { ActivityPhotos } from '@/components/activity-photos';
+import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -45,7 +46,7 @@ const pageContent = {
             {
                 icon: Users,
                 title: 'Khó khăn trong Tuyển dụng & Tìm kiếm Nguồn ứng viên',
-                description: 'Thị trường cạnh tranh khốc liệt, chi phí marketing cao nhưng nguồn ứng viên khan hiếm, không chất lượng. Lao động thiếu tay nghề và ngoại ngữ dẫn đến tỷ lệ trượt đơn hàng cao, lãng phí chi phí đào tạo.',
+                description: 'Thị trường cạnh tranh khốc liệt, chi phí marketing cao nhưng nguồn ứng viên khan hiếm, không chất lượng, dẫn đến tỷ lệ trượt đơn hàng cao và lãng phí chi phí đào tạo.',
             },
             {
                 icon: Handshake,
@@ -76,7 +77,7 @@ const pageContent = {
                     'Xây dựng "phễu" ứng viên chất lượng cao của riêng bạn, nâng cao tính tự chủ và giảm sự phụ thuộc vào các kênh truyền thống.',
                 ],
             },
-            {
+             {
                 icon: Handshake,
                 title: 'Xây dựng Thương hiệu & Kết nối Đối tác',
                 image: '/img/NTD/phaicu03.jpg',
@@ -96,6 +97,7 @@ const pageContent = {
                     'Đăng tin miễn phí để giảm chi phí marketing, tối đa hóa lợi nhuận.',
                 ],
             },
+           
             {
                 icon: ShieldCheck,
                 title: 'Công cụ & Tri thức đồng hành',
@@ -188,6 +190,7 @@ export default function PhaiCuLandingPage() {
   const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
 
   const handleXL01Complete = (preferences: any) => {
+    console.log("X-L01 Completed with:", preferences);
     setRecruitmentPrefs(preferences);
     setIsXL01DialogOpen(false);
   };
@@ -281,7 +284,7 @@ export default function PhaiCuLandingPage() {
                 {t.painPointsDescription}
               </p>
             </div>
-            <div id="ND_PAINPOINTS_GRID" className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div id="ND_PAINPOINTS_GRID" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {t.painPoints.map((point, index) => (
                 <Card key={point.title} id={`ND_PAINPOINT_${index + 1}`} className="text-center p-8 shadow-lg bg-background">
                   <div className="mx-auto bg-destructive/10 rounded-full p-4 w-fit mb-4">
@@ -358,7 +361,11 @@ export default function PhaiCuLandingPage() {
           </div>
         </section>
         
+        <CtaHienThiViec08 lang={lang} prioritizedVisaType="Thực tập sinh kỹ năng" />
+        
         <ActivityPhotos id="HINHANHHOATDONG02" lang={lang}/>
+
+        <CtaNhaTuyenDung />
 
       </div>
        <XL01Dialog 
