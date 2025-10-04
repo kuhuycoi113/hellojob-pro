@@ -52,6 +52,34 @@ const viewers = [
   { name: 'F', src: 'https://placehold.co/40x40.png?text=F' },
 ];
 
+const LoggedOutView = () => {
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+
+    return (
+        <>
+        <div className="flex items-center justify-center text-center py-20">
+            <Card className="max-w-2xl p-8 shadow-2xl">
+                <CardHeader>
+                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
+                        <Briefcase className="h-12 w-12 text-primary"/>
+                    </div>
+                    <CardTitle className="text-3xl font-headline">Quản lý việc làm của bạn</CardTitle>
+                    <CardDescription className="text-base pt-2">
+                        Đăng nhập để xem các công việc được gợi ý riêng cho bạn, theo dõi các đơn đã ứng tuyển và quản lý các việc làm đã lưu.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button onClick={() => setIsAuthDialogOpen(true)} size="lg">
+                        <LogIn className="mr-2"/>Đăng ký / Đăng nhập
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+        <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+        </>
+    )
+}
+
 const EmptyProfileView = () => {
     const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -394,7 +422,8 @@ const LoggedInView = () => {
     const appliedJobsRef = useRef<HTMLDivElement>(null);
 
 
-    const [openAccordion, setOpenAccordion] = useState<string[]>(['item-1']); // Open "Gợi ý cho bạn" by default
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
+    const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
 
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
@@ -411,7 +440,7 @@ const LoggedInView = () => {
         // @ts-ignore
         setChartData(dynamicChartData);
     }, []);
-
+    
     const fetchAppliedJobs = useCallback(() => {
         const appliedJobIds = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
         const appliedJobsData = jobData.filter(job => appliedJobIds.includes(job.id));
@@ -419,8 +448,18 @@ const LoggedInView = () => {
     }, []);
 
     useEffect(() => {
-        if (searchParams.get('highlight') === 'applied') {
-            setOpenAccordion(['item-2']); // Set "Việc đã ứng tuyển" to be open
+        if (searchParams.get('highlight') === 'suggested') {
+            setOpenAccordion('item-1');
+            setIsSuggestionHighlighted(true);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('highlight');
+            router.replace(nextUrl.toString(), { scroll: false });
+            
+            return () => clearTimeout(timer);
+        } else if (searchParams.get('highlight') === 'applied') {
+            setOpenAccordion('item-2'); // Set "Việc đã ứng tuyển" to be open
             setTimeout(() => { // Delay scroll slightly to ensure accordion is open
                 appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth' });
                 clearApplicationCount(); // Clear the badge
@@ -430,9 +469,12 @@ const LoggedInView = () => {
                 nextUrl.searchParams.delete('highlight');
                 router.replace(nextUrl.toString(), { scroll: false });
             }, 100);
+        } else {
+             setOpenAccordion('item-1');
         }
         fetchAppliedJobs();
     }, [searchParams, router, clearApplicationCount, fetchAppliedJobs]);
+
 
     const fetchSuggestedJobs = useCallback(async () => {
         setIsLoadingSuggestions(true);
@@ -660,7 +702,7 @@ const LoggedInView = () => {
                 type="multiple"
                 className="w-full space-y-4" 
                 value={openAccordion}
-                onValueChange={setOpenAccordion}
+                onValueChange={(value) => setOpenAccordion(value)}
             >
                 <AccordionItem value="item-1" className={cn(
                     "border-b-0 transition-all duration-500 ease-in-out border rounded-lg",
@@ -1122,183 +1164,18 @@ const LoggedInView = () => {
     )
 }
 
-const LoggedOutView = () => {
-    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-
-    return (
-        <>
-        <div className="flex items-center justify-center text-center py-20">
-            <Card className="max-w-2xl p-8 shadow-2xl">
-                <CardHeader>
-                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
-                        <Briefcase className="h-12 w-12 text-primary"/>
-                    </div>
-                    <CardTitle className="text-3xl font-headline">Quản lý việc làm của bạn</CardTitle>
-                    <CardDescription className="text-base pt-2">
-                        Đăng nhập để xem các công việc được gợi ý riêng cho bạn, theo dõi các đơn đã ứng tuyển và quản lý các việc làm đã lưu.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button onClick={() => setIsAuthDialogOpen(true)} size="lg">
-                        <LogIn className="mr-2"/>Đăng ký / Đăng nhập
-                    </Button>
-                </CardContent>
-            </Card>
-        </div>
-        <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-        </>
-    )
-}
-
-const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
-    const [isVisible, setIsVisible] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
-    const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
-    const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
-    const [transformStyle, setTransformStyle] = useState({});
-    const cardRef = useRef<HTMLDivElement>(null);
-  
-    useEffect(() => {
-        const vietnamVisaDetails = [
-            'Thực tập sinh 3 năm',
-            'Thực tập sinh 1 năm',
-            'Đặc định đầu Việt',
-            'Đặc định đi mới',
-            'Kỹ sư, tri thức đầu Việt'
-        ];
-        
-        const japanVisaDetails = [
-            'Đặc định đầu Nhật',
-            'Kỹ sư, tri thức đầu Nhật'
-        ];
-
-        try {
-            const storedProfile = localStorage.getItem('generatedCandidateProfile');
-            if (storedProfile) {
-                const profile = JSON.parse(storedProfile);
-                const userVisaDetail = profile.aspirations?.desiredVisaDetail;
-                if (userVisaDetail) {
-                   if (vietnamVisaDetails.includes(userVisaDetail)) {
-                       setCompanyButtonText('Công ty phái cử uy tín');
-                   } else if (japanVisaDetails.includes(userVisaDetail)) {
-                       setCompanyButtonText('Công ty tiếp nhận uy tín');
-                   }
-
-                   if (userVisaDetail === 'Thực tập sinh 3 Go') {
-                        setFeeButtonText('Nghiệp đoàn uy tín');
-                        setCompanyButtonText('Công ty tiếp nhận uy tín');
-                   } else if (userVisaDetail === "Kỹ sư, tri thức đầu Nhật") {
-                       setFeeButtonText("Shokai uy tín");
-                   } else if (userVisaDetail === "Đặc định đầu Nhật") {
-                       setFeeButtonText("Shien uy tín");
-                   }
-                }
-            }
-        } catch (e) {
-            console.error("Could not parse user profile from localStorage", e);
-        }
-        
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 2000); // Show after 2 seconds
-  
-      return () => {
-        clearTimeout(timer);
-      };
-    }, []);
-
-    const handleClose = () => {
-        const targetButton = document.getElementById('highlight-target-button');
-        const cardElement = cardRef.current;
-
-        if (targetButton && cardElement) {
-            const targetRect = targetButton.getBoundingClientRect();
-            const cardRect = cardElement.getBoundingClientRect();
-            
-            const translateX = targetRect.left - cardRect.left + (targetRect.width / 2) - (cardRect.width / 2);
-            const translateY = targetRect.top - cardRect.top + (targetRect.height / 2) - (cardRect.height / 2);
-
-            setTransformStyle({
-                transform: `translate(${translateX}px, ${translateY}px) scale(0.1)`,
-                opacity: 0,
-            });
-        }
-        
-        setIsClosing(true);
-        setTimeout(() => {
-            onHighlight();
-            setIsVisible(false); // Hide the component after animation
-        }, 700); // This duration must match the CSS transition duration
-    };
-  
-    useEffect(() => {
-        let closeTimer: NodeJS.Timeout;
-        if(isVisible && !isClosing) {
-            closeTimer = setTimeout(() => {
-                handleClose();
-            }, 3000); 
-        }
-        return () => clearTimeout(closeTimer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isVisible, isClosing]);
-  
-    if (!isVisible) {
-      return null;
-    }
-  
-    return (
-      <div
-        ref={cardRef}
-        style={isClosing ? transformStyle : {}}
-        className={cn(
-          "fixed bottom-24 left-4 z-50 transition-all duration-700",
-          !isClosing && "animate-in slide-in-from-bottom"
-        )}
-      >
-        { !isClosing && (
-            <Card className="shadow-2xl w-full max-w-sm">
-                <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-bold flex items-center justify-between">
-                        <span>Ưu tiên tìm việc theo?</span>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={handleClose}
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-2">
-                    <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        <TrendingUp className="mr-2 h-4 w-4 text-accent-green" /> Lương tốt
-                    </Button>
-                    <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        <ShieldCheck className="mr-2 h-4 w-4 text-primary" /> {feeButtonText}
-                    </Button>
-                    <Button variant="outline" className="justify-start" onClick={handleClose}>
-                        <ThumbsUp className="mr-2 h-4 w-4 text-accent-orange" /> {companyButtonText}
-                    </Button>
-                </CardContent>
-            </Card>
-        )}
-    </div>
-  );
-};
-
-
 function MyJobsDashboardPageContent() {
     const { role, isLoggedIn } = useAuth();
-    const [isHighlighting, setIsHighlighting] = useState(false);
+    
+    // This state is now managed inside LoggedInView
+    // const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
+    
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
     const handleHighlight = () => {
-        setIsHighlighting(true);
-        setShowFloatingSelector(false); // Hide the selector after it has animated
-        setTimeout(() => {
-            setIsHighlighting(false);
-        }, 1500); // Duration of the highlight effect
+        // This function might need to be passed down to FloatingPrioritySelector if it needs to trigger a highlight
+        // For now, we just manage the visibility of the selector.
+        setShowFloatingSelector(false);
     };
   
     return (
