@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -351,7 +352,7 @@ export default function UnionLandingPage() {
                <div id="ND_HERO_IMAGE" className="relative flex flex-col">
                   <div className="relative aspect-video">
                       <Image
-                          src="/img/NTD/CBTD002.png"
+                          src="/img/NTD/CBTD003.png"
                           alt="Hợp tác cùng phát triển với HelloJob"
                           fill
                           className="object-cover rounded-lg shadow-2xl"
@@ -397,19 +398,18 @@ export default function UnionLandingPage() {
             </div>
             <div id="ND_SOLUTIONS_LIST" className="space-y-16">
               {t.solutions.map((solution, index) => (
-                <div key={index} id={`ND_SOLUTION_${index + 1}`} className={`flex flex-col md:flex-row items-center gap-8 md:gap-12 ${index % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
-                   <div className="w-full md:w-1/2 flex-shrink-0">
-                    <div className="inline-block md:hidden bg-primary/10 p-3 rounded-full w-fit mb-4">
-                        <solution.icon className="h-8 w-8 text-primary"/>
+                <div key={index} id={`ND_SOLUTION_${index + 1}`} className={`grid md:grid-cols-2 gap-8 md:gap-12 items-center`}>
+                   <div className={`flex flex-col space-y-4 ${index % 2 !== 0 ? 'md:order-last' : ''}`}>
+                    <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                        <div className="inline-block bg-primary/10 p-3 rounded-full w-fit">
+                            <solution.icon className="h-8 w-8 text-primary"/>
+                        </div>
                     </div>
-                     <div className="relative aspect-video rounded-lg shadow-xl overflow-hidden">
+                     <div className={`relative aspect-video h-60 w-full md:h-80 rounded-lg shadow-xl overflow-hidden`}>
                         <Image src={solution.image} alt={solution.title} fill className="object-cover" data-ai-hint="solution illustration"/>
                     </div>
                   </div>
-                  <div className="w-full md:w-1/2 space-y-4">
-                      <div className="hidden md:inline-block bg-primary/10 p-3 rounded-full w-fit">
-                            <solution.icon className="h-8 w-8 text-primary"/>
-                      </div>
+                  <div className={`space-y-4 ${index % 2 !== 0 ? 'md:order-first' : ''}`}>
                       <h3 className="text-2xl font-bold font-headline">{solution.title}</h3>
                       <ul className="space-y-3">
                           {solution.details.map((detail, i) => (
