@@ -122,7 +122,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const resolvedParams = use(params);
     const router = useRouter();
     const { toast } = useToast();
-    const { role, isLoggedIn, setPostLoginAction } = useAuth();
+    const { role, isLoggedIn, setPostLoginAction, incrementApplicationCount } = useAuth();
     const job = jobData.find(j => j.id === resolvedParams.id);
     const [isClient, setIsClient] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
@@ -218,6 +218,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                      appliedJobs.push(job.id);
                      localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
                      setHasApplied(true);
+                     incrementApplicationCount(); // Increment the count
                      toast({
                          title: 'Ứng tuyển thành công!',
                          description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
@@ -543,9 +544,9 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         className: 'bg-green-500 text-white'
                     });
                 }}
-                source="application"
             />
         </div>
     );
 
     
+}

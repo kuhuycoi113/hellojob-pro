@@ -63,6 +63,7 @@ import { Input } from './ui/input';
 import type { SearchFilters } from './job-search/search-results';
 import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 import { CreateProfileDialog } from './create-profile-dialog';
+import { Badge } from './ui/badge';
 
 
 export const Logo = ({ className }: { className?: string }) => (
@@ -71,7 +72,7 @@ export const Logo = ({ className }: { className?: string }) => (
 
 export function Header() {
   const pathname = usePathname();
-  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl } = useAuth();
+  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl, applicationCount } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -346,8 +347,15 @@ const LoggedOutContent = () => {
                                <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">{createProfileButtonText}</Button>
                             </CreateProfileDialog>
 
-                             <Button asChild>
-                                <Link href="/viec-lam-cua-toi">Trang việc làm</Link>
+                             <Button asChild className="relative">
+                                <Link href="/viec-lam-cua-toi">
+                                    Trang việc làm
+                                    {applicationCount > 0 && (
+                                        <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
+                                            {applicationCount > 9 ? '9+' : applicationCount}
+                                        </Badge>
+                                    )}
+                                </Link>
                             </Button>
                            
                             <MainMenu />
@@ -367,8 +375,15 @@ const LoggedOutContent = () => {
                            </Button>
                         </CreateProfileDialog>
 
-                         <Button asChild variant="default" size="sm">
-                            <Link href="/viec-lam-cua-toi">Việc</Link>
+                         <Button asChild variant="default" size="sm" className="relative">
+                            <Link href="/viec-lam-cua-toi">
+                                Việc
+                                {applicationCount > 0 && (
+                                    <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
+                                        {applicationCount > 9 ? '9+' : applicationCount}
+                                    </Badge>
+                                )}
+                            </Link>
                         </Button>
                         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                             <SheetTrigger asChild>

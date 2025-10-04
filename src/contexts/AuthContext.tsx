@@ -22,7 +22,9 @@ interface AuthContextType {
   isLoggedIn: boolean;
   profileName: string | null;
   profileHeadline: string | null;
-  avatarUrl: string | null; // Added avatarUrl
+  avatarUrl: string | null;
+  applicationCount: number;
+  incrementApplicationCount: () => void;
   setRole: (role: Role) => void;
   postLoginAction: PostLoginAction;
   setPostLoginAction: (action: PostLoginAction) => void;
@@ -142,7 +144,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [profileName, setProfileName] = useState<string | null>(null);
   const [profileHeadline, setProfileHeadline] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [applicationCount, setApplicationCount] = useState(0);
   const isLoggedIn = role !== 'guest';
+
+  const incrementApplicationCount = useCallback(() => {
+    setApplicationCount(prev => prev + 1);
+  }, []);
 
   const updateProfileInfoFromStorage = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -163,7 +170,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setProfileName(null);
         setProfileHeadline(null);
         setAvatarUrl(null);
-        setCurrentUser(loggedInUser); // Fallback
+        setCurrentUser(isLoggedIn ? loggedInUser : guestUser);
       }
     } else {
       setProfileName(null);
@@ -177,6 +184,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (newRole === 'guest') {
         setCurrentUser(guestUser);
         localStorage.removeItem('generatedCandidateProfile');
+        setApplicationCount(0); // Reset count on logout
     } else { 
         if (newRole === 'candidate-full-profile') {
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(fullCandidateProfile));
@@ -244,6 +252,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     profileName,
     profileHeadline,
     avatarUrl,
+    applicationCount,
+    incrementApplicationCount,
     setRole,
     postLoginAction,
     setPostLoginAction,
