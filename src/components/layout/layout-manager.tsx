@@ -37,7 +37,7 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
     const isNtdLandingNdPage = pathname === '/nha-tuyen-dung/landing/nd';
 
-    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky', '/nha-tuyen-dung/landing/nd'];
+    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky', '/nha-tuyen-dung/landing/nd', '/nha-tuyen-dung/landing/can-bo-tuyen-dung'];
     
     // Determine whether to show CTAs based on client-side path
     const showDefaultCtas = isClient && !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);

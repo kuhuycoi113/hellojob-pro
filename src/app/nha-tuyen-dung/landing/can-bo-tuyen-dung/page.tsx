@@ -16,6 +16,7 @@ import { YL01Dialog } from '@/components/Y-L01-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CtaHienThiViec08 } from '@/components/cta-hien-thi-viec-08';
 import { ActivityPhotos } from '@/components/activity-photos';
+import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
 
 
 type Language = 'vi' | 'ja' | 'en';
@@ -454,6 +455,8 @@ export default function UnionLandingPage() {
         <CtaHienThiViec08 lang={lang} prioritizedVisaType="Thực tập sinh kỹ năng" />
         
         <ActivityPhotos id="HINHANHHOATDONG02" lang={lang}/>
+
+        <CtaNhaTuyenDung />
 
       </div>
        <XL01Dialog 
