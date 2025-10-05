@@ -80,6 +80,7 @@ const LoggedOutView = () => {
     )
 }
 
+
 const EmptyProfileView = () => {
     const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -303,6 +304,7 @@ const EmptyProfileView = () => {
         )
     }
 
+
     const renderDialogContent = () => {
         switch(profileCreationStep) {
             case 1: return <FirstStepDialog />;
@@ -422,7 +424,7 @@ const LoggedInView = () => {
     const appliedJobsRef = useRef<HTMLDivElement>(null);
 
 
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
+    const [openAccordion, setOpenAccordion] = useState<string[]>([]);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
 
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
@@ -448,8 +450,9 @@ const LoggedInView = () => {
     }, []);
 
     useEffect(() => {
-        if (searchParams.get('highlight') === 'suggested') {
-            setOpenAccordion('item-1');
+        const highlightParam = searchParams.get('highlight');
+        if (highlightParam === 'suggested') {
+            setOpenAccordion(['item-1']);
             setIsSuggestionHighlighted(true);
             const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
 
@@ -458,8 +461,8 @@ const LoggedInView = () => {
             router.replace(nextUrl.toString(), { scroll: false });
             
             return () => clearTimeout(timer);
-        } else if (searchParams.get('highlight') === 'applied') {
-            setOpenAccordion('item-2'); // Set "Việc đã ứng tuyển" to be open
+        } else if (highlightParam === 'applied') {
+            setOpenAccordion(['item-2']); // Set "Việc đã ứng tuyển" to be open
             setTimeout(() => { // Delay scroll slightly to ensure accordion is open
                 appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth' });
                 clearApplicationCount(); // Clear the badge
@@ -470,7 +473,7 @@ const LoggedInView = () => {
                 router.replace(nextUrl.toString(), { scroll: false });
             }, 100);
         } else {
-             setOpenAccordion('item-1');
+             setOpenAccordion(['item-1']);
         }
         fetchAppliedJobs();
     }, [searchParams, router, clearApplicationCount, fetchAppliedJobs]);
@@ -1165,17 +1168,17 @@ const LoggedInView = () => {
 }
 
 function MyJobsDashboardPageContent() {
-    const { role, isLoggedIn } = useAuth();
-    
-    // This state is now managed inside LoggedInView
-    // const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
-    
+    const { role } = useAuth();
+    const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile' || role === 'candidate-empty-profile';
+    const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
     const handleHighlight = () => {
-        // This function might need to be passed down to FloatingPrioritySelector if it needs to trigger a highlight
-        // For now, we just manage the visibility of the selector.
-        setShowFloatingSelector(false);
+        setIsHighlighting(true);
+        setShowFloatingSelector(false); // Hide the selector after it has animated
+        setTimeout(() => {
+            setIsHighlighting(false);
+        }, 1500); // Duration of the highlight effect
     };
   
     return (
