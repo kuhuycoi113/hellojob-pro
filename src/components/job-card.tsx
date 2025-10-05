@@ -201,30 +201,31 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
         return;
     }
 
-    // GHSLUT-L01: Check application limit
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
-    const limitData = JSON.parse(localStorage.getItem('applicationLimit') || '{}');
-    const APPLICATION_LIMIT = 20;
-
-    if (limitData.month !== currentMonth) {
-        limitData.month = currentMonth;
-        limitData.count = 0;
-    }
-
-    if (limitData.count >= APPLICATION_LIMIT) {
-        setIsLimitDialogOpen(true);
-        return;
-    }
-
-    // Proceed with application logic if under limit
     const profileRaw = localStorage.getItem('generatedCandidateProfile');
-    if (profileRaw) {
-        const profile: CandidateProfile = JSON.parse(profileRaw);
-        const missingFields = validateProfileForApplication(profile);
-        if (missingFields.length === 0) {
-             const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-             if (!appliedJobs.includes(job.id)) {
+    const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+
+    if (!appliedJobs.includes(job.id)) {
+        // GHSLUT-L01: Check application limit only for new applications
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
+        const limitData = JSON.parse(localStorage.getItem('applicationLimit') || '{}');
+        const APPLICATION_LIMIT = 20;
+
+        if (limitData.month !== currentMonth) {
+            limitData.month = currentMonth;
+            limitData.count = 0;
+        }
+
+        if (limitData.count >= APPLICATION_LIMIT) {
+            setIsLimitDialogOpen(true);
+            return;
+        }
+
+        if (profileRaw) {
+            const profile: CandidateProfile = JSON.parse(profileRaw);
+            const missingFields = validateProfileForApplication(profile);
+            if (missingFields.length === 0) {
+                // Profile is valid, proceed with application
                 appliedJobs.push(job.id);
                 localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
                 setHasApplied(true);
@@ -239,17 +240,17 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                     description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
                     className: 'bg-green-500 text-white'
                 });
-             } else {
-                 toast({
-                     variant: 'destructive',
-                     title: 'Bạn đã ứng tuyển công việc này rồi'
-                 });
-             }
+            } else {
+                setIsProfileIncompleteAlertOpen(true);
+            }
         } else {
-            setIsProfileIncompleteAlertOpen(true);
+             setIsProfileEditDialogOpen(true);
         }
     } else {
-         setIsProfileEditDialogOpen(true);
+         toast({
+             variant: 'destructive',
+             title: 'Bạn đã ứng tuyển công việc này rồi'
+         });
     }
   };
   
@@ -418,11 +419,11 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                                 <AlertDialogHeader>
                                                 <AlertDialogTitle>Xác nhận huỷ ứng tuyển?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này không thể hoàn tác.
+                                                   Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này không thể hoàn tác.
                                                 </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
-                                                <AlertDialogCancel>Huỷ bỏ</AlertDialogCancel>
+                                                <AlertDialogCancel>Để sau</AlertDialogCancel>
                                                 <AlertDialogAction onClick={() => onCancelApplication?.(job.id)}>Đồng ý</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
@@ -471,7 +472,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                 }}
                 source="application"
             />
-            <AlertDialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen} id="GHSLUT-L01">
+             <AlertDialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen} id="GHSLUT-L01">
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
@@ -621,7 +622,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                                 </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
-                                                <AlertDialogCancel>Huỷ bỏ</AlertDialogCancel>
+                                                <AlertDialogCancel>Để sau</AlertDialogCancel>
                                                 <AlertDialogAction onClick={() => onCancelApplication?.(job.id)}>Đồng ý</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
