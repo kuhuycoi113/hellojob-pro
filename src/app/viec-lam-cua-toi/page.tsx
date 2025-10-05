@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -429,27 +428,26 @@ const LoggedInView = () => {
 
     useEffect(() => {
         const highlightParam = searchParams.get('highlight');
-        if (highlightParam === 'suggested') {
+        if (highlightParam === 'applied') {
+            setOpenAccordion('item-2');
+            setTimeout(() => {
+                appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                clearApplicationCount();
+                
+                const nextUrl = new URL(window.location.href);
+                nextUrl.searchParams.delete('highlight');
+                router.replace(nextUrl.toString(), { scroll: false });
+            }, 100); 
+        } else if (highlightParam === 'suggested') {
             setOpenAccordion('item-1');
             setIsSuggestionHighlighted(true);
             const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
-
+            
             const nextUrl = new URL(window.location.href);
             nextUrl.searchParams.delete('highlight');
             router.replace(nextUrl.toString(), { scroll: false });
             
             return () => clearTimeout(timer);
-        } else if (highlightParam === 'applied') {
-            setOpenAccordion('item-2'); // Set "Việc đã ứng tuyển" to be open
-            setTimeout(() => { // Delay scroll slightly to ensure accordion is open
-                appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth' });
-                clearApplicationCount(); // Clear the badge
-                
-                // Clean up URL
-                const nextUrl = new URL(window.location.href);
-                nextUrl.searchParams.delete('highlight');
-                router.replace(nextUrl.toString(), { scroll: false });
-            }, 100);
         } else {
              setOpenAccordion('item-1');
         }
@@ -645,12 +643,8 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: string[] } = {
-        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
-    };
-    const visaTypes = Object.keys(visaDetailsOptions);
+    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = visaDetailsByVisaType;
+    const visaTypes = Object.keys(visaDetailsByVisaType);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
@@ -1299,6 +1293,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
     </div>
   );
 };
+
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
