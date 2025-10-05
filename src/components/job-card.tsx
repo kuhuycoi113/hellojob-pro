@@ -203,15 +203,22 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
             const missingFields = validateProfileForApplication(profile);
             if (missingFields.length === 0) {
                  const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-                 appliedJobs.push(job.id);
-                 localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
-                 setHasApplied(true);
-                 incrementApplicationCount(); // Increment the count
-                 toast({
-                     title: 'Ứng tuyển thành công!',
-                     description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
-                     className: 'bg-green-500 text-white'
-                 });
+                 if (!appliedJobs.includes(job.id)) {
+                    appliedJobs.push(job.id);
+                    localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
+                    setHasApplied(true);
+                    incrementApplicationCount(); // Increment the count
+                    toast({
+                        title: 'Ứng tuyển thành công!',
+                        description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
+                        className: 'bg-green-500 text-white'
+                    });
+                 } else {
+                     toast({
+                         variant: 'destructive',
+                         title: 'Bạn đã ứng tuyển công việc này rồi'
+                     });
+                 }
             } else {
                 setIsProfileIncompleteAlertOpen(true);
             }
@@ -377,7 +384,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                      {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                                      {showCancelApplication && hasApplied && (
                                         <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onCancelApplication?.(job.id); }}>
-                                            <X className="mr-2 h-4 w-4" /> Huỷ ứng tuyển
+                                            <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
                                         </Button>
                                     )}
                                 </div>}
@@ -544,7 +551,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                     <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
                                     {showCancelApplication && hasApplied && (
                                         <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onCancelApplication?.(job.id); }}>
-                                            <X className="mr-2 h-4 w-4" /> Huỷ ứng tuyển
+                                            <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
                                         </Button>
                                     )}
                                 </div>
