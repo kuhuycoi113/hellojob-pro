@@ -24,7 +24,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -376,8 +376,8 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                     }
                                      {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                                      {showCancelApplication && hasApplied && (
-                                        <Button variant="destructive" size="sm" onClick={(e) => { e.stopPropagation(); onCancelApplication?.(job.id); }}>
-                                            <X className="mr-2 h-4 w-4" /> Huỷ
+                                        <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onCancelApplication?.(job.id); }}>
+                                            <X className="mr-2 h-4 w-4" /> Huỷ ứng tuyển
                                         </Button>
                                     )}
                                 </div>}
@@ -543,8 +543,8 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                 <div className="flex items-center gap-2">
                                     <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
                                     {showCancelApplication && hasApplied && (
-                                        <Button variant="destructive" size="sm" onClick={(e) => { e.stopPropagation(); onCancelApplication?.(job.id); }}>
-                                            <X className="mr-2 h-4 w-4" /> Huỷ
+                                        <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onCancelApplication?.(job.id); }}>
+                                            <X className="mr-2 h-4 w-4" /> Huỷ ứng tuyển
                                         </Button>
                                     )}
                                 </div>
