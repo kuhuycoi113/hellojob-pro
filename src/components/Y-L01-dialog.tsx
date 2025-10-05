@@ -223,7 +223,7 @@ const regionContent = {
         title: 'Select Work Regions',
         description: 'Choose the regions you want to recruit in, in order of priority.',
         backButton: 'Back',
-        completeButton: 'Continue'
+        continueButton: 'Continue'
     }
 };
 

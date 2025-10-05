@@ -322,16 +322,16 @@ const interestOptions = {
         { id: 'refer-and-post', title: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng' },
     ],
     ja: [
-        { id: 'post-job', title: '求人掲載' },
-        { id: 'refer-candidate', title: '候補者紹介' },
-        { id: 'post-and-refer', title: '求人掲載と候補者紹介' },
-        { id: 'refer-and-post', title: '候補者紹介と求人掲載' },
+        { id: 'post-job', title: '候補者を見つけるために求人を掲載する' },
+        { id: 'refer-candidate', title: '適切な人材パートナーを探す' },
+        { id: 'post-and-refer', title: '候補者へのシステム広報協力' },
+        { id: 'refer-and-post', title: '採用担当者へのシステム広報協力' },
     ],
     en: [
-        { id: 'post-job', title: 'Post a Job' },
-        { id: 'refer-candidate', title: 'Refer a Candidate' },
-        { id: 'post-and-refer', title: 'Post Job & Refer Candidate' },
-        { id: 'refer-and-post', title: 'Refer Candidate & Post Job' },
+        { id: 'post-job', title: 'Post jobs to find candidates' },
+        { id: 'refer-candidate', title: 'Find suitable HR partners' },
+        { id: 'post-and-refer', title: 'Collaborate to promote the system to candidates' },
+        { id: 'refer-and-post', title: 'Collaborate to promote the system to employers' },
     ]
 };
 
@@ -477,13 +477,14 @@ export default function EmployerDetailPage() {
             roleParts.push(subRoleTexts[subRoleKey][langFromParams]);
             roleParts.push(roleTexts[roleKey][langFromParams]);
             if (companyNameParam) roleParts.push(companyNameParam);
-        } else if (roleKey === 'nhan-vien-nhan-luc-nhat' && subRoleTexts[nationalityKey] && roleTexts[subRoleKey]) {
-            roleParts.push(subRoleTexts[nationalityKey][langFromParams]);
-            roleParts.push(roleTexts[subRoleKey][langFromParams]);
+        } else if (roleKey === 'nhan-vien-nhan-luc-nhat') {
+            if (subRoleTexts[nationalityKey]) {
+                roleParts.push(subRoleTexts[nationalityKey][langFromParams]);
+            }
+            if(roleTexts[subRoleKey]) {
+                 roleParts.push(roleTexts[subRoleKey][langFromParams]);
+            }
             if (companyNameParam) roleParts.push(companyNameParam);
-        } else if (roleKey === 'nhan-vien-nhan-luc-nhat' && roleTexts[subRoleKey]) {
-             roleParts.push(roleTexts[subRoleKey][langFromParams]);
-             if (companyNameParam) roleParts.push(companyNameParam);
         }
     } else if (!isIndividualRole && roleTexts[roleKey]) {
         roleParts.push(roleTexts[roleKey][langFromParams]);
