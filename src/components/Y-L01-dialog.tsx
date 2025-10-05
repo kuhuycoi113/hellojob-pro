@@ -328,11 +328,25 @@ const subRoleTexts: Record<string, Record<Language, string>> = {
     'japanese': { vi: 'Nhân sự người Nhật', ja: '日本人事', en: 'Japanese Staff' }
 };
 
-const interestTexts: Record<string, Record<Language, string>> = {
-    'post-job': { vi: 'Đăng việc làm để tìm ứng viên', ja: '候補者を見つけるために求人を掲載する', en: 'Post jobs to find candidates' },
-    'refer-candidate': { vi: 'Tìm kiếm đối tác nhân lực phù hợp', ja: '適切な人材パートナーを探す', en: 'Find suitable HR partners' },
-    'post-and-refer': { vi: 'Hợp tác quảng bá hệ thống đến ứng viên', ja: '候補者へのシステム広報協力', en: 'Collaborate to promote the system to candidates' },
-    'refer-and-post': { vi: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng', ja: '採用担当者へのシステム広報協力', en: 'Collaborate to promote the system to employers' },
+const interestOptions = {
+    vi: [
+        { id: 'post-job', title: 'Đăng việc làm để tìm ứng viên', desc: 'Đăng việc làm để tìm ứng viên phù hợp' },
+        { id: 'refer-candidate', title: 'Tìm kiếm đối tác nhân lực phù hợp', desc: 'Tìm kiếm đối tác nhân lực phù hợp với nhu cầu tuyển dụng hoặc giới thiệu của tôi' },
+        { id: 'post-and-refer', title: 'Hợp tác quảng bá hệ thống đến ứng viên', desc: 'Hợp tác với nền tảng để quảng bá, thu hút ứng viên cho hệ thống' },
+        { id: 'refer-and-post', title: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng', desc: 'Hợp tác với nền tảng để quảng bá, thu hút nhà tuyển dụng cho hệ thống' },
+    ],
+    ja: [
+        { id: 'post-job', title: '候補者を見つけるために求人を掲載する', desc: '候補者を見つけるために求人を掲載する' },
+        { id: 'refer-candidate', title: '適切な人材パートナーを探す', desc: '私の採用または紹介のニーズに合った人材パートナーを探す' },
+        { id: 'post-and-refer', title: '候補者へのシステム広報協力', desc: 'プラットフォームと協力して、候補者を引き付けるための広報活動を行う' },
+        { id: 'refer-and-post', title: '採用担当者へのシステム広報協力', desc: 'プラットフォームと協力して、採用担当者を引き付けるための広報活動を行う' },
+    ],
+    en: [
+        { id: 'post-job', title: 'Post jobs to find candidates', desc: 'Post jobs to find suitable candidates' },
+        { id: 'refer-candidate', title: 'Find suitable HR partners', desc: 'Find HR partners that match my recruitment or referral needs' },
+        { id: 'post-and-refer', title: 'Collaborate to promote the system to candidates', desc: 'Collaborate with the platform to promote and attract candidates to the system' },
+        { id: 'refer-and-post', title: 'Collaborate to promote the system to employers', desc: 'Collaborate with the platform to promote and attract employers to the system' },
+    ]
 };
 
 
@@ -588,62 +602,42 @@ export function YL01Dialog({
 
   const InterestStepDialog = () => {
     const content = {
-        vi: {
-            title: "Bạn quan tâm đến những nghiệp vụ nào?",
-            description: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.",
-            options: [
-                { id: 'post-job', icon: Briefcase, title: 'Đăng việc làm để tìm ứng viên', desc: '(Đăng việc làm để tìm ứng viên phù hợp cho)' },
-                { id: 'refer-candidate', icon: Handshake, title: 'Tìm kiếm đối tác nhân lực phù hợp', desc: '(Tìm kiếm đối tác nhân lực phù hợp với nhu cầu tuyển dụng hoặc giới thiệu của tôi)' },
-                { id: 'post-and-refer', icon: UserPlus, title: 'Hợp tác quảng bá hệ thống đến ứng viên', desc: '(Hợp tác với nền tảng để quảng bá, thu hút ứng viên cho hệ thống)' },
-                { id: 'refer-and-post', icon: Building, title: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng', desc: '(Hợp tác với nền tảng để quảng bá, thu hút nhà tuyển dụng cho hệ thống)' }
-            ],
-            backButton: 'Quay lại',
-            continueButton: 'Tiếp tục'
-        },
-        ja: {
-            title: "どの業務に興味がありますか？",
-            description: "最高の体験のために、あなたの主な目標を教えてください。複数選択可能です。",
-            options: [
-                { id: 'post-job', icon: Briefcase, title: '候補者を見つけるために求人を掲載する', desc: '(候補者を見つけるために求人を掲載する)' },
-                { id: 'refer-candidate', icon: Handshake, title: '適切な人材パートナーを探す', desc: '(私の採用または紹介のニーズに合った人材パートナーを探す)' },
-                { id: 'post-and-refer', icon: UserPlus, title: '候補者へのシステム広報協力', desc: '(プラットフォームと協力して、候補者を引き付けるための広報活動を行う)' },
-                { id: 'refer-and-post', icon: Building, title: '採用担当者へのシステム広報協力', desc: '(プラットフォームと協力して、採用担当者を引き付けるための広報活動を行う)' }
-            ],
-            backButton: '戻る',
-            continueButton: '続ける'
-        },
-        en: {
-            title: 'Which operations are you interested in?',
-            description: 'Tell us your main goal for the best experience. You can select multiple items.',
-            options: [
-                { id: 'post-job', icon: Briefcase, title: 'Post jobs to find candidates', desc: '(Post jobs to find suitable candidates)' },
-                { id: 'refer-candidate', icon: Handshake, title: 'Find suitable HR partners', desc: '(Find HR partners that match my recruitment or referral needs)' },
-                { id: 'post-and-refer', icon: UserPlus, title: 'Collaborate to promote the system to candidates', desc: '(Collaborate with the platform to promote and attract candidates to the system)' },
-                { id: 'refer-and-post', icon: Building, title: 'Collaborate to promote the system to employers', desc: '(Collaborate with the platform to promote and attract employers to the system)' }
-            ],
-            backButton: 'Back',
-            continueButton: 'Continue'
-        },
+        vi: { title: "Bạn quan tâm đến những nghiệp vụ nào?", description: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.", backButton: 'Quay lại', continueButton: 'Tiếp tục' },
+        ja: { title: "どの業務に興味がありますか？", description: "最高の体験のために、あなたの主な目標を教えてください。複数選択可能です。", backButton: '戻る', continueButton: '続ける' },
+        en: { title: 'Which operations are you interested in?', description: 'Tell us your main goal for the best experience. You can select multiple items.', backButton: 'Back', continueButton: 'Continue' },
     }[currentLang];
+
+    const options = interestOptions[currentLang];
 
     return (
         <>
+            {/* Screen Y003 */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                 <DialogDescription className="text-center">{content.description}</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-4 pt-4">
-                {content.options.map(option => (
-                     <Card
-                        key={option.id}
-                        onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
-                        className={cn("text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center", selectedInterest.includes(option.id) && "ring-2 ring-primary border-primary")}
-                    >
-                        <option.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                        <h3 className="font-bold text-base">{option.title}</h3>
-                        <p className="text-muted-foreground text-xs">{option.desc}</p>
-                    </Card>
-                ))}
+                {options.map(option => {
+                    const isSelected = selectedInterest.includes(option.id);
+                    const selectionOrder = isSelected ? selectedInterest.indexOf(option.id) + 1 : 0;
+                    return (
+                        <Card
+                            key={option.id}
+                            onClick={() => handleMultiSelect(option.id, selectedInterest, setSelectedInterest)}
+                            className={cn(
+                                "text-center p-4 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-300 h-full flex flex-col items-center justify-center relative",
+                                isSelected && "ring-2 ring-primary border-primary bg-primary/10"
+                            )}
+                        >
+                            {isSelected && (
+                                <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                                    {selectionOrder}
+                                </Badge>
+                            )}
+                            <h3 className="font-bold text-base">{option.title}</h3>
+                        </Card>
+                    );
+                })}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
                  <Button variant="link" onClick={() => {
@@ -824,6 +818,7 @@ export function YL01Dialog({
 
         return (
             <>
+                {/* Screen: Y010 */}
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
                     <DialogDescription className="text-center">{content.description}</DialogDescription>
@@ -960,5 +955,3 @@ export function YL01Dialog({
     </>
   );
 }
-
-    

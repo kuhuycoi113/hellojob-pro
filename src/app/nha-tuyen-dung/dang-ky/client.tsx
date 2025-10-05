@@ -316,10 +316,10 @@ const contentByLang = {
 
 const interestOptions = {
     vi: [
-        { id: 'post-job', title: 'Đăng việc làm' },
-        { id: 'refer-candidate', title: 'Giới thiệu ứng viên' },
-        { id: 'post-and-refer', title: 'Đăng việc làm & Giới thiệu ứng viên' },
-        { id: 'refer-and-post', title: 'Giới thiệu ứng viên & Đăng việc làm' },
+        { id: 'post-job', title: 'Đăng việc làm để tìm ứng viên' },
+        { id: 'refer-candidate', title: 'Tìm kiếm đối tác nhân lực phù hợp' },
+        { id: 'post-and-refer', title: 'Hợp tác quảng bá hệ thống đến ứng viên' },
+        { id: 'refer-and-post', title: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng' },
     ],
     ja: [
         { id: 'post-job', title: '求人掲載' },
@@ -383,8 +383,8 @@ const roleTexts: Record<string, Record<Language, string>> = {
 const subRoleTexts: Record<string, Record<Language, string>> = {
     'phu-trach-doi-ngoai': { vi: 'Phụ trách đối ngoại', ja: '渉外担当', en: 'External Relations' },
     'phu-trach-tuyen-dung': { vi: 'Phụ trách tuyển dụng', ja: '採用担当', en: 'Recruitment' },
-    'vietnamese': { vi: 'Nhân viên người Việt', ja: 'ベトナム人スタッフ', en: 'Vietnamese Staff' },
-    'japanese': { vi: 'Nhân viên người Nhật', ja: '日本人スタッフ', en: 'Japanese Staff' }
+    'vietnamese': { vi: 'Nhân sự người Việt', ja: 'ベトナム人事', en: 'Vietnamese Staff' },
+    'japanese': { vi: 'Nhân sự người Nhật', ja: '日本人事', en: 'Japanese Staff' }
 };
 
 const interestTexts: Record<string, Record<Language, string>> = {
@@ -1178,8 +1178,16 @@ export default function EmployerDetailPage() {
     const value = field?.[lang] || [];
     if (Array.isArray(value) && value.length > 0) {
       if (fieldKey === 'interest') {
-        const item = interestOptions[lang].find(i => i.id === value[0]);
-        return item ? <Badge variant="secondary" className="font-normal">{item.title}</Badge> : null;
+          const content = value.map((id: string, index: number) => {
+              const item = interestOptions[lang].find(i => i.id === id);
+              return item ? (
+                  <Badge key={id} variant="secondary" className="font-normal">
+                      <span className="font-bold mr-1.5">{index + 1}.</span>
+                      {item.title}
+                  </Badge>
+              ) : null;
+          }).filter(Boolean);
+          return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
       }
       
       const allItems = [...japanJobTypes, ...Object.values(visaDetailsByVisaType).flat(), ...allIndustries, ...japanRegions];
@@ -1327,8 +1335,8 @@ export default function EmployerDetailPage() {
                             {getValueInterestValue(employer.valueInterest)}
                         </div>
                     </div>
-                    <Button id="DKNV_TIEUDE" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
-                    <CardTitle id="DKNV_NUTSUA" className="absolute top-4 right-4 font-headline text-xl flex items-center gap-3"><Edit className="h-4 w-4" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')} /></CardTitle>
+                    <CardTitle id="DKNV_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><CheckCircle className="text-primary h-6 w-6"/>{t.valueInterestTitle}</CardTitle>
+                    <Button id="DKNV_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')} /></Button>
                   </SectionCard>
                   <SectionCard id="DKLICHSU" title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
                        <ul id="DKLS_DANHSACH" className="space-y-4 text-sm">
