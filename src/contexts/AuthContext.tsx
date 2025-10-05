@@ -6,6 +6,7 @@ import { getAuth, onAuthStateChanged, signOut, type User as FirebaseUser } from 
 import { guestUser, loggedInUser, type User } from '@/lib/chat-data';
 import type { CandidateProfile } from '@/ai/schemas';
 import { app } from '@/firebase/config'; // Import the initialized Firebase app
+import { useToast } from '@/hooks/use-toast';
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest' | 'candidate-full-profile';
 
@@ -163,6 +164,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [applicationCount, setApplicationCount] = useState(0);
   const isLoggedIn = role !== 'guest';
+  const { toast } = useToast();
 
   const incrementApplicationCount = useCallback(() => {
     setApplicationCount(prev => prev + 1);
@@ -179,6 +181,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true') {
         localStorage.removeItem('simulatedRole');
     }
+    toast({ title: "Đăng xuất thành công!" });
   };
   
   const clearPostLoginAction = () => {
@@ -189,30 +192,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (typeof window === 'undefined') return;
     
     // Developer simulation override
-    if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true') {
-        const simulatedRole = localStorage.getItem('simulatedRole') as Role;
-        if(simulatedRole) {
-            setInternalRole(simulatedRole);
-             if (simulatedRole === 'guest') {
-                 setCurrentUser(guestUser);
-                 setProfileName(null);
-                 setProfileHeadline(null);
-                 setAvatarUrl(null);
-                 setApplicationCount(0);
-             } else {
-                 let profileData: Partial<CandidateProfile & {avatarUrl?: string}> = {};
-                 if (simulatedRole === 'candidate-full-profile') {
-                     profileData = fullCandidateProfile as Partial<CandidateProfile & {avatarUrl?: string}>;
-                 } else if (simulatedRole === 'candidate') {
-                     profileData = partialCandidateProfile as Partial<CandidateProfile & {avatarUrl?: string}>;
-                 }
-                 setProfileName(profileData.name || 'Ứng viên');
-                 setProfileHeadline(profileData.headline || 'Cập nhật hồ sơ');
-                 setAvatarUrl(profileData.avatarUrl || null);
-                 setCurrentUser(prev => ({...prev, name: profileData.name || 'Ứng viên', id: firebaseUser?.uid || 'user-0', avatarUrl: profileData.avatarUrl || loggedInUser.avatarUrl}));
+    const simulatedRole = process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' 
+        ? localStorage.getItem('simulatedRole') as Role 
+        : null;
+
+    if(simulatedRole) {
+        setInternalRole(simulatedRole);
+         if (simulatedRole === 'guest') {
+             setCurrentUser(guestUser);
+             setProfileName(null);
+             setProfileHeadline(null);
+             setAvatarUrl(null);
+             setApplicationCount(0);
+         } else {
+             let profileData: Partial<CandidateProfile & {avatarUrl?: string}> = {};
+             if (simulatedRole === 'candidate-full-profile') {
+                 profileData = fullCandidateProfile as Partial<CandidateProfile & {avatarUrl?: string}>;
+             } else if (simulatedRole === 'candidate') {
+                 profileData = partialCandidateProfile as Partial<CandidateProfile & {avatarUrl?: string}>;
              }
-            return;
-        }
+             setProfileName(profileData.name || 'Ứng viên');
+             setProfileHeadline(profileData.headline || 'Cập nhật hồ sơ');
+             setAvatarUrl(profileData.avatarUrl || null);
+             setCurrentUser(prev => ({...prev, name: profileData.name || 'Ứng viên', id: firebaseUser?.uid || 'user-0', avatarUrl: profileData.avatarUrl || loggedInUser.avatarUrl}));
+         }
+        return;
     }
 
     if (!firebaseUser) {
