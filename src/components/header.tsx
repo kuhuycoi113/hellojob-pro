@@ -305,7 +305,6 @@ const LoggedOutContent = () => {
   const isEditing = role === 'candidate' || role === 'candidate-full-profile';
   const createProfileButtonText = isEditing ? 'Sửa hồ sơ' : 'Tạo hồ sơ';
   const createProfileButtonTextMobile = isEditing ? 'Sửa' : 'Tạo';
-  
   const myJobsLink = applicationCount > 0 ? '/viec-lam-cua-toi?highlight=applied' : '/viec-lam-cua-toi';
 
   return (
