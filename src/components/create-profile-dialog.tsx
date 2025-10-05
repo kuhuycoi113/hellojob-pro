@@ -188,8 +188,8 @@ export function CreateProfileDialog({ children }: CreateProfileDialogProps) {
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
             {options.map(option => (
-                <Button key={option.name} onClick={() => { setSelectedVisaDetail(option.name); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <h3 className="font-bold text-base mb-1">{option.name}</h3>
+                <Button key={option.slug} onClick={() => { setSelectedVisaDetail(option.name.vi); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                    <h3 className="font-bold text-base mb-1">{option.name.vi}</h3>
                     <p className="text-muted-foreground text-xs">{option.slug}</p>
                 </Button>
             ))}
@@ -200,24 +200,21 @@ export function CreateProfileDialog({ children }: CreateProfileDialogProps) {
   };
 
   const IndustryStepDialog = () => {
-    const parentVisaSlug = selectedVisa?.slug;
-
-    if (!parentVisaSlug) return null;
-
-    const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
+    if (!selectedVisa) return null;
+    const industries = industriesByJobType[selectedVisa.slug as keyof typeof industriesByJobType] || [];
     
     let screenIdComment = '';
-    if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-    else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-    else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+    if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+    else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+    else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
 
     return (
         <>
             <span className="hidden">{screenIdComment}</span>
             <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề muốn tuyển dụng</DialogTitle>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn ngành nghề mong muốn</DialogTitle>
                 <DialogDescription className="text-center">
-                    Lựa chọn ngành nghề bạn muốn tuyển dụng.
+                    Lựa chọn ngành nghề bạn quan tâm nhất để chúng tôi gợi ý việc làm chính xác hơn.
                 </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">

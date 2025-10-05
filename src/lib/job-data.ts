@@ -67,6 +67,7 @@ export interface Job {
     otherSkillRequirement?: string[]; // Added this for filtering
     companyArrivalTime?: string;
     ginouExpiryRequirement?: string;
+    hepatitisBRequirement?: string;
     details: {
         description: string;
         requirements: string;
@@ -343,6 +344,7 @@ const createJobList = (): Job[] => {
                         specialConditions: specialConditions,
                         otherSkillRequirement: selectedOtherSkills.map(s => s.slug),
                         companyArrivalTime: ['thuc-tap-sinh-3-go', 'dac-dinh-dau-nhat', 'ky-su-tri-thuc-dau-nhat'].includes(detail.slug) ? getFutureMonths(jobIndex) : undefined,
+                        hepatitisBRequirement: jobIndex % 10 === 0 ? 'Không yêu cầu' : 'Không nhận viêm gan B',
                         details: {
                             description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản. Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p><ul><li>Chi tiết công việc: ${keyword}.</li><li>Môi trường làm việc sạch sẽ, hiện đại.</li></ul>`,
                             requirements: `${requirementsBase}<ul>${otherSkillsText}</ul>`,
@@ -514,6 +516,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 specialConditions: specialConditions,
                 otherSkillRequirement: selectedOtherSkills.map(s => s.slug),
                 companyArrivalTime: ['thuc-tap-sinh-3-go', 'dac-dinh-dau-nhat', 'ky-su-tri-thuc-dau-nhat'].includes(detail.slug) ? getFutureMonths(jobIndex) : undefined,
+                hepatitisBRequirement: jobIndex % 10 === 0 ? 'Không yêu cầu' : 'Không nhận viêm gan B',
                 details: {
                     description: `<p>Mô tả chi tiết cho công việc <strong>${title}</strong>. Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản. Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p><ul><li>Chi tiết công việc: ${keyword}.</li><li>Môi trường làm việc sạch sẽ, hiện đại.</li></ul>`,
                     requirements: `${requirementsBase}<ul>${otherSkillsText}</ul>`,
