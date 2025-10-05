@@ -114,7 +114,7 @@ export function Header() {
       href={href}
       className={cn(
         'transition-colors hover:text-primary py-2 font-medium flex items-center gap-2',
-        (pathname === href || (pathname.startsWith(href) && href !== '/')) ? 'text-primary font-bold' : 'text-foreground/80',
+        (pathname === href || (href !== '/' && pathname.startsWith(`${href}/`))) ? 'text-primary font-bold' : 'text-foreground/80',
         className
       )}
        onClick={onClick}
@@ -433,5 +433,3 @@ const LoggedOutContent = () => {
     </>
   );
 }
-
-    
