@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -240,13 +241,16 @@ const EmptyProfileView = () => {
     };
 
     const IndustryStepDialog = () => {
-        if (!selectedVisa) return null;
-        const industries = industriesByJobType[selectedVisa.slug as keyof typeof industriesByJobType] || [];
+        const parentVisaSlug = selectedVisa?.slug;
+
+        if (!parentVisaSlug) return null;
+
+        const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
         
         let screenIdComment = '';
-        if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-        else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-        else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+        if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+        else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+        else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
 
         return (
             <>
@@ -306,7 +310,7 @@ const EmptyProfileView = () => {
 
 
     const renderDialogContent = () => {
-        switch(profileCreationStep) {
+        switch (profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -424,7 +428,7 @@ const LoggedInView = () => {
     const appliedJobsRef = useRef<HTMLDivElement>(null);
 
 
-    const [openAccordion, setOpenAccordion] = useState<string[]>([]);
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
 
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
@@ -452,7 +456,7 @@ const LoggedInView = () => {
     useEffect(() => {
         const highlightParam = searchParams.get('highlight');
         if (highlightParam === 'suggested') {
-            setOpenAccordion(['item-1']);
+            setOpenAccordion('item-1');
             setIsSuggestionHighlighted(true);
             const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
 
@@ -462,7 +466,7 @@ const LoggedInView = () => {
             
             return () => clearTimeout(timer);
         } else if (highlightParam === 'applied') {
-            setOpenAccordion(['item-2']); // Set "Việc đã ứng tuyển" to be open
+            setOpenAccordion('item-2'); // Set "Việc đã ứng tuyển" to be open
             setTimeout(() => { // Delay scroll slightly to ensure accordion is open
                 appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth' });
                 clearApplicationCount(); // Clear the badge
@@ -473,7 +477,7 @@ const LoggedInView = () => {
                 router.replace(nextUrl.toString(), { scroll: false });
             }, 100);
         } else {
-             setOpenAccordion(['item-1']);
+             setOpenAccordion('item-1');
         }
         fetchAppliedJobs();
     }, [searchParams, router, clearApplicationCount, fetchAppliedJobs]);
@@ -679,12 +683,8 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: string[] } = {
-        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
-    };
-    const visaTypes = Object.keys(visaDetailsOptions);
+    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = visaDetailsByVisaType;
+    const visaTypes = Object.keys(visaDetailsByVisaType);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
@@ -1203,3 +1203,4 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
