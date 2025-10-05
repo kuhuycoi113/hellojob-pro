@@ -414,7 +414,7 @@ const EmptyProfileView = () => {
 
 
     const renderDialogContent = () => {
-        switch (profileCreationStep) {
+        switch(profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -523,7 +523,6 @@ const LoggedInView = () => {
     const [chartData, setChartData] = useState([]);
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
-    const appliedJobsRef = useRef<HTMLDivElement>(null);
     const initialLoadRef = useRef(true);
 
 
@@ -533,6 +532,7 @@ const LoggedInView = () => {
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
+    const appliedJobsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         // Generate dynamic chart data
@@ -545,7 +545,7 @@ const LoggedInView = () => {
         // @ts-ignore
         setChartData(dynamicChartData);
     }, []);
-    
+
     const fetchAppliedJobs = useCallback(() => {
         const appliedJobIds = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
         const appliedJobsData = jobData.filter(job => appliedJobIds.includes(job.id));
@@ -565,31 +565,33 @@ const LoggedInView = () => {
     }, [fetchAppliedJobs, toast]);
 
     useEffect(() => {
-        const highlightParam = searchParams.get('highlight');
         if (initialLoadRef.current) {
+            const highlightParam = searchParams.get('highlight');
             if (highlightParam === 'applied') {
                 setOpenAccordion('item-2');
-                clearApplicationCount(); 
-                router.replace('/viec-lam-cua-toi', { scroll: false }); 
+                clearApplicationCount(); // Clear badge count
+                router.replace('/viec-lam-cua-toi', { scroll: false }); // Clean URL
             } else if (highlightParam === 'suggested') {
                 setOpenAccordion('item-1');
                 setIsSuggestionHighlighted(true);
                 const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
                 router.replace('/viec-lam-cua-toi', { scroll: false });
-                // We don't clear timer on unmount as it's a one-off effect
+                // No need to clear timer on unmount for this one-off effect
             }
             initialLoadRef.current = false;
         }
     }, [searchParams, router, clearApplicationCount]);
     
+    // This new useEffect handles the scrolling after the accordion state is updated.
     useEffect(() => {
         const highlightParam = searchParams.get('highlight');
         if (highlightParam === 'applied') {
-             setTimeout(() => {
+             // A small timeout can help ensure the element is ready to be scrolled to.
+            setTimeout(() => {
                 appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 150);
         }
-    }, [openAccordion]); // Run this effect when accordion state changes
+    }, [openAccordion]); // Depend on openAccordion to run after state update
     
 
     const fetchSuggestedJobs = useCallback(async () => {
@@ -1300,7 +1302,7 @@ const LoggedOutView = () => {
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
+    const isLoggedIn = role !== 'guest';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
@@ -1334,5 +1336,3 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-
-    
