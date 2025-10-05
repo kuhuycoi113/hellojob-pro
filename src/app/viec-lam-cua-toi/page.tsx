@@ -53,35 +53,6 @@ const viewers = [
   { name: 'F', src: 'https://placehold.co/40x40.png?text=F' },
 ];
 
-const LoggedOutView = () => {
-    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-
-    return (
-        <>
-        <div className="flex items-center justify-center text-center py-20">
-            <Card className="max-w-2xl p-8 shadow-2xl">
-                <CardHeader>
-                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
-                        <Briefcase className="h-12 w-12 text-primary"/>
-                    </div>
-                    <CardTitle className="text-3xl font-headline">Quản lý việc làm của bạn</CardTitle>
-                    <CardDescription className="text-base pt-2">
-                        Đăng nhập để xem các công việc được gợi ý riêng cho bạn, theo dõi các đơn đã ứng tuyển và quản lý các việc làm đã lưu.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button onClick={() => setIsAuthDialogOpen(true)} size="lg">
-                        <LogIn className="mr-2"/>Đăng ký / Đăng nhập
-                    </Button>
-                </CardContent>
-            </Card>
-        </div>
-        <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-        </>
-    )
-}
-
-
 const EmptyProfileView = () => {
     const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -674,7 +645,11 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = visaDetailsByVisaType;
+    const visaDetailsOptions: { [key: string]: string[] } = {
+        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
+        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
+        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
+    };
     const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
@@ -693,10 +668,11 @@ const LoggedInView = () => {
          {/* Main Content */}
         <div className="w-full mb-8">
             <Accordion 
-                type="multiple"
+                type="single"
+                collapsible
                 className="w-full space-y-4" 
                 value={openAccordion}
-                onValueChange={(value) => setOpenAccordion(value)}
+                onValueChange={setOpenAccordion}
             >
                 <AccordionItem value="item-1" className={cn(
                     "border-b-0 transition-all duration-500 ease-in-out border rounded-lg",
@@ -1159,9 +1135,174 @@ const LoggedInView = () => {
     )
 }
 
+const LoggedOutView = () => {
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+
+    return (
+        <>
+        <div className="flex items-center justify-center text-center py-20">
+            <Card className="max-w-2xl p-8 shadow-2xl">
+                <CardHeader>
+                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
+                        <Briefcase className="h-12 w-12 text-primary"/>
+                    </div>
+                    <CardTitle className="text-3xl font-headline">Quản lý việc làm của bạn</CardTitle>
+                    <CardDescription className="text-base pt-2">
+                        Đăng nhập để xem các công việc được gợi ý riêng cho bạn, theo dõi các đơn đã ứng tuyển và quản lý các việc làm đã lưu.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button onClick={() => setIsAuthDialogOpen(true)} size="lg">
+                        <LogIn className="mr-2"/>Đăng ký / Đăng nhập
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+        <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+        </>
+    )
+}
+
+const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+    const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
+    const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
+    const [transformStyle, setTransformStyle] = useState({});
+    const cardRef = useRef<HTMLDivElement>(null);
+  
+    useEffect(() => {
+        const vietnamVisaDetails = [
+            'Thực tập sinh 3 năm',
+            'Thực tập sinh 1 năm',
+            'Đặc định đầu Việt',
+            'Đặc định đi mới',
+            'Kỹ sư, tri thức đầu Việt'
+        ];
+        
+        const japanVisaDetails = [
+            'Đặc định đầu Nhật',
+            'Kỹ sư, tri thức đầu Nhật'
+        ];
+
+        try {
+            const storedProfile = localStorage.getItem('generatedCandidateProfile');
+            if (storedProfile) {
+                const profile = JSON.parse(storedProfile);
+                const userVisaDetail = profile.aspirations?.desiredVisaDetail;
+                if (userVisaDetail) {
+                   if (vietnamVisaDetails.includes(userVisaDetail)) {
+                       setCompanyButtonText('Công ty phái cử uy tín');
+                   } else if (japanVisaDetails.includes(userVisaDetail)) {
+                       setCompanyButtonText('Công ty tiếp nhận uy tín');
+                   }
+
+                   if (userVisaDetail === 'Thực tập sinh 3 Go') {
+                        setFeeButtonText('Nghiệp đoàn uy tín');
+                        setCompanyButtonText('Công ty tiếp nhận uy tín');
+                   } else if (userVisaDetail === "Kỹ sư, tri thức đầu Nhật") {
+                       setFeeButtonText("Shokai uy tín");
+                   } else if (userVisaDetail === "Đặc định đầu Nhật") {
+                       setFeeButtonText("Shien uy tín");
+                   }
+                }
+            }
+        } catch (e) {
+            console.error("Could not parse user profile from localStorage", e);
+        }
+        
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 2000); // Show after 2 seconds
+  
+      return () => {
+        clearTimeout(timer);
+      };
+    }, []);
+
+    const handleClose = () => {
+        const targetButton = document.getElementById('highlight-target-button');
+        const cardElement = cardRef.current;
+
+        if (targetButton && cardElement) {
+            const targetRect = targetButton.getBoundingClientRect();
+            const cardRect = cardElement.getBoundingClientRect();
+            
+            const translateX = targetRect.left - cardRect.left + (targetRect.width / 2) - (cardRect.width / 2);
+            const translateY = targetRect.top - cardRect.top + (targetRect.height / 2) - (cardRect.height / 2);
+
+            setTransformStyle({
+                transform: `translate(${translateX}px, ${translateY}px) scale(0.1)`,
+                opacity: 0,
+            });
+        }
+        
+        setIsClosing(true);
+        setTimeout(() => {
+            onHighlight();
+            setIsVisible(false); // Hide the component after animation
+        }, 700); // This duration must match the CSS transition duration
+    };
+  
+    useEffect(() => {
+        let closeTimer: NodeJS.Timeout;
+        if(isVisible && !isClosing) {
+            closeTimer = setTimeout(() => {
+                handleClose();
+            }, 3000); 
+        }
+        return () => clearTimeout(closeTimer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isVisible, isClosing]);
+  
+    if (!isVisible) {
+      return null;
+    }
+  
+    return (
+      <div
+        ref={cardRef}
+        style={isClosing ? transformStyle : {}}
+        className={cn(
+          "fixed bottom-24 left-4 z-50 transition-all duration-700",
+          !isClosing && "animate-in slide-in-from-bottom"
+        )}
+      >
+        { !isClosing && (
+            <Card className="shadow-2xl w-full max-w-sm">
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-bold flex items-center justify-between">
+                        <span>Ưu tiên tìm việc theo?</span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={handleClose}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2">
+                    <Button variant="outline" className="justify-start" onClick={handleClose}>
+                        <TrendingUp className="mr-2 h-4 w-4 text-accent-green" /> Lương tốt
+                    </Button>
+                    <Button variant="outline" className="justify-start" onClick={handleClose}>
+                        <ShieldCheck className="mr-2 h-4 w-4 text-primary" /> {feeButtonText}
+                    </Button>
+                    <Button variant="outline" className="justify-start" onClick={handleClose}>
+                        <ThumbsUp className="mr-2 h-4 w-4 text-accent-orange" /> {companyButtonText}
+                    </Button>
+                </CardContent>
+            </Card>
+        )}
+    </div>
+  );
+};
+
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile' || role === 'candidate-empty-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
@@ -1195,4 +1336,3 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-
