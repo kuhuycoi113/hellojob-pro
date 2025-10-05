@@ -1288,7 +1288,7 @@ export default function EmployerDetailPage() {
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
-                       <Button id="DKGT_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}><Edit className="h-4 w-4"/></Button>
+                       <Button id="DKGT_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
                   
                   {/* Info card for Mobile */}
@@ -1443,7 +1443,7 @@ export default function EmployerDetailPage() {
       </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent id={`${editingModule?.field}_DIALOG`} className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
           </DialogHeader>
