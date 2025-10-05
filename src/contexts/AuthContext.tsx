@@ -30,6 +30,7 @@ interface AuthContextType {
   postLoginAction: PostLoginAction;
   setPostLoginAction: (action: PostLoginAction) => void;
   clearPostLoginAction: () => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -138,6 +139,19 @@ const partialCandidateProfile: Partial<CandidateProfile> = {
     },
 };
 
+const isProfileConsideredFull = (profile: Partial<CandidateProfile>): boolean => {
+  if (!profile) return false;
+  // A simple check: if 'about', 'education', and 'experience' are filled, consider it "full".
+  return !!(
+    profile.name &&
+    profile.headline &&
+    profile.about &&
+    profile.education && profile.education.length > 0 && profile.education.every(e => e.school && e.degree) &&
+    profile.experience && profile.experience.length > 0 && profile.experience.every(e => e.company && e.role)
+  );
+};
+
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [role, setInternalRole] = useState<Role>('guest');
   const [currentUser, setCurrentUser] = useState<User>(guestUser);
@@ -156,41 +170,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setApplicationCount(0);
   }, []);
 
-  const updateProfileInfoFromStorage = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    const storedProfile = localStorage.getItem('generatedCandidateProfile');
-    if (storedProfile) {
-      try {
-        const profile: Partial<CandidateProfile & { avatarUrl?: string }> = JSON.parse(storedProfile);
-        setProfileName(profile.name || null);
-        setProfileHeadline(profile.headline || null);
-        setAvatarUrl(profile.avatarUrl || null);
-        
-        // Update user object
-        const updatedUser = {...loggedInUser, name: profile.name || loggedInUser.name, avatarUrl: profile.avatarUrl || loggedInUser.avatarUrl };
-        setCurrentUser(updatedUser);
-
-      } catch (e) {
-        console.error("Failed to parse profile from localStorage", e);
-        setProfileName(null);
-        setProfileHeadline(null);
-        setAvatarUrl(null);
-        setCurrentUser(isLoggedIn ? loggedInUser : guestUser);
-      }
-    } else {
-      setProfileName(null);
-      setProfileHeadline(null);
-      setAvatarUrl(null);
-      setCurrentUser(isLoggedIn ? loggedInUser : guestUser);
-    }
-  }, [isLoggedIn]);
-
+  // Manual role setter for development simulation
   const setRole = (newRole: Role) => {
+    // This function is now primarily for the simulation menu
+    if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION !== 'true') {
+        console.warn("Manual role setting is disabled in production.");
+        return;
+    }
+
+    localStorage.setItem('simulatedRole', newRole); // Save for persistence across reloads in dev
+
     if (newRole === 'guest') {
-        setCurrentUser(guestUser);
+        localStorage.setItem('isLoggedIn', 'false');
         localStorage.removeItem('generatedCandidateProfile');
-        setApplicationCount(0); // Reset count on logout
-    } else { 
+    } else {
+        localStorage.setItem('isLoggedIn', 'true');
         if (newRole === 'candidate-full-profile') {
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(fullCandidateProfile));
         } else if (newRole === 'candidate') {
@@ -199,56 +193,87 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             localStorage.removeItem('generatedCandidateProfile');
         }
     }
-    setInternalRole(newRole);
-    // updateProfileInfoFromStorage will be triggered by the useEffect below
+    
+    // Trigger a storage event to ensure all tabs and components react to the change
+    window.dispatchEvent(new Event('storage'));
   };
+
+  const logout = () => {
+    localStorage.setItem('isLoggedIn', 'false');
+    localStorage.removeItem('generatedCandidateProfile');
+    localStorage.removeItem('simulatedRole');
+    window.dispatchEvent(new Event('storage'));
+  }
   
   const clearPostLoginAction = () => {
     setPostLoginAction(null);
   };
   
-  useEffect(() => {
-    updateProfileInfoFromStorage();
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'generatedCandidateProfile' || event.key === null) {
-        updateProfileInfoFromStorage();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [updateProfileInfoFromStorage]);
+  // This is the core logic that runs in both dev and prod
+  const updateAuthAndProfileState = useCallback(() => {
+    if (typeof window === 'undefined') return;
 
-  useEffect(() => {
-    // This effect runs whenever the role changes, including after setRole is called.
-    updateProfileInfoFromStorage();
+    const userIsLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+    if (!userIsLoggedIn) {
+        setInternalRole('guest');
+        setCurrentUser(guestUser);
+        setProfileName(null);
+        setProfileHeadline(null);
+        setAvatarUrl(null);
+        setApplicationCount(0);
+        return;
+    }
 
-    const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
-    if (role === 'candidate-empty-profile' && preferencesRaw) {
+    // If logged in, determine the role based on profile data
+    const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
+    
+    if (!storedProfileRaw) {
+        setInternalRole('candidate-empty-profile');
+    } else {
         try {
-            const preferences = JSON.parse(preferencesRaw);
-            const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
-            let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
-            profile = {
-                ...profile,
-                desiredIndustry: preferences.desiredIndustry || profile.desiredIndustry,
-                aspirations: {
-                    ...profile.aspirations,
-                    desiredVisaType: preferences.desiredVisaType,
-                    desiredVisaDetail: preferences.desiredVisaDetail,
-                    desiredLocation: preferences.desiredLocation,
-                }
-            };
-            localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
-            sessionStorage.removeItem('onboardingPreferences');
-            setRole('candidate'); // Transition to the 'candidate' role
-        } catch(e) {
-            console.error("Failed to apply onboarding preferences:", e);
-            sessionStorage.removeItem('onboardingPreferences');
+            const profile = JSON.parse(storedProfileRaw);
+            if (isProfileConsideredFull(profile)) {
+                setInternalRole('candidate-full-profile');
+            } else {
+                setInternalRole('candidate');
+            }
+        } catch {
+            setInternalRole('candidate-empty-profile');
         }
     }
-  }, [role, updateProfileInfoFromStorage]);
+
+    // Update shared user info regardless of profile completeness
+    const profile: Partial<CandidateProfile & { avatarUrl?: string }> = storedProfileRaw ? JSON.parse(storedProfileRaw) : {};
+    setProfileName(profile.name || 'Ứng viên');
+    setProfileHeadline(profile.headline || 'Cập nhật hồ sơ của bạn');
+    setAvatarUrl(profile.avatarUrl || null);
+    setCurrentUser(prevUser => ({
+        ...prevUser, // Keep ID, etc.
+        id: 'user-0', // Ensure a consistent logged-in user ID
+        name: profile.name || 'Ứng viên',
+        avatarUrl: profile.avatarUrl || loggedInUser.avatarUrl,
+    }));
+    const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+    setApplicationCount(appliedJobs.length);
+  }, []);
+
+  useEffect(() => {
+    // Initial load
+    const simulatedRole = localStorage.getItem('simulatedRole') as Role;
+    if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' && simulatedRole) {
+        // If in dev and a role is saved, force that state
+        setRole(simulatedRole);
+    }
+    updateAuthAndProfileState();
+
+    // Listen for changes
+    window.addEventListener('storage', updateAuthAndProfileState);
+
+    return () => {
+      window.removeEventListener('storage', updateAuthAndProfileState);
+    };
+  }, [updateAuthAndProfileState]);
 
   const value = {
     role,
@@ -264,7 +289,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     postLoginAction,
     setPostLoginAction,
     clearPostLoginAction,
+    logout,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+    

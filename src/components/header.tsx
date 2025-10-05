@@ -72,7 +72,7 @@ export const Logo = ({ className }: { className?: string }) => (
 
 export function Header() {
   const pathname = usePathname();
-  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl, applicationCount } = useAuth();
+  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl, applicationCount, logout } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -176,6 +176,15 @@ export function Header() {
             ))}
           </div>
         </DropdownMenuGroup>
+        {isLoggedIn && (
+            <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={logout} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Đăng xuất</span>
+                </DropdownMenuItem>
+            </>
+        )}
         {process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' && (
           <>
             <DropdownMenuSeparator />
@@ -272,6 +281,12 @@ export function Header() {
                 )
             })}
             </div>
+        </div>
+        <div className="p-4 mt-auto border-t">
+          <Button variant="outline" className="w-full" onClick={logout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Đăng xuất
+          </Button>
         </div>
         <MobileRoleSwitcher />
     </>
@@ -418,3 +433,5 @@ const LoggedOutContent = () => {
     </>
   );
 }
+
+    

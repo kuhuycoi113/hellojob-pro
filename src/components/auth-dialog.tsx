@@ -31,7 +31,15 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
 
   const handleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setRole('candidate-empty-profile'); // Default to empty profile, context will fill it
+    
+    // Simulate login by setting a flag in localStorage
+    localStorage.setItem('isLoggedIn', 'true');
+    // Set a default empty profile to trigger the 'candidate-empty-profile' state initially
+    localStorage.removeItem('generatedCandidateProfile'); 
+
+    // Dispatch a storage event to notify other tabs/components (like AuthContext)
+    window.dispatchEvent(new Event('storage'));
+
     onOpenChange(false);
     toast({
         title: "Đăng nhập thành công!",
@@ -42,7 +50,7 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
 
     // Check if there is a pending action. If not, check for a redirect path.
     if (postLoginAction) {
-        // The action will be handled by the listener in MyJobsDashboardPageContent
+        // The action will be handled by the listener in LayoutManager
         return;
     }
 
@@ -55,7 +63,10 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
   
   const handleSimulateLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setRole('candidate-empty-profile'); 
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.removeItem('generatedCandidateProfile');
+    localStorage.setItem('simulatedRole', 'candidate-empty-profile');
+    window.dispatchEvent(new Event('storage'));
     onOpenChange(false);
     toast({
         title: "Đăng nhập giả lập thành công!",
@@ -78,15 +89,15 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
             </DialogHeader>
 
             <div className="space-y-3">
-                 <Button variant="outline" className="w-full justify-start h-12 text-base">
+                 <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handleLogin}>
                     <Image src="/img/Facebook.svg" alt="Facebook" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Facebook
                  </Button>
-                 <Button variant="outline" className="w-full justify-start h-12 text-base">
+                 <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handleLogin}>
                     <Image src="/img/google.svg" alt="Google" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Google
                  </Button>
-                 <Button variant="outline" className="w-full justify-start h-12 text-base">
+                 <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handleLogin}>
                     <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Số điện thoại
                  </Button>
@@ -104,11 +115,13 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
                     </a>
                     {' '} của chúng tôi.
                 </p>
+                {process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' && (
                  <div className="flex justify-end mt-2">
                     <Button variant="link" size="sm" className="h-auto p-0 text-xs text-muted-foreground" onClick={handleSimulateLogin}>
                         Giả lập đăng nhập
                     </Button>
                 </div>
+                )}
             </div>
         </div>
         <div className="hidden md:block relative">
@@ -123,3 +136,5 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
     </Dialog>
   );
 }
+
+    
