@@ -37,6 +37,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 
+
 const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
@@ -413,7 +414,7 @@ const EmptyProfileView = () => {
 
 
     const renderDialogContent = () => {
-        switch(profileCreationStep) {
+        switch (profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -523,9 +524,10 @@ const LoggedInView = () => {
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
     const appliedJobsRef = useRef<HTMLDivElement>(null);
+    const initialLoadRef = useRef(true);
 
 
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
 
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
@@ -564,34 +566,31 @@ const LoggedInView = () => {
 
     useEffect(() => {
         const highlightParam = searchParams.get('highlight');
-        if (highlightParam === 'applied') {
-            setOpenAccordion('item-2');
-            setTimeout(() => {
-                appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-            clearApplicationCount(); // Clear the notification badge
-            
-            // Clean the URL
-            const nextUrl = new URL(window.location.href);
-            nextUrl.searchParams.delete('highlight');
-            router.replace(nextUrl.toString(), { scroll: false });
-
-        } else if (highlightParam === 'suggested') {
-            setOpenAccordion('item-1');
-            setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
-
-            const nextUrl = new URL(window.location.href);
-            nextUrl.searchParams.delete('highlight');
-            router.replace(nextUrl.toString(), { scroll: false });
-            
-            return () => clearTimeout(timer);
-        } else {
-             setOpenAccordion('item-1');
+        if (initialLoadRef.current) {
+            if (highlightParam === 'applied') {
+                setOpenAccordion('item-2');
+                clearApplicationCount(); 
+                router.replace('/viec-lam-cua-toi', { scroll: false }); 
+            } else if (highlightParam === 'suggested') {
+                setOpenAccordion('item-1');
+                setIsSuggestionHighlighted(true);
+                const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
+                router.replace('/viec-lam-cua-toi', { scroll: false });
+                // We don't clear timer on unmount as it's a one-off effect
+            }
+            initialLoadRef.current = false;
         }
-        fetchAppliedJobs();
-    }, [searchParams, router, clearApplicationCount, fetchAppliedJobs]);
-
+    }, [searchParams, router, clearApplicationCount]);
+    
+    useEffect(() => {
+        const highlightParam = searchParams.get('highlight');
+        if (highlightParam === 'applied') {
+             setTimeout(() => {
+                appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 150);
+        }
+    }, [openAccordion]); // Run this effect when accordion state changes
+    
 
     const fetchSuggestedJobs = useCallback(async () => {
         setIsLoadingSuggestions(true);
@@ -1301,7 +1300,7 @@ const LoggedOutView = () => {
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
@@ -1335,3 +1334,5 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
