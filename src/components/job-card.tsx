@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark, Phone, LogIn, Star, FileText } from 'lucide-react';
+import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark, Phone, LogIn, Star, FileText, X } from 'lucide-react';
 import { Job, publicFeeLimits, controlledFeeVisas } from '@/lib/mock-data';
 import {
     DropdownMenu,
@@ -113,7 +113,7 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 };
 
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false }: { job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean }) => {
+export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, onCancelApplication }: { id?: string, job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, onCancelApplication?: (jobId: string) => void }) => {
   const { isLoggedIn, setPostLoginAction, incrementApplicationCount } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -189,8 +189,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
      // Trigger a storage event to update other components like the "My Jobs" page
     window.dispatchEvent(new Event('storage'));
   };
-
-  const handleApplyClick = (e: React.MouseEvent) => {
+  
+   const handleApplyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     if (!isLoggedIn) {
@@ -213,11 +213,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                      className: 'bg-green-500 text-white'
                  });
             } else {
-                //setIsProfileIncompleteAlertOpen(true);
-                setIsProfileEditDialogOpen(true);
+                setIsProfileIncompleteAlertOpen(true);
             }
         } else {
-             // No profile found, show alert to update
              setIsProfileEditDialogOpen(true);
         }
     }
@@ -229,7 +227,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
   };
   
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Only navigate if the click target is not an interactive element
     if ((e.target as HTMLElement).closest('a, button')) {
       return;
     }
@@ -286,8 +283,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   if (variant === 'list-item' || variant === 'list-item-compact') {
      return (
-        <>
-            <div id="HIENTHIVIEC01" className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground" onClick={handleCardClick}>
+        <div id={id}>
+            <div className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground" onClick={handleCardClick}>
                 <div className="p-3 hover:bg-secondary/30">
                     <div className="flex flex-col items-stretch gap-4 md:flex-row">
                          <div className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
@@ -377,7 +374,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                         Lưu
                                     </Button>
                                     }
-                                    {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
+                                     {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
+                                     {showCancelApplication && hasApplied && (
+                                        <Button variant="destructive" size="sm" onClick={(e) => { e.stopPropagation(); onCancelApplication?.(job.id); }}>
+                                            <X className="mr-2 h-4 w-4" /> Huỷ
+                                        </Button>
+                                    )}
                                 </div>}
                             </div>
                         </div>
@@ -409,24 +411,19 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-             <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
-                <AlertDialogContent id="UNGTUYEN-L02-B1">
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Để sau</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => {
-                            setIsProfileIncompleteAlertOpen(false);
-                            router.push('/ho-so-cua-toi');
-                        }}>Đồng ý, cập nhật</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </>
+            <EditProfileDialog 
+                isOpen={isProfileEditDialogOpen} 
+                onOpenChange={setIsProfileEditDialogOpen} 
+                onSaveSuccess={() => {
+                    toast({
+                        title: 'Cập nhật thành công!',
+                        description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
+                        className: 'bg-green-500 text-white'
+                    });
+                }}
+                source="application"
+            />
+        </div>
      );
   }
 
@@ -489,8 +486,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
   // Default variant: 'grid-item'
   return (
-    <>
-        <Card id="HIENTHIVIEC02" className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-border shadow-sm transition-shadow duration-300 hover:shadow-lg")}>
+    <div id={id}>
+        <Card className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-border shadow-sm transition-shadow duration-300 hover:shadow-lg")}>
              <div className="group cursor-pointer flex flex-col h-full" onClick={handleCardClick}>
                 <div className="relative aspect-video w-full">
                      <Image src={job.image.src} alt={job.title} fill className="object-cover transition-transform group-hover:scale-105" />
@@ -542,7 +539,16 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 </Link>
                                 <ContactButtons contact={job.recruiter as any} job={job} variant="compact" />
                             </div>
-                            {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
+                            {isClient && showApplyButtons && (
+                                <div className="flex items-center gap-2">
+                                    <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
+                                    {showCancelApplication && hasApplied && (
+                                        <Button variant="destructive" size="sm" onClick={(e) => { e.stopPropagation(); onCancelApplication?.(job.id); }}>
+                                            <X className="mr-2 h-4 w-4" /> Huỷ
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -585,6 +591,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             }}
             source="application"
         />
-    </>
+    </div>
   );
 };

@@ -241,16 +241,13 @@ const EmptyProfileView = () => {
     };
 
     const IndustryStepDialog = () => {
-        const parentVisaSlug = selectedVisa?.slug;
-
-        if (!parentVisaSlug) return null;
-
-        const industries = industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || [];
+        if (!selectedVisa) return null;
+        const industries = industriesByJobType[selectedVisa.slug as keyof typeof industriesByJobType] || [];
         
         let screenIdComment = '';
-        if (parentVisaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-        else if (parentVisaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-        else if (parentVisaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+        if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+        else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+        else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
 
         return (
             <>
@@ -310,7 +307,7 @@ const EmptyProfileView = () => {
 
 
     const renderDialogContent = () => {
-        switch (profileCreationStep) {
+        switch(profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -333,13 +330,7 @@ const EmptyProfileView = () => {
                 <div className="mt-6 flex flex-wrap gap-4 justify-center">
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
-                           <Button 
-                                className="bg-accent-orange hover:bg-accent-orange/90 text-white"
-                                onClick={() => {
-                                    setProfileCreationStep(2); // Start from step 2 directly
-                                    setIsDialogOpen(true);
-                                }}
-                            >
+                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
@@ -453,6 +444,18 @@ const LoggedInView = () => {
         setAppliedJobs(appliedJobsData);
     }, []);
 
+    const handleCancelApplication = useCallback((jobId: string) => {
+        const currentApplied = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+        const newApplied = currentApplied.filter((id: string) => id !== jobId);
+        localStorage.setItem('appliedJobs', JSON.stringify(newApplied));
+        fetchAppliedJobs(); // Re-fetch to update the UI
+        toast({
+          title: "Đã huỷ ứng tuyển",
+          description: `Bạn đã huỷ ứng tuyển công việc có mã ${jobId}.`,
+        });
+        window.dispatchEvent(new Event('storage')); // Notify header to update count
+    }, [fetchAppliedJobs, toast]);
+
     useEffect(() => {
         const highlightParam = searchParams.get('highlight');
         if (highlightParam === 'suggested') {
@@ -529,18 +532,6 @@ const LoggedInView = () => {
         const savedJobsData = jobData.filter(job => savedJobIds.includes(job.id));
         setSavedJobs(savedJobsData);
     }, []);
-
-    const handleCancelApplication = useCallback((jobId: string) => {
-        const currentApplied = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-        const newApplied = currentApplied.filter((id: string) => id !== jobId);
-        localStorage.setItem('appliedJobs', JSON.stringify(newApplied));
-        fetchAppliedJobs(); // Re-fetch to update the UI
-        toast({
-          title: "Đã huỷ ứng tuyển",
-          description: `Bạn đã huỷ ứng tuyển công việc có mã ${jobId}.`,
-        });
-        window.dispatchEvent(new Event('storage')); // Notify header to update count
-    }, [fetchAppliedJobs, toast]);
 
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
@@ -684,7 +675,7 @@ const LoggedInView = () => {
     }
     
     const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = visaDetailsByVisaType;
-    const visaTypes = Object.keys(visaDetailsByVisaType);
+    const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
@@ -788,15 +779,16 @@ const LoggedInView = () => {
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {appliedJobs.map((job) => ( 
-                                <JobCard 
-                                    key={job.id} 
+                            {appliedJobs.map((job) => (
+                               <div id="HIENTHIVIEC06" key={job.id}>
+                                  <JobCard 
                                     job={job} 
                                     showRecruiterName={false} 
                                     showPostedTime={true}
                                     showCancelApplication={true}
                                     onCancelApplication={handleCancelApplication}
-                                /> 
+                                  /> 
+                               </div>
                             ))}
                         </div>
                     </AccordionContent>
@@ -1169,7 +1161,7 @@ const LoggedInView = () => {
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile' || role === 'candidate-empty-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
