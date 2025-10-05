@@ -176,37 +176,44 @@ export function Header() {
             ))}
           </div>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup
-          value={role}
-          onValueChange={(value) => setRole(value as Role)}
-        >
-          <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <DropdownMenuRadioItem value="candidate-full-profile">
-              Đã đăng nhập (Profile full)
-            </DropdownMenuRadioItem>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <DropdownMenuRadioItem value="candidate">
-              Đã đăng nhập (Có Profile)
-            </DropdownMenuRadioItem>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <DropdownMenuRadioItem value="candidate-empty-profile">
-              Đã đăng nhập (Profile trắng)
-            </DropdownMenuRadioItem>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <DropdownMenuRadioItem value="guest">Khách (Chưa đăng nhập)</DropdownMenuRadioItem>
-          </DropdownMenuItem>
-        </DropdownMenuRadioGroup>
+        {process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuRadioGroup
+              value={role}
+              onValueChange={(value) => setRole(value as Role)}
+            >
+              <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuRadioItem value="candidate-full-profile">
+                  Đã đăng nhập (Profile full)
+                </DropdownMenuRadioItem>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuRadioItem value="candidate">
+                  Đã đăng nhập (Có Profile)
+                </DropdownMenuRadioItem>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuRadioItem value="candidate-empty-profile">
+                  Đã đăng nhập (Profile trắng)
+                </DropdownMenuRadioItem>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuRadioItem value="guest">Khách (Chưa đăng nhập)</DropdownMenuRadioItem>
+              </DropdownMenuItem>
+            </DropdownMenuRadioGroup>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 
   const MobileRoleSwitcher = () => {
     const { role, setRole } = useAuth();
+    if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION !== 'true') {
+      return null;
+    }
     return (
       <div className="p-4 mt-auto border-t">
         <Label className="text-xs font-medium text-muted-foreground">Mô phỏng vai trò</Label>
@@ -411,5 +418,3 @@ const LoggedOutContent = () => {
     </>
   );
 }
-
-    
