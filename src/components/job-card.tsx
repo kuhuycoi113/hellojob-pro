@@ -471,19 +471,21 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                 }}
                 source="application"
             />
-             {/* GHSLUT-L01: Dialog for application limit */}
-            <AlertDialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Bạn đã đạt giới hạn 20 lượt ứng tuyển trong tháng này. Giới hạn sẽ được làm mới vào đầu tháng sau.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogAction onClick={() => setIsLimitDialogOpen(false)}>Đã hiểu</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
+            <AlertDialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen} id="GHSLUT-L01">
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Bạn đã đạt giới hạn 20 lượt ứng tuyển trong tháng này. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive" className="align-middle">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Để sau</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => router.push('/viec-lam-cua-toi?highlight=applied')}>
+                    Đến mục đã ứng tuyển
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
             </AlertDialog>
         </div>
      );
@@ -669,21 +671,22 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
             }}
             source="application"
         />
-        {/* GHSLUT-L01: Dialog for application limit */}
-        <AlertDialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Bạn đã đạt giới hạn 20 lượt ứng tuyển trong tháng này. Giới hạn sẽ được làm mới vào đầu tháng sau.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogAction onClick={() => setIsLimitDialogOpen(false)}>Đã hiểu</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
+        <AlertDialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen} id="GHSLUT-L01">
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
+              <AlertDialogDescription>
+                Bạn đã đạt giới hạn 20 lượt ứng tuyển trong tháng này. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive" className="align-middle">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Để sau</AlertDialogCancel>
+              <AlertDialogAction onClick={() => router.push('/viec-lam-cua-toi?highlight=applied')}>
+                Đến mục đã ứng tuyển
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
         </AlertDialog>
     </div>
   );
 };
-
