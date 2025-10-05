@@ -24,6 +24,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -383,9 +384,25 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                     }
                                      {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                                      {showCancelApplication && hasApplied && (
-                                        <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onCancelApplication?.(job.id); }}>
-                                            <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
-                                        </Button>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
+                                                    <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                                                <AlertDialogHeader>
+                                                <AlertDialogTitle>Xác nhận huỷ ứng tuyển?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này không thể hoàn tác.
+                                                </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                <AlertDialogCancel>Huỷ bỏ</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => onCancelApplication?.(job.id)}>Đồng ý</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     )}
                                 </div>}
                             </div>
@@ -550,9 +567,25 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                 <div className="flex items-center gap-2">
                                     <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
                                     {showCancelApplication && hasApplied && (
-                                        <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onCancelApplication?.(job.id); }}>
-                                            <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
-                                        </Button>
+                                         <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
+                                                    <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                                                <AlertDialogHeader>
+                                                <AlertDialogTitle>Xác nhận huỷ ứng tuyển?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này không thể hoàn tác.
+                                                </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                <AlertDialogCancel>Huỷ bỏ</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => onCancelApplication?.(job.id)}>Đồng ý</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     )}
                                 </div>
                             )}
