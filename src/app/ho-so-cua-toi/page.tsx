@@ -475,7 +475,7 @@ const EditDialog = ({
 
 export default function CandidateProfilePage() {
   const { toast } = useToast();
-  const { role, profileName, profileHeadline, avatarUrl } = useAuth();
+  const { role, profileName, profileHeadline, avatarUrl, logout } = useAuth();
   const [profileByLang, setProfileByLang] = useState<ProfilesByLang>({ vi: null, ja: null, en: null });
   const [newSkill, setNewSkill] = useState('');
   const [newInterest, setNewInterest] = useState('');
@@ -1693,7 +1693,7 @@ export default function CandidateProfilePage() {
                 </Card>
 
                  <div className="text-center pt-4">
-                    <Button variant="link" className="text-muted-foreground text-sm" onClick={() => { /* Handle logout */ }}>
+                    <Button variant="link" className="text-muted-foreground text-sm" onClick={logout}>
                         <LogOut className="mr-2 h-4 w-4"/>
                         Đăng xuất
                     </Button>
