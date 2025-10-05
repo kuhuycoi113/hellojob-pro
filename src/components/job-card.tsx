@@ -472,7 +472,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                 }}
                 source="application"
             />
-             <AlertDialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen} id="GHSLUT-L01">
+             <AlertDialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen} id="GHSLUT002">
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
@@ -672,7 +672,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
             }}
             source="application"
         />
-        <AlertDialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen} id="GHSLUT-L01">
+        <AlertDialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen} id="GHSLUT002">
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
