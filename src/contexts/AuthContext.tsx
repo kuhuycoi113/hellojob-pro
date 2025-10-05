@@ -2,8 +2,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import { getAuth, onAuthStateChanged, signOut, type User as FirebaseUser } from 'firebase/auth';
 import { guestUser, loggedInUser, type User } from '@/lib/chat-data';
 import type { CandidateProfile } from '@/ai/schemas';
+import { app } from '@/firebase/config'; // Import the initialized Firebase app
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest' | 'candidate-full-profile';
 
@@ -170,52 +172,50 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setApplicationCount(0);
   }, []);
 
-  // Manual role setter for development simulation
-  const setRole = (newRole: Role) => {
-    // This function is now primarily for the simulation menu
-    if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION !== 'true') {
-        console.warn("Manual role setting is disabled in production.");
-        return;
-    }
-
-    localStorage.setItem('simulatedRole', newRole); // Save for persistence across reloads in dev
-
-    if (newRole === 'guest') {
-        localStorage.setItem('isLoggedIn', 'false');
-        localStorage.removeItem('generatedCandidateProfile');
-    } else {
-        localStorage.setItem('isLoggedIn', 'true');
-        if (newRole === 'candidate-full-profile') {
-            localStorage.setItem('generatedCandidateProfile', JSON.stringify(fullCandidateProfile));
-        } else if (newRole === 'candidate') {
-            localStorage.setItem('generatedCandidateProfile', JSON.stringify(partialCandidateProfile));
-        } else if (newRole === 'candidate-empty-profile') {
-            localStorage.removeItem('generatedCandidateProfile');
-        }
-    }
-    
-    // Trigger a storage event to ensure all tabs and components react to the change
-    window.dispatchEvent(new Event('storage'));
-  };
+  const auth = getAuth(app);
 
   const logout = () => {
-    localStorage.setItem('isLoggedIn', 'false');
-    localStorage.removeItem('generatedCandidateProfile');
-    localStorage.removeItem('simulatedRole');
-    window.dispatchEvent(new Event('storage'));
-  }
+    signOut(auth);
+    if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true') {
+        localStorage.removeItem('simulatedRole');
+    }
+  };
   
   const clearPostLoginAction = () => {
     setPostLoginAction(null);
   };
   
-  // This is the core logic that runs in both dev and prod
-  const updateAuthAndProfileState = useCallback(() => {
+  const updateAuthAndProfileState = useCallback((firebaseUser: FirebaseUser | null) => {
     if (typeof window === 'undefined') return;
-
-    const userIsLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     
-    if (!userIsLoggedIn) {
+    // Developer simulation override
+    if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true') {
+        const simulatedRole = localStorage.getItem('simulatedRole') as Role;
+        if(simulatedRole) {
+            setInternalRole(simulatedRole);
+             if (simulatedRole === 'guest') {
+                 setCurrentUser(guestUser);
+                 setProfileName(null);
+                 setProfileHeadline(null);
+                 setAvatarUrl(null);
+                 setApplicationCount(0);
+             } else {
+                 let profileData: Partial<CandidateProfile & {avatarUrl?: string}> = {};
+                 if (simulatedRole === 'candidate-full-profile') {
+                     profileData = fullCandidateProfile as Partial<CandidateProfile & {avatarUrl?: string}>;
+                 } else if (simulatedRole === 'candidate') {
+                     profileData = partialCandidateProfile as Partial<CandidateProfile & {avatarUrl?: string}>;
+                 }
+                 setProfileName(profileData.name || 'Ứng viên');
+                 setProfileHeadline(profileData.headline || 'Cập nhật hồ sơ');
+                 setAvatarUrl(profileData.avatarUrl || null);
+                 setCurrentUser(prev => ({...prev, name: profileData.name || 'Ứng viên', id: firebaseUser?.uid || 'user-0', avatarUrl: profileData.avatarUrl || loggedInUser.avatarUrl}));
+             }
+            return;
+        }
+    }
+
+    if (!firebaseUser) {
         setInternalRole('guest');
         setCurrentUser(guestUser);
         setProfileName(null);
@@ -225,7 +225,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return;
     }
 
-    // If logged in, determine the role based on profile data
+    // Real logic for logged-in users
     const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
     
     if (!storedProfileRaw) {
@@ -243,37 +243,50 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
     }
 
-    // Update shared user info regardless of profile completeness
     const profile: Partial<CandidateProfile & { avatarUrl?: string }> = storedProfileRaw ? JSON.parse(storedProfileRaw) : {};
-    setProfileName(profile.name || 'Ứng viên');
+    const displayName = firebaseUser.displayName || profile.name || 'Ứng viên';
+    
+    setProfileName(displayName);
     setProfileHeadline(profile.headline || 'Cập nhật hồ sơ của bạn');
-    setAvatarUrl(profile.avatarUrl || null);
-    setCurrentUser(prevUser => ({
-        ...prevUser, // Keep ID, etc.
-        id: 'user-0', // Ensure a consistent logged-in user ID
-        name: profile.name || 'Ứng viên',
-        avatarUrl: profile.avatarUrl || loggedInUser.avatarUrl,
-    }));
+    setAvatarUrl(firebaseUser.photoURL || profile.avatarUrl || null);
+    
+    setCurrentUser({
+        id: firebaseUser.uid,
+        name: displayName,
+        avatarUrl: firebaseUser.photoURL || profile.avatarUrl || loggedInUser.avatarUrl,
+    });
+
     const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
     setApplicationCount(appliedJobs.length);
   }, []);
 
-  useEffect(() => {
-    // Initial load
-    const simulatedRole = localStorage.getItem('simulatedRole') as Role;
-    if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' && simulatedRole) {
-        // If in dev and a role is saved, force that state
-        setRole(simulatedRole);
+  const setRole = (newRole: Role) => {
+    if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION !== 'true') {
+        console.warn("Manual role setting is disabled in production.");
+        return;
     }
-    updateAuthAndProfileState();
+    localStorage.setItem('simulatedRole', newRole);
+    // Directly call the update function to reflect the change immediately
+    updateAuthAndProfileState(auth.currentUser);
+  };
 
-    // Listen for changes
-    window.addEventListener('storage', updateAuthAndProfileState);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+        updateAuthAndProfileState(user);
+    });
+
+    const handleStorageChange = () => {
+        updateAuthAndProfileState(auth.currentUser);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
 
     return () => {
-      window.removeEventListener('storage', updateAuthAndProfileState);
+        unsubscribe();
+        window.removeEventListener('storage', handleStorageChange);
     };
-  }, [updateAuthAndProfileState]);
+  }, [auth, updateAuthAndProfileState]);
 
   const value = {
     role,
@@ -294,5 +307,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-    

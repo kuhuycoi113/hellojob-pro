@@ -17,6 +17,8 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
+import { app } from '@/firebase/config';
 
 interface AuthDialogProps {
   isOpen: boolean;
@@ -25,55 +27,39 @@ interface AuthDialogProps {
 
 export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
   const [authType, setAuthType] = useState<'login' | 'register'>('register');
-  const { setRole, postLoginAction } = useAuth();
+  const { postLoginAction } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
+  const auth = getAuth(app);
 
-  const handleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    
-    // Simulate login by setting a flag in localStorage
-    localStorage.setItem('isLoggedIn', 'true');
-    // Set a default empty profile to trigger the 'candidate-empty-profile' state initially
-    localStorage.removeItem('generatedCandidateProfile'); 
+  const handleProviderLogin = async (provider: GoogleAuthProvider | FacebookAuthProvider) => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      // This user object contains all the info from the provider.
+      const user = result.user;
+      
+      onOpenChange(false);
+      toast({
+          title: "Đăng nhập thành công!",
+          description: `Chào mừng ${user.displayName || 'bạn'} đã quay trở lại.`,
+          className: 'bg-green-500 text-white',
+          duration: 2000,
+      });
 
-    // Dispatch a storage event to notify other tabs/components (like AuthContext)
-    window.dispatchEvent(new Event('storage'));
-
-    onOpenChange(false);
-    toast({
-        title: "Đăng nhập thành công!",
-        description: "Chào mừng bạn đã quay trở lại.",
-        className: 'bg-green-500 text-white',
-        duration: 2000,
-    })
-
-    // Check if there is a pending action. If not, check for a redirect path.
-    if (postLoginAction) {
-        // The action will be handled by the listener in LayoutManager
-        return;
+      // The onAuthStateChanged listener in AuthContext will handle the rest.
+      
+    } catch (error: any) {
+      console.error("Authentication error:", error);
+      toast({
+          variant: 'destructive',
+          title: "Đăng nhập thất bại",
+          description: error.message || "Đã có lỗi xảy ra, vui lòng thử lại.",
+      });
     }
+  };
 
-    const redirectPath = sessionStorage.getItem('postLoginRedirect');
-    if (redirectPath) {
-        sessionStorage.removeItem('postLoginRedirect');
-        router.push(redirectPath);
-    }
-  }
-  
-  const handleSimulateLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.removeItem('generatedCandidateProfile');
-    localStorage.setItem('simulatedRole', 'candidate-empty-profile');
-    window.dispatchEvent(new Event('storage'));
-    onOpenChange(false);
-    toast({
-        title: "Đăng nhập giả lập thành công!",
-        description: "Vai trò: Đã đăng nhập (Profile trắng).",
-        duration: 2000,
-    })
-  }
+  const handleGoogleLogin = () => handleProviderLogin(new GoogleAuthProvider());
+  const handleFacebookLogin = () => handleProviderLogin(new FacebookAuthProvider());
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -89,17 +75,17 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
             </DialogHeader>
 
             <div className="space-y-3">
-                 <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handleLogin}>
+                 <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handleFacebookLogin}>
                     <Image src="/img/Facebook.svg" alt="Facebook" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Facebook
                  </Button>
-                 <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handleLogin}>
+                 <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handleGoogleLogin}>
                     <Image src="/img/google.svg" alt="Google" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Google
                  </Button>
-                 <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handleLogin}>
+                 <Button variant="outline" className="w-full justify-start h-12 text-base" disabled>
                     <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-3 h-5 w-5" />
-                    Tiếp tục với Số điện thoại
+                    Tiếp tục với Số điện thoại (sắp có)
                  </Button>
             </div>
 
@@ -117,9 +103,7 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
                 </p>
                 {process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' && (
                  <div className="flex justify-end mt-2">
-                    <Button variant="link" size="sm" className="h-auto p-0 text-xs text-muted-foreground" onClick={handleSimulateLogin}>
-                        Giả lập đăng nhập
-                    </Button>
+                    {/* Kept for testing if needed, but main login is real */}
                 </div>
                 )}
             </div>
@@ -136,5 +120,3 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
     </Dialog>
   );
 }
-
-    
