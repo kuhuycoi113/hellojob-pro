@@ -114,7 +114,7 @@ export function Header() {
       href={href}
       className={cn(
         'transition-colors hover:text-primary py-2 font-medium flex items-center gap-2',
-        (pathname === href || (href !== '/' && pathname.startsWith(`${href}/`))) ? 'text-primary font-bold' : 'text-foreground/80',
+        (pathname === href || (pathname.startsWith(`${href}/`) && href !== '/')) ? 'text-primary font-bold' : 'text-foreground/80',
         className
       )}
        onClick={onClick}
@@ -176,15 +176,6 @@ export function Header() {
             ))}
           </div>
         </DropdownMenuGroup>
-        {isLoggedIn && (
-            <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={logout} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Đăng xuất</span>
-                </DropdownMenuItem>
-            </>
-        )}
         {process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' && (
           <>
             <DropdownMenuSeparator />
@@ -281,12 +272,6 @@ export function Header() {
                 )
             })}
             </div>
-        </div>
-        <div className="p-4 mt-auto border-t">
-          <Button variant="outline" className="w-full" onClick={logout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Đăng xuất
-          </Button>
         </div>
         <MobileRoleSwitcher />
     </>
