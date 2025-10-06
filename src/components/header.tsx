@@ -72,7 +72,7 @@ export const Logo = ({ className }: { className?: string }) => (
 
 export function Header() {
   const pathname = usePathname();
-  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl, applicationCount, logout } = useAuth();
+  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl, applicationCount } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

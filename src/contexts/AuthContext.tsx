@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
@@ -26,6 +27,7 @@ interface AuthContextType {
   profileHeadline: string | null;
   avatarUrl: string | null;
   applicationCount: number;
+  setApplicationCount: (count: number | ((prevCount: number) => number)) => void;
   incrementApplicationCount: () => void;
   clearApplicationCount: () => void;
   setRole: (role: Role) => void;
@@ -215,6 +217,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
              setAvatarUrl(profileData.avatarUrl || null);
              setCurrentUser(prev => ({...prev, name: profileData.name || 'Ứng viên', id: firebaseUser?.uid || 'user-0', avatarUrl: profileData.avatarUrl || loggedInUser.avatarUrl}));
          }
+        const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+        setApplicationCount(appliedJobs.length);
         return;
     }
 
@@ -299,6 +303,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     profileHeadline,
     avatarUrl,
     applicationCount,
+    setApplicationCount,
     incrementApplicationCount,
     clearApplicationCount,
     setRole,

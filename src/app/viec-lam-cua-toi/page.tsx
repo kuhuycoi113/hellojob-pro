@@ -366,17 +366,18 @@ const MY_JOBS_SECTIONS = {
     BEHAVIORAL: 'item-4',
 };
 
+
 const LoggedInView = () => {
-    const { role } = useAuth();
+    const { role, clearApplicationCount, setApplicationCount } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
     const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
-    const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]);
+    const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]); // CANHANHOA01
     const [savedJobs, setSavedJobs] = useState<Job[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
-    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
+    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
@@ -422,6 +423,7 @@ const LoggedInView = () => {
             setCancelSuggestionMode(true);
         } else if (highlightParam === 'applied') {
             setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
+            clearApplicationCount(); // Clear the badge
         } else if (highlightParam === 'suggested') {
             setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
             setIsSuggestionHighlighted(true);
@@ -435,7 +437,7 @@ const LoggedInView = () => {
         } else {
              setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
         }
-    }, [searchParams, router]);
+    }, [searchParams, router, clearApplicationCount]);
     
     useEffect(() => {
         if (openAccordion === MY_JOBS_SECTIONS.APPLIED && (searchParams.get('highlight') === 'applied' || searchParams.get('action') === 'cancel_suggestion')) {
@@ -502,13 +504,7 @@ const LoggedInView = () => {
         const newApplied = currentApplied.filter((id: string) => id !== jobId);
         localStorage.setItem('appliedJobs', JSON.stringify(newApplied));
 
-        const limitData = JSON.parse(localStorage.getItem('applicationLimit') || '{}');
-        const now = new Date();
-        const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
-        if (limitData.month === currentMonth && limitData.count > 0) {
-            limitData.count -= 1;
-            localStorage.setItem('applicationLimit', JSON.stringify(limitData));
-        }
+        setApplicationCount(prev => Math.max(0, prev - 1));
 
         fetchAppliedJobs();
         toast({
@@ -516,7 +512,7 @@ const LoggedInView = () => {
           description: `Bạn đã huỷ ứng tuyển công việc có mã ${jobId}.`,
         });
         window.dispatchEvent(new Event('storage'));
-    }, [fetchAppliedJobs, toast]);
+    }, [fetchAppliedJobs, toast, setApplicationCount]);
 
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
