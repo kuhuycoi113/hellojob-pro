@@ -299,7 +299,13 @@ const EmptyProfileView = () => {
                 <div className="mt-6 flex flex-wrap gap-4 justify-center">
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
-                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                           <Button 
+                                className="bg-accent-orange hover:bg-accent-orange/90 text-white"
+                                onClick={() => {
+                                    setProfileCreationStep(2); // Start from step 2 directly
+                                    setIsDialogOpen(true);
+                                }}
+                            >
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
@@ -332,7 +338,7 @@ const EmptyProfileView = () => {
                                 </Card>
                             </div>
                              <div className="mt-4 text-center">
-                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
+                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); setProfileCreationStep(1)}}>Quay lại</Button>
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -368,7 +374,7 @@ const MY_JOBS_SECTIONS = {
 
 
 const LoggedInView = () => {
-    const { role, clearApplicationCount, setApplicationCount } = useAuth();
+    const { role, cancelApplication, setApplicationCount } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
@@ -423,7 +429,7 @@ const LoggedInView = () => {
             setCancelSuggestionMode(true);
         } else if (highlightParam === 'applied') {
             setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
-            clearApplicationCount(); // Clear the badge
+            setApplicationCount(0); // Clear the badge
         } else if (highlightParam === 'suggested') {
             setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
             setIsSuggestionHighlighted(true);
@@ -437,7 +443,7 @@ const LoggedInView = () => {
         } else {
              setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
         }
-    }, [searchParams, router, clearApplicationCount]);
+    }, [searchParams, router, setApplicationCount]);
     
     useEffect(() => {
         if (openAccordion === MY_JOBS_SECTIONS.APPLIED && (searchParams.get('highlight') === 'applied' || searchParams.get('action') === 'cancel_suggestion')) {
@@ -500,19 +506,9 @@ const LoggedInView = () => {
     }, []);
 
     const handleCancelApplication = useCallback((jobId: string) => {
-        const currentApplied = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-        const newApplied = currentApplied.filter((id: string) => id !== jobId);
-        localStorage.setItem('appliedJobs', JSON.stringify(newApplied));
-
-        setApplicationCount(prev => Math.max(0, prev - 1));
-
-        fetchAppliedJobs();
-        toast({
-          title: "Đã huỷ ứng tuyển",
-          description: `Bạn đã huỷ ứng tuyển công việc có mã ${jobId}.`,
-        });
-        window.dispatchEvent(new Event('storage'));
-    }, [fetchAppliedJobs, toast, setApplicationCount]);
+        cancelApplication(jobId);
+        // We don't need to manually update state as the context provider will trigger a re-render.
+    }, [cancelApplication]);
 
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
@@ -936,7 +932,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.name}>{vd.name}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -953,7 +949,7 @@ const LoggedInView = () => {
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
+                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>

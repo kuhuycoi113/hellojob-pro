@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
@@ -31,6 +32,7 @@ interface AuthContextType {
   applyForJob: (jobId: string, jobTitle: string) => boolean;
   cancelApplication: (jobId: string) => void;
   clearApplicationCount: () => void;
+  setApplicationCount: (count: number | ((prevCount: number) => number)) => void;
   setRole: (role: Role) => void;
   postLoginAction: PostLoginAction;
   setPostLoginAction: (action: PostLoginAction) => void;
@@ -214,7 +216,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
          }
         const localAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
         setAppliedJobs(localAppliedJobs);
-        setApplicationCount(localAppliedJobs.length);
+        // Do not set application count from total length here.
         return;
     }
 
@@ -262,7 +264,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const localAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
     setAppliedJobs(localAppliedJobs);
-    setApplicationCount(localAppliedJobs.length);
+    // Do not set application count from total length here.
   }, []);
 
   const setRole = (newRole: Role) => {
@@ -303,9 +305,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setAppliedJobs(prev => {
         const newAppliedJobs = [...prev, jobId];
         localStorage.setItem('appliedJobs', JSON.stringify(newAppliedJobs));
-        setApplicationCount(newAppliedJobs.length); // Update count
         return newAppliedJobs;
     });
+
+    setApplicationCount(prev => prev + 1); // Increment count for badge
 
     toast({
         title: 'Ứng tuyển thành công!',
@@ -320,7 +323,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setAppliedJobs(prev => {
         const newAppliedJobs = prev.filter(id => id !== jobId);
         localStorage.setItem('appliedJobs', JSON.stringify(newAppliedJobs));
-        setApplicationCount(newAppliedJobs.length); // Update count
+        // Do not change applicationCount here
         return newAppliedJobs;
     });
      toast({
@@ -341,8 +344,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     profileHeadline,
     avatarUrl,
     applicationCount,
-    setApplicationCount: () => {}, // Deprecated, managed internally
-    incrementApplicationCount: () => {}, // Deprecated, managed internally
+    setApplicationCount,
     clearApplicationCount,
     appliedJobs,
     applyForJob,
