@@ -114,7 +114,7 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 };
 
 
-export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, onCancelApplication }: { id?: string, job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, onCancelApplication?: (jobId: string) => void }) => {
+export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, cancelSuggestionMode = false, onCancelApplication }: { id?: string, job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, cancelSuggestionMode?: boolean, onCancelApplication?: (jobId: string) => void }) => {
   const { isLoggedIn, setPostLoginAction, incrementApplicationCount } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -411,7 +411,15 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                      {showCancelApplication && hasApplied && (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <Button variant="destructive" className="bg-transparent text-destructive hover:bg-destructive/10" size="sm" onClick={(e) => e.stopPropagation()}>
+                                                <Button 
+                                                    variant="destructive"
+                                                    className={cn(
+                                                        "bg-transparent hover:bg-destructive/10",
+                                                        cancelSuggestionMode ? "border-destructive text-destructive" : "border-[#9B999A] text-muted-foreground"
+                                                    )} 
+                                                    size="sm" 
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
                                                     <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
                                                 </Button>
                                             </AlertDialogTrigger>
@@ -482,7 +490,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Để sau</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => router.push('/viec-lam-cua-toi?highlight=applied')}>
+                  <AlertDialogAction onClick={() => router.push('/viec-lam-cua-toi?action=cancel_suggestion')}>
                     Đến mục đã ứng tuyển
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -610,7 +618,10 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                     {showCancelApplication && hasApplied && (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <Button variant="destructive" size="sm" className="bg-transparent text-destructive hover:bg-destructive/10" onClick={(e) => e.stopPropagation()}>
+                                                <Button 
+                                                    variant="destructive" 
+                                                    className="bg-transparent text-destructive hover:bg-destructive/10" 
+                                                    size="sm" onClick={(e) => e.stopPropagation()}>
                                                     <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
                                                 </Button>
                                             </AlertDialogTrigger>
@@ -682,7 +693,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Để sau</AlertDialogCancel>
-              <AlertDialogAction onClick={() => router.push('/viec-lam-cua-toi?highlight=applied')}>
+              <AlertDialogAction onClick={() => router.push('/viec-lam-cua-toi?action=cancel_suggestion')}>
                 Đến mục đã ứng tuyển
               </AlertDialogAction>
             </AlertDialogFooter>
