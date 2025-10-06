@@ -211,13 +211,14 @@ const EmptyProfileView = () => {
     };
 
     const IndustryStepDialog = () => {
-        if (!selectedVisa) return null;
-        const industries = industriesByJobType[selectedVisa.slug as keyof typeof industriesByJobType] || [];
+        const visaSlug = selectedVisa?.slug;
+        if (!visaSlug) return null;
+        const industries = industriesByJobType[visaSlug as keyof typeof industriesByJobType] || [];
         
         let screenIdComment = '';
-        if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-        else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-        else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+        if (visaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+        else if (visaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+        else if (visaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
 
         return (
             <>
@@ -257,7 +258,7 @@ const EmptyProfileView = () => {
                         <Button 
                             key={region} 
                             variant="outline"
-                            onClick={()={() => setSelectedRegion(region)} }
+                            onClick={() => setSelectedRegion(region)} 
                             className={cn(
                                 "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary",
                                 selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
@@ -275,8 +276,9 @@ const EmptyProfileView = () => {
         )
     }
 
+
     const renderDialogContent = () => {
-        switch(profileCreationStep) {
+        switch (profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -367,6 +369,9 @@ const LoggedInView = () => {
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
     const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]); // CANHANHOA01
+    const [appliedJobsData, setAppliedJobsData] = useState<Job[]>([]);
+    const [savedJobsData, setSavedJobsData] = useState<Job[]>([]);
+    const { appliedJobs: appliedJobIdsFromAuth } = useAuth();
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
@@ -383,6 +388,8 @@ const LoggedInView = () => {
     const [chartData, setChartData] = useState([]);
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
+
+
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
     const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
@@ -390,10 +397,7 @@ const LoggedInView = () => {
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
     const appliedJobsRef = useRef<HTMLDivElement>(null);
-    const { appliedJobs: appliedJobIdsFromAuth } = useAuth();
-    const [appliedJobsData, setAppliedJobsData] = useState<Job[]>([]);
-    const [savedJobsData, setSavedJobsData] = useState<Job[]>([]);
-
+    
     const MY_JOBS_SECTIONS = {
         SUGGESTED: 'item-1',
         APPLIED: 'item-2',
@@ -402,6 +406,7 @@ const LoggedInView = () => {
     };
 
     useEffect(() => {
+        // Generate dynamic chart data
         const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
         const dynamicChartData = days.map(day => ({
             name: day,
@@ -439,7 +444,7 @@ const LoggedInView = () => {
         } else {
              setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
         }
-    }, [searchParams, router, setApplicationCount, clearSavedJobCount]);
+    }, [searchParams, router, setApplicationCount, clearSavedJobCount, MY_JOBS_SECTIONS.APPLIED, MY_JOBS_SECTIONS.SAVED, MY_JOBS_SECTIONS.SUGGESTED]);
     
     useEffect(() => {
         if (openAccordion === MY_JOBS_SECTIONS.APPLIED && (searchParams.get('highlight') === 'applied' || searchParams.get('action') === 'cancel_suggestion')) {
@@ -447,7 +452,7 @@ const LoggedInView = () => {
                 appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 150);
         }
-    }, [openAccordion, searchParams]);
+    }, [openAccordion, searchParams, MY_JOBS_SECTIONS.APPLIED]);
     
 
     const fetchSuggestedJobs = useCallback(async () => {
@@ -456,7 +461,7 @@ const LoggedInView = () => {
             const storedProfile = localStorage.getItem('generatedCandidateProfile');
             if (storedProfile) {
                 const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-                const matchResults = await matchJobsToProfile(profile, 'related', []);
+                const matchResults = await matchJobsToProfile(profile, 'related', []); // Pass empty signals for profile-based suggestions
                 setSuggestedJobs(matchResults.map(r => r.job));
             } else {
                 setSuggestedJobs(jobData.slice(0, 20));
@@ -469,6 +474,7 @@ const LoggedInView = () => {
         }
     }, []);
 
+    // CANHANHOA01: New function to fetch behavior-based suggestions
     const fetchBehavioralSuggestions = useCallback(async () => {
         setIsLoadingBehavioral(true);
         try {
@@ -476,6 +482,7 @@ const LoggedInView = () => {
             if (storedProfile) {
                  const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
                  const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+                 // The flow will now receive signals. If signals are empty, it will fall back to profile-based matching.
                  const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
                  setBehavioralSuggestedJobs(matchResults);
             } else {
@@ -489,6 +496,10 @@ const LoggedInView = () => {
         }
     }, []);
     
+    const handleCancelApplication = useCallback((jobId: string) => {
+        cancelApplication(jobId);
+    }, [cancelApplication]);
+
     useEffect(() => {
         setAppliedJobsData(jobData.filter(job => appliedJobIdsFromAuth.includes(job.id)));
     }, [appliedJobIdsFromAuth]);
@@ -497,10 +508,6 @@ const LoggedInView = () => {
         setSavedJobsData(jobData.filter(job => savedJobIds.includes(job.id)));
     }, [savedJobIds]);
 
-
-    const handleCancelApplication = useCallback((jobId: string) => {
-        cancelApplication(jobId);
-    }, [cancelApplication]);
 
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
@@ -548,7 +555,7 @@ const LoggedInView = () => {
         if (storedPrinciple === 'salary' || storedPrinciple === 'fee' || storedPrinciple === 'company') {
             setSuggestionPrinciple(storedPrinciple);
         } else {
-            setSuggestionPrinciple(null);
+            setSuggestionPrinciple(null); // Set to null if nothing is stored
         }
          const storedType = localStorage.getItem('suggestionType');
         if(storedType === 'accurate' || storedType === 'related') {
@@ -572,15 +579,17 @@ const LoggedInView = () => {
             localStorage.removeItem('suggestionPrinciple');
         }
         localStorage.setItem('suggestionType', suggestionType);
+        console.log("Suggestion principle saved:", suggestionPrinciple);
+        console.log("Suggestion type saved:", suggestionType);
         setIsAspirationsDialogOpen(false);
-        setForceUpdate(prev => prev + 1);
+        setForceUpdate(prev => prev + 1); // Trigger a re-fetch
     };
 
     const openFeeDialog = () => {
         const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
         if (storedProfileRaw) {
             const profile = JSON.parse(storedProfileRaw);
-            setTempAspirations(profile.aspirations || {});
+            setTempAspirations(profile.aspirations || {}); // Load aspirations to get visa detail
             setTempFee(profile.aspirations?.financialAbility || '');
         }
         setIsFeeDialogOpen(true);
@@ -649,9 +658,9 @@ const LoggedInView = () => {
     }
     
     const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = {
-        'Thực tập sinh kỹ năng': visaDetailsByVisaType['thuc-tap-sinh-ky-nang'].map(d => ({ name: d.name.vi, slug: d.slug })),
-        'Kỹ năng đặc định': visaDetailsByVisaType['ky-nang-dac-dinh'].map(d => ({ name: d.name.vi, slug: d.slug })),
-        'Kỹ sư, tri thức': visaDetailsByVisaType['ky-su-tri-thuc'].map(d => ({ name: d.name.vi, slug: d.slug })),
+        'Thực tập sinh kỹ năng': (visaDetailsByVisaType['thuc-tap-sinh-ky-nang'] || []).map(d => ({ name: d.name.vi, slug: d.slug })),
+        'Kỹ năng đặc định': (visaDetailsByVisaType['ky-nang-dac-dinh'] || []).map(d => ({ name: d.name.vi, slug: d.slug })),
+        'Kỹ sư, tri thức': (visaDetailsByVisaType['ky-su-tri-thuc'] || []).map(d => ({ name: d.name.vi, slug: d.slug })),
     };
     
     const visaTypes = Object.keys(visaDetailsOptions);
@@ -672,11 +681,10 @@ const LoggedInView = () => {
          {/* Main Content */}
         <div className="w-full mb-8">
             <Accordion 
-                type="single"
-                collapsible
+                type="multiple"
                 className="w-full space-y-4" 
-                value={openAccordion}
-                onValueChange={setOpenAccordion}
+                value={openAccordion ? [openAccordion] : undefined}
+                onValueChange={(value) => setOpenAccordion(value[0])}
             >
                 <AccordionItem value={MY_JOBS_SECTIONS.SUGGESTED} className={cn(
                     "border-b-0 transition-all duration-500 ease-in-out border rounded-lg",
@@ -875,7 +883,7 @@ const LoggedInView = () => {
                 </div>
                  <Card 
                     className="shadow-lg md:col-span-1 cursor-pointer hover:bg-secondary/80 transition-colors"
-                    onClick={()={() => setIsViewersDialogOpen(true)} }
+                    onClick={() => setIsViewersDialogOpen(true)}
                 >
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Nhà tuyển dụng đã xem hồ sơ</CardTitle>
@@ -1343,4 +1351,3 @@ export default function MyJobsDashboardPage() {
     )
 }
 
-    
