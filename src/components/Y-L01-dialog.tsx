@@ -752,7 +752,7 @@ export function YL01Dialog({
                 })}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 3)} className="mx-auto block">
+                 <Button variant="link" onClick={() => setStep(selectedRole && ['nhan-vien-phai-cu', 'nhan-vien-nhan-luc-nhat'].includes(selectedRole) ? 5 : 3)}>
                     {currentLang === 'ja' ? '戻る' : currentLang === 'en' ? 'Back' : 'Quay lại'}
                 </Button>
                 <Button onClick={() => setStep(7)} disabled={selectedVisa.length === 0}>
