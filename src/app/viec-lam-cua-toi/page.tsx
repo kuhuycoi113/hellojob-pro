@@ -359,6 +359,12 @@ const EmptyProfileView = () => {
     )
 };
 
+const MY_JOBS_SECTIONS = {
+    SUGGESTED: 'item-1',
+    APPLIED: 'item-2',
+    SAVED: 'item-3',
+    BEHAVIORAL: 'item-4',
+};
 
 const LoggedInView = () => {
     const { role } = useAuth();
@@ -367,10 +373,10 @@ const LoggedInView = () => {
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
     const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
-    const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]); // CANHANHOA01
+    const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]);
     const [savedJobs, setSavedJobs] = useState<Job[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
-    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
+    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
@@ -386,11 +392,9 @@ const LoggedInView = () => {
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
 
-
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>(MY_JOBS_SECTIONS.SUGGESTED);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
     const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
-
 
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
@@ -409,63 +413,32 @@ const LoggedInView = () => {
         setChartData(dynamicChartData);
     }, []);
 
-    const fetchAppliedJobs = useCallback(() => {
-        const appliedJobIds = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-        const appliedJobsData = jobData.filter(job => appliedJobIds.includes(job.id));
-        setAppliedJobs(appliedJobsData);
-    }, []);
-
-    const handleCancelApplication = useCallback((jobId: string) => {
-        const currentApplied = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-        const newApplied = currentApplied.filter((id: string) => id !== jobId);
-        localStorage.setItem('appliedJobs', JSON.stringify(newApplied));
-
-        // Logic to decrement the monthly application count
-        const limitData = JSON.parse(localStorage.getItem('applicationLimit') || '{}');
-        const now = new Date();
-        const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
-        if (limitData.month === currentMonth && limitData.count > 0) {
-            limitData.count -= 1;
-            localStorage.setItem('applicationLimit', JSON.stringify(limitData));
-        }
-
-        fetchAppliedJobs();
-        toast({
-          title: "Đã huỷ ứng tuyển",
-          description: `Bạn đã huỷ ứng tuyển công việc có mã ${jobId}.`,
-        });
-        window.dispatchEvent(new Event('storage'));
-    }, [fetchAppliedJobs, toast]);
-
     useEffect(() => {
         const highlightParam = searchParams.get('highlight');
         const actionParam = searchParams.get('action');
 
         if (actionParam === 'cancel_suggestion') {
-            setOpenAccordion('item-2');
+            setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
             setCancelSuggestionMode(true);
         } else if (highlightParam === 'applied') {
-            setOpenAccordion('item-2');
+            setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
         } else if (highlightParam === 'suggested') {
-            setOpenAccordion('item-1');
+            setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
             setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+
             const nextUrl = new URL(window.location.href);
             nextUrl.searchParams.delete('highlight');
             router.replace(nextUrl.toString(), { scroll: false });
+            
             return () => clearTimeout(timer);
         } else {
-             setOpenAccordion('item-1');
+             setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
         }
     }, [searchParams, router]);
     
-    // This new useEffect handles the scrolling after the accordion state is updated.
     useEffect(() => {
-        const highlightParam = searchParams.get('highlight');
-         const actionParam = searchParams.get('action');
-
-        if ((highlightParam === 'applied' || actionParam === 'cancel_suggestion') && openAccordion === 'item-2') {
-             // A small timeout can help ensure the element is ready to be scrolled to.
+        if (openAccordion === MY_JOBS_SECTIONS.APPLIED && (searchParams.get('highlight') === 'applied' || searchParams.get('action') === 'cancel_suggestion')) {
             setTimeout(() => {
                 appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 150);
@@ -492,7 +465,6 @@ const LoggedInView = () => {
         }
     }, []);
 
-    // CANHANHOA01: New function to fetch behavior-based suggestions
     const fetchBehavioralSuggestions = useCallback(async () => {
         setIsLoadingBehavioral(true);
         try {
@@ -500,7 +472,6 @@ const LoggedInView = () => {
             if (storedProfile) {
                  const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
                  const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-                 // The flow will now receive signals. If signals are empty, it will fall back to profile-based matching.
                  const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
                  setBehavioralSuggestedJobs(matchResults);
             } else {
@@ -520,6 +491,33 @@ const LoggedInView = () => {
         setSavedJobs(savedJobsData);
     }, []);
 
+    const fetchAppliedJobs = useCallback(() => {
+        const appliedJobIds = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+        const appliedJobsData = jobData.filter(job => appliedJobIds.includes(job.id));
+        setAppliedJobs(appliedJobsData);
+    }, []);
+
+    const handleCancelApplication = useCallback((jobId: string) => {
+        const currentApplied = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+        const newApplied = currentApplied.filter((id: string) => id !== jobId);
+        localStorage.setItem('appliedJobs', JSON.stringify(newApplied));
+
+        const limitData = JSON.parse(localStorage.getItem('applicationLimit') || '{}');
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
+        if (limitData.month === currentMonth && limitData.count > 0) {
+            limitData.count -= 1;
+            localStorage.setItem('applicationLimit', JSON.stringify(limitData));
+        }
+
+        fetchAppliedJobs();
+        toast({
+          title: "Đã huỷ ứng tuyển",
+          description: `Bạn đã huỷ ứng tuyển công việc có mã ${jobId}.`,
+        });
+        window.dispatchEvent(new Event('storage'));
+    }, [fetchAppliedJobs, toast]);
+
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
             setIsLoadingSuggestions(false);
@@ -527,7 +525,7 @@ const LoggedInView = () => {
             return;
         }
         fetchSuggestedJobs();
-        fetchBehavioralSuggestions(); // Fetch behavioral suggestions
+        fetchBehavioralSuggestions();
         fetchSavedJobs();
         fetchAppliedJobs();
 
@@ -560,7 +558,7 @@ const LoggedInView = () => {
         if (storedPrinciple === 'salary' || storedPrinciple === 'fee' || storedPrinciple === 'company') {
             setSuggestionPrinciple(storedPrinciple);
         } else {
-            setSuggestionPrinciple(null); // Set to null if nothing is stored
+            setSuggestionPrinciple(null);
         }
          const storedType = localStorage.getItem('suggestionType');
         if(storedType === 'accurate' || storedType === 'related') {
@@ -585,14 +583,14 @@ const LoggedInView = () => {
         }
         localStorage.setItem('suggestionType', suggestionType);
         setIsAspirationsDialogOpen(false);
-        setForceUpdate(prev => prev + 1); // Trigger a re-fetch
+        setForceUpdate(prev => prev + 1);
     };
 
     const openFeeDialog = () => {
         const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
         if (storedProfileRaw) {
             const profile = JSON.parse(storedProfileRaw);
-            setTempAspirations(profile.aspirations || {}); // Load aspirations to get visa detail
+            setTempAspirations(profile.aspirations || {});
             setTempFee(profile.aspirations?.financialAbility || '');
         }
         setIsFeeDialogOpen(true);
@@ -607,7 +605,6 @@ const LoggedInView = () => {
         });
     };
     
-    // Logic for the Fee Dialog (MPMM01)
     const getFeePlaceholder = () => {
         const visaDetail = tempAspirations.desiredVisaDetail;
         if (visaDetail === 'Thực tập sinh 1 năm') return "1000";
@@ -661,7 +658,7 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: {name: string, slug: string}[] } = {
+    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = {
         'Thực tập sinh kỹ năng': visaDetailsByVisaType['thuc-tap-sinh-ky-nang'].map(d => ({ name: d.name.vi, slug: d.slug })),
         'Kỹ năng đặc định': visaDetailsByVisaType['ky-nang-dac-dinh'].map(d => ({ name: d.name.vi, slug: d.slug })),
         'Kỹ sư, tri thức': visaDetailsByVisaType['ky-su-tri-thuc'].map(d => ({ name: d.name.vi, slug: d.slug })),
@@ -691,7 +688,7 @@ const LoggedInView = () => {
                 value={openAccordion}
                 onValueChange={setOpenAccordion}
             >
-                <AccordionItem value="item-1" className={cn(
+                <AccordionItem value={MY_JOBS_SECTIONS.SUGGESTED} className={cn(
                     "border-b-0 transition-all duration-500 ease-in-out border rounded-lg",
                     isSuggestionHighlighted && "ring-2 ring-accent-orange ring-offset-2 shadow-2xl bg-accent-orange/10"
                 )}>
@@ -762,7 +759,7 @@ const LoggedInView = () => {
                        )}
                     </AccordionContent>
                 </AccordionItem>
-                 <AccordionItem value="item-2" className="border rounded-lg border-b-0" ref={appliedJobsRef}>
+                 <AccordionItem value={MY_JOBS_SECTIONS.APPLIED} className="border rounded-lg border-b-0" ref={appliedJobsRef}>
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
                             <Briefcase className="h-5 w-5 text-blue-500" />
@@ -787,7 +784,7 @@ const LoggedInView = () => {
                         </div>
                     </AccordionContent>
                 </AccordionItem>
-                 <AccordionItem value="item-3" className="border rounded-lg border-b-0">
+                 <AccordionItem value={MY_JOBS_SECTIONS.SAVED} className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
                             <Bookmark className="h-5 w-5 text-red-500" />
@@ -808,8 +805,7 @@ const LoggedInView = () => {
                     </AccordionContent>
                 </AccordionItem>
 
-                 {/* CANHANHOA01: New Module */}
-                 <AccordionItem value="item-4" id="behavioral-suggestions" className="border rounded-lg border-b-0">
+                 <AccordionItem value={MY_JOBS_SECTIONS.BEHAVIORAL} id="behavioral-suggestions" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
                             <BrainCircuit className="h-5 w-5 text-purple-500" />

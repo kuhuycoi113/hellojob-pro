@@ -56,7 +56,7 @@ export function MobileSecondaryHeader() {
   }
 
   const icons: { [key: string]: React.ElementType } = {
-    '/viec-lam-cua-toi': Briefcase,
+    '/viec-lam': Briefcase,
     '/lo-trinh': Compass,
     '/tao-ho-so-ai': Sparkles,
     '/cam-nang': LifeBuoy,
@@ -73,7 +73,7 @@ export function MobileSecondaryHeader() {
        <div className="w-full overflow-x-auto whitespace-nowrap no-scrollbar">
           <div className="flex items-center h-14 px-2">
             {mobileFooterLinks.map(({ href, label }) => {
-                const isActive = (href === '/' && activePath === href) || (href !== '/' && (activePath === href || activePath.startsWith(`${href}/`)));
+                const isActive = (href === '/' && activePath === href) || (href !== '/' && (activePath === href || activePath.startsWith(href + '/')));
                 const isAiProfile = href === '/tao-ho-so-ai';
                 const Icon = icons[href];
                 
