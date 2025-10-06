@@ -1,10 +1,11 @@
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
-import { mobileFooterLinks } from '@/lib/nav-data';
+import { mainNavLinks, mobileFooterLinks } from '@/lib/nav-data';
 import { Sparkles, Briefcase, Compass, LifeBuoy, UserSearch, Info } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
