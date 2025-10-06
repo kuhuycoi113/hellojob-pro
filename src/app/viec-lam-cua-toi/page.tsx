@@ -396,6 +396,12 @@ const LoggedInView = () => {
     const { appliedJobs: appliedJobIds } = useAuth();
     const [appliedJobsData, setAppliedJobsData] = useState<Job[]>([]);
 
+    const MY_JOBS_SECTIONS = {
+        SUGGESTED: 'item-1',
+        APPLIED: 'item-2',
+        SAVED: 'item-3',
+        BEHAVIORAL: 'item-4',
+    };
 
     useEffect(() => {
         // Generate dynamic chart data
@@ -427,9 +433,11 @@ const LoggedInView = () => {
             setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
             setIsSuggestionHighlighted(true);
             const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+
             const nextUrl = new URL(window.location.href);
             nextUrl.searchParams.delete('highlight');
             router.replace(nextUrl.toString(), { scroll: false });
+            
             return () => clearTimeout(timer);
         } else {
              setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
@@ -464,6 +472,7 @@ const LoggedInView = () => {
         }
     }, []);
 
+    // CANHANHOA01: New function to fetch behavior-based suggestions
     const fetchBehavioralSuggestions = useCallback(async () => {
         setIsLoadingBehavioral(true);
         try {
@@ -471,6 +480,7 @@ const LoggedInView = () => {
             if (storedProfile) {
                  const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
                  const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+                 // The flow will now receive signals. If signals are empty, it will fall back to profile-based matching.
                  const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
                  setBehavioralSuggestedJobs(matchResults);
             } else {
@@ -505,6 +515,10 @@ const LoggedInView = () => {
              if (event.key === 'appliedJobs' || event.key === null) { // Listen for changes from other tabs or direct manipulation
                 const localAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
                 setAppliedJobsData(jobData.filter(job => localAppliedJobs.includes(job.id)));
+            }
+             if (event.key === 'savedJobs' || event.key === null) {
+                const localSavedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+                setSavedJobs(jobData.filter(job => localSavedJobs.includes(job.id)));
             }
             if (event.key === 'behavioralSignals' || event.key === null) {
                  fetchBehavioralSuggestions();
@@ -781,6 +795,7 @@ const LoggedInView = () => {
                     </AccordionContent>
                 </AccordionItem>
 
+                 {/* CANHANHOA01: New Module */}
                  <AccordionItem value={MY_JOBS_SECTIONS.BEHAVIORAL} id="behavioral-suggestions" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
@@ -1327,5 +1342,3 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-
-    
