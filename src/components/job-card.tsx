@@ -313,7 +313,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                             <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                             <span>{job.id}</span>
                             </div>
-                            {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
+                            {isClient && <Button variant="outline" size="icon" className={cn("absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white", (variant === 'list-item' || variant === 'list-item-compact') && 'md:hidden')} onClick={handleSaveJob}>
                                 <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                             </Button>}
                         </div>
