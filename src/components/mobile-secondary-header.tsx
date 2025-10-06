@@ -72,7 +72,7 @@ export function MobileSecondaryHeader() {
     )}>
        <div className="w-full overflow-x-auto whitespace-nowrap no-scrollbar">
           <div className="flex items-center h-14 px-2">
-            {mainNavLinks.map(({ href, label }) => {
+            {mainNavLinks.filter(link => link.href !== '/').map(({ href, label }) => {
                 const isActive = (href === '/' && activePath === href) || (href !== '/' && (activePath === href || activePath.startsWith(href + '/')));
                 const isAiProfile = href === '/tao-ho-so-ai';
                 const Icon = icons[href];
