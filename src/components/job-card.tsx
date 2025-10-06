@@ -411,12 +411,14 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                      {showCancelApplication && hasApplied && (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <Button 
-                                                    variant="destructive"
+                                                 <Button 
+                                                    variant="outline"
                                                     className={cn(
-                                                        "bg-transparent hover:bg-destructive/10",
-                                                        cancelSuggestionMode ? "border-destructive text-destructive" : "border-[#9B999A] text-muted-foreground"
-                                                    )} 
+                                                        "bg-transparent text-muted-foreground",
+                                                        cancelSuggestionMode 
+                                                            ? "border-destructive text-destructive hover:bg-destructive/10"
+                                                            : "border-[#9B999A] hover:bg-destructive/10 hover:border-destructive hover:text-destructive"
+                                                    )}
                                                     size="sm" 
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
@@ -618,10 +620,17 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                     {showCancelApplication && hasApplied && (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <Button 
-                                                    variant="destructive" 
-                                                    className="bg-transparent text-destructive hover:bg-destructive/10" 
-                                                    size="sm" onClick={(e) => e.stopPropagation()}>
+                                                 <Button 
+                                                    variant="outline"
+                                                    className={cn(
+                                                        "bg-transparent text-muted-foreground",
+                                                        cancelSuggestionMode 
+                                                            ? "border-destructive text-destructive hover:bg-destructive/10"
+                                                            : "border-[#9B999A] hover:bg-destructive/10 hover:border-destructive hover:text-destructive"
+                                                    )}
+                                                    size="sm" 
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
                                                     <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
                                                 </Button>
                                             </AlertDialogTrigger>

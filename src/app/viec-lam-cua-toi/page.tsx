@@ -444,26 +444,27 @@ const LoggedInView = () => {
         if (actionParam === 'cancel_suggestion') {
             setOpenAccordion('item-2');
             setCancelSuggestionMode(true);
-             setTimeout(() => {
-                appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 150);
         } else if (highlightParam === 'applied') {
             setOpenAccordion('item-2');
         } else if (highlightParam === 'suggested') {
             setOpenAccordion('item-1');
             setIsSuggestionHighlighted(true);
             const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
-            router.replace('/viec-lam-cua-toi', { scroll: false });
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('highlight');
+            router.replace(nextUrl.toString(), { scroll: false });
             return () => clearTimeout(timer);
-        } else if (!openAccordion) {
-            setOpenAccordion('item-1');
+        } else {
+             setOpenAccordion('item-1');
         }
-    }, [searchParams, router, openAccordion]);
+    }, [searchParams, router]);
     
     // This new useEffect handles the scrolling after the accordion state is updated.
     useEffect(() => {
         const highlightParam = searchParams.get('highlight');
-        if (highlightParam === 'applied' && openAccordion === 'item-2') {
+         const actionParam = searchParams.get('action');
+
+        if ((highlightParam === 'applied' || actionParam === 'cancel_suggestion') && openAccordion === 'item-2') {
              // A small timeout can help ensure the element is ready to be scrolled to.
             setTimeout(() => {
                 appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
