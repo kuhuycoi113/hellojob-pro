@@ -115,7 +115,7 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 
 
 export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, cancelSuggestionMode = false, onCancelApplication: propOnCancelApplication }: { id?: string, job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, cancelSuggestionMode?: boolean, onCancelApplication?: (jobId: string) => void }) => {
-  const { isLoggedIn, setPostLoginAction, appliedJobs, applyForJob, cancelApplication, reapplyForJob } = useAuth();
+  const { isLoggedIn, setPostLoginAction, appliedJobs, applyForJob, reapplyForJob, cancelApplication } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -396,7 +396,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                     }
                                      {showApplyButtons && wasJustCancelled && (
                                          <Button size="sm" className="bg-accent-green hover:bg-accent-green/90" onClick={handleReapplyClick}>
-                                             Hoàn tác lại ứng tuyển
+                                             Hoàn tác ứng tuyển
                                          </Button>
                                      )}
                                      {showApplyButtons && !wasJustCancelled && (
@@ -483,7 +483,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                 <AlertDialogHeader>
                   <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Bạn đã đạt giới hạn tối đa 10 lượt ứng tuyển cùng lúc. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
+                    Bạn đã đạt giới hạn tối đa 10 lượt ứng tuyển cùng lúc. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="outline" className="border-destructive text-destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -703,7 +703,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
             <AlertDialogHeader>
               <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
               <AlertDialogDescription>
-                Bạn đã đạt giới hạn tối đa 10 lượt ứng tuyển cùng lúc. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
+                Bạn đã đạt giới hạn tối đa 10 lượt ứng tuyển cùng lúc. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="outline" className="border-destructive text-destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
