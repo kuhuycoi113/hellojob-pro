@@ -412,7 +412,6 @@ const EmptyProfileView = () => {
         )
     }
 
-
     const renderDialogContent = () => {
         switch(profileCreationStep) {
             case 1: return <FirstStepDialog />;
@@ -583,7 +582,7 @@ const LoggedInView = () => {
             const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
              router.replace('/viec-lam-cua-toi', { scroll: false });
             return () => clearTimeout(timer);
-        } else {
+        } else if (!openAccordion) { // Default to item-1 if nothing is open
              setOpenAccordion('item-1');
         }
     }, [searchParams, router, openAccordion]);
@@ -787,13 +786,14 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: string[] } = {
-        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
+    const visaDetailsOptions: { [key: string]: {name: string, slug: string}[] } = {
+        'Thực tập sinh kỹ năng': visaDetailsByVisaType['thuc-tap-sinh-ky-nang'].map(d => ({ name: d.name.vi, slug: d.slug })),
+        'Kỹ năng đặc định': visaDetailsByVisaType['ky-nang-dac-dinh'].map(d => ({ name: d.name.vi, slug: d.slug })),
+        'Kỹ sư, tri thức': visaDetailsByVisaType['ky-su-tri-thuc'].map(d => ({ name: d.name.vi, slug: d.slug })),
     };
+    
     const visaTypes = Object.keys(visaDetailsOptions);
-    const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
+    const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[japanJobTypes.find(j => j.name === tempAspirations.desiredVisaType)?.slug as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
     const languageLevels = ["Không yêu cầu", "N5", "N4", "N3", "N2", "N1"];
@@ -1068,7 +1068,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.name}>{vd.name}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -1085,7 +1085,7 @@ const LoggedInView = () => {
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -1341,3 +1341,6 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
+
+    
