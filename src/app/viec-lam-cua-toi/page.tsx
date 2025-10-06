@@ -278,9 +278,8 @@ const EmptyProfileView = () => {
         )
     }
 
-
     const renderDialogContent = () => {
-        switch (profileCreationStep) {
+        switch(profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -365,7 +364,7 @@ const EmptyProfileView = () => {
 
 
 const LoggedInView = () => {
-    const { role, cancelApplication, setApplicationCount, savedJobs: savedJobIds, clearSavedJobCount } = useAuth();
+    const { role, cancelApplication, setApplicationCount, savedJobs: savedJobIds, clearApplicationCount, clearSavedJobCount } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
@@ -429,7 +428,7 @@ const LoggedInView = () => {
             setApplicationCount(0);
         } else if (highlightParam === 'applied') {
             setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
-            setApplicationCount(0);
+            clearApplicationCount();
         } else if (highlightParam === 'saved') {
             setOpenAccordion(MY_JOBS_SECTIONS.SAVED);
             clearSavedJobCount();
@@ -437,16 +436,21 @@ const LoggedInView = () => {
             setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
             setIsSuggestionHighlighted(true);
             const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
-
-            const nextUrl = new URL(window.location.href);
-            nextUrl.searchParams.delete('highlight');
-            router.replace(nextUrl.toString(), { scroll: false });
-            
             return () => clearTimeout(timer);
         } else {
              setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
         }
-    }, [searchParams, router, setApplicationCount, clearSavedJobCount, MY_JOBS_SECTIONS.APPLIED, MY_JOBS_SECTIONS.SAVED, MY_JOBS_SECTIONS.SUGGESTED]);
+        
+        // This effect should only run when the search params change.
+        // We'll remove the router from dependencies and handle URL cleaning separately if needed.
+        const nextUrl = new URL(window.location.href);
+        if (nextUrl.searchParams.has('highlight') || nextUrl.searchParams.has('action')) {
+            nextUrl.searchParams.delete('highlight');
+            nextUrl.searchParams.delete('action');
+            router.replace(nextUrl.toString(), { scroll: false });
+        }
+
+    }, [searchParams, router, clearApplicationCount, clearSavedJobCount, setApplicationCount, MY_JOBS_SECTIONS.APPLIED, MY_JOBS_SECTIONS.SAVED, MY_JOBS_SECTIONS.SUGGESTED]);
     
     useEffect(() => {
         if (openAccordion === MY_JOBS_SECTIONS.APPLIED && (searchParams.get('highlight') === 'applied' || searchParams.get('action') === 'cancel_suggestion')) {
@@ -659,14 +663,13 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = {
-        'Thực tập sinh kỹ năng': (visaDetailsByVisaType['thuc-tap-sinh-ky-nang'] || []).map(d => ({ name: d.name.vi, slug: d.slug })),
-        'Kỹ năng đặc định': (visaDetailsByVisaType['ky-nang-dac-dinh'] || []).map(d => ({ name: d.name.vi, slug: d.slug })),
-        'Kỹ sư, tri thức': (visaDetailsByVisaType['ky-su-tri-thuc'] || []).map(d => ({ name: d.name.vi, slug: d.slug })),
+    const visaDetailsOptions: { [key: string]: string[] } = {
+        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
+        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
+        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
     };
-    
     const visaTypes = Object.keys(visaDetailsOptions);
-    const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[japanJobTypes.find(j => j.name === tempAspirations.desiredVisaType)?.slug as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
+    const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
     const languageLevels = ["Không yêu cầu", "N5", "N4", "N3", "N2", "N1"];
@@ -941,7 +944,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.name}>{vd.name}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -958,7 +961,7 @@ const LoggedInView = () => {
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
+                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>

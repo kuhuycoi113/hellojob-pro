@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat, ChevronRight, Search, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
@@ -76,6 +76,7 @@ export function Header() {
   const [isClient, setIsClient] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [myJobsLink, setMyJobsLink] = useState('/viec-lam-cua-toi');
 
 
   const [showNav, setShowNav] = useState(true);
@@ -108,6 +109,24 @@ export function Header() {
       window.removeEventListener('scroll', controlNavbar);
     };
   }, [isClient, isMobile, lastScrollY]);
+
+  useEffect(() => {
+    let link = '/viec-lam-cua-toi';
+    // Prioritize last action
+    if (lastAction === 'apply' && applicationCount > 0) {
+      link = '/viec-lam-cua-toi?highlight=applied';
+    } else if (lastAction === 'save' && savedJobCount > 0) {
+      link = '/viec-lam-cua-toi?highlight=saved';
+    } 
+    // Fallback to any remaining notification
+    else if (applicationCount > 0) {
+      link = '/viec-lam-cua-toi?highlight=applied';
+    } else if (savedJobCount > 0) {
+      link = '/viec-lam-cua-toi?highlight=saved';
+    }
+    setMyJobsLink(link);
+  }, [lastAction, applicationCount, savedJobCount]);
+
 
   const NavLink = ({ href, label, className, icon: Icon, onClick }: { href: string; label: string, className?: string, icon?: React.ElementType, onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => (
     <Link
@@ -314,13 +333,6 @@ const LoggedOutContent = () => {
   const createProfileButtonTextMobile = isEditing ? 'Sửa' : 'Tạo';
   
   const totalNotificationCount = applicationCount + savedJobCount;
-
-  let myJobsLink = '/viec-lam-cua-toi';
-  if (lastAction === 'apply' && applicationCount > 0) {
-    myJobsLink = '/viec-lam-cua-toi?highlight=applied';
-  } else if (lastAction === 'save' && savedJobCount > 0) {
-    myJobsLink = '/viec-lam-cua-toi?highlight=saved';
-  }
 
   return (
     <>

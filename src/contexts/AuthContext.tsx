@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
@@ -382,11 +381,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const clearApplicationCount = useCallback(() => {
     setApplicationCount(0);
-  }, []);
+    // If saved jobs still have notifications, make 'save' the next action
+    if (savedJobCount > 0) {
+        setLastAction('save');
+    } else {
+        setLastAction(null);
+    }
+  }, [savedJobCount]);
 
   const clearSavedJobCount = useCallback(() => {
     setSavedJobCount(0);
-  }, []);
+    // If applied jobs still have notifications, make 'apply' the next action
+    if (applicationCount > 0) {
+        setLastAction('apply');
+    } else {
+        setLastAction(null);
+    }
+  }, [applicationCount]);
+
 
   const value = {
     role,
@@ -416,5 +428,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-    
