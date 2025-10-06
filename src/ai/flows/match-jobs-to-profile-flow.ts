@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { ai } from '@/ai/genkit';
 import { locations } from '@/lib/location-data';
 
+const g = global as any;
 
 const MatchResultSchema = z.object({
     job: z.custom<Job>(),
@@ -56,7 +57,7 @@ const WEIGHTS = {
     BEHAVIOR: 70, // Weight for behavioral signals
 };
 
-const matchJobsToProfileFlow = ai.defineFlow(
+const matchJobsToProfileFlow = g.matchJobsToProfileFlow || ai.defineFlow(
     {
         name: 'matchJobsToProfileFlow',
         inputSchema: MatchInputSchema,
@@ -210,3 +211,4 @@ const matchJobsToProfileFlow = ai.defineFlow(
         return matchedJobs.slice(0, 20);
     }
 );
+g.matchJobsToProfileFlow = matchJobsToProfileFlow;

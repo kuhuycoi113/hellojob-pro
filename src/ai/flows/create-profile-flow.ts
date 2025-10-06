@@ -31,7 +31,9 @@ export async function createProfile(
   return createProfileFlow(input);
 }
 
-const prompt = ai.definePrompt({
+const g = global as any;
+
+const prompt = g.createProfilePrompt || ai.definePrompt({
   name: 'createProfilePrompt',
   input: {schema: CreateProfileInputSchema},
   output: {schema: CandidateProfileSchema, format: 'json'},
@@ -57,8 +59,10 @@ const prompt = ai.definePrompt({
   {{/if}}
   `,
 });
+g.createProfilePrompt = prompt;
 
-const createProfileFlow = ai.defineFlow(
+
+const createProfileFlow = g.createProfileFlow || ai.defineFlow(
   {
     name: 'createProfileFlow',
     inputSchema: CreateProfileInputSchema,
@@ -75,3 +79,4 @@ const createProfileFlow = ai.defineFlow(
     return output;
   }
 );
+g.createProfileFlow = createProfileFlow;

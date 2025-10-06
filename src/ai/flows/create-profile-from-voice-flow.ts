@@ -21,7 +21,9 @@ export async function createProfileFromVoice(
   return createProfileFromVoiceFlow(input);
 }
 
-const prompt = ai.definePrompt({
+const g = global as any;
+
+const prompt = g.createProfileFromVoicePrompt || ai.definePrompt({
   name: 'createProfileFromVoicePrompt',
   input: {schema: z.string()},
   output: {schema: CandidateProfileSchema, format: 'json'},
@@ -42,8 +44,9 @@ const prompt = ai.definePrompt({
   "{{{input}}}"
   `,
 });
+g.createProfileFromVoicePrompt = prompt;
 
-const createProfileFromVoiceFlow = ai.defineFlow(
+const createProfileFromVoiceFlow = g.createProfileFromVoiceFlow || ai.defineFlow(
   {
     name: 'createProfileFromVoiceFlow',
     inputSchema: z.string(),
@@ -60,10 +63,11 @@ const createProfileFromVoiceFlow = ai.defineFlow(
     return output;
   }
 );
+g.createProfileFromVoiceFlow = createProfileFromVoiceFlow;
 
 
 // Optional: Text-to-speech flow
-export const textToSpeechFlow = ai.defineFlow(
+export const textToSpeechFlow = g.textToSpeechFlow || ai.defineFlow(
   {
     name: 'textToSpeechFlow',
     inputSchema: z.string(),
@@ -94,6 +98,7 @@ export const textToSpeechFlow = ai.defineFlow(
     };
   }
 );
+g.textToSpeechFlow = textToSpeechFlow;
 
 async function toWav(
   pcmData: Buffer,

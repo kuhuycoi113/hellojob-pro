@@ -13,6 +13,8 @@ import { CandidateProfileSchema, type CandidateProfile } from '@/ai/schemas';
 import { TranslateProfileInputSchema } from '@/ai/schemas/translate-profile-schema';
 import type { TranslateProfileInput } from '@/ai/schemas/translate-profile-schema';
 
+const g = global as any;
+
 // Create a partial schema for translation to avoid re-translating static data
 const TranslatableCandidateProfileSchema = CandidateProfileSchema.partial().pick({
   name: true,
@@ -106,7 +108,7 @@ export async function translateProfile(
   return finalProfile;
 }
 
-const prompt = ai.definePrompt({
+const prompt = g.translateProfilePrompt || ai.definePrompt({
   name: 'translateProfilePrompt',
   input: { schema: TranslateProfileInputSchema },
   output: { schema: TranslatableCandidateProfileSchema, format: 'json' },
@@ -126,9 +128,10 @@ const prompt = ai.definePrompt({
   {{{json profile}}}
   `,
 });
+g.translateProfilePrompt = prompt;
 
 
-const translateProfileFlow = ai.defineFlow(
+const translateProfileFlow = g.translateProfileFlow || ai.defineFlow(
   {
     name: 'translateProfileFlow',
     inputSchema: TranslateProfileInputSchema,
@@ -167,3 +170,4 @@ const translateProfileFlow = ai.defineFlow(
     return output;
   }
 );
+g.translateProfileFlow = translateProfileFlow;
