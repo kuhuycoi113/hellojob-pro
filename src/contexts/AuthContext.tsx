@@ -30,6 +30,7 @@ interface AuthContextType {
   applicationCount: number;
   appliedJobs: string[];
   applyForJob: (jobId: string, jobTitle: string) => boolean;
+  reapplyForJob: (jobId: string) => void;
   cancelApplication: (jobId: string) => void;
   clearApplicationCount: () => void;
   setApplicationCount: (count: number | ((prevCount: number) => number)) => void;
@@ -318,12 +319,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     
     return true;
   };
+  
+  const reapplyForJob = (jobId: string) => {
+     setAppliedJobs(prev => {
+        const newAppliedJobs = [...prev, jobId];
+        localStorage.setItem('appliedJobs', JSON.stringify(newAppliedJobs));
+        return newAppliedJobs;
+    });
+    // NO toast and NO badge update for re-apply
+  };
 
   const cancelApplication = (jobId: string) => {
     setAppliedJobs(prev => {
         const newAppliedJobs = prev.filter(id => id !== jobId);
         localStorage.setItem('appliedJobs', JSON.stringify(newAppliedJobs));
-        // Do not change applicationCount here
         return newAppliedJobs;
     });
      toast({
@@ -348,6 +357,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     clearApplicationCount,
     appliedJobs,
     applyForJob,
+    reapplyForJob,
     cancelApplication,
     setRole,
     postLoginAction,
@@ -358,3 +368,5 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+    

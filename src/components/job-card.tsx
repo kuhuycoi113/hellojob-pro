@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -113,8 +114,8 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 };
 
 
-export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, cancelSuggestionMode = false, onCancelApplication }: { id?: string, job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, cancelSuggestionMode?: boolean, onCancelApplication?: (jobId: string) => void }) => {
-  const { isLoggedIn, setPostLoginAction, appliedJobs, applyForJob } = useAuth();
+export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, cancelSuggestionMode = false, onCancelApplication: propOnCancelApplication }: { id?: string, job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, cancelSuggestionMode?: boolean, onCancelApplication?: (jobId: string) => void }) => {
+  const { isLoggedIn, setPostLoginAction, appliedJobs, applyForJob, cancelApplication, reapplyForJob } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -129,6 +130,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
   const [postedTime, setPostedTime] = useState<string | null>(null);
   const [interviewDate, setInterviewDate] = useState<string | null>(null);
   const [badgeClassName, setBadgeClassName] = useState<string>('opacity-0');
+  const [wasJustCancelled, setWasJustCancelled] = useState(false);
 
 
   useEffect(() => {
@@ -192,7 +194,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
    const handleApplyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    if (hasApplied) {
+    if (hasApplied && !wasJustCancelled) {
         toast({
              variant: 'destructive',
              title: 'Bạn đã ứng tuyển công việc này rồi'
@@ -223,6 +225,21 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
          setIsProfileEditDialogOpen(true);
     }
   };
+
+  const handleReapplyClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    reapplyForJob(job.id);
+    setWasJustCancelled(false); // Reset the state
+  }
+
+  const handleCancelApplicationClick = () => {
+    cancelApplication(job.id);
+    setWasJustCancelled(true);
+    if(propOnCancelApplication) {
+        propOnCancelApplication(job.id);
+    }
+  }
   
   const handleConfirmLogin = () => {
     setIsConfirmLoginOpen(false);
@@ -237,7 +254,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
     router.push(`/viec-lam/${job.id}`);
   };
 
-  const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
+  const applyButtonContent = hasApplied && !wasJustCancelled ? 'Đã ứng tuyển' : 'Ứng tuyển';
   
     const getFeeDisplayInfo = () => {
         const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
@@ -273,7 +290,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
             return { shouldShow: true, text: `Phí: ${formattedVnd.replace('.',',')}tr` };
         }
         
-        const visasForUsd = ['Đặc định đầu Việt'];
+        const visasForUsd = ['dac-dinh-dau-viet'];
         if (visaDetail && visasForUsd.includes(visaDetail)) {
            return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
         }
@@ -377,8 +394,17 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                         Lưu
                                     </Button>
                                     }
-                                     {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
-                                     {showCancelApplication && hasApplied && (
+                                     {showApplyButtons && wasJustCancelled && (
+                                         <Button size="sm" className="bg-green-600 text-white hover:bg-green-700" onClick={handleReapplyClick}>
+                                             Ứng tuyển lại
+                                         </Button>
+                                     )}
+                                     {showApplyButtons && !wasJustCancelled && (
+                                        <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>
+                                            {applyButtonContent}
+                                        </Button>
+                                     )}
+                                     {showCancelApplication && hasApplied && !wasJustCancelled && (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
                                                  <Button 
@@ -399,12 +425,12 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                                 <AlertDialogHeader>
                                                 <AlertDialogTitle>Xác nhận huỷ ứng tuyển?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                   Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này không thể hoàn tác.
+                                                   Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này sẽ được ghi nhận ngay lập tức.
                                                 </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                 <AlertDialogCancel>Để sau</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => onCancelApplication?.(job.id)}>Đồng ý</AlertDialogAction>
+                                                <AlertDialogAction onClick={handleCancelApplicationClick}>Đồng ý</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
@@ -441,8 +467,8 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                 </AlertDialogContent>
             </AlertDialog>
             <EditProfileDialog 
-                isOpen={isProfileEditDialogOpen} 
-                onOpenChange={setIsProfileEditDialogOpen} 
+                isOpen={isProfileIncompleteAlertOpen} 
+                onOpenChange={setIsProfileIncompleteAlertOpen} 
                 onSaveSuccess={() => {
                     toast({
                         title: 'Cập nhật thành công!',
@@ -586,8 +612,16 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                             </div>
                             {isClient && showApplyButtons && (
                                 <div className="flex items-center gap-2">
-                                    <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
-                                    {showCancelApplication && hasApplied && (
+                                     {wasJustCancelled ? (
+                                         <Button size="sm" className="bg-green-600 text-white hover:bg-green-700" onClick={handleReapplyClick}>
+                                             Ứng tuyển lại
+                                         </Button>
+                                     ) : (
+                                        <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>
+                                            {applyButtonContent}
+                                        </Button>
+                                     )}
+                                     {showCancelApplication && hasApplied && !wasJustCancelled && (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
                                                  <Button 
@@ -601,19 +635,19 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                                     size="sm" 
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
+                                                    <X className="mr-1 h-4 w-4" />Huỷ
                                                 </Button>
                                             </AlertDialogTrigger>
                                             <AlertDialogContent id="XNHUT001" onClick={(e) => e.stopPropagation()}>
                                                 <AlertDialogHeader>
                                                 <AlertDialogTitle>Xác nhận huỷ ứng tuyển?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                   Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này không thể hoàn tác.
+                                                   Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này sẽ được ghi nhận ngay lập tức.
                                                 </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                 <AlertDialogCancel>Để sau</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => onCancelApplication?.(job.id)}>Đồng ý</AlertDialogAction>
+                                                <AlertDialogAction onClick={handleCancelApplicationClick}>Đồng ý</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
@@ -683,3 +717,5 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
     </div>
   );
 };
+
+    
