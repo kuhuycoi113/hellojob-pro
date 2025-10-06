@@ -765,8 +765,7 @@ export function YL01Dialog({
   
   const renderMultiSelectStepDialog = (
     stepNumber: number,
-    title: string,
-    description: string,
+    content: { title: string; description: string; backButton: string; continueButton: string },
     options: { id: string; icon?: React.ElementType; title: string; desc?: string; color?: string; name: {vi: string, ja: string, en: string}}[],
     selectedItems: string[],
     setter: React.Dispatch<React.SetStateAction<string[]>>,
@@ -778,8 +777,8 @@ export function YL01Dialog({
     return (
         <>
             <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">{title}</DialogTitle>
-                <DialogDescription className="text-center">{description}</DialogDescription>
+                <DialogTitle className="text-2xl font-headline text-center">{content.title}</DialogTitle>
+                <DialogDescription className="text-center">{content.description}</DialogDescription>
             </DialogHeader>
              <div className={cn("grid grid-cols-2 pt-4 gap-4 max-h-80 overflow-y-auto", gridCols)}>
                 {options.map((option) => {
@@ -806,8 +805,8 @@ export function YL01Dialog({
                 })}
             </div>
             <div className="flex justify-center items-center mt-4 gap-4">
-                <Button variant="link" onClick={() => setStep(prevStep)}>Quay lại</Button>
-                <Button onClick={() => setStep(nextStep)} disabled={selectedItems.length === 0}>Tiếp tục</Button>
+                <Button variant="link" onClick={() => setStep(prevStep)}>{content.backButton}</Button>
+                <Button onClick={() => setStep(nextStep)} disabled={selectedItems.length === 0}>{content.continueButton}</Button>
             </div>
         </>
     );
@@ -874,15 +873,15 @@ export function YL01Dialog({
       case 7:
           const visaDetailOptions = selectedVisa.flatMap(vSlug => (visaDetailsByVisaType[vSlug] || []).map(o => ({...o, id: o.slug, title: o.name.vi})));
           const visaDetailContentMultiLang = {
-              vi: { title: 'Chọn chi tiết loại hình visa', description: 'Bạn có thể chọn nhiều mục, lựa chọn đầu tiên là ưu tiên số 1.' },
-              ja: { title: 'ビザの詳細を選択', description: '複数の項目を選択できます。最初の選択が優先順位1番になります。' },
-              en: { title: 'Select Visa Details', description: 'You can select multiple items. The first selection is priority #1.' },
+              vi: { title: 'Chọn chi tiết loại hình visa', description: 'Bạn có thể chọn nhiều mục, lựa chọn đầu tiên là ưu tiên số 1.', backButton: 'Quay lại', continueButton: 'Tiếp tục' },
+              ja: { title: 'ビザの詳細を選択', description: '複数の項目を選択できます。最初の選択が優先順位1番になります。', backButton: '戻る', continueButton: '続ける' },
+              en: { title: 'Select Visa Details', description: 'You can select multiple items. The first selection is priority #1.', backButton: 'Back', continueButton: 'Continue' },
           };
-          return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang].title, visaDetailContentMultiLang[currentLang].description, visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
+          return renderMultiSelectStepDialog(7, visaDetailContentMultiLang[currentLang], visaDetailOptions, selectedVisaDetail, setSelectedVisaDetail, 8, 6, 'md:grid-cols-3');
       case 8:
           const allIndustries = Object.values(industriesByJobType).flat();
           const industryOptions = Array.from(new Map(selectedVisa.flatMap(vSlug => industriesByJobType[vSlug as keyof typeof industriesByJobType] || []).map(item => [item.slug, item])).values()).map(o => ({...o, id: o.slug, title: o.name.vi}));
-          return renderMultiSelectStepDialog(8, industryContent[currentLang].title, industryContent[currentLang].description, industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
+          return renderMultiSelectStepDialog(8, industryContent[currentLang], industryOptions, selectedIndustry, setSelectedIndustry, 9, 7, 'md:grid-cols-4');
       case 9:
            const regionOptions = japanRegions.map(r => ({id: r.slug, title: r.name, name: {vi:r.name, ja: r.name, en:r.name}}));
            const content = regionContent[currentLang];
