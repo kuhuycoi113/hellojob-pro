@@ -276,7 +276,7 @@ const EmptyProfileView = () => {
     }
 
     const renderDialogContent = () => {
-        switch (profileCreationStep) {
+        switch(profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -299,13 +299,7 @@ const EmptyProfileView = () => {
                 <div className="mt-6 flex flex-wrap gap-4 justify-center">
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
-                           <Button 
-                                className="bg-accent-orange hover:bg-accent-orange/90 text-white"
-                                onClick={() => {
-                                    setProfileCreationStep(2); // Start from step 2 directly
-                                    setIsDialogOpen(true);
-                                }}
-                            >
+                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
@@ -366,23 +360,13 @@ const EmptyProfileView = () => {
 };
 
 
-const MY_JOBS_SECTIONS = {
-    SUGGESTED: 'item-1',
-    APPLIED: 'item-2',
-    SAVED: 'item-3',
-    BEHAVIORAL: 'item-4',
-};
-
-
 const LoggedInView = () => {
-    const { role, cancelApplication, setApplicationCount } = useAuth();
+    const { role, cancelApplication, setApplicationCount, savedJobs, clearSavedJobCount } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
-    const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
     const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]); // CANHANHOA01
-    const [savedJobs, setSavedJobs] = useState<Job[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
@@ -400,6 +384,7 @@ const LoggedInView = () => {
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
 
+
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
     const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
@@ -408,6 +393,9 @@ const LoggedInView = () => {
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
     const appliedJobsRef = useRef<HTMLDivElement>(null);
+    const { appliedJobs: appliedJobIds } = useAuth();
+    const [appliedJobsData, setAppliedJobsData] = useState<Job[]>([]);
+
 
     useEffect(() => {
         // Generate dynamic chart data
@@ -428,24 +416,25 @@ const LoggedInView = () => {
         if (actionParam === 'cancel_suggestion') {
             setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
             setCancelSuggestionMode(true);
-            setApplicationCount(0); // Also clear badge when navigating here for cancellation
+            setApplicationCount(0);
         } else if (highlightParam === 'applied') {
             setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
-            setApplicationCount(0); // Clear the badge
+            setApplicationCount(0);
+        } else if (highlightParam === 'saved') {
+            setOpenAccordion(MY_JOBS_SECTIONS.SAVED);
+            clearSavedJobCount();
         } else if (highlightParam === 'suggested') {
             setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
             setIsSuggestionHighlighted(true);
             const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
-
             const nextUrl = new URL(window.location.href);
             nextUrl.searchParams.delete('highlight');
             router.replace(nextUrl.toString(), { scroll: false });
-            
             return () => clearTimeout(timer);
         } else {
              setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
         }
-    }, [searchParams, router, setApplicationCount]);
+    }, [searchParams, router, setApplicationCount, clearSavedJobCount]);
     
     useEffect(() => {
         if (openAccordion === MY_JOBS_SECTIONS.APPLIED && (searchParams.get('highlight') === 'applied' || searchParams.get('action') === 'cancel_suggestion')) {
@@ -495,21 +484,12 @@ const LoggedInView = () => {
         }
     }, []);
     
-    const fetchSavedJobs = useCallback(() => {
-        const savedJobIds = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-        const savedJobsData = jobData.filter(job => savedJobIds.includes(job.id));
-        setSavedJobs(savedJobsData);
-    }, []);
-
-    const fetchAppliedJobs = useCallback(() => {
-        const appliedJobIds = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-        const appliedJobsData = jobData.filter(job => appliedJobIds.includes(job.id));
-        setAppliedJobs(appliedJobsData);
-    }, []);
+    useEffect(() => {
+        setAppliedJobsData(jobData.filter(job => appliedJobIds.includes(job.id)));
+    }, [appliedJobIds]);
 
     const handleCancelApplication = useCallback((jobId: string) => {
         cancelApplication(jobId);
-        // We don't need to manually update state as the context provider will trigger a re-render.
     }, [cancelApplication]);
 
     useEffect(() => {
@@ -520,18 +500,20 @@ const LoggedInView = () => {
         }
         fetchSuggestedJobs();
         fetchBehavioralSuggestions();
-        fetchSavedJobs();
-        fetchAppliedJobs();
 
-        const handleStorageChange = () => {
-            fetchSavedJobs();
-            fetchAppliedJobs();
-            fetchBehavioralSuggestions();
+        const handleStorageChange = (event: StorageEvent) => {
+             if (event.key === 'appliedJobs' || event.key === null) { // Listen for changes from other tabs or direct manipulation
+                const localAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+                setAppliedJobsData(jobData.filter(job => localAppliedJobs.includes(job.id)));
+            }
+            if (event.key === 'behavioralSignals' || event.key === null) {
+                 fetchBehavioralSuggestions();
+            }
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
         
-    }, [role, fetchSuggestedJobs, fetchSavedJobs, fetchAppliedJobs, fetchBehavioralSuggestions, forceUpdate]);
+    }, [role, fetchSuggestedJobs, fetchBehavioralSuggestions, forceUpdate]);
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
@@ -758,12 +740,12 @@ const LoggedInView = () => {
                         <div className="flex items-center gap-3">
                             <Briefcase className="h-5 w-5 text-blue-500" />
                             <span>Việc đã ứng tuyển</span>
-                            <Badge>{appliedJobs.length}</Badge>
+                            <Badge>{appliedJobsData.length}</Badge>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {appliedJobs.map((job) => (
+                            {appliedJobsData.map((job) => (
                                <div id="HIENTHIVIEC06" key={job.id}>
                                   <JobCard 
                                     job={job} 
@@ -934,7 +916,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.name}>{vd.name}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -951,7 +933,7 @@ const LoggedInView = () => {
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -1345,3 +1327,5 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
+    

@@ -115,11 +115,11 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 
 
 export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, cancelSuggestionMode = false, onCancelApplication: propOnCancelApplication }: { id?: string, job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, cancelSuggestionMode?: boolean, onCancelApplication?: (jobId: string) => void }) => {
-  const { isLoggedIn, setPostLoginAction, appliedJobs, applyForJob, reapplyForJob, cancelApplication } = useAuth();
+  const { isLoggedIn, setPostLoginAction, appliedJobs, applyForJob, reapplyForJob, cancelApplication, handleSaveJob, savedJobs } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const isSaved = savedJobs.includes(job.id);
   const hasApplied = appliedJobs.includes(job.id);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
@@ -135,8 +135,6 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
 
   useEffect(() => {
     setIsClient(true);
-    const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-    setIsSaved(savedJobs.includes(job.id));
     
     // Safely calculate dates on the client to avoid hydration mismatch
     const today = new Date();
@@ -173,22 +171,15 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
 
   }, [job.id, job.postedTimeOffset, job.interviewDateOffset, job.visaDetail, job.visaType]);
 
-  const handleSaveJob = (e: React.MouseEvent) => {
+  const handleSaveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-    if (isSaved) {
-      const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
-      localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
-      setIsSaved(false);
-    } else {
-      savedJobs.push(job.id);
-      localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
-      setIsSaved(true);
-      logInteraction(job, 'save'); // CANHANHOA01: Log save interaction
+    if (!isLoggedIn) {
+        setPostLoginAction({ type: 'SAVE_JOB', data: { jobId: job.id, jobTitle: job.title } });
+        setIsConfirmLoginOpen(true);
+        return;
     }
-     // Trigger a storage event to update other components like the "My Jobs" page
-    window.dispatchEvent(new Event('storage'));
+    handleSaveJob(job.id, job.title);
   };
   
    const handleApplyClick = (e: React.MouseEvent) => {
@@ -313,7 +304,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                             <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                             <span>{job.id}</span>
                             </div>
-                            {isClient && <Button variant="outline" size="icon" className={cn("absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white", (variant === 'list-item' || variant === 'list-item-compact') && 'md:hidden')} onClick={handleSaveJob}>
+                            {isClient && <Button variant="outline" size="icon" className={cn("absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white", (variant === 'list-item' || variant === 'list-item-compact') && 'md:hidden')} onClick={handleSaveClick}>
                                 <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                             </Button>}
                         </div>
@@ -389,7 +380,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                 </div>
                                 {isClient && <div className="flex items-center gap-2">
                                     {variant !== 'list-item-compact' &&
-                                    <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
+                                    <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveClick}>
                                         <Bookmark className={cn("mr-2 h-5 w-5", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                                         Lưu
                                     </Button>
@@ -455,7 +446,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                     <AlertDialogHeader>
                     <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Bạn cần đăng nhập để ứng tuyển, bạn có muốn đăng nhập không?
+                        Bạn cần đăng nhập để thực hiện hành động này.
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -566,7 +557,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                         <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                         <span>{job.id}</span>
                       </div>
-                      {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
+                      {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveClick}>
                         <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                       </Button>}
                 </div>
@@ -673,7 +664,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                 <AlertDialogHeader>
                 <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Bạn cần đăng nhập để ứng tuyển, bạn có muốn đăng nhập không?
+                    Bạn cần đăng nhập để thực hiện hành động này.
                 </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -717,3 +708,5 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
     </div>
   );
 };
+
+    

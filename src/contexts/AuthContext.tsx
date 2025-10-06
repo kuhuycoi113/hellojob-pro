@@ -34,7 +34,7 @@ interface AuthContextType {
   applyForJob: (jobId: string, jobTitle: string) => boolean;
   reapplyForJob: (jobId: string) => void;
   cancelApplication: (jobId: string) => void;
-  handleSaveJob: (jobId: string, jobTitle: string) => boolean;
+  handleSaveJob: (jobId: string, jobTitle: string) => void;
   clearApplicationCount: () => void;
   clearSavedJobCount: () => void;
   setApplicationCount: (count: number | ((prevCount: number) => number)) => void;
@@ -316,17 +316,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const isAlreadySaved = savedJobs.includes(jobId);
 
     if (isAlreadySaved) {
-        // Unsave
         const newSavedJobs = savedJobs.filter(id => id !== jobId);
         setSavedJobs(newSavedJobs);
         localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
         toast({ title: "Đã bỏ lưu việc làm", description: `"${jobTitle}" đã được xóa khỏi danh sách của bạn.` });
-        // We don't decrement the `new` count when unsaving
     } else {
-        // Save
         if (savedJobs.length >= SAVED_JOB_LIMIT) {
              toast({ variant: 'destructive', title: "Đã đạt giới hạn lưu", description: "Bạn chỉ có thể lưu tối đa 20 việc làm. Vui lòng xóa bớt để lưu việc mới." });
-             return false;
+             return;
         }
         const newSavedJobs = [...savedJobs, jobId];
         setSavedJobs(newSavedJobs);
@@ -335,7 +332,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setLastAction('save');
         toast({ title: "Đã lưu việc làm", description: `"${jobTitle}" đã được thêm vào danh sách của bạn.` });
     }
-    return true;
   };
 
   const applyForJob = (jobId: string, jobTitle: string) => {
@@ -420,3 +416,5 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+    
