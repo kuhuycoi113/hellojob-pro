@@ -279,7 +279,7 @@ const EmptyProfileView = () => {
     }
 
     const renderDialogContent = () => {
-        switch(profileCreationStep) {
+        switch (profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -423,48 +423,50 @@ const LoggedInView = () => {
         const actionParam = searchParams.get('action');
 
         let shouldClearParams = false;
+        let initialAccordion = openAccordion;
 
         if (actionParam === 'cancel_suggestion') {
-            setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
+            initialAccordion = MY_JOBS_SECTIONS.APPLIED;
             setCancelSuggestionMode(true);
             setApplicationCount(0);
             shouldClearParams = true;
         } else if (highlightParam === 'applied') {
-            setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
+            initialAccordion = MY_JOBS_SECTIONS.APPLIED;
             clearApplicationCount();
             shouldClearParams = true;
         } else if (highlightParam === 'saved') {
-            setOpenAccordion(MY_JOBS_SECTIONS.SAVED);
+            initialAccordion = MY_JOBS_SECTIONS.SAVED;
             clearSavedJobCount();
             shouldClearParams = true;
         } else if (highlightParam === 'suggested') {
-            setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
+            initialAccordion = MY_JOBS_SECTIONS.SUGGESTED;
             setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
             shouldClearParams = true;
-            return () => clearTimeout(timer);
-        } else {
-            // Default open state
-            if (openAccordion === undefined) {
-                setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
-            }
+            // No return here, let cleanup run below
+        } else if (initialAccordion === undefined) {
+             initialAccordion = MY_JOBS_SECTIONS.SUGGESTED;
         }
+
+        setOpenAccordion(initialAccordion);
 
         if (shouldClearParams) {
              const currentUrl = new URL(window.location.href);
              currentUrl.searchParams.delete('highlight');
              currentUrl.searchParams.delete('action');
-             router.replace(currentUrl.toString(), { scroll: false });
+             // Use a timeout to ensure state update has propagated before replacing URL
+             setTimeout(() => {
+                router.replace(currentUrl.toString(), { scroll: false });
+             }, 0);
         }
-    }, [searchParams, clearApplicationCount, clearSavedJobCount, setApplicationCount, router, openAccordion, MY_JOBS_SECTIONS]);
-    
-    useEffect(() => {
-        if (openAccordion === MY_JOBS_SECTIONS.APPLIED && (searchParams.get('highlight') === 'applied' || searchParams.get('action') === 'cancel_suggestion')) {
+        
+        if (initialAccordion === MY_JOBS_SECTIONS.APPLIED) {
             setTimeout(() => {
                 appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 150);
         }
-    }, [openAccordion, searchParams, MY_JOBS_SECTIONS.APPLIED]);
+
+    }, [searchParams, clearApplicationCount, clearSavedJobCount, setApplicationCount, router, MY_JOBS_SECTIONS.APPLIED, MY_JOBS_SECTIONS.SAVED, MY_JOBS_SECTIONS.SUGGESTED]);
     
 
     const fetchSuggestedJobs = useCallback(async () => {
@@ -692,10 +694,11 @@ const LoggedInView = () => {
          {/* Main Content */}
         <div className="w-full mb-8">
             <Accordion 
-                type="multiple"
+                type="single"
+                collapsible
                 className="w-full space-y-4" 
-                value={openAccordion ? [openAccordion] : undefined}
-                onValueChange={(value) => setOpenAccordion(value[0])}
+                value={openAccordion}
+                onValueChange={setOpenAccordion}
             >
                 <AccordionItem value={MY_JOBS_SECTIONS.SUGGESTED} className={cn(
                     "border-b-0 transition-all duration-500 ease-in-out border rounded-lg",
@@ -1361,5 +1364,3 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-
-    
