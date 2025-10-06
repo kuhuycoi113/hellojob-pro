@@ -411,7 +411,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                      {showCancelApplication && hasApplied && (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
+                                                <Button variant="destructive" className="bg-transparent text-destructive hover:bg-destructive/10" size="sm" onClick={(e) => e.stopPropagation()}>
                                                     <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
                                                 </Button>
                                             </AlertDialogTrigger>
@@ -477,7 +477,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                 <AlertDialogHeader>
                   <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Bạn đã đạt giới hạn 20 lượt ứng tuyển trong tháng này. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive" className="align-middle">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
+                    Bạn đã đạt giới hạn 20 lượt ứng tuyển trong tháng này. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -610,7 +610,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                     {showCancelApplication && hasApplied && (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
+                                                <Button variant="destructive" size="sm" className="bg-transparent text-destructive hover:bg-destructive/10" onClick={(e) => e.stopPropagation()}>
                                                     <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
                                                 </Button>
                                             </AlertDialogTrigger>
@@ -618,7 +618,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                                 <AlertDialogHeader>
                                                 <AlertDialogTitle>Xác nhận huỷ ứng tuyển?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này không thể hoàn tác.
+                                                   Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này không thể hoàn tác.
                                                 </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
@@ -677,7 +677,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
             <AlertDialogHeader>
               <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
               <AlertDialogDescription>
-                Bạn đã đạt giới hạn 20 lượt ứng tuyển trong tháng này. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive" className="align-middle">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
+                Bạn đã đạt giới hạn 20 lượt ứng tuyển trong tháng này. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

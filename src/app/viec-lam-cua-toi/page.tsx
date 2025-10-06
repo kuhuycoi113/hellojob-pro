@@ -499,7 +499,7 @@ const EmptyProfileView = () => {
 
 
 const LoggedInView = () => {
-    const { role, clearApplicationCount } = useAuth();
+    const { role } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
@@ -523,7 +523,6 @@ const LoggedInView = () => {
     const [chartData, setChartData] = useState([]);
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
-    const initialLoadRef = useRef(true);
 
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
@@ -556,42 +555,48 @@ const LoggedInView = () => {
         const currentApplied = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
         const newApplied = currentApplied.filter((id: string) => id !== jobId);
         localStorage.setItem('appliedJobs', JSON.stringify(newApplied));
-        fetchAppliedJobs(); // Re-fetch to update the UI
+
+        // Logic to decrement the monthly application count
+        const limitData = JSON.parse(localStorage.getItem('applicationLimit') || '{}');
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
+        if (limitData.month === currentMonth && limitData.count > 0) {
+            limitData.count -= 1;
+            localStorage.setItem('applicationLimit', JSON.stringify(limitData));
+        }
+
+        fetchAppliedJobs();
         toast({
           title: "Đã huỷ ứng tuyển",
           description: `Bạn đã huỷ ứng tuyển công việc có mã ${jobId}.`,
         });
-        window.dispatchEvent(new Event('storage')); // Notify header to update count
+        window.dispatchEvent(new Event('storage'));
     }, [fetchAppliedJobs, toast]);
 
     useEffect(() => {
-        if (initialLoadRef.current) {
-            const highlightParam = searchParams.get('highlight');
-            if (highlightParam === 'applied') {
-                setOpenAccordion('item-2');
-                clearApplicationCount(); // Clear badge count
-                router.replace('/viec-lam-cua-toi', { scroll: false }); // Clean URL
-            } else if (highlightParam === 'suggested') {
-                setOpenAccordion('item-1');
-                setIsSuggestionHighlighted(true);
-                const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
-                router.replace('/viec-lam-cua-toi', { scroll: false });
-                // No need to clear timer on unmount for this one-off effect
-            }
-            initialLoadRef.current = false;
+        const highlightParam = searchParams.get('highlight');
+        if (highlightParam === 'applied' && openAccordion !== 'item-2') {
+            setOpenAccordion('item-2');
+        } else if (highlightParam === 'suggested') {
+            setOpenAccordion('item-1');
+            setIsSuggestionHighlighted(true);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+             router.replace('/viec-lam-cua-toi', { scroll: false });
+            return () => clearTimeout(timer);
+        } else {
+             setOpenAccordion('item-1');
         }
-    }, [searchParams, router, clearApplicationCount]);
+    }, [searchParams, router, openAccordion]);
     
     // This new useEffect handles the scrolling after the accordion state is updated.
     useEffect(() => {
-        const highlightParam = searchParams.get('highlight');
-        if (highlightParam === 'applied') {
+        if (searchParams.get('highlight') === 'applied' && openAccordion === 'item-2') {
              // A small timeout can help ensure the element is ready to be scrolled to.
             setTimeout(() => {
                 appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 150);
         }
-    }, [openAccordion]); // Depend on openAccordion to run after state update
+    }, [openAccordion, searchParams]);
     
 
     const fetchSuggestedJobs = useCallback(async () => {
