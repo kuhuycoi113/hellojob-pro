@@ -395,8 +395,8 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                     </Button>
                                     }
                                      {showApplyButtons && wasJustCancelled && (
-                                         <Button size="sm" className="bg-green-600 text-white hover:bg-green-700" onClick={handleReapplyClick}>
-                                             Ứng tuyển lại
+                                         <Button size="sm" className="bg-accent-green hover:bg-accent-green/90" onClick={handleReapplyClick}>
+                                             Hoàn tác lại ứng tuyển
                                          </Button>
                                      )}
                                      {showApplyButtons && !wasJustCancelled && (
@@ -613,8 +613,8 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                             {isClient && showApplyButtons && (
                                 <div className="flex items-center gap-2">
                                      {wasJustCancelled ? (
-                                         <Button size="sm" className="bg-green-600 text-white hover:bg-green-700" onClick={handleReapplyClick}>
-                                             Ứng tuyển lại
+                                         <Button size="sm" className="bg-accent-green hover:bg-accent-green/90" onClick={handleReapplyClick}>
+                                             Hoàn tác lại ứng tuyển
                                          </Button>
                                      ) : (
                                         <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>
@@ -635,7 +635,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                                     size="sm" 
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    <X className="mr-1 h-4 w-4" />Huỷ
+                                                    <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
                                                 </Button>
                                             </AlertDialogTrigger>
                                             <AlertDialogContent id="XNHUT001" onClick={(e) => e.stopPropagation()}>
@@ -717,5 +717,3 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
     </div>
   );
 };
-
-    
