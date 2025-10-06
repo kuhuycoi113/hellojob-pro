@@ -929,7 +929,6 @@ export function YL01Dialog({
                   <div className="flex justify-center items-center mt-6 gap-4">
                       <Button variant="link" onClick={() => setStep(8)}>{content.backButton}</Button>
                       <Button 
-                          className="bg-accent-orange text-white hover:bg-accent-orange/90"
                           onClick={() => setStep(10)} 
                           disabled={selectedRegion.length === 0}
                       >
