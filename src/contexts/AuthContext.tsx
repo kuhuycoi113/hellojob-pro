@@ -5,8 +5,9 @@ import React, { createContext, useContext, useState, ReactNode, useEffect, useCa
 import { getAuth, onAuthStateChanged, signOut, type User as FirebaseUser } from 'firebase/auth';
 import { guestUser, loggedInUser, type User } from '@/lib/chat-data';
 import type { CandidateProfile } from '@/ai/schemas';
-import { app } from '@/firebase/config'; // Import the initialized Firebase app
+import { app } from '@/firebase/config';
 import { useToast } from '@/hooks/use-toast';
+import { validateProfileForApplication } from '@/lib/validators';
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest' | 'candidate-full-profile';
 
@@ -27,8 +28,9 @@ interface AuthContextType {
   profileHeadline: string | null;
   avatarUrl: string | null;
   applicationCount: number;
-  setApplicationCount: (count: number | ((prevCount: number) => number)) => void;
-  incrementApplicationCount: () => void;
+  appliedJobs: string[];
+  applyForJob: (jobId: string, jobTitle: string) => boolean;
+  cancelApplication: (jobId: string) => void;
   clearApplicationCount: () => void;
   setRole: (role: Role) => void;
   postLoginAction: PostLoginAction;
@@ -164,16 +166,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [profileHeadline, setProfileHeadline] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [applicationCount, setApplicationCount] = useState(0);
+  const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
   const isLoggedIn = role !== 'guest';
   const { toast } = useToast();
-
-  const incrementApplicationCount = useCallback(() => {
-    setApplicationCount(prev => prev + 1);
-  }, []);
-
-  const clearApplicationCount = useCallback(() => {
-    setApplicationCount(0);
-  }, []);
 
   const auth = getAuth(app);
 
@@ -205,6 +200,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
              setProfileHeadline(null);
              setAvatarUrl(null);
              setApplicationCount(0);
+             setAppliedJobs([]);
          } else {
              let profileData: Partial<CandidateProfile & {avatarUrl?: string}> = {};
              if (simulatedRole === 'candidate-full-profile') {
@@ -217,8 +213,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
              setAvatarUrl(profileData.avatarUrl || null);
              setCurrentUser(prev => ({...prev, name: profileData.name || 'Ứng viên', id: firebaseUser?.uid || 'user-0', avatarUrl: profileData.avatarUrl || loggedInUser.avatarUrl}));
          }
-        const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-        setApplicationCount(appliedJobs.length);
+        const localAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+        setAppliedJobs(localAppliedJobs);
+        setApplicationCount(localAppliedJobs.length);
         return;
     }
 
@@ -229,6 +226,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setProfileHeadline(null);
         setAvatarUrl(null);
         setApplicationCount(0);
+        setAppliedJobs([]);
         return;
     }
 
@@ -263,8 +261,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         avatarUrl: firebaseUser.photoURL || profile.avatarUrl || loggedInUser.avatarUrl,
     });
 
-    const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-    setApplicationCount(appliedJobs.length);
+    const localAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+    setAppliedJobs(localAppliedJobs);
+    setApplicationCount(localAppliedJobs.length);
   }, []);
 
   const setRole = (newRole: Role) => {
@@ -295,6 +294,57 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
   }, [auth, updateAuthAndProfileState]);
 
+  const applyForJob = (jobId: string, jobTitle: string) => {
+    const now = new Date();
+    const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
+    const limitData = JSON.parse(localStorage.getItem('applicationLimit') || '{}');
+    const APPLICATION_LIMIT = 20;
+
+    if (limitData.month !== currentMonth) {
+        limitData.month = currentMonth;
+        limitData.count = 0;
+    }
+
+    if (limitData.count >= APPLICATION_LIMIT) {
+        return false; // Limit reached
+    }
+
+    setAppliedJobs(prev => {
+        const newAppliedJobs = [...prev, jobId];
+        localStorage.setItem('appliedJobs', JSON.stringify(newAppliedJobs));
+        setApplicationCount(newAppliedJobs.length); // Update count
+        return newAppliedJobs;
+    });
+
+    limitData.count = (limitData.count || 0) + 1;
+    localStorage.setItem('applicationLimit', JSON.stringify(limitData));
+
+    toast({
+        title: 'Ứng tuyển thành công!',
+        description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
+        className: 'bg-green-500 text-white'
+    });
+    
+    return true;
+  };
+
+  const cancelApplication = (jobId: string) => {
+    setAppliedJobs(prev => {
+        const newAppliedJobs = prev.filter(id => id !== jobId);
+        localStorage.setItem('appliedJobs', JSON.stringify(newAppliedJobs));
+        setApplicationCount(newAppliedJobs.length); // Update count
+        return newAppliedJobs;
+    });
+     toast({
+        title: "Đã huỷ ứng tuyển",
+        description: `Bạn đã huỷ ứng tuyển công việc có mã ${jobId}.`,
+    });
+  };
+
+  const clearApplicationCount = useCallback(() => {
+    setApplicationCount(0);
+  }, []);
+
   const value = {
     role,
     currentUser,
@@ -303,9 +353,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     profileHeadline,
     avatarUrl,
     applicationCount,
-    setApplicationCount,
-    incrementApplicationCount,
+    setApplicationCount: () => {}, // Deprecated, managed internally
+    incrementApplicationCount: () => {}, // Deprecated, managed internally
     clearApplicationCount,
+    appliedJobs,
+    applyForJob,
+    cancelApplication,
     setRole,
     postLoginAction,
     setPostLoginAction,

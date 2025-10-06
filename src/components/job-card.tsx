@@ -115,12 +115,12 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 
 
 export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, cancelSuggestionMode = false, onCancelApplication }: { id?: string, job: Job, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat' | 'list-item-compact', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, cancelSuggestionMode?: boolean, onCancelApplication?: (jobId: string) => void }) => {
-  const { isLoggedIn, setPostLoginAction, incrementApplicationCount } = useAuth();
+  const { isLoggedIn, setPostLoginAction, appliedJobs, applyForJob } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [hasApplied, setHasApplied] = useState(false);
+  const hasApplied = appliedJobs.includes(job.id);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
   const [isConsultantPopoverOpen, setIsConsultantPopoverOpen] = useState(false);
@@ -136,9 +136,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
     setIsClient(true);
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     setIsSaved(savedJobs.includes(job.id));
-    const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-    setHasApplied(appliedJobs.includes(job.id));
-
+    
     // Safely calculate dates on the client to avoid hydration mismatch
     const today = new Date();
     const postedDate = new Date(today);
@@ -195,6 +193,13 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
    const handleApplyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    if (hasApplied) {
+        toast({
+             variant: 'destructive',
+             title: 'Bạn đã ứng tuyển công việc này rồi'
+         });
+        return;
+    }
     if (!isLoggedIn) {
         setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: job.title } });
         setIsConfirmLoginOpen(true);
@@ -202,55 +207,21 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
     }
 
     const profileRaw = localStorage.getItem('generatedCandidateProfile');
-    const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-
-    if (!appliedJobs.includes(job.id)) {
-        // GHSLUT-L01: Check application limit only for new applications
-        const now = new Date();
-        const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
-        const limitData = JSON.parse(localStorage.getItem('applicationLimit') || '{}');
-        const APPLICATION_LIMIT = 20;
-
-        if (limitData.month !== currentMonth) {
-            limitData.month = currentMonth;
-            limitData.count = 0;
-        }
-
-        if (limitData.count >= APPLICATION_LIMIT) {
-            setIsLimitDialogOpen(true);
-            return;
-        }
-
-        if (profileRaw) {
-            const profile: CandidateProfile = JSON.parse(profileRaw);
-            const missingFields = validateProfileForApplication(profile);
-            if (missingFields.length === 0) {
-                // Profile is valid, proceed with application
-                appliedJobs.push(job.id);
-                localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
-                setHasApplied(true);
-                
-                // GHSLUT-L01: Increment count after successful application
-                limitData.count = (limitData.count || 0) + 1;
-                localStorage.setItem('applicationLimit', JSON.stringify(limitData));
-
-                incrementApplicationCount(); // Increment the count in context
-                toast({
-                    title: 'Ứng tuyển thành công!',
-                    description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
-                    className: 'bg-green-500 text-white'
-                });
-            } else {
-                setIsProfileIncompleteAlertOpen(true);
+    if (profileRaw) {
+        const profile: CandidateProfile = JSON.parse(profileRaw);
+        const missingFields = validateProfileForApplication(profile);
+        if (missingFields.length === 0) {
+            // Profile is valid, proceed with application
+            const success = applyForJob(job.id, job.title);
+            if (!success) {
+                // Limit reached
+                setIsLimitDialogOpen(true);
             }
         } else {
-             setIsProfileEditDialogOpen(true);
+            setIsProfileIncompleteAlertOpen(true);
         }
     } else {
-         toast({
-             variant: 'destructive',
-             title: 'Bạn đã ứng tuyển công việc này rồi'
-         });
+         setIsProfileEditDialogOpen(true);
     }
   };
   
@@ -681,14 +652,16 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
             </AlertDialogContent>
         </AlertDialog>
         <EditProfileDialog 
-            isOpen={isProfileEditDialogOpen} 
-            onOpenChange={setIsProfileEditDialogOpen} 
+            isOpen={isProfileIncompleteAlertOpen} 
+            onOpenChange={setIsProfileIncompleteAlertOpen} 
             onSaveSuccess={() => {
                 toast({
                     title: 'Cập nhật thành công!',
                     description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
                     className: 'bg-green-500 text-white'
                 });
+                // Attempt to apply again after saving
+                handleApplyClick(new MouseEvent('click') as any);
             }}
             source="application"
         />
