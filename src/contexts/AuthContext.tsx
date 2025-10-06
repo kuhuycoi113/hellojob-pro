@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
@@ -295,17 +294,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [auth, updateAuthAndProfileState]);
 
   const applyForJob = (jobId: string, jobTitle: string) => {
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
-    const limitData = JSON.parse(localStorage.getItem('applicationLimit') || '{}');
-    const APPLICATION_LIMIT = 20;
-
-    if (limitData.month !== currentMonth) {
-        limitData.month = currentMonth;
-        limitData.count = 0;
-    }
-
-    if (limitData.count >= APPLICATION_LIMIT) {
+    const APPLICATION_LIMIT = 10;
+    
+    if (appliedJobs.length >= APPLICATION_LIMIT) {
         return false; // Limit reached
     }
 
@@ -315,9 +306,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setApplicationCount(newAppliedJobs.length); // Update count
         return newAppliedJobs;
     });
-
-    limitData.count = (limitData.count || 0) + 1;
-    localStorage.setItem('applicationLimit', JSON.stringify(limitData));
 
     toast({
         title: 'Ứng tuyển thành công!',

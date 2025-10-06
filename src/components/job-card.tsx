@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -458,7 +457,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                 <AlertDialogHeader>
                   <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Bạn đã đạt giới hạn 20 lượt ứng tuyển trong tháng này. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
+                    Bạn đã đạt giới hạn tối đa 10 lượt ứng tuyển cùng lúc. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -670,7 +669,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
             <AlertDialogHeader>
               <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
               <AlertDialogDescription>
-                Bạn đã đạt giới hạn 20 lượt ứng tuyển trong tháng này. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
+                Bạn đã đạt giới hạn tối đa 10 lượt ứng tuyển cùng lúc. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
