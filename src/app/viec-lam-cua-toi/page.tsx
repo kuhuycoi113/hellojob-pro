@@ -279,7 +279,7 @@ const EmptyProfileView = () => {
     }
 
     const renderDialogContent = () => {
-        switch (profileCreationStep) {
+        switch(profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -369,14 +369,18 @@ const LoggedInView = () => {
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
-    const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]); // CANHANHOA01
+    const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]);
     const [appliedJobsData, setAppliedJobsData] = useState<Job[]>([]);
     const [savedJobsData, setSavedJobsData] = useState<Job[]>([]);
     const { appliedJobs: appliedJobIdsFromAuth } = useAuth();
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
-    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
+    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [visibleSavedJobsCount, setVisibleSavedJobsCount] = useState(8);
+    const [isLoadingMoreSaved, setIsLoadingMoreSaved] = useState(false);
+    const [visibleBehavioralJobsCount, setVisibleBehavioralJobsCount] = useState(8);
+    const [isLoadingMoreBehavioral, setIsLoadingMoreBehavioral] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations'] & { educationRequirement?: string, languageRequirement?: string, yearsOfExperience?: string, specialConditions?: string[] }>>({});
@@ -406,6 +410,48 @@ const LoggedInView = () => {
         BEHAVIORAL: 'item-4',
     };
 
+    const initialOpenAccordionRef = useRef<string | undefined>();
+
+    useEffect(() => {
+        const highlightParam = searchParams.get('highlight');
+        const actionParam = searchParams.get('action');
+
+        let shouldClearParams = false;
+        let initialAccordion: string | undefined;
+
+        if (actionParam === 'cancel_suggestion') {
+            initialAccordion = MY_JOBS_SECTIONS.APPLIED;
+            setCancelSuggestionMode(true);
+            setApplicationCount(0);
+        } else if (highlightParam === 'applied') {
+            initialAccordion = MY_JOBS_SECTIONS.APPLIED;
+            clearApplicationCount();
+        } else if (highlightParam === 'saved') {
+            initialAccordion = MY_JOBS_SECTIONS.SAVED;
+            clearSavedJobCount();
+        } else if (highlightParam === 'suggested') {
+            initialAccordion = MY_JOBS_SECTIONS.SUGGESTED;
+            setIsSuggestionHighlighted(true);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+            // no return here
+        } else {
+             initialAccordion = MY_JOBS_SECTIONS.SUGGESTED;
+        }
+
+        if (initialAccordion) {
+            initialOpenAccordionRef.current = initialAccordion;
+            setOpenAccordion(initialAccordion);
+        }
+
+        if (actionParam || highlightParam) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.delete('highlight');
+            currentUrl.searchParams.delete('action');
+            router.replace(currentUrl.toString(), { scroll: false });
+        }
+        
+    }, []); // Run only once on mount
+
     useEffect(() => {
         // Generate dynamic chart data
         const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
@@ -417,57 +463,6 @@ const LoggedInView = () => {
         // @ts-ignore
         setChartData(dynamicChartData);
     }, []);
-
-    useEffect(() => {
-        const highlightParam = searchParams.get('highlight');
-        const actionParam = searchParams.get('action');
-
-        let shouldClearParams = false;
-        let initialAccordion = openAccordion;
-
-        if (actionParam === 'cancel_suggestion') {
-            initialAccordion = MY_JOBS_SECTIONS.APPLIED;
-            setCancelSuggestionMode(true);
-            setApplicationCount(0);
-            shouldClearParams = true;
-        } else if (highlightParam === 'applied') {
-            initialAccordion = MY_JOBS_SECTIONS.APPLIED;
-            clearApplicationCount();
-            shouldClearParams = true;
-        } else if (highlightParam === 'saved') {
-            initialAccordion = MY_JOBS_SECTIONS.SAVED;
-            clearSavedJobCount();
-            shouldClearParams = true;
-        } else if (highlightParam === 'suggested') {
-            initialAccordion = MY_JOBS_SECTIONS.SUGGESTED;
-            setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
-            shouldClearParams = true;
-            // No return here, let cleanup run below
-        } else if (initialAccordion === undefined) {
-             initialAccordion = MY_JOBS_SECTIONS.SUGGESTED;
-        }
-
-        setOpenAccordion(initialAccordion);
-
-        if (shouldClearParams) {
-             const currentUrl = new URL(window.location.href);
-             currentUrl.searchParams.delete('highlight');
-             currentUrl.searchParams.delete('action');
-             // Use a timeout to ensure state update has propagated before replacing URL
-             setTimeout(() => {
-                router.replace(currentUrl.toString(), { scroll: false });
-             }, 0);
-        }
-        
-        if (initialAccordion === MY_JOBS_SECTIONS.APPLIED) {
-            setTimeout(() => {
-                appliedJobsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 150);
-        }
-
-    }, [searchParams, clearApplicationCount, clearSavedJobCount, setApplicationCount, router, MY_JOBS_SECTIONS.APPLIED, MY_JOBS_SECTIONS.SAVED, MY_JOBS_SECTIONS.SUGGESTED]);
-    
 
     const fetchSuggestedJobs = useCallback(async () => {
         setIsLoadingSuggestions(true);
@@ -557,6 +552,23 @@ const LoggedInView = () => {
             setIsLoadingMore(false);
         }, 500); // Simulate network delay
     };
+    
+    const handleLoadMoreSaved = () => {
+        setIsLoadingMoreSaved(true);
+        setTimeout(() => {
+            setVisibleSavedJobsCount(prev => prev + savedJobsData.length);
+            setIsLoadingMoreSaved(false);
+        }, 500);
+    };
+
+    const handleLoadMoreBehavioral = () => {
+        setIsLoadingMoreBehavioral(true);
+        setTimeout(() => {
+            setVisibleBehavioralJobsCount(prev => prev + behavioralSuggestedJobs.length);
+            setIsLoadingMoreBehavioral(false);
+        }, 500);
+    };
+
 
     const openEditAspirationsDialog = () => {
         const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
@@ -693,7 +705,7 @@ const LoggedInView = () => {
         </div>
          {/* Main Content */}
         <div className="w-full mb-8">
-            <Accordion 
+             <Accordion 
                 type="single"
                 collapsible
                 className="w-full space-y-4" 
@@ -806,9 +818,18 @@ const LoggedInView = () => {
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                        {savedJobsData.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {savedJobsData.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
-                            </div>
+                            <>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {savedJobsData.slice(0, visibleSavedJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                </div>
+                                {visibleSavedJobsCount < savedJobsData.length && (
+                                    <div className="text-center mt-8">
+                                        <Button onClick={handleLoadMoreSaved} disabled={isLoadingMoreSaved}>
+                                            {isLoadingMoreSaved ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang tải...</>) : 'Xem thêm'}
+                                        </Button>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                              <div className="text-center py-8 text-muted-foreground">
                                 <p>Bạn chưa lưu công việc nào.</p>
@@ -834,11 +855,20 @@ const LoggedInView = () => {
                                 ))}
                             </div>
                        ) : behavioralSuggestedJobs.length > 0 ? (
-                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {behavioralSuggestedJobs.map((item) => (
-                                    <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
-                                ))}
-                            </div>
+                            <>
+                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {behavioralSuggestedJobs.slice(0, visibleBehavioralJobsCount).map((item) => (
+                                        <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
+                                    ))}
+                                </div>
+                                 {visibleBehavioralJobsCount < behavioralSuggestedJobs.length && (
+                                    <div className="text-center mt-8">
+                                        <Button onClick={handleLoadMoreBehavioral} disabled={isLoadingMoreBehavioral}>
+                                            {isLoadingMoreBehavioral ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang tải...</>) : 'Xem thêm'}
+                                        </Button>
+                                    </div>
+                                )}
+                            </>
                        ) : (
                            <div className="text-center py-8 text-muted-foreground">
                              <p>Hãy xem và lưu một vài công việc để chúng tôi có thể gợi ý tốt hơn cho bạn!</p>
@@ -1364,3 +1394,5 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
