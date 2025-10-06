@@ -72,7 +72,7 @@ export const Logo = ({ className }: { className?: string }) => (
 
 export function Header() {
   const pathname = usePathname();
-  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl, applicationCount } = useAuth();
+  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl, applicationCount, savedJobCount, lastAction } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -312,7 +312,15 @@ const LoggedOutContent = () => {
   const isEditing = role === 'candidate' || role === 'candidate-full-profile';
   const createProfileButtonText = isEditing ? 'Sửa hồ sơ' : 'Tạo hồ sơ';
   const createProfileButtonTextMobile = isEditing ? 'Sửa' : 'Tạo';
-  const myJobsLink = applicationCount > 0 ? '/viec-lam-cua-toi?highlight=applied' : '/viec-lam-cua-toi';
+  
+  const totalNotificationCount = applicationCount + savedJobCount;
+
+  let myJobsLink = '/viec-lam-cua-toi';
+  if (lastAction === 'apply' && applicationCount > 0) {
+    myJobsLink = '/viec-lam-cua-toi?highlight=applied';
+  } else if (lastAction === 'save' && savedJobCount > 0) {
+    myJobsLink = '/viec-lam-cua-toi?highlight=saved';
+  }
 
   return (
     <>
@@ -358,9 +366,9 @@ const LoggedOutContent = () => {
                              <Button asChild className="relative">
                                 <Link href={myJobsLink}>
                                     Việc của tôi
-                                    {applicationCount > 0 && (
+                                    {totalNotificationCount > 0 && (
                                         <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
-                                            {applicationCount > 9 ? '9+' : applicationCount}
+                                            {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
                                         </Badge>
                                     )}
                                 </Link>
@@ -386,9 +394,9 @@ const LoggedOutContent = () => {
                          <Button asChild variant="default" size="sm" className="relative">
                             <Link href={myJobsLink}>
                                 Việc
-                                {applicationCount > 0 && (
+                                {totalNotificationCount > 0 && (
                                     <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
-                                        {applicationCount > 9 ? '9+' : applicationCount}
+                                        {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
                                     </Badge>
                                 )}
                             </Link>

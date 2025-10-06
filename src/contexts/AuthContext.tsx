@@ -12,7 +12,7 @@ import { validateProfileForApplication } from '@/lib/validators';
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest' | 'candidate-full-profile';
 
 export type PostLoginAction = {
-  type: 'APPLY_JOB';
+  type: 'APPLY_JOB' | 'SAVE_JOB';
   data: {
     jobId: string;
     jobTitle: string;
@@ -28,17 +28,22 @@ interface AuthContextType {
   profileHeadline: string | null;
   avatarUrl: string | null;
   applicationCount: number;
+  savedJobCount: number;
   appliedJobs: string[];
+  savedJobs: string[];
   applyForJob: (jobId: string, jobTitle: string) => boolean;
   reapplyForJob: (jobId: string) => void;
   cancelApplication: (jobId: string) => void;
+  handleSaveJob: (jobId: string, jobTitle: string) => boolean;
   clearApplicationCount: () => void;
+  clearSavedJobCount: () => void;
   setApplicationCount: (count: number | ((prevCount: number) => number)) => void;
   setRole: (role: Role) => void;
   postLoginAction: PostLoginAction;
   setPostLoginAction: (action: PostLoginAction) => void;
   clearPostLoginAction: () => void;
   logout: () => void;
+  lastAction: 'apply' | 'save' | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -167,8 +172,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [profileName, setProfileName] = useState<string | null>(null);
   const [profileHeadline, setProfileHeadline] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  
   const [applicationCount, setApplicationCount] = useState(0);
+  const [savedJobCount, setSavedJobCount] = useState(0);
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
+  const [savedJobs, setSavedJobs] = useState<string[]>([]);
+  const [lastAction, setLastAction] = useState<'apply' | 'save' | null>(null);
+
   const isLoggedIn = role !== 'guest';
   const { toast } = useToast();
 
@@ -202,7 +212,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
              setProfileHeadline(null);
              setAvatarUrl(null);
              setApplicationCount(0);
+             setSavedJobCount(0);
              setAppliedJobs([]);
+             setSavedJobs([]);
          } else {
              let profileData: Partial<CandidateProfile & {avatarUrl?: string}> = {};
              if (simulatedRole === 'candidate-full-profile') {
@@ -217,7 +229,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
          }
         const localAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
         setAppliedJobs(localAppliedJobs);
-        // Do not set application count from total length here.
+        const localSavedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+        setSavedJobs(localSavedJobs);
         return;
     }
 
@@ -228,7 +241,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setProfileHeadline(null);
         setAvatarUrl(null);
         setApplicationCount(0);
+        setSavedJobCount(0);
         setAppliedJobs([]);
+        setSavedJobs([]);
         return;
     }
 
@@ -265,7 +280,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const localAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
     setAppliedJobs(localAppliedJobs);
-    // Do not set application count from total length here.
+    const localSavedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+    setSavedJobs(localSavedJobs);
   }, []);
 
   const setRole = (newRole: Role) => {
@@ -274,7 +290,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return;
     }
     localStorage.setItem('simulatedRole', newRole);
-    // Directly call the update function to reflect the change immediately
     updateAuthAndProfileState(auth.currentUser);
   };
 
@@ -296,6 +311,33 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
   }, [auth, updateAuthAndProfileState]);
 
+  const handleSaveJob = (jobId: string, jobTitle: string) => {
+    const SAVED_JOB_LIMIT = 20;
+    const isAlreadySaved = savedJobs.includes(jobId);
+
+    if (isAlreadySaved) {
+        // Unsave
+        const newSavedJobs = savedJobs.filter(id => id !== jobId);
+        setSavedJobs(newSavedJobs);
+        localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
+        toast({ title: "Đã bỏ lưu việc làm", description: `"${jobTitle}" đã được xóa khỏi danh sách của bạn.` });
+        // We don't decrement the `new` count when unsaving
+    } else {
+        // Save
+        if (savedJobs.length >= SAVED_JOB_LIMIT) {
+             toast({ variant: 'destructive', title: "Đã đạt giới hạn lưu", description: "Bạn chỉ có thể lưu tối đa 20 việc làm. Vui lòng xóa bớt để lưu việc mới." });
+             return false;
+        }
+        const newSavedJobs = [...savedJobs, jobId];
+        setSavedJobs(newSavedJobs);
+        localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
+        setSavedJobCount(prev => prev + 1);
+        setLastAction('save');
+        toast({ title: "Đã lưu việc làm", description: `"${jobTitle}" đã được thêm vào danh sách của bạn.` });
+    }
+    return true;
+  };
+
   const applyForJob = (jobId: string, jobTitle: string) => {
     const APPLICATION_LIMIT = 10;
     
@@ -309,7 +351,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return newAppliedJobs;
     });
 
-    setApplicationCount(prev => prev + 1); // Increment count for badge
+    setApplicationCount(prev => prev + 1);
+    setLastAction('apply');
 
     toast({
         title: 'Ứng tuyển thành công!',
@@ -345,6 +388,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setApplicationCount(0);
   }, []);
 
+  const clearSavedJobCount = useCallback(() => {
+    setSavedJobCount(0);
+  }, []);
+
   const value = {
     role,
     currentUser,
@@ -353,17 +400,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     profileHeadline,
     avatarUrl,
     applicationCount,
+    savedJobCount,
     setApplicationCount,
     clearApplicationCount,
+    clearSavedJobCount,
     appliedJobs,
+    savedJobs,
     applyForJob,
     reapplyForJob,
     cancelApplication,
+    handleSaveJob,
     setRole,
     postLoginAction,
     setPostLoginAction,
     clearPostLoginAction,
     logout,
+    lastAction,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
