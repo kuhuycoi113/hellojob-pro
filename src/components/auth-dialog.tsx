@@ -14,7 +14,7 @@ import { Label } from './ui/label';
 import { useState } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, type Role } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
@@ -27,7 +27,7 @@ interface AuthDialogProps {
 
 export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
   const [authType, setAuthType] = useState<'login' | 'register'>('register');
-  const { postLoginAction } = useAuth();
+  const { setRole, postLoginAction } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const auth = getAuth(app);
@@ -61,6 +61,15 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
   const handleGoogleLogin = () => handleProviderLogin(new GoogleAuthProvider());
   const handleFacebookLogin = () => handleProviderLogin(new FacebookAuthProvider());
 
+  const handleSimulateLogin = (role: Role) => {
+    setRole(role);
+    onOpenChange(false);
+    toast({
+        title: "Chuyển đổi vai trò thành công!",
+        description: `Bạn đang mô phỏng vai trò: ${role}`,
+    });
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] p-0 grid grid-cols-1 md:grid-cols-2 gap-0">
@@ -83,9 +92,9 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
                     <Image src="/img/google.svg" alt="Google" width={20} height={20} className="mr-3 h-5 w-5" />
                     Tiếp tục với Google
                  </Button>
-                 <Button variant="outline" className="w-full justify-start h-12 text-base" disabled>
+                 <Button variant="outline" className="w-full justify-start h-12 text-base">
                     <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-3 h-5 w-5" />
-                    Tiếp tục với Số điện thoại (sắp có)
+                    Tiếp tục với Số điện thoại
                  </Button>
             </div>
 
@@ -102,8 +111,11 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
                     {' '} của chúng tôi.
                 </p>
                 {process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' && (
-                 <div className="flex justify-end mt-2">
-                    {/* Kept for testing if needed, but main login is real */}
+                 <div className="flex flex-wrap justify-end mt-2 gap-2">
+                    <Button size="sm" variant="ghost" onClick={() => handleSimulateLogin('guest')}>Guest</Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleSimulateLogin('candidate-empty-profile')}>Empty</Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleSimulateLogin('candidate')}>Partial</Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleSimulateLogin('candidate-full-profile')}>Full</Button>
                 </div>
                 )}
             </div>
