@@ -257,7 +257,7 @@ const EmptyProfileView = () => {
                         <Button 
                             key={region} 
                             variant="outline"
-                            onClick={() => setSelectedRegion(region)} 
+                            onClick={()={() => setSelectedRegion(region)} }
                             className={cn(
                                 "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary",
                                 selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
@@ -361,7 +361,7 @@ const EmptyProfileView = () => {
 
 
 const LoggedInView = () => {
-    const { role, cancelApplication, setApplicationCount, savedJobs, clearSavedJobCount } = useAuth();
+    const { role, cancelApplication, setApplicationCount, savedJobs: savedJobIds, clearSavedJobCount } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
@@ -383,18 +383,16 @@ const LoggedInView = () => {
     const [chartData, setChartData] = useState([]);
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
-
-
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
     const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
-
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
     const appliedJobsRef = useRef<HTMLDivElement>(null);
-    const { appliedJobs: appliedJobIds } = useAuth();
+    const { appliedJobs: appliedJobIdsFromAuth } = useAuth();
     const [appliedJobsData, setAppliedJobsData] = useState<Job[]>([]);
+    const [savedJobsData, setSavedJobsData] = useState<Job[]>([]);
 
     const MY_JOBS_SECTIONS = {
         SUGGESTED: 'item-1',
@@ -404,7 +402,6 @@ const LoggedInView = () => {
     };
 
     useEffect(() => {
-        // Generate dynamic chart data
         const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
         const dynamicChartData = days.map(day => ({
             name: day,
@@ -459,7 +456,7 @@ const LoggedInView = () => {
             const storedProfile = localStorage.getItem('generatedCandidateProfile');
             if (storedProfile) {
                 const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-                const matchResults = await matchJobsToProfile(profile, 'related', []); // Pass empty signals for profile-based suggestions
+                const matchResults = await matchJobsToProfile(profile, 'related', []);
                 setSuggestedJobs(matchResults.map(r => r.job));
             } else {
                 setSuggestedJobs(jobData.slice(0, 20));
@@ -472,7 +469,6 @@ const LoggedInView = () => {
         }
     }, []);
 
-    // CANHANHOA01: New function to fetch behavior-based suggestions
     const fetchBehavioralSuggestions = useCallback(async () => {
         setIsLoadingBehavioral(true);
         try {
@@ -480,7 +476,6 @@ const LoggedInView = () => {
             if (storedProfile) {
                  const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
                  const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-                 // The flow will now receive signals. If signals are empty, it will fall back to profile-based matching.
                  const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
                  setBehavioralSuggestedJobs(matchResults);
             } else {
@@ -495,8 +490,13 @@ const LoggedInView = () => {
     }, []);
     
     useEffect(() => {
-        setAppliedJobsData(jobData.filter(job => appliedJobIds.includes(job.id)));
-    }, [appliedJobIds]);
+        setAppliedJobsData(jobData.filter(job => appliedJobIdsFromAuth.includes(job.id)));
+    }, [appliedJobIdsFromAuth]);
+    
+    useEffect(() => {
+        setSavedJobsData(jobData.filter(job => savedJobIds.includes(job.id)));
+    }, [savedJobIds]);
+
 
     const handleCancelApplication = useCallback((jobId: string) => {
         cancelApplication(jobId);
@@ -512,13 +512,13 @@ const LoggedInView = () => {
         fetchBehavioralSuggestions();
 
         const handleStorageChange = (event: StorageEvent) => {
-             if (event.key === 'appliedJobs' || event.key === null) { // Listen for changes from other tabs or direct manipulation
+             if (event.key === 'appliedJobs' || event.key === null) {
                 const localAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
                 setAppliedJobsData(jobData.filter(job => localAppliedJobs.includes(job.id)));
             }
              if (event.key === 'savedJobs' || event.key === null) {
                 const localSavedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-                setSavedJobs(jobData.filter(job => localSavedJobs.includes(job.id)));
+                setSavedJobsData(jobData.filter(job => localSavedJobs.includes(job.id)));
             }
             if (event.key === 'behavioralSignals' || event.key === null) {
                  fetchBehavioralSuggestions();
@@ -779,13 +779,13 @@ const LoggedInView = () => {
                         <div className="flex items-center gap-3">
                             <Bookmark className="h-5 w-5 text-red-500" />
                             <span>Việc đã lưu</span>
-                            <Badge>{savedJobs.length}</Badge>
+                            <Badge>{savedJobsData.length}</Badge>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
-                       {savedJobs.length > 0 ? (
+                       {savedJobsData.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                {savedJobsData.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
                             </div>
                         ) : (
                              <div className="text-center py-8 text-muted-foreground">
@@ -851,7 +851,7 @@ const LoggedInView = () => {
                         <h2 className="text-xl font-bold font-headline">Nguyện vọng tìm việc</h2>
                     </div>
                     <div className="grid grid-cols-1 gap-4">
-                        {aspirations.map(asp => (
+                        {aspirations.map((asp) => (
                             <Card key={asp.id} className="shadow-lg">
                                 <CardContent className="p-4 flex items-center justify-between">
                                     <div>
@@ -875,7 +875,7 @@ const LoggedInView = () => {
                 </div>
                  <Card 
                     className="shadow-lg md:col-span-1 cursor-pointer hover:bg-secondary/80 transition-colors"
-                    onClick={() => setIsViewersDialogOpen(true)}
+                    onClick={()={() => setIsViewersDialogOpen(true)} }
                 >
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Nhà tuyển dụng đã xem hồ sơ</CardTitle>
@@ -1170,7 +1170,7 @@ const LoggedOutView = () => {
 
 const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
+    const [isClosing, setIsClosing] = useState(isClosing);
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [transformStyle, setTransformStyle] = useState({});
@@ -1342,3 +1342,5 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
