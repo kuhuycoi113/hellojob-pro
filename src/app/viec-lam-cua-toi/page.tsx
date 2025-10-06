@@ -43,6 +43,9 @@ const aspirations = [
     { id: 2, title: 'Chế biến thực phẩm, Tokyo', salary: '180,000 JPY', type: 'Tokutei' },
 ];
 
+const appliedJobs = jobData.slice(0, 3).map(job => ({ ...job, applicationStatus: 'NTD đã xem', appliedDate: '2024-07-20' }));
+
+
 const viewers = [
   { name: 'A', src: 'https://placehold.co/40x40.png?text=A' },
   { name: 'B', src: 'https://placehold.co/40x40.png?text=B' },
@@ -211,14 +214,13 @@ const EmptyProfileView = () => {
     };
 
     const IndustryStepDialog = () => {
-        const visaSlug = selectedVisa?.slug;
-        if (!visaSlug) return null;
-        const industries = industriesByJobType[visaSlug as keyof typeof industriesByJobType] || [];
+        if (!selectedVisa) return null;
+        const industries = industriesByJobType[selectedVisa.slug as keyof typeof industriesByJobType] || [];
         
         let screenIdComment = '';
-        if (visaSlug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
-        else if (visaSlug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
-        else if (visaSlug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
+        if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
+        else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
+        else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN004-3';
 
         return (
             <>
@@ -1178,7 +1180,7 @@ const LoggedOutView = () => {
 
 const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [isClosing, setIsClosing] = useState(isClosing);
+    const [isClosing, setIsClosing] = useState(false);
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [transformStyle, setTransformStyle] = useState({});
@@ -1350,4 +1352,3 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-
