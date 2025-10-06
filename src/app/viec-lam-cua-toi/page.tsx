@@ -422,35 +422,41 @@ const LoggedInView = () => {
         const highlightParam = searchParams.get('highlight');
         const actionParam = searchParams.get('action');
 
+        let shouldClearParams = false;
+
         if (actionParam === 'cancel_suggestion') {
             setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
             setCancelSuggestionMode(true);
             setApplicationCount(0);
+            shouldClearParams = true;
         } else if (highlightParam === 'applied') {
             setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
             clearApplicationCount();
+            shouldClearParams = true;
         } else if (highlightParam === 'saved') {
             setOpenAccordion(MY_JOBS_SECTIONS.SAVED);
             clearSavedJobCount();
+            shouldClearParams = true;
         } else if (highlightParam === 'suggested') {
             setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
             setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
+            shouldClearParams = true;
             return () => clearTimeout(timer);
         } else {
-             setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
-        }
-        
-        // This effect should only run when the search params change.
-        // We'll remove the router from dependencies and handle URL cleaning separately if needed.
-        const nextUrl = new URL(window.location.href);
-        if (nextUrl.searchParams.has('highlight') || nextUrl.searchParams.has('action')) {
-            nextUrl.searchParams.delete('highlight');
-            nextUrl.searchParams.delete('action');
-            router.replace(nextUrl.toString(), { scroll: false });
+            // Default open state
+            if (openAccordion === undefined) {
+                setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
+            }
         }
 
-    }, [searchParams, router, clearApplicationCount, clearSavedJobCount, setApplicationCount, MY_JOBS_SECTIONS.APPLIED, MY_JOBS_SECTIONS.SAVED, MY_JOBS_SECTIONS.SUGGESTED]);
+        if (shouldClearParams) {
+             const currentUrl = new URL(window.location.href);
+             currentUrl.searchParams.delete('highlight');
+             currentUrl.searchParams.delete('action');
+             router.replace(currentUrl.toString(), { scroll: false });
+        }
+    }, [searchParams, clearApplicationCount, clearSavedJobCount, setApplicationCount, router, openAccordion, MY_JOBS_SECTIONS]);
     
     useEffect(() => {
         if (openAccordion === MY_JOBS_SECTIONS.APPLIED && (searchParams.get('highlight') === 'applied' || searchParams.get('action') === 'cancel_suggestion')) {
@@ -864,7 +870,7 @@ const LoggedInView = () => {
                         <h2 className="text-xl font-bold font-headline">Nguyện vọng tìm việc</h2>
                     </div>
                     <div className="grid grid-cols-1 gap-4">
-                        {aspirations.map((asp) => (
+                        {aspirations.map(asp => (
                             <Card key={asp.id} className="shadow-lg">
                                 <CardContent className="p-4 flex items-center justify-between">
                                     <div>
@@ -1355,3 +1361,5 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
