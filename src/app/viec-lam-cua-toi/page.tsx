@@ -276,7 +276,7 @@ const EmptyProfileView = () => {
     }
 
     const renderDialogContent = () => {
-        switch(profileCreationStep) {
+        switch (profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -338,7 +338,7 @@ const EmptyProfileView = () => {
                                 </Card>
                             </div>
                              <div className="mt-4 text-center">
-                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); setProfileCreationStep(1)}}>Quay lại</Button>
+                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -364,6 +364,7 @@ const EmptyProfileView = () => {
         </>
     )
 };
+
 
 const MY_JOBS_SECTIONS = {
     SUGGESTED: 'item-1',
@@ -399,7 +400,7 @@ const LoggedInView = () => {
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
 
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>(MY_JOBS_SECTIONS.SUGGESTED);
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
     const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
 
@@ -427,6 +428,7 @@ const LoggedInView = () => {
         if (actionParam === 'cancel_suggestion') {
             setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
             setCancelSuggestionMode(true);
+            setApplicationCount(0); // Also clear badge when navigating here for cancellation
         } else if (highlightParam === 'applied') {
             setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
             setApplicationCount(0); // Clear the badge

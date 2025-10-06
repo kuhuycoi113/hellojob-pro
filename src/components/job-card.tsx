@@ -396,7 +396,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                     }
                                      {showApplyButtons && wasJustCancelled && (
                                          <Button size="sm" className="bg-accent-green hover:bg-accent-green/90" onClick={handleReapplyClick}>
-                                             Hoàn tác ứng tuyển
+                                             Hoàn tác lại ứng tuyển
                                          </Button>
                                      )}
                                      {showApplyButtons && !wasJustCancelled && (
@@ -614,7 +614,7 @@ export const JobCard = ({ id, job, showRecruiterName = true, variant = 'grid-ite
                                 <div className="flex items-center gap-2">
                                      {wasJustCancelled ? (
                                          <Button size="sm" className="bg-accent-green hover:bg-accent-green/90" onClick={handleReapplyClick}>
-                                             Hoàn tác lại ứng tuyển
+                                             Hoàn tác ứng tuyển lại
                                          </Button>
                                      ) : (
                                         <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>
