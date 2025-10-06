@@ -1,8 +1,7 @@
 
-
 'use client';
 
-import { use, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -76,24 +75,35 @@ const getJobsByGroupedExpertise = (expertise: string): Job[] | null => {
     return null;
 }
 
-export default function ConsultantDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const resolvedParams = use(params);
-    const consultant = consultantData.find(c => c.id === resolvedParams.id);
+export default function ConsultantDetailPage({ params }: { params: { id: string } }) {
+    const [consultant, setConsultant] = useState<typeof consultantData[0] | null>(null);
+
+    useEffect(() => {
+        const foundConsultant = consultantData.find(c => c.id === params.id);
+        if (foundConsultant) {
+            setConsultant(foundConsultant);
+        } else {
+            // Handle not found case, maybe redirect or show a not found component
+            // For now, we can use Next.js's notFound() but it needs to be handled carefully in client components.
+            // A simple state check is better.
+        }
+    }, [params.id]);
+
 
     if (!consultant) {
-        notFound();
+        // You can return a loading state or a "not found" message here
+        return <div>Loading...</div>; // Or a more sophisticated loading component
     }
     
     // HIENTHIVIEC01 Algorithm
     const getConsultantJobs = (): Job[] => {
         // Helper to safely parse and get date for sorting
         const getSortableDate = (job: Job) => {
-            if (!job.postedTime) return 0;
-            try {
-                return new Date(job.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime();
-            } catch (e) {
-                return 0; // Return a default value if parsing fails
-            }
+            if (!job.postedTimeOffset) return 0;
+            const today = new Date();
+            const postedDate = new Date(today);
+            postedDate.setDate(today.getDate() + job.postedTimeOffset);
+            return postedDate.getTime();
         };
 
         const sortJobsByDate = (jobs: Job[]) => {
