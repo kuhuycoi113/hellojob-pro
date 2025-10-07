@@ -389,16 +389,39 @@ const LoggedInView = () => {
     const [chartData, setChartData] = useState([]);
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
+    const [openAccordion, setOpenAccordion] = useState<string>('item-1');
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
     const [appliedJobs, setAppliedJobsState] = useState<Job[]>([]);
     const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
-    const initialLoad = useRef(true);
+
+    const handleAccordionChange = (value: string[]) => {
+        const newOpenItem = value.find(item => item !== openAccordion);
+        if (newOpenItem) {
+            setOpenAccordion(newOpenItem);
+            // Scroll to the new item
+            setTimeout(() => {
+                const element = document.getElementById(newOpenItem);
+                if (element) {
+                    const headerOffset = 100; // a bit of space from the top
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: "smooth"
+                    });
+                }
+            }, 200); // Delay to allow accordion to open
+        } else {
+            setOpenAccordion('');
+        }
+    };
 
     useEffect(() => {
+        // Generate dynamic chart data
         const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
         const dynamicChartData = days.map(day => ({
             name: day,
@@ -433,19 +456,17 @@ const LoggedInView = () => {
             setIsSuggestionHighlighted(true);
             const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
             shouldClearUrl = true;
+            return () => clearTimeout(timer);
         }
 
         if (shouldClearUrl) {
+            // A safer way to clear URL params without full page reload
             const nextUrl = new URL(window.location.href);
             nextUrl.searchParams.delete('highlight');
             nextUrl.searchParams.delete('action');
             router.replace(nextUrl.toString(), { scroll: false });
-        } else if (initialLoad.current) {
-            setOpenAccordion('item-1');
-            initialLoad.current = false;
         }
-
-    }, [searchParams, clearApplicationCount, clearSavedJobCount, router]);
+    }, [searchParams, router, clearApplicationCount, clearSavedJobCount]);
     
     const fetchAllData = useCallback(async () => {
         if (role === 'candidate-empty-profile') {
@@ -632,7 +653,7 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = visaDetailsByVisaType;
+    const visaDetailsOptions: { [key: string]: string[] } = visaDetailsByVisaType;
     const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
@@ -651,13 +672,12 @@ const LoggedInView = () => {
          {/* Main Content */}
         <div className="w-full mb-8">
             <Accordion 
-                type="single"
-                collapsible
+                type="multiple"
                 className="w-full space-y-4" 
-                value={openAccordion}
-                onValueChange={setOpenAccordion}
+                value={openAccordion ? [openAccordion] : undefined}
+                onValueChange={handleAccordionChange}
             >
-                <AccordionItem value="item-1" className={cn(
+                <AccordionItem value="item-1" id="item-1" className={cn(
                     "border-b-0 transition-all duration-500 ease-in-out",
                     isSuggestionHighlighted ? "ring-2 ring-accent-orange ring-offset-2 shadow-2xl rounded-lg bg-accent-orange/10" : "border rounded-lg"
                 )}>
@@ -728,7 +748,7 @@ const LoggedInView = () => {
                        )}
                     </AccordionContent>
                 </AccordionItem>
-                 <AccordionItem value="item-2" className="border rounded-lg border-b-0">
+                 <AccordionItem value="item-2" id="item-2" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
                             <Briefcase className="h-5 w-5 text-blue-500" />
@@ -742,7 +762,7 @@ const LoggedInView = () => {
                         </div>
                     </AccordionContent>
                 </AccordionItem>
-                 <AccordionItem value="item-3" className="border rounded-lg border-b-0">
+                 <AccordionItem value="item-3" id="item-3" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
                             <Bookmark className="h-5 w-5 text-red-500" />
@@ -771,7 +791,7 @@ const LoggedInView = () => {
                         )}
                     </AccordionContent>
                 </AccordionItem>
-                 <AccordionItem value="item-4" id="behavioral-suggestions" className="border rounded-lg border-b-0">
+                 <AccordionItem value="item-4" id="item-4" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
                             <BrainCircuit className="h-5 w-5 text-purple-500" />
