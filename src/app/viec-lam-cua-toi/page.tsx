@@ -300,7 +300,13 @@ const EmptyProfileView = () => {
                 <div className="mt-6 flex flex-wrap gap-4 justify-center">
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
-                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                           <Button 
+                                className="bg-accent-orange hover:bg-accent-orange/90 text-white"
+                                onClick={() => {
+                                    setProfileCreationStep(2); // Start from step 2 directly
+                                    setIsDialogOpen(true);
+                                }}
+                            >
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
@@ -333,7 +339,7 @@ const EmptyProfileView = () => {
                                 </Card>
                             </div>
                              <div className="mt-4 text-center">
-                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
+                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); setProfileCreationStep(1)}}>Quay lại</Button>
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -372,11 +378,7 @@ const LoggedInView = () => {
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
-    const [visibleSavedJobsCount, setVisibleSavedJobsCount] = useState(8);
-    const [visibleBehavioralJobsCount, setVisibleBehavioralJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [isLoadingMoreSaved, setIsLoadingMoreSaved] = useState(false);
-    const [isLoadingMoreBehavioral, setIsLoadingMoreBehavioral] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations'] & { educationRequirement?: string, languageRequirement?: string, yearsOfExperience?: string, specialConditions?: string[] }>>({});
@@ -389,23 +391,63 @@ const LoggedInView = () => {
     const [chartData, setChartData] = useState([]);
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
+
+
     const [openAccordion, setOpenAccordion] = useState<string>('item-1');
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
+
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
     const [appliedJobs, setAppliedJobsState] = useState<Job[]>([]);
     const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
+    const [visibleSavedJobsCount, setVisibleSavedJobsCount] = useState(8);
+    const [visibleBehavioralJobsCount, setVisibleBehavioralJobsCount] = useState(8);
+    const [isLoadingMoreSaved, setIsLoadingMoreSaved] = useState(false);
+    const [isLoadingMoreBehavioral, setIsLoadingMoreBehavioral] = useState(false);
 
-    const handleAccordionChange = (value: string[]) => {
-        const newOpenItem = value.find(item => item !== openAccordion);
-        if (newOpenItem) {
-            setOpenAccordion(newOpenItem);
-            // Scroll to the new item
+     useEffect(() => {
+        const highlight = searchParams.get('highlight');
+        const action = searchParams.get('action');
+
+        let newOpenAccordion = openAccordion;
+
+        if (action === 'cancel_suggestion') {
+            newOpenAccordion = 'item-2';
+            setCancelSuggestionMode(true);
+            clearApplicationCount();
+        } else if (highlight === 'applied') {
+            newOpenAccordion = 'item-2';
+            clearApplicationCount();
+        } else if (highlight === 'saved') {
+            newOpenAccordion = 'item-3';
+            clearSavedJobCount();
+        } else if (highlight === 'suggested') {
+            newOpenAccordion = 'item-1';
+            setIsSuggestionHighlighted(true);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
+            return () => clearTimeout(timer);
+        }
+
+        setOpenAccordion(newOpenAccordion);
+
+        if (highlight || action) {
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('highlight');
+            nextUrl.searchParams.delete('action');
+            router.replace(nextUrl.toString(), { scroll: false });
+        }
+
+    }, [searchParams, router, clearApplicationCount, clearSavedJobCount, openAccordion]);
+
+
+    useEffect(() => {
+        const newOpenItem = searchParams.get('highlight') || (searchParams.get('action') ? 'item-2' : openAccordion);
+        if (newOpenItem && document.getElementById(newOpenItem)) {
             setTimeout(() => {
                 const element = document.getElementById(newOpenItem);
                 if (element) {
-                    const headerOffset = 100; // a bit of space from the top
+                    const headerOffset = 120; // Accounts for both headers on mobile
                     const elementPosition = element.getBoundingClientRect().top;
                     const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -414,10 +456,14 @@ const LoggedInView = () => {
                         behavior: "smooth"
                     });
                 }
-            }, 200); // Delay to allow accordion to open
-        } else {
-            setOpenAccordion('');
+            }, 300); // Delay to allow accordion to open
         }
+    }, [openAccordion, searchParams]);
+
+
+    const handleAccordionChange = (value: string[]) => {
+        const newOpenItem = value.find(item => item !== openAccordion) || '';
+        setOpenAccordion(newOpenItem);
     };
 
     useEffect(() => {
@@ -431,42 +477,6 @@ const LoggedInView = () => {
         // @ts-ignore
         setChartData(dynamicChartData);
     }, []);
-
-    useEffect(() => {
-        const highlight = searchParams.get('highlight');
-        const action = searchParams.get('action');
-
-        let shouldClearUrl = false;
-        
-        if (action === 'cancel_suggestion') {
-            setOpenAccordion('item-2');
-            setCancelSuggestionMode(true);
-            clearApplicationCount();
-            shouldClearUrl = true;
-        } else if (highlight === 'applied') {
-            setOpenAccordion('item-2');
-            clearApplicationCount();
-            shouldClearUrl = true;
-        } else if (highlight === 'saved') {
-            setOpenAccordion('item-3');
-            clearSavedJobCount();
-            shouldClearUrl = true;
-        } else if (highlight === 'suggested') {
-            setOpenAccordion('item-1');
-            setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
-            shouldClearUrl = true;
-            return () => clearTimeout(timer);
-        }
-
-        if (shouldClearUrl) {
-            // A safer way to clear URL params without full page reload
-            const nextUrl = new URL(window.location.href);
-            nextUrl.searchParams.delete('highlight');
-            nextUrl.searchParams.delete('action');
-            router.replace(nextUrl.toString(), { scroll: false });
-        }
-    }, [searchParams, router, clearApplicationCount, clearSavedJobCount]);
     
     const fetchAllData = useCallback(async () => {
         if (role === 'candidate-empty-profile') {
@@ -674,7 +684,7 @@ const LoggedInView = () => {
             <Accordion 
                 type="multiple"
                 className="w-full space-y-4" 
-                value={openAccordion ? [openAccordion] : undefined}
+                value={openAccordion ? [openAccordion] : []}
                 onValueChange={handleAccordionChange}
             >
                 <AccordionItem value="item-1" id="item-1" className={cn(
@@ -791,6 +801,8 @@ const LoggedInView = () => {
                         )}
                     </AccordionContent>
                 </AccordionItem>
+
+                 {/* CANHANHOA01: New Module */}
                  <AccordionItem value="item-4" id="item-4" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
@@ -1174,7 +1186,7 @@ const LoggedOutView = () => {
 
 const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
+    const [isClosing, setIsClosing] = useState(isClosing);
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [transformStyle, setTransformStyle] = useState({});
