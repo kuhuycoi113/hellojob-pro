@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -361,13 +360,14 @@ const EmptyProfileView = () => {
 };
 
 
-function LoggedInView() {
-    const { role, clearApplicationCount, clearSavedJobCount, appliedJobs, savedJobs } = useAuth();
+const LoggedInView = () => {
+    const { role, clearApplicationCount, clearSavedJobCount } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
     const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]); // CANHANHOA01
+    const [savedJobs, setSavedJobs] = useState<Job[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
@@ -386,13 +386,14 @@ function LoggedInView() {
     const USD_VND_RATE = 26300;
 
 
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
-    const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
 
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
+    const [appliedJobs, setAppliedJobsState] = useState<Job[]>([]);
+    const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
 
     useEffect(() => {
         // Generate dynamic chart data
@@ -405,37 +406,39 @@ function LoggedInView() {
         // @ts-ignore
         setChartData(dynamicChartData);
     }, []);
-
+    
     useEffect(() => {
-        const highlight = searchParams.get('highlight');
-        const action = searchParams.get('action');
+        const handleNavigation = () => {
+            const highlight = searchParams.get('highlight');
+            const action = searchParams.get('action');
 
-        let newOpenState = openAccordion;
+            let newOpenState = 'item-1'; // Default to suggestions
+            
+            if (action === 'cancel_suggestion') {
+                newOpenState = 'item-2';
+                setCancelSuggestionMode(true);
+            } else if (highlight === 'applied') {
+                newOpenState = 'item-2';
+                clearApplicationCount();
+            } else if (highlight === 'saved') {
+                newOpenState = 'item-3';
+                clearSavedJobCount();
+            } else if (highlight === 'suggested') {
+                newOpenState = 'item-1';
+                setIsSuggestionHighlighted(true);
+                setTimeout(() => setIsSuggestionHighlighted(false), 2500);
+            }
+            setOpenAccordion(newOpenState);
 
-        if (action === 'cancel_suggestion') {
-            newOpenState = 'item-2';
-            setCancelSuggestionMode(true);
-        } else if (highlight === 'applied') {
-            newOpenState = 'item-2';
-            clearApplicationCount();
-        } else if (highlight === 'saved') {
-            newOpenState = 'item-3';
-            clearSavedJobCount();
-        } else if (highlight === 'suggested') {
-            newOpenState = 'item-1';
-            setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
-            return () => clearTimeout(timer);
-        }
-        
-        setOpenAccordion(newOpenState);
+            if(highlight || action) {
+                 const nextUrl = new URL(window.location.href);
+                nextUrl.searchParams.delete('highlight');
+                nextUrl.searchParams.delete('action');
+                router.replace(nextUrl.toString(), { scroll: false });
+            }
+        };
 
-        if(highlight || action) {
-             const nextUrl = new URL(window.location.href);
-            nextUrl.searchParams.delete('highlight');
-            nextUrl.searchParams.delete('action');
-            router.replace(nextUrl.toString(), { scroll: false });
-        }
+        handleNavigation();
     }, [searchParams, router, clearApplicationCount, clearSavedJobCount]);
 
 
@@ -467,6 +470,17 @@ function LoggedInView() {
             setIsLoadingBehavioral(false);
         }
     }, []);
+    
+    const fetchSavedAndAppliedJobs = useCallback(() => {
+        const savedJobIds = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+        const savedJobsData = jobData.filter(job => savedJobIds.includes(job.id));
+        setSavedJobs(savedJobsData);
+
+        const appliedJobIds = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+        const appliedJobsData = jobData.filter(job => appliedJobIds.includes(job.id));
+        setAppliedJobsState(appliedJobsData);
+    }, []);
+
 
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
@@ -475,16 +489,22 @@ function LoggedInView() {
             return;
         }
         fetchJobs();
+        fetchSavedAndAppliedJobs();
 
-        const handleStorageChange = () => {
+        const handleStorageChange = (event: StorageEvent) => {
             if (role !== 'candidate-empty-profile') {
-                fetchJobs();
+                if (event.key === 'behavioralSignals' || event.key === 'generatedCandidateProfile' || event.key === null) {
+                    fetchJobs();
+                }
+                 if (event.key === 'savedJobs' || event.key === 'appliedJobs' || event.key === null) {
+                    fetchSavedAndAppliedJobs();
+                }
             }
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
         
-    }, [role, fetchJobs, forceUpdate]);
+    }, [role, fetchJobs, fetchSavedAndAppliedJobs, forceUpdate]);
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
@@ -710,7 +730,7 @@ function LoggedInView() {
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {appliedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showCancelApplication={true} cancelSuggestionMode={cancelSuggestionMode} onCancelApplication={() => {}} /> ))}
+                           {appliedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showCancelApplication={true} cancelSuggestionMode={cancelSuggestionMode} onCancelApplication={() => {}} /> ))}
                         </div>
                     </AccordionContent>
                 </AccordionItem>
@@ -734,6 +754,8 @@ function LoggedInView() {
                         )}
                     </AccordionContent>
                 </AccordionItem>
+
+                 {/* CANHANHOA01: New Module */}
                  <AccordionItem value="item-4" id="behavioral-suggestions" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
@@ -783,6 +805,7 @@ function LoggedInView() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             <JobStatsChart data={chartData} />
             <div className="lg:col-span-1">
+                {/* Aspirations Section */}
                 <div className="mb-8">
                      <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-bold font-headline">Nguyện vọng tìm việc</h2>
@@ -1107,7 +1130,7 @@ const LoggedOutView = () => {
 
 const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
+    const [isClosing, setIsClosing] = useState(isClosing);
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [transformStyle, setTransformStyle] = useState({});
@@ -1245,7 +1268,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 
 function MyJobsDashboardPageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile' || role === 'candidate-empty-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
