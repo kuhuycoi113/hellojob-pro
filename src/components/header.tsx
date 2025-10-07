@@ -72,6 +72,7 @@ export const Logo = ({ className }: { className?: string }) => (
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl, applicationCount, savedJobCount, lastAction } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
@@ -375,15 +376,13 @@ const LoggedOutContent = () => {
                                <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">{createProfileButtonText}</Button>
                             </CreateProfileDialog>
 
-                             <Button asChild className="relative">
-                                <Link href={myJobsLink}>
-                                    Việc của tôi
-                                    {totalNotificationCount > 0 && (
-                                        <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
-                                            {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
-                                        </Badge>
-                                    )}
-                                </Link>
+                             <Button className="relative" onClick={() => router.push(myJobsLink)}>
+                                Việc của tôi
+                                {totalNotificationCount > 0 && (
+                                    <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
+                                        {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
+                                    </Badge>
+                                )}
                             </Button>
                            
                             <MainMenu />
@@ -403,15 +402,13 @@ const LoggedOutContent = () => {
                            </Button>
                         </CreateProfileDialog>
 
-                         <Button asChild variant="default" size="sm" className="relative">
-                            <Link href={myJobsLink}>
-                                Việc
-                                {totalNotificationCount > 0 && (
-                                    <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
-                                        {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
-                                    </Badge>
-                                )}
-                            </Link>
+                         <Button variant="default" size="sm" className="relative" onClick={() => router.push(myJobsLink)}>
+                            Việc
+                            {totalNotificationCount > 0 && (
+                                <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
+                                    {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
+                                </Badge>
+                            )}
                         </Button>
                         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                             <SheetTrigger asChild>
