@@ -95,6 +95,11 @@ const ShareExperienceCard = () => (
 
 export default function ArticleClient({ article }: { article: HandbookArticle }) {
   const [activeId, setActiveId] = React.useState('');
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   React.useEffect(() => {
     if (!article || article.type !== 'article' || !article.content) return;
@@ -242,7 +247,7 @@ export default function ArticleClient({ article }: { article: HandbookArticle })
                       </Button>
                     </CardContent>
                  </Card>
-                 <ShareExperienceCard />
+                 {isClient && <ShareExperienceCard />}
               </div>
             </aside>
           )}
