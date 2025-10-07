@@ -66,6 +66,32 @@ const ShareDialogContent = () => (
     </>
 );
 
+const ShareExperienceCard = () => (
+    <Card className="mt-8">
+      <CardHeader>
+        <CardTitle className="text-base font-bold flex items-center">
+            <PlusCircle className="mr-2 h-4 w-4"/>
+            Chia sẻ kinh nghiệm
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4 text-center">
+        <p className="text-sm text-muted-foreground">
+          Đóng góp bài viết, video cho cộng đồng HelloJob.
+        </p>
+         <Dialog>
+            <DialogTrigger asChild>
+                <Button size="sm" className="w-full">
+                    Chia sẻ ngay
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-3xl">
+               <ShareDialogContent />
+            </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
+);
+
 
 export default function ArticleClient({ article }: { article: HandbookArticle }) {
   const [activeId, setActiveId] = React.useState('');
@@ -216,6 +242,7 @@ export default function ArticleClient({ article }: { article: HandbookArticle })
                       </Button>
                     </CardContent>
                  </Card>
+                 <ShareExperienceCard />
               </div>
             </aside>
           )}
