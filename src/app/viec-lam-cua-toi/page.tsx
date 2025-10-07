@@ -372,7 +372,11 @@ const LoggedInView = () => {
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
+    const [visibleSavedJobsCount, setVisibleSavedJobsCount] = useState(8);
+    const [visibleBehavioralJobsCount, setVisibleBehavioralJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [isLoadingMoreSaved, setIsLoadingMoreSaved] = useState(false);
+    const [isLoadingMoreBehavioral, setIsLoadingMoreBehavioral] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations'] & { educationRequirement?: string, languageRequirement?: string, yearsOfExperience?: string, specialConditions?: string[] }>>({});
@@ -385,11 +389,8 @@ const LoggedInView = () => {
     const [chartData, setChartData] = useState([]);
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
-
-
     const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
-
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
@@ -397,9 +398,7 @@ const LoggedInView = () => {
     const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
     const initialLoad = useRef(true);
 
-
     useEffect(() => {
-        // Generate dynamic chart data
         const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
         const dynamicChartData = days.map(day => ({
             name: day,
@@ -409,6 +408,44 @@ const LoggedInView = () => {
         // @ts-ignore
         setChartData(dynamicChartData);
     }, []);
+
+    useEffect(() => {
+        const highlight = searchParams.get('highlight');
+        const action = searchParams.get('action');
+
+        let shouldClearUrl = false;
+        
+        if (action === 'cancel_suggestion') {
+            setOpenAccordion('item-2');
+            setCancelSuggestionMode(true);
+            clearApplicationCount();
+            shouldClearUrl = true;
+        } else if (highlight === 'applied') {
+            setOpenAccordion('item-2');
+            clearApplicationCount();
+            shouldClearUrl = true;
+        } else if (highlight === 'saved') {
+            setOpenAccordion('item-3');
+            clearSavedJobCount();
+            shouldClearUrl = true;
+        } else if (highlight === 'suggested') {
+            setOpenAccordion('item-1');
+            setIsSuggestionHighlighted(true);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+            shouldClearUrl = true;
+        }
+
+        if (shouldClearUrl) {
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('highlight');
+            nextUrl.searchParams.delete('action');
+            router.replace(nextUrl.toString(), { scroll: false });
+        } else if (initialLoad.current) {
+            setOpenAccordion('item-1');
+            initialLoad.current = false;
+        }
+
+    }, [searchParams, clearApplicationCount, clearSavedJobCount, router]);
     
     const fetchAllData = useCallback(async () => {
         if (role === 'candidate-empty-profile') {
@@ -449,45 +486,6 @@ const LoggedInView = () => {
     }, [role]);
 
     useEffect(() => {
-        const highlight = searchParams.get('highlight');
-        const action = searchParams.get('action');
-
-        let shouldClearUrl = false;
-
-        if (action === 'cancel_suggestion') {
-            setOpenAccordion('item-2');
-            setCancelSuggestionMode(true);
-            clearApplicationCount();
-            shouldClearUrl = true;
-        } else if (highlight === 'applied') {
-            setOpenAccordion('item-2');
-            clearApplicationCount();
-            shouldClearUrl = true;
-        } else if (highlight === 'saved') {
-            setOpenAccordion('item-3');
-            clearSavedJobCount();
-            shouldClearUrl = true;
-        } else if (highlight === 'suggested') {
-            setOpenAccordion('item-1');
-            setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
-            shouldClearUrl = true;
-             // No clearTimeout needed here as it's a one-off effect
-        }
-        
-        if (shouldClearUrl) {
-            const nextUrl = new URL(window.location.href);
-            nextUrl.searchParams.delete('highlight');
-            nextUrl.searchParams.delete('action');
-            router.replace(nextUrl.toString(), { scroll: false });
-        } else if (!openAccordion) {
-            // Default to opening the first accordion if no params are set
-            setOpenAccordion('item-1');
-        }
-
-    }, [searchParams, clearApplicationCount, clearSavedJobCount, router, openAccordion]);
-    
-    useEffect(() => {
         fetchAllData();
         const handleStorageChange = (event: StorageEvent) => {
              if (event.key === 'behavioralSignals' || event.key === 'generatedCandidateProfile' || event.key === 'savedJobs' || event.key === 'appliedJobs' || event.key === null) {
@@ -499,13 +497,27 @@ const LoggedInView = () => {
         
     }, [role, forceUpdate, fetchAllData]);
 
-
-
     const handleLoadMore = () => {
         setIsLoadingMore(true);
         setTimeout(() => {
             setVisibleJobsCount(prev => prev + 8);
             setIsLoadingMore(false);
+        }, 500); // Simulate network delay
+    };
+    
+    const handleLoadMoreSavedJobs = () => {
+        setIsLoadingMoreSaved(true);
+        setTimeout(() => {
+            setVisibleSavedJobsCount(prev => prev + 8);
+            setIsLoadingMoreSaved(false);
+        }, 500);
+    };
+
+    const handleLoadMoreBehavioralJobs = () => {
+        setIsLoadingMoreBehavioral(true);
+        setTimeout(() => {
+            setVisibleBehavioralJobsCount(prev => prev + 8);
+            setIsLoadingMoreBehavioral(false);
         }, 500);
     };
 
@@ -520,7 +532,7 @@ const LoggedInView = () => {
         if (storedPrinciple === 'salary' || storedPrinciple === 'fee' || storedPrinciple === 'company') {
             setSuggestionPrinciple(storedPrinciple);
         } else {
-            setSuggestionPrinciple(null);
+            setSuggestionPrinciple(null); // Set to null if nothing is stored
         }
          const storedType = localStorage.getItem('suggestionType');
         if(storedType === 'accurate' || storedType === 'related') {
@@ -620,8 +632,8 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: { name: { vi: string }, slug: string }[] } = visaDetailsByVisaType;
-    const visaTypes = Object.keys(visaDetailsByVisaType);
+    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = visaDetailsByVisaType;
+    const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
@@ -636,6 +648,7 @@ const LoggedInView = () => {
             <h1 className="text-3xl font-bold font-headline">Trang quản lý việc làm</h1>
             <p className="text-muted-foreground mt-1">Quản lý toàn bộ hành trình tìm việc của bạn tại một nơi duy nhất.</p>
         </div>
+         {/* Main Content */}
         <div className="w-full mb-8">
             <Accordion 
                 type="single"
@@ -739,9 +752,18 @@ const LoggedInView = () => {
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
                        {savedJobs.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
-                            </div>
+                            <>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {savedJobs.slice(0, visibleSavedJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                </div>
+                                {visibleSavedJobsCount < savedJobs.length && (
+                                    <div className="text-center mt-8">
+                                        <Button onClick={handleLoadMoreSavedJobs} disabled={isLoadingMoreSaved}>
+                                            {isLoadingMoreSaved ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Xem thêm'}
+                                        </Button>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                              <div className="text-center py-8 text-muted-foreground">
                                 <p>Bạn chưa lưu công việc nào.</p>
@@ -749,8 +771,6 @@ const LoggedInView = () => {
                         )}
                     </AccordionContent>
                 </AccordionItem>
-
-                 {/* CANHANHOA01: New Module */}
                  <AccordionItem value="item-4" id="behavioral-suggestions" className="border rounded-lg border-b-0">
                     <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                         <div className="flex items-center gap-3">
@@ -767,11 +787,20 @@ const LoggedInView = () => {
                                 ))}
                             </div>
                        ) : behavioralSuggestedJobs.length > 0 ? (
-                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {behavioralSuggestedJobs.map((item) => (
-                                    <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
-                                ))}
-                            </div>
+                            <>
+                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {behavioralSuggestedJobs.slice(0, visibleBehavioralJobsCount).map((item) => (
+                                        <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
+                                    ))}
+                                </div>
+                                {visibleBehavioralJobsCount < behavioralSuggestedJobs.length && (
+                                    <div className="text-center mt-8">
+                                        <Button onClick={handleLoadMoreBehavioralJobs} disabled={isLoadingMoreBehavioral}>
+                                            {isLoadingMoreBehavioral ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Xem thêm'}
+                                        </Button>
+                                    </div>
+                                )}
+                           </>
                        ) : (
                            <div className="text-center py-8 text-muted-foreground">
                              <p>Hãy xem và lưu một vài công việc để chúng tôi có thể gợi ý tốt hơn cho bạn!</p>
@@ -1297,3 +1326,5 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
+    
