@@ -35,7 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
-import { japanJobTypes, visaDetailsByVisaType, VisaDetail } from '@/lib/visa-data';
+import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 
 
 const aspirations = [
@@ -407,41 +407,6 @@ const LoggedInView = () => {
         setChartData(dynamicChartData);
     }, []);
     
-    useEffect(() => {
-        const handleNavigation = () => {
-            const highlight = searchParams.get('highlight');
-            const action = searchParams.get('action');
-
-            let newOpenState = 'item-1'; // Default to suggestions
-            
-            if (action === 'cancel_suggestion') {
-                newOpenState = 'item-2';
-                setCancelSuggestionMode(true);
-            } else if (highlight === 'applied') {
-                newOpenState = 'item-2';
-                clearApplicationCount();
-            } else if (highlight === 'saved') {
-                newOpenState = 'item-3';
-                clearSavedJobCount();
-            } else if (highlight === 'suggested') {
-                newOpenState = 'item-1';
-                setIsSuggestionHighlighted(true);
-                setTimeout(() => setIsSuggestionHighlighted(false), 2500);
-            }
-            setOpenAccordion(newOpenState);
-
-            if(highlight || action) {
-                 const nextUrl = new URL(window.location.href);
-                nextUrl.searchParams.delete('highlight');
-                nextUrl.searchParams.delete('action');
-                router.replace(nextUrl.toString(), { scroll: false });
-            }
-        };
-
-        handleNavigation();
-    }, [searchParams, router, clearApplicationCount, clearSavedJobCount]);
-
-
     const fetchJobs = useCallback(async () => {
         setIsLoadingSuggestions(true);
         setIsLoadingBehavioral(true);
@@ -481,15 +446,45 @@ const LoggedInView = () => {
         setAppliedJobsState(appliedJobsData);
     }, []);
 
-
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
             setIsLoadingSuggestions(false);
             setIsLoadingBehavioral(false);
             return;
         }
+        
         fetchJobs();
         fetchSavedAndAppliedJobs();
+
+        // Handle navigation based on URL params
+        const highlight = searchParams.get('highlight');
+        const action = searchParams.get('action');
+
+        let newOpenState = 'item-1'; // Default to suggestions
+        
+        if (action === 'cancel_suggestion') {
+            newOpenState = 'item-2';
+            setCancelSuggestionMode(true);
+        } else if (highlight === 'applied') {
+            newOpenState = 'item-2';
+            clearApplicationCount();
+        } else if (highlight === 'saved') {
+            newOpenState = 'item-3';
+            clearSavedJobCount();
+        } else if (highlight === 'suggested') {
+            newOpenState = 'item-1';
+            setIsSuggestionHighlighted(true);
+            setTimeout(() => setIsSuggestionHighlighted(false), 2500);
+        }
+        setOpenAccordion(newOpenState);
+
+        if(highlight || action) {
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('highlight');
+            nextUrl.searchParams.delete('action');
+            router.replace(nextUrl.toString(), { scroll: false });
+        }
+
 
         const handleStorageChange = (event: StorageEvent) => {
             if (role !== 'candidate-empty-profile') {
@@ -504,7 +499,7 @@ const LoggedInView = () => {
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
         
-    }, [role, fetchJobs, fetchSavedAndAppliedJobs, forceUpdate]);
+    }, [role, fetchJobs, fetchSavedAndAppliedJobs, forceUpdate, searchParams, router, clearApplicationCount, clearSavedJobCount]);
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
@@ -891,7 +886,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsByVisaType[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.name.vi}>{vd.name.vi}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.name.vi}>{vd.name.vi}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -1130,9 +1125,10 @@ const LoggedOutView = () => {
 
 const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [isClosing, setIsClosing] = useState(isClosing);
+    const [isClosing, setIsClosing] = useState(false);
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
+		// Initialize transformStyle with an empty object to avoid errors.
     const [transformStyle, setTransformStyle] = useState({});
     const cardRef = useRef<HTMLDivElement>(null);
   
@@ -1266,11 +1262,13 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 };
 
 
-function MyJobsDashboardPageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+function MyJobsDashboardPageContent() {
     const { role } = useAuth();
     const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
+		// Add a default value `false` for `isClosing` for cases where it's not yet initialized.
+    const [isClosing, setIsClosing] = useState(false);
 
     const handleHighlight = () => {
         setIsHighlighting(true);
@@ -1289,15 +1287,18 @@ function MyJobsDashboardPageContent({ searchParams }: { searchParams: { [key: st
                 <LoggedOutView />
             )}
         </div>
-        {isLoggedIn && role !== 'candidate-empty-profile' && showFloatingSelector && <FloatingPrioritySelector onHighlight={handleHighlight} />}
+        {role === 'candidate' && showFloatingSelector && <FloatingPrioritySelector onHighlight={handleHighlight} />}
       </div>
     );
 }
 
+
 export default function MyJobsDashboardPage() {
     return (
         <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="h-16 w-16 animate-spin"/></div>}>
-            <MyJobsDashboardPageContent searchParams={useSearchParams() as any}/>
+            <MyJobsDashboardPageContent />
         </Suspense>
     )
 }
+
+    
