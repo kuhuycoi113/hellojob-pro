@@ -387,7 +387,7 @@ const LoggedInView = () => {
     const USD_VND_RATE = 26300;
 
 
-    const [openAccordion, setOpenAccordion] = useState<string>('item-1');
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
 
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
@@ -405,6 +405,27 @@ const LoggedInView = () => {
         setOpenAccordion(newOpenItem);
     };
 
+    useEffect(() => {
+        if (!openAccordion) return;
+
+        // Use a more reliable way to scroll after animations
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const element = document.getElementById(openAccordion);
+                if (element) {
+                    const headerOffset = 120; // Estimated height for sticky headers
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    }, [openAccordion]);
+    
     useEffect(() => {
         const highlight = searchParams.get('highlight');
         const action = searchParams.get('action');
@@ -438,28 +459,6 @@ const LoggedInView = () => {
         }
 
     }, [searchParams, router, clearApplicationCount, clearSavedJobCount, openAccordion]);
-
-
-    useEffect(() => {
-        if (!openAccordion) return;
-
-        // Use a more reliable way to scroll after animations
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                const element = document.getElementById(openAccordion);
-                if (element) {
-                    const headerOffset = 120; // Estimated height for sticky headers
-                    const elementPosition = element.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                    window.scrollTo({
-                        top: offsetPosition,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-    }, [openAccordion]);
 
 
     useEffect(() => {
@@ -1320,7 +1319,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
@@ -1354,4 +1353,3 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-
