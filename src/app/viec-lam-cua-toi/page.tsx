@@ -43,6 +43,9 @@ const aspirations = [
     { id: 2, title: 'Chế biến thực phẩm, Tokyo', salary: '180,000 JPY', type: 'Tokutei' },
 ];
 
+const appliedJobs = jobData.slice(0, 3).map(job => ({ ...job, applicationStatus: 'NTD đã xem', appliedDate: '2024-07-20' }));
+
+
 const viewers = [
   { name: 'A', src: 'https://placehold.co/40x40.png?text=A' },
   { name: 'B', src: 'https://placehold.co/40x40.png?text=B' },
@@ -362,7 +365,7 @@ const EmptyProfileView = () => {
 
 
 const LoggedInView = () => {
-    const { role, clearApplicationCount, clearSavedJobCount } = useAuth();
+    const { role } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
@@ -435,13 +438,10 @@ const LoggedInView = () => {
         if (action === 'cancel_suggestion') {
             newOpenAccordion = 'item-2';
             setCancelSuggestionMode(true);
-            clearApplicationCount();
         } else if (highlight === 'applied') {
             newOpenAccordion = 'item-2';
-            clearApplicationCount();
         } else if (highlight === 'saved') {
             newOpenAccordion = 'item-3';
-            clearSavedJobCount();
         } else if (highlight === 'suggested') {
             newOpenAccordion = 'item-1';
             setIsSuggestionHighlighted(true);
@@ -458,7 +458,7 @@ const LoggedInView = () => {
             router.replace(nextUrl.toString(), { scroll: false });
         }
 
-    }, [searchParams, router, clearApplicationCount, clearSavedJobCount, openAccordion]);
+    }, [searchParams, router, openAccordion]);
 
 
     useEffect(() => {
@@ -722,7 +722,7 @@ const LoggedInView = () => {
                        ) : suggestedJobs.length > 0 ? (
                             <>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                    {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showCancelApplication={true}/> ))}
                                 </div>
                                 {visibleJobsCount < suggestedJobs.length && (
                                     <div className="text-center mt-8">
@@ -779,7 +779,7 @@ const LoggedInView = () => {
                        {savedJobs.length > 0 ? (
                             <>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {savedJobs.slice(0, visibleSavedJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                    {savedJobs.slice(0, visibleSavedJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showCancelApplication={true}/> ))}
                                 </div>
                                 {visibleSavedJobsCount < savedJobs.length && (
                                     <div className="text-center mt-8">
@@ -817,7 +817,7 @@ const LoggedInView = () => {
                             <>
                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     {behavioralSuggestedJobs.slice(0, visibleBehavioralJobsCount).map((item) => (
-                                        <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
+                                        <JobCard key={item.job.id} job={item.job} showRecruiterName={false} showCancelApplication={true} />
                                     ))}
                                 </div>
                                 {visibleBehavioralJobsCount < behavioralSuggestedJobs.length && (
@@ -1319,7 +1319,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
