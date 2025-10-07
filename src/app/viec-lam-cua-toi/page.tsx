@@ -35,7 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
-import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { japanJobTypes, visaDetailsByVisaType, VisaDetail } from '@/lib/visa-data';
 
 
 const aspirations = [
@@ -359,8 +359,7 @@ const EmptyProfileView = () => {
     )
 };
 
-
-const LoggedInView = () => {
+function LoggedInView() {
     const { role, cancelApplication, clearApplicationCount, clearSavedJobCount } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -387,13 +386,56 @@ const LoggedInView = () => {
     const USD_VND_RATE = 26300;
 
 
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>('item-1');
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
     const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
 
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
+
+    useEffect(() => {
+        // Generate dynamic chart data
+        const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+        const dynamicChartData = days.map(day => ({
+            name: day,
+            'Việc làm phù hợp với bạn': Math.floor(Math.random() * 15) + 1,
+            'Người có nhu cầu tìm việc giống bạn': Math.floor(Math.random() * 10) + 1
+        }));
+        // @ts-ignore
+        setChartData(dynamicChartData);
+    }, []);
+
+    useEffect(() => {
+        const highlight = searchParams.get('highlight');
+        const action = searchParams.get('action');
+
+        if (action === 'cancel_suggestion') {
+            setOpenAccordion('item-2');
+            setCancelSuggestionMode(true);
+        } else if (highlight === 'applied') {
+            setOpenAccordion('item-2');
+            clearApplicationCount();
+        } else if (highlight === 'saved') {
+            setOpenAccordion('item-3');
+            clearSavedJobCount();
+        } else {
+             setOpenAccordion('item-1');
+        }
+
+        if (highlight) {
+            setIsSuggestionHighlighted(true);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('highlight');
+            nextUrl.searchParams.delete('action');
+            router.replace(nextUrl.toString(), { scroll: false });
+            
+            return () => clearTimeout(timer);
+        }
+    }, [searchParams, router, clearApplicationCount, clearSavedJobCount]);
+
 
     const fetchJobs = useCallback(async () => {
         setIsLoadingSuggestions(true);
@@ -417,7 +459,6 @@ const LoggedInView = () => {
                 setSuggestedJobs(profileSuggestions.map(r => r.job));
                 setBehavioralSuggestedJobs(behavioralSuggestions);
             } else {
-                // Fallback for logged-in users without a profile (should not happen with role guard)
                 setSuggestedJobs(jobData.slice(0, 20));
                 setBehavioralSuggestedJobs([]);
             }
@@ -432,39 +473,12 @@ const LoggedInView = () => {
     }, []);
 
     useEffect(() => {
-        const highlight = searchParams.get('highlight');
-        const action = searchParams.get('action');
-
-        if (action === 'cancel_suggestion') {
-            setOpenAccordion('item-2');
-            setCancelSuggestionMode(true);
-        } else if (highlight === 'applied') {
-            setOpenAccordion('item-2');
-            clearApplicationCount();
-        } else if (highlight === 'saved') {
-            setOpenAccordion('item-3');
-            clearSavedJobCount();
-        } else {
-            setOpenAccordion('item-1');
-        }
-
-        if (highlight) {
-            setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
-            const nextUrl = new URL(window.location.href);
-            nextUrl.searchParams.delete('highlight');
-            nextUrl.searchParams.delete('action');
-            router.replace(nextUrl.toString(), { scroll: false });
-            return () => clearTimeout(timer);
-        }
-
-        // Initial data fetch
-        if (role !== 'candidate-empty-profile') {
-            fetchJobs();
-        } else {
+        if (role === 'candidate-empty-profile') {
             setIsLoadingSuggestions(false);
             setIsLoadingBehavioral(false);
+            return;
         }
+        fetchJobs();
 
         const handleStorageChange = () => {
             if (role !== 'candidate-empty-profile') {
@@ -472,16 +486,16 @@ const LoggedInView = () => {
             }
         };
         window.addEventListener('storage', handleStorageChange);
-
         return () => window.removeEventListener('storage', handleStorageChange);
-    }, [role, searchParams, router, fetchJobs, clearApplicationCount, clearSavedJobCount]);
+        
+    }, [role, fetchJobs, forceUpdate]);
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
         setTimeout(() => {
             setVisibleJobsCount(prev => prev + 8);
             setIsLoadingMore(false);
-        }, 500);
+        }, 500); // Simulate network delay
     };
 
     const openEditAspirationsDialog = () => {
@@ -595,7 +609,7 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: { name: { vi: string } }[] } = visaDetailsByVisaType;
+    const visaDetailsOptions: { [key: string]: VisaDetail[] } = visaDetailsByVisaType;
     const visaTypes = Object.keys(visaDetailsByVisaType);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
@@ -607,468 +621,468 @@ const LoggedInView = () => {
 
     return (
         <>
-        <div className="text-center md:text-left mb-8">
-            <h1 className="text-3xl font-bold font-headline">Trang quản lý việc làm</h1>
-            <p className="text-muted-foreground mt-1">Quản lý toàn bộ hành trình tìm việc của bạn tại một nơi duy nhất.</p>
-        </div>
-         {/* Main Content */}
-        <div className="w-full mb-8">
-            <Accordion 
-                type="single"
-                collapsible
-                className="w-full space-y-4" 
-                value={openAccordion}
-                onValueChange={setOpenAccordion}
-            >
-                <AccordionItem value="item-1" className={cn(
-                    "border-b-0 transition-all duration-500 ease-in-out",
-                    isSuggestionHighlighted ? "ring-2 ring-accent-orange ring-offset-2 shadow-2xl rounded-lg bg-accent-orange/10" : "border rounded-lg"
-                )}>
-                    <div className="flex items-center bg-background px-6 rounded-t-lg hover:no-underline">
-                        <AccordionTrigger className="flex-grow py-4 font-semibold text-base">
-                            <div className="flex items-center gap-3">
-                                <Star className="h-5 w-5 text-yellow-500" />
-                                <span>Gợi ý cho bạn</span>
-                                <Badge>{isLoadingSuggestions ? '...' : suggestedJobs.length}</Badge>
-                            </div>
-                        </AccordionTrigger>
-                         <Button
-                            id="highlight-target-button"
-                            variant="default"
-                            size="sm"
-                            className="ml-auto flex-shrink-0"
-                            onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}
-                        >
-                            <span className="hidden sm:inline">Sửa gợi ý</span>
-                            <Pencil className="h-4 w-4 sm:ml-2"/>
-                        </Button>
-                    </div>
-                    <AccordionContent className="bg-background p-6 rounded-b-lg">
-                       {isLoadingSuggestions ? (
-                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {Array.from({ length: 4 }).map((_, i) => (
-                                    <Card key={i}>
-                                        <CardContent className="p-4 space-y-3">
-                                            <Skeleton className="h-28 w-full" />
-                                            <Skeleton className="h-4 w-3/4" />
-                                            <Skeleton className="h-4 w-1/2" />
-                                            <Skeleton className="h-4 w-full" />
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                       ) : suggestedJobs.length > 0 ? (
-                            <>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
-                                </div>
-                                {visibleJobsCount < suggestedJobs.length && (
-                                    <div className="text-center mt-8">
-                                        <Button onClick={handleLoadMore} disabled={isLoadingMore}>
-                                            {isLoadingMore ? (
-                                                <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    Đang tải...
-                                                </>
-                                            ) : (
-                                                'Xem thêm'
-                                            )}
-                                        </Button>
-                                    </div>
-                                )}
-                            </>
-                       ) : (
-                           <div className="text-center py-8 text-muted-foreground">
-                             <p>Không tìm thấy công việc nào phù hợp với hồ sơ của bạn.</p>
-                             <p className="text-sm mt-2">
-                                Hãy thử cập nhật{' '}
-                                <button onClick={openEditAspirationsDialog} className="text-primary underline">
-                                    hồ sơ và nguyện vọng
-                                </button>{' '}
-                                của bạn.
-                             </p>
-                           </div>
-                       )}
-                    </AccordionContent>
-                </AccordionItem>
-                 <AccordionItem value="item-2" className="border rounded-lg border-b-0">
-                    <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
-                        <div className="flex items-center gap-3">
-                            <Briefcase className="h-5 w-5 text-blue-500" />
-                            <span>Việc đã ứng tuyển</span>
-                            <Badge>{appliedJobsData.length}</Badge>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="bg-background p-6 rounded-b-lg">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {appliedJobsData.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showCancelApplication={true} cancelSuggestionMode={cancelSuggestionMode} onCancelApplication={cancelApplication} /> ))}
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
-                 <AccordionItem value="item-3" className="border rounded-lg border-b-0">
-                    <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
-                        <div className="flex items-center gap-3">
-                            <Bookmark className="h-5 w-5 text-red-500" />
-                            <span>Việc đã lưu</span>
-                            <Badge>{savedJobs.length}</Badge>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="bg-background p-6 rounded-b-lg">
-                       {savedJobs.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
-                            </div>
-                        ) : (
-                             <div className="text-center py-8 text-muted-foreground">
-                                <p>Bạn chưa lưu công việc nào.</p>
-                             </div>
-                        )}
-                    </AccordionContent>
-                </AccordionItem>
-
-                 {/* CANHANHOA01: New Module */}
-                 <AccordionItem value="item-4" id="behavioral-suggestions" className="border rounded-lg border-b-0">
-                    <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
-                        <div className="flex items-center gap-3">
-                            <BrainCircuit className="h-5 w-5 text-purple-500" />
-                            <span>Có thể bạn quan tâm</span>
-                            <Badge variant="secondary">{isLoadingBehavioral ? '...' : behavioralSuggestedJobs.length}</Badge>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="bg-background p-6 rounded-b-lg">
-                       {isLoadingBehavioral ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {Array.from({ length: 4 }).map((_, i) => (
-                                    <Card key={i}><CardContent className="p-4 space-y-3"><Skeleton className="h-28 w-full" /><Skeleton className="h-4 w-3/4" /><Skeleton className="h-4 w-1/2" /></CardContent></Card>
-                                ))}
-                            </div>
-                       ) : behavioralSuggestedJobs.length > 0 ? (
-                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {behavioralSuggestedJobs.map((item) => (
-                                    <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
-                                ))}
-                            </div>
-                       ) : (
-                           <div className="text-center py-8 text-muted-foreground">
-                             <p>Hãy xem và lưu một vài công việc để chúng tôi có thể gợi ý tốt hơn cho bạn!</p>
-                             <Button asChild variant="link" className="mt-2"><Link href="/viec-lam">Bắt đầu tìm kiếm</Link></Button>
-                           </div>
-                       )}
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
-        </div>
-        
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <StatCard title="Việc làm phù hợp/tuần" value="12" change="+5.2%" />
-            <StatCard title="Việc làm phù hợp/tháng" value="48" change="+8.1%" />
-            <StatCard title="Việc làm cùng ngành nghề" value="315" />
-            <StatCard title="Lượt xem hồ sơ" value={viewers.length} change="+12" />
-        </div>
-        
-        {/* Progress Tracker */}
-        <div className="mb-8">
-            <h2 className="text-xl font-bold font-headline mb-4">Tiến độ của bạn</h2>
-            <ProgressTracker />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <JobStatsChart data={chartData} />
-            <div className="lg:col-span-1">
-                {/* Aspirations Section */}
-                <div className="mb-8">
-                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold font-headline">Nguyện vọng tìm việc</h2>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4">
-                        {aspirations.map(asp => (
-                            <Card key={asp.id} className="shadow-lg">
-                                <CardContent className="p-4 flex items-center justify-between">
-                                    <div>
-                                        <Badge className="mb-1">{asp.type}</Badge>
-                                        <p className="font-bold">{asp.title}</p>
-                                        <p className="text-sm text-green-600 font-semibold">{asp.salary}</p>
-                                    </div>
-                                    <Button variant="ghost" size="icon">
-                                        <Edit className="h-4 w-4"/>
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        ))}
-                         <Card className="shadow-lg border-dashed flex items-center justify-center hover:border-primary hover:text-primary transition-colors cursor-pointer min-h-[100px]">
-                            <CardContent className="p-4 text-center">
-                               <PlusCircle className="mx-auto h-6 w-6 text-muted-foreground mb-1"/>
-                               <p className="font-semibold text-sm">Thêm nguyện vọng</p>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-                 <Card 
-                    className="shadow-lg md:col-span-1 cursor-pointer hover:bg-secondary/80 transition-colors"
-                    onClick={() => setIsViewersDialogOpen(true)}
-                >
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Nhà tuyển dụng đã xem hồ sơ</CardTitle>
-                        <Eye className="h-5 w-5 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{viewers.length}</div>
-                        <div className="flex items-center mt-2">
-                            <div className="flex -space-x-2 overflow-hidden">
-                                {viewers.slice(0, 5).map((viewer, index) => (
-                                    <Avatar key={index} className="inline-block h-6 w-6 border-2 border-background">
-                                        <AvatarImage src={viewer.src} />
-                                        <AvatarFallback>{viewer.name}</AvatarFallback>
-                                    </Avatar>
-                                ))}
-                            </div>
-                            {viewers.length > 5 && (
-                               <span className="text-xs font-semibold text-muted-foreground ml-3">+{viewers.length - 5}</span>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+            <div className="text-center md:text-left mb-8">
+                <h1 className="text-3xl font-bold font-headline">Trang quản lý việc làm</h1>
+                <p className="text-muted-foreground mt-1">Quản lý toàn bộ hành trình tìm việc của bạn tại một nơi duy nhất.</p>
             </div>
-        </div>
-        <ProfileViewersDialog isOpen={isViewersDialogOpen} onClose={() => setIsViewersDialogOpen(false)} />
-        <Dialog open={isAspirationsDialogOpen} onOpenChange={setIsAspirationsDialogOpen}>
-            <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle>Sửa điều kiện gợi ý</DialogTitle>
-                    <DialogDescription>
-                        Thay đổi các nguyện vọng để nhận được gợi ý việc làm phù hợp hơn.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
-                    <div className="space-y-2">
-                        <Label htmlFor="visa-type-modal">Loại visa mong muốn</Label>
-                        <Select
-                            value={tempAspirations.desiredVisaType || ''}
-                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }))}
-                        >
-                            <SelectTrigger id="visa-type-modal"><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
-                            <SelectContent>
-                                {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="visa-detail-modal">Chi tiết visa</Label>
-                        <Select
-                            value={tempAspirations.desiredVisaDetail || ''}
-                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaDetail: value }))}
-                            disabled={!tempAspirations.desiredVisaType}
-                        >
-                            <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
-                            <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="industry-modal">Ngành nghề mong muốn</Label>
-                        <Select
-                            value={tempDesiredIndustry}
-                            onValueChange={value => setTempDesiredIndustry(value)}
-                            disabled={!tempAspirations.desiredVisaType}
-                        >
-                             <SelectTrigger id="industry-modal">
-                                <SelectValue placeholder="Chọn ngành nghề" >
-                                    {tempDesiredIndustry || "Chọn ngành nghề"}
-                                </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="location-modal">Địa điểm mong muốn</Label>
-                        <Select
-                            value={tempAspirations.desiredLocation || ''}
-                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredLocation: value }))}
-                        >
-                            <SelectTrigger id="location-modal"><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
-                            <SelectContent className="max-h-[300px]">
-                                <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                                {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
-                                    <SelectGroup key={region}>
-                                        <SelectLabel>{region}</SelectLabel>
-                                        <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
-                                        {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                                    </SelectGroup>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="space-y-2 pt-2">
-                        <Label className="font-semibold">Nguyên tắc gợi ý</Label>
-                        <div className="grid grid-cols-2 gap-2">
-                             <Button 
-                                variant={suggestionType === 'accurate' ? 'default' : 'outline'}
-                                onClick={() => setSuggestionType('accurate')}
-                                className="justify-center text-left h-auto py-2"
-                            >
-                                Chính xác 100%
-                            </Button>
-                             <Button 
-                                variant={suggestionType === 'related' ? 'default' : 'outline'}
-                                onClick={() => setSuggestionType('related')}
-                                className="justify-center text-left h-auto py-2"
-                            >
-                               Thêm cả việc liên quan
-                            </Button>
-                        </div>
-                    </div>
-                    
-                    <div className="space-y-2 pt-2">
-                        <Label className="font-semibold">Ưu tiên tìm việc</Label>
-                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+             {/* Main Content */}
+            <div className="w-full mb-8">
+                <Accordion 
+                    type="single"
+                    collapsible
+                    className="w-full space-y-4" 
+                    value={openAccordion}
+                    onValueChange={setOpenAccordion}
+                >
+                    <AccordionItem value="item-1" className={cn(
+                        "border-b-0 transition-all duration-500 ease-in-out",
+                        isSuggestionHighlighted ? "ring-2 ring-accent-orange ring-offset-2 shadow-2xl rounded-lg bg-accent-orange/10" : "border rounded-lg"
+                    )}>
+                        <div className="flex items-center bg-background px-6 rounded-t-lg hover:no-underline">
+                            <AccordionTrigger className="flex-grow py-4 font-semibold text-base">
+                                <div className="flex items-center gap-3">
+                                    <Star className="h-5 w-5 text-yellow-500" />
+                                    <span>Gợi ý cho bạn</span>
+                                    <Badge>{isLoadingSuggestions ? '...' : suggestedJobs.length}</Badge>
+                                </div>
+                            </AccordionTrigger>
                              <Button
-                                variant="outline"
-                                onClick={() => {
-                                    setSuggestionPrinciple('salary');
-                                }}
-                                className={cn(
-                                    "justify-start text-left h-auto py-2",
-                                    suggestionPrinciple === 'salary' && "ring-2 ring-primary border-primary bg-primary/10"
-                                )}
+                                id="highlight-target-button"
+                                variant="default"
+                                size="sm"
+                                className="ml-auto flex-shrink-0"
+                                onClick={(e) => { e.stopPropagation(); openEditAspirationsDialog(); }}
                             >
-                                <div>
-                                    <p className="font-semibold">Lương tốt</p>
-                                    <p className="text-xs opacity-80 font-normal">Ưu tiên việc có lương cao</p>
-                                </div>
-                            </Button>
-                            <Button 
-                                variant="outline"
-                                onClick={() => {
-                                    setSuggestionPrinciple('fee');
-                                    openFeeDialog();
-                                }}
-                                 className={cn(
-                                    "justify-start text-left h-auto py-2",
-                                    suggestionPrinciple === 'fee' && "ring-2 ring-primary border-primary bg-primary/10"
-                                )}
-                            >
-                                 <div>
-                                    <p className="font-semibold">{feeButtonText}</p>
-                                    <p className="text-xs opacity-80 font-normal">Ưu tiên phí thấp / uy tín</p>
-                                </div>
-                            </Button>
-                            <Button 
-                                variant="outline"
-                                onClick={() => setSuggestionPrinciple('company')}
-                                className={cn(
-                                    "justify-start text-left h-auto py-2",
-                                    suggestionPrinciple === 'company' && "ring-2 ring-primary border-primary bg-primary/10"
-                                )}
-                            >
-                                 <div>
-                                    <p className="font-semibold">{companyButtonText}</p>
-                                    <p className="text-xs opacity-80 font-normal">Ưu tiên công ty uy tín</p>
-                                </div>
+                                <span className="hidden sm:inline">Sửa gợi ý</span>
+                                <Pencil className="h-4 w-4 sm:ml-2"/>
                             </Button>
                         </div>
-                    </div>
-                    <Collapsible>
-                        <CollapsibleTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start text-left font-semibold">
-                                <ChevronDown className="mr-2 h-4 w-4" />
-                                Thêm điều kiện mở rộng
-                            </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="pt-4 space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label>Học vấn</Label>
-                                    <Select value={tempAspirations.educationRequirement} onValueChange={value => setTempAspirations(prev => ({...prev, educationRequirement: value}))}>
-                                        <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
-                                        <SelectContent>
-                                            {educationLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Trình độ tiếng Nhật</Label>
-                                    <Select value={tempAspirations.languageRequirement} onValueChange={value => setTempAspirations(prev => ({...prev, languageRequirement: value}))}>
-                                        <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
-                                        <SelectContent>
-                                            {languageLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <Label>Số năm kinh nghiệm</Label>
-                                    <Select value={tempAspirations.yearsOfExperience} onValueChange={value => setTempAspirations(prev => ({...prev, yearsOfExperience: value}))}>
-                                        <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
-                                        <SelectContent>
-                                            {experienceYears.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                            <div className="space-y-2 pt-2">
-                                <Label>Các điều kiện khác</Label>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2">
-                                     {allSpecialConditions.map(item => (
-                                        <div key={item} className="flex items-center space-x-2">
-                                            <Checkbox
-                                                id={`cond-modal-${item}`}
-                                                checked={tempAspirations.specialConditions?.includes(item)}
-                                                onCheckedChange={checked => {
-                                                    const current = tempAspirations.specialConditions || [];
-                                                    const newConditions = checked
-                                                        ? [...current, item]
-                                                        : current.filter(c => c !== item);
-                                                    setTempAspirations(prev => ({...prev, specialConditions: newConditions}));
-                                                }}
-                                            />
-                                            <Label htmlFor={`cond-modal-${item}`} className="text-sm font-normal cursor-pointer">{item}</Label>
-                                        </div>
+                        <AccordionContent className="bg-background p-6 rounded-b-lg">
+                           {isLoadingSuggestions ? (
+                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {Array.from({ length: 4 }).map((_, i) => (
+                                        <Card key={i}>
+                                            <CardContent className="p-4 space-y-3">
+                                                <Skeleton className="h-28 w-full" />
+                                                <Skeleton className="h-4 w-3/4" />
+                                                <Skeleton className="h-4 w-1/2" />
+                                                <Skeleton className="h-4 w-full" />
+                                            </CardContent>
+                                        </Card>
                                     ))}
                                 </div>
+                           ) : suggestedJobs.length > 0 ? (
+                                <>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                        {suggestedJobs.slice(0, visibleJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                    </div>
+                                    {visibleJobsCount < suggestedJobs.length && (
+                                        <div className="text-center mt-8">
+                                            <Button onClick={handleLoadMore} disabled={isLoadingMore}>
+                                                {isLoadingMore ? (
+                                                    <>
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                        Đang tải...
+                                                    </>
+                                                ) : (
+                                                    'Xem thêm'
+                                                )}
+                                            </Button>
+                                        </div>
+                                    )}
+                                </>
+                           ) : (
+                               <div className="text-center py-8 text-muted-foreground">
+                                 <p>Không tìm thấy công việc nào phù hợp với hồ sơ của bạn.</p>
+                                 <p className="text-sm mt-2">
+                                    Hãy thử cập nhật{' '}
+                                    <button onClick={openEditAspirationsDialog} className="text-primary underline">
+                                        hồ sơ và nguyện vọng
+                                    </button>{' '}
+                                    của bạn.
+                                 </p>
+                               </div>
+                           )}
+                        </AccordionContent>
+                    </AccordionItem>
+                     <AccordionItem value="item-2" className="border rounded-lg border-b-0">
+                        <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
+                            <div className="flex items-center gap-3">
+                                <Briefcase className="h-5 w-5 text-blue-500" />
+                                <span>Việc đã ứng tuyển</span>
+                                <Badge>{appliedJobsData.length}</Badge>
                             </div>
-                        </CollapsibleContent>
-                    </Collapsible>
-                </div>
-                <DialogFooter className="flex-row justify-end space-x-2">
-                    <DialogClose asChild>
-                        <Button variant="outline">Hủy</Button>
-                    </DialogClose>
-                    <Button onClick={handleSaveAspirations}>Lưu và tìm lại</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-        <Dialog open={isFeeDialogOpen} onOpenChange={setIsFeeDialogOpen}>
-            <DialogContent className="sm:max-w-md">
-                {/* MPMM01 */}
-                <DialogHeader>
-                    <DialogTitle>Mức phí mong muốn</DialogTitle>
-                    <DialogDescription>Nhập mức phí tối đa bạn sẵn sàng chi trả (USD).</DialogDescription>
-                </DialogHeader>
-                <div className="pt-4 space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="fee-usd">Phí tối đa (USD)</Label>
-                        <Input 
-                            id="fee-usd" 
-                            type="text" 
-                            placeholder={getFeePlaceholder()}
-                            value={getFeeDisplayValue(tempFee)}
-                            onChange={handleFeeInputChange}
-                        />
-                         <p className="text-xs text-muted-foreground">{getConvertedFeeValue(tempFee)}</p>
+                        </AccordionTrigger>
+                        <AccordionContent className="bg-background p-6 rounded-b-lg">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {appliedJobsData.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} showCancelApplication={true} cancelSuggestionMode={cancelSuggestionMode} onCancelApplication={() => {}} /> ))}
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                     <AccordionItem value="item-3" className="border rounded-lg border-b-0">
+                        <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
+                            <div className="flex items-center gap-3">
+                                <Bookmark className="h-5 w-5 text-red-500" />
+                                <span>Việc đã lưu</span>
+                                <Badge>{savedJobs.length}</Badge>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="bg-background p-6 rounded-b-lg">
+                           {savedJobs.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                </div>
+                            ) : (
+                                 <div className="text-center py-8 text-muted-foreground">
+                                    <p>Bạn chưa lưu công việc nào.</p>
+                                 </div>
+                            )}
+                        </AccordionContent>
+                    </AccordionItem>
+    
+                     {/* CANHANHOA01: New Module */}
+                     <AccordionItem value="item-4" id="behavioral-suggestions" className="border rounded-lg border-b-0">
+                        <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
+                            <div className="flex items-center gap-3">
+                                <BrainCircuit className="h-5 w-5 text-purple-500" />
+                                <span>Có thể bạn quan tâm</span>
+                                <Badge variant="secondary">{isLoadingBehavioral ? '...' : behavioralSuggestedJobs.length}</Badge>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="bg-background p-6 rounded-b-lg">
+                           {isLoadingBehavioral ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {Array.from({ length: 4 }).map((_, i) => (
+                                        <Card key={i}><CardContent className="p-4 space-y-3"><Skeleton className="h-28 w-full" /><Skeleton className="h-4 w-3/4" /><Skeleton className="h-4 w-1/2" /></CardContent></Card>
+                                    ))}
+                                </div>
+                           ) : behavioralSuggestedJobs.length > 0 ? (
+                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {behavioralSuggestedJobs.map((item) => (
+                                        <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
+                                    ))}
+                                </div>
+                           ) : (
+                               <div className="text-center py-8 text-muted-foreground">
+                                 <p>Hãy xem và lưu một vài công việc để chúng tôi có thể gợi ý tốt hơn cho bạn!</p>
+                                 <Button asChild variant="link" className="mt-2"><Link href="/viec-lam">Bắt đầu tìm kiếm</Link></Button>
+                               </div>
+                           )}
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+            </div>
+            
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <StatCard title="Việc làm phù hợp/tuần" value="12" change="+5.2%" />
+                <StatCard title="Việc làm phù hợp/tháng" value="48" change="+8.1%" />
+                <StatCard title="Việc làm cùng ngành nghề" value="315" />
+                <StatCard title="Lượt xem hồ sơ" value={viewers.length} change="+12" />
+            </div>
+            
+            {/* Progress Tracker */}
+            <div className="mb-8">
+                <h2 className="text-xl font-bold font-headline mb-4">Tiến độ của bạn</h2>
+                <ProgressTracker />
+            </div>
+    
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <JobStatsChart data={chartData} />
+                <div className="lg:col-span-1">
+                    {/* Aspirations Section */}
+                    <div className="mb-8">
+                         <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold font-headline">Nguyện vọng tìm việc</h2>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4">
+                            {aspirations.map(asp => (
+                                <Card key={asp.id} className="shadow-lg">
+                                    <CardContent className="p-4 flex items-center justify-between">
+                                        <div>
+                                            <Badge className="mb-1">{asp.type}</Badge>
+                                            <p className="font-bold">{asp.title}</p>
+                                            <p className="text-sm text-green-600 font-semibold">{asp.salary}</p>
+                                        </div>
+                                        <Button variant="ghost" size="icon">
+                                            <Edit className="h-4 w-4"/>
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                             <Card className="shadow-lg border-dashed flex items-center justify-center hover:border-primary hover:text-primary transition-colors cursor-pointer min-h-[100px]">
+                                <CardContent className="p-4 text-center">
+                                   <PlusCircle className="mx-auto h-6 w-6 text-muted-foreground mb-1"/>
+                                   <p className="font-semibold text-sm">Thêm nguyện vọng</p>
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
+                     <Card 
+                        className="shadow-lg md:col-span-1 cursor-pointer hover:bg-secondary/80 transition-colors"
+                        onClick={() => setIsViewersDialogOpen(true)}
+                    >
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Nhà tuyển dụng đã xem hồ sơ</CardTitle>
+                            <Eye className="h-5 w-5 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{viewers.length}</div>
+                            <div className="flex items-center mt-2">
+                                <div className="flex -space-x-2 overflow-hidden">
+                                    {viewers.slice(0, 5).map((viewer, index) => (
+                                        <Avatar key={index} className="inline-block h-6 w-6 border-2 border-background">
+                                            <AvatarImage src={viewer.src} />
+                                            <AvatarFallback>{viewer.name}</AvatarFallback>
+                                        </Avatar>
+                                    ))}
+                                </div>
+                                {viewers.length > 5 && (
+                                   <span className="text-xs font-semibold text-muted-foreground ml-3">+{viewers.length - 5}</span>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
-                <DialogFooter className="pt-4">
-                    <Button variant="outline" onClick={() => setIsFeeDialogOpen(false)}>Hủy</Button>
-                    <Button onClick={handleSaveFee}>Lưu thay đổi</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    </>
-    )
+            </div>
+            <ProfileViewersDialog isOpen={isViewersDialogOpen} onClose={() => setIsViewersDialogOpen(false)} />
+            <Dialog open={isAspirationsDialogOpen} onOpenChange={setIsAspirationsDialogOpen}>
+                <DialogContent className="sm:max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle>Sửa điều kiện gợi ý</DialogTitle>
+                        <DialogDescription>
+                            Thay đổi các nguyện vọng để nhận được gợi ý việc làm phù hợp hơn.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="visa-type-modal">Loại visa mong muốn</Label>
+                            <Select
+                                value={tempAspirations.desiredVisaType || ''}
+                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }))}
+                            >
+                                <SelectTrigger id="visa-type-modal"><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
+                                <SelectContent>
+                                    {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="visa-detail-modal">Chi tiết visa</Label>
+                            <Select
+                                value={tempAspirations.desiredVisaDetail || ''}
+                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaDetail: value }))}
+                                disabled={!tempAspirations.desiredVisaType}
+                            >
+                                <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
+                                <SelectContent>
+                                    {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.slug}>{vd.name.vi}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="industry-modal">Ngành nghề mong muốn</Label>
+                            <Select
+                                value={tempDesiredIndustry}
+                                onValueChange={value => setTempDesiredIndustry(value)}
+                                disabled={!tempAspirations.desiredVisaType}
+                            >
+                                 <SelectTrigger id="industry-modal">
+                                    <SelectValue placeholder="Chọn ngành nghề" >
+                                        {tempDesiredIndustry || "Chọn ngành nghề"}
+                                    </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="location-modal">Địa điểm mong muốn</Label>
+                            <Select
+                                value={tempAspirations.desiredLocation || ''}
+                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredLocation: value }))}
+                            >
+                                <SelectTrigger id="location-modal"><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
+                                <SelectContent className="max-h-[300px]">
+                                    <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                                    {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
+                                        <SelectGroup key={region}>
+                                            <SelectLabel>{region}</SelectLabel>
+                                            <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                            {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                        </SelectGroup>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+    
+                        <div className="space-y-2 pt-2">
+                            <Label className="font-semibold">Nguyên tắc gợi ý</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                                 <Button 
+                                    variant={suggestionType === 'accurate' ? 'default' : 'outline'}
+                                    onClick={() => setSuggestionType('accurate')}
+                                    className="justify-center text-left h-auto py-2"
+                                >
+                                    Chính xác 100%
+                                </Button>
+                                 <Button 
+                                    variant={suggestionType === 'related' ? 'default' : 'outline'}
+                                    onClick={() => setSuggestionType('related')}
+                                    className="justify-center text-left h-auto py-2"
+                                >
+                                   Thêm cả việc liên quan
+                                </Button>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-2 pt-2">
+                            <Label className="font-semibold">Ưu tiên tìm việc</Label>
+                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                 <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setSuggestionPrinciple('salary');
+                                    }}
+                                    className={cn(
+                                        "justify-start text-left h-auto py-2",
+                                        suggestionPrinciple === 'salary' && "ring-2 ring-primary border-primary bg-primary/10"
+                                    )}
+                                >
+                                    <div>
+                                        <p className="font-semibold">Lương tốt</p>
+                                        <p className="text-xs opacity-80 font-normal">Ưu tiên việc có lương cao</p>
+                                    </div>
+                                </Button>
+                                <Button 
+                                    variant="outline"
+                                    onClick={() => {
+                                        setSuggestionPrinciple('fee');
+                                        openFeeDialog();
+                                    }}
+                                     className={cn(
+                                        "justify-start text-left h-auto py-2",
+                                        suggestionPrinciple === 'fee' && "ring-2 ring-primary border-primary bg-primary/10"
+                                    )}
+                                >
+                                     <div>
+                                        <p className="font-semibold">{feeButtonText}</p>
+                                        <p className="text-xs opacity-80 font-normal">Ưu tiên phí thấp / uy tín</p>
+                                    </div>
+                                </Button>
+                                <Button 
+                                    variant="outline"
+                                    onClick={() => setSuggestionPrinciple('company')}
+                                    className={cn(
+                                        "justify-start text-left h-auto py-2",
+                                        suggestionPrinciple === 'company' && "ring-2 ring-primary border-primary bg-primary/10"
+                                    )}
+                                >
+                                     <div>
+                                        <p className="font-semibold">{companyButtonText}</p>
+                                        <p className="text-xs opacity-80 font-normal">Ưu tiên công ty uy tín</p>
+                                    </div>
+                                </Button>
+                            </div>
+                        </div>
+                        <Collapsible>
+                            <CollapsibleTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-semibold">
+                                    <ChevronDown className="mr-2 h-4 w-4" />
+                                    Thêm điều kiện mở rộng
+                                </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="pt-4 space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label>Học vấn</Label>
+                                        <Select value={tempAspirations.educationRequirement} onValueChange={value => setTempAspirations(prev => ({...prev, educationRequirement: value}))}>
+                                            <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
+                                            <SelectContent>
+                                                {educationLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Trình độ tiếng Nhật</Label>
+                                        <Select value={tempAspirations.languageRequirement} onValueChange={value => setTempAspirations(prev => ({...prev, languageRequirement: value}))}>
+                                            <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
+                                            <SelectContent>
+                                                {languageLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label>Số năm kinh nghiệm</Label>
+                                        <Select value={tempAspirations.yearsOfExperience} onValueChange={value => setTempAspirations(prev => ({...prev, yearsOfExperience: value}))}>
+                                            <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
+                                            <SelectContent>
+                                                {experienceYears.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+                                <div className="space-y-2 pt-2">
+                                    <Label>Các điều kiện khác</Label>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2">
+                                         {allSpecialConditions.map(item => (
+                                            <div key={item} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`cond-modal-${item}`}
+                                                    checked={tempAspirations.specialConditions?.includes(item)}
+                                                    onCheckedChange={checked => {
+                                                        const current = tempAspirations.specialConditions || [];
+                                                        const newConditions = checked
+                                                            ? [...current, item]
+                                                            : current.filter(c => c !== item);
+                                                        setTempAspirations(prev => ({...prev, specialConditions: newConditions}));
+                                                    }}
+                                                />
+                                                <Label htmlFor={`cond-modal-${item}`} className="text-sm font-normal cursor-pointer">{item}</Label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </CollapsibleContent>
+                        </Collapsible>
+                    </div>
+                    <DialogFooter className="flex-row justify-end space-x-2">
+                        <DialogClose asChild>
+                            <Button variant="outline">Hủy</Button>
+                        </DialogClose>
+                        <Button onClick={handleSaveAspirations}>Lưu và tìm lại</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={isFeeDialogOpen} onOpenChange={setIsFeeDialogOpen}>
+                <DialogContent className="sm:max-w-md">
+                    {/* MPMM01 */}
+                    <DialogHeader>
+                        <DialogTitle>Mức phí mong muốn</DialogTitle>
+                        <DialogDescription>Nhập mức phí tối đa bạn sẵn sàng chi trả (USD).</DialogDescription>
+                    </DialogHeader>
+                    <div className="pt-4 space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="fee-usd">Phí tối đa (USD)</Label>
+                            <Input 
+                                id="fee-usd" 
+                                type="text" 
+                                placeholder={getFeePlaceholder()}
+                                value={getFeeDisplayValue(tempFee)}
+                                onChange={handleFeeInputChange}
+                            />
+                             <p className="text-xs text-muted-foreground">{getConvertedFeeValue(tempFee)}</p>
+                        </div>
+                    </div>
+                    <DialogFooter className="pt-4">
+                        <Button variant="outline" onClick={() => setIsFeeDialogOpen(false)}>Hủy</Button>
+                        <Button onClick={handleSaveFee}>Lưu thay đổi</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
 }
 
 const LoggedOutView = () => {
@@ -1165,7 +1179,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
             const cardRect = cardElement.getBoundingClientRect();
             
             const translateX = targetRect.left - cardRect.left + (targetRect.width / 2) - (cardRect.width / 2);
-            const translateY = targetRect.top - targetRect.top + (targetRect.height / 2) - (cardRect.height / 2);
+            const translateY = targetRect.top - cardRect.top + (targetRect.height / 2) - (cardRect.height / 2);
 
             setTransformStyle({
                 transform: `translate(${translateX}px, ${translateY}px) scale(0.1)`,
@@ -1237,9 +1251,9 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 };
 
 
-function MyJobsDashboardPageContent() {
+function MyJobsDashboardPageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile' || role === 'candidate-empty-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
@@ -1265,11 +1279,11 @@ function MyJobsDashboardPageContent() {
     );
 }
 
+
 export default function MyJobsDashboardPage() {
     return (
         <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="h-16 w-16 animate-spin"/></div>}>
-            <MyJobsDashboardPageContent />
+            <MyJobsDashboardPageContent searchParams={useSearchParams() as any}/>
         </Suspense>
     )
 }
-
