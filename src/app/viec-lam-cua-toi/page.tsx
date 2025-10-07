@@ -410,48 +410,85 @@ const LoggedInView = () => {
         setChartData(dynamicChartData);
     }, []);
     
-    useEffect(() => {
+    const fetchAllData = useCallback(async () => {
         if (role === 'candidate-empty-profile') {
             setIsLoadingSuggestions(false);
             setIsLoadingBehavioral(false);
             return;
         }
 
-        const fetchAllData = async () => {
-            setIsLoadingSuggestions(true);
-            setIsLoadingBehavioral(true);
-            try {
-                const storedProfile = localStorage.getItem('generatedCandidateProfile');
-                const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-                
-                const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
-                
-                const [profileSuggestions, behavioralSuggestions] = await Promise.all([
-                    matchJobsToProfile(profile || {}, 'related', []),
-                    matchJobsToProfile(profile, 'related', behavioralSignals)
-                ]);
+        setIsLoadingSuggestions(true);
+        setIsLoadingBehavioral(true);
+        try {
+            const storedProfile = localStorage.getItem('generatedCandidateProfile');
+            const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+            const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
+            
+            const [profileSuggestions, behavioralSuggestions] = await Promise.all([
+                matchJobsToProfile(profile || {}, 'related', []),
+                matchJobsToProfile(profile || {}, 'related', behavioralSignals)
+            ]);
 
-                setSuggestedJobs(profileSuggestions.map(r => r.job));
-                setBehavioralSuggestedJobs(behavioralSuggestions);
-                
-                const savedJobIds = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-                setSavedJobs(jobData.filter(job => savedJobIds.includes(job.id)));
+            setSuggestedJobs(profileSuggestions.map(r => r.job));
+            setBehavioralSuggestedJobs(behavioralSuggestions);
+            
+            const savedJobIds = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            setSavedJobs(jobData.filter(job => savedJobIds.includes(job.id)));
 
-                const appliedJobIds = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-                setAppliedJobsState(jobData.filter(job => appliedJobIds.includes(job.id)));
+            const appliedJobIds = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+            setAppliedJobsState(jobData.filter(job => appliedJobIds.includes(job.id)));
 
-            } catch (error) {
-                console.error("Failed to fetch job data:", error);
-                setSuggestedJobs(jobData.slice(0, 20));
-                setBehavioralSuggestedJobs([]);
-            } finally {
-                setIsLoadingSuggestions(false);
-                setIsLoadingBehavioral(false);
-            }
-        };
+        } catch (error) {
+            console.error("Failed to fetch job data:", error);
+            setSuggestedJobs(jobData.slice(0, 20));
+            setBehavioralSuggestedJobs([]);
+        } finally {
+            setIsLoadingSuggestions(false);
+            setIsLoadingBehavioral(false);
+        }
+    }, [role]);
 
+    useEffect(() => {
+        const highlight = searchParams.get('highlight');
+        const action = searchParams.get('action');
+
+        let shouldClearUrl = false;
+
+        if (action === 'cancel_suggestion') {
+            setOpenAccordion('item-2');
+            setCancelSuggestionMode(true);
+            clearApplicationCount();
+            shouldClearUrl = true;
+        } else if (highlight === 'applied') {
+            setOpenAccordion('item-2');
+            clearApplicationCount();
+            shouldClearUrl = true;
+        } else if (highlight === 'saved') {
+            setOpenAccordion('item-3');
+            clearSavedJobCount();
+            shouldClearUrl = true;
+        } else if (highlight === 'suggested') {
+            setOpenAccordion('item-1');
+            setIsSuggestionHighlighted(true);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+            shouldClearUrl = true;
+             // No clearTimeout needed here as it's a one-off effect
+        }
+        
+        if (shouldClearUrl) {
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('highlight');
+            nextUrl.searchParams.delete('action');
+            router.replace(nextUrl.toString(), { scroll: false });
+        } else if (!openAccordion) {
+            // Default to opening the first accordion if no params are set
+            setOpenAccordion('item-1');
+        }
+
+    }, [searchParams, clearApplicationCount, clearSavedJobCount, router, openAccordion]);
+    
+    useEffect(() => {
         fetchAllData();
-
         const handleStorageChange = (event: StorageEvent) => {
              if (event.key === 'behavioralSignals' || event.key === 'generatedCandidateProfile' || event.key === 'savedJobs' || event.key === 'appliedJobs' || event.key === null) {
                 fetchAllData();
@@ -460,45 +497,7 @@ const LoggedInView = () => {
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
         
-    }, [role, forceUpdate]);
-
-
-    useEffect(() => {
-        const highlight = searchParams.get('highlight');
-        const action = searchParams.get('action');
-
-        if (initialLoad.current) {
-            let shouldClearUrl = false;
-            if (action === 'cancel_suggestion') {
-                setOpenAccordion('item-2');
-                setCancelSuggestionMode(true);
-                clearApplicationCount();
-                shouldClearUrl = true;
-            } else if (highlight === 'applied') {
-                setOpenAccordion('item-2');
-                clearApplicationCount();
-                shouldClearUrl = true;
-            } else if (highlight === 'saved') {
-                setOpenAccordion('item-3');
-                clearSavedJobCount();
-                shouldClearUrl = true;
-            } else if (highlight === 'suggested') {
-                setOpenAccordion('item-1');
-                setIsSuggestionHighlighted(true);
-                const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
-                shouldClearUrl = true;
-                 // No clearTimeout needed here as it's a one-off effect
-            }
-            
-            if (shouldClearUrl) {
-                const nextUrl = new URL(window.location.href);
-                nextUrl.searchParams.delete('highlight');
-                nextUrl.searchParams.delete('action');
-                router.replace(nextUrl.toString(), { scroll: false });
-            }
-            initialLoad.current = false;
-        }
-    }, [searchParams, clearApplicationCount, clearSavedJobCount, router]);
+    }, [role, forceUpdate, fetchAllData]);
 
 
 
@@ -1264,7 +1263,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
@@ -1298,5 +1297,3 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-
-    
