@@ -275,9 +275,8 @@ const EmptyProfileView = () => {
         )
     }
 
-
     const renderDialogContent = () => {
-        switch(profileCreationStep) {
+        switch (profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -362,19 +361,17 @@ const EmptyProfileView = () => {
 
 
 const LoggedInView = () => {
-    const { role, cancelApplication, setApplicationCount, savedJobCount, clearApplicationCount, clearSavedJobCount } = useAuth();
+    const { role, cancelApplication } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
-    const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]);
+    const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]); // CANHANHOA01
     const [appliedJobsData, setAppliedJobsData] = useState<Job[]>([]);
-    const [savedJobsData, setSavedJobsData] = useState<Job[]>([]);
+    const [savedJobs, setSavedJobs] = useState<Job[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
-    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
+    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
-    const [visibleSavedJobsCount, setVisibleSavedJobsCount] = useState(8);
-    const [visibleBehavioralJobsCount, setVisibleBehavioralJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
@@ -385,124 +382,125 @@ const LoggedInView = () => {
     const { toast } = useToast();
     const [tempSalary, setTempSalary] = useState('');
     const [tempFee, setTempFee] = useState('');
-    const [chartData, setChartData] = useState<any[]>([]);
+    const [chartData, setChartData] = useState([]);
     const JPY_VND_RATE = 180;
     const USD_VND_RATE = 26300;
-    
+
+
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
     const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
     const [cancelSuggestionMode, setCancelSuggestionMode] = useState(false);
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
-    
-    const MY_JOBS_SECTIONS = {
-        SUGGESTED: 'item-1',
-        APPLIED: 'item-2',
-        SAVED: 'item-3',
-        BEHAVIORAL: 'item-4',
-    };
 
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>(MY_JOBS_SECTIONS.SUGGESTED);
-
-    // Effect to handle URL params for highlighting and actions.
     useEffect(() => {
-        const highlightParam = searchParams.get('highlight');
-        const actionParam = searchParams.get('action');
-    
-        // This function should only run once based on the initial URL params
-        if (actionParam === 'cancel_suggestion') {
-            setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
-            setCancelSuggestionMode(true);
-        } else if (highlightParam === 'applied') {
-            setOpenAccordion(MY_JOBS_SECTIONS.APPLIED);
-            clearApplicationCount();
-        } else if (highlightParam === 'saved') {
-            setOpenAccordion(MY_JOBS_SECTIONS.SAVED);
-            clearSavedJobCount();
-        } else if (highlightParam === 'suggested') {
-            setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
-            setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
-            return () => clearTimeout(timer);
-        } else {
-            // Default to suggested if no params
-            setOpenAccordion(MY_JOBS_SECTIONS.SUGGESTED);
-        }
-
-        // Clean up URL params after initial processing
-        if(highlightParam || actionParam){
-            const nextUrl = new URL(window.location.href);
-            nextUrl.searchParams.delete('highlight');
-            nextUrl.searchParams.delete('action');
-            router.replace(nextUrl.toString(), { scroll: false });
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency array ensures this runs only once on mount.
-
-
-    // Effect to fetch all data.
-    useEffect(() => {
-        if (role === 'candidate-empty-profile') {
-            setIsLoadingSuggestions(false);
-            setIsLoadingBehavioral(false);
-            return;
-        }
-
-        async function fetchAllData() {
-            setIsLoadingSuggestions(true);
-            setIsLoadingBehavioral(true);
-            try {
-                const storedProfile = localStorage.getItem('generatedCandidateProfile');
-                const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-                const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
-                
-                const [suggestedResults, behavioralResults] = await Promise.all([
-                    matchJobsToProfile(profile || {}, 'related', []),
-                    matchJobsToProfile(profile || {}, 'related', behavioralSignals)
-                ]);
-
-                setSuggestedJobs(suggestedResults.map(r => r.job));
-                setBehavioralSuggestedJobs(behavioralResults);
-            } catch (error) {
-                console.error("Failed to fetch job suggestions:", error);
-                setSuggestedJobs(jobData.slice(0, 20));
-                setBehavioralSuggestedJobs([]);
-            } finally {
-                setIsLoadingSuggestions(false);
-                setIsLoadingBehavioral(false);
-            }
-        }
-        
-        fetchAllData();
-
-        const savedJobIds = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-        setSavedJobsData(jobData.filter(job => savedJobIds.includes(job.id)));
-
-        const appliedJobIds = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-        setAppliedJobsData(jobData.filter(job => appliedJobIds.includes(job.id)));
-        
-        // Dynamic Chart Data
+        // Generate dynamic chart data
         const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
         const dynamicChartData = days.map(day => ({
             name: day,
             'Việc làm phù hợp với bạn': Math.floor(Math.random() * 15) + 1,
             'Người có nhu cầu tìm việc giống bạn': Math.floor(Math.random() * 10) + 1
         }));
+        // @ts-ignore
         setChartData(dynamicChartData);
+    }, []);
 
-    }, [role, forceUpdate]);
+    useEffect(() => {
+        const highlight = searchParams.get('highlight');
+        if (highlight === 'suggested') {
+            setOpenAccordion('item-1');
+            setIsSuggestionHighlighted(true);
+            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500); 
+            // Clean up URL
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('highlight');
+            router.replace(nextUrl.toString(), { scroll: false });
+            return () => clearTimeout(timer);
+        } else {
+             setOpenAccordion('item-1');
+        }
+    }, [searchParams, router]);
 
 
-     const handleLoadMore = (type: 'suggested' | 'saved' | 'behavioral') => {
+    const fetchSuggestedJobs = useCallback(async () => {
+        setIsLoadingSuggestions(true);
+        try {
+            const storedProfile = localStorage.getItem('generatedCandidateProfile');
+            if (storedProfile) {
+                const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+                const matchResults = await matchJobsToProfile(profile, 'related', []); // Pass empty signals for profile-based suggestions
+                setSuggestedJobs(matchResults.map(r => r.job));
+            } else {
+                setSuggestedJobs(jobData.slice(0, 20));
+            }
+        } catch (error) {
+            console.error("Failed to fetch profile-based suggestions:", error);
+            setSuggestedJobs(jobData.slice(0, 20));
+        } finally {
+            setIsLoadingSuggestions(false);
+        }
+    }, []);
+
+    // CANHANHOA01: New function to fetch behavior-based suggestions
+    const fetchBehavioralSuggestions = useCallback(async () => {
+        setIsLoadingBehavioral(true);
+        try {
+            const storedProfile = localStorage.getItem('generatedCandidateProfile');
+            if (storedProfile) {
+                 const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+                 const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+                 // The flow will now receive signals. If signals are empty, it will fall back to profile-based matching.
+                 const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
+                 setBehavioralSuggestedJobs(matchResults);
+            } else {
+                 setBehavioralSuggestedJobs([]);
+            }
+        } catch (error) {
+            console.error("Failed to fetch behavioral suggestions:", error);
+            setBehavioralSuggestedJobs([]);
+        } finally {
+            setIsLoadingBehavioral(false);
+        }
+    }, []);
+    
+    const fetchSavedJobs = useCallback(() => {
+        const savedJobIds = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+        const savedJobsData = jobData.filter(job => savedJobIds.includes(job.id));
+        setSavedJobs(savedJobsData);
+    }, []);
+
+    const fetchAppliedJobs = useCallback(() => {
+        const appliedJobIds = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+        const appliedJobsData = jobData.filter(job => appliedJobIds.includes(job.id));
+        setAppliedJobsData(appliedJobsData);
+    }, []);
+
+    useEffect(() => {
+        if (role === 'candidate-empty-profile') {
+            setIsLoadingSuggestions(false);
+            setIsLoadingBehavioral(false);
+            return;
+        }
+        fetchSuggestedJobs();
+        fetchBehavioralSuggestions(); // Fetch behavioral suggestions
+        fetchSavedJobs();
+        fetchAppliedJobs();
+
+        const handleStorageChange = () => {
+            fetchSavedJobs();
+            fetchAppliedJobs();
+            fetchBehavioralSuggestions(); // Re-fetch when behavior changes
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+        
+    }, [role, fetchSuggestedJobs, fetchSavedJobs, fetchAppliedJobs, fetchBehavioralSuggestions, forceUpdate]);
+
+    const handleLoadMore = () => {
         setIsLoadingMore(true);
         setTimeout(() => {
-            if (type === 'suggested') {
-                setVisibleJobsCount(prev => prev + 8);
-            } else if (type === 'saved') {
-                setVisibleSavedJobsCount(prev => prev + 8);
-            } else if (type === 'behavioral') {
-                 setVisibleBehavioralJobsCount(prev => prev + 8);
-            }
+            setVisibleJobsCount(prev => prev + 8);
             setIsLoadingMore(false);
         }, 500); // Simulate network delay
     };
@@ -542,6 +540,8 @@ const LoggedInView = () => {
             localStorage.removeItem('suggestionPrinciple');
         }
         localStorage.setItem('suggestionType', suggestionType);
+        console.log("Suggestion principle saved:", suggestionPrinciple);
+        console.log("Suggestion type saved:", suggestionType);
         setIsAspirationsDialogOpen(false);
         setForceUpdate(prev => prev + 1); // Trigger a re-fetch
     };
@@ -638,11 +638,10 @@ const LoggedInView = () => {
          {/* Main Content */}
         <div className="w-full mb-8">
             <Accordion 
-                type="single"
-                collapsible
+                type="multiple"
                 className="w-full space-y-4" 
-                value={openAccordion}
-                onValueChange={setOpenAccordion}
+                value={openAccordion ? [openAccordion] : undefined}
+                onValueChange={(value) => setOpenAccordion(value[0])}
             >
                 <AccordionItem value="item-1" className={cn(
                     "border-b-0 transition-all duration-500 ease-in-out",
@@ -688,7 +687,7 @@ const LoggedInView = () => {
                                 </div>
                                 {visibleJobsCount < suggestedJobs.length && (
                                     <div className="text-center mt-8">
-                                        <Button onClick={() => handleLoadMore('suggested')} disabled={isLoadingMore}>
+                                        <Button onClick={handleLoadMore} disabled={isLoadingMore}>
                                             {isLoadingMore ? (
                                                 <>
                                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -734,23 +733,14 @@ const LoggedInView = () => {
                         <div className="flex items-center gap-3">
                             <Bookmark className="h-5 w-5 text-red-500" />
                             <span>Việc đã lưu</span>
-                            <Badge>{savedJobsData.length}</Badge>
+                            <Badge>{savedJobs.length}</Badge>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="bg-background p-6 rounded-b-lg">
-                       {savedJobsData.length > 0 ? (
-                            <>
+                       {savedJobs.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {savedJobsData.slice(0, visibleSavedJobsCount).map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
+                                {savedJobs.map((job) => ( <JobCard key={job.id} job={job} showRecruiterName={false} /> ))}
                             </div>
-                             {visibleSavedJobsCount < savedJobsData.length && (
-                                <div className="text-center mt-8">
-                                    <Button onClick={() => handleLoadMore('saved')} disabled={isLoadingMore}>
-                                        {isLoadingMore ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Xem thêm'}
-                                    </Button>
-                                </div>
-                            )}
-                            </>
                         ) : (
                              <div className="text-center py-8 text-muted-foreground">
                                 <p>Bạn chưa lưu công việc nào.</p>
@@ -776,20 +766,11 @@ const LoggedInView = () => {
                                 ))}
                             </div>
                        ) : behavioralSuggestedJobs.length > 0 ? (
-                           <>
                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {behavioralSuggestedJobs.slice(0, visibleBehavioralJobsCount).map((item) => (
+                                {behavioralSuggestedJobs.map((item) => (
                                     <JobCard key={item.job.id} job={item.job} showRecruiterName={false} />
                                 ))}
                             </div>
-                             {visibleBehavioralJobsCount < behavioralSuggestedJobs.length && (
-                                <div className="text-center mt-8">
-                                    <Button onClick={() => handleLoadMore('behavioral')} disabled={isLoadingMore}>
-                                        {isLoadingMore ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Xem thêm'}
-                                    </Button>
-                                </div>
-                            )}
-                            </>
                        ) : (
                            <div className="text-center py-8 text-muted-foreground">
                              <p>Hãy xem và lưu một vài công việc để chúng tôi có thể gợi ý tốt hơn cho bạn!</p>
@@ -1279,7 +1260,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 };
 
 
-function MyJobsDashboardPageContent({ key: pageKey }: { key: string }) {
+function MyJobsDashboardPageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
     const { role } = useAuth();
     const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
@@ -1307,8 +1288,17 @@ function MyJobsDashboardPageContent({ key: pageKey }: { key: string }) {
     );
 }
 
+
 export default function MyJobsDashboardPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="h-16 w-16 animate-spin"/></div>}>
+            <MyJobsDashboardPageContentWrapper />
+        </Suspense>
+    )
+}
+
+function MyJobsDashboardPageContentWrapper() {
     const searchParams = useSearchParams();
-    // Re-mount the component whenever the search params change.
-    return <MyJobsDashboardPageContent key={searchParams.toString()} />;
+    const params = Object.fromEntries(searchParams.entries());
+    return <MyJobsDashboardPageContent searchParams={params} />;
 }
