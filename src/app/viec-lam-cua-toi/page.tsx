@@ -300,13 +300,7 @@ const EmptyProfileView = () => {
                 <div className="mt-6 flex flex-wrap gap-4 justify-center">
                      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
-                           <Button 
-                                className="bg-accent-orange hover:bg-accent-orange/90 text-white"
-                                onClick={() => {
-                                    setProfileCreationStep(2); // Start from step 2 directly
-                                    setIsDialogOpen(true);
-                                }}
-                            >
+                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
@@ -339,7 +333,7 @@ const EmptyProfileView = () => {
                                 </Card>
                             </div>
                              <div className="mt-4 text-center">
-                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); setProfileCreationStep(1)}}>Quay lại</Button>
+                                <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -406,7 +400,12 @@ const LoggedInView = () => {
     const [isLoadingMoreSaved, setIsLoadingMoreSaved] = useState(false);
     const [isLoadingMoreBehavioral, setIsLoadingMoreBehavioral] = useState(false);
 
-     useEffect(() => {
+    const handleAccordionChange = (value: string[]) => {
+        const newOpenItem = value.find(item => item !== openAccordion) || '';
+        setOpenAccordion(newOpenItem);
+    };
+
+    useEffect(() => {
         const highlight = searchParams.get('highlight');
         const action = searchParams.get('action');
 
@@ -442,29 +441,26 @@ const LoggedInView = () => {
 
 
     useEffect(() => {
-        const newOpenItem = searchParams.get('highlight') || (searchParams.get('action') ? 'item-2' : openAccordion);
-        if (newOpenItem && document.getElementById(newOpenItem)) {
-            setTimeout(() => {
-                const element = document.getElementById(newOpenItem);
+        if (!openAccordion) return;
+
+        // Use a more reliable way to scroll after animations
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const element = document.getElementById(openAccordion);
                 if (element) {
-                    const headerOffset = 120; // Accounts for both headers on mobile
+                    const headerOffset = 120; // Estimated height for sticky headers
                     const elementPosition = element.getBoundingClientRect().top;
                     const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
                     window.scrollTo({
                         top: offsetPosition,
-                        behavior: "smooth"
+                        behavior: 'smooth'
                     });
                 }
-            }, 300); // Delay to allow accordion to open
-        }
-    }, [openAccordion, searchParams]);
+            });
+        });
+    }, [openAccordion]);
 
-
-    const handleAccordionChange = (value: string[]) => {
-        const newOpenItem = value.find(item => item !== openAccordion) || '';
-        setOpenAccordion(newOpenItem);
-    };
 
     useEffect(() => {
         // Generate dynamic chart data
@@ -1186,7 +1182,7 @@ const LoggedOutView = () => {
 
 const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [isClosing, setIsClosing] = useState(isClosing);
+    const [isClosing, setIsClosing] = useState(false);
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [transformStyle, setTransformStyle] = useState({});
@@ -1324,7 +1320,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
@@ -1359,4 +1355,3 @@ export default function MyJobsDashboardPage() {
     )
 }
 
-    
