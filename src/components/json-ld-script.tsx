@@ -3,9 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import type { Job } from '@/lib/mock-data';
-import type { SearchFilters } from './search-results';
+import type { SearchFilters } from './job-search/search-results';
 import { allIndustries } from '@/lib/industry-data';
 import { publicFeeLimits, controlledFeeVisas } from '@/lib/mock-data';
+import { HandbookArticle } from '@/lib/handbook-data';
 
 interface JsonLdScriptProps {
     job?: Job;
@@ -15,12 +16,36 @@ interface JsonLdScriptProps {
         description: string;
     }
     appliedFilters?: SearchFilters;
+    article?: HandbookArticle;
 }
 
-export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: JsonLdScriptProps) => {
+export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters, article }: JsonLdScriptProps) => {
     const [structuredData, setStructuredData] = useState<string | null>(null);
 
     useEffect(() => {
+        const getArticleStructuredData = (article: HandbookArticle) => {
+            return {
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "headline": article.title,
+                "description": article.excerpt,
+                "image": `https://vi.hellojob.jp${article.image}`,
+                "datePublished": new Date().toISOString(), // Placeholder
+                "author": {
+                    "@type": "Person",
+                    "name": article.author
+                },
+                 "publisher": {
+                    "@type": "Organization",
+                    "name": "HelloJob",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": "https://vi.hellojob.jp/img/HJPNG.png"
+                    }
+                },
+            };
+        };
+
         const getJobPostingStructuredData = (job: Job) => {
             const today = new Date();
             const postedDate = new Date(today);
@@ -52,13 +77,11 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 additionalInfo.push(`<li>Số vòng phỏng vấn: ${job.interviewRounds} vòng.</li>`);
             }
             
-            // Logic for interview date from filters
             if (appliedFilters?.interviewDate && appliedFilters.interviewDate !== 'flexible') {
                  const interviewDateStr = `<li>Lịch phỏng vấn: ${appliedFilters.interviewDateType === 'from' ? 'Từ ngày' : appliedFilters.interviewDateType === 'exact' ? 'Đúng ngày' : 'Đến ngày'} ${appliedFilters.interviewDate}.</li>`;
                  additionalInfo.push(interviewDateStr);
             }
 
-            // Structured data for special conditions
             const jobBenefits: string[] = [];
             const qualifications: string[] = [];
             let specialCommitments: string[] = [];
@@ -91,7 +114,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
             }
 
 
-            const industryData = allIndustries.find(ind => ind.name === job.industry);
+            const industryData = allIndustries.find(ind => ind.name.vi === job.industry);
 
             const getApplicantLocationRequirements = () => {
                 if (!controlledFeeVisas.includes(job.visaDetail || '')) {
@@ -253,7 +276,7 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
                 ...(industryData && {
                     "industry": {
                         "@type": "DefinedTerm",
-                        "name": industryData.name,
+                        "name": industryData.name.vi,
                         "termCode": industryData.termCode,
                         "inDefinedTermSet": "https://www.naics.com/search/"
                     }
@@ -296,13 +319,15 @@ export const JsonLdScript = ({ job, jobList, pageMetadata, appliedFilters }: Jso
             };
         };
 
-        if (job) {
+        if (article) {
+            setStructuredData(JSON.stringify(getArticleStructuredData(article)));
+        } else if (job) {
              setStructuredData(JSON.stringify(getJobPostingStructuredData(job)));
         } else if (jobList && pageMetadata) {
              setStructuredData(JSON.stringify(getItemListStructuredData(jobList, pageMetadata)));
         }
 
-    }, [job, jobList, pageMetadata, appliedFilters]);
+    }, [job, jobList, pageMetadata, appliedFilters, article]);
 
     if (!structuredData) {
         return null;
