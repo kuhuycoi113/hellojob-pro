@@ -36,8 +36,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
-import { XL01Dialog } from '@/components/X-L01-dialog';
-import { YL01Dialog } from '@/components/Y-L01-dialog';
 
 
 const employersData: { [key: string]: any } = {
@@ -445,7 +443,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 
 export default function EmployerDetailPage() {
   const searchParams = useSearchParams();
-  const [showContinueButton, setShowContinueButton] = useState(false);
+  const [showContinueButton, setShowContinueButton] = React.useState(false);
   
   const [employer, setEmployer] = React.useState<any | null>(null);
   const [lang, setLang] = React.useState<Language>('vi');
@@ -1461,8 +1459,8 @@ export default function EmployerDetailPage() {
 
        {showContinueButton && (
         <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
-          <div className="container mx-auto flex justify-end">
-            <Button size="lg" onClick={handleContinue} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+          <div className="container mx-auto flex justify-center">
+            <Button size="lg" onClick={handleContinue} className="bg-accent-orange hover:bg-accent-orange/90 text-white">
               {t.continueButton}
             </Button>
           </div>
@@ -1490,3 +1488,5 @@ export default function EmployerDetailPage() {
     </>
   );
 }
+
+    
