@@ -8,7 +8,7 @@ import type { CandidateProfile } from '@/ai/schemas';
 import { app } from '@/firebase/config';
 import { useToast } from '@/hooks/use-toast';
 import { validateProfileForApplication } from '@/lib/validators';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest' | 'candidate-full-profile' | 'recruiter-empty-profile';
 
@@ -183,7 +183,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const isLoggedIn = role !== 'guest';
   const { toast } = useToast();
-
+  const router = useRouter();
   const auth = getAuth(app);
 
   const logout = () => {
@@ -195,8 +195,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
   
   const clearPostLoginAction = () => {
+    sessionStorage.removeItem('postLoginAction');
     setPostLoginAction(null);
   };
+
+  useEffect(() => {
+    const action = sessionStorage.getItem('postLoginAction');
+    if (action) {
+      setPostLoginAction(JSON.parse(action));
+    }
+  }, []);
   
   const updateAuthAndProfileState = useCallback((firebaseUser: FirebaseUser | null) => {
     if (typeof window === 'undefined') return;
@@ -204,7 +212,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
      if (postLoginAction?.type === 'REGISTER_RECRUITER' && firebaseUser) {
         localStorage.setItem('recruiterProfile', JSON.stringify(postLoginAction.data.recruiterData));
         setInternalRole('recruiter-empty-profile');
-        setProfileName(postLoginAction.data.recruiterData.name || 'Đối tác mới');
+        setProfileName(postLoginAction.data.recruiterData?.name || 'Đối tác mới');
         setProfileHeadline('Nhà tuyển dụng');
         setAvatarUrl(firebaseUser.photoURL);
         setCurrentUser({
@@ -212,6 +220,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             name: firebaseUser.displayName || 'Đối tác mới',
             avatarUrl: firebaseUser.photoURL || loggedInUser.avatarUrl,
         });
+        
+        const redirectPath = sessionStorage.getItem('postLoginRedirect') || '/nha-tuyen-dung/dang-ky/hoan-thanh';
+        router.push(redirectPath);
+        
         clearPostLoginAction();
         return;
     }
@@ -308,7 +320,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setAppliedJobs(localAppliedJobs);
     const localSavedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     setSavedJobs(localSavedJobs);
-  }, [postLoginAction]);
+  }, [postLoginAction, router]);
 
   const setRole = (newRole: Role) => {
     if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION !== 'true') {
@@ -447,7 +459,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     handleSaveJob,
     setRole,
     postLoginAction,
-    setPostLoginAction,
+    setPostLoginAction: (action: PostLoginAction) => {
+        sessionStorage.setItem('postLoginAction', JSON.stringify(action));
+        setPostLoginAction(action);
+    },
     clearPostLoginAction,
     logout,
     lastAction,

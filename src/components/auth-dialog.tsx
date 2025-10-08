@@ -113,7 +113,8 @@ export function AuthDialog({ isOpen, onOpenChange }: AuthDialogProps) {
                 {process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' && (
                  <div className="flex flex-wrap justify-end mt-2 gap-2">
                     <Button size="sm" variant="ghost" onClick={() => handleSimulateLogin('guest')}>Guest</Button>
-                    <Button size="sm" variant="ghost" onClick={() => handleSimulateLogin('candidate-empty-profile')}>Empty</Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleSimulateLogin('candidate-empty-profile')}>Empty (Cand.)</Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleSimulateLogin('recruiter-empty-profile')}>Recruiter</Button>
                     <Button size="sm" variant="ghost" onClick={() => handleSimulateLogin('candidate')}>Partial</Button>
                     <Button size="sm" variant="ghost" onClick={() => handleSimulateLogin('candidate-full-profile')}>Full</Button>
                 </div>
