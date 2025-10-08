@@ -9,6 +9,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from '@/components/auth-dialog';
 import { ZaloIcon, MessengerIcon, LineIcon } from '@/components/custom-icons';
 import Link from 'next/link';
+import Image from 'next/image';
+
+const Logo = () => (
+    <Image src="/img/HJPNG.png" alt="HelloJob Logo" width={110} height={36} className="h-9 w-auto" />
+);
+
 
 export default function CompletionPage() {
     const router = useRouter();
@@ -49,8 +55,11 @@ export default function CompletionPage() {
                         </div>
                     </div>
                     {isRecruiter ? (
-                        <div className="flex gap-2 flex-shrink-0 mt-4 sm:mt-0">
-                             <Button asChild variant="outline" size="icon" className="h-11 w-11 border-blue-500 hover:bg-blue-50">
+                        <div className="flex items-center gap-3 flex-shrink-0 mt-4 sm:mt-0">
+                            <div className="hidden md:block">
+                                <Logo />
+                            </div>
+                            <Button asChild variant="outline" size="icon" className="h-11 w-11 border-blue-500 hover:bg-blue-50">
                                 <Link href="mailto:chairman@hellojob.jp"><Mail className="h-5 w-5 text-blue-500"/></Link>
                             </Button>
                             <Button asChild variant="outline" size="icon" className="h-11 w-11 border-green-500 hover:bg-green-50">
