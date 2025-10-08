@@ -450,6 +450,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const [isIndividual, setIsIndividual] = React.useState(false);
   const [displayName, setDisplayName] = React.useState('');
   const [roleText, setRoleText] = React.useState('');
+  const [recruiterId, setRecruiterId] = React.useState('');
   
   const handleLangChange = (lang: Language) => {
     setLang(lang);
@@ -458,6 +459,25 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const handleContinue = () => {
     const params = new URLSearchParams(searchParams.toString());
     router.push(`/nha-tuyen-dung/dang-ky/xac-nhan?${params.toString()}`);
+  };
+
+  const generateRecruiterId = (roleSlug: string): string => {
+    const prefixes: { [key: string]: string } = {
+        'nhan-vien-phai-cu': 'OKS',
+        'nhan-vien-nhan-luc-nhat': 'NJS',
+        'sending': 'OKK',
+        'support': 'SKK',
+        'company': 'UKG',
+        'supervising-organization': 'KND',
+        'paid-placement-agency': 'YSS',
+        'haken': 'HAK'
+    };
+    const prefix = prefixes[roleSlug] || 'NTD';
+    const now = new Date();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const year = now.getFullYear().toString().slice(-2);
+    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `${prefix}${month}${year}${randomPart}`;
   };
 
   React.useEffect(() => {
@@ -472,7 +492,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     const nameParam = params.get('name');
     const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
     
-    setDisplayName(isIndividualRole ? (nameParam || '') : (companyNameParam || ''));
+    setRecruiterId(generateRecruiterId(roleParam || ''));
+    setDisplayName(isIndividualRole ? (nameParam || '') : (companyNameParam || 'Nhà tuyển dụng mới'));
     setIsIndividual(isIndividualRole);
 
     const roleParts: string[] = [];
@@ -1277,6 +1298,9 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                           <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
                             <h1 id="DKTC_TEN" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
                             <p id="DKTC_VAITRO" className="font-semibold text-primary">{roleText}</p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                                <Badge variant="outline">Mã đối tác: {recruiterId}</Badge>
+                            </p>
                             <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                           </div>
                           <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 md:mt-0 flex-shrink-0 md:ml-auto">
