@@ -658,7 +658,11 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: string[] } = visaDetailsByVisaType;
+    const visaDetailsOptions: { [key: string]: string[] } = {
+        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
+        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
+        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
+    };
     const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
@@ -1319,7 +1323,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
