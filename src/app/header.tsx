@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Briefcase, Menu, X, Building, PlusCircle, User, LogOut, Shield, FileText, Gift, MessageSquareWarning, Settings, LifeBuoy, LayoutGrid, Sparkles, BookOpen, Compass, Home, Info, Handshake, ChevronDown, Gem, UserPlus, MessageSquare, LogIn, Pencil, FastForward, ListChecks, GraduationCap, UserCheck, HardHat, ChevronRight, Search, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
@@ -63,6 +63,7 @@ import { Input } from './ui/input';
 import type { SearchFilters } from './job-search/search-results';
 import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
 import { CreateProfileDialog } from './create-profile-dialog';
+import { Badge } from './ui/badge';
 
 
 export const Logo = ({ className }: { className?: string }) => (
@@ -71,10 +72,12 @@ export const Logo = ({ className }: { className?: string }) => (
 
 export function Header() {
   const pathname = usePathname();
-  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl } = useAuth();
+  const router = useRouter();
+  const { role, setRole, isLoggedIn, profileName, profileHeadline, avatarUrl, applicationCount, savedJobCount, lastAction } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [myJobsLink, setMyJobsLink] = useState('/viec-lam-cua-toi');
 
 
   const [showNav, setShowNav] = useState(true);
@@ -108,12 +111,30 @@ export function Header() {
     };
   }, [isClient, isMobile, lastScrollY]);
 
+  useEffect(() => {
+    let link = '/viec-lam-cua-toi';
+    // Prioritize last action
+    if (lastAction === 'apply' && applicationCount > 0) {
+      link = '/viec-lam-cua-toi?highlight=applied';
+    } else if (lastAction === 'save' && savedJobCount > 0) {
+      link = '/viec-lam-cua-toi?highlight=saved';
+    } 
+    // Fallback to any remaining notification
+    else if (applicationCount > 0) {
+      link = '/viec-lam-cua-toi?highlight=applied';
+    } else if (savedJobCount > 0) {
+      link = '/viec-lam-cua-toi?highlight=saved';
+    }
+    setMyJobsLink(link);
+  }, [lastAction, applicationCount, savedJobCount]);
+
+
   const NavLink = ({ href, label, className, icon: Icon, onClick }: { href: string; label: string, className?: string, icon?: React.ElementType, onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => (
     <Link
       href={href}
       className={cn(
         'transition-colors hover:text-primary py-2 font-medium flex items-center gap-2',
-        (pathname === href || (pathname.startsWith(href) && href !== '/')) ? 'text-primary font-bold' : 'text-foreground/80',
+        (pathname === href || (pathname.startsWith(`${href}/`) && href !== '/')) ? 'text-primary font-bold' : 'text-foreground/80',
         className
       )}
        onClick={onClick}
@@ -175,37 +196,49 @@ export function Header() {
             ))}
           </div>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup
-          value={role}
-          onValueChange={(value) => setRole(value as Role)}
-        >
-          <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <DropdownMenuRadioItem value="candidate-full-profile">
-              Đã đăng nhập (Profile full)
-            </DropdownMenuRadioItem>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <DropdownMenuRadioItem value="candidate">
-              Đã đăng nhập (Có Profile)
-            </DropdownMenuRadioItem>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <DropdownMenuRadioItem value="candidate-empty-profile">
-              Đã đăng nhập (Profile trắng)
-            </DropdownMenuRadioItem>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <DropdownMenuRadioItem value="guest">Khách (Chưa đăng nhập)</DropdownMenuRadioItem>
-          </DropdownMenuItem>
-        </DropdownMenuRadioGroup>
+        {process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuRadioGroup
+              value={role}
+              onValueChange={(value) => setRole(value as Role)}
+            >
+              <DropdownMenuLabel>Mô phỏng vai trò người dùng</DropdownMenuLabel>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuRadioItem value="candidate-full-profile">
+                  Đã đăng nhập (Profile full)
+                </DropdownMenuRadioItem>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuRadioItem value="candidate">
+                  Đã đăng nhập (Có Profile)
+                </DropdownMenuRadioItem>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuRadioItem value="candidate-empty-profile">
+                  Đã đăng nhập (Profile trắng)
+                </DropdownMenuRadioItem>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuRadioItem value="recruiter-empty-profile">
+                  Đã đăng nhập (Profile trắng - NTD)
+                </DropdownMenuRadioItem>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuRadioItem value="guest">Khách (Chưa đăng nhập)</DropdownMenuRadioItem>
+              </DropdownMenuItem>
+            </DropdownMenuRadioGroup>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 
   const MobileRoleSwitcher = () => {
     const { role, setRole } = useAuth();
+    if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION !== 'true') {
+      return null;
+    }
     return (
       <div className="p-4 mt-auto border-t">
         <Label className="text-xs font-medium text-muted-foreground">Mô phỏng vai trò</Label>
@@ -217,6 +250,7 @@ export function Header() {
             <SelectItem value="candidate-full-profile">Đã đăng nhập (Profile full)</SelectItem>
             <SelectItem value="candidate">Đã đăng nhập (Có Profile)</SelectItem>
             <SelectItem value="candidate-empty-profile">Đã đăng nhập (Profile trắng)</SelectItem>
+            <SelectItem value="recruiter-empty-profile">Đã đăng nhập (Profile trắng - NTD)</SelectItem>
             <SelectItem value="guest">Khách (Chưa đăng nhập)</SelectItem>
           </SelectContent>
         </Select>
@@ -304,6 +338,8 @@ const LoggedOutContent = () => {
   const isEditing = role === 'candidate' || role === 'candidate-full-profile';
   const createProfileButtonText = isEditing ? 'Sửa hồ sơ' : 'Tạo hồ sơ';
   const createProfileButtonTextMobile = isEditing ? 'Sửa' : 'Tạo';
+  
+  const totalNotificationCount = applicationCount + savedJobCount;
 
   return (
     <>
@@ -346,8 +382,15 @@ const LoggedOutContent = () => {
                                <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">{createProfileButtonText}</Button>
                             </CreateProfileDialog>
 
-                             <Button asChild>
-                                <Link href="/viec-lam-cua-toi">Việc của tôi</Link>
+                            <Button asChild className="relative">
+                                <Link href={myJobsLink}>
+                                    Việc của tôi
+                                    {totalNotificationCount > 0 && (
+                                        <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
+                                            {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
+                                        </Badge>
+                                    )}
+                                </Link>
                             </Button>
                            
                             <MainMenu />
@@ -367,8 +410,15 @@ const LoggedOutContent = () => {
                            </Button>
                         </CreateProfileDialog>
 
-                         <Button asChild variant="default" size="sm">
-                            <Link href="/viec-lam-cua-toi">Việc</Link>
+                        <Button asChild variant="default" size="sm" className="relative">
+                            <Link href={myJobsLink}>
+                                Việc
+                                {totalNotificationCount > 0 && (
+                                    <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-xs">
+                                        {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
+                                    </Badge>
+                                )}
+                            </Link>
                         </Button>
                         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                             <SheetTrigger asChild>

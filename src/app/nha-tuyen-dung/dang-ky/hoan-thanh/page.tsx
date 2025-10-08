@@ -1,23 +1,31 @@
+
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import EmployerDetailPage from '../client';
 import { CheckCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthDialog } from '@/components/auth-dialog';
+import { useState } from 'react';
 
 export default function CompletionPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const { setPostLoginAction } = useAuth();
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
 
     const handleCreateAccount = () => {
-        // Logic to navigate to account creation page
-        // For now, we can just log it or redirect to a placeholder
-        console.log("Redirecting to create account...");
-        router.push('/dang-ky'); // Or wherever the registration page is
+        const recruiterData = Object.fromEntries(searchParams.entries());
+        setPostLoginAction({
+            type: 'REGISTER_RECRUITER',
+            data: { recruiterData }
+        });
+        setIsAuthDialogOpen(true);
     };
 
     const handleLater = () => {
-        // Navigate to the homepage or another relevant page
         router.push('/');
     };
 
@@ -40,12 +48,13 @@ export default function CompletionPage() {
                         <Button variant="outline" size="lg" onClick={handleLater}>
                             Để sau
                         </Button>
-                        <Button size="lg" onClick={handleCreateAccount}>
+                        <Button size="lg" onClick={handleCreateAccount} className="bg-primary hover:bg-primary/90 text-white">
                             Tạo tài khoản
                         </Button>
                     </div>
                 </div>
             </div>
+             <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
         </div>
     );
 }

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
@@ -7,14 +8,16 @@ import type { CandidateProfile } from '@/ai/schemas';
 import { app } from '@/firebase/config';
 import { useToast } from '@/hooks/use-toast';
 import { validateProfileForApplication } from '@/lib/validators';
+import { useSearchParams } from 'next/navigation';
 
-export type Role = 'candidate' | 'candidate-empty-profile' | 'guest' | 'candidate-full-profile';
+export type Role = 'candidate' | 'candidate-empty-profile' | 'guest' | 'candidate-full-profile' | 'recruiter-empty-profile';
 
 export type PostLoginAction = {
-  type: 'APPLY_JOB' | 'SAVE_JOB';
+  type: 'APPLY_JOB' | 'SAVE_JOB' | 'REGISTER_RECRUITER';
   data: {
-    jobId: string;
-    jobTitle: string;
+    jobId?: string;
+    jobTitle?: string;
+    recruiterData?: any;
   };
 } | null;
 
@@ -197,6 +200,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   
   const updateAuthAndProfileState = useCallback((firebaseUser: FirebaseUser | null) => {
     if (typeof window === 'undefined') return;
+
+     if (postLoginAction?.type === 'REGISTER_RECRUITER' && firebaseUser) {
+        localStorage.setItem('recruiterProfile', JSON.stringify(postLoginAction.data.recruiterData));
+        setInternalRole('recruiter-empty-profile');
+        setProfileName(postLoginAction.data.recruiterData.name || 'Đối tác mới');
+        setProfileHeadline('Nhà tuyển dụng');
+        setAvatarUrl(firebaseUser.photoURL);
+        setCurrentUser({
+            id: firebaseUser.uid,
+            name: firebaseUser.displayName || 'Đối tác mới',
+            avatarUrl: firebaseUser.photoURL || loggedInUser.avatarUrl,
+        });
+        clearPostLoginAction();
+        return;
+    }
     
     // Developer simulation override
     const simulatedRole = process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION === 'true' 
@@ -220,11 +238,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                  profileData = fullCandidateProfile as Partial<CandidateProfile & {avatarUrl?: string}>;
              } else if (simulatedRole === 'candidate') {
                  profileData = partialCandidateProfile as Partial<CandidateProfile & {avatarUrl?: string}>;
+             } else if (simulatedRole === 'recruiter-empty-profile') {
+                 const recruiterData = JSON.parse(localStorage.getItem('recruiterProfile') || '{}');
+                 profileData = { name: recruiterData.name, headline: 'Nhà tuyển dụng' };
              }
-             setProfileName(profileData.name || 'Ứng viên');
+             setProfileName(profileData.name || 'Người dùng');
              setProfileHeadline(profileData.headline || 'Cập nhật hồ sơ');
              setAvatarUrl(profileData.avatarUrl || null);
-             setCurrentUser(prev => ({...prev, name: profileData.name || 'Ứng viên', id: firebaseUser?.uid || 'user-0', avatarUrl: profileData.avatarUrl || loggedInUser.avatarUrl}));
+             setCurrentUser(prev => ({...prev, name: profileData.name || 'Người dùng', id: firebaseUser?.uid || prev.id, avatarUrl: profileData.avatarUrl || loggedInUser.avatarUrl}));
          }
         const localAppliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
         setAppliedJobs(localAppliedJobs);
@@ -248,8 +269,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     // Real logic for logged-in users
     const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
-    
-    if (!storedProfileRaw) {
+    const storedRecruiterProfileRaw = localStorage.getItem('recruiterProfile');
+
+    if (storedRecruiterProfileRaw) {
+        setInternalRole('recruiter-empty-profile');
+        const recruiterProfile = JSON.parse(storedRecruiterProfileRaw);
+        setProfileName(recruiterProfile.name || 'Đối tác mới');
+        setProfileHeadline('Nhà tuyển dụng');
+    } else if (!storedProfileRaw) {
         setInternalRole('candidate-empty-profile');
     } else {
         try {
@@ -281,7 +308,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setAppliedJobs(localAppliedJobs);
     const localSavedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     setSavedJobs(localSavedJobs);
-  }, []);
+  }, [postLoginAction]);
 
   const setRole = (newRole: Role) => {
     if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION !== 'true') {
