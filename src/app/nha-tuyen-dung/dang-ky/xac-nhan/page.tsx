@@ -5,6 +5,9 @@ import React from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import EmployerDetailPage from '../client';
+import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
+import { CtaViecLamGoiY } from '@/components/cta-viec-lam-goi-y';
+import { CtaViecLamPhuHop } from '@/components/cta-viec-lam-phu-hop';
 
 export default function ConfirmationPage() {
     const router = useRouter();

@@ -397,13 +397,13 @@ const interestTexts: Record<string, Record<Language, string>> = {
 
 
 
-const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, id?: string }) => (
+const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, isConfirmationMode }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, id?: string, isConfirmationMode?: boolean }) => (
     <Card className={cn("shadow-lg", className)} id={id}>
         <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="font-headline text-xl flex items-center gap-3">
                 <Icon className="text-primary h-6 w-6"/>{title}
             </CardTitle>
-            {onEditClick && (
+            {onEditClick && !isConfirmationMode && (
               <Button variant="ghost" size="icon" onClick={onEditClick}><Edit className="h-4 w-4"/></Button>
             )}
         </CardHeader>
@@ -441,9 +441,8 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 };
 
 
-export default function EmployerDetailPage() {
+export default function EmployerDetailPage({ isConfirmationMode = false }: { isConfirmationMode?: boolean }) {
   const searchParams = useSearchParams();
-  const [showContinueButton, setShowContinueButton] = React.useState(false);
   const router = useRouter();
   
   const [employer, setEmployer] = React.useState<any | null>(null);
@@ -463,11 +462,6 @@ export default function EmployerDetailPage() {
 
   React.useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
-    if (params.has('role')) {
-        setShowContinueButton(true);
-    } else {
-        setShowContinueButton(false);
-    }
     const langFromParams = (params.get('lang') || 'vi') as Language;
     setLang(langFromParams);
 
@@ -1231,7 +1225,7 @@ export default function EmployerDetailPage() {
     const editField = fieldKey === 'interest' ? 'valueInterest' : (fieldKey === 'industries' ? 'industries' : 'visa');
     const editData = fieldKey === 'interest' ? { interest: employer.interest, valueInterest: employer.valueInterest } : (fieldKey === 'industries' ? employer.industries : { visaType: employer.visaType, visaDetail: employer.visaDetail });
 
-    return <button className="italic text-primary underline" onClick={() => handleEditClick(editTitle, editData, editField)}>{t.clickToUpdate}</button>
+    return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(editTitle, editData, editField)}>{t.clickToUpdate}</button>
   };
 
   const getValueInterestValue = (value: any) => {
@@ -1241,7 +1235,7 @@ export default function EmployerDetailPage() {
           });
           return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
       }
-      return <button className="italic text-primary underline" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>{t.clickToUpdate}</button>
+      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>{t.clickToUpdate}</button>
   };
 
 
@@ -1256,12 +1250,14 @@ export default function EmployerDetailPage() {
                 <div className="relative w-full h-48">
                   <Image src={employer.banner} alt={`${employer.name[lang] || ''} banner`} fill className="object-cover" />
                   <div className="absolute inset-0 bg-black/40" />
+                   {!isConfirmationMode && (
                   <Label htmlFor="banner-upload" className="absolute top-4 right-4 z-10 cursor-pointer">
                      <Button variant="secondary" size="sm" asChild>
                        <span><Camera className="mr-2 h-4 w-4" /> {t.edit}</span>
                      </Button>
                      <Input id="banner-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'banner')} />
                   </Label>
+                  )}
                 </div>
                 <div id="DKTHONGTINCHUNG" className="p-6 bg-card">
                   <div className="flex flex-col sm:flex-row items-start gap-4 -mt-24 md:-mt-20">
@@ -1270,10 +1266,12 @@ export default function EmployerDetailPage() {
                             <AvatarImage src={employer.logo} />
                             <AvatarFallback>{(employer.name[lang] || 'A').charAt(0)}</AvatarFallback>
                           </Avatar>
+                           {!isConfirmationMode && (
                            <Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
                               <Camera className="h-4 w-4 text-secondary-foreground" />
                            </Label>
-                           <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
+                           )}
+                           <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} disabled={isConfirmationMode}/>
                       </div>
                       <div className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16">
                           <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
@@ -1289,7 +1287,7 @@ export default function EmployerDetailPage() {
                                         <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="hidden sm:inline">English</span></TabsTrigger>
                                     </TabsList>
                                 </Tabs>
-                             <Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>
+                             {!isConfirmationMode && (<Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
                           </div>
                       </div>
                   </div>
@@ -1301,14 +1299,14 @@ export default function EmployerDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
-                  <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
+                  <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
+                       <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{`${t.notUpdated}, ${t.clickToUpdate}`}</button>}</p>
                        <Button id="DKGT_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
                   
                   {/* Info card for Mobile */}
                   <div className="block lg:hidden">
-                    <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
+                    <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.infoTitle, employer.info, 'info')}>
                         <div className="space-y-3 text-sm">
                             <p id="DKDN_NAMTHANHLAP-mobile"><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
                             <p id="DKDN_QUYMO-mobile"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
@@ -1339,7 +1337,7 @@ export default function EmployerDetailPage() {
                     </SectionCard>
                   </div>
 
-                  <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
+                  <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
                     <div className="space-y-3 text-sm">
                         <div id="DKNV_NGHIEPVU">
                             <p className="font-semibold mb-1">{t.interestLabel}:</p>
@@ -1353,7 +1351,7 @@ export default function EmployerDetailPage() {
                     <CardTitle id="DKNV_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><CheckCircle className="text-primary h-6 w-6"/>{t.valueInterestTitle}</CardTitle>
                     <Button id="DKNV_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')} /></Button>
                   </SectionCard>
-                  <SectionCard id="DKLICHSU" title={t.historyTitle} icon={History} onEditClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>
+                  <SectionCard id="DKLICHSU" title={t.historyTitle} icon={History} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.historyTitle, employer.history, 'history')}>
                        <ul id="DKLS_DANHSACH" className="space-y-4 text-sm">
                           {employer.history.length > 0 ? employer.history.map((item: any, index: number) => (
                               <li key={index} className="relative pl-6">
@@ -1361,36 +1359,36 @@ export default function EmployerDetailPage() {
                                   <p className="font-bold text-primary mb-1">{item.year}</p>
                                   <p className="text-muted-foreground">{item.event[lang]}</p>
                               </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                        <CardTitle id="DKLS_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><History className="text-primary h-6 w-6"/>{t.historyTitle}</CardTitle>
                        <Button id="DKLS_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
-                  <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={() => handleEditClick(t.imagesTitle, employer.images, 'images')}>
+                  <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div id="DKHA_LUOIANH" className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {employer.images.map((img: any, index: number) => (
                               <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
                                   <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover" />
-                                   <Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                                   {!isConfirmationMode && (<Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                                         <Camera className="h-6 w-6 text-white"/>
-                                   </Label>
-                                   <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} />
-                                   <Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
+                                   </Label>)}
+                                   <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} disabled={isConfirmationMode}/>
+                                   {!isConfirmationMode && (<Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
                                         <Trash2 className="h-3 w-3"/>
-                                   </Button>
+                                   </Button>)}
                               </div>
                           ))}
                       </div>
                       <CardTitle id="DKHA_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><ImageIcon className="text-primary h-6 w-6"/>{t.imagesTitle}</CardTitle>
                       <Button id="DKHA_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
-                  <SectionCard id="DKPHUCLOI" title={t.benefitsTitle} icon={Award} onEditClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
+                  <SectionCard id="DKPHUCLOI" title={t.benefitsTitle} icon={Award} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
                       <ul id="DKPL_DANHSACH" className="space-y-2 text-sm">
                           {employer.benefits.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
                               <li key={index} className="flex items-start gap-2">
                                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
                               </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                       <CardTitle id="DKPL_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><Award className="text-primary h-6 w-6"/>{t.benefitsTitle}</CardTitle>
                       <Button id="DKPL_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
@@ -1400,7 +1398,7 @@ export default function EmployerDetailPage() {
                 {/* Right Column (order-first on desktop) */}
               <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
                   <div className="hidden lg:block">
-                    <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={() => handleEditClick(t.infoTitle, employer.info, 'info')}>
+                    <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.infoTitle, employer.info, 'info')}>
                         <div className="space-y-3 text-sm">
                             <p id="DKDN_NAMTHANHLAP"><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
                             <p id="DKDN_QUYMO"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
@@ -1433,7 +1431,7 @@ export default function EmployerDetailPage() {
                         )}
                     </SectionCard>
                   </div>
-                  <SectionCard id="DKLOAIHINHVISA" title={t.visaTitle} icon={FileSignature} onEditClick={() => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
+                  <SectionCard id="DKLOAIHINHVISA" title={t.visaTitle} icon={FileSignature} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
                           <div id="DKLV_LOAIHINH"><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
                           <div id="DKLV_CHITIETVISA"><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
@@ -1441,7 +1439,7 @@ export default function EmployerDetailPage() {
                       <CardTitle id="DKLV_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><FileSignature className="text-primary h-6 w-6"/>{t.visaTitle}</CardTitle>
                       <Button id="DKLV_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
-                  <SectionCard id="DKNGANHNGHEKHUVUC" title={t.industriesTitle} icon={Briefcase} onEditClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
+                  <SectionCard id="DKNGANHNGHEKHUVUC" title={t.industriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
                           <div id="DKNK_NGANHNGHE"><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
                           <div id="DKNK_KHUVUC"><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
@@ -1457,13 +1455,11 @@ export default function EmployerDetailPage() {
         </div>
       </div>
 
-       {showContinueButton && (
+       {!isConfirmationMode && (
         <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
           <div className="container mx-auto flex justify-center">
-            <Button size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" asChild>
-               <Link href={`/nha-tuyen-dung/dang-ky/xac-nhan?${searchParams.toString()}`}>
+            <Button size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleContinue}>
                 {t.continueButton}
-              </Link>
             </Button>
           </div>
         </div>
