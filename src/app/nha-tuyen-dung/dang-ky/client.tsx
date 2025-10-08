@@ -444,6 +444,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 export default function EmployerDetailPage() {
   const searchParams = useSearchParams();
   const [showContinueButton, setShowContinueButton] = React.useState(false);
+  const router = useRouter();
   
   const [employer, setEmployer] = React.useState<any | null>(null);
   const [lang, setLang] = React.useState<Language>('vi');
@@ -454,28 +455,27 @@ export default function EmployerDetailPage() {
   const handleLangChange = (lang: Language) => {
     setLang(lang);
   };
-
+  
   const handleContinue = () => {
-    // Placeholder for next step logic
-    console.log("Proceeding to the next step with data:", employer);
-    alert("Chức năng 'Lưu và tiếp tục' sẽ được triển khai ở bước tiếp theo.");
+    const params = new URLSearchParams(searchParams.toString());
+    router.push(`/nha-tuyen-dung/dang-ky/xac-nhan?${params.toString()}`);
   };
 
   React.useEffect(() => {
-    // Check for params from Y-L01 to show the button
-    if (searchParams.has('role')) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (params.has('role')) {
         setShowContinueButton(true);
     } else {
         setShowContinueButton(false);
     }
-    const langFromParams = (searchParams.get('lang') || 'vi') as Language;
+    const langFromParams = (params.get('lang') || 'vi') as Language;
     setLang(langFromParams);
 
-    const roleParam = searchParams.get('role');
-    const subRoleParam = searchParams.get('sub_role');
-    const nationalityParam = searchParams.get('nationality');
-    const companyNameParam = searchParams.get('company_name');
-    const nameParam = searchParams.get('name');
+    const roleParam = params.get('role');
+    const subRoleParam = params.get('sub_role');
+    const nationalityParam = params.get('nationality');
+    const companyNameParam = params.get('company_name');
+    const nameParam = params.get('name');
     const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
     
     setDisplayName(isIndividualRole ? (nameParam || '') : (companyNameParam || ''));
@@ -515,32 +515,32 @@ export default function EmployerDetailPage() {
 
     employerData.name[langFromParams] = companyNameParam;
     
-    const visaTypes = searchParams.getAll('visa_type');
+    const visaTypes = params.getAll('visa_type');
     if (visaTypes.length > 0) {
         employerData.visaType = { vi: visaTypes, ja: visaTypes, en: visaTypes };
     }
     
-    const visaDetails = searchParams.getAll('visa_detail');
+    const visaDetails = params.getAll('visa_detail');
     if (visaDetails.length > 0) {
         employerData.visaDetail = { vi: visaDetails, ja: visaDetails, en: visaDetails };
     }
     
-    const industries = searchParams.getAll('industry');
+    const industries = params.getAll('industry');
     if (industries.length > 0) {
         employerData.industries.main = { vi: industries, ja: industries, en: industries };
     }
 
-    const locations = searchParams.getAll('location');
+    const locations = params.getAll('location');
     if (locations.length > 0) {
         employerData.industries.secondary = { vi: locations, ja: locations, en: locations };
     }
     
-    const interests = searchParams.getAll('interest');
+    const interests = params.getAll('interest');
     if (interests.length > 0) {
         employerData.interest = { vi: interests, ja: interests, en: interests };
     }
     
-    const valueInterests = searchParams.getAll('value_interest');
+    const valueInterests = params.getAll('value_interest');
     if (valueInterests.length > 0) {
          employerData.valueInterest = valueInterests.map(id => {
             const viOption = valueInterestOptions['vi'].find(o => o.id === id);
@@ -1460,8 +1460,10 @@ export default function EmployerDetailPage() {
        {showContinueButton && (
         <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
           <div className="container mx-auto flex justify-center">
-            <Button size="lg" onClick={handleContinue} className="bg-accent-orange hover:bg-accent-orange/90 text-white">
-              {t.continueButton}
+            <Button size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" asChild>
+               <Link href={`/nha-tuyen-dung/dang-ky/xac-nhan?${searchParams.toString()}`}>
+                {t.continueButton}
+              </Link>
             </Button>
           </div>
         </div>
@@ -1488,5 +1490,3 @@ export default function EmployerDetailPage() {
     </>
   );
 }
-
-    
