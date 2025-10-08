@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -365,7 +366,7 @@ const EmptyProfileView = () => {
 
 
 const LoggedInView = () => {
-    const { role } = useAuth();
+    const { role, clearApplicationCount, clearSavedJobCount } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
@@ -438,10 +439,13 @@ const LoggedInView = () => {
         if (action === 'cancel_suggestion') {
             newOpenAccordion = 'item-2';
             setCancelSuggestionMode(true);
+            clearApplicationCount();
         } else if (highlight === 'applied') {
             newOpenAccordion = 'item-2';
+            clearApplicationCount();
         } else if (highlight === 'saved') {
             newOpenAccordion = 'item-3';
+            clearSavedJobCount();
         } else if (highlight === 'suggested') {
             newOpenAccordion = 'item-1';
             setIsSuggestionHighlighted(true);
@@ -458,7 +462,7 @@ const LoggedInView = () => {
             router.replace(nextUrl.toString(), { scroll: false });
         }
 
-    }, [searchParams, router, openAccordion]);
+    }, [searchParams, router, openAccordion, clearApplicationCount, clearSavedJobCount]);
 
 
     useEffect(() => {
@@ -474,7 +478,8 @@ const LoggedInView = () => {
     }, []);
     
     const fetchAllData = useCallback(async () => {
-        if (role === 'candidate-empty-profile') {
+        const isLoggedIn = role !== 'guest';
+        if (!isLoggedIn || role === 'candidate-empty-profile') {
             setIsLoadingSuggestions(false);
             setIsLoadingBehavioral(false);
             return;
@@ -519,7 +524,9 @@ const LoggedInView = () => {
             }
         };
         window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
+        return () => {
+          window.removeEventListener('storage', handleStorageChange);
+        };
         
     }, [role, forceUpdate, fetchAllData]);
 
@@ -658,11 +665,7 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: string[] } = {
-        'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-        'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-        'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
-    };
+    const visaDetailsOptions: { [key: string]: { name: {vi: string, ja: string, en: string}, slug: string }[] } = visaDetailsByVisaType;
     const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
@@ -946,7 +949,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}
+                                {(visaDetailsByVisaType[tempAspirations.desiredVisaType as keyof typeof visaDetailsByVisaType] || []).map(vd => <SelectItem key={vd.slug} value={vd.name.vi}>{vd.name.vi}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -963,7 +966,7 @@ const LoggedInView = () => {
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -1323,7 +1326,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-full-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
@@ -1357,3 +1360,6 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
+
+    
