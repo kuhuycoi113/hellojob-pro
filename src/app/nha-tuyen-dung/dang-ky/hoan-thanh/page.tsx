@@ -45,7 +45,7 @@ export default function CompletionPage() {
 
             {/* Sticky footer for success message and actions */}
             <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
-                <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
                     <div className="flex flex-col sm:flex-row items-center gap-3">
                         <CheckCircle className="h-8 w-8 text-accent-orange flex-shrink-0 mb-2 sm:mb-0"/>
                         <div className="flex-grow">
@@ -64,7 +64,7 @@ export default function CompletionPage() {
                                 <Link href="mailto:chairman@hellojob.jp"><Mail className="h-5 w-5 text-blue-500"/></Link>
                             </Button>
                             <Button asChild variant="outline" size="icon" className="h-11 w-11 border-green-500 hover:bg-green-50">
-                                <Link href="tel:0386667999"><Phone className="h-5 w-5 text-green-500"/></Link>
+                                <Link href="tel:0386667999"><Image src="/img/phone.svg" alt="Phone" width={20} height={20} /></Link>
                             </Button>
                             <Button asChild variant="outline" size="icon" className="h-11 w-11 border-sky-500 hover:bg-sky-50">
                                 <Link href="https://zalo.me/your_zalo_id"><ZaloIcon className="h-5 w-5"/></Link>
