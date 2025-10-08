@@ -221,7 +221,8 @@ const contentByLang = {
         clickToUpdate: 'Nhấn để cập nhật',
         headerTitle: 'Thông tin chung',
         namePlaceholder: 'Ví dụ: Nguyễn Văn An',
-        rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]'
+        rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
+        continueButton: 'Lưu và tiếp tục',
 
     },
     ja: {
@@ -266,7 +267,8 @@ const contentByLang = {
         messengerHelper: 'システムが自動的にユーザー名を取得します。',
         linePlaceholder: 'LineのリンクまたはIDを入力してください',
         lineHelper: 'システムが自動的にユーザー名を取得します。',
-        rolePlaceholder: '[種別/役割/役職...]'
+        rolePlaceholder: '[種別/役割/役職...]',
+        continueButton: '保存して続行',
     },
     en: {
         edit: 'Edit',
@@ -310,7 +312,8 @@ const contentByLang = {
         messengerHelper: 'The system will automatically extract your username.',
         linePlaceholder: 'Paste Line link or enter your ID',
         lineHelper: 'The system will automatically extract your username.',
-        rolePlaceholder: '[Type/Role/Title...]'
+        rolePlaceholder: '[Type/Role/Title...]',
+        continueButton: 'Save and Continue',
     }
 };
 
@@ -442,6 +445,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 
 export default function EmployerDetailPage() {
   const searchParams = useSearchParams();
+  const [showContinueButton, setShowContinueButton] = useState(false);
   
   const [employer, setEmployer] = React.useState<any | null>(null);
   const [lang, setLang] = React.useState<Language>('vi');
@@ -453,7 +457,19 @@ export default function EmployerDetailPage() {
     setLang(lang);
   };
 
+  const handleContinue = () => {
+    // Placeholder for next step logic
+    console.log("Proceeding to the next step with data:", employer);
+    alert("Chức năng 'Lưu và tiếp tục' sẽ được triển khai ở bước tiếp theo.");
+  };
+
   React.useEffect(() => {
+    // Check for params from Y-L01 to show the button
+    if (searchParams.has('role')) {
+        setShowContinueButton(true);
+    } else {
+        setShowContinueButton(false);
+    }
     const langFromParams = (searchParams.get('lang') || 'vi') as Language;
     setLang(langFromParams);
 
@@ -1233,7 +1249,7 @@ export default function EmployerDetailPage() {
 
   return (
     <>
-      <div className="bg-secondary">
+      <div className="bg-secondary pb-24">
         <div className="container mx-auto px-4 md:px-6 py-12">
           <div className="max-w-7xl mx-auto">
             {/* Header Section */}
@@ -1442,6 +1458,16 @@ export default function EmployerDetailPage() {
           </div>
         </div>
       </div>
+
+       {showContinueButton && (
+        <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
+          <div className="container mx-auto flex justify-end">
+            <Button size="lg" onClick={handleContinue} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              {t.continueButton}
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent id={`${editingModule?.field}_DIALOG`} className="sm:max-w-2xl">
