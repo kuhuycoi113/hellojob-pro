@@ -1,13 +1,9 @@
-
 'use client';
 
 import React from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import EmployerDetailPage from '../client';
-import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
-import { CtaViecLamGoiY } from '@/components/cta-viec-lam-goi-y';
-import { CtaViecLamPhuHop } from '@/components/cta-viec-lam-phu-hop';
 
 export default function ConfirmationPage() {
     const router = useRouter();
@@ -19,8 +15,8 @@ export default function ConfirmationPage() {
     };
 
     const handleConfirm = () => {
-        // Logic for Y036 will be implemented here in the future
-        alert("Chức năng 'Xác nhận & Tiếp tục' sẽ được thiết kế ở prompt sau.");
+        const params = new URLSearchParams(searchParams.toString());
+        router.push(`/nha-tuyen-dung/dang-ky/hoan-thanh?${params.toString()}`);
     };
 
     return (
@@ -37,7 +33,7 @@ export default function ConfirmationPage() {
                             Sửa lại
                         </Button>
                         <Button size="lg" onClick={handleConfirm} className="bg-accent-green hover:bg-accent-green/90 text-white">
-                            Xác nhận &amp; Tiếp tục
+                            Xác nhận & Tiếp tục
                         </Button>
                     </div>
                 </div>
