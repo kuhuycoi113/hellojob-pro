@@ -1,19 +1,19 @@
-
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import EmployerDetailPage from '../client';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Mail, Phone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from '@/components/auth-dialog';
-import { useState } from 'react';
+import { ZaloIcon, MessengerIcon, LineIcon } from '@/components/custom-icons';
+import Link from 'next/link';
 
 export default function CompletionPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { setPostLoginAction } = useAuth();
+    const { isLoggedIn, role, setPostLoginAction } = useAuth();
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
 
     const handleCreateAccount = () => {
@@ -29,10 +29,12 @@ export default function CompletionPage() {
         router.push('/');
     };
 
+    const isRecruiter = isLoggedIn && role === 'recruiter-empty-profile';
+
     return (
         <div>
             {/* The main content is the disabled version of the employer detail page */}
-            <EmployerDetailPage isConfirmationMode={true} showCtas={false} />
+            <EmployerDetailPage isConfirmationMode={true} />
 
             {/* Sticky footer for success message and actions */}
             <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
@@ -41,17 +43,39 @@ export default function CompletionPage() {
                          <CheckCircle className="h-8 w-8 text-accent-orange flex-shrink-0"/>
                         <div className="flex-grow">
                              <p className="font-semibold text-foreground">Thông tin của bạn đã được gửi, chúng tôi sẽ sớm liên hệ với bạn.</p>
-                             <p className="text-sm text-muted-foreground">Bạn có muốn tạo tài khoản để lưu lại thông tin không?</p>
+                             <p className="text-sm text-muted-foreground">
+                                {isRecruiter ? "Bạn có muốn liên hệ ngay với HelloJob không?" : "Bạn có muốn tạo tài khoản để lưu lại thông tin không?"}
+                             </p>
                         </div>
                     </div>
-                    <div className="flex gap-4 flex-shrink-0 mt-4 sm:mt-0">
-                        <Button variant="outline" size="lg" onClick={handleLater}>
-                            Để sau
-                        </Button>
-                        <Button size="lg" onClick={handleCreateAccount} className="bg-primary hover:bg-primary/90 text-white">
-                            Tạo tài khoản
-                        </Button>
-                    </div>
+                    {isRecruiter ? (
+                        <div className="flex gap-2 flex-shrink-0 mt-4 sm:mt-0">
+                             <Button asChild variant="outline" size="icon" className="h-11 w-11 border-blue-500 hover:bg-blue-50">
+                                <Link href="mailto:chairman@hellojob.jp"><Mail className="h-5 w-5 text-blue-500"/></Link>
+                            </Button>
+                            <Button asChild variant="outline" size="icon" className="h-11 w-11 border-green-500 hover:bg-green-50">
+                                <Link href="tel:0386667999"><Phone className="h-5 w-5 text-green-500"/></Link>
+                            </Button>
+                            <Button asChild variant="outline" size="icon" className="h-11 w-11 border-sky-500 hover:bg-sky-50">
+                                <Link href="https://zalo.me/your_zalo_id"><ZaloIcon className="h-5 w-5"/></Link>
+                            </Button>
+                            <Button asChild variant="outline" size="icon" className="h-11 w-11 border-purple-500 hover:bg-purple-50">
+                                <Link href="https://m.me/your_user_id"><MessengerIcon className="h-5 w-5"/></Link>
+                            </Button>
+                            <Button asChild variant="outline" size="icon" className="h-11 w-11 border-emerald-500 hover:bg-emerald-50">
+                                <Link href="https://line.me/ti/p/~your_line_id"><LineIcon className="h-5 w-5"/></Link>
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="flex gap-4 flex-shrink-0 mt-4 sm:mt-0">
+                            <Button variant="outline" size="lg" onClick={handleLater}>
+                                Để sau
+                            </Button>
+                            <Button size="lg" onClick={handleCreateAccount} className="bg-primary hover:bg-primary/90 text-white">
+                                Tạo tài khoản
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
              <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
