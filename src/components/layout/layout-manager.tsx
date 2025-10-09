@@ -40,10 +40,20 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
         '/nha-tuyen-dung/landing/nd',
         '/nha-tuyen-dung/landing/can-bo-tuyen-dung',
         '/nha-tuyen-dung/landing/tuyen-dung-tokutei',
-        '/nha-tuyen-dung/landing/shien' // Added new page
+        '/nha-tuyen-dung/landing/shien'
     ];
     
-    const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky', '/nha-tuyen-dung/dang-ky/xac-nhan', ...ntdLandingPagePaths];
+    const excludedCtaPages = [
+        '/', 
+        '/gioi-thieu', 
+        '/nha-tuyen-dung', 
+        '/nhuong-quyen', 
+        '/viec-lam', 
+        '/nha-tuyen-dung/dang-ky', 
+        '/nha-tuyen-dung/dang-ky/xac-nhan',
+        '/nha-tuyen-dung/dang-ky/hoan-thanh',
+        ...ntdLandingPagePaths
+    ];
     
     // Determine whether to show CTAs based on client-side path
     const showDefaultCtas = isClient && !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
