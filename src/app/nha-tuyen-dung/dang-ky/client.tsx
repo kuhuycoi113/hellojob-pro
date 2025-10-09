@@ -1290,7 +1290,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   </Label>
                   )}
                 </div>
-                <div id="DKTHONGTINCHUNG" className="p-6 bg-card">
+                <div id="DKTHONGTINCHUNG" className="p-6 bg-card relative">
                   <div className="flex flex-col sm:flex-row items-start gap-4 -mt-24 md:-mt-20">
                       <div className="relative flex-shrink-0">
                         <Avatar id="DKTC_AVATAR" className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
@@ -1308,23 +1308,24 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                           <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
                             <h1 id="DKTC_TEN" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
                             <p id="DKTC_VAITRO" className="font-semibold text-primary">{roleText}</p>
-                            <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
-                            <p className="text-sm text-muted-foreground mt-1">
+                             <p className="text-sm text-muted-foreground mt-1">
                                 <Badge variant="outline">Mã đối tác: {recruiterId}</Badge>
                             </p>
+                            <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                           </div>
                           <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 md:mt-0 flex-shrink-0 md:ml-auto">
                                <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
                                     <TabsList className="grid w-full grid-cols-3">
-                                        <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span></TabsTrigger>
-                                        <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="hidden sm:inline">日本語</span></TabsTrigger>
-                                        <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="hidden sm:inline">English</span></TabsTrigger>
+                                        <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="md:hidden">VI</span><span className="hidden md:inline">Tiếng Việt</span></TabsTrigger>
+                                        <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="md:hidden">JA</span><span className="hidden md:inline">日本語</span></TabsTrigger>
+                                        <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="md:hidden">EN</span><span className="hidden md:inline">English</span></TabsTrigger>
                                     </TabsList>
                                 </Tabs>
-                             {!isConfirmationMode && (<Button variant="ghost" size="icon" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
+                             {!isConfirmationMode && (<Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
                           </div>
                       </div>
-                  </div>
+                      {!isConfirmationMode && (<Button variant="ghost" size="icon" className="absolute top-4 right-4 md:hidden" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
+                </div>
                 </div>
               </CardHeader>
             </Card>
@@ -1523,3 +1524,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
+
+    
