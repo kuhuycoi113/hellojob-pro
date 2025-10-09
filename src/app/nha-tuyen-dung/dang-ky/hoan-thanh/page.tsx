@@ -77,7 +77,7 @@ export default function CompletionPage() {
                             </Button>
                         </div>
                     ) : (
-                        <div className="flex gap-4 flex-shrink-0 mt-4 sm:mt-0 md:ml-auto">
+                        <div className="flex gap-4 flex-shrink-0 mt-4 sm:mt-0">
                             <Button id="HT_NUT_DESAU" variant="outline" size="lg" onClick={handleLater}>
                                 Để sau
                             </Button>
