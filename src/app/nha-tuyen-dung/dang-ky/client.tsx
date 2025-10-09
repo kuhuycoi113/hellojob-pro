@@ -221,6 +221,7 @@ const contentByLang = {
         namePlaceholder: 'Ví dụ: Nguyễn Văn An',
         rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         continueButton: 'Lưu và tiếp tục',
+        backButton: 'Quay lại',
 
     },
     ja: {
@@ -267,6 +268,7 @@ const contentByLang = {
         lineHelper: 'システムが自動的にユーザー名を取得します。',
         rolePlaceholder: '[種別/役割/役職...]',
         continueButton: '保存して続行',
+        backButton: '戻る',
     },
     en: {
         edit: 'Edit',
@@ -312,6 +314,7 @@ const contentByLang = {
         lineHelper: 'The system will automatically extract your username.',
         rolePlaceholder: '[Type/Role/Title...]',
         continueButton: 'Save and Continue',
+        backButton: 'Back',
     }
 };
 
@@ -460,6 +463,13 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     const params = new URLSearchParams(searchParams.toString());
     router.push(`/nha-tuyen-dung/dang-ky/xac-nhan?${params.toString()}`);
   };
+
+  const handleBack = () => {
+      const params = new URLSearchParams(searchParams.toString());
+      // Logic to go back to YL01 dialog if needed, or simply router.back()
+      // For simplicity, we can use router.back() here.
+      router.back();
+  }
 
   const generateRecruiterId = (roleSlug: string): string => {
     const prefixes: { [key: string]: string } = {
@@ -1262,7 +1272,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
   return (
     <>
-      <div className="bg-secondary pb-24">
+      <div id="Y062" className="bg-secondary pb-24">
         <div className="container mx-auto px-4 md:px-6 py-12">
           <div className="max-w-7xl mx-auto">
             {/* Header Section */}
@@ -1481,7 +1491,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
        {!isConfirmationMode && (
         <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
-          <div className="container mx-auto flex justify-center">
+          <div className="container mx-auto flex justify-start gap-4">
+            <Button variant="outline" size="lg" onClick={handleBack}>
+                {t.backButton}
+            </Button>
             <Button size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleContinue}>
                 {t.continueButton}
             </Button>
