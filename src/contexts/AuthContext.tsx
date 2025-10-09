@@ -3,6 +3,13 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import * as chatData from '@/lib/chat-data';
+import {
+  IdTokenResult,
+  onIdTokenChanged,
+  User as FirebaseUser,
+  UserInfo
+} from 'firebase/auth';
+import { Claims, filterStandardClaims } from 'next-firebase-auth-edge/auth/claims';
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
 
@@ -16,6 +23,7 @@ export type PostLoginAction = {
 
 
 interface AuthContextType {
+  user: User | null;
   role: Role;
   isLoggedIn: boolean;
   setRole: (role: Role) => void;
@@ -33,25 +41,48 @@ export const useAuth = () => {
   }
   return context;
 };
+export interface User extends UserInfo {
+  emailVerified: boolean;
+  customClaims: Claims;
+  authTime: number;
+  isAdmin?: boolean;
+  [key: string]: any;
+}
 
 interface AuthProviderProps {
+  serverUser: User | null;
   children: ReactNode;
 }
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+function toAuthTime(date: string) {
+  return new Date(date).getTime() / 1000;
+}
+
+function toUser(user: FirebaseUser, idTokenResult: IdTokenResult): User {
+  return {
+    ...user,
+    emailVerified:
+      user.emailVerified || (idTokenResult.claims.email_verified as boolean),
+    customClaims: filterStandardClaims(idTokenResult.claims),
+    authTime: toAuthTime(idTokenResult.issuedAtTime)
+  };
+}
+
+export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
+  const [user, setUser] = React.useState(serverUser);
   const [role, setInternalRole] = useState<Role>('guest');
   const [postLoginAction, setPostLoginAction] = useState<PostLoginAction>(null);
   const isLoggedIn = role !== 'guest';
 
   const setRole = (newRole: Role) => {
     if (newRole === 'guest') {
-        chatData.setCurrentUser(chatData.guestUser);
+      chatData.setCurrentUser(chatData.guestUser);
     } else { // 'candidate' or 'candidate-empty-profile'
-        chatData.setCurrentUser(chatData.loggedInUser);
+      chatData.setCurrentUser(chatData.loggedInUser);
     }
     setInternalRole(newRole);
   };
-  
+
   const clearPostLoginAction = () => {
     setPostLoginAction(null);
   };
@@ -59,47 +90,48 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
-    
+
     // When role changes to 'candidate-empty-profile' (which is the default on login)
     // we check if there are preferences to apply from the guest session.
     if (role === 'candidate-empty-profile' && preferencesRaw) {
-        try {
-            const preferences = JSON.parse(preferencesRaw);
-            const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
-            let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
+      try {
+        const preferences = JSON.parse(preferencesRaw);
+        const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
+        let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
 
-            // Merge preferences into the profile
-            profile = {
-                ...profile,
-                desiredIndustry: preferences.desiredIndustry || profile.desiredIndustry,
-                aspirations: {
-                    ...profile.aspirations,
-                    desiredVisaType: preferences.desiredVisaType,
-                    desiredVisaDetail: preferences.desiredVisaDetail,
-                    desiredLocation: preferences.desiredLocation,
-                }
-            };
-            localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
-            sessionStorage.removeItem('onboardingPreferences');
-            
-            // After applying preferences, the profile is no longer 'empty' in spirit,
-            // so we transition the role to 'candidate'.
-            setRole('candidate');
+        // Merge preferences into the profile
+        profile = {
+          ...profile,
+          desiredIndustry: preferences.desiredIndustry || profile.desiredIndustry,
+          aspirations: {
+            ...profile.aspirations,
+            desiredVisaType: preferences.desiredVisaType,
+            desiredVisaDetail: preferences.desiredVisaDetail,
+            desiredLocation: preferences.desiredLocation,
+          }
+        };
+        localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+        sessionStorage.removeItem('onboardingPreferences');
 
-        } catch(e) {
-            console.error("Failed to apply onboarding preferences:", e);
-            // If applying preferences fails, we still remove the temp data
-            sessionStorage.removeItem('onboardingPreferences');
-        }
+        // After applying preferences, the profile is no longer 'empty' in spirit,
+        // so we transition the role to 'candidate'.
+        setRole('candidate');
+
+      } catch (e) {
+        console.error("Failed to apply onboarding preferences:", e);
+        // If applying preferences fails, we still remove the temp data
+        sessionStorage.removeItem('onboardingPreferences');
+      }
     } else if (role === 'candidate-empty-profile' && !preferencesRaw) {
-        // If the role is set to empty but there are no preferences, it means a fresh start.
-        // Clear any potentially lingering profile data.
-        localStorage.removeItem('generatedCandidateProfile');
+      // If the role is set to empty but there are no preferences, it means a fresh start.
+      // Clear any potentially lingering profile data.
+      localStorage.removeItem('generatedCandidateProfile');
     }
 
   }, [role]);
 
   const value = {
+    user: user ?? serverUser,
     role,
     isLoggedIn,
     setRole,

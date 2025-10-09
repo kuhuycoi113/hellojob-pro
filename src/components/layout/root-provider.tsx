@@ -8,34 +8,38 @@ import { Footer } from '@/components/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { FloatingChatWidget } from '@/components/chat/floating-chat-widget';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { validateProfileForApplication } from '@/lib/utils';
 import type { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from '../candidate-edit-dialog';
+import { getTokens, Tokens } from 'next-firebase-auth-edge';
+import { cookies } from 'next/headers';
+import { AuthProvider, useAuth, User } from '@/contexts/AuthContext';
+import { filterStandardClaims } from 'next-firebase-auth-edge/auth/claims';
+import { authConfig } from '@/lib/firebase-server';
 
 
 function LayoutManager({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const { toast } = useToast();
-    const { isLoggedIn, postLoginAction, clearPostLoginAction } = useAuth();
+    const { user, isLoggedIn, postLoginAction, clearPostLoginAction } = useAuth();
     const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = useState(false);
     const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
-    
+
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
 
     useEffect(() => {
-      if (isLoggedIn && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
-        setIsPostLoginApplyDialogOpen(true);
-      }
+        if (isLoggedIn && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
+            setIsPostLoginApplyDialogOpen(true);
+        }
     }, [isLoggedIn, postLoginAction]);
-    
+
     const handlePostLoginApply = (apply: boolean) => {
         setIsPostLoginApplyDialogOpen(false); // Close the first dialog
-        
+
         if (apply && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
             const { jobId, jobTitle } = postLoginAction.data;
             const profileRaw = localStorage.getItem('generatedCandidateProfile');
@@ -70,7 +74,7 @@ function LayoutManager({ children }: { children: ReactNode }) {
                 setIsProfileIncompleteAlertOpen(true);
             }
         }
-        
+
         clearPostLoginAction();
     };
 
@@ -94,14 +98,14 @@ function LayoutManager({ children }: { children: ReactNode }) {
             }}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                    <AlertDialogTitle>Tiếp tục ứng tuyển?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Bạn có muốn tiếp tục ứng tuyển công việc "{postLoginAction?.data.jobTitle}" không?
-                    </AlertDialogDescription>
+                        <AlertDialogTitle>Tiếp tục ứng tuyển?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Bạn có muốn tiếp tục ứng tuyển công việc "{postLoginAction?.data.jobTitle}" không?
+                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => handlePostLoginApply(false)}>Từ chối</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handlePostLoginApply(true)}>Đồng ý</AlertDialogAction>
+                        <AlertDialogCancel onClick={() => handlePostLoginApply(false)}>Từ chối</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handlePostLoginApply(true)}>Đồng ý</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -119,9 +123,9 @@ function LayoutManager({ children }: { children: ReactNode }) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <EditProfileDialog 
-                isOpen={isProfileEditDialogOpen} 
-                onOpenChange={setIsProfileEditDialogOpen} 
+            <EditProfileDialog
+                isOpen={isProfileEditDialogOpen}
+                onOpenChange={setIsProfileEditDialogOpen}
                 onSaveSuccess={() => {
                     toast({
                         title: 'Cập nhật thành công!',
@@ -133,14 +137,43 @@ function LayoutManager({ children }: { children: ReactNode }) {
         </>
     );
 }
+export const toUser = ({ decodedToken }: Tokens): User => {
+    const {
+        uid,
+        email,
+        picture: photoURL,
+        email_verified: emailVerified,
+        phone_number: phoneNumber,
+        name: displayName,
+        auth_time: authTime,
+        source_sign_in_provider: signInProvider
+    } = decodedToken;
 
-export function RootProvider({
+    const customClaims = filterStandardClaims(decodedToken);
+
+    return {
+        uid,
+        email: email ?? null,
+        displayName: displayName ?? null,
+        photoURL: photoURL ?? null,
+        phoneNumber: phoneNumber ?? null,
+        emailVerified: emailVerified ?? false,
+        providerId: signInProvider,
+        customClaims,
+        authTime
+    };
+};
+
+
+export async function RootProvider({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const tokens = await getTokens(await cookies(), authConfig);
+    let user = tokens ? toUser(tokens) : null;
     return (
-        <AuthProvider>
+        <AuthProvider serverUser={user}>
             <ChatProvider>
                 <LayoutManager>{children}</LayoutManager>
             </ChatProvider>
