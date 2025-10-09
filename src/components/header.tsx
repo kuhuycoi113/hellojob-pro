@@ -220,6 +220,11 @@ export function Header() {
                 </DropdownMenuRadioItem>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuRadioItem value="recruiter-empty-profile">
+                  Đã đăng nhập (Profile trắng - NTD)
+                </DropdownMenuRadioItem>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                 <DropdownMenuRadioItem value="guest">Khách (Chưa đăng nhập)</DropdownMenuRadioItem>
               </DropdownMenuItem>
             </DropdownMenuRadioGroup>
@@ -245,6 +250,7 @@ export function Header() {
             <SelectItem value="candidate-full-profile">Đã đăng nhập (Profile full)</SelectItem>
             <SelectItem value="candidate">Đã đăng nhập (Có Profile)</SelectItem>
             <SelectItem value="candidate-empty-profile">Đã đăng nhập (Profile trắng)</SelectItem>
+            <SelectItem value="recruiter-empty-profile">Đã đăng nhập (Profile trắng - NTD)</SelectItem>
             <SelectItem value="guest">Khách (Chưa đăng nhập)</SelectItem>
           </SelectContent>
         </Select>

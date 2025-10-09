@@ -328,7 +328,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         console.warn("Manual role setting is disabled.");
         return;
     }
-    // Only set in localStorage and reload. The useEffect will handle the rest.
+    // Set role in localStorage and reload for a clean state
     localStorage.setItem('simulatedRole', newRole);
     window.location.reload();
   };
