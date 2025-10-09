@@ -39,7 +39,7 @@ export default function CompletionPage() {
     const isRecruiter = isLoggedIn && role === 'recruiter-empty-profile';
 
     return (
-        <div id="Y064">
+        <div id="Y063">
             {/* The main content is the disabled version of the employer detail page */}
             <EmployerDetailPage isConfirmationMode={true} />
 
@@ -56,7 +56,7 @@ export default function CompletionPage() {
                         </div>
                     </div>
                     {isRecruiter ? (
-                        <div id="HT_LIENHE" className="flex items-center gap-3 flex-shrink-0 mt-4 md:mt-0 md:ml-auto">
+                        <div id="Y065" className="flex items-center gap-3 flex-shrink-0 mt-4 md:mt-0 md:ml-4">
                             <div className="hidden md:block">
                                 <Logo />
                             </div>
