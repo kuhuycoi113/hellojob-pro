@@ -192,6 +192,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         localStorage.removeItem('simulatedRole');
     }
     toast({ title: "Đăng xuất thành công!" });
+    window.location.reload(); // Reload to clear all state
   };
   
   const clearPostLoginAction = () => {
@@ -324,11 +325,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const setRole = (newRole: Role) => {
     if (process.env.NEXT_PUBLIC_ENABLE_ROLE_SIMULATION !== 'true') {
-        console.warn("Manual role setting is disabled in production.");
+        console.warn("Manual role setting is disabled.");
         return;
     }
+    // Only set in localStorage and reload. The useEffect will handle the rest.
     localStorage.setItem('simulatedRole', newRole);
-    updateAuthAndProfileState(auth.currentUser);
+    window.location.reload();
   };
 
 
