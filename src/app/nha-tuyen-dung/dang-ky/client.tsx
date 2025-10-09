@@ -1308,10 +1308,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                           <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
                             <h1 id="DKTC_TEN" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
                             <p id="DKTC_VAITRO" className="font-semibold text-primary">{roleText}</p>
+                            <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                             <p className="text-sm text-muted-foreground mt-1">
                                 <Badge variant="outline">Mã đối tác: {recruiterId}</Badge>
                             </p>
-                            <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                           </div>
                           <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 md:mt-0 flex-shrink-0 md:ml-auto">
                                <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
