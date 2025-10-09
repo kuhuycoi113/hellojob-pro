@@ -49,7 +49,7 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
         '/nha-tuyen-dung', 
         '/nhuong-quyen', 
         '/viec-lam', 
-        '/nha-tuyen-dung/dang-ky', 
+        '/nha-tuyen-dung/dang-ky',
         '/nha-tuyen-dung/dang-ky/xac-nhan',
         '/nha-tuyen-dung/dang-ky/hoan-thanh',
         ...ntdLandingPagePaths
