@@ -36,7 +36,7 @@ export default function CompletionPage() {
         router.push('/');
     };
 
-    const isRecruiter = isLoggedIn && role === 'recruiter-empty-profile';
+    const isRecruiter = isLoggedIn; // Simplified check for any logged-in user
 
     return (
         <div id="Y063">
@@ -77,7 +77,7 @@ export default function CompletionPage() {
                             </Button>
                         </div>
                     ) : (
-                        <div className="flex gap-4 flex-shrink-0 mt-4 sm:mt-0">
+                        <div id="Y064" className="flex gap-4 flex-shrink-0 mt-4 sm:mt-0">
                             <Button id="HT_NUT_DESAU" variant="outline" size="lg" onClick={handleLater}>
                                 Để sau
                             </Button>
