@@ -414,36 +414,6 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, 
     </Card>
 );
 
-const formatPhoneNumberInput = (value: string, country: string): string => {
-    if (!value) return '';
-    const cleanValue = value.replace(/\D/g, '');
-
-    if (country === '+84') { // Vietnam (10 digits starting with 0)
-        if (cleanValue.length === 0) return '';
-        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,10);
-        if (cleanValue.length === 1) return `(0)`;
-
-        const mobilePart = cleanValue.substring(1);
-        if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
-        if (mobilePart.length <= 6) return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3)}`;
-        return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
-    }
-
-    if (country === '+81') { // Japan (11 digits total starting with 0)
-        if (cleanValue.length === 0) return '';
-        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,11);
-        if (cleanValue.length === 1) return `(0)`;
-        
-        const mobilePart = cleanValue.substring(1); 
-        if (mobilePart.length <= 2) return `(0)${mobilePart}`;
-        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2, 6)}`;
-        return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2,6)} ${mobilePart.slice(6,10)}`;
-    }
-
-    return cleanValue;
-};
-
-
 export default function EmployerDetailPage({ isConfirmationMode = false }: { isConfirmationMode?: boolean }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -1304,27 +1274,26 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                            )}
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} disabled={isConfirmationMode}/>
                       </div>
-                      <div className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16">
+                      <div className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16 w-full">
                           <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
                             <h1 id="DKTC_TEN" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
                             <p id="DKTC_VAITRO" className="font-semibold text-primary">{roleText}</p>
-                             <p className="text-sm text-muted-foreground mt-1">
+                             <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
+                            <p className="text-sm text-muted-foreground mt-1">
                                 <Badge variant="outline">Mã đối tác: {recruiterId}</Badge>
                             </p>
-                            <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                           </div>
-                          <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 md:mt-0 flex-shrink-0 md:ml-auto">
+                          <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 w-full justify-center md:w-auto md:mt-0 flex-shrink-0 md:ml-auto">
                                <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
                                     <TabsList className="grid w-full grid-cols-3">
-                                        <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="md:hidden">VI</span><span className="hidden md:inline">Tiếng Việt</span></TabsTrigger>
-                                        <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="md:hidden">JA</span><span className="hidden md:inline">日本語</span></TabsTrigger>
-                                        <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="md:hidden">EN</span><span className="hidden md:inline">English</span></TabsTrigger>
+                                        <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon className="h-4 w-4" /> <span className="hidden sm:inline">Tiếng Việt</span><span className="sm:hidden">VI</span></TabsTrigger>
+                                        <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon className="h-4 w-4" /> <span className="hidden sm:inline">日本語</span><span className="sm:hidden">JA</span></TabsTrigger>
+                                        <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon className="h-4 w-4" /> <span className="hidden sm:inline">English</span><span className="sm:hidden">EN</span></TabsTrigger>
                                     </TabsList>
                                 </Tabs>
-                             {!isConfirmationMode && (<Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
                           </div>
                       </div>
-                      {!isConfirmationMode && (<Button variant="ghost" size="icon" className="absolute top-4 right-4 md:hidden" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
+                      {!isConfirmationMode && (<Button variant="ghost" size="icon" className="absolute top-4 right-4" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
                 </div>
                 </div>
               </CardHeader>
@@ -1525,4 +1494,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   );
 }
 
-    
