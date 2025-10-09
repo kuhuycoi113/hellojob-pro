@@ -39,16 +39,16 @@ export default function CompletionPage() {
     const isRecruiter = isLoggedIn && role === 'recruiter-empty-profile';
 
     return (
-        <div>
+        <div id="Y064">
             {/* The main content is the disabled version of the employer detail page */}
             <EmployerDetailPage isConfirmationMode={true} />
 
             {/* Sticky footer for success message and actions */}
-            <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
-                <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
+            <div id="HOANTAT_FOOTER" className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
+                <div className="container mx-auto flex flex-col md:flex-row justify-start items-start md:items-center gap-4 text-left">
                     <div className="flex flex-col sm:flex-row items-center gap-3">
                         <CheckCircle className="h-8 w-8 text-accent-orange flex-shrink-0 mb-2 sm:mb-0"/>
-                        <div className="flex-grow">
+                        <div id="HT_THONGBAO" className="flex-grow">
                              <p className="font-semibold text-foreground">Thông tin của bạn đã được gửi, chúng tôi sẽ sớm liên hệ với bạn.</p>
                              <p className="text-sm text-muted-foreground">
                                 {isRecruiter ? "Bạn có muốn liên hệ ngay với HelloJob không?" : "Bạn có muốn tạo tài khoản để lưu lại thông tin không?"}
@@ -56,7 +56,7 @@ export default function CompletionPage() {
                         </div>
                     </div>
                     {isRecruiter ? (
-                        <div className="flex items-center gap-3 flex-shrink-0 mt-4 md:mt-0">
+                        <div id="HT_LIENHE" className="flex items-center gap-3 flex-shrink-0 mt-4 md:mt-0 md:ml-auto">
                             <div className="hidden md:block">
                                 <Logo />
                             </div>
@@ -77,11 +77,11 @@ export default function CompletionPage() {
                             </Button>
                         </div>
                     ) : (
-                        <div className="flex gap-4 flex-shrink-0 mt-4 sm:mt-0">
-                            <Button variant="outline" size="lg" onClick={handleLater}>
+                        <div className="flex gap-4 flex-shrink-0 mt-4 sm:mt-0 md:ml-auto">
+                            <Button id="HT_NUT_DESAU" variant="outline" size="lg" onClick={handleLater}>
                                 Để sau
                             </Button>
-                            <Button size="lg" onClick={handleCreateAccount} className="bg-primary hover:bg-primary/90 text-white">
+                            <Button id="HT_NUT_TAIKHOAN" size="lg" onClick={handleCreateAccount} className="bg-primary hover:bg-primary/90 text-white">
                                 Tạo tài khoản
                             </Button>
                         </div>
