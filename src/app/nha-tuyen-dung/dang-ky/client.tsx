@@ -196,7 +196,7 @@ const contentByLang = {
         messengerLabel: 'Facebook Messenger',
         messengerPlaceholder: 'Ví dụ: Nguyễn Văn An',
         companyNamePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
-        typePlaceholder: 'Ví dụ: Công ty phái cử',
+        typePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
         industriesTitle: 'Ngành nghề & Khu vực',
         mainIndustriesLabel: 'Ngành nghề tuyển dụng chính',
@@ -248,7 +248,7 @@ const contentByLang = {
         headerTitle: '一般情報',
         namePlaceholder: '例: グエン・ヴァン・アン',
         companyNamePlaceholder: '例: ABC株式会社',
-        typePlaceholder: '例: 送り出し機関',
+        typePlaceholder: '[種別/役割/役職...]',
         locationPlaceholder: '例: ベトナム、ハノイ',
         industriesTitle: '業種と分野',
         mainIndustriesLabel: '主要業種',
@@ -294,7 +294,7 @@ const contentByLang = {
         headerTitle: 'General Information',
         namePlaceholder: 'E.g., An Nguyen Van',
         companyNamePlaceholder: 'E.g., ABC Corporation',
-        typePlaceholder: 'E.g., Dispatch Company',
+        typePlaceholder: '[Type/Role/Title...]',
         locationPlaceholder: 'E.g., Hanoi, Vietnam',
         industriesTitle: 'Industries & Sectors',
         mainIndustriesLabel: 'Main Industries',
@@ -746,7 +746,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         <Label>{isIndividual ? "Họ và tên" : "Tên công ty/pháp nhân"}</Label>
                         <Input placeholder={nameLabel} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} />
                     </div>
-                    <div className="space-y-2"><Label>{t.typePlaceholder}</Label><Input placeholder={placeholderEmployerData.type[lang]} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
                     <div className="space-y-2"><Label>{t.locationPlaceholder}</Label><Input placeholder={placeholderEmployerData.location[lang]} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
                 </div>
             );
@@ -1496,3 +1495,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
+
+    
