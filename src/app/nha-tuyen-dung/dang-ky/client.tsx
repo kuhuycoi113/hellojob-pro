@@ -192,6 +192,7 @@ const contentByLang = {
         foundedPlaceholder: 'Ví dụ: 2010',
         sizeLabel: 'Quy mô',
         licenseLabel: 'Giấy phép',
+        licensePlaceholder: 'Ví dụ: Số 123/LĐTBXH-GP',
         websiteLabel: 'Website',
         emailLabel: 'Email liên hệ',
         phoneLabel: 'Số điện thoại',
@@ -238,6 +239,7 @@ const contentByLang = {
         foundedPlaceholder: '例：2010',
         sizeLabel: '従業員数',
         licenseLabel: '許可証',
+        licensePlaceholder: '例：22登-999999',
         websiteLabel: 'ウェブサイト',
         emailLabel: '連絡先メールアドレス',
         phoneLabel: '電話番号',
@@ -284,6 +286,7 @@ const contentByLang = {
         foundedPlaceholder: 'E.g., 2010',
         sizeLabel: 'Company Size',
         licenseLabel: 'License',
+        licensePlaceholder: 'E.g., No. 22T-999999',
         websiteLabel: 'Website',
         emailLabel: 'Contact Email',
         phoneLabel: 'Phone',
@@ -801,7 +804,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         </div>
                         <div className="space-y-2">
                             <Label id="DKDN_GIAYPHEP_LABEL" htmlFor="license">{t.licenseLabel}</Label>
-                            <Input id="DKDN_GIAYPHEP_INPUT" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} />
+                            <Input id="DKDN_GIAYPHEP_INPUT" placeholder={t.licensePlaceholder} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} />
                         </div>
                         <div className="space-y-2">
                            <Label id="DKDN_WEBSITE_LABEL" htmlFor="website">{t.websiteLabel}</Label>
@@ -1504,4 +1507,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
-
