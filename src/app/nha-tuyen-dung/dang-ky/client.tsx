@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -232,6 +231,8 @@ const contentByLang = {
         selectVisaTypePlaceholder: 'Chọn Loại hình',
         selectVisaDetailPlaceholder: 'Chọn Chi tiết',
         rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
+        newRecruiterPlaceholder: 'Nhà tuyển dụng mới',
+        partnerIdLabel: 'Mã đối tác',
         continueButton: 'Lưu và tiếp tục',
         backButton: 'Quay lại',
         cancelButton: 'Huỷ',
@@ -292,6 +293,8 @@ const contentByLang = {
         selectVisaTypePlaceholder: '種別を選択',
         selectVisaDetailPlaceholder: '詳細を選択',
         rolePlaceholder: '[種別/役割/役職...]',
+        newRecruiterPlaceholder: '新規採用担当者',
+        partnerIdLabel: 'パートナーID',
         continueButton: '保存して続行',
         backButton: '戻る',
         cancelButton: 'キャンセル',
@@ -352,6 +355,8 @@ const contentByLang = {
         selectVisaTypePlaceholder: 'Select Type',
         selectVisaDetailPlaceholder: 'Select Details',
         rolePlaceholder: '[Type/Role/Title...]',
+        newRecruiterPlaceholder: 'New Recruiter',
+        partnerIdLabel: 'Partner ID',
         continueButton: 'Save and Continue',
         backButton: 'Back',
         cancelButton: 'Cancel',
@@ -615,35 +620,38 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     });
   }, [lang]);
 
-  const getArrayValue = (value: { [key in Language]?: string[] }, context: 'industries' | 'regions' | 'visaType' | 'visaDetail' | 'interest') => {
+  const getArrayValue = useCallback((value: { [key in Language]?: string[] }, context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
     const items = value?.[lang] || [];
     if (items.length === 0) {
-      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>{t.clickToUpdate}</button>
+      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick('N/A', {}, 'N/A')}>{t.clickToUpdate}</button>
     }
     const dataMap: any = {
         industries: allIndustries,
         regions: japanRegions,
         visaType: japanJobTypes,
         visaDetail: Object.values(visaDetailsByVisaType).flat(),
-        interest: Object.values(interestOptions).flat()
+        interest: Object.values(interestOptions).flat(),
+        valueInterest: Object.values(valueInterestOptions).flat()
     };
     const content = items.map((slug: string, index: number) => {
-        const item = dataMap[context]?.find((i: any) => i.slug === slug);
-        const name = (item?.name?.[lang] || item?.name) || slug;
+        let item;
+        if(context === 'interest' || context === 'valueInterest') {
+            item = dataMap[context]?.find((i: any) => i.id === slug);
+        } else {
+            item = dataMap[context]?.find((i: any) => i.slug === slug);
+        }
+        
+        let name = item?.title || item?.name?.[lang] || item?.name || slug;
+
+        if (context === 'valueInterest') {
+             const valueItem = employer.valueInterest.find((v:any) => v.id === slug);
+             if(valueItem) name = valueItem[lang];
+        }
+
         return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
     });
     return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
-  };
-
-  const getValueInterestValue = (value: any) => {
-      if (Array.isArray(value) && value.length > 0) {
-          const content = value.map((item: any, index: number) => {
-              return <Badge key={item.id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item[lang]}</Badge>
-          });
-          return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
-      }
-      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>{t.clickToUpdate}</button>
-  };
+  }, [lang, isConfirmationMode, t.clickToUpdate, employer]);
 
   if (!employer) {
       return <div className="flex h-screen items-center justify-center">Loading...</div>;
@@ -651,6 +659,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   
   const t = contentByLang[lang] || contentByLang['vi'];
   const headerName = displayName || (isIndividual ? `[${t.namePlaceholder}]` : `[${t.companyNamePlaceholder}]`);
+  const headerRoleText = roleText || t.rolePlaceholder;
 
   const validateEmail = (email: string) => {
     if (!email) return true; // Not required, but if present must be valid
@@ -913,10 +922,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                               </Label>
                              <div className="flex items-center">
                                 <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-                                    <SelectTrigger className="w-[120px] rounded-r-none"><SelectValue /></SelectTrigger>
+                                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="+84">VN (+84)</SelectItem>
-                                        <SelectItem value="+81">JP (+81)</SelectItem>
+                                        <SelectItem value="+84">VN</SelectItem>
+                                        <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <Input id="DKDN_SODIENTHOAI_INPUT" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
@@ -926,10 +935,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                               <Label id="DKDN_ZALO_LABEL" htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
                              <div className="flex items-center relative">
                                 <Select value={zaloCountry} onValueChange={setZaloCountry}>
-                                    <SelectTrigger className="w-[120px] rounded-r-none"><SelectValue /></SelectTrigger>
+                                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="+84">VN (+84)</SelectItem>
-                                        <SelectItem value="+81">JP (+81)</SelectItem>
+                                        <SelectItem value="+84">VN</SelectItem>
+                                        <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
@@ -1318,10 +1327,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                       <div className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16 w-full">
                           <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
                             <h1 id="DKTC_TEN" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                            <p id="DKTC_VAITRO" className="font-semibold text-primary">{roleText}</p>
+                            <p id="DKTC_VAITRO" className="font-semibold text-primary">{headerRoleText}</p>
                              <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                             <p className="text-sm text-muted-foreground mt-1">
-                                <Badge variant="outline">Mã đối tác: {recruiterId}</Badge>
+                                <Badge variant="outline">{t.partnerIdLabel}: {recruiterId}</Badge>
                             </p>
                           </div>
                           <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 w-full justify-center md:w-auto md:mt-0 flex-shrink-0 md:ml-auto">
@@ -1393,7 +1402,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         </div>
                         <div id="DKNV_GIATRI">
                             <p className="font-semibold mb-1">{t.valueInterestLabel}:</p>
-                            {getValueInterestValue(employer.valueInterest)}
+                            {getArrayValue({[lang]: employer.valueInterest.map((item:any) => item.id)}, 'valueInterest')}
                         </div>
                     </div>
                   </SectionCard>
