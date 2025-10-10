@@ -189,6 +189,7 @@ const contentByLang = {
         historyTitle: 'Lịch sử & các mốc sự kiện',
         infoTitle: 'Thông tin doanh nghiệp',
         foundedLabel: 'Năm thành lập',
+        foundedPlaceholder: 'Ví dụ: 2010',
         sizeLabel: 'Quy mô',
         licenseLabel: 'Giấy phép',
         websiteLabel: 'Website',
@@ -233,6 +234,7 @@ const contentByLang = {
         historyTitle: '沿革と主な出来事',
         infoTitle: '企業情報',
         foundedLabel: '設立年',
+        foundedPlaceholder: '例：2010',
         sizeLabel: '従業員数',
         licenseLabel: '許可証',
         websiteLabel: 'ウェブサイト',
@@ -276,6 +278,7 @@ const contentByLang = {
         historyTitle: 'History & Milestones',
         infoTitle: 'Company Information',
         foundedLabel: 'Founded',
+        foundedPlaceholder: 'E.g., 2010',
         sizeLabel: 'Company Size',
         licenseLabel: 'License',
         websiteLabel: 'Website',
@@ -783,32 +786,32 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
              return (
                 <div id="DKTHONGTINDOANHNGHIEP_DIALOG" className="space-y-4">
                     <div id="DKDN_THONGTINCHUNG" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div id="DKDN_NAMTHANHLAP" className="space-y-2">
-                            <Label htmlFor="founded">{t.foundedLabel}</Label>
-                            <Input id="founded" placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} />
+                        <div className="space-y-2">
+                            <Label id="DKDN_NAMTHANHLAP_LABEL" htmlFor="founded">{t.foundedLabel}</Label>
+                            <Input id="DKDN_NAMTHANHLAP_INPUT" placeholder={t.foundedPlaceholder} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} />
                         </div>
-                        <div id="DKDN_QUYMO" className="space-y-2">
-                            <Label htmlFor="size">{t.sizeLabel}</Label>
-                            <Input id="size" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} />
+                        <div className="space-y-2">
+                            <Label id="DKDN_QUYMO_LABEL" htmlFor="size">{t.sizeLabel}</Label>
+                            <Input id="DKDN_QUYMO_INPUT" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} />
                         </div>
-                        <div id="DKDN_GIAYPHEP" className="space-y-2">
-                            <Label htmlFor="license">{t.licenseLabel}</Label>
-                            <Input id="license" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} />
+                        <div className="space-y-2">
+                            <Label id="DKDN_GIAYPHEP_LABEL" htmlFor="license">{t.licenseLabel}</Label>
+                            <Input id="DKDN_GIAYPHEP_INPUT" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} />
                         </div>
-                        <div id="DKDN_WEBSITE" className="space-y-2">
-                           <Label htmlFor="website">{t.websiteLabel}</Label>
-                           <Input id="website" placeholder="https://example.com" value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} />
+                        <div className="space-y-2">
+                           <Label id="DKDN_WEBSITE_LABEL" htmlFor="website">{t.websiteLabel}</Label>
+                           <Input id="DKDN_WEBSITE_INPUT" placeholder="https://example.com" value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} />
                         </div>
                     </div>
                     
                     <div id="DKDN_THONGTINLIENHE" className="pt-4 border-t">
                       <h4 className="font-semibold mb-4">{t.contactTitle}</h4>
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                           <div className="space-y-1 md:col-span-2" id="DKDN_EMAIL">
-                              <Label htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4"/> {t.emailLabel}</Label>
+                           <div className="space-y-1 md:col-span-2">
+                              <Label id="DKDN_EMAIL_LABEL" htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4"/> {t.emailLabel}</Label>
                               <Input 
                                 type="email" 
-                                id="email"
+                                id="DKDN_EMAIL_INPUT"
                                 placeholder="contact@company.com" 
                                 value={tempContent.email} 
                                 onChange={(e) => setTempContent({...tempContent, email: e.target.value})} 
@@ -823,8 +826,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                               />
                                {errors?.email && <p className="text-xs text-destructive">{errors.email}</p>}
                            </div>
-                          <div className="space-y-2" id="DKDN_SODIENTHOAI">
-                              <Label htmlFor="phone" className="flex items-center gap-2">
+                          <div className="space-y-2">
+                              <Label id="DKDN_SODIENTHOAI_LABEL" htmlFor="phone" className="flex items-center gap-2">
                                 <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
                                 {t.phoneLabel}
                               </Label>
@@ -836,11 +839,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                         <SelectItem value="+81">JP (+81)</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="DKDN_SODIENTHOAI_INPUT" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
                             </div>
                           </div>
-                          <div className="space-y-2" id="DKDN_ZALO">
-                              <Label htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
+                          <div className="space-y-2">
+                              <Label id="DKDN_ZALO_LABEL" htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
                              <div className="flex items-center relative">
                                 <Select value={zaloCountry} onValueChange={setZaloCountry}>
                                     <SelectTrigger className="w-[120px] rounded-r-none"><SelectValue /></SelectTrigger>
@@ -849,16 +852,16 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                         <SelectItem value="+81">JP (+81)</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
                                 <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
                             </div>
                           </div>
-                          <div className="space-y-1" id="DKDN_MESSENGER">
-                             <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
+                          <div className="space-y-1">
+                             <Label id="DKDN_MESSENGER_LABEL" htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
                             <Input
-                                id="messenger"
+                                id="DKDN_MESSENGER_INPUT"
                                 placeholder={t.messengerPlaceholder}
                                 value={tempContent.messenger}
                                 onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})}
@@ -868,10 +871,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             {!errors.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
                             {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
-                         <div className="space-y-1" id="DKDN_LINE">
-                            <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
+                         <div className="space-y-1">
+                            <Label id="DKDN_LINE_LABEL" htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
                             <Input
-                                id="line"
+                                id="DKDN_LINE_INPUT"
                                 placeholder={t.linePlaceholder}
                                 value={tempContent.line}
                                 onChange={(e) => setTempContent({...tempContent, line: e.target.value})}
@@ -1180,7 +1183,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 </div>
             );
         default:
-            return <p>Chức năng này đang được phát triển.</p>;
+            return <p>Chức năng đang được phát triển.</p>;
     }
   };
 
@@ -1496,3 +1499,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
+
+    
