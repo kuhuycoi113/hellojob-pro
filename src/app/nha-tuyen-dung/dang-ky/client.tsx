@@ -398,6 +398,34 @@ const interestTexts: Record<string, Record<Language, string>> = {
     'refer-and-post': { vi: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng', ja: '採用担当者へのシステム広報協力', en: 'Collaborate to promote the system to employers' },
 };
 
+const formatPhoneNumberInput = (value: string, country: string): string => {
+    if (!value) return '';
+    const cleanValue = value.replace(/\D/g, '');
+
+    if (country === '+84') { // Vietnam (10 digits starting with 0)
+        if (cleanValue.length === 0) return '';
+        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,10);
+        if (cleanValue.length === 1) return `(0)`;
+
+        const mobilePart = cleanValue.substring(1);
+        if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
+        if (mobilePart.length <= 6) return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3)}`;
+        return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
+    }
+
+    if (country === '+81') { // Japan (11 digits total starting with 0)
+        if (cleanValue.length === 0) return '';
+        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,11);
+        if (cleanValue.length === 1) return `(0)`;
+        
+        const mobilePart = cleanValue.substring(1); 
+        if (mobilePart.length <= 2) return `(0)${mobilePart}`;
+        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2, 6)}`;
+        return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2,6)} ${mobilePart.slice(6,10)}`;
+    }
+
+    return cleanValue;
+};
 
 
 const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, isConfirmationMode }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, id?: string, isConfirmationMode?: boolean }) => (
@@ -905,15 +933,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 </div>
              );
         case 'valueInterest':
-            const currentInterest = tempContent.interest?.[lang]?.[0] || null;
+            const currentInterest = tempContent.interest?.[lang] || [];
             const handleInterestChange = (checked: boolean, interestId: string) => {
-                const currentSelection = tempContent.interest?.[lang] || [];
-                let newSelection;
-                if (checked) {
-                    newSelection = [...currentSelection, interestId];
-                } else {
-                    newSelection = currentSelection.filter((id: string) => id !== interestId);
-                }
+                 const newSelection = checked
+                    ? [interestId] // Allow only one selection
+                    : [];
                 setTempContent({ ...tempContent, interest: { vi: newSelection, ja: newSelection, en: newSelection } });
             };
             
@@ -933,30 +957,23 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                     <div className="space-y-2">
                         <Label className="font-semibold text-base">{t.interestLabel}</Label>
                          <p className="text-sm text-muted-foreground">Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.</p>
-                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                    <div className="flex flex-wrap gap-1">
-                                    {currentInterest ? (
-                                        currentInterest.map((id: string) => <Badge key={id} variant="secondary" className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>{interestOptions[lang].find(i => i.id === id)?.title}</Badge>)
-                                    ) : `Chọn ${t.interestLabel}`}
-                                    </div>
-                                </Button>
-                            </DropdownMenuTrigger>
-                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn nghiệp vụ (có thể chọn nhiều)</DropdownMenuLabel>
-                                {interestOptions[lang].map((option) => (
-                                    <DropdownMenuCheckboxItem
-                                        key={option.id}
-                                        checked={currentInterest.includes(option.id)}
-                                        onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleInterestChange(Boolean(checked), option.id)}
-                                    >
-                                        {option.title}
-                                    </DropdownMenuCheckboxItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                         <RadioGroup
+                            value={currentInterest[0] || ''}
+                            onValueChange={(value) => {
+                                const newSelection = value ? [value] : [];
+                                setTempContent({ ...tempContent, interest: { vi: newSelection, ja: newSelection, en: newSelection } });
+                            }}
+                         >
+                             {interestOptions[currentLang].map((option) => (
+                                <div key={option.id} className="flex items-center space-x-2 rounded-md p-2 hover:bg-accent/50">
+                                    <RadioGroupItem value={option.id} id={`interest-${option.id}`} />
+                                    <Label htmlFor={`interest-${option.id}`} className="font-normal cursor-pointer w-full">
+                                        <p className="font-semibold">{option.title}</p>
+                                        <p className="text-xs text-muted-foreground">{option.desc}</p>
+                                    </Label>
+                                </div>
+                             ))}
+                         </RadioGroup>
                     </div>
                     <div className="space-y-2">
                         <Label className="font-semibold text-base">{t.valueInterestLabel}</Label>
@@ -1506,4 +1523,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
-
