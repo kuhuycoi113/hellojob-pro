@@ -45,19 +45,21 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+// import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import Image from 'next/image';
 import { useChat } from '@/contexts/ChatContext';
 import { mainNavLinks, quickAccessLinks, mobileFooterLinks } from '@/lib/nav-data';
 import { useAuth, type Role } from '@/contexts/AuthContext';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
-import { AuthDialog } from './auth-dialog';
-import { locations } from '@/lib/location-data';
+// import { AuthDialog } from './auth-dialog';
+// import { locations } from '@/lib/location-data';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { MobileSecondaryHeader } from './mobile-secondary-header';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Label } from './ui/label';
+// import { MobileSecondaryHeader } from './mobile-secondary-header';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+// import { Label } from './ui/label';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { AuthDialog } from '@/components/auth-dialog';
 
 
 export const Logo = ({ className }: { className?: string }) => (
@@ -68,7 +70,7 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { openChat } = useChat();
-  const { role, setRole, isLoggedIn } = useAuth();
+  const { role, isLoggedIn } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [profileCreationStep, setProfileCreationStep] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -412,7 +414,7 @@ export function Header() {
             ))}
           </div>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
+        {/* <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
           value={role}
           onValueChange={(value) => setRole(value as 'candidate' | 'candidate-empty-profile' | 'guest')}
@@ -431,29 +433,29 @@ export function Header() {
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
             <DropdownMenuRadioItem value="guest">Khách (Chưa đăng nhập)</DropdownMenuRadioItem>
           </DropdownMenuItem>
-        </DropdownMenuRadioGroup>
+        </DropdownMenuRadioGroup> */}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 
-  const MobileRoleSwitcher = () => {
-    const { role, setRole } = useAuth();
-    return (
-      <div className="p-4 mt-auto border-t">
-        <Label className="text-xs font-medium text-muted-foreground">Mô phỏng vai trò</Label>
-        <Select value={role} onValueChange={(value) => setRole(value as Role)}>
-          <SelectTrigger className="w-full mt-1">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="candidate">Đã đăng nhập (Có Profile)</SelectItem>
-            <SelectItem value="candidate-empty-profile">Đã đăng nhập (Profile trắng)</SelectItem>
-            <SelectItem value="guest">Khách (Chưa đăng nhập)</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-    );
-  }
+  // const MobileRoleSwitcher = () => {
+  //   const { role, setRole } = useAuth();
+  //   return (
+  //     <div className="p-4 mt-auto border-t">
+  //       <Label className="text-xs font-medium text-muted-foreground">Mô phỏng vai trò</Label>
+  //       <Select value={role} onValueChange={(value) => setRole(value as Role)}>
+  //         <SelectTrigger className="w-full mt-1">
+  //           <SelectValue />
+  //         </SelectTrigger>
+  //         <SelectContent>
+  //           <SelectItem value="candidate">Đã đăng nhập (Có Profile)</SelectItem>
+  //           <SelectItem value="candidate-empty-profile">Đã đăng nhập (Profile trắng)</SelectItem>
+  //           <SelectItem value="guest">Khách (Chưa đăng nhập)</SelectItem>
+  //         </SelectContent>
+  //       </Select>
+  //     </div>
+  //   );
+  // }
 
   const LoggedInContent = () => (
     <>
@@ -496,7 +498,7 @@ export function Header() {
             })}
             </div>
         </div>
-        <MobileRoleSwitcher />
+        {/* <MobileRoleSwitcher /> */}
     </>
   );
 
@@ -527,7 +529,7 @@ const LoggedOutContent = () => {
                 })}
             </div>
           </div>
-          <MobileRoleSwitcher />
+          {/* <MobileRoleSwitcher /> */}
         </div>
     );
 };
@@ -561,7 +563,7 @@ const LoggedOutContent = () => {
                             {isLoggedIn ? (
                                 <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                     <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
-                                        <AvatarImage src={"https://placehold.co/100x100.png" || undefined} alt="User Avatar" data-ai-hint="user avatar" />
+                                        <AvatarImage src={"https://placehold.co/100x100.png"} alt="User Avatar" data-ai-hint="user avatar" />
                                         <AvatarFallback>A</AvatarFallback>
                                     </Avatar>
                                 </Link>
@@ -619,7 +621,7 @@ const LoggedOutContent = () => {
                 )}
             </div>
         </header>
-        {isClient && isMobile && <MobileSecondaryHeader />}
+        {/* {isClient && isMobile && <MobileSecondaryHeader />} */}
     </div>
      <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
         <AlertDialogContent>

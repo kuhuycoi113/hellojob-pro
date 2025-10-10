@@ -7,6 +7,58 @@ export type Industry = {
     keywords: string[];
 };
 
+export const CAREERS = {
+  "thuc-tap-sinh-ky-nang": [
+    "Ngư nghiệp",
+    "Nông Nghiệp",
+    "Thực phẩm",
+    "Sản xuất, dịch vụ tổng hợp",
+    "Cơ khí, kim loại",
+    "Xây dựng",
+    "May mặc"
+  ],
+  "ky-nang-dac-dinh": [
+    "Ngư nghiệp",
+    "Nông nghiệp",
+    "Nhà hàng",
+    "Thực phẩm",
+    "Sản xuất, dịch vụ tổng hợp",
+    "Điện, điện tử",
+    "Chế tạo Vật liệu",
+    "Cơ khí, chế tạo máy",
+    "Ô tô",
+    "Hàng không",
+    "Vận tải",
+    "Xây dựng",
+    "Vệ sinh toà nhà",
+    "Lưu trú, khách sạn",
+    "Điều dưỡng"
+  ],
+  "ky-su-tri-thuc": [
+    "Nông lâm ngư nghiệp",
+    "Thực phẩm",
+    "Sản xuất, chế tạo, công nghệ",
+    "Cơ khí, máy móc",
+    "Công nghệ ô tô",
+    "Vận chuyển hàng hoá",
+    "Xây dựng",
+    "Khách sạn, lưu trú",
+    "Y tế, điều dưỡng",
+    "Kinh doanh, kinh tế",
+    "Tài chính, kế toán, bảo hiểm",
+    "Báo chí, truyền thông, marketing",
+    "Công nghệ thông tin",
+    "Nghiên cứu, phân tích",
+    "Giáo dục, đào tạo",
+    "Hành chính, văn phòng",
+    "Pháp lý",
+    "Nghệ thuật, nghệ sĩ",
+    "Thể dục thể thao",
+    "Nghề có kỹ năng chuyên nghiệp",
+    "Việc làm bán chuyên nghiệp"
+  ]
+}
+
 export const industriesByJobType: { [key: string]: Industry[] } = {
     'thuc-tap-sinh-ky-nang': [
       { name: 'Ngư nghiệp', slug: 'ngu-nghiep', termCode: '11411', keywords: [

@@ -9,7 +9,7 @@ import {
   User as FirebaseUser,
   UserInfo
 } from 'firebase/auth';
-import { Claims, filterStandardClaims } from 'next-firebase-auth-edge/auth/claims';
+import { Claims,filterStandardClaims } from "next-firebase-auth-edge/lib/auth/claims";
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
 
@@ -69,37 +69,34 @@ function toUser(user: FirebaseUser, idTokenResult: IdTokenResult): User {
 }
 
 export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
-  const [user, setUser] = React.useState(serverUser);
-  const [role, setInternalRole] = useState<Role>('guest');
+  // Xác định role dựa vào serverUser
+  let role: Role = 'guest';
+  if (serverUser) {
+    if (!serverUser.phoneNumber || !serverUser.email) {
+      role = 'candidate-empty-profile';
+    } else {
+      role = 'candidate';
+    }
+  }
+
   const [postLoginAction, setPostLoginAction] = useState<PostLoginAction>(null);
   const isLoggedIn = role !== 'guest';
 
-  const setRole = (newRole: Role) => {
-    if (newRole === 'guest') {
-      chatData.setCurrentUser(chatData.guestUser);
-    } else { // 'candidate' or 'candidate-empty-profile'
-      chatData.setCurrentUser(chatData.loggedInUser);
-    }
-    setInternalRole(newRole);
-  };
+  // setRole không còn cần thiết, nhưng giữ lại hàm rỗng để không lỗi các nơi gọi
+  const setRole = (_role: Role) => {};
 
   const clearPostLoginAction = () => {
     setPostLoginAction(null);
   };
 
-
   useEffect(() => {
     const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
-
-    // When role changes to 'candidate-empty-profile' (which is the default on login)
-    // we check if there are preferences to apply from the guest session.
     if (role === 'candidate-empty-profile' && preferencesRaw) {
       try {
         const preferences = JSON.parse(preferencesRaw);
         const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
         let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
 
-        // Merge preferences into the profile
         profile = {
           ...profile,
           desiredIndustry: preferences.desiredIndustry || profile.desiredIndustry,
@@ -112,26 +109,17 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
         };
         localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
         sessionStorage.removeItem('onboardingPreferences');
-
-        // After applying preferences, the profile is no longer 'empty' in spirit,
-        // so we transition the role to 'candidate'.
-        setRole('candidate');
-
       } catch (e) {
         console.error("Failed to apply onboarding preferences:", e);
-        // If applying preferences fails, we still remove the temp data
         sessionStorage.removeItem('onboardingPreferences');
       }
     } else if (role === 'candidate-empty-profile' && !preferencesRaw) {
-      // If the role is set to empty but there are no preferences, it means a fresh start.
-      // Clear any potentially lingering profile data.
       localStorage.removeItem('generatedCandidateProfile');
     }
-
   }, [role]);
 
   const value = {
-    user: user ?? serverUser,
+    user: serverUser,
     role,
     isLoggedIn,
     setRole,

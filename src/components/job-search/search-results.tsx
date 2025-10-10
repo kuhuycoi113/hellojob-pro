@@ -53,6 +53,7 @@ export { experienceYears };
 
 type SearchResultsProps = {
     jobs: Job[];
+    total: number;
     filters: SearchFilters;
     appliedFilters: SearchFilters;
     onFilterChange: (newFilters: Partial<SearchFilters>) => void;
@@ -63,7 +64,7 @@ type SearchResultsProps = {
     onSortChange: (value: string) => void;
 }
 
-export const SearchResults = ({ jobs, filters, appliedFilters, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange }: SearchResultsProps) => {
+export const SearchResults = ({ jobs,total, filters, appliedFilters, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange }: SearchResultsProps) => {
     const [visibleJobsCount, setVisibleJobsCount] = useState(24);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -110,7 +111,7 @@ export const SearchResults = ({ jobs, filters, appliedFilters, onFilterChange, a
 
                 <div className="md:col-span-3 lg:col-span-3">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">Kết quả ({jobs.length})</h2>
+                        <h2 className="text-xl font-bold">Kết quả ({total})</h2>
                         <div className="flex items-center gap-2">
                             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                               <SheetTrigger asChild>
