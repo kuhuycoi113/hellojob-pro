@@ -924,7 +924,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 newBenefits[index] = {...newBenefits[index], [lang]: e.target.value};
                                 setTempContent(newBenefits);
                             }} />
-                             <Button variant="ghost" size="icon" onClick={()={() => removeTempArrayItem(index)}}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
                     <Button variant="outline" onClick={() => addTempArrayItem('benefits')}><PlusCircle className="mr-2"/> Thêm phúc lợi</Button>
@@ -1523,3 +1523,4 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   );
 }
 
+    
