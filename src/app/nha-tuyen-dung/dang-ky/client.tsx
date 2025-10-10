@@ -214,10 +214,16 @@ const contentByLang = {
         industriesTitle: 'Ngành nghề & Khu vực',
         mainIndustriesLabel: 'Ngành nghề tuyển dụng chính',
         secondaryIndustriesLabel: 'Khu vực tuyển dụng chính',
+        selectMainIndustriesPlaceholder: 'Chọn Ngành nghề tuyển dụng chính',
+        selectSecondaryIndustriesPlaceholder: 'Chọn Khu vực tuyển dụng chính',
         benefitsTitle: 'Phúc lợi & Môi trường',
-        valueInterestTitle: 'Nghiệp vụ, giá trị quan tâm',
+        valueInterestTitle: 'Nghiệp vụ & Giá trị quan tâm',
         interestLabel: "Nghiệp vụ quan tâm",
+        interestDescription: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.",
         valueInterestLabel: "Giá trị quan tâm",
+        valueInterestDescription: "Điều gì là quan trọng nhất với bạn khi hợp tác?",
+        selectInterestPlaceholder: "Chọn nghiệp vụ quan tâm",
+        selectValueInterestPlaceholder: "Chọn giá trị quan tâm",
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
@@ -226,8 +232,6 @@ const contentByLang = {
         visaDetailLabel: 'Chi tiết loại hình visa',
         selectVisaTypePlaceholder: 'Chọn Loại hình',
         selectVisaDetailPlaceholder: 'Chọn Chi tiết',
-        selectMainIndustriesPlaceholder: 'Chọn Ngành nghề tuyển dụng chính',
-        selectSecondaryIndustriesPlaceholder: 'Chọn Khu vực tuyển dụng chính',
         rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         continueButton: 'Lưu và tiếp tục',
         backButton: 'Quay lại',
@@ -267,10 +271,16 @@ const contentByLang = {
         industriesTitle: '業種と分野',
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: '主な採用地域',
+        selectMainIndustriesPlaceholder: '主要な募集業種を選択',
+        selectSecondaryIndustriesPlaceholder: '主な採用地域を選択',
         benefitsTitle: '福利厚生と環境',
-        valueInterestTitle: '業務、価値観',
+        valueInterestTitle: '業務と価値観',
         interestLabel: "関心のある業務",
+        interestDescription: "最高の体験のために、あなたの主な目標を教えてください。複数選択可能です。",
         valueInterestLabel: "関心のある価値",
+        valueInterestDescription: "提携において最も重要なことは何ですか？",
+        selectInterestPlaceholder: "関心のある業務を選択",
+        selectValueInterestPlaceholder: "関心のある価値を選択",
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
         registerAction: '登録',
@@ -279,8 +289,6 @@ const contentByLang = {
         visaDetailLabel: 'ビザ詳細',
         selectVisaTypePlaceholder: '種別を選択',
         selectVisaDetailPlaceholder: '詳細を選択',
-        selectMainIndustriesPlaceholder: '主要な募集業種を選択',
-        selectSecondaryIndustriesPlaceholder: '主な採用地域を選択',
         rolePlaceholder: '[種別/役割/役職...]',
         continueButton: '保存して続行',
         backButton: '戻る',
@@ -320,10 +328,16 @@ const contentByLang = {
         industriesTitle: 'Industries & Sectors',
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Main Recruitment Areas',
+        selectMainIndustriesPlaceholder: 'Select Main Industries',
+        selectSecondaryIndustriesPlaceholder: 'Select Main Recruitment Areas',
         benefitsTitle: 'Benefits & Environment',
         valueInterestTitle: 'Operations & Values',
         interestLabel: "Operations of Interest",
+        interestDescription: "Tell us your main goal for the best experience. You can select multiple items.",
         valueInterestLabel: "Desired Values",
+        valueInterestDescription: "What is most important to you in a partnership?",
+        selectInterestPlaceholder: "Select operations of interest",
+        selectValueInterestPlaceholder: "Select desired values",
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
         registerAction: 'Register',
@@ -332,8 +346,6 @@ const contentByLang = {
         visaDetailLabel: 'Visa Details',
         selectVisaTypePlaceholder: 'Select Type',
         selectVisaDetailPlaceholder: 'Select Details',
-        selectMainIndustriesPlaceholder: 'Select Main Industries',
-        selectSecondaryIndustriesPlaceholder: 'Select Main Recruitment Areas',
         rolePlaceholder: '[Type/Role/Title...]',
         continueButton: 'Save and Continue',
         backButton: 'Back',
@@ -963,14 +975,14 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 <div id="DKNGHIEPVUGIATRIQUANTAM_DIALOG" className="space-y-6">
                     <div id="DKNV_NGHIEPVU" className="space-y-2">
                         <Label className="font-semibold text-base">{t.interestLabel}</Label>
-                        <p className="text-sm text-muted-foreground">Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.</p>
+                        <p className="text-sm text-muted-foreground">{t.interestDescription}</p>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
                                     <div className="flex flex-wrap gap-1">
                                         {currentInterest.length > 0 ? (
                                             currentInterest.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(interestOptions[lang].find(o => o.id === id))?.title}</Badge>)
-                                        ) : `Chọn ${t.interestLabel}`}
+                                        ) : t.selectInterestPlaceholder}
                                     </div>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -993,14 +1005,14 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                     </div>
                     <div id="DKNV_GIATRI" className="space-y-2">
                         <Label className="font-semibold text-base">{t.valueInterestLabel}</Label>
-                        <p className="text-sm text-muted-foreground">Điều gì là quan trọng nhất với bạn khi hợp tác?</p>
+                        <p className="text-sm text-muted-foreground">{t.valueInterestDescription}</p>
                         <DropdownMenu>
                            <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
                                     <div className="flex flex-wrap gap-1">
                                     {currentValueInterests.length > 0 ? (
                                         currentValueInterests.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(valueInterestOptions[lang].find(o => o.id === id))?.title}</Badge>)
-                                    ) : `Chọn ${t.valueInterestLabel}`}
+                                    ) : t.selectValueInterestPlaceholder}
                                     </div>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -1525,5 +1537,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
-
-    
