@@ -191,6 +191,7 @@ const contentByLang = {
         foundedLabel: 'Năm thành lập',
         foundedPlaceholder: 'Ví dụ: 2010',
         sizeLabel: 'Quy mô',
+        sizePlaceholder: 'Ví dụ: 50 - 100 nhân viên',
         licenseLabel: 'Giấy phép',
         licensePlaceholder: 'Ví dụ: Số 123/LĐTBXH-GP',
         websiteLabel: 'Website',
@@ -238,6 +239,7 @@ const contentByLang = {
         foundedLabel: '設立年',
         foundedPlaceholder: '例：2010',
         sizeLabel: '従業員数',
+        sizePlaceholder: '例：50～100名',
         licenseLabel: '許可証',
         licensePlaceholder: '例：22登-999999',
         websiteLabel: 'ウェブサイト',
@@ -285,6 +287,7 @@ const contentByLang = {
         foundedLabel: 'Founded',
         foundedPlaceholder: 'E.g., 2010',
         sizeLabel: 'Company Size',
+        sizePlaceholder: 'E.g., 50 - 100 employees',
         licenseLabel: 'License',
         licensePlaceholder: 'E.g., No. 22T-999999',
         websiteLabel: 'Website',
@@ -800,7 +803,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         </div>
                         <div className="space-y-2">
                             <Label id="DKDN_QUYMO_LABEL" htmlFor="size">{t.sizeLabel}</Label>
-                            <Input id="DKDN_QUYMO_INPUT" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} />
+                            <Input id="DKDN_QUYMO_INPUT" placeholder={t.sizePlaceholder} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} />
                         </div>
                         <div className="space-y-2">
                             <Label id="DKDN_GIAYPHEP_LABEL" htmlFor="license">{t.licenseLabel}</Label>
@@ -1507,3 +1510,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
+
+    
