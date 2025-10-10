@@ -225,7 +225,8 @@ const contentByLang = {
         rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         continueButton: 'Lưu và tiếp tục',
         backButton: 'Quay lại',
-
+        cancelButton: 'Huỷ',
+        saveButton: 'Lưu thay đổi',
     },
     ja: {
         edit: '編集',
@@ -270,6 +271,8 @@ const contentByLang = {
         rolePlaceholder: '[種別/役割/役職...]',
         continueButton: '保存して続行',
         backButton: '戻る',
+        cancelButton: 'キャンセル',
+        saveButton: '変更を保存',
     },
     en: {
         edit: 'Edit',
@@ -314,6 +317,8 @@ const contentByLang = {
         rolePlaceholder: '[Type/Role/Title...]',
         continueButton: 'Save and Continue',
         backButton: 'Back',
+        cancelButton: 'Cancel',
+        saveButton: 'Save Changes',
     }
 };
 
@@ -1488,10 +1493,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
            </div>
           <DialogFooter>
             <DialogClose asChild>
-                <Button variant="outline">Hủy</Button>
+                <Button variant="outline">{t.cancelButton}</Button>
             </DialogClose>
              {(editingModule) && (
-                <Button onClick={handleSaveChanges}>Lưu thay đổi</Button>
+                <Button onClick={handleSaveChanges}>{t.saveButton}</Button>
              )}
           </DialogFooter>
         </DialogContent>
@@ -1500,4 +1505,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   );
 }
 
-    
