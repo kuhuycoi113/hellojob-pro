@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, QrCode, CheckCircle, FileSignature, HardHat, UserCheck, Globe, Users2, FastForward, ListChecks, GraduationCap, Users, UserSquare, UserCog, UserPlus, Handshake, Plane } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { cn, parseMessengerInput, parseZaloInput, parseLineInput } from '@/lib/utils';
+import { cn, parseMessengerInput, parseZaloInput, parseLineInput, formatPhoneNumberInput } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';

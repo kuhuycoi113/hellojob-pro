@@ -69,3 +69,32 @@ export const parseLineInput = (input: string): string => {
   // Fallback to treat the whole input as an ID, removing potential URL parts and special characters
   return trimmedInput.split('/').pop()?.replace(/^[~@]/, '') || trimmedInput.replace(/^[~@]/, '');
 };
+
+export const formatPhoneNumberInput = (value: string, country: string): string => {
+    if (!value) return '';
+    const cleanValue = value.replace(/\D/g, '');
+
+    if (country === '+84') { // Vietnam (10 digits starting with 0)
+        if (cleanValue.length === 0) return '';
+        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,10);
+        if (cleanValue.length === 1) return `(0)`;
+
+        const mobilePart = cleanValue.substring(1);
+        if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
+        if (mobilePart.length <= 6) return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3)}`;
+        return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
+    }
+
+    if (country === '+81') { // Japan (11 digits total starting with 0)
+        if (cleanValue.length === 0) return '';
+        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,11);
+        if (cleanValue.length === 1) return `(0)`;
+        
+        const mobilePart = cleanValue.substring(1); 
+        if (mobilePart.length <= 2) return `(0)${mobilePart}`;
+        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2, 6)}`;
+        return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2,6)} ${mobilePart.slice(6,10)}`;
+    }
+
+    return cleanValue;
+};
