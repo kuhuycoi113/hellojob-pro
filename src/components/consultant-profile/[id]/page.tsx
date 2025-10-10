@@ -11,7 +11,7 @@ import { Award, Briefcase, Handshake, MessageSquare, PieChart, Send, ShieldCheck
 import { MessengerIcon, ZaloIcon } from '@/components/custom-icons';
 import { ContactButtons } from '@/components/contact-buttons';
 import { consultants as consultantData } from '@/lib/consultant-data';
-import { jobData, type Job } from '@/lib/mock-data';
+import { jobData, type Job } from '@/lib/job-data';
 import { JobCard } from '@/components/job-card';
 import Link from 'next/link';
 import { industryGroups } from '@/lib/industry-data';
@@ -220,7 +220,7 @@ export default function ConsultantDetailPage({ params }: { params: { id: string 
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {consultantJobs.length > 0 ? (
                         consultantJobs.map(job => (
-                            <JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} />
+                            <JobCard key={job.id} job={job} showRecruiterName={false} />
                         ))
                     ) : (
                         <p className="text-muted-foreground col-span-2">Hiện tại tư vấn viên này chưa phụ trách công việc nào.</p>
@@ -233,5 +233,3 @@ export default function ConsultantDetailPage({ params }: { params: { id: string 
     </div>
   );
 }
-
-    
