@@ -237,6 +237,7 @@ const contentByLang = {
         saveButton: 'Lưu thay đổi',
         examplePlaceholder: 'Ví dụ:',
         addMilestoneButton: 'Thêm mốc',
+        addBenefitButton: 'Thêm phúc lợi',
         selectMainIndustriesPlaceholder: "Chọn Ngành nghề tuyển dụng chính",
         selectSecondaryIndustriesPlaceholder: "Chọn Khu vực tuyển dụng chính",
     },
@@ -295,6 +296,7 @@ const contentByLang = {
         saveButton: '変更を保存',
         examplePlaceholder: '例：',
         addMilestoneButton: 'マイルストーンを追加',
+        addBenefitButton: '福利厚生を追加',
         selectMainIndustriesPlaceholder: "主要な募集業種を選択",
         selectSecondaryIndustriesPlaceholder: "主な採用地域を選択",
     },
@@ -353,6 +355,7 @@ const contentByLang = {
         saveButton: 'Save Changes',
         examplePlaceholder: 'E.g.,',
         addMilestoneButton: 'Add Milestone',
+        addBenefitButton: 'Add Benefit',
         selectMainIndustriesPlaceholder: "Select Main Industries",
         selectSecondaryIndustriesPlaceholder: "Select Main Recruitment Areas",
     }
@@ -799,7 +802,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                            <Input id={`dialog-image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} />
                         </Label>
                         <Input 
-                            placeholder={`Ví dụ: ${placeholderEmployerData.images[index]?.alt[lang] || 'Văn phòng hiện đại'}`}
+                            placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.images[index]?.alt[lang] || 'Văn phòng hiện đại'}`}
                             value={img.alt[lang] || ''}
                             onChange={(e) => handleTempArrayMultiLangChange(index, 'alt', e.target.value)}
                         />
@@ -947,7 +950,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                              <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
-                    <Button variant="outline" onClick={() => addTempArrayItem('benefits')}><PlusCircle className="mr-2"/> Thêm phúc lợi</Button>
+                    <Button variant="outline" onClick={() => addTempArrayItem('benefits')}><PlusCircle className="mr-2"/> {t.addBenefitButton}</Button>
                 </div>
              );
         case 'valueInterest':
@@ -1243,51 +1246,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       }
       return phone;
   }
-
-  const getArrayValue = (field: any, fieldKey: string) => {
-    const value = field?.[lang] || [];
-    if (Array.isArray(value) && value.length > 0) {
-      if (fieldKey === 'interest') {
-          const content = value.map((id: string, index: number) => {
-              const item = interestOptions[lang].find(i => i.id === id);
-              return item ? (
-                  <Badge key={id} variant="secondary" className="font-normal">
-                      <span className="font-bold mr-1.5">{index + 1}.</span>
-                      {item.title}
-                  </Badge>
-              ) : null;
-          }).filter(Boolean);
-          return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
-      }
-      
-      const allItems = [...japanJobTypes, ...Object.values(visaDetailsByVisaType).flat(), ...allIndustries, ...japanRegions];
-      
-      const content = value.map((slug: string, index: number) => {
-          const item: any = allItems.find((i: any) => i.slug === slug);
-          let name = slug;
-          if (item && 'name' in item && typeof item.name === 'object') {
-            name = item.name[lang];
-          }
-          else if (item && 'name' in item && typeof item.name === 'string') {
-             name = item.name;
-          }
-          return (
-            <Badge key={slug} variant="secondary" className="font-normal">
-              <span className="font-bold mr-1.5">{index + 1}.</span>
-              {name}
-            </Badge>
-          );
-      });
-      
-      return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
-    }
-
-    const editTitle = fieldKey === 'industries' ? t.industriesTitle : (fieldKey === 'interest' ? t.valueInterestTitle : t.visaTitle);
-    const editField = fieldKey === 'interest' ? 'valueInterest' : (fieldKey === 'industries' ? 'industries' : 'visa');
-    const editData = fieldKey === 'interest' ? { interest: employer.interest, valueInterest: employer.valueInterest } : (fieldKey === 'industries' ? employer.industries : { visaType: employer.visaType, visaDetail: employer.visaDetail });
-
-    return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(editTitle, editData, editField)}>{t.clickToUpdate}</button>
-  };
 
   const getValueInterestValue = (value: any) => {
       if (Array.isArray(value) && value.length > 0) {
