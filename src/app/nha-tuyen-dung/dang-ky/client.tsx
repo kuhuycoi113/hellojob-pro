@@ -264,9 +264,6 @@ const contentByLang = {
         visaTitle: '種別とビザ',
         visaTypeLabel: '種別',
         visaDetailLabel: 'ビザ詳細',
-        messengerHelper: 'システムが自動的にユーザー名を取得します。',
-        linePlaceholder: 'LineのリンクまたはIDを入力してください',
-        lineHelper: 'システムが自動的にユーザー名を取得します。',
         rolePlaceholder: '[種別/役割/役職...]',
         continueButton: '保存して続行',
         backButton: '戻る',
@@ -310,9 +307,6 @@ const contentByLang = {
         visaTitle: 'Type and Visa',
         visaTypeLabel: 'Type',
         visaDetailLabel: 'Visa Details',
-        messengerHelper: 'The system will automatically extract your username.',
-        linePlaceholder: 'Paste Line link or enter your ID',
-        lineHelper: 'The system will automatically extract your username.',
         rolePlaceholder: '[Type/Role/Title...]',
         continueButton: 'Save and Continue',
         backButton: 'Back',
@@ -818,25 +812,34 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             );
         case 'info':
              return (
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2"><Label>{t.foundedLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} /></div>
-                        <div className="space-y-2"><Label>{t.sizeLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} /></div>
-                        <div className="space-y-2"><Label>{t.licenseLabel}</Label><Input placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} /></div>
-                        <div className="space-y-2">
-                           <Label>{t.websiteLabel}</Label>
-                           <Input placeholder="https://example.com" value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} />
+                <div id="DKTHONGTINDOANHNGHIEP_DIALOG" className="space-y-4">
+                    <div id="DKDN_THONGTINCHUNG" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div id="DKDN_NAMTHANHLAP" className="space-y-2">
+                            <Label htmlFor="founded" id="DKDN_NAMTHANHLAP_LABEL">{t.foundedLabel}</Label>
+                            <Input id="founded" placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} />
+                        </div>
+                        <div id="DKDN_QUYMO" className="space-y-2">
+                            <Label htmlFor="size" id="DKDN_QUYMO_LABEL">{t.sizeLabel}</Label>
+                            <Input id="size" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} />
+                        </div>
+                        <div id="DKDN_GIAYPHEP" className="space-y-2">
+                            <Label htmlFor="license" id="DKDN_GIAYPHEP_LABEL">{t.licenseLabel}</Label>
+                            <Input id="license" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} />
+                        </div>
+                        <div id="DKDN_WEBSITE" className="space-y-2">
+                           <Label htmlFor="website" id="DKDN_WEBSITE_LABEL">{t.websiteLabel}</Label>
+                           <Input id="website" placeholder="https://example.com" value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} />
                         </div>
                     </div>
                     
-                    <div className="pt-4 border-t">
+                    <div id="DKDN_THONGTINLIENHE" className="pt-4 border-t">
                       <h4 className="font-semibold mb-4">{t.contactTitle}</h4>
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                           <div className="space-y-1 md:col-span-2">
-                              <Label htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4"/> {t.emailLabel}</Label>
+                           <div className="space-y-1 md:col-span-2" id="DKDN_EMAIL">
+                              <Label htmlFor="email" className="flex items-center gap-2" id="DKDN_EMAIL_LABEL"><Mail className="h-4 w-4"/> {t.emailLabel}</Label>
                               <Input 
                                 type="email" 
-                                id="email" 
+                                id="DKDN_EMAIL_INPUT"
                                 placeholder="contact@company.com" 
                                 value={tempContent.email} 
                                 onChange={(e) => setTempContent({...tempContent, email: e.target.value})} 
@@ -851,42 +854,42 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                               />
                                {errors?.email && <p className="text-xs text-destructive">{errors.email}</p>}
                            </div>
-                          <div className="space-y-2">
-                              <Label htmlFor="phone" className="flex items-center gap-2">
+                          <div className="space-y-2" id="DKDN_SODIENTHOAI">
+                              <Label htmlFor="phone" className="flex items-center gap-2" id="DKDN_SODIENTHOAI_LABEL">
                                 <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
                                 {t.phoneLabel}
                               </Label>
                              <div className="flex items-center">
                                 <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-                                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
+                                    <SelectTrigger className="w-[120px] rounded-r-none"><SelectValue /></SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="+84">VN</SelectItem>
-                                        <SelectItem value="+81">JP</SelectItem>
+                                        <SelectItem value="+84">VN (+84)</SelectItem>
+                                        <SelectItem value="+81">JP (+81)</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="DKDN_SODIENTHOAI_INPUT" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
                             </div>
                           </div>
-                          <div className="space-y-2">
-                              <Label htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
+                          <div className="space-y-2" id="DKDN_ZALO">
+                              <Label htmlFor="zalo" className="flex items-center gap-2" id="DKDN_ZALO_LABEL"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
                              <div className="flex items-center relative">
                                 <Select value={zaloCountry} onValueChange={setZaloCountry}>
-                                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
+                                    <SelectTrigger className="w-[120px] rounded-r-none"><SelectValue /></SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="+84">VN</SelectItem>
-                                        <SelectItem value="+81">JP</SelectItem>
+                                        <SelectItem value="+84">VN (+84)</SelectItem>
+                                        <SelectItem value="+81">JP (+81)</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
                                 <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
                             </div>
                           </div>
-                          <div className="space-y-1">
-                             <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
+                          <div className="space-y-1" id="DKDN_MESSENGER">
+                             <Label htmlFor="messenger" className="flex items-center gap-2" id="DKDN_MESSENGER_LABEL"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
                             <Input
-                                id="messenger"
+                                id="DKDN_MESSENGER_INPUT"
                                 placeholder={t.messengerPlaceholder}
                                 value={tempContent.messenger}
                                 onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})}
@@ -896,10 +899,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             {!errors.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
                             {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
-                         <div className="space-y-1">
-                            <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
+                         <div className="space-y-1" id="DKDN_LINE">
+                            <Label htmlFor="line" className="flex items-center gap-2" id="DKDN_LINE_LABEL"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
                             <Input
-                                id="line"
+                                id="DKDN_LINE_INPUT"
                                 placeholder={t.linePlaceholder}
                                 value={tempContent.line}
                                 onChange={(e) => setTempContent({...tempContent, line: e.target.value})}
@@ -1265,7 +1268,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     }
 
     const editTitle = fieldKey === 'industries' ? t.industriesTitle : (fieldKey === 'interest' ? t.valueInterestTitle : t.visaTitle);
-    const editField = fieldKey === 'interest' ? 'valueInterest' : (fieldKey === 'industries' ? 'industries' : { visaType: employer.visaType, visaDetail: employer.visaDetail });
+    const editField = fieldKey === 'interest' ? 'valueInterest' : (fieldKey === 'industries' ? 'industries' : 'visa');
     const editData = fieldKey === 'interest' ? { interest: employer.interest, valueInterest: employer.valueInterest } : (fieldKey === 'industries' ? employer.industries : { visaType: employer.visaType, visaDetail: employer.visaDetail });
 
     return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(editTitle, editData, editField)}>{t.clickToUpdate}</button>
@@ -1538,3 +1541,138 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
+
+```
+- src/pages/sitemap.xml.ts:
+```ts
+
+import { GetServerSideProps } from 'next';
+import { articles } from '@/lib/handbook-data';
+import { jobData } from '@/lib/mock-data';
+
+const generateSitemap = (
+  staticPaths: string[],
+  handbookArticles: typeof articles,
+  jobs: typeof jobData
+): string => {
+  const siteUrl = 'https://vi.hellojob.jp';
+
+  const staticUrls = staticPaths.map(path => `
+    <url>
+      <loc>${siteUrl}${path}</loc>
+      <lastmod>${new Date().toISOString()}</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>${path === '/' ? '1.0' : '0.8'}</priority>
+    </url>`);
+
+  const handbookUrls = handbookArticles.map(article => `
+    <url>
+      <loc>${siteUrl}/cam-nang/${article.slug}</loc>
+      <lastmod>${new Date().toISOString()}</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.7</priority>
+    </url>`);
+
+  const jobUrls = jobs.map(job => `
+    <url>
+      <loc>${siteUrl}/viec-lam/${job.id}</loc>
+      <lastmod>${new Date().toISOString()}</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.9</priority>
+    </url>`);
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      ${staticUrls.join('')}
+      ${handbookUrls.join('')}
+      ${jobUrls.join('')}
+    </urlset>
+  `;
+};
+
+export const getServerSideProps: GetServerSideProps = async ({ res }) => {
+  const staticPaths = [
+    '/',
+    '/lo-trinh',
+    '/career-orientation',
+    '/career-orientation/holland',
+    '/career-orientation/disc',
+    '/career-orientation/mbti',
+    '/tao-ho-so-ai',
+    '/hoc-tap',
+    '/cam-nang',
+    '/gioi-thieu',
+    '/ho-so-cua-toi',
+    '/nha-tuyen-dung',
+    '/nhuong-quyen',
+    '/doi-tac/dang-tin-tuyen-dung',
+    '/bang-dieu-khien',
+    '/gop-y',
+    '/nang-cap-premium',
+    '/gioi-thieu-ban-be',
+    '/viec-lam',
+    '/tim-viec-lam',
+    '/chat',
+    '/viec-lam-cua-toi',
+  ];
+
+  const sitemap = generateSitemap(staticPaths, articles, jobData);
+
+  res.setHeader('Content-Type', 'text/xml');
+  res.write(sitemap);
+  res.end();
+
+  return {
+    props: {},
+  };
+};
+
+// This is a placeholder component because Next.js Pages Router requires a default export.
+// It will not be rendered because getServerSideProps handles the response.
+const SitemapPage = () => null;
+
+export default SitemapPage;
+```
+- tsconfig.json:
+```json
+
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+```
