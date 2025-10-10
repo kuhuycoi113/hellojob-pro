@@ -933,40 +933,62 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 </div>
              );
         case 'valueInterest':
-            const currentInterest = tempContent.interest?.[lang] || '';
-            const handleInterestChange = (value: string) => {
-                setTempContent({ ...tempContent, interest: { vi: value, ja: value, en: value } });
+            const currentInterest = tempContent.interest?.[lang] || [];
+            const handleInterestChange = (checked: boolean, interestId: string) => {
+                const newSelection = checked
+                    ? [...currentInterest, interestId]
+                    : currentInterest.filter((id: string) => id !== interestId);
+                setTempContent({ ...tempContent, interest: { ...tempContent.interest, [lang]: newSelection }});
             };
-            
-            const currentValueInterests = Array.isArray(tempContent.valueInterest) ? tempContent.valueInterest.map((item:any) => item.id) : [];
+
+            const currentValueInterests = Array.isArray(tempContent.valueInterest) ? tempContent.valueInterest.map((item: any) => item.id) : [];
             const handleValueInterestChange = (checked: boolean, interestId: string) => {
                 let newSelection;
                 if (checked) {
-                    newSelection = [...tempContent.valueInterest, { id: interestId, vi: valueInterestOptions['vi'].find(o=>o.id===interestId)?.title, ja: valueInterestOptions['ja'].find(o=>o.id===interestId)?.title, en: valueInterestOptions['en'].find(o=>o.id===interestId)?.title }];
+                    newSelection = [...currentValueInterests, interestId];
                 } else {
-                    newSelection = tempContent.valueInterest.filter((item: any) => item.id !== interestId);
+                    newSelection = currentValueInterests.filter((id: string) => id !== interestId);
                 }
-                setTempContent({ ...tempContent, valueInterest: newSelection });
+                const newObjects = newSelection.map(id => ({
+                    id,
+                    vi: valueInterestOptions['vi'].find(o=>o.id===id)?.title,
+                    ja: valueInterestOptions['ja'].find(o=>o.id===id)?.title,
+                    en: valueInterestOptions['en'].find(o=>o.id===id)?.title,
+                }));
+                setTempContent({ ...tempContent, valueInterest: newObjects });
             };
 
             return (
                 <div id="DKNGHIEPVUGIATRIQUANTAM_DIALOG" className="space-y-6">
                     <div id="DKNV_NGHIEPVU" className="space-y-2">
                         <Label className="font-semibold text-base">{t.interestLabel}</Label>
-                         <p className="text-sm text-muted-foreground">Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.</p>
-                         <RadioGroup
-                            value={currentInterest || ''}
-                            onValueChange={handleInterestChange}
-                         >
-                             {(interestOptions[lang] || []).map((option) => (
-                                <div key={option.id} className="flex items-center space-x-2 rounded-md p-2 hover:bg-accent/50">
-                                    <RadioGroupItem value={option.id} id={`interest-${option.id}`} />
-                                    <Label htmlFor={`interest-${option.id}`} className="font-normal cursor-pointer w-full">
-                                        <p className="font-semibold">{option.title}</p>
-                                    </Label>
-                                </div>
-                             ))}
-                         </RadioGroup>
+                        <p className="text-sm text-muted-foreground">Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.</p>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                    <div className="flex flex-wrap gap-1">
+                                        {currentInterest.length > 0 ? (
+                                            currentInterest.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(interestOptions[lang].find(o => o.id === id))?.title}</Badge>)
+                                        ) : `Chọn ${t.interestLabel}`}
+                                    </div>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuLabel>Chọn nghiệp vụ</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {(interestOptions[lang] || []).map((option) => (
+                                     <DropdownMenuCheckboxItem
+                                        key={option.id}
+                                        checked={currentInterest.includes(option.id)}
+                                        onSelect={(e) => e.preventDefault()}
+                                        onCheckedChange={(checked) => handleInterestChange(Boolean(checked), option.id)}
+                                    >
+                                        <span className="font-bold w-6 mr-2">{currentInterest.includes(option.id) ? `${currentInterest.indexOf(option.id) + 1}.` : ''}</span>
+                                        {option.title}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                     <div id="DKNV_GIATRI" className="space-y-2">
                         <Label className="font-semibold text-base">{t.valueInterestLabel}</Label>
@@ -1001,14 +1023,14 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 </div>
             );
         case 'visa':
-            const currentVisaTypes = Array.isArray(tempContent.visaType?.[lang]) ? tempContent.visaType[lang] : [];
+            const currentVisaTypes = tempContent.visaType?.[lang] || [];
             const handleVisaTypeChange = (checked: boolean, typeSlug: string) => {
                 const newSelection = checked
                     ? [...currentVisaTypes, typeSlug]
                     : currentVisaTypes.filter((slug: string) => slug !== typeSlug);
 
                 const newVisaDetails = (tempContent.visaDetail?.[lang] || []).filter((detailSlug: string) => 
-                    newSelection.some(visaSlug => 
+                    newSelection.some((visaSlug: string) => 
                         (visaDetailsByVisaType[visaSlug as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === detailSlug)
                     )
                 );
@@ -1019,7 +1041,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 });
             };
 
-            const currentVisaDetails = Array.isArray(tempContent.visaDetail?.[lang]) ? tempContent.visaDetail[lang] : [];
+            const currentVisaDetails = tempContent.visaDetail?.[lang] || [];
             const handleDetailCheckboxChange = (checked: boolean, detailSlug: string) => {
                 const newSelection = checked
                     ? [...currentVisaDetails, detailSlug]
@@ -1103,7 +1125,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 </div>
             );
         case 'industries':
-            const currentIndustries = Array.isArray(tempContent.main?.[lang]) ? tempContent.main[lang] : [];
+            const currentIndustries = tempContent.main?.[lang] || [];
             const handleIndustryChange = (checked: boolean, industrySlug: string) => {
                 const newSelection = checked
                     ? [...currentIndustries, industrySlug]
@@ -1111,7 +1133,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 setTempContent({ ...tempContent, main: { ...tempContent.main, [lang]: newSelection }});
             };
             
-            const currentRegions = Array.isArray(tempContent.secondary?.[lang]) ? tempContent.secondary[lang] : [];
+            const currentRegions = tempContent.secondary?.[lang] || [];
             const handleRegionChange = (checked: boolean, regionSlug: string) => {
                 const newSelection = checked
                     ? [...currentRegions, regionSlug]
