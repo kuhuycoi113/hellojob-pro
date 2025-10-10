@@ -274,7 +274,7 @@ const contentByLang = {
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: '主な採用地域',
         benefitsTitle: '福利厚生と環境',
-        valueInterestTitle: '業務と価値観',
+        valueInterestTitle: "業務と価値観",
         interestLabel: "関心のある業務",
         interestDescription: "最高の体験のために、あなたの主な目標を教えてください。複数選択可能です。",
         valueInterestLabel: "関心のある価値",
@@ -771,6 +771,36 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         });
     };
   
+  const getArrayValue = (value: { [key in Language]: string[] }, context: 'industries' | 'regions' | 'visaType' | 'visaDetail' | 'interest') => {
+    const items = value?.[lang] || [];
+    if (items.length === 0) {
+      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>{t.clickToUpdate}</button>
+    }
+    const dataMap: any = {
+        industries: allIndustries,
+        regions: japanRegions,
+        visaType: japanJobTypes,
+        visaDetail: Object.values(visaDetailsByVisaType).flat(),
+        interest: Object.values(interestOptions).flat()
+    };
+    const content = items.map((slug: string, index: number) => {
+        const item = dataMap[context]?.find((i: any) => i.slug === slug);
+        const name = (item?.name?.[lang] || item?.name) || slug;
+        return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
+    });
+    return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
+  };
+
+  const getValueInterestValue = (value: any) => {
+      if (Array.isArray(value) && value.length > 0) {
+          const content = value.map((item: any, index: number) => {
+              return <Badge key={item.id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item[lang]}</Badge>
+          });
+          return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
+      }
+      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>{t.clickToUpdate}</button>
+  };
+
   const renderEditContent = () => {
     if (!editingModule) return <p>Chức năng đang được phát triển.</p>;
 
@@ -818,7 +848,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 <div className="space-y-4">
                     {tempContent.map((item: any, index: number) => (
                         <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
-                            <Input placeholder="Năm" value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
+                            <Input placeholder={t.foundedPlaceholder} value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
                             <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayMultiLangChange(index, 'event', e.target.value)} />
                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
@@ -1246,18 +1276,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       }
       return phone;
   }
-
-  const getValueInterestValue = (value: any) => {
-      if (Array.isArray(value) && value.length > 0) {
-          const content = value.map((item: any, index: number) => {
-              return <Badge key={item.id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item[lang]}</Badge>
-          });
-          return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
-      }
-      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>{t.clickToUpdate}</button>
-  };
-
-
+  
   return (
     <>
       <div id="Y062" className="bg-secondary pb-24">
