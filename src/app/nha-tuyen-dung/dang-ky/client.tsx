@@ -772,6 +772,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         <Label>{isIndividual ? t.namePlaceholder : t.companyNamePlaceholder}</Label>
                         <Input placeholder={isIndividual ? t.namePlaceholder : t.companyNamePlaceholder} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} />
                     </div>
+                    <div className="space-y-2"><Label>{t.typePlaceholder}</Label><Input placeholder={placeholderEmployerData.type[lang]} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
                     <div className="space-y-2"><Label>{t.locationPlaceholder}</Label><Input placeholder={placeholderEmployerData.location[lang]} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
                 </div>
             );
@@ -932,10 +933,9 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 </div>
              );
         case 'valueInterest':
-            const currentInterest = tempContent.interest?.[lang] || [];
+            const currentInterest = tempContent.interest?.[lang] || '';
             const handleInterestChange = (value: string) => {
-                 const newSelection = value ? [value] : [];
-                setTempContent({ ...tempContent, interest: { vi: newSelection, ja: newSelection, en: newSelection } });
+                setTempContent({ ...tempContent, interest: { vi: value, ja: value, en: value } });
             };
             
             const currentValueInterests = Array.isArray(tempContent.valueInterest) ? tempContent.valueInterest.map((item:any) => item.id) : [];
@@ -950,12 +950,12 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             };
 
             return (
-                <div className="space-y-6">
-                    <div className="space-y-2">
+                <div id="DKNGHIEPVUGIATRIQUANTAM_DIALOG" className="space-y-6">
+                    <div id="DKNV_NGHIEPVU" className="space-y-2">
                         <Label className="font-semibold text-base">{t.interestLabel}</Label>
                          <p className="text-sm text-muted-foreground">Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.</p>
                          <RadioGroup
-                            value={currentInterest[0] || ''}
+                            value={currentInterest || ''}
                             onValueChange={handleInterestChange}
                          >
                              {(interestOptions[lang] || []).map((option) => (
@@ -968,7 +968,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                              ))}
                          </RadioGroup>
                     </div>
-                    <div className="space-y-2">
+                    <div id="DKNV_GIATRI" className="space-y-2">
                         <Label className="font-semibold text-base">{t.valueInterestLabel}</Label>
                         <p className="text-sm text-muted-foreground">Điều gì là quan trọng nhất với bạn khi hợp tác?</p>
                         <DropdownMenu>
@@ -1516,4 +1516,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
-
