@@ -115,7 +115,7 @@ const placeholderEmployerData = {
     about: {
         vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
         ja: 'ABC派遣会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。長年の経験により、私たちは何千人ものベトナム人労働者の夢を支援してきたことを誇りに思っています...',
-        en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\'\'\' dreams take flight...'
+        en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\' dreams take flight...'
     },
     images: [
       { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
@@ -127,7 +127,7 @@ const placeholderEmployerData = {
         { year: '2010', event: { vi: 'Thành lập công ty cổ phần ABC.', ja: 'ABC株式会社設立。', en: 'Established ABC Corporation.' } },
         { year: '2015', event: { vi: 'Đạt mốc 1.000 lao động được phái cử thành công.', ja: '派遣労働者1,000人達成。', en: 'Reached the milestone of 1,000 successfully dispatched workers.' } },
         { year: '2020', event: { vi: 'Mở rộng văn phòng đại diện tại Tokyo, Nhật Bản.', ja: '東京に駐在員事務所を開設。', en: 'Opened representative office in Tokyo, Japan.' } },
-        { year: '2023', event: { vi: 'Nhận giải thưởng "Công ty phái cử uy tín của năm".', ja: '「今年の信頼できる派遣会社」賞を受賞。', en: '\'\'\'Reputable Dispatch Company of the Year\'\'\' award.' } }
+        { year: '2023', event: { vi: 'Nhận giải thưởng "Công ty phái cử uy tín của năm".', ja: '「今年の信頼できる派遣会社」賞を受賞。', en: 'Reputable Dispatch Company of the Year award.' } }
     ],
     info: {
         founded: '2010',
@@ -179,6 +179,7 @@ const emptyEmployerData = {
 };
 
 
+type Language = 'vi' | 'ja' | 'en';
 
 const contentByLang = {
     vi: {
@@ -391,36 +392,6 @@ const interestTexts: Record<string, Record<Language, string>> = {
     'refer-and-post': { vi: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng', ja: '採用担当者へのシステム広報協力', en: 'Collaborate to promote the system to employers' },
 };
 
-const formatPhoneNumberInput = (value: string, country: string): string => {
-    if (!value) return '';
-    const cleanValue = value.replace(/\D/g, '');
-
-    if (country === '+84') { // Vietnam (10 digits starting with 0)
-        if (cleanValue.length === 0) return '';
-        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,10);
-        if (cleanValue.length === 1) return `(0)`;
-
-        const mobilePart = cleanValue.substring(1);
-        if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
-        if (mobilePart.length <= 6) return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3)}`;
-        return `(0) ${mobilePart.slice(0, 3)} ${mobilePart.slice(3, 6)} ${mobilePart.slice(6, 9)}`;
-    }
-
-    if (country === '+81') { // Japan (11 digits total starting with 0)
-        if (cleanValue.length === 0) return '';
-        if (!cleanValue.startsWith('0')) return `0${cleanValue}`.slice(0,11);
-        if (cleanValue.length === 1) return `(0)`;
-        
-        const mobilePart = cleanValue.substring(1); 
-        if (mobilePart.length <= 2) return `(0)${mobilePart}`;
-        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2, 6)}`;
-        return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2,6)} ${mobilePart.slice(6,10)}`;
-    }
-
-    return cleanValue;
-};
-
-
 const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, isConfirmationMode }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, id?: string, isConfirmationMode?: boolean }) => (
     <Card className={cn("shadow-lg", className)} id={id}>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -457,9 +428,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
   const handleBack = () => {
       const params = new URLSearchParams(searchParams.toString());
-      // Logic to go back to YL01 dialog if needed, or simply router.back()
-      // For simplicity, we can use router.back() here.
-      router.back();
+      router.push(`/nha-tuyen-dung?${params.toString()}`);
   }
 
   const generateRecruiterId = (roleSlug: string): string => {
@@ -815,19 +784,19 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 <div id="DKTHONGTINDOANHNGHIEP_DIALOG" className="space-y-4">
                     <div id="DKDN_THONGTINCHUNG" className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div id="DKDN_NAMTHANHLAP" className="space-y-2">
-                            <Label htmlFor="founded" id="DKDN_NAMTHANHLAP_LABEL">{t.foundedLabel}</Label>
+                            <Label htmlFor="founded">{t.foundedLabel}</Label>
                             <Input id="founded" placeholder={`Ví dụ: ${placeholderEmployerData.info.founded}`} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} />
                         </div>
                         <div id="DKDN_QUYMO" className="space-y-2">
-                            <Label htmlFor="size" id="DKDN_QUYMO_LABEL">{t.sizeLabel}</Label>
+                            <Label htmlFor="size">{t.sizeLabel}</Label>
                             <Input id="size" placeholder={`Ví dụ: ${placeholderEmployerData.info.size[lang]}`} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} />
                         </div>
                         <div id="DKDN_GIAYPHEP" className="space-y-2">
-                            <Label htmlFor="license" id="DKDN_GIAYPHEP_LABEL">{t.licenseLabel}</Label>
+                            <Label htmlFor="license">{t.licenseLabel}</Label>
                             <Input id="license" placeholder={`Ví dụ: ${placeholderEmployerData.info.license}`} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} />
                         </div>
                         <div id="DKDN_WEBSITE" className="space-y-2">
-                           <Label htmlFor="website" id="DKDN_WEBSITE_LABEL">{t.websiteLabel}</Label>
+                           <Label htmlFor="website">{t.websiteLabel}</Label>
                            <Input id="website" placeholder="https://example.com" value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} />
                         </div>
                     </div>
@@ -836,10 +805,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                       <h4 className="font-semibold mb-4">{t.contactTitle}</h4>
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                            <div className="space-y-1 md:col-span-2" id="DKDN_EMAIL">
-                              <Label htmlFor="email" className="flex items-center gap-2" id="DKDN_EMAIL_LABEL"><Mail className="h-4 w-4"/> {t.emailLabel}</Label>
+                              <Label htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4"/> {t.emailLabel}</Label>
                               <Input 
                                 type="email" 
-                                id="DKDN_EMAIL_INPUT"
+                                id="email"
                                 placeholder="contact@company.com" 
                                 value={tempContent.email} 
                                 onChange={(e) => setTempContent({...tempContent, email: e.target.value})} 
@@ -855,7 +824,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                {errors?.email && <p className="text-xs text-destructive">{errors.email}</p>}
                            </div>
                           <div className="space-y-2" id="DKDN_SODIENTHOAI">
-                              <Label htmlFor="phone" className="flex items-center gap-2" id="DKDN_SODIENTHOAI_LABEL">
+                              <Label htmlFor="phone" className="flex items-center gap-2">
                                 <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
                                 {t.phoneLabel}
                               </Label>
@@ -867,11 +836,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                         <SelectItem value="+81">JP (+81)</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="DKDN_SODIENTHOAI_INPUT" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
                             </div>
                           </div>
                           <div className="space-y-2" id="DKDN_ZALO">
-                              <Label htmlFor="zalo" className="flex items-center gap-2" id="DKDN_ZALO_LABEL"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
+                              <Label htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
                              <div className="flex items-center relative">
                                 <Select value={zaloCountry} onValueChange={setZaloCountry}>
                                     <SelectTrigger className="w-[120px] rounded-r-none"><SelectValue /></SelectTrigger>
@@ -880,16 +849,16 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                         <SelectItem value="+81">JP (+81)</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="zalo" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
                                 <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
                             </div>
                           </div>
                           <div className="space-y-1" id="DKDN_MESSENGER">
-                             <Label htmlFor="messenger" className="flex items-center gap-2" id="DKDN_MESSENGER_LABEL"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
+                             <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
                             <Input
-                                id="DKDN_MESSENGER_INPUT"
+                                id="messenger"
                                 placeholder={t.messengerPlaceholder}
                                 value={tempContent.messenger}
                                 onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})}
@@ -900,9 +869,9 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                          <div className="space-y-1" id="DKDN_LINE">
-                            <Label htmlFor="line" className="flex items-center gap-2" id="DKDN_LINE_LABEL"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
+                            <Label htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
                             <Input
-                                id="DKDN_LINE_INPUT"
+                                id="line"
                                 placeholder={t.linePlaceholder}
                                 value={tempContent.line}
                                 onChange={(e) => setTempContent({...tempContent, line: e.target.value})}
@@ -1400,8 +1369,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             {getValueInterestValue(employer.valueInterest)}
                         </div>
                     </div>
-                    <CardTitle id="DKNV_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><CheckCircle className="text-primary h-6 w-6"/>{t.valueInterestTitle}</CardTitle>
-                    <Button id="DKNV_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')} /></Button>
                   </SectionCard>
                   <SectionCard id="DKLICHSU" title={t.historyTitle} icon={History} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.historyTitle, employer.history, 'history')}>
                        <ul id="DKLS_DANHSACH" className="space-y-4 text-sm">
@@ -1413,8 +1380,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                               </li>
                           )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
-                       <CardTitle id="DKLS_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><History className="text-primary h-6 w-6"/>{t.historyTitle}</CardTitle>
-                       <Button id="DKLS_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
                   <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
                       <div id="DKHA_LUOIANH" className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1431,8 +1396,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                               </div>
                           ))}
                       </div>
-                      <CardTitle id="DKHA_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><ImageIcon className="text-primary h-6 w-6"/>{t.imagesTitle}</CardTitle>
-                      <Button id="DKHA_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
                   <SectionCard id="DKPHUCLOI" title={t.benefitsTitle} icon={Award} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
                       <ul id="DKPL_DANHSACH" className="space-y-2 text-sm">
@@ -1442,8 +1405,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                               </li>
                           )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
-                      <CardTitle id="DKPL_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><Award className="text-primary h-6 w-6"/>{t.benefitsTitle}</CardTitle>
-                      <Button id="DKPL_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
               </div>
               
@@ -1457,9 +1418,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             <p id="DKDN_GIAYPHEP"><strong>{t.licenseLabel}:</strong> {employer.info.license || t.notUpdated}</p>
                             <p id="DKDN_WEBSITE"><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || t.notUpdated}</a></p>
                         </div>
-                        <CardTitle id="DKDN_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><Building className="text-primary h-6 w-6"/>{t.infoTitle}</CardTitle>
-                        <Button id="DKDN_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
-
+                        
                         {hasContactInfo ? (
                             <div id="DKTHONGTINLIENHE" className="mt-6 border-t pt-4 space-y-2">
                                {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
@@ -1488,16 +1447,12 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                           <div id="DKLV_LOAIHINH"><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
                           <div id="DKLV_CHITIETVISA"><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
                       </div>
-                      <CardTitle id="DKLV_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><FileSignature className="text-primary h-6 w-6"/>{t.visaTitle}</CardTitle>
-                      <Button id="DKLV_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
                   <SectionCard id="DKNGANHNGHEKHUVUC" title={t.industriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
                           <div id="DKNK_NGANHNGHE"><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
                           <div id="DKNK_KHUVUC"><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
                       </div>
-                      <CardTitle id="DKNK_TIEUDE" className="font-headline text-xl flex items-center gap-3 invisible"><Briefcase className="text-primary h-6 w-6"/>{t.industriesTitle}</CardTitle>
-                      <Button id="DKNK_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
               </div>
 
@@ -1541,138 +1496,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
-
-```
-- src/pages/sitemap.xml.ts:
-```ts
-
-import { GetServerSideProps } from 'next';
-import { articles } from '@/lib/handbook-data';
-import { jobData } from '@/lib/mock-data';
-
-const generateSitemap = (
-  staticPaths: string[],
-  handbookArticles: typeof articles,
-  jobs: typeof jobData
-): string => {
-  const siteUrl = 'https://vi.hellojob.jp';
-
-  const staticUrls = staticPaths.map(path => `
-    <url>
-      <loc>${siteUrl}${path}</loc>
-      <lastmod>${new Date().toISOString()}</lastmod>
-      <changefreq>weekly</changefreq>
-      <priority>${path === '/' ? '1.0' : '0.8'}</priority>
-    </url>`);
-
-  const handbookUrls = handbookArticles.map(article => `
-    <url>
-      <loc>${siteUrl}/cam-nang/${article.slug}</loc>
-      <lastmod>${new Date().toISOString()}</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>`);
-
-  const jobUrls = jobs.map(job => `
-    <url>
-      <loc>${siteUrl}/viec-lam/${job.id}</loc>
-      <lastmod>${new Date().toISOString()}</lastmod>
-      <changefreq>daily</changefreq>
-      <priority>0.9</priority>
-    </url>`);
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-      ${staticUrls.join('')}
-      ${handbookUrls.join('')}
-      ${jobUrls.join('')}
-    </urlset>
-  `;
-};
-
-export const getServerSideProps: GetServerSideProps = async ({ res }) => {
-  const staticPaths = [
-    '/',
-    '/lo-trinh',
-    '/career-orientation',
-    '/career-orientation/holland',
-    '/career-orientation/disc',
-    '/career-orientation/mbti',
-    '/tao-ho-so-ai',
-    '/hoc-tap',
-    '/cam-nang',
-    '/gioi-thieu',
-    '/ho-so-cua-toi',
-    '/nha-tuyen-dung',
-    '/nhuong-quyen',
-    '/doi-tac/dang-tin-tuyen-dung',
-    '/bang-dieu-khien',
-    '/gop-y',
-    '/nang-cap-premium',
-    '/gioi-thieu-ban-be',
-    '/viec-lam',
-    '/tim-viec-lam',
-    '/chat',
-    '/viec-lam-cua-toi',
-  ];
-
-  const sitemap = generateSitemap(staticPaths, articles, jobData);
-
-  res.setHeader('Content-Type', 'text/xml');
-  res.write(sitemap);
-  res.end();
-
-  return {
-    props: {},
-  };
-};
-
-// This is a placeholder component because Next.js Pages Router requires a default export.
-// It will not be rendered because getServerSideProps handles the response.
-const SitemapPage = () => null;
-
-export default SitemapPage;
-```
-- tsconfig.json:
-```json
-
-{
-  "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
-  },
-  "include": [
-    "next-env.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
-}
-```
