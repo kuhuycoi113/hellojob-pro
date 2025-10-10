@@ -364,7 +364,7 @@ const contentByLang = {
         examplePlaceholder: 'E.g.,',
         addMilestoneButton: 'Add Milestone',
         addBenefitButton: 'Add Benefit',
-        addImageButton: 'Add Photo',
+        addImageButton: 'Thêm ảnh',
         selectMainIndustriesPlaceholder: "Select Main Industries",
         selectSecondaryIndustriesPlaceholder: "Select Main Recruitment Areas",
     }
@@ -472,6 +472,40 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const [displayName, setDisplayName] = React.useState('');
   const [roleText, setRoleText] = React.useState('');
   const [recruiterId, setRecruiterId] = React.useState('');
+  const t = contentByLang[lang] || contentByLang['vi'];
+
+  const getArrayValue = useCallback((value: { [key in Language]?: string[] }, context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
+    const items = value?.[lang] || [];
+    if (items.length === 0) {
+      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick('N/A', {}, 'N/A')}>{t.clickToUpdate}</button>
+    }
+    const dataMap: any = {
+        industries: allIndustries,
+        regions: japanRegions,
+        visaType: japanJobTypes,
+        visaDetail: Object.values(visaDetailsByVisaType).flat(),
+        interest: Object.values(interestOptions).flat(),
+        valueInterest: Object.values(valueInterestOptions).flat()
+    };
+    const content = items.map((slug: string, index: number) => {
+        let item;
+        if(context === 'interest' || context === 'valueInterest') {
+            item = dataMap[context]?.find((i: any) => i.id === slug);
+        } else {
+            item = dataMap[context]?.find((i: any) => i.slug === slug);
+        }
+        
+        let name = item?.title || item?.name?.[lang] || item?.name || slug;
+
+        if (context === 'valueInterest') {
+             const valueItem = employer.valueInterest.find((v:any) => v.id === slug);
+             if(valueItem) name = valueItem[lang];
+        }
+
+        return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
+    });
+    return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
+  }, [lang, isConfirmationMode, t.clickToUpdate, employer]);
   
   const handleLangChange = (lang: Language) => {
     setLang(lang);
@@ -620,44 +654,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     });
   }, [lang]);
 
-  const getArrayValue = useCallback((value: { [key in Language]?: string[] }, context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
-    const items = value?.[lang] || [];
-    if (items.length === 0) {
-      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick('N/A', {}, 'N/A')}>{t.clickToUpdate}</button>
-    }
-    const dataMap: any = {
-        industries: allIndustries,
-        regions: japanRegions,
-        visaType: japanJobTypes,
-        visaDetail: Object.values(visaDetailsByVisaType).flat(),
-        interest: Object.values(interestOptions).flat(),
-        valueInterest: Object.values(valueInterestOptions).flat()
-    };
-    const content = items.map((slug: string, index: number) => {
-        let item;
-        if(context === 'interest' || context === 'valueInterest') {
-            item = dataMap[context]?.find((i: any) => i.id === slug);
-        } else {
-            item = dataMap[context]?.find((i: any) => i.slug === slug);
-        }
-        
-        let name = item?.title || item?.name?.[lang] || item?.name || slug;
-
-        if (context === 'valueInterest') {
-             const valueItem = employer.valueInterest.find((v:any) => v.id === slug);
-             if(valueItem) name = valueItem[lang];
-        }
-
-        return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
-    });
-    return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
-  }, [lang, isConfirmationMode, t.clickToUpdate, employer]);
-
   if (!employer) {
       return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
   
-  const t = contentByLang[lang] || contentByLang['vi'];
   const headerName = displayName || (isIndividual ? `[${t.namePlaceholder}]` : `[${t.companyNamePlaceholder}]`);
   const headerRoleText = roleText || t.rolePlaceholder;
 
