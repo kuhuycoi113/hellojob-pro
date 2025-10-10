@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -238,6 +239,7 @@ const contentByLang = {
         examplePlaceholder: 'Ví dụ:',
         addMilestoneButton: 'Thêm mốc',
         addBenefitButton: 'Thêm phúc lợi',
+        addImageButton: 'Thêm ảnh',
         selectMainIndustriesPlaceholder: "Chọn Ngành nghề tuyển dụng chính",
         selectSecondaryIndustriesPlaceholder: "Chọn Khu vực tuyển dụng chính",
     },
@@ -297,6 +299,7 @@ const contentByLang = {
         examplePlaceholder: '例：',
         addMilestoneButton: 'マイルストーンを追加',
         addBenefitButton: '福利厚生を追加',
+        addImageButton: '写真を追加',
         selectMainIndustriesPlaceholder: "主要な募集業種を選択",
         selectSecondaryIndustriesPlaceholder: "主な採用地域を選択",
     },
@@ -356,6 +359,7 @@ const contentByLang = {
         examplePlaceholder: 'E.g.,',
         addMilestoneButton: 'Add Milestone',
         addBenefitButton: 'Add Benefit',
+        addImageButton: 'Add Photo',
         selectMainIndustriesPlaceholder: "Select Main Industries",
         selectSecondaryIndustriesPlaceholder: "Select Main Recruitment Areas",
     }
@@ -611,6 +615,36 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     });
   }, [lang]);
 
+  const getArrayValue = (value: { [key in Language]?: string[] }, context: 'industries' | 'regions' | 'visaType' | 'visaDetail' | 'interest') => {
+    const items = value?.[lang] || [];
+    if (items.length === 0) {
+      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>{t.clickToUpdate}</button>
+    }
+    const dataMap: any = {
+        industries: allIndustries,
+        regions: japanRegions,
+        visaType: japanJobTypes,
+        visaDetail: Object.values(visaDetailsByVisaType).flat(),
+        interest: Object.values(interestOptions).flat()
+    };
+    const content = items.map((slug: string, index: number) => {
+        const item = dataMap[context]?.find((i: any) => i.slug === slug);
+        const name = (item?.name?.[lang] || item?.name) || slug;
+        return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
+    });
+    return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
+  };
+
+  const getValueInterestValue = (value: any) => {
+      if (Array.isArray(value) && value.length > 0) {
+          const content = value.map((item: any, index: number) => {
+              return <Badge key={item.id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item[lang]}</Badge>
+          });
+          return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
+      }
+      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>{t.clickToUpdate}</button>
+  };
+
   if (!employer) {
       return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
@@ -771,36 +805,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         });
     };
   
-  const getArrayValue = (value: { [key in Language]: string[] }, context: 'industries' | 'regions' | 'visaType' | 'visaDetail' | 'interest') => {
-    const items = value?.[lang] || [];
-    if (items.length === 0) {
-      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>{t.clickToUpdate}</button>
-    }
-    const dataMap: any = {
-        industries: allIndustries,
-        regions: japanRegions,
-        visaType: japanJobTypes,
-        visaDetail: Object.values(visaDetailsByVisaType).flat(),
-        interest: Object.values(interestOptions).flat()
-    };
-    const content = items.map((slug: string, index: number) => {
-        const item = dataMap[context]?.find((i: any) => i.slug === slug);
-        const name = (item?.name?.[lang] || item?.name) || slug;
-        return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
-    });
-    return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
-  };
-
-  const getValueInterestValue = (value: any) => {
-      if (Array.isArray(value) && value.length > 0) {
-          const content = value.map((item: any, index: number) => {
-              return <Badge key={item.id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item[lang]}</Badge>
-          });
-          return <div className="flex flex-wrap gap-1 mt-1">{content}</div>;
-      }
-      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>{t.clickToUpdate}</button>
-  };
-
   const renderEditContent = () => {
     if (!editingModule) return <p>Chức năng đang được phát triển.</p>;
 
@@ -839,7 +843,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                     </div>
                     ))}
-                    <Button variant="outline" onClick={() => addTempArrayItem('images')}><PlusCircle className="mr-2"/> Thêm ảnh</Button>
+                    <Button variant="outline" onClick={() => addTempArrayItem('images')}><PlusCircle className="mr-2"/> {t.addImageButton}</Button>
                 </div>
             );
 
