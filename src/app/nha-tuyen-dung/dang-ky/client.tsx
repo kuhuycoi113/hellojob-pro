@@ -224,8 +224,10 @@ const contentByLang = {
         visaTitle: 'Loại hình và Visa',
         visaTypeLabel: 'Loại hình',
         visaDetailLabel: 'Chi tiết loại hình visa',
-        selectVisaTypePlaceholder: 'Chọn loại hình',
-        selectVisaDetailPlaceholder: 'Chọn chi tiết',
+        selectVisaTypePlaceholder: 'Chọn Loại hình',
+        selectVisaDetailPlaceholder: 'Chọn Chi tiết',
+        selectMainIndustriesPlaceholder: 'Chọn Ngành nghề tuyển dụng chính',
+        selectSecondaryIndustriesPlaceholder: 'Chọn Khu vực tuyển dụng chính',
         rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         continueButton: 'Lưu và tiếp tục',
         backButton: 'Quay lại',
@@ -276,6 +278,8 @@ const contentByLang = {
         visaDetailLabel: 'ビザ詳細',
         selectVisaTypePlaceholder: '種別を選択',
         selectVisaDetailPlaceholder: '詳細を選択',
+        selectMainIndustriesPlaceholder: '主要な募集業種を選択',
+        selectSecondaryIndustriesPlaceholder: '主な採用地域を選択',
         rolePlaceholder: '[種別/役割/役職...]',
         continueButton: '保存して続行',
         backButton: '戻る',
@@ -326,6 +330,8 @@ const contentByLang = {
         visaDetailLabel: 'Visa Details',
         selectVisaTypePlaceholder: 'Select Type',
         selectVisaDetailPlaceholder: 'Select Details',
+        selectMainIndustriesPlaceholder: 'Select Main Industries',
+        selectSecondaryIndustriesPlaceholder: 'Select Main Recruitment Areas',
         rolePlaceholder: '[Type/Role/Title...]',
         continueButton: 'Save and Continue',
         backButton: 'Back',
@@ -918,7 +924,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 newBenefits[index] = {...newBenefits[index], [lang]: e.target.value};
                                 setTempContent(newBenefits);
                             }} />
-                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                             <Button variant="ghost" size="icon" onClick={()={() => removeTempArrayItem(index)}}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
                     <Button variant="outline" onClick={() => addTempArrayItem('benefits')}><PlusCircle className="mr-2"/> Thêm phúc lợi</Button>
@@ -1147,7 +1153,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     <div className="flex flex-wrap gap-1">
                                         {currentIndustries.length > 0 ? (
                                             currentIndustries.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(allIndustries.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)
-                                        ) : `Chọn ${t.mainIndustriesLabel}`}
+                                        ) : t.selectMainIndustriesPlaceholder}
                                     </div>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -1176,7 +1182,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                      <div className="flex flex-wrap gap-1">
                                         {currentRegions.length > 0 ? (
                                             currentRegions.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)
-                                        ) : `Chọn ${t.secondaryIndustriesLabel}`}
+                                        ) : t.selectSecondaryIndustriesPlaceholder}
                                     </div>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -1516,3 +1522,4 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
+
