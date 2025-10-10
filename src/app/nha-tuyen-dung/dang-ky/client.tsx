@@ -214,16 +214,14 @@ const contentByLang = {
         industriesTitle: 'Ngành nghề & Khu vực',
         mainIndustriesLabel: 'Ngành nghề tuyển dụng chính',
         secondaryIndustriesLabel: 'Khu vực tuyển dụng chính',
-        selectMainIndustriesPlaceholder: 'Chọn Ngành nghề tuyển dụng chính',
-        selectSecondaryIndustriesPlaceholder: 'Chọn Khu vực tuyển dụng chính',
         benefitsTitle: 'Phúc lợi & Môi trường',
-        valueInterestTitle: 'Nghiệp vụ & Giá trị quan tâm',
         interestLabel: "Nghiệp vụ quan tâm",
         interestDescription: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.",
         valueInterestLabel: "Giá trị quan tâm",
         valueInterestDescription: "Điều gì là quan trọng nhất với bạn khi hợp tác?",
         selectInterestPlaceholder: "Chọn nghiệp vụ quan tâm",
         selectValueInterestPlaceholder: "Chọn giá trị quan tâm",
+        valueInterestTitle: "Nghiệp vụ & Giá trị quan tâm",
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
@@ -238,6 +236,9 @@ const contentByLang = {
         cancelButton: 'Huỷ',
         saveButton: 'Lưu thay đổi',
         examplePlaceholder: 'Ví dụ:',
+        addMilestoneButton: 'Thêm mốc',
+        selectMainIndustriesPlaceholder: "Chọn Ngành nghề tuyển dụng chính",
+        selectSecondaryIndustriesPlaceholder: "Chọn Khu vực tuyển dụng chính",
     },
     ja: {
         edit: '編集',
@@ -271,8 +272,6 @@ const contentByLang = {
         industriesTitle: '業種と分野',
         mainIndustriesLabel: '主要業種',
         secondaryIndustriesLabel: '主な採用地域',
-        selectMainIndustriesPlaceholder: '主要な募集業種を選択',
-        selectSecondaryIndustriesPlaceholder: '主な採用地域を選択',
         benefitsTitle: '福利厚生と環境',
         valueInterestTitle: '業務と価値観',
         interestLabel: "関心のある業務",
@@ -295,6 +294,9 @@ const contentByLang = {
         cancelButton: 'キャンセル',
         saveButton: '変更を保存',
         examplePlaceholder: '例：',
+        addMilestoneButton: 'マイルストーンを追加',
+        selectMainIndustriesPlaceholder: "主要な募集業種を選択",
+        selectSecondaryIndustriesPlaceholder: "主な採用地域を選択",
     },
     en: {
         edit: 'Edit',
@@ -328,8 +330,6 @@ const contentByLang = {
         industriesTitle: 'Industries & Sectors',
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Main Recruitment Areas',
-        selectMainIndustriesPlaceholder: 'Select Main Industries',
-        selectSecondaryIndustriesPlaceholder: 'Select Main Recruitment Areas',
         benefitsTitle: 'Benefits & Environment',
         valueInterestTitle: 'Operations & Values',
         interestLabel: "Operations of Interest",
@@ -352,6 +352,9 @@ const contentByLang = {
         cancelButton: 'Cancel',
         saveButton: 'Save Changes',
         examplePlaceholder: 'E.g.,',
+        addMilestoneButton: 'Add Milestone',
+        selectMainIndustriesPlaceholder: "Select Main Industries",
+        selectSecondaryIndustriesPlaceholder: "Select Main Recruitment Areas",
     }
 };
 
@@ -813,11 +816,13 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                     {tempContent.map((item: any, index: number) => (
                         <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
                             <Input placeholder="Năm" value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
-                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayMultiLangChange(index, 'event', e.target.value)} />
+                            <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayMultiLangChange(index, 'event', e.target.value)} />
                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
-                    <Button variant="outline" onClick={() => addTempArrayItem('history')}><PlusCircle className="mr-2"/> Thêm mốc</Button>
+                    <Button variant="outline" onClick={() => addTempArrayItem('history')}>
+                        <PlusCircle className="mr-2"/> {t.addMilestoneButton}
+                    </Button>
                 </div>
             );
         case 'info':
@@ -934,7 +939,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 <div className="space-y-4">
                      {tempContent.map((item: any, index: number) => (
                         <div key={index} className="flex items-center gap-2">
-                            <Input placeholder={`Ví dụ: ${placeholderEmployerData.benefits[index]?.[lang] || ''}`} value={item[lang] || ''} onChange={(e) => {
+                            <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.benefits[index]?.[lang] || ''}`} value={item[lang] || ''} onChange={(e) => {
                                 const newBenefits = [...tempContent];
                                 newBenefits[index] = {...newBenefits[index], [lang]: e.target.value};
                                 setTempContent(newBenefits);
