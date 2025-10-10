@@ -233,6 +233,7 @@ const contentByLang = {
         backButton: 'Quay lại',
         cancelButton: 'Huỷ',
         saveButton: 'Lưu thay đổi',
+        examplePlaceholder: 'Ví dụ:',
     },
     ja: {
         edit: '編集',
@@ -285,6 +286,7 @@ const contentByLang = {
         backButton: '戻る',
         cancelButton: 'キャンセル',
         saveButton: '変更を保存',
+        examplePlaceholder: '例：',
     },
     en: {
         edit: 'Edit',
@@ -337,6 +339,7 @@ const contentByLang = {
         backButton: 'Back',
         cancelButton: 'Cancel',
         saveButton: 'Save Changes',
+        examplePlaceholder: 'E.g.,',
     }
 };
 
@@ -766,7 +769,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 </div>
             );
         case 'about':
-            return <Textarea id="DKGT_TEXTAREA" className="min-h-[150px]" placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />;
+            return <Textarea id="DKGT_TEXTAREA" className="min-h-[150px]" placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />;
         
         case 'images':
             return (
