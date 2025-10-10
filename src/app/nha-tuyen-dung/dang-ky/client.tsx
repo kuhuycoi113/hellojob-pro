@@ -36,6 +36,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 
 const employersData: { [key: string]: any } = {
@@ -370,8 +371,6 @@ const valueInterestOptions = {
 };
 
 
-
-type Language = keyof typeof contentByLang;
 
 const roleTexts: Record<string, Record<Language, string>> = {
   'nhan-vien-phai-cu': { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
@@ -958,18 +957,17 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         <Label className="font-semibold text-base">{t.interestLabel}</Label>
                          <p className="text-sm text-muted-foreground">Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.</p>
                          <RadioGroup
-                            value={currentInterest[0] || ''}
+                            value={currentInterest?.[0] || ''}
                             onValueChange={(value) => {
                                 const newSelection = value ? [value] : [];
                                 setTempContent({ ...tempContent, interest: { vi: newSelection, ja: newSelection, en: newSelection } });
                             }}
                          >
-                             {interestOptions[currentLang].map((option) => (
+                             {(interestOptions[lang] || []).map((option) => (
                                 <div key={option.id} className="flex items-center space-x-2 rounded-md p-2 hover:bg-accent/50">
                                     <RadioGroupItem value={option.id} id={`interest-${option.id}`} />
                                     <Label htmlFor={`interest-${option.id}`} className="font-normal cursor-pointer w-full">
                                         <p className="font-semibold">{option.title}</p>
-                                        <p className="text-xs text-muted-foreground">{option.desc}</p>
                                     </Label>
                                 </div>
                              ))}
