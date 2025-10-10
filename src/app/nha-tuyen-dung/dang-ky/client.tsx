@@ -199,7 +199,15 @@ const contentByLang = {
         phoneLabel: 'Số điện thoại',
         zaloLabel: 'Zalo',
         messengerLabel: 'Facebook Messenger',
-        messengerPlaceholder: 'Ví dụ: Nguyễn Văn An',
+        messengerPlaceholder: 'Dán link Facebook / Messenger hoặc username',
+        messengerHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
+        lineLabel: 'Line',
+        linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
+        lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
+        notUpdated: '[Chưa có thông tin]',
+        clickToUpdate: 'Nhấn để cập nhật',
+        headerTitle: 'Thông tin chung',
+        namePlaceholder: 'Ví dụ: Nguyễn Văn An',
         companyNamePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
         typePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
@@ -216,14 +224,8 @@ const contentByLang = {
         visaTitle: 'Loại hình và Visa',
         visaTypeLabel: 'Loại hình',
         visaDetailLabel: 'Chi tiết loại hình visa',
-        messengerHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
-        lineLabel: 'Line',
-        linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
-        lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
-        notUpdated: '[Chưa có thông tin]',
-        clickToUpdate: 'Nhấn để cập nhật',
-        headerTitle: 'Thông tin chung',
-        namePlaceholder: 'Ví dụ: Nguyễn Văn An',
+        selectVisaTypePlaceholder: 'Chọn loại hình',
+        selectVisaDetailPlaceholder: 'Chọn chi tiết',
         rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         continueButton: 'Lưu và tiếp tục',
         backButton: 'Quay lại',
@@ -272,6 +274,8 @@ const contentByLang = {
         visaTitle: '種別とビザ',
         visaTypeLabel: '種別',
         visaDetailLabel: 'ビザ詳細',
+        selectVisaTypePlaceholder: '種別を選択',
+        selectVisaDetailPlaceholder: '詳細を選択',
         rolePlaceholder: '[種別/役割/役職...]',
         continueButton: '保存して続行',
         backButton: '戻る',
@@ -320,6 +324,8 @@ const contentByLang = {
         visaTitle: 'Type and Visa',
         visaTypeLabel: 'Type',
         visaDetailLabel: 'Visa Details',
+        selectVisaTypePlaceholder: 'Select Type',
+        selectVisaDetailPlaceholder: 'Select Details',
         rolePlaceholder: '[Type/Role/Title...]',
         continueButton: 'Save and Continue',
         backButton: 'Back',
@@ -1046,7 +1052,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     <div className="flex flex-wrap gap-1">
                                     {currentVisaTypes.length > 0 ? (
                                         currentVisaTypes.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanJobTypes.find(t => t.slug === slug))?.name}</Badge>)
-                                    ) : `Chọn ${t.visaTypeLabel}`}
+                                    ) : t.selectVisaTypePlaceholder}
                                     </div>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -1078,7 +1084,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                                 const detail = Object.values(visaDetailsByVisaType).flat().find(d => d.slug === slug);
                                                 return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{detail?.name[lang] || slug}</Badge>
                                             })
-                                        ) : `Chọn ${t.visaDetailLabel}`}
+                                        ) : t.selectVisaDetailPlaceholder}
                                     </div>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -1510,5 +1516,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
-
-    
