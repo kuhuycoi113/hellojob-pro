@@ -776,7 +776,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 </div>
             );
         case 'about':
-            return <Textarea className="min-h-[150px]" placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />;
+            return <Textarea id="DKGT_TEXTAREA" className="min-h-[150px]" placeholder={`Ví dụ: ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />;
         
         case 'images':
             return (
@@ -933,10 +933,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
              );
         case 'valueInterest':
             const currentInterest = tempContent.interest?.[lang] || [];
-            const handleInterestChange = (checked: boolean, interestId: string) => {
-                 const newSelection = checked
-                    ? [interestId] // Allow only one selection
-                    : [];
+            const handleInterestChange = (value: string) => {
+                 const newSelection = value ? [value] : [];
                 setTempContent({ ...tempContent, interest: { vi: newSelection, ja: newSelection, en: newSelection } });
             };
             
@@ -957,11 +955,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         <Label className="font-semibold text-base">{t.interestLabel}</Label>
                          <p className="text-sm text-muted-foreground">Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất.</p>
                          <RadioGroup
-                            value={currentInterest?.[0] || ''}
-                            onValueChange={(value) => {
-                                const newSelection = value ? [value] : [];
-                                setTempContent({ ...tempContent, interest: { vi: newSelection, ja: newSelection, en: newSelection } });
-                            }}
+                            value={currentInterest[0] || ''}
+                            onValueChange={handleInterestChange}
                          >
                              {(interestOptions[lang] || []).map((option) => (
                                 <div key={option.id} className="flex items-center space-x-2 rounded-md p-2 hover:bg-accent/50">
@@ -1248,7 +1243,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     }
 
     const editTitle = fieldKey === 'industries' ? t.industriesTitle : (fieldKey === 'interest' ? t.valueInterestTitle : t.visaTitle);
-    const editField = fieldKey === 'interest' ? 'valueInterest' : (fieldKey === 'industries' ? 'industries' : 'visa');
+    const editField = fieldKey === 'interest' ? 'valueInterest' : (fieldKey === 'industries' ? 'industries' : { visaType: employer.visaType, visaDetail: employer.visaDetail });
     const editData = fieldKey === 'interest' ? { interest: employer.interest, valueInterest: employer.valueInterest } : (fieldKey === 'industries' ? employer.industries : { visaType: employer.visaType, visaDetail: employer.visaDetail });
 
     return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(editTitle, editData, editField)}>{t.clickToUpdate}</button>
@@ -1521,3 +1516,4 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
+
