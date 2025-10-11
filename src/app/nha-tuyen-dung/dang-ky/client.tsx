@@ -240,8 +240,8 @@ const contentByLang = {
         addMilestoneButton: 'Thêm mốc',
         addBenefitButton: 'Thêm phúc lợi',
         addImageButton: 'Thêm ảnh',
-        selectMainIndustriesPlaceholder: "Chọn Ngành nghề tuyển dụng chính",
-        selectSecondaryIndustriesPlaceholder: "Chọn Khu vực tuyển dụng chính",
+        selectMainIndustriesPlaceholder: "Chọn ngành nghề",
+        selectSecondaryIndustriesPlaceholder: "Chọn khu vực",
         selectInterestLabel: 'Chọn nghiệp vụ',
         selectValueInterestLabel: 'Chọn giá trị (sắp xếp theo ưu tiên)',
     },
@@ -304,8 +304,8 @@ const contentByLang = {
         addMilestoneButton: 'マイルストーンを追加',
         addBenefitButton: '福利厚生を追加',
         addImageButton: '写真を追加',
-        selectMainIndustriesPlaceholder: "主要な募集業種を選択",
-        selectSecondaryIndustriesPlaceholder: "主な採用地域を選択",
+        selectMainIndustriesPlaceholder: "業種を選択",
+        selectSecondaryIndustriesPlaceholder: "地域を選択",
         selectInterestLabel: '業務を選択',
         selectValueInterestLabel: '価値観を選択 (優先順位で並べ替え)',
     },
@@ -368,8 +368,8 @@ const contentByLang = {
         addMilestoneButton: 'Add Milestone',
         addBenefitButton: 'Add Benefit',
         addImageButton: 'Thêm ảnh',
-        selectMainIndustriesPlaceholder: "Select Main Industries",
-        selectSecondaryIndustriesPlaceholder: "Select Main Recruitment Areas",
+        selectMainIndustriesPlaceholder: "Select Industries",
+        selectSecondaryIndustriesPlaceholder: "Select Region",
         selectInterestLabel: 'Select Operations',
         selectValueInterestLabel: 'Select Values (sort by priority)',
     }
@@ -1089,7 +1089,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         <DropdownMenu>
                            <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                    <div className="flex flex-wrap gap-1">
+                                     <div className="flex flex-wrap gap-1">
                                     {currentValueInterests.length > 0 ? (
                                         currentValueInterests.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(valueInterestOptions[lang].find(o => o.id === id))?.title}</Badge>)
                                     ) : t.selectValueInterestPlaceholder}
@@ -1253,7 +1253,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn ngành nghề</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t.selectMainIndustriesPlaceholder}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {availableIndustries.map(industry => (
                                      <DropdownMenuCheckboxItem
@@ -1282,7 +1282,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn khu vực</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t.selectSecondaryIndustriesPlaceholder}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {japanRegions.map(region => (
                                      <DropdownMenuCheckboxItem
@@ -1559,5 +1559,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
-
-    
