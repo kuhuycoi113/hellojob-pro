@@ -1455,10 +1455,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   <div className="block lg:hidden">
                     <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.infoTitle, employer.info, 'info')}>
                         <div className="space-y-3 text-sm">
-                            <p id="DKDN_NAMTHANHLAP-mobile"><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
-                            <p id="DKDN_QUYMO-mobile"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
-                            <p id="DKDN_GIAYPHEP-mobile"><strong>{t.licenseLabel}:</strong> {employer.info.license || t.notUpdated}</p>
-                            <p id="DKDN_WEBSITE-mobile"><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || t.notUpdated}</a></p>
+                            <p id="DKDN_NAMTHANHLAP-mobile"><strong>{t.foundedLabel}:</strong> {employer.info.founded || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                            <p id="DKDN_QUYMO-mobile"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                            <p id="DKDN_GIAYPHEP-mobile"><strong>{t.licenseLabel}:</strong> {employer.info.license || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                            <p id="DKDN_WEBSITE-mobile"><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
                         </div>
                         {hasContactInfo ? (
                             <div id="DKTHONGTINLIENHE-mobile" className="mt-6 border-t pt-4 space-y-2">
@@ -1466,7 +1466,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
                                {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
                                {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
-                               {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
+                               {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                             </div>
                         ) : (
                             <div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4">
@@ -1539,10 +1539,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   <div className="hidden lg:block">
                     <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.infoTitle, employer.info, 'info')}>
                         <div className="space-y-3 text-sm">
-                            <p id="DKDN_NAMTHANHLAP"><strong>{t.foundedLabel}:</strong> {employer.info.founded || t.notUpdated}</p>
-                            <p id="DKDN_QUYMO"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || t.notUpdated}</p>
-                            <p id="DKDN_GIAYPHEP"><strong>{t.licenseLabel}:</strong> {employer.info.license || t.notUpdated}</p>
-                            <p id="DKDN_WEBSITE"><strong>{t.websiteLabel}:</strong> <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website || t.notUpdated}</a></p>
+                            <p id="DKDN_NAMTHANHLAP"><strong>{t.foundedLabel}:</strong> {employer.info.founded || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                            <p id="DKDN_QUYMO"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                            <p id="DKDN_GIAYPHEP"><strong>{t.licenseLabel}:</strong> {employer.info.license || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                            <p id="DKDN_WEBSITE"><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
                         </div>
                         
                         {hasContactInfo ? (
@@ -1551,7 +1551,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
                                {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
                                {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
-                               {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
+                               {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                             </div>
                         ) : (
                             <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
@@ -1616,3 +1616,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
+
+    
