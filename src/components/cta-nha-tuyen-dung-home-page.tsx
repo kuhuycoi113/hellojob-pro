@@ -3,8 +3,25 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { XL01Dialog } from '@/components/X-L01-dialog';
+import type { Language } from './X-L01-dialog';
 
 export function CtaNhaTuyenDungHomePage() {
+    const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
+    const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
+    const [selectedLang, setSelectedLang] = useState<Language>('vi');
+    const router = useRouter();
+
+    const handleXL01Complete = (preferences: any) => {
+        console.log("X-L01 Completed with:", preferences);
+        setRecruitmentPrefs(preferences);
+        setIsXL01DialogOpen(false);
+        // Navigate to the next step or page if needed
+        // For now, we just close the dialog
+    };
+    
     return (
         <>
             <section id="NHATUYENDUNG01_HOME" className="w-full bg-gradient-to-br from-accent to-primary text-primary-foreground py-20 md:py-28">
@@ -20,16 +37,14 @@ export function CtaNhaTuyenDungHomePage() {
                         <span className="block text-sm opacity-80 mt-2">質の高い技能実習生、特定技能、エンジニア人材にアクセス。無料で求人を掲載し、今日から人材と繋がりましょう。/ HelloJob is a free job posting platform to recruit Vietnamese candidates...</span>
                     </p>
                     <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                        <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                           <Link href="/nha-tuyen-dung/dang-tin-tuyen-dung">
+                        <Button size="lg" className="bg-white text-primary hover:bg-white/90" onClick={() => setIsXL01DialogOpen(true)}>
                             <div className="text-center">
                                 <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                                 <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                             </div>
-                          </Link>
                         </Button>
                          <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
-                          <Link href="/nha-tuyen-dung?action=register">
+                          <Link href="/nhuong-quyen">
                             <div className="text-center">
                                 <span className="font-semibold">Đăng ký đối tác</span>
                                 <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
@@ -51,6 +66,14 @@ export function CtaNhaTuyenDungHomePage() {
                 </div>
                 </div>
             </section>
+            <XL01Dialog
+                isOpen={isXL01DialogOpen}
+                onOpenChange={setIsXL01DialogOpen}
+                onLanguageChange={setSelectedLang}
+                initialLang={selectedLang}
+                onComplete={handleXL01Complete}
+                onBack={() => setIsXL01DialogOpen(false)}
+            />
         </>
     )
 }
