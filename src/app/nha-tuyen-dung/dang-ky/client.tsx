@@ -463,6 +463,13 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, 
     </Card>
 );
 
+// Local translation map for visa types
+const visaTypeTranslations: { [key: string]: { ja: string; en: string } } = {
+  'Thực tập sinh kỹ năng': { ja: '技能実習', en: 'Technical Intern Training' },
+  'Kỹ năng đặc định': { ja: '特定技能', en: 'Specified Skilled Worker' },
+  'Kỹ sư, tri thức': { ja: '技術・人文知識・国際業務', en: 'Engineer/Specialist' }
+};
+
 export default function EmployerDetailPage({ isConfirmationMode = false }: { isConfirmationMode?: boolean }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -522,6 +529,16 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
     }
 
+    if (context === 'visaType') {
+      const content = items.map((slug: string, index: number) => {
+        const item = dataMap.visaType?.find((i: any) => i.slug === slug);
+        const nameInVi = item?.name || slug;
+        const name = lang === 'vi' ? nameInVi : (visaTypeTranslations[nameInVi]?.[lang] || nameInVi);
+        return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>;
+      });
+      return <div id="DKLV_LOAIHINH_DISPLAY" className="flex flex-wrap gap-1 mt-1">{content}</div>;
+    }
+
     const content = items.map((slug: string, index: number) => {
         let item;
         let name;
@@ -534,7 +551,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         }
         return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>;
     });
-    return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
+    return <div id={
+        context === 'visaDetail' ? 'DKLV_CHITIETVISA_DISPLAY' :
+        context === 'industries' ? 'DKNN_NGANHNGHE_DISPLAY' :
+        context === 'regions' ? 'DKNN_KHUVUC_DISPLAY' : undefined
+    } className="flex flex-wrap gap-1 mt-1">{content}</div>
   }, [lang, isConfirmationMode, t, employer]);
   
   const handleLangChange = (lang: Language) => {
@@ -1176,7 +1197,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             };
 
             return (
-                <div className="space-y-4">
+                <div className="space-y-4" id="DKVISA_NGANHNGHE_KHUVUC_DIALOG">
                      <div className="space-y-2" id="DKLV_LOAIHINH">
                         <Label id="DKLV_LOAIHINH_LABEL">{t.visaTypeLabel}</Label>
                         <DropdownMenu>
@@ -1184,7 +1205,12 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKLV_LOAIHINH_BUTTON">
                                     <div className="flex flex-wrap gap-1">
                                     {currentVisaTypes.length > 0 ? (
-                                        currentVisaTypes.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanJobTypes.find(t => t.slug === slug))?.name}</Badge>)
+                                        currentVisaTypes.map((slug: string, index: number) => {
+                                            const item = japanJobTypes.find(t => t.slug === slug);
+                                            const nameInVi = item?.name || slug;
+                                            const name = lang === 'vi' ? nameInVi : (visaTypeTranslations[nameInVi]?.[lang] || nameInVi);
+                                            return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
+                                        })
                                     ) : t.selectVisaTypePlaceholder}
                                     </div>
                                 </Button>
@@ -1520,10 +1546,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   </div>
                    <SectionCard id="DKVISA_NGANHNGHE_KHUVUC" title={t.visaAndIndustriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries')}>
                     <div className="space-y-3 text-sm">
-                        <div id="DKLV_LOAIHINH_DISPLAY"><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
-                        <div id="DKLV_CHITIETVISA_DISPLAY"><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
-                        <div id="DKNN_NGANHNGHE_DISPLAY"><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
-                        <div id="DKNN_KHUVUC_DISPLAY"><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
+                        <div><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
+                        <div><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
+                        <div><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
+                        <div><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
                     </div>
                 </SectionCard>
               </div>
@@ -1566,3 +1592,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
+
+    
