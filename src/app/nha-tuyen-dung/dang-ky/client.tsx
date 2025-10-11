@@ -114,7 +114,7 @@ const placeholderEmployerData = {
     about: {
         vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
         ja: 'ABC派遣会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。長年の経験により、私たちは何千人ものベトナム人労働者の夢を支援してきたことを誇りに思っています...',
-        en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\'\'\' dreams take flight...'
+        en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\' dreams take flight...'
     },
     images: [
       { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
@@ -231,21 +231,17 @@ const contentByLang = {
         companyNamePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
         typePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
-        industriesTitle: 'Ngành nghề & Khu vực',
-        mainIndustriesLabel: 'Ngành nghề chính',
-        secondaryIndustriesLabel: 'Khu vực chính',
         benefitsTitle: 'Phúc lợi & Môi trường',
+        valueInterestTitle: "Nghiệp vụ & Giá trị quan tâm",
         interestLabel: "Nghiệp vụ quan tâm",
         interestDescription: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.",
         valueInterestLabel: "Giá trị quan tâm",
         valueInterestDescription: "Điều gì là quan trọng nhất với bạn khi hợp tác?",
         selectInterestPlaceholder: "Chọn nghiệp vụ quan tâm",
         selectValueInterestPlaceholder: "Chọn giá trị quan tâm",
-        valueInterestTitle: "Nghiệp vụ & Giá trị quan tâm",
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
-        visaTitle: 'Loại hình và Visa',
         visaTypeLabel: 'Loại hình',
         visaDetailLabel: 'Chi tiết loại hình visa',
         selectVisaTypePlaceholder: 'Chọn Loại hình',
@@ -266,7 +262,9 @@ const contentByLang = {
         selectInterestLabel: 'Chọn nghiệp vụ',
         selectValueInterestLabel: 'Chọn giá trị (sắp xếp theo ưu tiên)',
         visaAndIndustriesTitle: 'Visa, Ngành nghề & Khu vực',
-        visaAndIndustriesDialogTitle: 'Chỉnh sửa Visa, Ngành nghề & Khu vực'
+        visaAndIndustriesDialogTitle: 'Chỉnh sửa Visa, Ngành nghề & Khu vực',
+        mainIndustriesLabel: 'Ngành nghề chính',
+        secondaryIndustriesLabel: 'Khu vực chính',
     },
     ja: {
         edit: '編集',
@@ -297,9 +295,6 @@ const contentByLang = {
         companyNamePlaceholder: '例: ABC株式会社',
         typePlaceholder: '[種別/役割/役職...]',
         locationPlaceholder: '例: ベトナム、ハノイ',
-        industriesTitle: '業種と分野',
-        mainIndustriesLabel: '主要業種',
-        secondaryIndustriesLabel: '主な採用地域',
         benefitsTitle: '福利厚生と環境',
         valueInterestTitle: "業務と価値観",
         interestLabel: "関心のある業務",
@@ -311,7 +306,6 @@ const contentByLang = {
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
         registerAction: '登録',
-        visaTitle: '種別とビザ',
         visaTypeLabel: '種別',
         visaDetailLabel: 'ビザ詳細',
         selectVisaTypePlaceholder: '種別を選択',
@@ -332,7 +326,9 @@ const contentByLang = {
         selectInterestLabel: '業務を選択',
         selectValueInterestLabel: '価値観を選択 (優先順位で並べ替え)',
         visaAndIndustriesTitle: 'ビザ、業種、地域',
-        visaAndIndustriesDialogTitle: 'ビザ、業種、地域を編集'
+        visaAndIndustriesDialogTitle: 'ビザ、業種、地域を編集',
+        mainIndustriesLabel: '主要業種',
+        secondaryIndustriesLabel: '主な採用地域',
     },
     en: {
         edit: 'Edit',
@@ -363,9 +359,6 @@ const contentByLang = {
         companyNamePlaceholder: 'E.g., ABC Corporation',
         typePlaceholder: '[Type/Role/Title...]',
         locationPlaceholder: 'E.g., Hanoi, Vietnam',
-        industriesTitle: 'Industries & Sectors',
-        mainIndustriesLabel: 'Main Industries',
-        secondaryIndustriesLabel: 'Main Recruitment Areas',
         benefitsTitle: 'Benefits & Environment',
         valueInterestTitle: 'Operations & Values',
         interestLabel: "Operations of Interest",
@@ -398,7 +391,9 @@ const contentByLang = {
         selectInterestLabel: 'Select Operations',
         selectValueInterestLabel: 'Select Values (sort by priority)',
         visaAndIndustriesTitle: 'Visa, Industry & Region',
-        visaAndIndustriesDialogTitle: 'Edit Visa, Industry & Region'
+        visaAndIndustriesDialogTitle: 'Edit Visa, Industry & Region',
+        mainIndustriesLabel: 'Main Industries',
+        secondaryIndustriesLabel: 'Main Recruitment Areas',
     }
 };
 
@@ -532,7 +527,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         let name;
         if (context === 'visaDetail') {
             item = dataMap[context]?.find((i: any) => i.slug === slug);
-            name = item?.name[lang] || item?.name || slug;
+            name = item?.name[lang] || item?.name?.vi || slug;
         } else {
              item = dataMap[context]?.find((i: any) => i.slug === slug);
              name = item?.title || item?.name || slug;
@@ -1254,11 +1249,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                     <div className="space-y-2">
-                        <Label>{t.mainIndustriesLabel}</Label>
+                     <div className="space-y-2" id="DKNN_NGANHNGHE">
+                        <Label id="DKNN_NGANHNGHE_LABEL">{t.mainIndustriesLabel}</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={availableIndustries.length === 0}>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={availableIndustries.length === 0} id="DKNN_NGANHNGHE_BUTTON">
                                     <div className="flex flex-wrap gap-1">
                                         {currentIndustries.length > 0 ? (
                                             currentIndustries.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(allIndustries.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)
@@ -1272,6 +1267,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 {availableIndustries.map(industry => (
                                      <DropdownMenuCheckboxItem
                                         key={industry.slug}
+                                        id={`DKNN_ITEM_${industry.slug}`}
                                         checked={currentIndustries.includes(industry.slug)}
                                         onSelect={(e) => e.preventDefault()}
                                         onCheckedChange={(checked) => handleIndustryChange(Boolean(checked), industry.slug)}
@@ -1283,11 +1279,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                     <div className="space-y-2">
-                        <Label>{t.secondaryIndustriesLabel}</Label>
+                     <div className="space-y-2" id="DKNN_KHUVUC">
+                        <Label id="DKNN_KHUVUC_LABEL">{t.secondaryIndustriesLabel}</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKNN_KHUVUC_BUTTON">
                                      <div className="flex flex-wrap gap-1">
                                         {currentRegions.length > 0 ? (
                                             currentRegions.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)
@@ -1301,6 +1297,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 {japanRegions.map(region => (
                                      <DropdownMenuCheckboxItem
                                         key={region.slug}
+                                        id={`DKNN_ITEM_${region.slug}`}
                                         checked={currentRegions.includes(region.slug)}
                                         onSelect={(e) => e.preventDefault()}
                                         onCheckedChange={(checked) => handleRegionChange(Boolean(checked), region.slug)}
