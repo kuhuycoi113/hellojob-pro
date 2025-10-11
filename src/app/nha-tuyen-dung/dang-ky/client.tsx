@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
-import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
+import { visaDetailsByVisaType } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
 
 
@@ -463,12 +463,11 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, 
     </Card>
 );
 
-// Local translation map for visa types
-const visaTypeTranslations: { [key: string]: { ja: string; en: string } } = {
-  'Thực tập sinh kỹ năng': { ja: '技能実習', en: 'Technical Intern Training' },
-  'Kỹ năng đặc định': { ja: '特定技能', en: 'Specified Skilled Worker' },
-  'Kỹ sư, tri thức': { ja: '技術・人文知識・国際業務', en: 'Engineer/Specialist' }
-};
+const localizedJapanJobTypes: { name: { vi: string, ja: string, en: string }, slug: string }[] = [
+  { name: { vi: 'Thực tập sinh kỹ năng', ja: '技能実習', en: 'Technical Intern Training' }, slug: 'thuc-tap-sinh-ky-nang' },
+  { name: { vi: 'Kỹ năng đặc định', ja: '特定技能', en: 'Specified Skilled Worker' }, slug: 'ky-nang-dac-dinh' },
+  { name: { vi: 'Kỹ sư, tri thức', ja: '技術・人文知識・国際業務', en: 'Engineer/Specialist' }, slug: 'ky-su-tri-thuc' }
+];
 
 export default function EmployerDetailPage({ isConfirmationMode = false }: { isConfirmationMode?: boolean }) {
   const searchParams = useSearchParams();
@@ -509,7 +508,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     const dataMap: any = {
         industries: allIndustries.map(i => ({...i, name: i.name[lang]})),
         regions: japanRegions,
-        visaType: japanJobTypes,
+        visaType: localizedJapanJobTypes, 
         visaDetail: Object.values(visaDetailsByVisaType).flat(),
     };
     
@@ -532,8 +531,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     if (context === 'visaType') {
       const content = items.map((slug: string, index: number) => {
         const item = dataMap.visaType?.find((i: any) => i.slug === slug);
-        const nameInVi = item?.name || slug;
-        const name = lang === 'vi' ? nameInVi : (visaTypeTranslations[nameInVi]?.[lang] || nameInVi);
+        const name = item?.name[lang] || slug;
         return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>;
       });
       return <div id="DKLV_LOAIHINH_DISPLAY" className="flex flex-wrap gap-1 mt-1">{content}</div>;
@@ -547,7 +545,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             name = item?.name[lang] || item?.name?.vi || slug;
         } else {
              item = dataMap[context]?.find((i: any) => i.slug === slug);
-             name = item?.title || item?.name || slug;
+             name = item?.title || item?.name[lang] || item?.name || slug;
         }
         return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>;
     });
@@ -1206,9 +1204,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     <div className="flex flex-wrap gap-1">
                                     {currentVisaTypes.length > 0 ? (
                                         currentVisaTypes.map((slug: string, index: number) => {
-                                            const item = japanJobTypes.find(t => t.slug === slug);
-                                            const nameInVi = item?.name || slug;
-                                            const name = lang === 'vi' ? nameInVi : (visaTypeTranslations[nameInVi]?.[lang] || nameInVi);
+                                            const item = localizedJapanJobTypes.find(t => t.slug === slug);
+                                            const name = item?.name[lang] || slug;
                                             return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
                                         })
                                     ) : t.selectVisaTypePlaceholder}
@@ -1218,7 +1215,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
                                 <DropdownMenuLabel>{t.selectVisaTypePlaceholder}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {japanJobTypes.map(type => (
+                                {localizedJapanJobTypes.map(type => (
                                     <DropdownMenuCheckboxItem
                                         key={type.slug}
                                         id={`DKLV_ITEM_${type.slug}`}
@@ -1227,7 +1224,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                         onCheckedChange={(checked) => handleVisaTypeChange(Boolean(checked), type.slug)}
                                     >
                                        <span className="font-bold w-6 mr-2">{currentVisaTypes.includes(type.slug) ? `${currentVisaTypes.indexOf(type.slug) + 1}.` : ''}</span>
-                                        {type.name}
+                                        {type.name[lang]}
                                     </DropdownMenuCheckboxItem>
                                 ))}
                             </DropdownMenuContent>
@@ -1252,11 +1249,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 <DropdownMenuLabel>{t.selectVisaDetailPlaceholder}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {currentVisaTypes.map((visaTypeSlug: string) => {
-                                    const visaType = japanJobTypes.find(t => t.slug === visaTypeSlug);
+                                    const visaType = localizedJapanJobTypes.find(t => t.slug === visaTypeSlug);
                                     if (!visaType) return null;
                                     return (
                                         <DropdownMenuGroup key={visaTypeSlug}>
-                                            <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">{visaType.name}</DropdownMenuLabel>
+                                            <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">{visaType.name[lang]}</DropdownMenuLabel>
                                             {(visaDetailsByVisaType[visaTypeSlug as keyof typeof visaDetailsByVisaType] || []).map((detail: any) => (
                                                 <DropdownMenuCheckboxItem
                                                     key={detail.slug}
@@ -1592,5 +1589,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
-
-    
