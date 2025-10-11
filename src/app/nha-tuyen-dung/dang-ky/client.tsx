@@ -1158,7 +1158,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn loại hình</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t.selectVisaTypePlaceholder}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {japanJobTypes.map(type => (
                                     <DropdownMenuCheckboxItem
@@ -1190,7 +1190,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 </Button>
                             </DropdownMenuTrigger>
                              <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn chi tiết</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t.selectVisaDetailPlaceholder}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {currentVisaTypes.map((visaTypeSlug: string) => {
                                     const visaType = japanJobTypes.find(t => t.slug === visaTypeSlug);
@@ -1559,3 +1559,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
+
+    
