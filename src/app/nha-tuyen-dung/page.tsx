@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldCheck, Users, FileSignature, BarChart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
+import { CtaNhaTuyenDungHomePage } from '@/components/cta-nha-tuyen-dung-home-page';
 
 const partnerBenefits = [
   { 
@@ -104,8 +103,8 @@ const welcomeContent = {
 export default function NhaTuyenDungPage() {
   return (
     <div className="flex flex-col items-center">
-      {/* Hero Section for Partnership - Replaced with the correct, reusable component */}
-      <CtaNhaTuyenDung />
+      {/* Hero Section for Partnership - Replaced with the new, specific component */}
+      <CtaNhaTuyenDungHomePage />
 
       {/* Featured Benefits */}
       <section className="w-full py-20 md:py-28 bg-secondary">
@@ -188,5 +187,3 @@ export default function NhaTuyenDungPage() {
     </div>
   );
 }
-
-    
