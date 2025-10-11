@@ -952,14 +952,14 @@ export default function CandidateProfilePage() {
                 </Button>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-                <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : notUpdatedText}</p>
-                <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender || notUpdatedText}</p>
-                <p><strong>{t.height}:</strong> {candidate.personalInfo.height && parseInt(candidate.personalInfo.height) > 0 ? `${candidate.personalInfo.height} cm` : notUpdatedText}</p>
-                <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight && parseInt(candidate.personalInfo.weight) > 0 ? `${candidate.personalInfo.weight} kg` : notUpdatedText}</p>
-                <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus || notUpdatedText}</p>
-                <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus || notUpdatedText}</p>
-                <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency || notUpdatedText}</p>
-                <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency || notUpdatedText}</p>
+                <p><strong>{t.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : 'Chưa cập nhật'}</p>
+                <p><strong>{t.gender}:</strong> {candidate.personalInfo.gender}</p>
+                <p><strong>{t.height}:</strong> {candidate.personalInfo.height} cm</p>
+                <p><strong>{t.weight}:</strong> {candidate.personalInfo.weight} kg</p>
+                <p><strong>{t.tattoo}:</strong> {candidate.personalInfo.tattooStatus}</p>
+                <p><strong>{t.hepatitisB}:</strong> {candidate.personalInfo.hepatitisBStatus}</p>
+                <p><strong>{t.japaneseProficiency}:</strong> {candidate.personalInfo.japaneseProficiency}</p>
+                <p><strong>{t.englishProficiency}:</strong> {candidate.personalInfo.englishProficiency}</p>
             </CardContent>
             <CardContent>
                 {hasContactInfo ? (
@@ -967,7 +967,7 @@ export default function CandidateProfilePage() {
                         {phone && <Button asChild variant="outline" className="w-full justify-start"><Link href={`tel:${phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumber(phone)}</Link></Button>}
                         {messenger && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://m.me/${messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${messenger}`}</span></Link></Button>}
                         {zalo && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://zalo.me/${zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumber(zalo)}</Link></Button>}
-                        {line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/~${line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${line}`}</span></Link></Button>}
+                        {line && <Button asChild variant="outline" className="w-full justify-start"><Link href={`https://line.me/ti/p/${line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${line}`}</span></Link></Button>}
                     </div>
                 ) : (
                     <div className="text-center">
@@ -1880,5 +1880,7 @@ const DocumentGrid = ({
     </div>
   )
 };
+
+    
 
     
