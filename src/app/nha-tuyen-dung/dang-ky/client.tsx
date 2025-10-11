@@ -1139,10 +1139,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             return (
                 <div id="DKLOAIHINHVISA_DIALOG" className="space-y-4">
                      <div className="space-y-2" id="DKLV_LOAIHINH">
-                        <Label>{t.visaTypeLabel}</Label>
+                        <Label id="DKLV_LOAIHINH_LABEL">{t.visaTypeLabel}</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKLV_LOAIHINH_BUTTON">
                                     <div className="flex flex-wrap gap-1">
                                     {currentVisaTypes.length > 0 ? (
                                         currentVisaTypes.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(japanJobTypes.find(t => t.slug === slug))?.name}</Badge>)
@@ -1156,6 +1156,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 {japanJobTypes.map(type => (
                                     <DropdownMenuCheckboxItem
                                         key={type.slug}
+                                        id={`DKLV_ITEM_${type.slug}`}
                                         checked={currentVisaTypes.includes(type.slug)}
                                         onSelect={(e) => e.preventDefault()}
                                         onCheckedChange={(checked) => handleVisaTypeChange(Boolean(checked), type.slug)}
@@ -1168,10 +1169,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         </DropdownMenu>
                     </div>
                      <div className="space-y-2" id="DKLV_CHITIETVISA">
-                        <Label>{t.visaDetailLabel}</Label>
+                        <Label id="DKLV_CHITIETVISA_LABEL">{t.visaDetailLabel}</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0}>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0} id="DKLV_CHITIETVISA_BUTTON">
                                      <div className="flex flex-wrap gap-1">
                                         {currentVisaDetails.length > 0 ? (
                                             currentVisaDetails.map((slug: string, index: number) => {
@@ -1194,6 +1195,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                             {(visaDetailsByVisaType[visaTypeSlug as keyof typeof visaDetailsByVisaType] || []).map((detail: any) => (
                                                 <DropdownMenuCheckboxItem
                                                     key={detail.slug}
+                                                    id={`DKLV_ITEM_${detail.slug}`}
                                                     checked={currentVisaDetails.includes(detail.slug)}
                                                     onSelect={(e) => e.preventDefault()}
                                                     onCheckedChange={(checked) => handleDetailCheckboxChange(Boolean(checked), detail.slug)}
@@ -1552,3 +1554,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
+
+    
