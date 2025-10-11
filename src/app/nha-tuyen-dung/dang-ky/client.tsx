@@ -1049,7 +1049,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
                                 <DropdownMenuLabel>Chọn nghiệp vụ</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {(interestOptions[currentLang] || []).map((option) => (
+                                {(interestOptions[lang] || []).map((option) => (
                                      <DropdownMenuCheckboxItem
                                         key={option.id}
                                         checked={currentInterest.includes(option.id)}
@@ -1537,7 +1537,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
-
-    
