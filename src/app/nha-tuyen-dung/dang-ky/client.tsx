@@ -1053,12 +1053,12 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
             return (
                 <div id="DKNGHIEPVUGIATRIQUANTAM_DIALOG" className="space-y-6">
-                    <div id="DKNV_NGHIEPVU" className="space-y-2">
-                        <Label className="font-semibold text-base">{t.interestLabel}</Label>
+                    <div className="space-y-2">
+                        <Label id="DKNV_NGHIEPVU_LABEL" className="font-semibold text-base">{t.interestLabel}</Label>
                         <p className="text-sm text-muted-foreground">{t.interestDescription}</p>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                <Button id="DKNV_NGHIEPVU_BUTTON" variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
                                     <div className="flex flex-wrap gap-1">
                                         {currentInterest.length > 0 ? (
                                             currentInterest.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(interestOptions[lang].find(o => o.id === id))?.title}</Badge>)
@@ -1072,6 +1072,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 {(interestOptions[lang] || []).map((option) => (
                                      <DropdownMenuCheckboxItem
                                         key={option.id}
+                                        id={`DKNV_ITEM_${option.id}`}
                                         checked={currentInterest.includes(option.id)}
                                         onSelect={(e) => e.preventDefault()}
                                         onCheckedChange={(checked) => handleInterestChange(Boolean(checked), option.id)}
@@ -1083,12 +1084,12 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                    <div id="DKNV_GIATRI" className="space-y-2">
-                        <Label className="font-semibold text-base">{t.valueInterestLabel}</Label>
+                    <div className="space-y-2">
+                        <Label id="DKNV_GIATRI_LABEL" className="font-semibold text-base">{t.valueInterestLabel}</Label>
                         <p className="text-sm text-muted-foreground">{t.valueInterestDescription}</p>
                         <DropdownMenu>
                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                <Button id="DKNV_GIATRI_BUTTON" variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
                                      <div className="flex flex-wrap gap-1">
                                     {currentValueInterests.length > 0 ? (
                                         currentValueInterests.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(valueInterestOptions[lang].find(o => o.id === id))?.title}</Badge>)
@@ -1102,6 +1103,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 {valueInterestOptions[lang].map((option) => (
                                      <DropdownMenuCheckboxItem
                                         key={option.id}
+                                        id={`DKNV_ITEM_${option.id}`}
                                         checked={currentValueInterests.includes(option.id)}
                                         onSelect={(e) => e.preventDefault()}
                                         onCheckedChange={(checked) => handleValueInterestChange(Boolean(checked), option.id)}
@@ -1144,8 +1146,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
 
             return (
-                <div className="space-y-4">
-                     <div className="space-y-2" id="DKY006">
+                <div id="DKLOAIHINHVISA_DIALOG" className="space-y-4">
+                     <div className="space-y-2" id="DKLV_LOAIHINH">
                         <Label>{t.visaTypeLabel}</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -1174,7 +1176,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                     <div className="space-y-2" id="DKY007">
+                     <div className="space-y-2" id="DKLV_CHITIETVISA">
                         <Label>{t.visaDetailLabel}</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -1239,8 +1241,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             ).values());
 
             return (
-                <div className="space-y-4">
-                     <div className="space-y-2" id="DKY008">
+                <div id="DKNGANHNGHEKHUVUC_DIALOG" className="space-y-4">
+                     <div className="space-y-2">
                         <Label>{t.mainIndustriesLabel}</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -1269,7 +1271,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                     <div className="space-y-2" id="DKY009">
+                     <div className="space-y-2">
                         <Label>{t.secondaryIndustriesLabel}</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -1426,11 +1428,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
                     <div className="space-y-3 text-sm">
                         <div id="DKNV_NGHIEPVU">
-                            <p className="font-semibold mb-1">{t.interestLabel}:</p>
+                            <p id="DKNV_NGHIEPVU_LABEL" className="font-semibold mb-1">{t.interestLabel}:</p>
                             {getArrayValue(employer.interest, 'interest')}
                         </div>
                         <div id="DKNV_GIATRI">
-                            <p className="font-semibold mb-1">{t.valueInterestLabel}:</p>
+                            <p id="DKNV_GIATRI_LABEL" className="font-semibold mb-1">{t.valueInterestLabel}:</p>
                             {getArrayValue({[lang]: employer.valueInterest.map((item:any) => item.id)}, 'valueInterest')}
                         </div>
                     </div>
