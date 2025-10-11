@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,8 @@ import { CtaNhaTuyenDungHomePage } from '@/components/cta-nha-tuyen-dung-home-pa
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
+import { XL01Dialog } from '@/components/X-L01-dialog';
+
 
 const partnerBenefits = [
   { 
@@ -110,6 +111,8 @@ function NhaTuyenDungPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false);
+  const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
+  const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
   const [selectedLang, setSelectedLang] = useState<Language>('vi');
 
   useEffect(() => {
@@ -135,6 +138,13 @@ function NhaTuyenDungPageContent() {
     
     router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
     setIsYL01DialogOpen(false);
+  };
+  
+   const handleXL01Complete = (preferences: any) => {
+    console.log("X-L01 Completed with:", preferences);
+    setRecruitmentPrefs(preferences);
+    setIsXL01DialogOpen(false);
+    // Potentially open next dialog here
   };
 
   return (
@@ -204,15 +214,13 @@ function NhaTuyenDungPageContent() {
                           <span className="block text-sm text-muted-foreground/80 mt-1">{welcomeContent.description2.en}</span>
                       </p>
                       <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                          <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
-                           <Link href="/doi-tac/dang-tin-tuyen-dung">
+                          <Button size="lg" className="bg-primary text-white hover:bg-primary/90" onClick={() => setIsXL01DialogOpen(true)}>
                             <div className="text-center">
                                 <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                                 <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                             </div>
-                          </Link>
-                        </Button>
-                         <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
+                          </Button>
+                         <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" onClick={() => setIsYL01DialogOpen(true)}>
                           
                             <div className="text-center">
                                 <span className="font-semibold">Đăng ký đối tác</span>
@@ -235,6 +243,15 @@ function NhaTuyenDungPageContent() {
         initialStep={1}
         onComplete={navigateToEmployerPage}
         onBack={() => setIsYL01DialogOpen(false)}
+      />
+       <XL01Dialog 
+        isOpen={isXL01DialogOpen} 
+        onOpenChange={setIsXL01DialogOpen}
+        onLanguageChange={setSelectedLang}
+        initialLang={selectedLang}
+        initialStep={1}
+        onComplete={handleXL01Complete}
+        onBack={() => setIsXL01DialogOpen(false)}
       />
     </>
   );
