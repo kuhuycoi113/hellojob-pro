@@ -446,13 +446,6 @@ const subRoleTexts: Record<string, Record<Language, string>> = {
     'japanese': { vi: 'Nhân sự người Nhật', ja: '日本人事', en: 'Japanese Staff' }
 };
 
-const interestTexts: Record<string, Record<Language, string>> = {
-    'post-job': { vi: 'Đăng việc làm để tìm ứng viên', ja: '候補者を見つけるために求人を掲載する', en: 'Post jobs to find candidates' },
-    'refer-candidate': { vi: 'Tìm kiếm đối tác nhân lực phù hợp', ja: '適切な人材パートナーを探す', en: 'Find suitable HR partners' },
-    'post-and-refer': { vi: 'Hợp tác quảng bá hệ thống đến ứng viên', ja: '候補者へのシステム広報協力', en: 'Collaborate to promote the system to candidates' },
-    'refer-and-post': { vi: 'Hợp tác quảng bá hệ thống đến nhà tuyển dụng', ja: '採用担当者へのシステム広報協力', en: 'Collaborate to promote the system to employers' },
-};
-
 const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, isConfirmationMode }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, id?: string, isConfirmationMode?: boolean }) => (
     <Card className={cn("shadow-lg", className)} id={id}>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -510,22 +503,20 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         regions: japanRegions,
         visaType: japanJobTypes,
         visaDetail: Object.values(visaDetailsByVisaType).flat(),
-        interest: Object.values(interestOptions).flat(),
-        valueInterest: Object.values(valueInterestOptions).flat()
     };
     const content = items.map((slug: string, index: number) => {
         let item;
-        if(context === 'interest' || context === 'valueInterest') {
-            item = dataMap[context]?.find((i: any) => i.id === slug);
-        } else {
-            item = dataMap[context]?.find((i: any) => i.slug === slug);
-        }
-        
-        let name = item?.title || item?.name?.[lang] || item?.name || slug;
-
-        if (context === 'valueInterest') {
+        let name;
+        if (context === 'interest') {
+            item = interestOptions[lang].find((i: any) => i.id === slug);
+            name = item?.title || slug;
+        } else if (context === 'valueInterest') {
              const valueItem = employer.valueInterest.find((v:any) => v.id === slug);
-             if(valueItem) name = valueItem[lang];
+             name = valueItem?.[lang] || slug;
+        }
+        else {
+            item = dataMap[context]?.find((i: any) => i.slug === slug);
+            name = item?.title || item?.name?.[lang] || item?.name || slug;
         }
 
         return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
