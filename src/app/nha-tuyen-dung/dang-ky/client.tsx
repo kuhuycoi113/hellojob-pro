@@ -36,7 +36,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 
 const employersData: { [key: string]: any } = {
@@ -115,7 +114,7 @@ const placeholderEmployerData = {
     about: {
         vi: 'Công ty phái cử ABC là một trong những đơn vị hàng đầu trong lĩnh vực cung ứng nhân lực cho thị trường Nhật Bản. Với nhiều năm kinh nghiệm, chúng tôi tự hào đã chắp cánh cho hàng ngàn ước mơ của người lao động Việt Nam...',
         ja: 'ABC派遣会社は、日本市場への人材供給分野におけるリーディングカンパニーの一つです。長年の経験により、私たちは何千人ものベトナム人労働者の夢を支援してきたことを誇りに思っています...',
-        en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\' dreams take flight...'
+        en: 'ABC Dispatch Company is one of the leading units in the field of human resource supply for the Japanese market. With many years of experience, we are proud to have helped thousands of Vietnamese workers\'\'\' dreams take flight...'
     },
     images: [
       { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
@@ -243,6 +242,7 @@ const contentByLang = {
         addImageButton: 'Thêm ảnh',
         selectMainIndustriesPlaceholder: "Chọn Ngành nghề tuyển dụng chính",
         selectSecondaryIndustriesPlaceholder: "Chọn Khu vực tuyển dụng chính",
+        selectInterestLabel: 'Chọn nghiệp vụ',
     },
     ja: {
         edit: '編集',
@@ -305,6 +305,7 @@ const contentByLang = {
         addImageButton: '写真を追加',
         selectMainIndustriesPlaceholder: "主要な募集業種を選択",
         selectSecondaryIndustriesPlaceholder: "主な採用地域を選択",
+        selectInterestLabel: '業務を選択',
     },
     en: {
         edit: 'Edit',
@@ -367,6 +368,7 @@ const contentByLang = {
         addImageButton: 'Thêm ảnh',
         selectMainIndustriesPlaceholder: "Select Main Industries",
         selectSecondaryIndustriesPlaceholder: "Select Main Recruitment Areas",
+        selectInterestLabel: 'Select Operations',
     }
 };
 
@@ -1047,7 +1049,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn nghiệp vụ</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t.selectInterestLabel}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {(interestOptions[lang] || []).map((option) => (
                                      <DropdownMenuCheckboxItem
