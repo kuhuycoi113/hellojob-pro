@@ -261,10 +261,10 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "Chọn khu vực",
         selectInterestLabel: 'Chọn nghiệp vụ',
         selectValueInterestLabel: 'Chọn giá trị (sắp xếp theo ưu tiên)',
-        visaAndIndustriesTitle: 'Visa, Ngành nghề & Khu vực',
-        visaAndIndustriesDialogTitle: 'Chỉnh sửa Visa, Ngành nghề & Khu vực',
-        mainIndustriesLabel: 'Ngành nghề chính',
-        secondaryIndustriesLabel: 'Khu vực chính',
+        visaAndIndustriesTitle: "Visa, Ngành nghề & Khu vực",
+        visaAndIndustriesDialogTitle: "Chỉnh sửa Visa, Ngành nghề & Khu vực",
+        mainIndustriesLabel: "Ngành nghề chính",
+        secondaryIndustriesLabel: "Khu vực chính",
     },
     ja: {
         edit: '編集',
@@ -325,10 +325,10 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "地域を選択",
         selectInterestLabel: '業務を選択',
         selectValueInterestLabel: '価値観を選択 (優先順位で並べ替え)',
-        visaAndIndustriesTitle: 'ビザ、業種、地域',
-        visaAndIndustriesDialogTitle: 'ビザ、業種、地域を編集',
-        mainIndustriesLabel: '主要業種',
-        secondaryIndustriesLabel: '主な採用地域',
+        visaAndIndustriesTitle: "ビザ、業種、地域",
+        visaAndIndustriesDialogTitle: "ビザ、業種、地域を編集",
+        mainIndustriesLabel: "主要業種",
+        secondaryIndustriesLabel: "主な採用地域",
     },
     en: {
         edit: 'Edit',
@@ -390,10 +390,10 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "Select Region",
         selectInterestLabel: 'Select Operations',
         selectValueInterestLabel: 'Select Values (sort by priority)',
-        visaAndIndustriesTitle: 'Visa, Industry & Region',
-        visaAndIndustriesDialogTitle: 'Edit Visa, Industry & Region',
-        mainIndustriesLabel: 'Main Industries',
-        secondaryIndustriesLabel: 'Main Recruitment Areas',
+        visaAndIndustriesTitle: "Visa, Industry & Region",
+        visaAndIndustriesDialogTitle: "Edit Visa, Industry & Region",
+        mainIndustriesLabel: "Main Industries",
+        secondaryIndustriesLabel: "Main Recruitment Areas",
     }
 };
 
@@ -1566,5 +1566,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
-
-    
