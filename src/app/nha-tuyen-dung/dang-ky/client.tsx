@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -179,7 +180,7 @@ const emptyEmployerData = {
 
 type Language = 'vi' | 'ja' | 'en';
 
-const interestOptions: Record<Language, { id: string; title: string }[]> = {
+const interestOptions = {
     vi: [
         { id: 'post-job', title: 'Đăng việc làm để tìm ứng viên' },
         { id: 'refer-candidate', title: 'Tìm kiếm đối tác nhân lực phù hợp' },
@@ -205,7 +206,7 @@ const contentByLang = {
         edit: 'Sửa',
         aboutTitle: 'Giới thiệu doanh nghiệp',
         imagesTitle: 'Ảnh về doanh nghiệp',
-        historyTitle: 'Lịch sử &amp; các mốc sự kiện',
+        historyTitle: 'Lịch sử & các mốc sự kiện',
         infoTitle: 'Thông tin doanh nghiệp',
         foundedLabel: 'Năm thành lập',
         foundedPlaceholder: 'Ví dụ: 2010',
@@ -230,17 +231,17 @@ const contentByLang = {
         companyNamePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
         typePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
-        industriesTitle: 'Ngành nghề &amp; Khu vực',
-        mainIndustriesLabel: 'Ngành nghề tuyển dụng chính',
-        secondaryIndustriesLabel: 'Khu vực tuyển dụng chính',
-        benefitsTitle: 'Phúc lợi &amp; Môi trường',
+        industriesTitle: 'Ngành nghề & Khu vực',
+        mainIndustriesLabel: 'Ngành nghề chính',
+        secondaryIndustriesLabel: 'Khu vực chính',
+        benefitsTitle: 'Phúc lợi & Môi trường',
         interestLabel: "Nghiệp vụ quan tâm",
         interestDescription: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.",
         valueInterestLabel: "Giá trị quan tâm",
         valueInterestDescription: "Điều gì là quan trọng nhất với bạn khi hợp tác?",
         selectInterestPlaceholder: "Chọn nghiệp vụ quan tâm",
         selectValueInterestPlaceholder: "Chọn giá trị quan tâm",
-        valueInterestTitle: "Nghiệp vụ &amp; Giá trị quan tâm",
+        valueInterestTitle: "Nghiệp vụ & Giá trị quan tâm",
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
@@ -264,8 +265,8 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "Chọn khu vực",
         selectInterestLabel: 'Chọn nghiệp vụ',
         selectValueInterestLabel: 'Chọn giá trị (sắp xếp theo ưu tiên)',
-        visaAndIndustriesTitle: 'Visa, Ngành nghề &amp; Khu vực', // New combined title
-        visaAndIndustriesDialogTitle: 'Chỉnh sửa Visa, Ngành nghề &amp; Khu vực' // New dialog title
+        visaAndIndustriesTitle: 'Visa, Ngành nghề & Khu vực',
+        visaAndIndustriesDialogTitle: 'Chỉnh sửa Visa, Ngành nghề & Khu vực'
     },
     ja: {
         edit: '編集',
@@ -330,14 +331,14 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "地域を選択",
         selectInterestLabel: '業務を選択',
         selectValueInterestLabel: '価値観を選択 (優先順位で並べ替え)',
-        visaAndIndustriesTitle: 'ビザ、業種、地域', // New combined title
-        visaAndIndustriesDialogTitle: 'ビザ、業種、地域を編集' // New dialog title
+        visaAndIndustriesTitle: 'ビザ、業種、地域',
+        visaAndIndustriesDialogTitle: 'ビザ、業種、地域を編集'
     },
     en: {
         edit: 'Edit',
         aboutTitle: 'About the Company',
         imagesTitle: 'Company Photos',
-        historyTitle: 'History &amp; Milestones',
+        historyTitle: 'History & Milestones',
         infoTitle: 'Company Information',
         foundedLabel: 'Founded',
         foundedPlaceholder: 'E.g., 2010',
@@ -362,11 +363,11 @@ const contentByLang = {
         companyNamePlaceholder: 'E.g., ABC Corporation',
         typePlaceholder: '[Type/Role/Title...]',
         locationPlaceholder: 'E.g., Hanoi, Vietnam',
-        industriesTitle: 'Industries &amp; Sectors',
+        industriesTitle: 'Industries & Sectors',
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Main Recruitment Areas',
-        benefitsTitle: 'Benefits &amp; Environment',
-        valueInterestTitle: 'Operations &amp; Values',
+        benefitsTitle: 'Benefits & Environment',
+        valueInterestTitle: 'Operations & Values',
         interestLabel: "Operations of Interest",
         interestDescription: "Tell us your main goal for the best experience. You can select multiple items.",
         valueInterestLabel: "Desired Values",
@@ -396,8 +397,8 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "Select Region",
         selectInterestLabel: 'Select Operations',
         selectValueInterestLabel: 'Select Values (sort by priority)',
-        visaAndIndustriesTitle: 'Visa, Industry &amp; Region', // New combined title
-        visaAndIndustriesDialogTitle: 'Edit Visa, Industry &amp; Region' // New dialog title
+        visaAndIndustriesTitle: 'Visa, Industry & Region',
+        visaAndIndustriesDialogTitle: 'Edit Visa, Industry & Region'
     }
 };
 
@@ -421,9 +422,9 @@ const valueInterestOptions = {
       { id: 'cham-soc-khach-hang', title: '最高の顧客ケアサービス' },
     ],
     en: [
-      { id: 'ung-vien-nhieu-nhanh', title: 'Most &amp; Fastest Candidates' },
+      { id: 'ung-vien-nhieu-nhanh', title: 'Most & Fastest Candidates' },
       { id: 'ung-vien-chat-luong', title: 'Quality Candidates' },
-      { id: 'viec-lam-ro-rang', title: 'Clear &amp; Quality Jobs' },
+      { id: 'viec-lam-ro-rang', title: 'Clear & Quality Jobs' },
       { id: 'chi-phi-thap', title: 'Lowest Recruitment Cost' },
       { id: 'loi-nhuan-cao', title: 'Highest Profit' },
       { id: 'quan-ly-ho-tro', title: 'Best Support Management Service' },
@@ -486,13 +487,13 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         switch(context) {
           case 'visaType':
           case 'visaDetail':
-            return () => handleEditClick(t.visaAndIndustriesTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
+            return () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
           case 'interest':
           case 'valueInterest':
              return () => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest');
           case 'industries':
           case 'regions':
-             return () => handleEditClick(t.visaAndIndustriesTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
+             return () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
           default:
             return () => {};
         }
@@ -504,27 +505,39 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       )
     }
     const dataMap: any = {
-        industries: allIndustries,
+        industries: allIndustries.map(i => ({...i, name: i.name[lang]})),
         regions: japanRegions,
         visaType: japanJobTypes,
         visaDetail: Object.values(visaDetailsByVisaType).flat(),
     };
+    
+    if (context === 'interest') {
+        const interestDisplayOptions = interestOptions[lang];
+        const content = items.map((slug: string, index: number) => {
+            const item = interestDisplayOptions.find((i: any) => i.id === slug);
+            return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item?.title || slug}</Badge>;
+        });
+        return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
+    }
+    
+    if (context === 'valueInterest') {
+        const content = employer.valueInterest.map((item: any, index: number) => {
+             return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item[lang] || item.vi}</Badge>
+        });
+        return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
+    }
+
     const content = items.map((slug: string, index: number) => {
         let item;
         let name;
-        if (context === 'interest') {
-            item = (interestOptions[lang] as { id: string; title: string }[]).find((i: any) => i.id === slug);
-            name = item?.title || slug;
-        } else if (context === 'valueInterest') {
-             const valueItem = employer.valueInterest.find((v:any) => v.id === slug);
-             name = valueItem?.[lang] || slug;
-        }
-        else {
+        if (context === 'visaDetail') {
             item = dataMap[context]?.find((i: any) => i.slug === slug);
-            name = item?.title || item?.name?.[lang] || item?.name || slug;
+            name = item?.name[lang] || item?.name || slug;
+        } else {
+             item = dataMap[context]?.find((i: any) => i.slug === slug);
+             name = item?.title || item?.name || slug;
         }
-
-        return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
+        return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>;
     });
     return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
   }, [lang, isConfirmationMode, t, employer]);
@@ -1510,10 +1523,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   </div>
                    <SectionCard id="DKVISA_NGANHNGHE_KHUVUC" title={t.visaAndIndustriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries')}>
                     <div className="space-y-3 text-sm">
-                        <div><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
-                        <div><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
-                        <div><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
-                        <div><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
+                        <div id="DKLV_LOAIHINH_DISPLAY"><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
+                        <div id="DKLV_CHITIETVISA_DISPLAY"><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
+                        <div id="DKNN_NGANHNGHE_DISPLAY"><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
+                        <div id="DKNN_KHUVUC_DISPLAY"><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
                     </div>
                 </SectionCard>
               </div>
@@ -1556,3 +1569,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
+
+    
