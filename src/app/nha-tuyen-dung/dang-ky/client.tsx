@@ -224,7 +224,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
         lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
-        notUpdated: 'Nhấn để cập nhật',
+        notUpdated: '[Chưa có thông tin]',
         clickToUpdate: 'Nhấn để cập nhật',
         headerTitle: 'Thông tin chung',
         namePlaceholder: 'Ví dụ: Nguyễn Văn An',
@@ -288,7 +288,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'LineのリンクまたはIDを入力してください',
         lineHelper: 'システムが自動的にユーザー名を取得します。',
-        notUpdated: 'クリックして更新',
+        notUpdated: '[情報なし]',
         clickToUpdate: 'クリックして更新',
         headerTitle: '一般情報',
         namePlaceholder: '例: グエン・ヴァン・アン',
@@ -352,7 +352,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'Paste Line link or enter your ID',
         lineHelper: 'The system will automatically extract your username.',
-        notUpdated: 'Click to update',
+        notUpdated: '[Not available]',
         clickToUpdate: 'Click to update',
         headerTitle: 'General Information',
         namePlaceholder: 'E.g., An Nguyen Van',
@@ -454,9 +454,7 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, 
                 <Icon className="text-primary h-6 w-6"/>{title}
             </CardTitle>
             {onEditClick && !isConfirmationMode && (
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={onEditClick}><Edit className="h-4 w-4"/></Button>
-              </DialogTrigger>
+              <Button variant="ghost" size="icon" onClick={onEditClick}><Edit className="h-4 w-4"/></Button>
             )}
         </CardHeader>
         <CardContent>{children}</CardContent>
@@ -481,6 +479,177 @@ const regionKanjiMap: { [key: string]: string } = {
   Okinawa: '沖縄',
 };
 
+const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, onSave, onEditClick }: { isOpen: boolean; onOpenChange: (open: boolean) => void; employer: any; lang: Language; isConfirmationMode: boolean; onSave: (data: any) => void; onEditClick: () => void; }) => {
+    const t = contentByLang[lang];
+    const [tempInfo, setTempInfo] = useState(employer.info);
+    const [phoneCountry, setPhoneCountry] = useState('+84');
+    const [zaloCountry, setZaloCountry] = useState('+84');
+    const [errors, setErrors] = useState<{ email?: string; messenger?: string; line?: string }>({});
+
+    useEffect(() => {
+        setTempInfo(employer.info);
+    }, [employer.info]);
+    
+    const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    const validateField = (field: 'messenger' | 'line', value: string) => {
+        if (!value) { setErrors(prev => ({...prev, [field]: undefined })); return true; }
+        let isValid = false;
+        let errorMessage = "Định dạng không hợp lệ.";
+        if (field === 'messenger') {
+            isValid = /^(https?:\/\/(www\.)?(facebook|m)\.com\/|m\.me\/|[\w.]{5,})/.test(value);
+            errorMessage = "Vui lòng nhập link Facebook/Messenger hoặc username hợp lệ.";
+        } else if (field === 'line') {
+            isValid = /^(https?:\/\/line\.me\/|@?[\w.-]+)/.test(value);
+            errorMessage = "Vui lòng nhập link Line hoặc Line ID hợp lệ.";
+        }
+        setErrors(prev => ({ ...prev, [field]: isValid ? undefined : errorMessage }));
+        return isValid;
+    };
+
+    const handleSave = () => {
+        let allValid = true;
+        if (!validateEmail(tempInfo.email || '')) {
+            setErrors(prev => ({ ...prev, email: "Email không hợp lệ" }));
+            allValid = false;
+        } else {
+             setErrors(prev => ({ ...prev, email: undefined }));
+        }
+        if (!validateField('messenger', tempInfo.messenger || '')) allValid = false;
+        if (!validateField('line', tempInfo.line || '')) allValid = false;
+
+        if (!allValid) {
+            alert('Vui lòng sửa các lỗi được hiển thị trước khi lưu.');
+            return;
+        }
+
+        const finalInfo = { ...tempInfo };
+        if (finalInfo.messenger) finalInfo.messenger = parseMessengerInput(finalInfo.messenger);
+        if (finalInfo.line) finalInfo.line = parseLineInput(finalInfo.line);
+        if (finalInfo.zalo) finalInfo.zalo = parseZaloInput(finalInfo.zalo);
+        
+        onSave({ ...employer, info: finalInfo });
+        onOpenChange(false);
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+            <DialogContent id="DKTHONGTINDOANHNGHIEP_DIALOG" className="sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>{t.infoTitle}</DialogTitle>
+                </DialogHeader>
+                <div id="DKTHONGTINDOANHNGHIEP_DIALOG" className="space-y-4 max-h-[70vh] overflow-y-auto pr-4">
+                    <div id="DKDN_THONGTINCHUNG" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label id="DKDN_NAMTHANHLAP_LABEL" htmlFor="founded">{t.foundedLabel}</Label>
+                            <Input id="DKDN_NAMTHANHLAP_INPUT" placeholder={t.foundedPlaceholder} value={tempInfo.founded} onChange={(e) => setTempInfo({...tempInfo, founded: e.target.value})} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label id="DKDN_QUYMO_LABEL" htmlFor="size">{t.sizeLabel}</Label>
+                            <Input id="DKDN_QUYMO_INPUT" placeholder={t.sizePlaceholder} value={tempInfo.size[lang] || ''} onChange={(e) => setTempInfo({...tempInfo, size: {...tempInfo.size, [lang]: e.target.value}})} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label id="DKDN_GIAYPHEP_LABEL" htmlFor="license">{t.licenseLabel}</Label>
+                            <Input id="DKDN_GIAYPHEP_INPUT" placeholder={t.licensePlaceholder} value={tempInfo.license} onChange={(e) => setTempInfo({...tempInfo, license: e.target.value})} />
+                        </div>
+                        <div className="space-y-2">
+                           <Label id="DKDN_WEBSITE_LABEL" htmlFor="website">{t.websiteLabel}</Label>
+                           <Input id="DKDN_WEBSITE_INPUT" placeholder="https://example.com" value={tempInfo.website} onChange={(e) => setTempInfo({...tempInfo, website: e.target.value})} />
+                        </div>
+                    </div>
+                    
+                    <div id="DKDN_THONGTINLIENHE" className="pt-4 border-t">
+                      <h4 className="font-semibold mb-4">{t.contactTitle}</h4>
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <div className="space-y-1 md:col-span-2">
+                              <Label id="DKDN_EMAIL_LABEL" htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4"/> {t.emailLabel}</Label>
+                              <Input 
+                                type="email" 
+                                id="DKDN_EMAIL_INPUT"
+                                placeholder="contact@company.com" 
+                                value={tempInfo.email} 
+                                onChange={(e) => setTempInfo({...tempInfo, email: e.target.value})} 
+                                onBlur={(e) => {
+                                  if (!validateEmail(e.target.value)) {
+                                    setErrors(prev => ({...prev, email: "Email không hợp lệ" }));
+                                  } else {
+                                     setErrors(prev => ({...prev, email: undefined}));
+                                  }
+                                }}
+                                className={cn(errors?.email && "border-destructive")}
+                              />
+                               {errors?.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                           </div>
+                          <div className="space-y-2">
+                              <Label id="DKDN_SODIENTHOAI_LABEL" htmlFor="phone" className="flex items-center gap-2">
+                                <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
+                                {t.phoneLabel}
+                              </Label>
+                             <div className="flex items-center">
+                                <Select value={phoneCountry} onValueChange={setPhoneCountry}>
+                                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="+84">VN</SelectItem>
+                                        <SelectItem value="+81">JP</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Input id="DKDN_SODIENTHOAI_INPUT" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo.phone, phoneCountry)} onChange={(e) => setTempInfo({...tempInfo, phone: e.target.value.replace(/\D/g, '')})} />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                              <Label id="DKDN_ZALO_LABEL" htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
+                             <div className="flex items-center relative">
+                                <Select value={zaloCountry} onValueChange={setZaloCountry}>
+                                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="+84">VN</SelectItem>
+                                        <SelectItem value="+81">JP</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo.zalo, zaloCountry)} onChange={(e) => setTempInfo({...tempInfo, zalo: e.target.value.replace(/\D/g, '')})} />
+                                <div onClick={onEditClick} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
+                                    <QrCode className="h-5 w-5"/>
+                                </div>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                             <Label id="DKDN_MESSENGER_LABEL" htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
+                            <Input
+                                id="DKDN_MESSENGER_INPUT"
+                                placeholder={t.messengerPlaceholder}
+                                value={tempInfo.messenger}
+                                onChange={(e) => setTempInfo({...tempInfo, messenger: e.target.value})}
+                                onBlur={(e) => validateField('messenger', e.target.value)}
+                                className={cn(errors.messenger && "border-destructive")}
+                            />
+                            {!errors.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
+                            {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
+                        </div>
+                         <div className="space-y-1">
+                            <Label id="DKDN_LINE_LABEL" htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
+                            <Input
+                                id="DKDN_LINE_INPUT"
+                                placeholder={t.linePlaceholder}
+                                value={tempInfo.line}
+                                onChange={(e) => setTempInfo({...tempInfo, line: e.target.value})}
+                                onBlur={(e) => validateField('line', e.target.value)}
+                                className={cn(errors.line && "border-destructive")}
+                            />
+                             {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
+                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
+                        </div>
+                      </div>
+                  </div>
+                </div>
+                 <DialogFooter>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>{t.cancelButton}</Button>
+                    <Button onClick={handleSave}>{t.saveButton}</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};
+
 
 export default function EmployerDetailPage({ isConfirmationMode = false }: { isConfirmationMode?: boolean }) {
   const searchParams = useSearchParams();
@@ -492,31 +661,46 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const [displayName, setDisplayName] = React.useState('');
   const [roleText, setRoleText] = React.useState('');
   const [recruiterId, setRecruiterId] = React.useState('');
+  const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false);
+
   const t = contentByLang[lang] || contentByLang['vi'];
+  const hasContactInfo = employer?.info.phone || employer?.info.zalo || employer?.info.messenger || employer?.info.line || employer?.info.email;
+
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+  const [editingModule, setEditingModule] = React.useState<{title: string, field: string } | null>(null);
+  const [tempContent, setTempContent] = React.useState<any>('');
+  
+  const [phoneCountry, setPhoneCountry] = React.useState('+84');
+  const [zaloCountry, setZaloCountry] = React.useState('+84');
+  const { toast } = useToast();
+  const [errors, setErrors] = React.useState<{ email?: string; messenger?: string, line?: string }>({});
+  
+  const handleTempArrayChange = React.useCallback((index: number, field: string, value: string) => {
+    setTempContent((prev: any[]) => {
+      const newArray = [...prev];
+      if (typeof newArray[index] === 'object' && newArray[index] !== null && 'event' in newArray[index]) { // History object
+        newArray[index] = { ...newArray[index], [field]: { ...newArray[index][field], [lang]: value } };
+      } else if (typeof newArray[index] === 'object' && newArray[index] !== null && 'alt' in newArray[index]) { // Image object
+         newArray[index] = { ...newArray[index], alt: { ...newArray[index].alt, [lang]: value } };
+      } else if (typeof newArray[index] === 'object' && newArray[index] !== null) { // Benefits object
+        newArray[index] = { ...newArray[index], [lang]: value };
+      }
+      return newArray;
+    });
+  }, [lang]);
 
   const getArrayValue = useCallback((value: { [key in Language]?: string[] }, context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
     const items = value?.[lang] || [];
     if (items.length === 0) {
-      const getClickHandler = () => {
-        switch(context) {
-          case 'visaType':
-          case 'visaDetail':
-            return () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
-          case 'interest':
-          case 'valueInterest':
-             return () => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest');
-          case 'industries':
-          case 'regions':
-             return () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
-          default:
-            return () => {};
-        }
-      }
-      return (
-        <DialogTrigger asChild>
-            <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={getClickHandler()}>{t.clickToUpdate}</button>
-        </DialogTrigger>
-      )
+      const clickHandler = () => {
+          if(context === 'interest' || context === 'valueInterest') {
+              handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest');
+          } else {
+              handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
+          }
+      };
+      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={clickHandler}>{t.clickToUpdate}</button>
     }
     const dataMap: any = {
         industries: allIndustries,
@@ -688,65 +872,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     setEmployer(employerData);
 
   }, [searchParams]);
-  
-  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
-  const [editingModule, setEditingModule] = React.useState<{title: string, field: string } | null>(null);
-  const [tempContent, setTempContent] = React.useState<any>('');
-  const [phoneCountry, setPhoneCountry] = React.useState('+84');
-  const [zaloCountry, setZaloCountry] = React.useState('+84');
-  const { toast } = useToast();
-  const [errors, setErrors] = React.useState<{ email?: string; messenger?: string, line?: string }>({});
-
-  const handleTempArrayMultiLangChange = React.useCallback((index: number, field: string, value: string) => {
-    setTempContent((prev: any[]) => {
-      const newArray = [...prev];
-      newArray[index] = {
-        ...newArray[index],
-        [field]: {
-          ...newArray[index][field],
-          [lang]: value
-        }
-      };
-      return newArray;
-    });
-  }, [lang]);
-
-  if (!employer) {
-      return <div className="flex h-screen items-center justify-center">Loading...</div>;
-  }
-  
-  const headerName = displayName || (isIndividual ? `[${t.namePlaceholder}]` : `[${t.companyNamePlaceholder}]`);
-  const headerRoleText = roleText || t.rolePlaceholder;
-
-  const validateEmail = (email: string) => {
-    if (!email) return true; // Not required, but if present must be valid
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
-  };
-  
-  const validateField = (field: 'messenger' | 'line', value: string) => {
-    if (!value) {
-        setErrors(prev => ({...prev, [field]: undefined }));
-        return true;
-    }
-
-    let isValid = false;
-    let errorMessage = "Định dạng không hợp lệ.";
-
-    if (field === 'messenger') {
-        isValid = /^(https?:\/\/(www\.)?(facebook|m)\.com\/|m\.me\/|[\w.]{5,})/.test(value);
-        errorMessage = "Vui lòng nhập link Facebook/Messenger hoặc username hợp lệ.";
-    } else if (field === 'line') {
-        isValid = /^(https?:\/\/line\.me\/|@?[\w.-]+)/.test(value);
-        errorMessage = "Vui lòng nhập link Line hoặc Line ID hợp lệ.";
-    }
-    
-    if (isValid) {
-        setErrors(prev => ({ ...prev, [field]: undefined }));
-    } else {
-        setErrors(prev => ({ ...prev, [field]: errorMessage }));
-    }
-    return isValid;
-  };
 
   const handleEditClick = (title: string, currentContent: any, field: string) => {
     setEditingModule({ title, field });
@@ -805,20 +930,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     setEditingModule(null);
   };
 
-  const handleTempArrayChange = (index: number, field: string, value: any) => {
-    setTempContent((prev: any[]) => {
-      const newArray = [...prev];
-      if (typeof newArray[index] === 'object' && newArray[index] !== null && 'event' in newArray[index]) { // History object
-        newArray[index] = { ...newArray[index], [field]: { ...newArray[index][field], [lang]: value } };
-      } else if (typeof newArray[index] === 'object' && newArray[index] !== null && 'alt' in newArray[index]) { // Image object
-         newArray[index] = { ...newArray[index], alt: { ...newArray[index].alt, [lang]: value } };
-      } else if (typeof newArray[index] === 'object' && newArray[index] !== null) { // Benefits object
-        newArray[index] = { ...newArray[index], [lang]: value };
-      }
-      return newArray;
-    });
-  };
-  
   const addTempArrayItem = (field: string) => {
     if (field === 'history') {
       setTempContent((prev: any[]) => [...prev, { year: new Date().getFullYear().toString(), event: { vi: '', ja: '', en: '' } }]);
@@ -922,7 +1033,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         <Input 
                             placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.images[index]?.alt[lang] || 'Văn phòng hiện đại'}`}
                             value={img.alt[lang] || ''}
-                            onChange={(e) => handleTempArrayMultiLangChange(index, 'alt', e.target.value)}
+                            onChange={(e) => handleTempArrayChange(index, 'alt', e.target.value)}
                         />
                         <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                     </div>
@@ -937,7 +1048,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                     {tempContent.map((item: any, index: number) => (
                         <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
                             <Input placeholder={t.foundedPlaceholder} value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
-                            <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayMultiLangChange(index, 'event', e.target.value)} />
+                            <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
                         </div>
                     ))}
@@ -946,115 +1057,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                     </Button>
                 </div>
             );
-        case 'info':
-             return (
-                <div id="DKTHONGTINDOANHNGHIEP_DIALOG" className="space-y-4">
-                    <div id="DKDN_THONGTINCHUNG" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label id="DKDN_NAMTHANHLAP_LABEL" htmlFor="founded">{t.foundedLabel}</Label>
-                            <Input id="DKDN_NAMTHANHLAP_INPUT" placeholder={t.foundedPlaceholder} value={tempContent.founded} onChange={(e) => setTempContent({...tempContent, founded: e.target.value})} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label id="DKDN_QUYMO_LABEL" htmlFor="size">{t.sizeLabel}</Label>
-                            <Input id="DKDN_QUYMO_INPUT" placeholder={t.sizePlaceholder} value={tempContent.size[lang] || ''} onChange={(e) => setTempContent({...tempContent, size: {...tempContent.size, [lang]: e.target.value}})} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label id="DKDN_GIAYPHEP_LABEL" htmlFor="license">{t.licenseLabel}</Label>
-                            <Input id="DKDN_GIAYPHEP_INPUT" placeholder={t.licensePlaceholder} value={tempContent.license} onChange={(e) => setTempContent({...tempContent, license: e.target.value})} />
-                        </div>
-                        <div className="space-y-2">
-                           <Label id="DKDN_WEBSITE_LABEL" htmlFor="website">{t.websiteLabel}</Label>
-                           <Input id="DKDN_WEBSITE_INPUT" placeholder="https://example.com" value={tempContent.website} onChange={(e) => setTempContent({...tempContent, website: e.target.value})} />
-                        </div>
-                    </div>
-                    
-                    <div id="DKDN_THONGTINLIENHE" className="pt-4 border-t">
-                      <h4 className="font-semibold mb-4">{t.contactTitle}</h4>
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                           <div className="space-y-1 md:col-span-2">
-                              <Label id="DKDN_EMAIL_LABEL" htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4"/> {t.emailLabel}</Label>
-                              <Input 
-                                type="email" 
-                                id="DKDN_EMAIL_INPUT"
-                                placeholder="contact@company.com" 
-                                value={tempContent.email} 
-                                onChange={(e) => setTempContent({...tempContent, email: e.target.value})} 
-                                onBlur={(e) => {
-                                  if (!validateEmail(e.target.value)) {
-                                    setErrors(prev => ({...prev, email: "Email không hợp lệ" }));
-                                  } else {
-                                     setErrors(prev => ({...prev, email: undefined}));
-                                  }
-                                }}
-                                className={cn(errors?.email && "border-destructive")}
-                              />
-                               {errors?.email && <p className="text-xs text-destructive">{errors.email}</p>}
-                           </div>
-                          <div className="space-y-2">
-                              <Label id="DKDN_SODIENTHOAI_LABEL" htmlFor="phone" className="flex items-center gap-2">
-                                <Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="h-4 w-4" />
-                                {t.phoneLabel}
-                              </Label>
-                             <div className="flex items-center">
-                                <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-                                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="+84">VN</SelectItem>
-                                        <SelectItem value="+81">JP</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <Input id="DKDN_SODIENTHOAI_INPUT" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.phone, phoneCountry)} onChange={(e) => setTempContent({...tempContent, phone: e.target.value.replace(/\D/g, '')})} />
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                              <Label id="DKDN_ZALO_LABEL" htmlFor="zalo" className="flex items-center gap-2"><ZaloIcon className="h-4 w-4" />{t.zaloLabel}</Label>
-                             <div className="flex items-center relative">
-                                <Select value={zaloCountry} onValueChange={setZaloCountry}>
-                                    <SelectTrigger className="w-[80px] rounded-r-none"><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="+84">VN</SelectItem>
-                                        <SelectItem value="+81">JP</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempContent.zalo, zaloCountry)} onChange={(e) => setTempContent({...tempContent, zalo: e.target.value.replace(/\D/g, '')})} />
-                                <div onClick={() => {}} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
-                                    <QrCode className="h-5 w-5"/>
-                                </div>
-                            </div>
-                          </div>
-                          <div className="space-y-1">
-                             <Label id="DKDN_MESSENGER_LABEL" htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4" />{t.messengerLabel}</Label>
-                            <Input
-                                id="DKDN_MESSENGER_INPUT"
-                                placeholder={t.messengerPlaceholder}
-                                value={tempContent.messenger}
-                                onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})}
-                                onBlur={(e) => validateField('messenger', e.target.value)}
-                                className={cn(errors.messenger && "border-destructive")}
-                            />
-                            {!errors.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
-                            {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
-                        </div>
-                         <div className="space-y-1">
-                            <Label id="DKDN_LINE_LABEL" htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
-                            <Input
-                                id="DKDN_LINE_INPUT"
-                                placeholder={t.linePlaceholder}
-                                value={tempContent.line}
-                                onChange={(e) => setTempContent({...tempContent, line: e.target.value})}
-                                onBlur={(e) => validateField('line', e.target.value)}
-                                className={cn(errors.line && "border-destructive")}
-                            />
-                             {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
-                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
-                        </div>
-                      </div>
-                      <div className="text-center mt-4">
-                        <div className="text-sm text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
-                      </div>
-                  </div>
-                </div>
-             );
+        
         case 'benefits':
              return (
                 <div className="space-y-4">
@@ -1365,21 +1368,14 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             return <p>Chức năng đang được phát triển.</p>;
     }
   };
-
-  const hasContactInfo = employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line || employer.info.email;
-
-  const formatDisplayPhoneNumber = (phone: string) => {
-      if (!phone) return '';
-      // A simplified version for display only
-      if (phone.length === 10 && phone.startsWith('0')) {
-          return `${phone.slice(0,4)} ${phone.slice(4,7)} ${phone.slice(7)}`;
-      }
-      if (phone.length === 11 && phone.startsWith('0')) {
-           return `${phone.slice(0,3)} ${phone.slice(3,7)} ${phone.slice(7)}`;
-      }
-      return phone;
+  
+  if (!employer) {
+      return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
   
+  const headerName = displayName || (isIndividual ? `[${t.namePlaceholder}]` : `[${t.companyNamePlaceholder}]`);
+  const headerRoleText = roleText || t.rolePlaceholder;
+
   return (
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
       <div id="Y062" className="bg-secondary pb-24">
@@ -1447,25 +1443,33 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <span className="italic text-muted-foreground">{t.notUpdated}, <DialogTrigger asChild><button disabled={isConfirmationMode} className="underline text-primary">{t.clickToUpdate}</button></DialogTrigger>.</span>}</p>
-                       <Button id="DKGT_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
+                       <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <span className="italic text-muted-foreground">{t.notUpdated}, <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button>.</span>}</p>
                   </SectionCard>
                   
                   {/* Info card for Mobile */}
                   <div className="block lg:hidden">
-                    <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.infoTitle, employer.info, 'info')}>
+                    <InfoDialog 
+                      isOpen={isInfoDialogOpen}
+                      onOpenChange={setIsInfoDialogOpen}
+                      employer={employer}
+                      lang={lang}
+                      isConfirmationMode={isConfirmationMode}
+                      onSave={(data) => setEmployer(data)}
+                      onEditClick={() => {}}
+                    />
+                     <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
                         <div className="space-y-3 text-sm">
-                            <p id="DKDN_NAMTHANHLAP-mobile"><strong>{t.foundedLabel}:</strong> {employer.info.founded || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                            <p id="DKDN_QUYMO-mobile"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                            <p id="DKDN_GIAYPHEP-mobile"><strong>{t.licenseLabel}:</strong> {employer.info.license || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                            <p id="DKDN_WEBSITE-mobile"><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                            <p id="DKDN_NAMTHANHLAP-mobile"><strong>{t.foundedLabel}:</strong> {employer.info.founded || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
+                            <p id="DKDN_QUYMO-mobile"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
+                            <p id="DKDN_GIAYPHEP-mobile"><strong>{t.licenseLabel}:</strong> {employer.info.license || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
+                            <p id="DKDN_WEBSITE-mobile"><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
                         </div>
                         {hasContactInfo ? (
                             <div id="DKTHONGTINLIENHE-mobile" className="mt-6 border-t pt-4 space-y-2">
                                {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                               {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
+                               {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
                                {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                               {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
+                               {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
                                {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                             </div>
                         ) : (
@@ -1504,7 +1508,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                   <p className="font-bold text-primary mb-1">{item.year}</p>
                                   <p className="text-muted-foreground">{item.event[lang]}</p>
                               </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <DialogTrigger asChild><button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button></DialogTrigger>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
                   <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
@@ -1529,7 +1533,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                               <li key={index} className="flex items-start gap-2">
                                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
                               </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <DialogTrigger asChild><button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button></DialogTrigger>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
               </div>
@@ -1537,20 +1541,29 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 {/* Right Column (order-first on desktop) */}
               <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
                   <div className="hidden lg:block">
-                    <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.infoTitle, employer.info, 'info')}>
+                     <InfoDialog 
+                      isOpen={isInfoDialogOpen}
+                      onOpenChange={setIsInfoDialogOpen}
+                      employer={employer}
+                      lang={lang}
+                      isConfirmationMode={isConfirmationMode}
+                      onSave={(data) => setEmployer(data)}
+                      onEditClick={() => {}}
+                    />
+                    <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
                         <div className="space-y-3 text-sm">
-                            <p id="DKDN_NAMTHANHLAP"><strong>{t.foundedLabel}:</strong> {employer.info.founded || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                            <p id="DKDN_QUYMO"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                            <p id="DKDN_GIAYPHEP"><strong>{t.licenseLabel}:</strong> {employer.info.license || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                            <p id="DKDN_WEBSITE"><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                            <p id="DKDN_NAMTHANHLAP"><strong>{t.foundedLabel}:</strong> {employer.info.founded || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
+                            <p id="DKDN_QUYMO"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
+                            <p id="DKDN_GIAYPHEP"><strong>{t.licenseLabel}:</strong> {employer.info.license || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
+                            <p id="DKDN_WEBSITE"><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
                         </div>
                         
                         {hasContactInfo ? (
                             <div id="DKTHONGTINLIENHE" className="mt-6 border-t pt-4 space-y-2">
                                {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                               {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
+                               {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
                                {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                               {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
+                               {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
                                {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                             </div>
                         ) : (
@@ -1616,5 +1629,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
-
-    
