@@ -944,7 +944,7 @@ export default function CandidateProfilePage() {
     const hasMissingFields = missingFields.length > 0;
 
     return (
-        <Card>
+        <Card id="HSCV_THONGTINCANHAN">
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="font-headline text-xl flex items-center"><UserCog className="mr-3 text-primary"/> {t.personalInfo}</CardTitle>
                 <Button variant="ghost" size="icon" onClick={() => setIsProfileEditDialogOpen(true)}>
@@ -1044,7 +1044,7 @@ export default function CandidateProfilePage() {
   
 
     const MediaCarousel = ({ items, title }: { items: MediaItem[], title: string }) => (
-    <Card>
+    <Card id="HSCV_VIDEO">
       <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="font-headline text-xl flex items-center"><Video className="mr-3 text-primary"/> {title}</CardTitle>
           <Button variant="ghost" size="icon"><PlusCircle className="h-5 w-5"/></Button>
@@ -1075,7 +1075,7 @@ export default function CandidateProfilePage() {
   );
 
   const BodyPhotosCarousel = ({items, onImageChange}: {items: MediaItem[], onImageChange: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void}) => (
-    <Card>
+    <Card id="HSCV_ANHHINHTHE">
         <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="font-headline text-xl flex items-center"><ImageIcon className="mr-3 text-primary"/> {t.bodyPhotos}</CardTitle>
              <Dialog>
@@ -1170,7 +1170,7 @@ export default function CandidateProfilePage() {
       <div className="container mx-auto px-4 md:px-6 py-12">
         <div className="max-w-5xl mx-auto">
           <Card className="shadow-2xl overflow-hidden">
-             <CardHeader className="p-0">
+             <CardHeader className="p-0" id="HSCV_THONGTINCHUNG">
                <div className="bg-gradient-to-tr from-primary to-accent h-32" />
                  <div className="p-6 flex flex-col md:flex-row items-center md:items-end -mt-16">
                  <div className="relative group">
@@ -1238,7 +1238,7 @@ export default function CandidateProfilePage() {
             <CardContent className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
                 
-                <Card>
+                <Card id="HSCV_GIOITHIEU">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><User className="mr-3 text-primary"/>{t.about}</CardTitle>
                      <EditDialog
@@ -1270,7 +1270,7 @@ export default function CandidateProfilePage() {
                 {candidate.images.length > 0 && <BodyPhotosCarousel items={candidate.images} onImageChange={(e, index) => handleMediaChange('image', e, index)} />}
 
 
-                <Card>
+                <Card id="HSCV_KINHNGHIEM">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><Briefcase className="mr-3 text-primary"/>{t.workExperience}</CardTitle>
                      <EditDialog
@@ -1333,7 +1333,7 @@ export default function CandidateProfilePage() {
                   </CardContent>
                 </Card>
                 
-                <Card>
+                <Card id="HSCV_HOCVAN">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><GraduationCap className="mr-3 text-primary"/>{t.education}</CardTitle>
                      <EditDialog
@@ -1393,7 +1393,7 @@ export default function CandidateProfilePage() {
                   </CardContent>
                 </Card>
                 
-                <Card>
+                <Card id="HSCV_GIAYTO">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><FileArchive className="mr-3 text-primary"/> {t.documentsSection}</CardTitle>
                      <EditDialog
@@ -1522,7 +1522,7 @@ export default function CandidateProfilePage() {
                   </CardContent>
                 </Card>
 
-                 <Card>
+                 <Card id="HSCV_GHICHU">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><FilePen className="mr-3 text-primary"/>{t.notes}</CardTitle>
                      <EditDialog
@@ -1555,7 +1555,7 @@ export default function CandidateProfilePage() {
                  <div className="hidden lg:block">
                   <PersonalInfoCard />
                 </div>
-                 <Card>
+                 <Card id="HSCV_NGUYENVONG">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><Target className="mr-3 text-primary"/> {t.aspirations}</CardTitle>
                      <EditDialog
@@ -1604,7 +1604,7 @@ export default function CandidateProfilePage() {
                   </CardContent>
                 </Card>
 
-                 <Card>
+                 <Card id="HSCV_KYNANG">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><Star className="mr-3 text-primary"/> {t.skillsAndInterests}</CardTitle>
                     <EditDialog
@@ -1660,7 +1660,7 @@ export default function CandidateProfilePage() {
                   </CardContent>
                 </Card>
                 
-                 <Card>
+                 <Card id="HSCV_CHUNGCHI">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><Award className="mr-3 text-primary"/> {t.certifications}</CardTitle>
                      <EditDialog
