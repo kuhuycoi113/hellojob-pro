@@ -484,9 +484,24 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const getArrayValue = useCallback((value: { [key in Language]?: string[] }, context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
     const items = value?.[lang] || [];
     if (items.length === 0) {
+      const getClickHandler = () => {
+        switch(context) {
+          case 'visaType':
+          case 'visaDetail':
+            return () => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa');
+          case 'interest':
+          case 'valueInterest':
+             return () => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest');
+          case 'industries':
+          case 'regions':
+             return () => handleEditClick(t.industriesTitle, employer.industries, 'industries');
+          default:
+            return () => {};
+        }
+      }
       return (
         <DialogTrigger asChild>
-            <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>{t.clickToUpdate}</button>
+            <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={getClickHandler()}>{t.clickToUpdate}</button>
         </DialogTrigger>
       )
     }
@@ -516,7 +531,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
     });
     return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
-  }, [lang, isConfirmationMode, t.clickToUpdate, employer, t.valueInterestTitle]);
+  }, [lang, isConfirmationMode, t, employer]);
   
   const handleLangChange = (lang: Language) => {
     setLang(lang);
