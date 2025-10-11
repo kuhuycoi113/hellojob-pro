@@ -199,13 +199,11 @@ function NhaTuyenDungPageContent() {
                           <span className="block text-sm text-muted-foreground/80 mt-1">{welcomeContent.description2.en}</span>
                       </p>
                       <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                          <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
-                             <Link href="/doi-tac/dang-tin-tuyen-dung">
+                          <Button size="lg" className="bg-primary text-white hover:bg-primary/90">
                               <div className="text-center">
                                   <span className="font-semibold">{welcomeContent.postJobButton.vi}</span>
                                   <div className="text-xs opacity-80">{welcomeContent.postJobButton.ja} / {welcomeContent.postJobButton.en}</div>
                               </div>
-                            </Link>
                           </Button>
                            <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
                             <Link href="/nhuong-quyen">
