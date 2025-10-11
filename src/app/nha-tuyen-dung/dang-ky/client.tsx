@@ -880,6 +880,18 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         { name: { vi: 'Kỹ sư, tri thức', ja: '技術・人文知識・国際業務', en: 'Engineer/Specialist' }, slug: 'ky-su-tri-thuc' }
     ];
 
+    const regionKanjiMap: { [key: string]: string } = {
+        Hokkaido: '北海道',
+        Tohoku: '東北',
+        Kanto: '関東',
+        Chubu: '中部',
+        Kansai: '関西',
+        Chugoku: '中国',
+        Shikoku: '四国',
+        Kyushu: '九州',
+        Okinawa: '沖縄',
+    };
+
     switch(editingModule.field) {
         case 'header':
             return (
@@ -1435,7 +1447,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <span className="italic text-muted-foreground">[{t.notUpdated}], <DialogTrigger asChild><button disabled={isConfirmationMode} className="underline text-primary">{t.clickToUpdate}</button></DialogTrigger>.</span>}</p>
+                       <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <span className="italic text-muted-foreground">{t.notUpdated}, <DialogTrigger asChild><button disabled={isConfirmationMode} className="underline text-primary">{t.clickToUpdate}</button></DialogTrigger>.</span>}</p>
                        <Button id="DKGT_NUTSUA" variant="ghost" size="icon" className="absolute top-4 right-4 invisible"><Edit className="h-4 w-4"/></Button>
                   </SectionCard>
                   
@@ -1492,7 +1504,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                   <p className="font-bold text-primary mb-1">{item.year}</p>
                                   <p className="text-muted-foreground">{item.event[lang]}</p>
                               </li>
-                          )) : <p className="italic text-muted-foreground">[{t.notUpdated}], <DialogTrigger asChild><button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button></DialogTrigger>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <DialogTrigger asChild><button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button></DialogTrigger>.</p>}
                       </ul>
                   </SectionCard>
                   <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
@@ -1517,7 +1529,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                               <li key={index} className="flex items-start gap-2">
                                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
                               </li>
-                          )) : <p className="italic text-muted-foreground">[{t.notUpdated}], <DialogTrigger asChild><button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button></DialogTrigger>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <DialogTrigger asChild><button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button></DialogTrigger>.</p>}
                       </ul>
                   </SectionCard>
               </div>
