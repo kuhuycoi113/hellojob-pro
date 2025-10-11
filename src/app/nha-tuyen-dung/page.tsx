@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -10,25 +11,95 @@ import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
 const partnerBenefits = [
   { 
     icon: Users,
-    title: 'Nguồn ứng viên dồi dào', 
-    description: 'Tiếp cận hệ thống dữ liệu ứng viên Kỹ năng Đặc định (Tokutei) đã được sàng lọc và xác thực thông tin ban đầu.'
+    title: {
+        vi: 'Nguồn ứng viên dồi dào',
+        ja: '豊富な候補者源',
+        en: 'Abundant Candidate Pool'
+    },
+    description: {
+        vi: 'Tiếp cận hệ thống dữ liệu ứng viên Kỹ năng Đặc định (Tokutei) đã được sàng lọc và xác thực thông tin ban đầu.',
+        ja: '事前にスクリーニング・検証された特定技能候補者のデータベースにアクセスできます。',
+        en: 'Access a database of Special Skilled Worker (Tokutei) candidates that has been pre-screened and verified.'
+    }
   },
   { 
     icon: FileSignature,
-    title: 'Công cụ quản lý hiệu quả', 
-    description: 'Sử dụng nền tảng để quản lý tin tuyển dụng, theo dõi trạng thái ứng viên và tương tác một cách chuyên nghiệp.'
+    title: {
+        vi: 'Công cụ quản lý hiệu quả',
+        ja: '効率的な管理ツール',
+        en: 'Effective Management Tools'
+    }, 
+    description: {
+        vi: 'Sử dụng nền tảng để quản lý tin tuyển dụng, theo dõi trạng thái ứng viên và tương tác một cách chuyên nghiệp.',
+        ja: 'プラットフォームを使用して、求人情報を管理し、候補者の状況を追跡し、専門的に対話します。',
+        en: 'Use the platform to manage job postings, track candidate status, and interact professionally.'
+    }
   },
   { 
     icon: BarChart,
-    title: 'Hỗ trợ Marketing & Vận hành', 
-    description: 'Được hỗ trợ quảng bá tin tuyển dụng trên các kênh của HelloJob, tiếp cận đúng đối tượng mục tiêu và tối ưu hóa hiệu quả.'
+    title: {
+        vi: 'Hỗ trợ Marketing & Vận hành',
+        ja: 'マーケティング・運営支援',
+        en: 'Marketing & Operations Support'
+    },
+    description: {
+        vi: 'Được hỗ trợ quảng bá tin tuyển dụng trên các kênh của HelloJob, tiếp cận đúng đối tượng mục tiêu và tối ưu hóa hiệu quả.',
+        ja: 'HelloJobのチャネルで求人広告を宣伝し、適切なターゲット層にリーチし、効果を最適化するためのサポートを受けられます。',
+        en: 'Receive support to promote job postings on HelloJob\'s channels, reaching the right target audience and optimizing effectiveness.'
+    }
   },
   {
     icon: ShieldCheck,
-    title: 'Hợp tác minh bạch',
-    description: 'Quy trình hợp tác rõ ràng, cơ chế chia sẻ doanh thu hấp dẫn và minh bạch, đảm bảo quyền lợi cho đối tác.'
+    title: {
+        vi: 'Hợp tác minh bạch',
+        ja: '透明性の高い協力体制',
+        en: 'Transparent Partnership'
+    },
+    description: {
+        vi: 'Quy trình hợp tác rõ ràng, cơ chế chia sẻ doanh thu hấp dẫn và minh bạch, đảm bảo quyền lợi cho đối tác.',
+        ja: '明確な協力プロセス、魅力的で透明な収益分配メカニズムにより、パートナーの利益を保証します。',
+        en: 'A clear cooperation process, along with an attractive and transparent revenue-sharing mechanism, ensures benefits for partners.'
+    }
   }
 ];
+
+const welcomeContent = {
+    title: {
+        vi: "Chào mừng các Đối tác Tuyển dụng",
+        ja: "採用パートナー様へようこそ",
+        en: "Welcome, Recruiting Partners"
+    },
+    description1: {
+        vi: "HelloJob là hệ thống giúp các đối tác đăng tải thông tin việc làm miễn phí để tuyển dụng ứng viên Việt Nam. Chúng tôi chào mừng các đối tác là Cá nhân (làm việc cho các tổ chức nhân lực) hoặc Pháp nhân tại Việt Nam và Nhật Bản.",
+        ja: "HelloJobはベトナム人候補者を採用するための無料求人投稿プラットフォームです。私たちは、ベトナムおよび日本国内の個人（人材組織勤務）または法人パートナーを歓迎します。",
+        en: "HelloJob is a free job posting platform for partners to post jobs to recruit Vietnamese candidates. We welcome partners who are Individuals (working for HR organizations) or Legal Entities in Vietnam and Japan."
+    },
+    mainRecruitmentTitle: {
+        vi: "Các loại hình tuyển dụng chính:",
+        ja: "主な採用形態:",
+        en: "Main recruitment types:"
+    },
+    recruitmentTypes: [
+        { vi: "- Kỹ năng đặc định (特定技能)", ja: "- 特定技能", en: "- Specified Skilled Worker (特定技能)" },
+        { vi: "- Thực tập sinh kỹ năng (技能実習)", ja: "- 技能実習", en: "- Technical Intern Training (技能実習)" },
+        { vi: "- Kỹ sư, tri thức (技術・人文知識・国際業務 - 技人国)", ja: "- 技術・人文知識・国際業務", en: "- Engineer/Specialist in Humanities/International Services (技人国)" }
+    ],
+    description2: {
+        vi: "Bạn có thể đăng việc làm ngay hoặc để lại thông tin liên hệ để tìm hiểu về cơ chế hợp tác.",
+        ja: "すぐに求人を掲載するか、連絡先を残して協力体制についてご相談ください。",
+        en: "You can post a job now or leave your contact information to learn about our partnership model."
+    },
+    postJobButton: {
+        vi: "Đăng tin tuyển dụng ngay",
+        ja: "求人を掲載",
+        en: "Post Job Now"
+    },
+    registerPartnerButton: {
+        vi: "Đăng ký đối tác",
+        ja: "パートナー登録",
+        en: "Register as Partner"
+    }
+};
 
 export default function NhaTuyenDungPage() {
   return (
@@ -40,17 +111,25 @@ export default function NhaTuyenDungPage() {
       <section className="w-full py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4 md:px-6">
            <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold">Lợi ích dành cho Đối tác</h2>
+            <h2 className="text-3xl md:text-4xl font-headline font-bold">
+                Lợi ích dành cho Đối tác
+                <span className="block text-lg text-muted-foreground mt-2">パートナーのメリット / Benefits for Partners</span>
+            </h2>
             <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
               Chúng tôi cung cấp một nền tảng toàn diện với các công cụ và sự hỗ trợ cần thiết để giúp bạn thành công.
+              <span className="block text-sm text-muted-foreground/80 mt-1">私たちは、パートナーの成功に必要なツールとサポートを備えた包括的なプラットフォームを提供します。</span>
+              <span className="block text-sm text-muted-foreground/80 mt-1">We provide a comprehensive platform with the necessary tools and support to help you succeed.</span>
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
             {partnerBenefits.map(feature => (
-              <Card key={feature.title} className="text-center p-6 border-t-4 border-primary shadow-lg hover:shadow-xl transition-shadow">
+              <Card key={feature.title.vi} className="text-center p-6 border-t-4 border-primary shadow-lg hover:shadow-xl transition-shadow h-full">
                  <feature.icon className="w-12 h-12 text-primary mx-auto mb-4" />
-                 <h3 className="text-xl font-bold font-headline mb-2">{feature.title}</h3>
-                 <p className="text-muted-foreground text-sm">{feature.description}</p>
+                 <h3 className="text-xl font-bold font-headline mb-2">{feature.title.vi}</h3>
+                 <p className="text-xs font-semibold text-muted-foreground/80">{feature.title.ja} / {feature.title.en}</p>
+                 <p className="text-muted-foreground text-sm mt-4">{feature.description.vi}</p>
+                 <p className="text-xs text-muted-foreground/80 mt-2">{feature.description.ja}</p>
+                 <p className="text-xs text-muted-foreground/80 mt-1">{feature.description.en}</p>
               </Card>
             ))}
           </div>
@@ -61,35 +140,42 @@ export default function NhaTuyenDungPage() {
         <div className="container mx-auto px-4 md:px-6">
             <Card className="p-8 md:p-12 bg-secondary border-none">
                  <div className="text-center">
-                    <h2 className="text-3xl font-bold font-headline mb-4">Chào mừng các Đối tác Tuyển dụng</h2>
+                    <h2 className="text-3xl font-bold font-headline mb-4">
+                        {welcomeContent.title.vi}
+                        <span className="block text-lg text-muted-foreground mt-2">{welcomeContent.title.ja} / {welcomeContent.title.en}</span>
+                    </h2>
                     <p className="text-muted-foreground max-w-4xl mx-auto">
-                        HelloJob là hệ thống giúp các đối tác đăng tải thông tin việc làm miễn phí để tuyển dụng ứng viên Việt Nam. Chúng tôi chào mừng các đối tác là Cá nhân (làm việc cho các tổ chức nhân lực) hoặc Pháp nhân tại Việt Nam và Nhật Bản.
+                        {welcomeContent.description1.vi}
+                        <span className="block text-sm text-muted-foreground/80 mt-2">{welcomeContent.description1.ja}</span>
+                        <span className="block text-sm text-muted-foreground/80 mt-1">{welcomeContent.description1.en}</span>
                     </p>
                     <div className="mt-6 bg-background p-6 rounded-lg inline-block text-left">
-                        <h3 className="font-semibold mb-3">Các loại hình tuyển dụng chính:</h3>
+                        <h3 className="font-semibold mb-3">{welcomeContent.mainRecruitmentTitle.vi}</h3>
                         <ul className="space-y-1 text-muted-foreground">
-                            <li>- Kỹ năng đặc định (特定技能)</li>
-                            <li>- Thực tập sinh kỹ năng (技能実習)</li>
-                            <li>- Kỹ sư, tri thức (技術・人文知識・国際業務 - 技人国)</li>
+                           {welcomeContent.recruitmentTypes.map(type => (
+                               <li key={type.vi}>{type.vi}</li>
+                           ))}
                         </ul>
                     </div>
                      <p className="mt-6 text-muted-foreground max-w-4xl mx-auto">
-                        Bạn có thể đăng việc làm ngay hoặc để lại thông tin liên hệ để tìm hiểu về cơ chế hợp tác.
+                        {welcomeContent.description2.vi}
+                        <span className="block text-sm text-muted-foreground/80 mt-2">{welcomeContent.description2.ja}</span>
+                        <span className="block text-sm text-muted-foreground/80 mt-1">{welcomeContent.description2.en}</span>
                     </p>
                     <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                         <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
                            <Link href="/nha-tuyen-dung/dang-tin-tuyen-dung">
                             <div className="text-center">
-                                <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
-                                <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                                <span className="font-semibold">{welcomeContent.postJobButton.vi}</span>
+                                <div className="text-xs opacity-80">{welcomeContent.postJobButton.ja} / {welcomeContent.postJobButton.en}</div>
                             </div>
                           </Link>
                         </Button>
                          <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
                           <Link href="/nhuong-quyen">
                             <div className="text-center">
-                                <span className="font-semibold">Đăng ký đối tác</span>
-                                <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                                <span className="font-semibold">{welcomeContent.registerPartnerButton.vi}</span>
+                                <div className="text-xs opacity-80">{welcomeContent.registerPartnerButton.ja} / {welcomeContent.registerPartnerButton.en}</div>
                             </div>
                           </Link>
                         </Button>
@@ -102,3 +188,5 @@ export default function NhaTuyenDungPage() {
     </div>
   );
 }
+
+    
