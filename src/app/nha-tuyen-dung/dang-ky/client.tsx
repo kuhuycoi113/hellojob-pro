@@ -186,7 +186,7 @@ const contentByLang = {
         edit: 'Sửa',
         aboutTitle: 'Giới thiệu doanh nghiệp',
         imagesTitle: 'Ảnh về doanh nghiệp',
-        historyTitle: 'Lịch sử & các mốc sự kiện',
+        historyTitle: 'Lịch sử &amp; các mốc sự kiện',
         infoTitle: 'Thông tin doanh nghiệp',
         foundedLabel: 'Năm thành lập',
         foundedPlaceholder: 'Ví dụ: 2010',
@@ -211,17 +211,17 @@ const contentByLang = {
         companyNamePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
         typePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
-        industriesTitle: 'Ngành nghề & Khu vực',
+        industriesTitle: 'Ngành nghề &amp; Khu vực',
         mainIndustriesLabel: 'Ngành nghề tuyển dụng chính',
         secondaryIndustriesLabel: 'Khu vực tuyển dụng chính',
-        benefitsTitle: 'Phúc lợi & Môi trường',
+        benefitsTitle: 'Phúc lợi &amp; Môi trường',
         interestLabel: "Nghiệp vụ quan tâm",
         interestDescription: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.",
         valueInterestLabel: "Giá trị quan tâm",
         valueInterestDescription: "Điều gì là quan trọng nhất với bạn khi hợp tác?",
         selectInterestPlaceholder: "Chọn nghiệp vụ quan tâm",
         selectValueInterestPlaceholder: "Chọn giá trị quan tâm",
-        valueInterestTitle: "Nghiệp vụ & Giá trị quan tâm",
+        valueInterestTitle: "Nghiệp vụ &amp; Giá trị quan tâm",
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
@@ -310,7 +310,7 @@ const contentByLang = {
         edit: 'Edit',
         aboutTitle: 'About the Company',
         imagesTitle: 'Company Photos',
-        historyTitle: 'History & Milestones',
+        historyTitle: 'History &amp; Milestones',
         infoTitle: 'Company Information',
         foundedLabel: 'Founded',
         foundedPlaceholder: 'E.g., 2010',
@@ -335,11 +335,11 @@ const contentByLang = {
         companyNamePlaceholder: 'E.g., ABC Corporation',
         typePlaceholder: '[Type/Role/Title...]',
         locationPlaceholder: 'E.g., Hanoi, Vietnam',
-        industriesTitle: 'Industries & Sectors',
+        industriesTitle: 'Industries &amp; Sectors',
         mainIndustriesLabel: 'Main Industries',
         secondaryIndustriesLabel: 'Main Recruitment Areas',
-        benefitsTitle: 'Benefits & Environment',
-        valueInterestTitle: 'Operations & Values',
+        benefitsTitle: 'Benefits &amp; Environment',
+        valueInterestTitle: 'Operations &amp; Values',
         interestLabel: "Operations of Interest",
         interestDescription: "Tell us your main goal for the best experience. You can select multiple items.",
         valueInterestLabel: "Desired Values",
@@ -411,9 +411,9 @@ const valueInterestOptions = {
       { id: 'cham-soc-khach-hang', title: '最高の顧客ケアサービス' },
     ],
     en: [
-      { id: 'ung-vien-nhieu-nhanh', title: 'Most & Fastest Candidates' },
+      { id: 'ung-vien-nhieu-nhanh', title: 'Most &amp; Fastest Candidates' },
       { id: 'ung-vien-chat-luong', title: 'Quality Candidates' },
-      { id: 'viec-lam-ro-rang', title: 'Clear & Quality Jobs' },
+      { id: 'viec-lam-ro-rang', title: 'Clear &amp; Quality Jobs' },
       { id: 'chi-phi-thap', title: 'Lowest Recruitment Cost' },
       { id: 'loi-nhuan-cao', title: 'Highest Profit' },
       { id: 'quan-ly-ho-tro', title: 'Best Support Management Service' },
@@ -454,7 +454,7 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, 
             <CardTitle className="font-headline text-xl flex items-center gap-3">
                 <Icon className="text-primary h-6 w-6"/>{title}
             </CardTitle>
-            {onEditClick && !isConfirmationMode && (
+            {onEditClick &amp;&amp; !isConfirmationMode &amp;&amp; (
               <Button variant="ghost" size="icon" onClick={onEditClick}><Edit className="h-4 w-4"/></Button>
             )}
         </CardHeader>
@@ -477,7 +477,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const getArrayValue = useCallback((value: { [key in Language]?: string[] }, context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
     const items = value?.[lang] || [];
     if (items.length === 0) {
-      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick('N/A', {}, 'N/A')}>{t.clickToUpdate}</button>
+      return (
+        <DialogTrigger asChild>
+            <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>{t.clickToUpdate}</button>
+        </DialogTrigger>
+      )
     }
     const dataMap: any = {
         industries: allIndustries,
@@ -505,7 +509,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
     });
     return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
-  }, [lang, isConfirmationMode, t.clickToUpdate, employer]);
+  }, [lang, isConfirmationMode, t.clickToUpdate, employer, t.valueInterestTitle]);
   
   const handleLangChange = (lang: Language) => {
     setLang(lang);
@@ -562,7 +566,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     const nationalityKey = nationalityParam || '';
 
     if (isIndividualRole) {
-        if (roleKey === 'nhan-vien-phai-cu' && subRoleTexts[subRoleKey]) {
+        if (roleKey === 'nhan-vien-phai-cu' &amp;&amp; subRoleTexts[subRoleKey]) {
             roleParts.push(subRoleTexts[subRoleKey][langFromParams]);
             roleParts.push(roleTexts[roleKey][langFromParams]);
             if (companyNameParam) roleParts.push(companyNameParam);
@@ -575,7 +579,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             }
             if (companyNameParam) roleParts.push(companyNameParam);
         }
-    } else if (!isIndividualRole && roleTexts[roleKey]) {
+    } else if (!isIndividualRole &amp;&amp; roleTexts[roleKey]) {
         roleParts.push(roleTexts[roleKey][langFromParams]);
     }
     
@@ -752,11 +756,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const handleTempArrayChange = (index: number, field: string, value: any) => {
     setTempContent((prev: any[]) => {
       const newArray = [...prev];
-      if (typeof newArray[index] === 'object' && newArray[index] !== null && 'event' in newArray[index]) { // History object
+      if (typeof newArray[index] === 'object' &amp;&amp; newArray[index] !== null &amp;&amp; 'event' in newArray[index]) { // History object
         newArray[index] = { ...newArray[index], [field]: { ...newArray[index][field], [lang]: value } };
-      } else if (typeof newArray[index] === 'object' && newArray[index] !== null && 'alt' in newArray[index]) { // Image object
+      } else if (typeof newArray[index] === 'object' &amp;&amp; newArray[index] !== null &amp;&amp; 'alt' in newArray[index]) { // Image object
          newArray[index] = { ...newArray[index], alt: { ...newArray[index].alt, [lang]: value } };
-      } else if (typeof newArray[index] === 'object' && newArray[index] !== null) { // Benefits object
+      } else if (typeof newArray[index] === 'object' &amp;&amp; newArray[index] !== null) { // Benefits object
         newArray[index] = { ...newArray[index], [lang]: value };
       }
       return newArray;
@@ -784,7 +788,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       const reader = new FileReader();
       reader.onload = (event) => {
         const newUrl = event.target?.result as string;
-        if (editingModule?.field === 'images' && index !== undefined) {
+        if (editingModule?.field === 'images' &amp;&amp; index !== undefined) {
              setTempContent((prev: any[]) => {
                 const newImages = [...prev];
                 newImages[index].src = newUrl;
@@ -795,7 +799,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 const newState = JSON.parse(JSON.stringify(prev));
                  if (field === 'banner' || field === 'logo') {
                    newState[field] = newUrl;
-                 } else if (field === 'images' && index !== undefined) {
+                 } else if (field === 'images' &amp;&amp; index !== undefined) {
                     newState.images[index].src = newUrl;
                  }
                 return newState;
@@ -911,9 +915,9 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                      setErrors(prev => ({...prev, email: undefined}));
                                   }
                                 }}
-                                className={cn(errors?.email && "border-destructive")}
+                                className={cn(errors?.email &amp;&amp; "border-destructive")}
                               />
-                               {errors?.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                               {errors?.email &amp;&amp; <p className="text-xs text-destructive">{errors.email}</p>}
                            </div>
                           <div className="space-y-2">
                               <Label id="DKDN_SODIENTHOAI_LABEL" htmlFor="phone" className="flex items-center gap-2">
@@ -955,10 +959,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 value={tempContent.messenger}
                                 onChange={(e) => setTempContent({...tempContent, messenger: e.target.value})}
                                 onBlur={(e) => validateField('messenger', e.target.value)}
-                                className={cn(errors.messenger && "border-destructive")}
+                                className={cn(errors.messenger &amp;&amp; "border-destructive")}
                             />
-                            {!errors.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
-                            {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
+                            {!errors.messenger &amp;&amp; <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
+                            {errors.messenger &amp;&amp; <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                          <div className="space-y-1">
                             <Label id="DKDN_LINE_LABEL" htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
@@ -968,10 +972,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 value={tempContent.line}
                                 onChange={(e) => setTempContent({...tempContent, line: e.target.value})}
                                 onBlur={(e) => validateField('line', e.target.value)}
-                                className={cn(errors.line && "border-destructive")}
+                                className={cn(errors.line &amp;&amp; "border-destructive")}
                             />
-                             {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
-                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
+                             {!errors.line &amp;&amp; <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
+                             {errors.line &amp;&amp; <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                       </div>
                       <div className="text-center mt-4">
@@ -1040,7 +1044,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
                                 <DropdownMenuLabel>Chọn nghiệp vụ</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {(interestOptions[lang] || []).map((option) => (
+                                {(interestOptions[currentLang] || []).map((option) => (
                                      <DropdownMenuCheckboxItem
                                         key={option.id}
                                         checked={currentInterest.includes(option.id)}
@@ -1281,10 +1285,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const formatDisplayPhoneNumber = (phone: string) => {
       if (!phone) return '';
       // A simplified version for display only
-      if (phone.length === 10 && phone.startsWith('0')) {
+      if (phone.length === 10 &amp;&amp; phone.startsWith('0')) {
           return `${phone.slice(0,4)} ${phone.slice(4,7)} ${phone.slice(7)}`;
       }
-      if (phone.length === 11 && phone.startsWith('0')) {
+      if (phone.length === 11 &amp;&amp; phone.startsWith('0')) {
            return `${phone.slice(0,3)} ${phone.slice(3,7)} ${phone.slice(7)}`;
       }
       return phone;
@@ -1301,7 +1305,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 <div className="relative w-full h-48">
                   <Image src={employer.banner} alt={`${employer.name[lang] || ''} banner`} fill className="object-cover" />
                   <div className="absolute inset-0 bg-black/40" />
-                   {!isConfirmationMode && (
+                   {!isConfirmationMode &amp;&amp; (
                   <Label htmlFor="banner-upload" className="absolute top-4 right-4 z-10 cursor-pointer">
                      <Button variant="secondary" size="sm" asChild>
                        <span><Camera className="mr-2 h-4 w-4" /> {t.edit}</span>
@@ -1317,7 +1321,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             <AvatarImage src={employer.logo} />
                             <AvatarFallback>{(employer.name[lang] || 'A').charAt(0)}</AvatarFallback>
                           </Avatar>
-                           {!isConfirmationMode && (
+                           {!isConfirmationMode &amp;&amp; (
                            <Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
                               <Camera className="h-4 w-4 text-secondary-foreground" />
                            </Label>
@@ -1342,11 +1346,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                         <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon className="h-4 w-4" /> <span className="hidden sm:inline">English</span><span className="sm:hidden">EN</span></TabsTrigger>
                                     </TabsList>
                                 </Tabs>
-                                {!isConfirmationMode && (<Button variant="ghost" size="icon" className="hidden md:flex" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
+                                {!isConfirmationMode &amp;&amp; (<Button variant="ghost" size="icon" className="hidden md:flex" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
                               </div>
                           </div>
                       </div>
-                      {!isConfirmationMode && (<Button variant="ghost" size="icon" className="absolute top-4 right-4 md:hidden" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
+                      {!isConfirmationMode &amp;&amp; (<Button variant="ghost" size="icon" className="absolute top-4 right-4 md:hidden" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
                 </div>
                 </div>
               </CardHeader>
@@ -1372,11 +1376,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         </div>
                         {hasContactInfo ? (
                             <div id="DKTHONGTINLIENHE-mobile" className="mt-6 border-t pt-4 space-y-2">
-                               {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                               {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
-                               {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                               {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
-                               {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
+                               {employer.info.email &amp;&amp; <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
+                               {employer.info.phone &amp;&amp; <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
+                               {employer.info.messenger &amp;&amp; <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
+                               {employer.info.zalo &amp;&amp; <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
+                               {employer.info.line &amp;&amp; <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
                             </div>
                         ) : (
                             <div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4">
@@ -1422,11 +1426,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                           {employer.images.map((img: any, index: number) => (
                               <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
                                   <Image src={img.src} alt={img.alt[lang] || ''} fill className="object-cover" />
-                                   {!isConfirmationMode && (<Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                                   {!isConfirmationMode &amp;&amp; (<Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                                         <Camera className="h-6 w-6 text-white"/>
                                    </Label>)}
                                    <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} disabled={isConfirmationMode}/>
-                                   {!isConfirmationMode && (<Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
+                                   {!isConfirmationMode &amp;&amp; (<Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
                                         <Trash2 className="h-3 w-3"/>
                                    </Button>)}
                               </div>
@@ -1457,11 +1461,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         
                         {hasContactInfo ? (
                             <div id="DKTHONGTINLIENHE" className="mt-6 border-t pt-4 space-y-2">
-                               {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                               {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
-                               {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                               {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
-                               {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
+                               {employer.info.email &amp;&amp; <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
+                               {employer.info.phone &amp;&amp; <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatDisplayPhoneNumber(employer.info.phone)}</Link></Button>}
+                               {employer.info.messenger &amp;&amp; <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
+                               {employer.info.zalo &amp;&amp; <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatDisplayPhoneNumber(employer.info.zalo)}</Link></Button>}
+                               {employer.info.line &amp;&amp; <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/~${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/~${employer.info.line}`}</span></Link></Button>}
                             </div>
                         ) : (
                             <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
@@ -1480,14 +1484,14 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   </div>
                   <SectionCard id="DKLOAIHINHVISA" title={t.visaTitle} icon={FileSignature} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.visaTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail }, 'visa')}>
                       <div className="space-y-3 text-sm">
-                          <div id="DKLV_LOAIHINH"><strong className="block">{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
-                          <div id="DKLV_CHITIETVISA"><strong className="block">{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
+                          <div id="DKLV_LOAIHINH"><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
+                          <div id="DKLV_CHITIETVISA"><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
                       </div>
                   </SectionCard>
                   <SectionCard id="DKNGANHNGHEKHUVUC" title={t.industriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.industriesTitle, employer.industries, 'industries')}>
                      <div className="space-y-3 text-sm">
-                          <div id="DKNK_NGANHNGHE"><strong className="block">{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
-                          <div id="DKNK_KHUVUC"><strong className="block">{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
+                          <div id="DKNK_NGANHNGHE"><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
+                          <div id="DKNK_KHUVUC"><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
                       </div>
                   </SectionCard>
               </div>
@@ -1498,7 +1502,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         </div>
       </div>
 
-       {!isConfirmationMode && (
+       {!isConfirmationMode &amp;&amp; (
         <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
           <div className="container mx-auto flex justify-start gap-4">
             <Button variant="outline" size="lg" onClick={handleBack}>
@@ -1523,7 +1527,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             <DialogClose asChild>
                 <Button variant="outline">{t.cancelButton}</Button>
             </DialogClose>
-             {(editingModule) && (
+             {(editingModule) &amp;&amp; (
                 <Button onClick={handleSaveChanges}>{t.saveButton}</Button>
              )}
           </DialogFooter>
@@ -1532,3 +1536,4 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </>
   );
 }
+
