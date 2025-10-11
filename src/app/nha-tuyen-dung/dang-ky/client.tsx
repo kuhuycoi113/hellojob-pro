@@ -11,7 +11,7 @@ import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, Plus
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn, parseMessengerInput, parseZaloInput, parseLineInput, formatPhoneNumberInput } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -1539,3 +1539,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   );
 }
+
+    
