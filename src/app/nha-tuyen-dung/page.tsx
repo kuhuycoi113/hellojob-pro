@@ -162,10 +162,15 @@ function NhaTuyenDungPageContent() {
                 <Card key={feature.title.vi} className="text-center p-6 border-t-4 border-primary shadow-lg hover:shadow-xl transition-shadow h-full">
                    <feature.icon className="w-12 h-12 text-primary mx-auto mb-4" />
                    <h3 className="text-xl font-bold font-headline mb-2">{feature.title.vi}</h3>
-                   <p className="text-xs font-semibold text-muted-foreground/80">{feature.title.ja} / {feature.title.en}</p>
-                   <p className="text-muted-foreground text-sm mt-4">{feature.description.vi}</p>
-                   <p className="text-xs text-muted-foreground/80 mt-2">{feature.description.ja}</p>
-                   <p className="text-xs text-muted-foreground/80 mt-1">{feature.description.en}</p>
+                   <p className="text-muted-foreground text-sm">{feature.description.vi}</p>
+                   <div className="mt-4 pt-4 border-t border-dashed">
+                      <p className="text-sm font-semibold text-muted-foreground">{feature.title.ja}</p>
+                      <p className="text-xs text-muted-foreground/80 mt-1">{feature.description.ja}</p>
+                   </div>
+                   <div className="mt-2">
+                      <p className="text-sm font-semibold text-muted-foreground">{feature.title.en}</p>
+                      <p className="text-xs text-muted-foreground/80 mt-1">{feature.description.en}</p>
+                   </div>
                 </Card>
               ))}
             </div>
@@ -199,21 +204,23 @@ function NhaTuyenDungPageContent() {
                           <span className="block text-sm text-muted-foreground/80 mt-1">{welcomeContent.description2.en}</span>
                       </p>
                       <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                          <Button size="lg" className="bg-primary text-white hover:bg-primary/90">
-                              <div className="text-center">
-                                  <span className="font-semibold">{welcomeContent.postJobButton.vi}</span>
-                                  <div className="text-xs opacity-80">{welcomeContent.postJobButton.ja} / {welcomeContent.postJobButton.en}</div>
-                              </div>
-                          </Button>
-                           <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
-                            <Link href="/nhuong-quyen">
-                              <div className="text-center">
-                                  <span className="font-semibold">{welcomeContent.registerPartnerButton.vi}</span>
-                                  <div className="text-xs opacity-80">{welcomeContent.registerPartnerButton.ja} / {welcomeContent.registerPartnerButton.en}</div>
-                              </div>
-                            </Link>
-                          </Button>
-                      </div>
+                          <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
+                           <Link href="/doi-tac/dang-tin-tuyen-dung">
+                            <div className="text-center">
+                                <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
+                                <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
+                            </div>
+                          </Link>
+                        </Button>
+                         <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
+                          
+                            <div className="text-center">
+                                <span className="font-semibold">Đăng ký đối tác</span>
+                                <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                            </div>
+                          
+                        </Button>
+                    </div>
                    </div>
               </Card>
           </div>
@@ -227,9 +234,7 @@ function NhaTuyenDungPageContent() {
         initialLang={selectedLang}
         initialStep={1}
         onComplete={navigateToEmployerPage}
-        onBack={() => {
-            setIsYL01DialogOpen(false);
-        }}
+        onBack={() => setIsYL01DialogOpen(false)}
       />
     </>
   );
