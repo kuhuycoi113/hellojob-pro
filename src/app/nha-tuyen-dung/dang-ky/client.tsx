@@ -243,6 +243,7 @@ const contentByLang = {
         selectMainIndustriesPlaceholder: "Chọn Ngành nghề tuyển dụng chính",
         selectSecondaryIndustriesPlaceholder: "Chọn Khu vực tuyển dụng chính",
         selectInterestLabel: 'Chọn nghiệp vụ',
+        selectValueInterestLabel: 'Chọn giá trị (sắp xếp theo ưu tiên)',
     },
     ja: {
         edit: '編集',
@@ -306,6 +307,7 @@ const contentByLang = {
         selectMainIndustriesPlaceholder: "主要な募集業種を選択",
         selectSecondaryIndustriesPlaceholder: "主な採用地域を選択",
         selectInterestLabel: '業務を選択',
+        selectValueInterestLabel: '価値観を選択 (優先順位で並べ替え)',
     },
     en: {
         edit: 'Edit',
@@ -369,6 +371,7 @@ const contentByLang = {
         selectMainIndustriesPlaceholder: "Select Main Industries",
         selectSecondaryIndustriesPlaceholder: "Select Main Recruitment Areas",
         selectInterestLabel: 'Select Operations',
+        selectValueInterestLabel: 'Select Values (sort by priority)',
     }
 };
 
@@ -1079,7 +1082,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>Chọn giá trị (sắp xếp theo ưu tiên)</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t.selectValueInterestLabel}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {valueInterestOptions[lang].map((option) => (
                                      <DropdownMenuCheckboxItem
