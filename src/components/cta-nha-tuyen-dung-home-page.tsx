@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -6,10 +7,13 @@ import Image from 'next/image';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { XL01Dialog } from '@/components/X-L01-dialog';
-import type { Language } from './X-L01-dialog';
+import { YL01Dialog } from '@/components/Y-L01-dialog';
+
+type Language = 'vi' | 'ja' | 'en';
 
 export function CtaNhaTuyenDungHomePage() {
     const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
+    const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false);
     const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
     const [selectedLang, setSelectedLang] = useState<Language>('vi');
     const router = useRouter();
@@ -18,8 +22,26 @@ export function CtaNhaTuyenDungHomePage() {
         console.log("X-L01 Completed with:", preferences);
         setRecruitmentPrefs(preferences);
         setIsXL01DialogOpen(false);
-        // Navigate to the next step or page if needed
-        // For now, we just close the dialog
+        // Navigate or open next dialog if needed
+    };
+
+    const navigateToEmployerPage = (data: any) => {
+      const params = new URLSearchParams();
+      if (data.role) params.set('role', data.role);
+      if (data.sub_role) params.set('sub_role', data.sub_role);
+      if (data.name) params.set('name', data.name);
+      if (data.company_name) params.set('company_name', data.company_name);
+      if (data.lang) params.set('lang', data.lang);
+  
+      (data.interest || []).forEach((item: string) => params.append('interest', item));
+      (data.value_interest || []).forEach((item: string) => params.append('value_interest', item));
+      (data.visaType || []).forEach((item: string) => params.append('visa_type', item));
+      (data.visaDetail || []).forEach((item: string) => params.append('visa_detail', item));
+      (data.industry || []).forEach((item: string) => params.append('industry', item));
+      (data.location || []).forEach((item: string) => params.append('location', item));
+      
+      router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
+      setIsYL01DialogOpen(false);
     };
     
     return (
@@ -37,19 +59,17 @@ export function CtaNhaTuyenDungHomePage() {
                         <span className="block text-sm opacity-80 mt-2">質の高い技能実習生、特定技能、エンジニア人材にアクセス。無料で求人を掲載し、今日から人材と繋がりましょう。/ HelloJob is a free job posting platform to recruit Vietnamese candidates...</span>
                     </p>
                     <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                        <Button size="lg" className="bg-white text-primary hover:bg-white/90" onClick={() => setIsXL01DialogOpen(true)}>
+                        <Button size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01" onClick={() => setIsXL01DialogOpen(true)}>
                             <div className="text-center">
                                 <span className="font-semibold">Đăng tin tuyển dụng ngay</span>
                                 <div className="text-xs opacity-80">求人を掲載 / Post Job Now</div>
                             </div>
                         </Button>
-                         <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90">
-                          <Link href="/nhuong-quyen">
-                            <div className="text-center">
-                                <span className="font-semibold">Đăng ký đối tác</span>
-                                <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
-                            </div>
-                          </Link>
+                         <Button size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01" onClick={() => setIsYL01DialogOpen(true)}>
+                          <div className="text-center">
+                              <span className="font-semibold">Đăng ký đối tác</span>
+                              <div className="text-xs opacity-80">パートナー登録 / Register as Partner</div>
+                          </div>
                         </Button>
                     </div>
                     </div>
@@ -73,6 +93,15 @@ export function CtaNhaTuyenDungHomePage() {
                 initialLang={selectedLang}
                 onComplete={handleXL01Complete}
                 onBack={() => setIsXL01DialogOpen(false)}
+            />
+            <YL01Dialog 
+                isOpen={isYL01DialogOpen} 
+                onOpenChange={setIsYL01DialogOpen}
+                onLanguageChange={setSelectedLang}
+                initialLang={selectedLang}
+                initialStep={1}
+                onComplete={navigateToEmployerPage}
+                onBack={() => setIsYL01DialogOpen(false)}
             />
         </>
     )
