@@ -96,7 +96,7 @@ function ConfirmationPageContent() {
                 "sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300",
                  isMobile && (!showFooter ? "translate-y-full" : "translate-y-0")
             )}>
-                <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                <div className="container mx-auto flex flex-col md:flex-row md:justify-start items-center gap-4 text-center md:text-left">
                     <p className="font-semibold text-foreground">{t.question}</p>
                     <div className="flex gap-4 flex-shrink-0">
                         <Button id="XN_NUT_SUALAI" variant="outline" size="lg" onClick={handleEdit}>
