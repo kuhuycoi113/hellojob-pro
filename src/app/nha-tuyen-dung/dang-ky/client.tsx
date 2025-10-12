@@ -261,7 +261,6 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "Chọn khu vực",
         selectInterestLabel: 'Chọn nghiệp vụ',
         selectValueInterestLabel: 'Chọn giá trị (sắp xếp theo ưu tiên)',
-        contactTitle: 'Thông tin liên hệ',
         visaAndIndustriesTitle: "Visa, Ngành nghề & Khu vực",
         visaAndIndustriesDialogTitle: "Chỉnh sửa Visa, Ngành nghề & Khu vực",
         mainIndustriesLabel: "Ngành nghề chính",
@@ -326,7 +325,6 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "地域を選択",
         selectInterestLabel: '業務を選択',
         selectValueInterestLabel: '価値観を選択 (優先順位で並べ替え)',
-        contactTitle: '連絡先情報',
         visaAndIndustriesTitle: "ビザ、業種、地域",
         visaAndIndustriesDialogTitle: "ビザ、業種、地域を編集",
         mainIndustriesLabel: "主要業種",
@@ -391,7 +389,6 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "Select Region",
         selectInterestLabel: 'Select Operations',
         selectValueInterestLabel: 'Select Values (sort by priority)',
-        contactTitle: 'Contact Information',
         visaAndIndustriesTitle: "Visa, Industry & Region",
         visaAndIndustriesDialogTitle: "Edit Visa, Industry & Region",
         mainIndustriesLabel: "Main Industries",
@@ -1605,7 +1602,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       </div>
 
        {!isConfirmationMode && (
-        <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
+        <div id="DANGKY_NTD_FOOTER" className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
           <div className="container mx-auto flex justify-start gap-4">
             <Button variant="outline" size="lg" onClick={handleBack}>
                 {t.backButton}
@@ -1636,5 +1633,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
-
-    
