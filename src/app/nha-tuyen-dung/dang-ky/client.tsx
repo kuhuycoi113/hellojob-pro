@@ -224,7 +224,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
         lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
-        notUpdated: '[Chưa có thông tin]',
+        notUpdated: 'Nhấn để cập nhật',
         clickToUpdate: 'Nhấn để cập nhật',
         headerTitle: 'Thông tin chung',
         namePlaceholder: 'Ví dụ: Nguyễn Văn An',
@@ -261,6 +261,7 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "Chọn khu vực",
         selectInterestLabel: 'Chọn nghiệp vụ',
         selectValueInterestLabel: 'Chọn giá trị (sắp xếp theo ưu tiên)',
+        contactTitle: 'Thông tin liên hệ',
         visaAndIndustriesTitle: "Visa, Ngành nghề & Khu vực",
         visaAndIndustriesDialogTitle: "Chỉnh sửa Visa, Ngành nghề & Khu vực",
         mainIndustriesLabel: "Ngành nghề chính",
@@ -288,7 +289,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'LineのリンクまたはIDを入力してください',
         lineHelper: 'システムが自動的にユーザー名を取得します。',
-        notUpdated: '[情報なし]',
+        notUpdated: 'クリックして更新',
         clickToUpdate: 'クリックして更新',
         headerTitle: '一般情報',
         namePlaceholder: '例: グエン・ヴァン・アン',
@@ -325,6 +326,7 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "地域を選択",
         selectInterestLabel: '業務を選択',
         selectValueInterestLabel: '価値観を選択 (優先順位で並べ替え)',
+        contactTitle: '連絡先情報',
         visaAndIndustriesTitle: "ビザ、業種、地域",
         visaAndIndustriesDialogTitle: "ビザ、業種、地域を編集",
         mainIndustriesLabel: "主要業種",
@@ -352,7 +354,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'Paste Line link or enter your ID',
         lineHelper: 'The system will automatically extract your username.',
-        notUpdated: '[Not available]',
+        notUpdated: 'Click to update',
         clickToUpdate: 'Click to update',
         headerTitle: 'General Information',
         namePlaceholder: 'E.g., An Nguyen Van',
@@ -370,7 +372,6 @@ const contentByLang = {
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
         registerAction: 'Register',
-        visaTitle: 'Type and Visa',
         visaTypeLabel: 'Type',
         visaDetailLabel: 'Visa Details',
         selectVisaTypePlaceholder: 'Select Type',
@@ -390,6 +391,7 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "Select Region",
         selectInterestLabel: 'Select Operations',
         selectValueInterestLabel: 'Select Values (sort by priority)',
+        contactTitle: 'Contact Information',
         visaAndIndustriesTitle: "Visa, Industry & Region",
         visaAndIndustriesDialogTitle: "Edit Visa, Industry & Region",
         mainIndustriesLabel: "Main Industries",
@@ -861,7 +863,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
          employerData.valueInterest = valueInterests.map(id => {
             const viOption = valueInterestOptions['vi'].find(o => o.id === id);
             return {
-                id: id,
+                id,
                 vi: viOption?.title,
                 ja: valueInterestOptions['ja'].find(o => o.id === id)?.title,
                 en: valueInterestOptions['en'].find(o => o.id === id)?.title
@@ -1448,44 +1450,47 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   
                   {/* Info card for Mobile */}
                   <div className="block lg:hidden">
-                    <InfoDialog 
-                      isOpen={isInfoDialogOpen}
-                      onOpenChange={setIsInfoDialogOpen}
-                      employer={employer}
-                      lang={lang}
-                      isConfirmationMode={isConfirmationMode}
-                      onSave={(data) => setEmployer(data)}
-                      onEditClick={() => {}}
-                    />
-                     <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
-                        <div className="space-y-3 text-sm">
-                            <p id="DKDN_NAMTHANHLAP-mobile"><strong>{t.foundedLabel}:</strong> {employer.info.founded || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
-                            <p id="DKDN_QUYMO-mobile"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
-                            <p id="DKDN_GIAYPHEP-mobile"><strong>{t.licenseLabel}:</strong> {employer.info.license || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
-                            <p id="DKDN_WEBSITE-mobile"><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
-                        </div>
-                        {hasContactInfo ? (
-                            <div id="DKTHONGTINLIENHE-mobile" className="mt-6 border-t pt-4 space-y-2">
-                               {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                               {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
-                               {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                               {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
-                               {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
+                    <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
+                        <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
+                            <div className="space-y-3 text-sm">
+                                <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                                <p><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                                <p><strong>{t.licenseLabel}:</strong> {employer.info.license || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                                <p><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
                             </div>
-                        ) : (
-                            <div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4">
-                                <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
-                                    <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
-                                    <ZaloIcon className="h-6 w-6" />
-                                    <MessengerIcon className="h-6 w-6" />
-                                    <LineIcon className="h-6 w-6" />
+                            {hasContactInfo ? (
+                                <div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4 space-y-2">
+                                   {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
+                                   {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
+                                   {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
+                                   {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
+                                   {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                                 </div>
-                                <div className="text-center text-sm">
-                                   <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                            ) : (
+                                <div className="mt-6 border-t pt-4">
+                                    <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
+                                        <Mail className="h-6 w-6"/>
+                                        <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
+                                        <ZaloIcon className="h-6 w-6" />
+                                        <MessengerIcon className="h-6 w-6" />
+                                        <LineIcon className="h-6 w-6" />
+                                    </div>
+                                    <div className="text-center text-sm">
+                                       <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </SectionCard>
+                            )}
+                        </SectionCard>
+                         <InfoDialog 
+                            isOpen={isInfoDialogOpen}
+                            onOpenChange={setIsInfoDialogOpen}
+                            employer={employer}
+                            lang={lang}
+                            isConfirmationMode={isConfirmationMode}
+                            onSave={(data) => setEmployer(data)}
+                            onEditClick={() => {}}
+                        />
+                    </Dialog>
                   </div>
 
                   <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
@@ -1541,45 +1546,47 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 {/* Right Column (order-first on desktop) */}
               <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
                   <div className="hidden lg:block">
-                     <InfoDialog 
-                      isOpen={isInfoDialogOpen}
-                      onOpenChange={setIsInfoDialogOpen}
-                      employer={employer}
-                      lang={lang}
-                      isConfirmationMode={isConfirmationMode}
-                      onSave={(data) => setEmployer(data)}
-                      onEditClick={() => {}}
-                    />
-                    <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
-                        <div className="space-y-3 text-sm">
-                            <p id="DKDN_NAMTHANHLAP"><strong>{t.foundedLabel}:</strong> {employer.info.founded || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
-                            <p id="DKDN_QUYMO"><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
-                            <p id="DKDN_GIAYPHEP"><strong>{t.licenseLabel}:</strong> {employer.info.license || <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
-                            <p id="DKDN_WEBSITE"><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>}</p>
-                        </div>
-                        
-                        {hasContactInfo ? (
-                            <div id="DKTHONGTINLIENHE" className="mt-6 border-t pt-4 space-y-2">
-                               {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                               {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
-                               {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                               {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
-                               {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
+                    <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
+                        <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
+                            <div className="space-y-3 text-sm">
+                                <p><strong>{t.foundedLabel}:</strong> {employer.info.founded || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                                <p><strong>{t.sizeLabel}:</strong> {employer.info.size[lang] || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                                <p><strong>{t.licenseLabel}:</strong> {employer.info.license || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                                <p><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
                             </div>
-                        ) : (
-                            <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
-                                <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
-                                    <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
-                                    <ZaloIcon className="h-6 w-6" />
-                                    <MessengerIcon className="h-6 w-6" />
-                                    <LineIcon className="h-6 w-6" />
+                            {hasContactInfo ? (
+                                <div id="DKTHONGTINLIENHE" className="mt-6 border-t pt-4 space-y-2">
+                                   {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
+                                   {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
+                                   {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
+                                   {employer.info.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
+                                   {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                                 </div>
-                                <div className="text-center text-sm">
-                                   <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                            ) : (
+                                <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
+                                    <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
+                                        <Mail className="h-6 w-6"/>
+                                        <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
+                                        <ZaloIcon className="h-6 w-6" />
+                                        <MessengerIcon className="h-6 w-6" />
+                                        <LineIcon className="h-6 w-6" />
+                                    </div>
+                                    <div className="text-center text-sm">
+                                       <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </SectionCard>
+                            )}
+                        </SectionCard>
+                         <InfoDialog 
+                            isOpen={isInfoDialogOpen}
+                            onOpenChange={setIsInfoDialogOpen}
+                            employer={employer}
+                            lang={lang}
+                            isConfirmationMode={isConfirmationMode}
+                            onSave={(data) => setEmployer(data)}
+                            onEditClick={() => {}}
+                        />
+                    </Dialog>
                   </div>
                    <SectionCard id="DKVISA_NGANHNGHE_KHUVUC" title={t.visaAndIndustriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries')}>
                     <div className="space-y-3 text-sm">
@@ -1629,3 +1636,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
+
+    
