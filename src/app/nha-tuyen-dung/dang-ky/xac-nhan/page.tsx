@@ -38,7 +38,6 @@ function ConfirmationPageContent() {
 
     const t = content[lang];
 
-
     const handleEdit = () => {
         const params = new URLSearchParams(searchParams.toString());
         router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
