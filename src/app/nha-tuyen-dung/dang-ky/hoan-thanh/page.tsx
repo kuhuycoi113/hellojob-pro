@@ -16,12 +16,47 @@ const Logo = () => (
     <Image src="/img/HJPNG.png" alt="HelloJob Logo" width={110} height={36} className="h-9 w-auto" />
 );
 
+type Language = 'vi' | 'ja' | 'en';
 
-export default function CompletionPage() {
+const contentByLang = {
+    vi: {
+        guestQuestion: "Bạn có muốn tạo tài khoản để lưu lại thông tin không?",
+        loggedInQuestion: "Bạn có muốn liên hệ ngay với HelloJob không?",
+        laterButton: "Để sau",
+        createAccountButton: "Tạo tài khoản",
+        successMessage: "Thông tin của bạn đã được gửi, chúng tôi sẽ sớm liên hệ với bạn.",
+    },
+    ja: {
+        guestQuestion: "情報を保存するためにアカウントを作成しますか？",
+        loggedInQuestion: "HelloJobに今すぐ連絡しますか？",
+        laterButton: "後で",
+        createAccountButton: "アカウント作成",
+        successMessage: "ご入力いただいた情報が送信されました。担当者よりご連絡いたします。",
+    },
+    en: {
+        guestQuestion: "Do you want to create an account to save your information?",
+        loggedInQuestion: "Would you like to contact HelloJob right away?",
+        laterButton: "Later",
+        createAccountButton: "Create Account",
+        successMessage: "Your information has been sent, we will contact you shortly.",
+    }
+};
+
+function CompletionPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { isLoggedIn, role, setPostLoginAction } = useAuth();
+    const { isLoggedIn, setPostLoginAction } = useAuth();
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+    const [lang, setLang] = useState<Language>('vi');
+
+    useEffect(() => {
+        const langParam = searchParams.get('lang');
+        if (langParam === 'ja' || langParam === 'en') {
+            setLang(langParam);
+        } else {
+            setLang('vi');
+        }
+    }, [searchParams]);
 
     const handleCreateAccount = () => {
         const recruiterData = Object.fromEntries(searchParams.entries());
@@ -37,6 +72,7 @@ export default function CompletionPage() {
     };
 
     const isRecruiter = isLoggedIn; // Simplified check for any logged-in user
+    const t = contentByLang[lang];
 
     return (
         <div id="Y063">
@@ -49,9 +85,9 @@ export default function CompletionPage() {
                     <div className="flex flex-col sm:flex-row items-center gap-3">
                         <CheckCircle className="h-8 w-8 text-accent-orange flex-shrink-0 mb-2 sm:mb-0"/>
                         <div id="HT_THONGBAO" className="flex-grow">
-                             <p className="font-semibold text-foreground">Thông tin của bạn đã được gửi, chúng tôi sẽ sớm liên hệ với bạn.</p>
+                             <p className="font-semibold text-foreground">{t.successMessage}</p>
                              <p className="text-sm text-muted-foreground">
-                                {isRecruiter ? "Bạn có muốn liên hệ ngay với HelloJob không?" : "Bạn có muốn tạo tài khoản để lưu lại thông tin không?"}
+                                {isRecruiter ? t.loggedInQuestion : t.guestQuestion}
                              </p>
                         </div>
                     </div>
@@ -79,10 +115,10 @@ export default function CompletionPage() {
                     ) : (
                         <div id="DANGKY_HOANTAT_FOOTER_GUEST" className="flex gap-4 flex-shrink-0 mt-4 sm:mt-0">
                             <Button id="HT_NUT_DESAU" variant="outline" size="lg" onClick={handleLater}>
-                                Để sau
+                                {t.laterButton}
                             </Button>
                             <Button id="HT_NUT_TAIKHOAN" size="lg" onClick={handleCreateAccount} className="bg-primary hover:bg-primary/90 text-white">
-                                Tạo tài khoản
+                                {t.createAccountButton}
                             </Button>
                         </div>
                     )}
@@ -90,5 +126,14 @@ export default function CompletionPage() {
             </div>
              <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
         </div>
+    );
+}
+
+
+export default function CompletionPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <CompletionPageContent />
+        </Suspense>
     );
 }
