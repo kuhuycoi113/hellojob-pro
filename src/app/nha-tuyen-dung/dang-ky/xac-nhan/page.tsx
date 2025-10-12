@@ -93,7 +93,7 @@ function ConfirmationPageContent() {
 
             {/* Sticky footer for confirmation actions */}
             <div id="DANGKY_XACNHAN_FOOTER" className={cn(
-                "sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300",
+                "sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300 mobile-sticky-footer",
                  isMobile && (!showFooter ? "translate-y-full" : "translate-y-0")
             )}>
                 <div className="container mx-auto flex flex-col md:flex-row md:justify-start items-center gap-4 text-center md:text-left">

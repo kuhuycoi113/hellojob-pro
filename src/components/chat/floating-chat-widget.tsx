@@ -8,15 +8,59 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { ChatWindow } from './chat-window';
 import { conversations, helloJobBot, getCurrentUser } from '@/lib/chat-data';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState, useRef } from 'react';
+import { cn } from '@/lib/utils';
 
 export function FloatingChatWidget() {
   const { isChatOpen, openChat, closeChat, activeConversation } = useChat();
+  const pathname = usePathname();
+  const [isFooterVisible, setIsFooterVisible] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const specialFooterPages = [
+    '/nha-tuyen-dung/dang-ky',
+    '/nha-tuyen-dung/dang-ky/xac-nhan',
+    '/nha-tuyen-dung/dang-ky/hoan-thanh',
+  ];
+
+  const needsFooterAvoidance = specialFooterPages.includes(pathname);
+
+  useEffect(() => {
+    if (!needsFooterAvoidance) {
+      setIsFooterVisible(false);
+      return;
+    }
+
+    const observerCallback: IntersectionObserverCallback = (entries) => {
+      entries.forEach(entry => {
+        setIsFooterVisible(entry.isIntersecting);
+      });
+    };
+
+    observerRef.current = new IntersectionObserver(observerCallback, {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.1, 
+    });
+
+    const footerElement = document.querySelector('.mobile-sticky-footer');
+    if (footerElement) {
+      observerRef.current.observe(footerElement);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [pathname, needsFooterAvoidance]);
+
 
   const handleToggleChat = () => {
     if (isChatOpen) {
       closeChat();
     } else {
-      // Always open the chat with the bot by default
       openChat(); 
     }
   };
@@ -24,7 +68,10 @@ export function FloatingChatWidget() {
   return (
     <>
       {/* Mobile full-screen overlay & button */}
-      <div className="md:hidden fixed bottom-6 right-6 z-50">
+      <div className={cn(
+        "md:hidden fixed right-6 z-50 transition-all duration-300",
+        isFooterVisible ? 'bottom-28' : 'bottom-6'
+      )}>
         {isChatOpen && activeConversation ? (
           <div className="fixed inset-0 bg-background">
             <ChatWindow conversation={activeConversation} />

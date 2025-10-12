@@ -129,19 +129,15 @@ function CompletionPageContent() {
             )}>
                 <div className="container mx-auto">
                     {isRecruiter ? (
-                         <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="flex flex-col md:flex-row md:items-end md:justify-start md:gap-8 lg:gap-16 w-full">
-                            <div className="flex flex-col items-center text-center w-full md:w-auto">
-                                <div className="relative w-full flex items-center justify-center mb-2">
-                                    <div className="absolute left-0">
-                                      <Button variant="outline" size="sm" className="border-[#9B999A]" onClick={handleEdit}>
+                         <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="mobile-sticky-footer flex flex-col md:flex-row md:items-end md:justify-start md:gap-16 w-full">
+                            <div className="flex-grow">
+                                <div className="relative text-center md:text-left">
+                                     <Button variant="outline" size="sm" className="border-[#9B999A] absolute top-0 left-0" onClick={handleEdit}>
                                         {t.editButton}
-                                    </Button>
-                                    </div>
-                                    <CheckCircle className="h-8 w-8 text-accent-orange"/>
-                                </div>
-                                <div className="flex-grow">
+                                     </Button>
+                                    <CheckCircle className="h-8 w-8 text-accent-orange mx-auto mb-2"/>
                                     <p className="font-semibold text-foreground">{t.successMessage}</p>
-                                    <div className="text-sm text-muted-foreground flex items-center justify-center flex-wrap">
+                                    <div className="text-sm text-muted-foreground flex items-center justify-center md:justify-start flex-wrap">
                                         {lang === 'ja' ? (
                                             <><ColoredHelloJob /><span>{t.question_part2}</span></>
                                         ) : (
@@ -172,7 +168,7 @@ function CompletionPageContent() {
                             </div>
                         </div>
                     ) : (
-                        <div id="DANGKY_HOANTAT_FOOTER_GUEST" className="w-full flex flex-col md:flex-row justify-start items-center gap-4 md:gap-8">
+                        <div id="DANGKY_HOANTAT_FOOTER_GUEST" className="mobile-sticky-footer w-full flex flex-col md:flex-row md:justify-start items-center gap-4">
                              <div className="flex items-center gap-3">
                                 <CheckCircle className="h-8 w-8 text-accent-orange flex-shrink-0"/>
                                 <div className="flex-grow text-center md:text-left">
@@ -182,7 +178,7 @@ function CompletionPageContent() {
                                      </p>
                                 </div>
                             </div>
-                            <div className="flex gap-4 flex-shrink-0 mt-4 md:mt-0">
+                            <div className="flex gap-4 flex-shrink-0 mt-4 md:mt-0 md:ml-4">
                                 <Button id="HT_NUT_SUALAI" variant="outline" size="lg" onClick={handleEdit}>
                                     {t.editButton}
                                 </Button>
