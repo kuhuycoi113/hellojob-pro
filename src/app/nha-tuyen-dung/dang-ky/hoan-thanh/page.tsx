@@ -5,7 +5,7 @@ import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import EmployerDetailPage from '../client';
-import { CheckCircle, Mail, Phone, Pencil } from 'lucide-react';
+import { CheckCircle, Mail, Phone, Pencil, Edit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from '@/components/auth-dialog';
 import { ZaloIcon, MessengerIcon, LineIcon } from '@/components/custom-icons';
@@ -118,11 +118,16 @@ function CompletionPageContent() {
                 <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                     {isRecruiter ? (
                         <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="flex flex-col sm:flex-row items-center gap-3 w-full">
-                           <div className="relative flex-grow text-center">
-                                <Button variant="outline" size="sm" className="absolute top-2 left-2 md:hidden" onClick={handleEdit}>
-                                    Sửa
-                                </Button>
-                                <CheckCircle className="h-8 w-8 text-accent-orange mx-auto mb-2"/>
+                           <div className="relative flex-grow text-center w-full">
+                                <div className="flex items-center justify-between mb-2">
+                                     <Button variant="outline" size="sm" className="border-[#9B999A] md:hidden" onClick={handleEdit}>
+                                        Sửa
+                                    </Button>
+                                    <div className="flex-grow flex justify-center">
+                                        <CheckCircle className="h-8 w-8 text-accent-orange"/>
+                                    </div>
+                                    <div className="w-12 md:hidden"></div> {/* Spacer to balance the button */}
+                                </div>
                                 <div className="flex-grow">
                                      <p className="font-semibold text-foreground">{t.successMessage}</p>
                                      <p className="text-sm text-muted-foreground">
