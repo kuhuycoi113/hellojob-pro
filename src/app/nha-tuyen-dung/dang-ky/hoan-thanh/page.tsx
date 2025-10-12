@@ -129,27 +129,28 @@ function CompletionPageContent() {
             )}>
                 <div className="container mx-auto">
                     {isRecruiter ? (
-                         <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="grid items-center md:grid-cols-2 lg:grid-cols-[1fr_auto] gap-4">
-                            <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                                <div className="flex items-center justify-between w-full mb-2">
-                                     <Button variant="outline" size="sm" className="border-[#9B999A]" onClick={handleEdit}>
+                         <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="flex flex-col md:flex-row md:items-start md:justify-start md:gap-8 lg:gap-16 w-full">
+                            <div className="flex flex-col items-center text-center w-full md:w-auto">
+                                <div className="relative w-full flex items-center justify-center mb-2">
+                                    <div className="absolute left-0">
+                                      <Button variant="outline" size="sm" className="border-[#9B999A]" onClick={handleEdit}>
                                         {t.editButton}
                                     </Button>
-                                    <div className="flex-grow flex justify-center">
-                                        <CheckCircle className="h-8 w-8 text-accent-orange"/>
                                     </div>
-                                    <div className="w-12 md:hidden"></div> {/* Spacer for mobile to center the check */}
+                                    <CheckCircle className="h-8 w-8 text-accent-orange"/>
                                 </div>
-                                <p className="font-semibold text-foreground">{t.successMessage}</p>
-                                <div className="text-sm text-muted-foreground flex items-center justify-center flex-wrap">
-                                    {lang === 'ja' ? (
-                                        <><ColoredHelloJob /><span>{t.question_part2}</span></>
-                                    ) : (
-                                        <><span>{t.question_part1}</span><ColoredHelloJob /><span>{t.question_part2}</span></>
-                                    )}
+                                <div className="flex-grow">
+                                    <p className="font-semibold text-foreground">{t.successMessage}</p>
+                                    <div className="text-sm text-muted-foreground flex items-center justify-center flex-wrap">
+                                        {lang === 'ja' ? (
+                                            <><ColoredHelloJob /><span>{t.question_part2}</span></>
+                                        ) : (
+                                            <><span>{t.question_part1}</span><ColoredHelloJob /><span>{t.question_part2}</span></>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3 flex-shrink-0 justify-center md:justify-end">
+                            <div className="flex items-center gap-3 flex-shrink-0 justify-center md:justify-end mt-4 md:mt-0">
                                 <div className="hidden md:block">
                                     <Logo />
                                 </div>
