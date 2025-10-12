@@ -22,27 +22,38 @@ type Language = 'vi' | 'ja' | 'en';
 
 const contentByLang = {
     vi: {
-        guestQuestion: "Bạn có muốn tạo tài khoản để lưu lại thông tin không?",
-        loggedInQuestion: "Bạn có muốn liên hệ ngay với HelloJob không?",
+        question_part1: "Bạn có muốn liên hệ ngay với ",
+        question_part2: " không?",
         laterButton: "Sửa lại",
         createAccountButton: "Tạo tài khoản",
         successMessage: "Thông tin của bạn đã được gửi, chúng tôi sẽ sớm liên hệ với bạn.",
     },
     ja: {
-        guestQuestion: "情報を保存するためにアカウントを作成しますか？",
-        loggedInQuestion: "HelloJobに今すぐ連絡しますか？",
+        question_part1: "に今すぐ連絡しますか？",
+        question_part2: "", // The word HelloJob is at the beginning in Japanese
         laterButton: "修正する",
         createAccountButton: "アカウント作成",
         successMessage: "ご入力いただいた情報が送信されました。担当者よりご連絡いたします。",
     },
     en: {
-        guestQuestion: "Do you want to create an account to save your information?",
-        loggedInQuestion: "Would you like to contact HelloJob right away?",
+        question_part1: "Would you like to contact ",
+        question_part2: " right away?",
         laterButton: "Edit",
         createAccountButton: "Create Account",
         successMessage: "Your information has been sent, we will contact you shortly.",
     }
 };
+
+const ColoredHelloJob = () => (
+    <b className="mx-1">
+        <span style={{ color: '#0D8DC8' }}>H</span>
+        <span style={{ color: '#F2B92A' }}>e</span>
+        <span style={{ color: '#AFC536' }}>l</span>
+        <span style={{ color: '#19A6DF' }}>l</span>
+        <span style={{ color: '#F2B92A' }}>o</span>
+        <span style={{ color: '#19A6DF' }}>Job</span>
+    </b>
+);
 
 function CompletionPageContent() {
     const router = useRouter();
@@ -130,9 +141,20 @@ function CompletionPageContent() {
                                 </div>
                                 <div className="flex-grow">
                                      <p className="font-semibold text-foreground">{t.successMessage}</p>
-                                     <p className="text-sm text-muted-foreground">
-                                        {t.loggedInQuestion}
-                                     </p>
+                                    <div className="text-sm text-muted-foreground flex items-center justify-center flex-wrap">
+                                        {lang === 'ja' ? (
+                                            <>
+                                                <ColoredHelloJob />
+                                                <span>{t.question_part1}</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>{t.question_part1}</span>
+                                                <ColoredHelloJob />
+                                                <span>{t.question_part2}</span>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0 mt-4 sm:mt-0 md:ml-4">
@@ -163,13 +185,13 @@ function CompletionPageContent() {
                                 <div className="flex-grow">
                                      <p className="font-semibold text-foreground">{t.successMessage}</p>
                                      <p className="text-sm text-muted-foreground">
-                                        {t.guestQuestion}
+                                        {lang === 'ja' ? <> <ColoredHelloJob /> {t.question_part1} </> : <>{t.question_part1}<ColoredHelloJob />{t.question_part2}</>}
                                      </p>
                                 </div>
                             </div>
                             <div className="flex gap-4 flex-shrink-0 mt-4 md:mt-0">
                                 <Button id="HT_NUT_SUALAI" variant="outline" size="lg" onClick={handleEdit}>
-                                    {t.laterButton}
+                                    {t.editButton}
                                 </Button>
                                 <Button id="HT_NUT_TAIKHOAN" size="lg" onClick={handleCreateAccount} className="bg-primary hover:bg-primary/90 text-white">
                                     {t.createAccountButton}
