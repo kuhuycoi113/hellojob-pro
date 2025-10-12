@@ -15,6 +15,8 @@ function ConfirmationPageContent() {
         const langParam = searchParams.get('lang');
         if (langParam === 'ja' || langParam === 'en') {
             setLang(langParam);
+        } else {
+            setLang('vi');
         }
     }, [searchParams]);
 
