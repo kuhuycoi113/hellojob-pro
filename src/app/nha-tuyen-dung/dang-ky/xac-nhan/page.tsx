@@ -58,20 +58,7 @@ function ConfirmationPageContent() {
             {/* The main content is the disabled version of the employer detail page */}
             <EmployerDetailPage isConfirmationMode={true} />
 
-            {/* Sticky footer for actions */}
-            <div id="DANGKY_XACNHAN_FOOTER" className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
-                <div className="container mx-auto flex flex-col md:flex-row justify-start items-start md:items-center gap-4 text-left">
-                    <p className="font-semibold text-foreground">{t.question}</p>
-                    <div className="flex gap-4">
-                        <Button id="XN_NUT_SUA" variant="outline" size="lg" onClick={handleEdit}>
-                            {t.editButton}
-                        </Button>
-                        <Button id="XN_NUT_XACNHAN" size="lg" onClick={handleConfirm} className="bg-accent-green hover:bg-accent-green/90 text-white">
-                           {t.confirmButton}
-                        </Button>
-                    </div>
-                </div>
-            </div>
+            {/* The footer has been removed as requested. */}
         </div>
     );
 }
