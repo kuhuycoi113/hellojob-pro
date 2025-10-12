@@ -127,34 +127,26 @@ function CompletionPageContent() {
                 "sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300",
                 isMobile && (!showFooter ? "translate-y-full" : "translate-y-0")
             )}>
-                <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                <div className="container mx-auto">
                     {isRecruiter ? (
-                        <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="w-full grid items-center md:grid-cols-[1fr_auto_1fr] gap-4">
-                           <div className="flex justify-center md:justify-start">
-                             <Button variant="outline" size="sm" className="border-[#9B999A]" onClick={handleEdit}>
-                                {t.editButton}
-                            </Button>
-                           </div>
-                           <div className="relative text-center w-full">
-                                <div className="flex items-center justify-center mb-2">
-                                    <CheckCircle className="h-8 w-8 text-accent-orange"/>
-                                </div>
-                                <div className="flex-grow">
-                                     <p className="font-semibold text-foreground">{t.successMessage}</p>
-                                    <div className="text-sm text-muted-foreground flex items-center justify-center flex-wrap">
-                                        {lang === 'ja' ? (
-                                            <>
-                                                <ColoredHelloJob />
-                                                <span>{t.question_part2}</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <span>{t.question_part1}</span>
-                                                <ColoredHelloJob />
-                                                <span>{t.question_part2}</span>
-                                            </>
-                                        )}
+                         <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="grid items-center md:grid-cols-2 lg:grid-cols-[1fr_auto] gap-4">
+                            <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                                <div className="flex items-center justify-between w-full mb-2">
+                                     <Button variant="outline" size="sm" className="border-[#9B999A]" onClick={handleEdit}>
+                                        {t.editButton}
+                                    </Button>
+                                    <div className="flex-grow flex justify-center">
+                                        <CheckCircle className="h-8 w-8 text-accent-orange"/>
                                     </div>
+                                    <div className="w-12 md:hidden"></div> {/* Spacer for mobile to center the check */}
+                                </div>
+                                <p className="font-semibold text-foreground">{t.successMessage}</p>
+                                <div className="text-sm text-muted-foreground flex items-center justify-center flex-wrap">
+                                    {lang === 'ja' ? (
+                                        <><ColoredHelloJob /><span>{t.question_part2}</span></>
+                                    ) : (
+                                        <><span>{t.question_part1}</span><ColoredHelloJob /><span>{t.question_part2}</span></>
+                                    )}
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0 justify-center md:justify-end">
