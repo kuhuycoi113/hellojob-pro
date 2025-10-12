@@ -119,8 +119,8 @@ function CompletionPageContent() {
                     {isRecruiter ? (
                         <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="flex flex-col sm:flex-row items-center gap-3 w-full">
                            <div className="relative flex-grow text-center">
-                                <Button variant="ghost" size="icon" className="absolute top-0 left-0 md:hidden" onClick={handleEdit}>
-                                    <Pencil className="h-5 w-5" />
+                                <Button variant="outline" size="sm" className="absolute top-2 left-2 md:hidden" onClick={handleEdit}>
+                                    Sửa
                                 </Button>
                                 <CheckCircle className="h-8 w-8 text-accent-orange mx-auto mb-2"/>
                                 <div className="flex-grow">
