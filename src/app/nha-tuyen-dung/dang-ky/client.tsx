@@ -661,9 +661,33 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const [roleText, setRoleText] = React.useState('');
   const [recruiterId, setRecruiterId] = React.useState('');
   const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false);
+  const [showFooter, setShowFooter] = React.useState(true);
+  const [lastScrollY, setLastScrollY] = React.useState(0);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
 
   const t = contentByLang[lang] || contentByLang['vi'];
   const hasContactInfo = employer?.info.phone || employer?.info.zalo || employer?.info.messenger || employer?.info.line || employer?.info.email;
+
+  const controlNavbar = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      if (window.scrollY > lastScrollY) { // if scroll down
+        setShowFooter(false);
+      } else { // if scroll up
+        setShowFooter(true);
+      }
+      setLastScrollY(window.scrollY);
+    }
+  }, [lastScrollY]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isMobile) {
+      window.addEventListener('scroll', controlNavbar);
+      return () => {
+        window.removeEventListener('scroll', controlNavbar);
+      };
+    }
+  }, [isMobile, lastScrollY, controlNavbar]);
 
 
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
@@ -1552,7 +1576,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 <p><strong>{t.websiteLabel}:</strong> {employer.info.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
                             </div>
                             {hasContactInfo ? (
-                                <div id="DKTHONGTINLIENHE" className="mt-6 border-t pt-4 space-y-2">
+                                <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4 space-y-2">
                                    {employer.info.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
                                    {employer.info.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
                                    {employer.info.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
@@ -1602,7 +1626,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       </div>
 
        {!isConfirmationMode && (
-        <div id="DANGKY_NTD_FOOTER" className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
+        <div id="DANGKY_NTD_FOOTER" className={cn(
+          "sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300",
+          !showFooter && isMobile ? "translate-y-full" : "translate-y-0"
+        )}>
           <div className="container mx-auto flex justify-start gap-4">
             <Button variant="outline" size="lg" onClick={handleBack}>
                 {t.backButton}
