@@ -129,16 +129,15 @@ function CompletionPageContent() {
             )}>
                 <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                     {isRecruiter ? (
-                        <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="flex flex-col sm:flex-row items-center gap-3 w-full">
-                           <div className="relative flex-grow text-center w-full">
-                                <div className="flex items-center justify-between mb-2">
-                                     <Button variant="outline" size="sm" className="border-[#9B999A] md:hidden" onClick={handleEdit}>
-                                        {t.editButton}
-                                    </Button>
-                                    <div className="flex-grow flex justify-center">
-                                        <CheckCircle className="h-8 w-8 text-accent-orange"/>
-                                    </div>
-                                    <div className="w-12 md:hidden"></div> {/* Spacer to balance the button */}
+                        <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="w-full grid items-center md:grid-cols-[1fr_auto_1fr] gap-4">
+                           <div className="flex justify-center md:justify-start">
+                             <Button variant="outline" size="sm" className="border-[#9B999A]" onClick={handleEdit}>
+                                {t.editButton}
+                            </Button>
+                           </div>
+                           <div className="relative text-center w-full">
+                                <div className="flex items-center justify-center mb-2">
+                                    <CheckCircle className="h-8 w-8 text-accent-orange"/>
                                 </div>
                                 <div className="flex-grow">
                                      <p className="font-semibold text-foreground">{t.successMessage}</p>
@@ -158,7 +157,7 @@ function CompletionPageContent() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3 flex-shrink-0 mt-4 sm:mt-0 md:ml-4">
+                            <div className="flex items-center gap-3 flex-shrink-0 justify-center md:justify-end">
                                 <div className="hidden md:block">
                                     <Logo />
                                 </div>
