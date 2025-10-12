@@ -24,7 +24,7 @@ const contentByLang = {
     vi: {
         question_part1: "Bạn có muốn liên hệ ngay với ",
         question_part2: " không?",
-        editButton: "Sửa lại",
+        editButton: "Sửa",
         createAccountButton: "Tạo tài khoản",
         successMessage: "Thông tin của bạn đã được gửi, chúng tôi sẽ sớm liên hệ với bạn.",
     },
@@ -133,7 +133,7 @@ function CompletionPageContent() {
                            <div className="relative flex-grow text-center w-full">
                                 <div className="flex items-center justify-between mb-2">
                                      <Button variant="outline" size="sm" className="border-[#9B999A] md:hidden" onClick={handleEdit}>
-                                        Sửa
+                                        {t.editButton}
                                     </Button>
                                     <div className="flex-grow flex justify-center">
                                         <CheckCircle className="h-8 w-8 text-accent-orange"/>
