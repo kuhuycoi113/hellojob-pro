@@ -24,21 +24,21 @@ const contentByLang = {
     vi: {
         guestQuestion: "Bạn có muốn tạo tài khoản để lưu lại thông tin không?",
         loggedInQuestion: "Bạn có muốn liên hệ ngay với HelloJob không?",
-        laterButton: "Để sau",
+        laterButton: "Sửa lại", // Changed from "Để sau"
         createAccountButton: "Tạo tài khoản",
         successMessage: "Thông tin của bạn đã được gửi, chúng tôi sẽ sớm liên hệ với bạn.",
     },
     ja: {
         guestQuestion: "情報を保存するためにアカウントを作成しますか？",
         loggedInQuestion: "HelloJobに今すぐ連絡しますか？",
-        laterButton: "後で",
+        laterButton: "修正する", // Changed from "後で"
         createAccountButton: "アカウント作成",
         successMessage: "ご入力いただいた情報が送信されました。担当者よりご連絡いたします。",
     },
     en: {
         guestQuestion: "Do you want to create an account to save your information?",
         loggedInQuestion: "Would you like to contact HelloJob right away?",
-        laterButton: "Later",
+        laterButton: "Edit", // Changed from "Later"
         createAccountButton: "Create Account",
         successMessage: "Your information has been sent, we will contact you shortly.",
     }
@@ -97,15 +97,16 @@ function CompletionPageContent() {
         setIsAuthDialogOpen(true);
     };
 
-    const handleLater = () => {
-        router.push('/');
+    const handleEdit = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
     };
 
     const isRecruiter = isLoggedIn; // Simplified check for any logged-in user
     const t = contentByLang[lang];
 
     return (
-        <div id="Y063">
+        <div id="Y063_Y064">
             {/* The main content is the disabled version of the employer detail page */}
             <EmployerDetailPage isConfirmationMode={true} />
 
@@ -147,7 +148,7 @@ function CompletionPageContent() {
                         </div>
                     ) : (
                         <div id="DANGKY_HOANTAT_FOOTER_GUEST" className="flex gap-4 flex-shrink-0 mt-4 sm:mt-0">
-                            <Button id="HT_NUT_DESAU" variant="outline" size="lg" onClick={handleLater}>
+                            <Button id="HT_NUT_SUALAI" variant="outline" size="lg" onClick={handleEdit}>
                                 {t.laterButton}
                             </Button>
                             <Button id="HT_NUT_TAIKHOAN" size="lg" onClick={handleCreateAccount} className="bg-primary hover:bg-primary/90 text-white">
