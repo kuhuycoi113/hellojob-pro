@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import EmployerDetailPage from '../client';
@@ -11,6 +11,8 @@ import { AuthDialog } from '@/components/auth-dialog';
 import { ZaloIcon, MessengerIcon, LineIcon } from '@/components/custom-icons';
 import Link from 'next/link';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Logo = () => (
     <Image src="/img/HJPNG.png" alt="HelloJob Logo" width={110} height={36} className="h-9 w-auto" />
@@ -48,6 +50,34 @@ function CompletionPageContent() {
     const { isLoggedIn, setPostLoginAction } = useAuth();
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
     const [lang, setLang] = useState<Language>('vi');
+    const [isClient, setIsClient] = useState(false);
+    const isMobile = useIsMobile();
+    const [showFooter, setShowFooter] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    const controlFooter = useCallback(() => {
+      if (typeof window !== 'undefined') {
+        if (window.scrollY > lastScrollY && window.scrollY > 80) { // if scroll down
+          setShowFooter(false);
+        } else { // if scroll up
+          setShowFooter(true);
+        }
+        setLastScrollY(window.scrollY);
+      }
+    }, [lastScrollY]);
+
+    useEffect(() => {
+        if (isClient && isMobile) {
+            window.addEventListener('scroll', controlFooter);
+            return () => {
+                window.removeEventListener('scroll', controlFooter);
+            };
+        }
+    }, [isClient, isMobile, controlFooter]);
 
     useEffect(() => {
         const langParam = searchParams.get('lang');
@@ -80,7 +110,10 @@ function CompletionPageContent() {
             <EmployerDetailPage isConfirmationMode={true} />
 
             {/* Sticky footer for success message and actions */}
-            <div className="sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
+            <div className={cn(
+                "sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300",
+                isMobile && (!showFooter ? "translate-y-full" : "translate-y-0")
+            )}>
                 <div className="container mx-auto flex flex-col md:flex-row justify-start items-start md:items-center gap-4 text-left">
                     <div className="flex flex-col sm:flex-row items-center gap-3">
                         <CheckCircle className="h-8 w-8 text-accent-orange flex-shrink-0 mb-2 sm:mb-0"/>
