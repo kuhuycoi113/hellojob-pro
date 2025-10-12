@@ -129,7 +129,7 @@ function CompletionPageContent() {
             )}>
                 <div className="container mx-auto">
                     {isRecruiter ? (
-                         <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="flex flex-col md:flex-row md:items-start md:justify-start md:gap-8 lg:gap-16 w-full">
+                         <div id="DANGKY_HOANTAT_FOOTER_LOGGEDIN" className="flex flex-col md:flex-row md:items-end md:justify-start md:gap-8 lg:gap-16 w-full">
                             <div className="flex flex-col items-center text-center w-full md:w-auto">
                                 <div className="relative w-full flex items-center justify-center mb-2">
                                     <div className="absolute left-0">
