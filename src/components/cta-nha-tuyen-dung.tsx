@@ -1,11 +1,15 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Briefcase } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function CtaNhaTuyenDung() {
+    const pathname = usePathname();
+
     return (
         <>
             <section id="NHATUYENDUNG01" className="w-full py-20 md:py-28 bg-background">
@@ -31,7 +35,7 @@ export function CtaNhaTuyenDung() {
                           </Link>
                         </Button>
                          <Button asChild size="lg" className="bg-accent-orange text-white hover:bg-accent-orange/90" id="DANGKYDOITAC01">
-                           <Link href="/nha-tuyen-dung?action=register">
+                           <Link href={`/nha-tuyen-dung?action=register&from=${encodeURIComponent(pathname)}`}>
                             <div className="text-center">
                                 <span className="font-semibold">Đăng ký ngay</span>
                                 <div className="text-xs opacity-80">今すぐ登録 / Register Now</div>

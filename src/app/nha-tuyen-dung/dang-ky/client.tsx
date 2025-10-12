@@ -781,8 +781,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   };
 
   const handleBack = () => {
-      const params = new URLSearchParams(searchParams.toString());
-      router.push(`/nha-tuyen-dung?${params.toString()}`);
+      const fromPath = searchParams.get('from') || '/nha-tuyen-dung';
+      router.push(fromPath);
   }
 
   const generateRecruiterId = (roleSlug: string): string => {
@@ -1488,7 +1488,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                    {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                                 </div>
                             ) : (
-                                <div className="mt-6 border-t pt-4">
+                                <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
                                     <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
                                         <Mail className="h-6 w-6"/>
                                         <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />

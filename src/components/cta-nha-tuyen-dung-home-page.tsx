@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
 
@@ -17,6 +17,7 @@ export function CtaNhaTuyenDungHomePage() {
     const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
     const [selectedLang, setSelectedLang] = useState<Language>('vi');
     const router = useRouter();
+    const pathname = usePathname();
 
     const handleXL01Complete = (preferences: any) => {
         console.log("X-L01 Completed with:", preferences);
@@ -40,6 +41,9 @@ export function CtaNhaTuyenDungHomePage() {
       (data.industry || []).forEach((item: string) => params.append('industry', item));
       (data.location || []).forEach((item: string) => params.append('location', item));
       
+      // Add the 'from' parameter
+      params.set('from', pathname);
+
       router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
       setIsYL01DialogOpen(false);
     };
