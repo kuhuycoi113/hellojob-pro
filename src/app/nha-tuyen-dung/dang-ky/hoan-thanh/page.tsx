@@ -24,21 +24,21 @@ const contentByLang = {
     vi: {
         question_part1: "Bạn có muốn liên hệ ngay với ",
         question_part2: " không?",
-        laterButton: "Sửa lại",
+        editButton: "Sửa lại",
         createAccountButton: "Tạo tài khoản",
         successMessage: "Thông tin của bạn đã được gửi, chúng tôi sẽ sớm liên hệ với bạn.",
     },
     ja: {
-        question_part1: "に今すぐ連絡しますか？",
-        question_part2: "", // The word HelloJob is at the beginning in Japanese
-        laterButton: "修正する",
+        question_part1: "",
+        question_part2: "に今すぐ連絡しますか？", // The word HelloJob is at the beginning in Japanese
+        editButton: "修正する",
         createAccountButton: "アカウント作成",
         successMessage: "ご入力いただいた情報が送信されました。担当者よりご連絡いたします。",
     },
     en: {
         question_part1: "Would you like to contact ",
         question_part2: " right away?",
-        laterButton: "Edit",
+        editButton: "Edit",
         createAccountButton: "Create Account",
         successMessage: "Your information has been sent, we will contact you shortly.",
     }
@@ -110,6 +110,7 @@ function CompletionPageContent() {
 
     const handleEdit = () => {
         const params = new URLSearchParams(searchParams.toString());
+        params.set('lang', lang);
         router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
     };
 
@@ -145,7 +146,7 @@ function CompletionPageContent() {
                                         {lang === 'ja' ? (
                                             <>
                                                 <ColoredHelloJob />
-                                                <span>{t.question_part1}</span>
+                                                <span>{t.question_part2}</span>
                                             </>
                                         ) : (
                                             <>
@@ -185,7 +186,7 @@ function CompletionPageContent() {
                                 <div className="flex-grow">
                                      <p className="font-semibold text-foreground">{t.successMessage}</p>
                                      <p className="text-sm text-muted-foreground">
-                                        {lang === 'ja' ? <> <ColoredHelloJob /> {t.question_part1} </> : <>{t.question_part1}<ColoredHelloJob />{t.question_part2}</>}
+                                        {lang === 'ja' ? <> <ColoredHelloJob /> {t.question_part2} </> : <>{t.question_part1}<ColoredHelloJob />{t.question_part2}</>}
                                      </p>
                                 </div>
                             </div>
