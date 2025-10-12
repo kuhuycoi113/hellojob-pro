@@ -1244,7 +1244,7 @@ export default function CandidateProfilePage() {
                      <EditDialog
                         title="Chỉnh sửa Giới thiệu bản thân"
                         onSave={handleSave}
-                        renderContent={(temp, handleChange) => <Textarea value={temp.about} onChange={e => handleChange('about', e.target.value)} rows={6}/>}
+                        renderContent={(temp, handleChange) => <Textarea value={temp.about} onChange={e => handleChange('about' as any, e.target.value)} rows={6}/>}
                         candidate={profileByLang.vi!}
                         description="Viết một đoạn giới thiệu ngắn về bản thân, kỹ năng và mục tiêu nghề nghiệp của bạn."
                     >
@@ -1257,7 +1257,7 @@ export default function CandidateProfilePage() {
                     ) : (
                       <div className="text-muted-foreground">
                         <span>{notUpdatedText}</span>
-                        <EditDialog title="Chỉnh sửa Giới thiệu bản thân" onSave={handleSave} renderContent={(temp, handleChange) => <Textarea value={temp.about} onChange={e => handleChange('about', e.target.value)} rows={6}/>} candidate={profileByLang.vi!}>
+                        <EditDialog title="Chỉnh sửa Giới thiệu bản thân" onSave={handleSave} renderContent={(temp, handleChange) => <Textarea value={temp.about} onChange={e => handleChange('about' as any, e.target.value)} rows={6}/>} candidate={profileByLang.vi!}>
                             <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                         </EditDialog>
                       </div>
@@ -1528,7 +1528,7 @@ export default function CandidateProfilePage() {
                      <EditDialog
                         title="Chỉnh sửa Ghi chú"
                         onSave={handleSave}
-                        renderContent={(temp, handleChange) => <Textarea value={temp.notes || ''} onChange={e => handleChange('notes', e.target.value)} rows={4} placeholder="Ghi chú về nguyện vọng, khả năng tài chính, thời gian có thể đi..."/>}
+                        renderContent={(temp, handleChange) => <Textarea value={temp.notes || ''} onChange={e => handleChange('notes' as any, e.target.value)} rows={4} placeholder="Ghi chú về nguyện vọng, khả năng tài chính, thời gian có thể đi..."/>}
                         candidate={profileByLang.vi!}
                         description="Thêm bất kỳ ghi chú hoặc thông tin bổ sung nào về nguyện vọng, hoàn cảnh của bạn."
                     >
@@ -1541,7 +1541,7 @@ export default function CandidateProfilePage() {
                     ) : (
                       <div className="text-muted-foreground">
                         <span>{notUpdatedText}</span>
-                        <EditDialog title="Chỉnh sửa Ghi chú" onSave={handleSave} renderContent={(temp, handleChange) => <Textarea value={temp.notes || ''} onChange={e => handleChange('notes', e.target.value)} rows={4} placeholder="Ghi chú về nguyện vọng, khả năng tài chính, thời gian có thể đi..."/>} candidate={profileByLang.vi!}>
+                        <EditDialog title="Chỉnh sửa Ghi chú" onSave={handleSave} renderContent={(temp, handleChange) => <Textarea value={temp.notes || ''} onChange={e => handleChange('notes' as any, e.target.value)} rows={4} placeholder="Ghi chú về nguyện vọng, khả năng tài chính, thời gian có thể đi..."/>} candidate={profileByLang.vi!}>
                             <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
                         </EditDialog>
                       </div>
@@ -1880,7 +1880,5 @@ const DocumentGrid = ({
     </div>
   )
 };
-
     
-
     
