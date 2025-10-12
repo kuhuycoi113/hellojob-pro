@@ -6,10 +6,31 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import EmployerDetailPage from '../client';
 
+type Language = 'vi' | 'ja' | 'en';
+
+const contentByLang = {
+    vi: {
+        question: "Bạn đã chắc chắn với các thông tin đã điền chưa?",
+        editButton: "Sửa lại",
+        confirmButton: "Xác nhận & Tiếp tục"
+    },
+    ja: {
+        question: "ご入力いただいた内容でよろしいでしょうか？",
+        editButton: "修正する",
+        confirmButton: "確認して続行"
+    },
+    en: {
+        question: "Are you sure about the information you have entered?",
+        editButton: "Edit",
+        confirmButton: "Confirm & Continue"
+    }
+};
+
+
 function ConfirmationPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [lang, setLang] = useState<'vi' | 'ja' | 'en'>('vi');
+    const [lang, setLang] = useState<Language>('vi');
 
     useEffect(() => {
         const langParam = searchParams.get('lang');
@@ -20,25 +41,7 @@ function ConfirmationPageContent() {
         }
     }, [searchParams]);
 
-    const content = {
-        vi: {
-            question: "Bạn đã chắc chắn với các thông tin đã điền chưa?",
-            editButton: "Sửa lại",
-            confirmButton: "Xác nhận & Tiếp tục"
-        },
-        ja: {
-            question: "ご入力いただいた内容でよろしいでしょうか？",
-            editButton: "修正する",
-            confirmButton: "確認して続行"
-        },
-        en: {
-            question: "Are you sure about the information you have entered?",
-            editButton: "Edit",
-            confirmButton: "Confirm & Continue"
-        }
-    };
-
-    const t = content[lang];
+    const t = contentByLang[lang];
 
     const handleEdit = () => {
         const params = new URLSearchParams(searchParams.toString());
