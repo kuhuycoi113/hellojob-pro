@@ -74,11 +74,15 @@ function ConfirmationPageContent() {
 
     const handleEdit = () => {
         const params = new URLSearchParams(searchParams.toString());
+        // Pass current language back to the edit page
+        params.set('lang', lang);
         router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
     };
 
     const handleConfirm = () => {
         const params = new URLSearchParams(searchParams.toString());
+        // Pass current language to the completion page
+        params.set('lang', lang);
         router.push(`/nha-tuyen-dung/dang-ky/hoan-thanh?${params.toString()}`);
     };
 
