@@ -62,6 +62,7 @@ interface YL01DialogProps {
   onLanguageChange: (lang: Language) => void;
   initialLang?: Language;
   showLanguageSwitcher?: boolean; 
+  fromPath?: string; // New prop to receive the path
 }
 
 const visaDetailContent = {
@@ -223,7 +224,7 @@ const regionContent = {
         title: 'Select Work Regions',
         description: 'Choose the regions you want to recruit in, in order of priority.',
         backButton: 'Back',
-        continueButton: 'Continue'
+        completeButton: 'Continue'
     }
 };
 
@@ -361,6 +362,7 @@ export function YL01Dialog({
     onLanguageChange,
     initialLang = 'vi',
     showLanguageSwitcher = true,
+    fromPath,
 }: YL01DialogProps) {
   const router = useRouter();
   const { role, setRole, isLoggedIn } = useAuth();
@@ -418,6 +420,7 @@ export function YL01Dialog({
         industry: selectedIndustry,
         location: selectedRegion,
         lang: currentLang,
+        from: fromPath, // Pass the fromPath
       });
     }
   };
@@ -929,7 +932,7 @@ export function YL01Dialog({
                   <div className="flex justify-center items-center mt-6 gap-4">
                       <Button variant="link" onClick={() => setStep(8)}>{content.backButton}</Button>
                       <Button 
-                          className="bg-accent-orange hover:bg-accent-orange/90 text-white"
+                          className="bg-accent-orange text-white hover:bg-accent-orange/90"
                           onClick={() => setStep(10)} 
                           disabled={selectedRegion.length === 0}
                       >

@@ -42,7 +42,9 @@ export function CtaNhaTuyenDungHomePage() {
       (data.location || []).forEach((item: string) => params.append('location', item));
       
       // Add the 'from' parameter
-      params.set('from', pathname);
+      if (pathname) {
+        params.set('from', pathname);
+      }
 
       router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
       setIsYL01DialogOpen(false);
@@ -106,6 +108,7 @@ export function CtaNhaTuyenDungHomePage() {
                 initialStep={1}
                 onComplete={navigateToEmployerPage}
                 onBack={() => setIsYL01DialogOpen(false)}
+                fromPath={pathname}
             />
         </>
     )

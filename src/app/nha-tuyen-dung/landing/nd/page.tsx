@@ -12,7 +12,7 @@ import { JpFlagIcon, EnFlagIcon, VnFlagIcon } from '@/components/custom-icons';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { CtaHienThiViec08 } from '@/components/cta-hien-thi-viec-08';
 import { ActivityPhotos } from '@/components/activity-photos';
 
@@ -273,7 +273,7 @@ export default function UnionLandingPage() {
   const t = pageContent[lang];
 
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
   const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false); 
   const [recruitmentPrefs, setRecruitmentPrefs] = useState<any>(null);
@@ -299,6 +299,10 @@ export default function UnionLandingPage() {
     (data.industry || []).forEach((item: string) => params.append('industry', item));
     (data.location || []).forEach((item: string) => params.append('location', item));
     
+    if (pathname) {
+      params.set('from', pathname);
+    }
+
     router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
     setIsYL01DialogOpen(false);
   };
@@ -477,6 +481,7 @@ export default function UnionLandingPage() {
         onBack={() => {
             setIsYL01DialogOpen(false);
         }}
+        fromPath={pathname}
       />
     </>
   );

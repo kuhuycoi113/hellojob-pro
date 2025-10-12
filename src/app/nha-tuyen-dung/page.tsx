@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { CtaNhaTuyenDungHomePage } from '@/components/cta-nha-tuyen-dung-home-page';
 import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { YL01Dialog } from '@/components/Y-L01-dialog';
 import { XL01Dialog } from '@/components/X-L01-dialog';
 
@@ -109,6 +110,7 @@ type Language = 'vi' | 'ja' | 'en';
 
 function NhaTuyenDungPageContent() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isYL01DialogOpen, setIsYL01DialogOpen] = useState(false);
   const [isXL01DialogOpen, setIsXL01DialogOpen] = useState(false);
@@ -135,6 +137,10 @@ function NhaTuyenDungPageContent() {
     (data.visaDetail || []).forEach((item: string) => params.append('visa_detail', item));
     (data.industry || []).forEach((item: string) => params.append('industry', item));
     (data.location || []).forEach((item: string) => params.append('location', item));
+    
+    if (pathname) {
+      params.set('from', pathname);
+    }
     
     router.push(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
     setIsYL01DialogOpen(false);
@@ -243,6 +249,7 @@ function NhaTuyenDungPageContent() {
         initialStep={1}
         onComplete={navigateToEmployerPage}
         onBack={() => setIsYL01DialogOpen(false)}
+        fromPath={pathname}
       />
        <XL01Dialog 
         isOpen={isXL01DialogOpen} 
