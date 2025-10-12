@@ -24,7 +24,7 @@ const contentByLang = {
     vi: {
         question_part1: "Bạn có muốn liên hệ ngay với ",
         question_part2: " không?",
-        editButton: "Sửa",
+        editButton: "Sửa lại",
         createAccountButton: "Tạo tài khoản",
         successMessage: "Thông tin của bạn đã được gửi, chúng tôi sẽ sớm liên hệ với bạn.",
     },
@@ -172,10 +172,10 @@ function CompletionPageContent() {
                             </div>
                         </div>
                     ) : (
-                        <div id="DANGKY_HOANTAT_FOOTER_GUEST" className="w-full flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div id="DANGKY_HOANTAT_FOOTER_GUEST" className="w-full flex flex-col md:flex-row justify-start items-center gap-4 md:gap-8">
                              <div className="flex items-center gap-3">
                                 <CheckCircle className="h-8 w-8 text-accent-orange flex-shrink-0"/>
-                                <div className="flex-grow">
+                                <div className="flex-grow text-center md:text-left">
                                      <p className="font-semibold text-foreground">{t.successMessage}</p>
                                      <p className="text-sm text-muted-foreground">
                                         {lang === 'ja' ? <> <ColoredHelloJob /> {t.question_part2} </> : <>{t.question_part1}<ColoredHelloJob />{t.question_part2}</>}
