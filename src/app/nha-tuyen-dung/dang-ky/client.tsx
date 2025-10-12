@@ -572,7 +572,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                   if (!validateEmail(e.target.value)) {
                                     setErrors(prev => ({...prev, email: "Email không hợp lệ" }));
                                   } else {
-                                     setErrors(prev => ({...prev, email: undefined}));
+                                     setErrors(prev => ({ ...prev, email: undefined }));
                                   }
                                 }}
                                 className={cn(errors?.email && "border-destructive")}
@@ -771,8 +771,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     } className="flex flex-wrap gap-1 mt-1">{content}</div>
   }, [lang, isConfirmationMode, t, employer]);
   
-  const handleLangChange = (lang: Language) => {
-    setLang(lang);
+  const handleLangChange = (newLang: Language) => {
+    setLang(newLang);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('lang', newLang);
+    router.replace(`?${params.toString()}`);
   };
   
   const handleContinue = () => {
@@ -1445,7 +1448,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                           <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 w-full justify-center md:w-auto md:mt-0 flex-shrink-0 md:ml-auto">
                               <div className="flex items-center gap-2">
                                 <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
-                                    <TabsList className="grid w-full grid-cols-3">
+                                    <TabsList id="DKXN_CHUYEN_NGON_NGU" className="grid w-full grid-cols-3">
                                         <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span><span className="sm:hidden">VI</span></TabsTrigger>
                                         <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="hidden sm:inline">日本語</span><span className="sm:hidden">JA</span></TabsTrigger>
                                         <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="hidden sm:inline">English</span><span className="sm:hidden">EN</span></TabsTrigger>
