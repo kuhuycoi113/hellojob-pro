@@ -1556,34 +1556,85 @@ export default function CandidateProfilePage() {
                   <PersonalInfoCard />
                 </div>
                  <Card id="HSCV_NGUYENVONG">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><Target className="mr-3 text-primary"/> {t.aspirations}</CardTitle>
+                  <CardHeader id="HSCV_NGUYENVONG_HEADER" className="flex flex-row items-center justify-between">
+                    <CardTitle id="HSCV_NGUYENVONG_LABEL" className="font-headline text-xl flex items-center"><Target className="mr-3 text-primary"/> {t.aspirations}</CardTitle>
                      <EditDialog
                         title="Chỉnh sửa Nguyện vọng"
                         onSave={handleSave}
+                        dialogId="HSCV_NGUYENVONG_DIALOG"
                         renderContent={(temp, handleChange) => (
                            <div className="space-y-4">
-                               {/* Render aspirations fields here */}
+                               <div className="space-y-2">
+                                <Label id="HSCV_NGUYENVONG_DIALOG_LOAIVISA_LABEL">Loại visa mong muốn</Label>
+                                <Select id="HSCV_NGUYENVONG_DIALOG_LOAIVISA_INPUT" value={temp.aspirations?.desiredVisaType || ''} onValueChange={value => handleChange('aspirations', 'desiredVisaType', value)}>
+                                    <SelectTrigger><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
+                                    <SelectContent>{visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}</SelectContent>
+                                </Select>
+                               </div>
+                                <div className="space-y-2">
+                                    <Label id="HSCV_NGUYENVONG_DIALOG_CHITIETVISA_LABEL">Chi tiết loại hình visa mong muốn</Label>
+                                    <Select id="HSCV_NGUYENVONG_DIALOG_CHITIETVISA_INPUT" value={temp.aspirations?.desiredVisaDetail || ''} onValueChange={value => handleChange('aspirations', 'desiredVisaDetail', value)} disabled={!temp.aspirations?.desiredVisaType}>
+                                        <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
+                                        <SelectContent>{(visaDetailsByVisaType[temp.aspirations?.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}</SelectContent>
+                                    </Select>
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label id="HSCV_NGUYENVONG_DIALOG_NGANHNGHE_LABEL">Ngành nghề mong muốn</Label>
+                                    <Select id="HSCV_NGUYENVONG_DIALOG_NGANHNGHE_INPUT" value={temp.desiredIndustry} onValueChange={value => handleChange('desiredIndustry', 'desiredIndustry', value)} disabled={!temp.aspirations?.desiredVisaType}>
+                                        <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
+                                        <SelectContent>{(industriesByJobType[temp.aspirations?.desiredVisaType as keyof typeof industriesByJobType] || allIndustries).map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}</SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label id="HSCV_NGUYENVONG_DIALOG_CONGVIECCUTHE_LABEL">Công việc chi tiết mong muốn</Label>
+                                    <Input id="HSCV_NGUYENVONG_DIALOG_CONGVIECCUTHE_INPUT" value={temp.aspirations?.desiredJobDetail} onChange={e => handleChange('aspirations', 'desiredJobDetail', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label id="HSCV_NGUYENVONG_DIALOG_DIADIEM_LABEL">Địa điểm mong muốn</Label>
+                                    <Input id="HSCV_NGUYENVONG_DIALOG_DIADIEM_INPUT" value={temp.aspirations?.desiredLocation} onChange={e => handleChange('aspirations', 'desiredLocation', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label id="HSCV_NGUYENVONG_DIALOG_LUONGCANBAN_LABEL">Lương cơ bản mong muốn/tháng</Label>
+                                    <Input id="HSCV_NGUYENVONG_DIALOG_LUONGCANBAN_INPUT" value={temp.aspirations?.desiredSalary} onChange={e => handleChange('aspirations', 'desiredSalary', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label id="HSCV_NGUYENVONG_DIALOG_THUCLINH_LABEL">Thực lĩnh mong muốn/tháng</Label>
+                                    <Input id="HSCV_NGUYENVONG_DIALOG_THUCLINH_INPUT" value={temp.aspirations?.desiredNetSalary} onChange={e => handleChange('aspirations', 'desiredNetSalary', e.target.value)} />
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label id="HSCV_NGUYENVONG_DIALOG_KHACHINHTAICHINH_LABEL">Khả năng tài chính</Label>
+                                    <Input id="HSCV_NGUYENVONG_DIALOG_KHACHINHTAICHINH_INPUT" value={temp.aspirations?.financialAbility} onChange={e => handleChange('aspirations', 'financialAbility', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label id="HSCV_NGUYENVONG_DIALOG_NOIPHONGVAN_LABEL">Tìm việc, phỏng vấn, tuyển tại</Label>
+                                    <Input id="HSCV_NGUYENVONG_DIALOG_NOIPHONGVAN_INPUT" value={temp.aspirations?.interviewLocation} onChange={e => handleChange('aspirations', 'interviewLocation', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label id="HSCV_NGUYENVONG_DIALOG_YEUCAUKHAC_LABEL">Nguyện vọng đặc biệt</Label>
+                                    <Textarea id="HSCV_NGUYENVONG_DIALOG_YEUCAUKHAC_INPUT" value={Array.isArray(temp.aspirations?.specialAspirations) ? temp.aspirations.specialAspirations.join(', ') : temp.aspirations?.specialAspirations} onChange={e => handleChange('aspirations', 'specialAspirations', e.target.value)} />
+                                </div>
                            </div>
                         )}
                         candidate={profileByLang.vi!}
                     >
-                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                      <Button id="HSCV_NGUYENVONG_BUTTON_EDIT" variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
                     </EditDialog>
                   </CardHeader>
                    <CardContent className="space-y-3 text-sm">
-                        <p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.desiredVisaType || notUpdatedText}</p>
-                        <p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.desiredVisaDetail || notUpdatedText}</p>
-                        <p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry || notUpdatedText}</p>
-                        <p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail || notUpdatedText}</p>
-                        <p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation || notUpdatedText}</p>
-                        <p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p>
-                        <p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p>
-                        {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(candidate.aspirations?.desiredVisaDetail || '') && (
-                            <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility || notUpdatedText}</p>
-                        )}
-                        <p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation || notUpdatedText}</p>
-                        <div className="space-y-1">
+                        <div id="HSCV_NGUYENVONG_LOAIVISA"><p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.desiredVisaType || notUpdatedText}</p></div>
+                        <div id="HSCV_NGUYENVONG_CHITIETVISA"><p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.desiredVisaDetail || notUpdatedText}</p></div>
+                        <div id="HSCV_NGUYENVONG_NGANHNGHE"><p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry || notUpdatedText}</p></div>
+                        <div id="HSCV_NGUYENVONG_CONGVIECCUTHE"><p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail || notUpdatedText}</p></div>
+                        <div id="HSCV_NGUYENVONG_DIADIEM"><p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation || notUpdatedText}</p></div>
+                        <div id="HSCV_NGUYENVONG_LUONGCANBAN"><p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p></div>
+                        <div id="HSCV_NGUYENVONG_THUCLINH"><p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p></div>
+                        <div id="HSCV_NGUYENVONG_KHACHINHTAICHINH">
+                          {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(candidate.aspirations?.desiredVisaDetail || '') && (
+                              <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility || notUpdatedText}</p>
+                          )}
+                        </div>
+                        <div id="HSCV_NGUYENVONG_NOIPHONGVAN"><p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation || notUpdatedText}</p></div>
+                        <div id="HSCV_NGUYENVONG_YEUCAUKHAC" className="space-y-1">
                             <p><strong>{t.specialAspirations}:</strong></p>
                             {candidate.aspirations?.specialAspirations && (
                                 Array.isArray(candidate.aspirations.specialAspirations) && candidate.aspirations.specialAspirations.length > 0 ? (
@@ -1881,4 +1932,6 @@ const DocumentGrid = ({
   )
 };
     
+    
+
     
