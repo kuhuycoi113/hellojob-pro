@@ -484,10 +484,20 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
     const [phoneCountry, setPhoneCountry] = useState('+84');
     const [zaloCountry, setZaloCountry] = useState('+84');
     const [errors, setErrors] = useState<{ email?: string; messenger?: string; line?: string }>({});
+    const [contactError, setContactError] = useState(false);
 
     useEffect(() => {
         setTempInfo(employer.info);
+        setContactError(false); // Reset error state when dialog opens
     }, [employer.info]);
+
+    const handleInfoChange = (field: string, value: string) => {
+        setTempInfo({ ...tempInfo, [field]: value });
+        // If any contact field has value, clear the error
+        if (value.trim() !== '' && ['email', 'phone', 'zalo', 'messenger', 'line'].includes(field)) {
+            setContactError(false);
+        }
+    }
     
     const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -508,7 +518,18 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
 
     const handleSave = () => {
         let allValid = true;
-        if (!validateEmail(tempInfo.email || '')) {
+        
+        // Check if at least one contact method is filled
+        const hasContactInfo = tempInfo.email || tempInfo.phone || tempInfo.zalo || tempInfo.messenger || tempInfo.line;
+        if (!hasContactInfo) {
+            setContactError(true);
+            allValid = false;
+        } else {
+            setContactError(false);
+        }
+
+        // Validate individual fields
+        if (tempInfo.email && !validateEmail(tempInfo.email)) {
             setErrors(prev => ({ ...prev, email: "Email không hợp lệ" }));
             allValid = false;
         } else {
@@ -518,7 +539,6 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
         if (!validateField('line', tempInfo.line || '')) allValid = false;
 
         if (!allValid) {
-            alert('Vui lòng sửa các lỗi được hiển thị trước khi lưu.');
             return;
         }
 
@@ -541,19 +561,22 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                     <div id="DKDN_THONGTINCHUNG" className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label id="DKDN_NAMTHANHLAP_LABEL" htmlFor="founded">{t.foundedLabel}</Label>
-                            <Input id="DKDN_NAMTHANHLAP_INPUT" placeholder={t.foundedPlaceholder} value={tempInfo.founded} onChange={(e) => setTempInfo({...tempInfo, founded: e.target.value})} />
+                            <Input id="DKDN_NAMTHANHLAP_INPUT" placeholder={t.foundedPlaceholder} value={tempInfo.founded} onChange={(e) => handleInfoChange('founded', e.target.value)} />
                         </div>
                         <div className="space-y-2">
                             <Label id="DKDN_QUYMO_LABEL" htmlFor="size">{t.sizeLabel}</Label>
-                            <Input id="DKDN_QUYMO_INPUT" placeholder={t.sizePlaceholder} value={tempInfo.size[lang] || ''} onChange={(e) => setTempInfo({...tempInfo, size: {...tempInfo.size, [lang]: e.target.value}})} />
+                            <Input id="DKDN_QUYMO_INPUT" placeholder={t.sizePlaceholder} value={tempInfo.size[lang] || ''} onChange={(e) => {
+                                const newSize = {...tempInfo.size, [lang]: e.target.value};
+                                setTempInfo({...tempInfo, size: newSize});
+                            }} />
                         </div>
                         <div className="space-y-2">
                             <Label id="DKDN_GIAYPHEP_LABEL" htmlFor="license">{t.licenseLabel}</Label>
-                            <Input id="DKDN_GIAYPHEP_INPUT" placeholder={t.licensePlaceholder} value={tempInfo.license} onChange={(e) => setTempInfo({...tempInfo, license: e.target.value})} />
+                            <Input id="DKDN_GIAYPHEP_INPUT" placeholder={t.licensePlaceholder} value={tempInfo.license} onChange={(e) => handleInfoChange('license', e.target.value)} />
                         </div>
                         <div className="space-y-2">
                            <Label id="DKDN_WEBSITE_LABEL" htmlFor="website">{t.websiteLabel}</Label>
-                           <Input id="DKDN_WEBSITE_INPUT" placeholder="https://example.com" value={tempInfo.website} onChange={(e) => setTempInfo({...tempInfo, website: e.target.value})} />
+                           <Input id="DKDN_WEBSITE_INPUT" placeholder="https://example.com" value={tempInfo.website} onChange={(e) => handleInfoChange('website', e.target.value)} />
                         </div>
                     </div>
                     
@@ -567,9 +590,9 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                 id="DKDN_EMAIL_INPUT"
                                 placeholder="contact@company.com" 
                                 value={tempInfo.email} 
-                                onChange={(e) => setTempInfo({...tempInfo, email: e.target.value})} 
+                                onChange={(e) => handleInfoChange('email', e.target.value)} 
                                 onBlur={(e) => {
-                                  if (!validateEmail(e.target.value)) {
+                                  if (e.target.value && !validateEmail(e.target.value)) {
                                     setErrors(prev => ({...prev, email: "Email không hợp lệ" }));
                                   } else {
                                      setErrors(prev => ({ ...prev, email: undefined }));
@@ -592,7 +615,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                         <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="DKDN_SODIENTHOAI_INPUT" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo.phone, phoneCountry)} onChange={(e) => setTempInfo({...tempInfo, phone: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="DKDN_SODIENTHOAI_INPUT" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo.phone, phoneCountry)} onChange={(e) => handleInfoChange('phone', e.target.value.replace(/\D/g, ''))} />
                             </div>
                           </div>
                           <div className="space-y-2">
@@ -605,7 +628,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                         <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo.zalo, zaloCountry)} onChange={(e) => setTempInfo({...tempInfo, zalo: e.target.value.replace(/\D/g, '')})} />
+                                <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo.zalo, zaloCountry)} onChange={(e) => handleInfoChange('zalo', e.target.value.replace(/\D/g, ''))} />
                                 <div onClick={onEditClick} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
@@ -617,7 +640,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                 id="DKDN_MESSENGER_INPUT"
                                 placeholder={t.messengerPlaceholder}
                                 value={tempInfo.messenger}
-                                onChange={(e) => setTempInfo({...tempInfo, messenger: e.target.value})}
+                                onChange={(e) => handleInfoChange('messenger', e.target.value)}
                                 onBlur={(e) => validateField('messenger', e.target.value)}
                                 className={cn(errors.messenger && "border-destructive")}
                             />
@@ -630,13 +653,16 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                 id="DKDN_LINE_INPUT"
                                 placeholder={t.linePlaceholder}
                                 value={tempInfo.line}
-                                onChange={(e) => setTempInfo({...tempInfo, line: e.target.value})}
+                                onChange={(e) => handleInfoChange('line', e.target.value)}
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
                              {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
+                      </div>
+                      <div className={cn("mt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all", contactError && 'border-destructive ring-2 ring-destructive/40')}>
+                          <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                       </div>
                   </div>
                 </div>
@@ -911,7 +937,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     
     let allValid = true;
     if (editingModule.field === 'info') {
-        if (!validateEmail(tempContent.email || '')) {
+        if (tempContent.email && !validateEmail(tempContent.email)) {
              setErrors(prev => ({ ...prev, email: "Email không hợp lệ" }));
              allValid = false;
         } else {
