@@ -825,6 +825,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   React.useEffect(() => {
     const partnerIdParam = searchParams.get('partnerId');
     if (!partnerIdParam) {
+        // Handled by page.tsx redirect
         return;
     }
     setPartnerId(partnerIdParam);
@@ -1586,7 +1587,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                       <div id="DKHA_LUOIANH" className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {employer.images?.map((img: any, index: number) => (
                               <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
-                                  <Image src={img.src} alt={img.alt?.[lang] || ''} fill className="object-cover" />
+                                  {img.src && <Image src={img.src} alt={img.alt?.[lang] || ''} fill className="object-cover" />}
                                    {!isConfirmationMode && (<Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                                         <Camera className="h-6 w-6 text-white"/>
                                    </Label>)}

@@ -1,11 +1,10 @@
 
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import EmployerDetailPage from './client';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function PageLogic() {
