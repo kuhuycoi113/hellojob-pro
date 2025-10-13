@@ -39,6 +39,24 @@ import { japanRegions } from '@/lib/location-data';
 import { Skeleton } from '@/components/ui/skeleton';
 
 
+const roleTexts: Record<string, Record<Language, string>> = {
+  'nhan-vien-phai-cu': { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
+  'nhan-vien-nhan-luc-nhat': { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
+  'sending': { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
+  'support': { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
+  'company': { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
+  'supervising-organization': { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
+  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Employment Placement Agency' },
+  'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
+};
+
+const subRoleTexts: Record<string, Record<Language, string>> = {
+    'phu-trach-doi-ngoai': { vi: 'Phụ trách đối ngoại', ja: '渉外担当', en: 'External Relations' },
+    'phu-trach-tuyen-dung': { vi: 'Phụ trách tuyển dụng', ja: '採用担当', en: 'Recruitment' },
+    'vietnamese': { vi: 'Nhân sự người Việt', ja: 'ベトナム人事', en: 'Vietnamese Staff' },
+    'japanese': { vi: 'Nhân sự người Nhật', ja: '日本人事', en: 'Japanese Staff' }
+};
+
 const employersData: { [key: string]: any } = {
     'Z000': {
         id: 'Z000',
@@ -459,23 +477,7 @@ const regionKanjiMap: { [key: string]: string } = {
   Okinawa: '沖縄',
 };
 
-const roleTexts: Record<string, Record<Language, string>> = {
-  'nhan-vien-phai-cu': { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
-  'nhan-vien-nhan-luc-nhat': { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
-  'sending': { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
-  'support': { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
-  'company': { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
-  'supervising-organization': { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
-  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Employment Placement Agency' },
-  'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
-};
 
-const subRoleTexts: Record<string, Record<Language, string>> = {
-    'phu-trach-doi-ngoai': { vi: 'Phụ trách đối ngoại', ja: '渉外担当', en: 'External Relations' },
-    'phu-trach-tuyen-dung': { vi: 'Phụ trách tuyển dụng', ja: '採用担当', en: 'Recruitment' },
-    'vietnamese': { vi: 'Nhân sự người Việt', ja: 'ベトナム人事', en: 'Vietnamese Staff' },
-    'japanese': { vi: 'Nhân sự người Nhật', ja: '日本人事', en: 'Japanese Staff' }
-};
 
 const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, onSave, onEditClick }: { isOpen: boolean; onOpenChange: (open: boolean) => void; employer: any; lang: Language; isConfirmationMode: boolean; onSave: (data: any) => void; onEditClick: () => void; }) => {
     const t = contentByLang[lang];
@@ -825,7 +827,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   React.useEffect(() => {
     const partnerIdParam = searchParams.get('partnerId');
     if (!partnerIdParam) {
-        // Handled by page.tsx redirect
         return;
     }
     setPartnerId(partnerIdParam);
@@ -838,46 +839,66 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     
     let finalData;
 
+    // Define a function to merge data safely
+    const mergeData = (base: any, updates: any) => {
+        const merged = { ...base };
+        for (const key in updates) {
+            if (updates[key] !== null && updates[key] !== undefined) {
+                 if (typeof updates[key] === 'object' && !Array.isArray(updates[key])) {
+                    merged[key] = { ...(base[key] || {}), ...updates[key] };
+                 } else {
+                    merged[key] = updates[key];
+                 }
+            }
+        }
+        return merged;
+    }
+
     if (existingProfileRaw) {
         const existingProfile = JSON.parse(existingProfileRaw);
+        finalData = { ...emptyEmployerData, ...existingProfile }; // Start with a full default structure
+
         if (tempOnboardingDataRaw) {
             const tempOnboardingData = JSON.parse(tempOnboardingDataRaw);
-            // Merge: new data from onboarding overwrites existing data
-            finalData = { ...existingProfile, ...tempOnboardingData, info: {...existingProfile.info, ...tempOnboardingData.info} };
+            // Merge onboarding data into the existing profile
+            finalData = mergeData(finalData, tempOnboardingData);
+
             localStorage.setItem(`recruiterProfile_${partnerIdParam}`, JSON.stringify(finalData));
             localStorage.removeItem(`onboardingData_${partnerIdParam}`);
-        } else {
-            finalData = existingProfile;
         }
         setIsUpdateMode(true);
     } else if (tempOnboardingDataRaw) {
-        finalData = JSON.parse(tempOnboardingDataRaw);
-        localStorage.setItem(`recruiterProfile_${partnerIdParam}`, tempOnboardingDataRaw);
+        const tempOnboardingData = JSON.parse(tempOnboardingDataRaw);
+        finalData = { ...emptyEmployerData, ...tempOnboardingData };
+        localStorage.setItem(`recruiterProfile_${partnerIdParam}`, JSON.stringify(finalData));
         localStorage.removeItem(`onboardingData_${partnerIdParam}`);
         setIsUpdateMode(false);
     } else {
-        finalData = JSON.parse(JSON.stringify(emptyEmployerData));
-        finalData.id = partnerIdParam;
+        finalData = { ...emptyEmployerData, id: partnerIdParam };
         setIsUpdateMode(false);
     }
     
-    // Ensure all nested objects exist
-    finalData.name = finalData.name || { vi: '', ja: '', en: '' };
-    finalData.type = finalData.type || { vi: '', ja: '', en: '' };
-    finalData.location = finalData.location || { vi: '', ja: '', en: '' };
-    finalData.about = finalData.about || { vi: '', ja: '', en: '' };
-    finalData.info = finalData.info || { ...emptyEmployerData.info };
-    finalData.info.size = finalData.info.size || { vi: '', ja: '', en: '' };
-    finalData.visaType = finalData.visaType || { vi: [], ja: [], en: [] };
-    finalData.visaDetail = finalData.visaDetail || { vi: [], ja: [], en: [] };
-    finalData.industries = finalData.industries || { main: { vi: [], ja: [], en: [] }, secondary: { vi: [], ja: [], en: [] } };
-    finalData.history = finalData.history || [];
-    finalData.benefits = finalData.benefits || [];
-    finalData.images = finalData.images || [];
-    finalData.interest = finalData.interest || { vi: [], ja: [], en: [] };
-    finalData.valueInterest = finalData.valueInterest || [];
-
-
+    // Ensure all nested objects exist to prevent runtime errors
+    const ensureNestedObjects = (data: any) => {
+        data.name = data.name || { vi: '', ja: '', en: '' };
+        data.type = data.type || { vi: '', ja: '', en: '' };
+        data.location = data.location || { vi: '', ja: '', en: '' };
+        data.about = data.about || { vi: '', ja: '', en: '' };
+        data.info = data.info || { ...emptyEmployerData.info };
+        data.info.size = data.info.size || { vi: '', ja: '', en: '' };
+        data.visaType = data.visaType || { vi: [], ja: [], en: [] };
+        data.visaDetail = data.visaDetail || { vi: [], ja: [], en: [] };
+        data.industries = data.industries || { main: { vi: [], ja: [], en: [] }, secondary: { vi: [], ja: [], en: [] } };
+        data.history = data.history || [];
+        data.benefits = data.benefits || [];
+        data.images = data.images || [];
+        data.interest = data.interest || { vi: [], ja: [], en: [] };
+        data.valueInterest = data.valueInterest || [];
+        return data;
+    };
+    
+    finalData = ensureNestedObjects(finalData);
+    
     const isIndividualRole = finalData.role === 'nhan-vien-phai-cu' || finalData.role === 'nhan-vien-nhan-luc-nhat';
     setDisplayName(isIndividualRole ? (finalData.name || '') : (finalData.company_name || ''));
     setIsIndividual(isIndividualRole);
@@ -1030,25 +1051,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   
   const renderEditContent = () => {
     if (!editingModule) return <p>Chức năng đang được phát triển.</p>;
-    
-    // Fix: create a local multi-language `japanJobTypes` for this specific dialog.
-    const localizedJapanJobTypes = [
-        { name: { vi: 'Thực tập sinh kỹ năng', ja: '技能実習', en: 'Technical Intern Training' }, slug: 'thuc-tap-sinh-ky-nang' },
-        { name: { vi: 'Kỹ năng đặc định', ja: '特定技能', en: 'Specified Skilled Worker' }, slug: 'ky-nang-dac-dinh' },
-        { name: { vi: 'Kỹ sư, tri thức', ja: '技術・人文知識・国際業務', en: 'Engineer/Specialist' }, slug: 'ky-su-tri-thuc' }
-    ];
-
-    const regionKanjiMap: { [key: string]: string } = {
-        Hokkaido: '北海道',
-        Tohoku: '東北',
-        Kanto: '関東',
-        Chubu: '中部',
-        Kansai: '関西',
-        Chugoku: '中国',
-        Shikoku: '四国',
-        Kyushu: '九州',
-        Okinawa: '沖縄',
-    };
 
     switch(editingModule.field) {
         case 'header':
@@ -1697,3 +1699,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
+
+    
