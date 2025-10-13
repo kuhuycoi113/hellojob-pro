@@ -335,7 +335,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <Image src={job.avatar || getJobImage(job.job,job.career)} alt={jobTitle} fill sizes='100%' className="rounded-lg object-cover" />
                                 <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                                     <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
-                                    <span>{job.id}</span>
+                                    <span>{job.code}</span>
                                 </div>
                                 {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white md:hidden" onClick={handleSaveJob}>
                                     <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
