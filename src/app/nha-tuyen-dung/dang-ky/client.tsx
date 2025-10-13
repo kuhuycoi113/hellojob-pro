@@ -484,20 +484,21 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
     const [phoneCountry, setPhoneCountry] = useState('+84');
     const [zaloCountry, setZaloCountry] = useState('+84');
     const [errors, setErrors] = useState<{ email?: string; messenger?: string; line?: string }>({});
-    const [contactError, setContactError] = useState(false);
+    const [showContactError, setShowContactError] = useState(false);
     const errorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setTempInfo(employer.info);
-        setContactError(false);
+        setShowContactError(false);
     }, [employer.info]);
 
     const handleInfoChange = (field: string, value: string) => {
-        setTempInfo((prev: any) => ({ ...prev, [field]: value }));
-        if (value.trim() !== '' && ['email', 'phone', 'zalo', 'messenger', 'line'].includes(field)) {
-            setContactError(false);
+        const newInfo = { ...tempInfo, [field]: value };
+        setTempInfo(newInfo);
+        if (value.trim() !== '') {
+            setShowContactError(false);
         }
-    }
+    };
     
     const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -519,11 +520,11 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
     const handleSave = () => {
         const hasContactInfo = tempInfo.email || tempInfo.phone || tempInfo.zalo || tempInfo.messenger || tempInfo.line;
         if (!hasContactInfo) {
-            setContactError(true);
+            setShowContactError(true);
             errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
-        setContactError(false);
+        setShowContactError(false);
 
         let allValid = true;
         if (tempInfo.email && !validateEmail(tempInfo.email)) {
@@ -658,8 +659,10 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                       </div>
-                      <div ref={errorRef} className={cn("mt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all", contactError && 'border-destructive ring-2 ring-destructive/40')}>
-                          <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                      <div ref={errorRef} className={cn("mt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", showContactError && 'border-destructive ring-2 ring-destructive/40')}>
+                           {(!tempInfo.email && !tempInfo.phone && !tempInfo.zalo && !tempInfo.messenger && !tempInfo.line) && (
+                              <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                           )}
                       </div>
                   </div>
                 </div>
@@ -686,6 +689,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const [showFooter, setShowFooter] = React.useState(true);
   const [lastScrollY, setLastScrollY] = React.useState(0);
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [mainContactError, setMainContactError] = React.useState(false);
+  const infoCardRef = React.useRef<HTMLDivElement>(null);
 
 
   const t = contentByLang[lang] || contentByLang['vi'];
@@ -801,6 +806,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   };
   
   const handleContinue = () => {
+    if (!hasContactInfo) {
+        setMainContactError(true);
+        infoCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
     const params = new URLSearchParams(searchParams.toString());
     router.push(`/nha-tuyen-dung/dang-ky/xac-nhan?${params.toString()}`);
   };
@@ -1508,7 +1518,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   </SectionCard>
                   
                   {/* Info card for Mobile */}
-                  <div className="block lg:hidden">
+                  <div className="block lg:hidden" ref={infoCardRef}>
                     <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
                         <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
                             <div className="space-y-3 text-sm">
@@ -1526,17 +1536,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                    {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                                 </div>
                             ) : (
-                                <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
-                                    <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
-                                        <Mail className="h-6 w-6"/>
-                                        <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
-                                        <ZaloIcon className="h-6 w-6" />
-                                        <MessengerIcon className="h-6 w-6" />
-                                        <LineIcon className="h-6 w-6" />
-                                    </div>
-                                    <div className="text-center text-sm">
-                                       <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
-                                    </div>
+                                <div id="HIENTHILIENHE03-mobile" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
+                                    <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                                 </div>
                             )}
                         </SectionCard>
@@ -1604,7 +1605,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
               
                 {/* Right Column (order-first on desktop) */}
               <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
-                  <div className="hidden lg:block">
+                  <div className="hidden lg:block" ref={infoCardRef}>
                     <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
                         <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
                             <div className="space-y-3 text-sm">
@@ -1622,17 +1623,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                    {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                                 </div>
                             ) : (
-                                <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4">
-                                    <div className="flex justify-center gap-4 mb-3 text-muted-foreground">
-                                        <Mail className="h-6 w-6"/>
-                                        <Image src="/img/phone.svg" alt="Phone" width={24} height={24} />
-                                        <ZaloIcon className="h-6 w-6" />
-                                        <MessengerIcon className="h-6 w-6" />
-                                        <LineIcon className="h-6 w-6" />
-                                    </div>
-                                    <div className="text-center text-sm">
-                                       <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
-                                    </div>
+                                <div id="HIENTHILIENHE03-desktop" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
+                                    <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                                 </div>
                             )}
                         </SectionCard>
@@ -1699,4 +1691,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   )
 }
 
-    
