@@ -162,15 +162,10 @@ const emptyEmployerData = {
     visaDetail: { vi: [], ja: [], en: [] }, // Changed to array
     industries: { main: { vi: [], ja: [], en: [] }, secondary: { vi: [], ja: [], en: [] } },
     location: { vi: '', ja: '', en: '' },
-    logo: '/img/viet-img/company3.png',
-    banner: '/img/viet-img/anh-bia.jpg',
+    logo: '',
+    banner: '',
     about: { vi: '', ja: '', en: '' },
-    images: [
-      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 1', ja: '新しい写真 1', en: 'New Photo 1' }, dataAiHint: 'new image 1' },
-      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 2', ja: '新しい写真 2', en: 'New Photo 2' }, dataAiHint: 'new image 2' },
-      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 3', ja: '新しい写真 3', en: 'New Photo 3' }, dataAiHint: 'new image 3' },
-      { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới 4', ja: '新しい写真 4', en: 'New Photo 4' }, dataAiHint: 'new image 4' },
-    ],
+    images: [],
     history: [],
     info: { founded: '', size: { vi: '', ja: '', en: '' }, website: '', license: '', phone: '', zalo: '', messenger: '', line: '', email: '' },
     benefits: [],
@@ -700,7 +695,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
 
   const t = contentByLang[lang] || contentByLang['vi'];
-  const hasContactInfo = employer?.info?.phone || employer?.info?.zalo || employer?.info?.messenger || employer?.info?.line || employer?.info?.email;
+  const hasContactInfo = employer?.info && (employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line || employer.info.email);
 
   const controlNavbar = useCallback(() => {
     if (typeof window !== 'undefined') {
@@ -830,8 +825,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   React.useEffect(() => {
     const partnerIdParam = searchParams.get('partnerId');
     if (!partnerIdParam) {
-        // This is now handled by the page.tsx redirect, but added as a fallback
-        // The page component should ensure this client component doesn't render without a partnerId
         return;
     }
     setPartnerId(partnerIdParam);
@@ -895,23 +888,23 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
     if (isIndividualRole) {
         if (roleKey === 'nhan-vien-phai-cu' && subRoleTexts[subRoleKey]) {
-            roleParts.push(subRoleTexts[subRoleKey][langFromParams]);
-            roleParts.push(roleTexts[roleKey][langFromParams]);
+            roleParts.push(subRoleTexts[subRoleKey]?.[langFromParams] || '');
+            roleParts.push(roleTexts[roleKey]?.[langFromParams] || '');
             if (finalData.company_name) roleParts.push(finalData.company_name);
         } else if (roleKey === 'nhan-vien-nhan-luc-nhat') {
             if (subRoleTexts[nationalityKey]) {
-                roleParts.push(subRoleTexts[nationalityKey][langFromParams]);
+                roleParts.push(subRoleTexts[nationalityKey]?.[langFromParams] || '');
             }
             if(roleTexts[subRoleKey]) {
-                 roleParts.push(roleTexts[subRoleKey][langFromParams]);
+                 roleParts.push(roleTexts[subRoleKey]?.[langFromParams] || '');
             }
             if (finalData.company_name) roleParts.push(finalData.company_name);
         }
     } else if (!isIndividualRole && roleTexts[roleKey]) {
-        roleParts.push(roleTexts[roleKey][langFromParams]);
+        roleParts.push(roleTexts[roleKey]?.[langFromParams] || '');
     }
     
-    let finalRoleText = roleParts.join(' - ');
+    let finalRoleText = roleParts.filter(Boolean).join(' - ');
     
     if (!finalRoleText) {
         finalRoleText = t.rolePlaceholder;
@@ -1457,7 +1450,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             <Card className="shadow-2xl overflow-hidden mb-8">
               <CardHeader className="p-0 relative">
                 <div className="relative w-full h-48">
-                  <Image src={employer.banner} alt={`${employer.name?.[lang] || ''} banner`} fill className="object-cover" />
+                  {employer.banner && <Image src={employer.banner} alt={`${employer.name?.[lang] || ''} banner`} fill className="object-cover" />}
                   <div className="absolute inset-0 bg-black/40" />
                    {!isConfirmationMode && (
                   <Label htmlFor="banner-upload" className="absolute top-4 right-4 z-10 cursor-pointer">
@@ -1472,7 +1465,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   <div className="flex flex-col sm:flex-row items-start gap-4 -mt-24 md:-mt-20">
                       <div className="relative flex-shrink-0">
                         <Avatar id="DKTC_AVATAR" className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
-                            <AvatarImage src={employer.logo} />
+                            {employer.logo && <AvatarImage src={employer.logo} />}
                             <AvatarFallback>{(employer.name?.[lang] || 'A').charAt(0)}</AvatarFallback>
                           </Avatar>
                            {!isConfirmationMode && (
@@ -1703,5 +1696,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
-
-    
