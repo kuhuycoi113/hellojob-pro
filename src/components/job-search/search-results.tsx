@@ -72,7 +72,7 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, totalPage,
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
 
-    const nextPage = useCallback(async() => {
+    const nextPage = useCallback(async () => {
         setIsLoadingMore(true);
         await loadMoreJobs();
         setIsLoadingMore(false);
@@ -159,7 +159,12 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, totalPage,
                             <div className="grid grid-cols-1 gap-4">
                                 {jobs.map((job, index) => {
                                     const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} />;
-                                    if (index === jobs.length - 1) {
+                                    if (index === jobs.length - 3) {
+                                        // return <div key={job.id} style={{ textAlign: 'center' }}>
+                                        //     <Button disabled={isLoadingMore} onClick={nextPage} asChild size="lg">
+                                        //         <span>Tải thêm việc làm</span>
+                                        //     </Button>
+                                        // </div>
                                         // return <button disabled={isLoadingMore} key={job.id} onClick={nextPage}>Load more</button>
                                         return <div ref={lastJobElementRef} key={job.id}>{card}</div>
                                     }

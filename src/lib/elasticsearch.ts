@@ -11,10 +11,10 @@ if (!elasticsearchHost) {
   throw new Error('ELASTICSEARCH_HOST is not defined in environment variables');
 }
 if (!elasticsearchUsername) {
-    throw new Error('ELASTICSEARCH_USERNAME is not defined in environment variables');
+  throw new Error('ELASTICSEARCH_USERNAME is not defined in environment variables');
 }
 if (!elasticsearchPassword) {
-    throw new Error('ELASTICSEARCH_PASSWORD is not defined in environment variables');
+  throw new Error('ELASTICSEARCH_PASSWORD is not defined in environment variables');
 }
 
 
@@ -53,18 +53,18 @@ export const createDocument = <T extends RequestBody>(
  * @returns Promise containing the found document.
  */
 export const getDocument = <T = unknown>(
-    index: string,
-    id: string
+  index: string,
+  id: string
 ): Promise<T | null> => {
-    return client.get({
-        index,
-        id,
-    }).then(response => ({ id: response.body._id, ...response.body._source as any }) as T)
+  return client.get({
+    index,
+    id,
+  }).then(response => ({ id: response.body._id, ...response.body._source as any }) as T)
     .catch(error => {
-        if (error.statusCode === 404) {
-            return null;
-        }
-        throw error;
+      if (error.statusCode === 404) {
+        return null;
+      }
+      throw error;
     });
 };
 
@@ -116,31 +116,38 @@ export const deleteDocument = (
  * @returns Promise containing the paginated search results.
  */
 export const searchDocuments = async <T = any>(
-    index: string,
-    query: RequestBody,
-    page: number = 1,
-    limit: number = 10,
+  index: string,
+  query: RequestBody,
+  page: number = 1,
+  limit: number = 10,
 ): Promise<PaginatedResponse<T>> => {
-    const from = (page - 1) * limit;
+  const from = (page - 1) * limit;
 
-    const response = await client.search({
-        index,
-        body: query,
-        from,
-        size: limit,
-        track_total_hits: true,
-    });
-    
-    const hits = response.body.hits.hits as SearchHit<T>[];
-    const total = (response.body.hits.total as any).value ?? 0;
+  const response = await client.search({
+    index,
+    body: query,
+    from,
+    size: limit,
+    track_total_hits: true,
+  });
+  console.log(JSON.stringify({
+    index,
+    body: query,
+    from,
+    size: limit,
+    track_total_hits: true,
+  }));
 
-    return {
-        docs: hits.map(hit => ({ ...hit._source, id: hit._id } as T)),
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-    };
+  const hits = response.body.hits.hits as SearchHit<T>[];
+  const total = (response.body.hits.total as any).value ?? 0;
+
+  return {
+    docs: hits.map(hit => ({ ...hit._source, id: hit._id } as T)),
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
 };
 export const countDocuments = async (
   index: string,

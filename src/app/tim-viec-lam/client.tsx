@@ -215,9 +215,7 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
         setStagedResultCount(total);
     }, []);
 
-
-
-    useEffect(() => {
+    const generateFilter = () => {
         const newFilters: SearchFilters = { ...initialSearchFilters, workLocation: [], specialConditions: [], otherSkillRequirement: [] };
         let sortOption = 'newest';
         for (const [key, value] of readOnlySearchParams.entries()) {
@@ -249,16 +247,18 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
                 }
             }
         }
-        const updateFilters = async () => {
-            setCurrentPage(1);
-            loadedPages.splice(0, loadedPages.length, 1);
-            setSortBy(sortOption);
-            setAppliedFilters(newFilters);
-            setStagedFilters(newFilters);
-            await runFilter(newFilters, sortOption, 1);
-            console.log('Filters from URL:', newFilters);
-        };
-        updateFilters();
+        return { sortOption, newFilters };
+    }
+
+    useEffect(() => {
+        const { newFilters, sortOption } = generateFilter();
+        setCurrentPage(1);
+        loadedPages.splice(0, loadedPages.length, 1);
+        setSortBy(sortOption);
+        setAppliedFilters(newFilters);
+        setStagedFilters(newFilters);
+        runFilter(newFilters, sortOption, 1);
+        console.log('Filters from URL:', newFilters);
     }, [readOnlySearchParams, runFilter, countStagedResults]);
 
     const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
@@ -312,13 +312,14 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
         router.push(`/tim-viec-lam?${query.toString()}`);
     };
 
-    const loadMoreJobs = async () => {
+    const loadMoreJobs = useCallback(async () => {
         const nextPage = loadedPages[loadedPages.length - 1] + 1;
-        const { docs: jobs } = await getJobs(appliedFilters, nextPage, 20);
-        setFilteredJobs([...filteredJobs, ...jobs]);
+        const { newFilters } = generateFilter();
+        const { docs: jobs } = await getJobs(newFilters, nextPage, 20);
+        setFilteredJobs(prevJobs => [...prevJobs, ...jobs]);
         setCurrentPage(nextPage);
         loadedPages.push(nextPage);
-    };
+    }, [appliedFilters]);
 
     const handleResetFilters = useCallback(() => {
     }, [router, runFilter, countStagedResults, readOnlySearchParams]);
