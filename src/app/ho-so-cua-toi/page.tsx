@@ -1707,38 +1707,6 @@ export default function CandidateProfilePage() {
                   </CardContent>
                 </Card>
                 
-                 <Card id="HSCV_CHUNGCHI">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-headline text-xl flex items-center"><Award className="mr-3 text-primary"/> {t.certifications}</CardTitle>
-                     <EditDialog
-                        title="Chỉnh sửa Chứng chỉ & Giải thưởng"
-                        onSave={handleSave}
-                        renderContent={(temp, handleChange) => (
-                            <div className="space-y-6">
-                            {temp.certifications.map((cert, index) => (<div key={index} className="p-4 border rounded-lg space-y-2 relative"><div className="flex justify-between items-center mb-2"><Label htmlFor={`cert-${index}`}>Chứng chỉ #{index + 1}</Label><Button variant="ghost" size="icon" onClick={() => handleRemoveItem('certifications', index)}><Trash2 className="h-4 w-4 text-destructive"/></Button></div><Input id={`cert-${index}`} value={cert} onChange={(e) => handleChange('certifications', index, null, e.target.value)} /></div>))}
-                            <Button variant="outline" className="w-full" onClick={() => handleAddItem('certifications', 'vietnam', undefined)}><PlusCircle className="mr-2"/> Thêm chứng chỉ</Button>
-                            </div>
-                        )}
-                        candidate={profileByLang.vi!}
-                    >
-                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
-                    </EditDialog>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                     {candidate.certifications.length > 0 ? candidate.certifications.map((cert, index) => (
-                         <p key={index} className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-muted-foreground"/>{cert}</p>
-                     )) : 
-                     <div className="text-muted-foreground text-sm">
-                        <span>{notUpdatedText}</span>
-                        <EditDialog title="Chỉnh sửa Chứng chỉ & Giải thưởng" onSave={handleSave} renderContent={(temp, handleChange) => (
-                            <div/>
-                        )} candidate={profileByLang.vi!}>
-                            <button className="text-primary hover:underline ml-1">{t.clickToUpdate}</button>
-                        </EditDialog>
-                    </div>}
-                  </CardContent>
-                </Card>
-
                  <div className="text-center pt-4">
                     <Button variant="link" className="text-muted-foreground text-sm" onClick={logout}>
                         <LogOut className="mr-2 h-4 w-4"/>
@@ -1931,3 +1899,4 @@ const DocumentGrid = ({
     
 
     
+
