@@ -325,6 +325,11 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
     }, [router, runFilter, countStagedResults, readOnlySearchParams]);
 
     const handleNewSearch = useCallback((filters: Partial<SearchFilters>) => {
+        const query = new URLSearchParams();
+        query.set('chi-tiet-loai-hinh-visa', filters.visaDetail || '');
+        query.set('nganh-nghe', filters.career || '');
+        query.set('dia-diem', filters.workLocation?.join(',') || '');
+        router.push(`/tim-viec-lam?${query.toString()}`);
         // Thực hiện logic tìm kiếm ở đây
     }, []);
 

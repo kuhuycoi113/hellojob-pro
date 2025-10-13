@@ -475,13 +475,13 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
     }, [activeFilters.visa, activeFilters.visaDetail, activeFilters.career]);
 
     useEffect(() => {
-        const parentVisaSlug = filters.visa || Object.keys(visaDetailsByVisaType).find(key =>
+        const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key =>
             (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === filters.visaDetail)
         );
         const industries = CAREERS[parentVisaSlug as keyof typeof CAREERS] || allIndustries;
         setAvailableIndustries(industries ?? []);
         setAvailableJobDetails([]);
-    }, [filters.visa]);
+    }, [filters.visaDetail]);
     useEffect(() => {
         const parentVisaSlug = filters.visa || Object.keys(visaDetailsByVisaType).find(key =>
             (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === filters.visaDetail)
@@ -511,7 +511,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         );
 
         if (parentTypeSlug && filters.visa !== parentTypeSlug) {
-            newFilters.visa = parentTypeSlug;
+            newFilters.visa = parentTypeSlug??'';
             newFilters.career = '';
             newFilters.job = '';
         }
