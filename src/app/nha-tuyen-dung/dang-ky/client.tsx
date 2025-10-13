@@ -224,8 +224,8 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
         lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
-        notUpdated: 'Nhấn để cập nhật',
-        clickToUpdate: 'Nhấn để cập nhật',
+        notUpdated: 'Chưa có thông tin.',
+        clickToUpdate: 'Nhấn để cập nhật.',
         headerTitle: 'Thông tin chung',
         namePlaceholder: 'Ví dụ: Nguyễn Văn An',
         companyNamePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
@@ -288,8 +288,8 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'LineのリンクまたはIDを入力してください',
         lineHelper: 'システムが自動的にユーザー名を取得します。',
-        notUpdated: 'クリックして更新',
-        clickToUpdate: 'クリックして更新',
+        notUpdated: '情報がありません。',
+        clickToUpdate: 'クリックして更新。',
         headerTitle: '一般情報',
         namePlaceholder: '例: グエン・ヴァン・アン',
         companyNamePlaceholder: '例: ABC株式会社',
@@ -352,8 +352,8 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'Paste Line link or enter your ID',
         lineHelper: 'The system will automatically extract your username.',
-        notUpdated: 'Click to update',
-        clickToUpdate: 'Click to update',
+        notUpdated: 'No information yet.',
+        clickToUpdate: 'Click to update.',
         headerTitle: 'General Information',
         namePlaceholder: 'E.g., An Nguyen Van',
         companyNamePlaceholder: 'E.g., ABC Corporation',
@@ -1469,7 +1469,20 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">{employer.about[lang] || <span className="italic text-muted-foreground">{t.notUpdated}, <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button>.</span>}</p>
+                       <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">
+                            {employer.about[lang] || (
+                                <span className="italic">
+                                    {t.notUpdated}{' '}
+                                    <button
+                                        disabled={isConfirmationMode}
+                                        className="underline text-primary"
+                                        onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}
+                                    >
+                                        {t.clickToUpdate}
+                                    </button>
+                                </span>
+                            )}
+                        </p>
                   </SectionCard>
                   
                   {/* Info card for Mobile */}
@@ -1537,7 +1550,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                   <p className="font-bold text-primary mb-1">{item.year}</p>
                                   <p className="text-muted-foreground">{item.event[lang]}</p>
                               </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated} <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
                   <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
@@ -1562,7 +1575,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                               <li key={index} className="flex items-start gap-2">
                                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
                               </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated}, <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
+                          )) : <p className="italic text-muted-foreground">{t.notUpdated} <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
                       </ul>
                   </SectionCard>
               </div>
@@ -1614,10 +1627,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   </div>
                    <SectionCard id="DKVISA_NGANHNGHE_KHUVUC" title={t.visaAndIndustriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries')}>
                     <div className="space-y-3 text-sm">
-                        <div id="DKLV_LOAIHINH_DISPLAY"><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
-                        <div id="DKLV_CHITIETVISA_DISPLAY"><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
-                        <div id="DKNN_NGANHNGHE_DISPLAY"><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
-                        <div id="DKNN_KHUVUC_DISPLAY"><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
+                        <div id="DKLV_LOAIHINH"><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
+                        <div id="DKLV_CHITIETVISA"><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
+                        <div id="DKNN_NGANHNGHE"><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
+                        <div id="DKNN_KHUVUC"><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
                     </div>
                 </SectionCard>
               </div>
@@ -1663,3 +1676,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
+
+    
