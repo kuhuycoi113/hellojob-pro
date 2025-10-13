@@ -58,7 +58,7 @@ import { Slider } from '@/components/ui/slider';
 import { translateProfile } from '@/ai/flows/translate-profile-flow';
 import type { TranslateProfileInput } from '@/ai/schemas/translate-profile-schema';
 import { JpFlagIcon, EnFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon, PdfIcon } from '@/components/custom-icons';
-import { industriesByJobType } from '@/lib/industry-data';
+import { industriesByJobType, allIndustries as allIndustriesData } from '@/lib/industry-data';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { locations } from '@/lib/location-data';
@@ -67,6 +67,7 @@ import { EditProfileDialog } from '@/components/candidate-edit-dialog';
 import { validateProfileForApplication } from '@/lib/validators';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { visaDetailsByVisaType } from '@/lib/visa-data';
 
 
 type MediaItem = {
@@ -304,11 +305,6 @@ const formatYen = (value?: string) => {
     return `${numericValue.toLocaleString('ja-JP')} yên`;
 };
 
-const visaDetailsByVisaType: { [key: string]: string[] } = {
-    'Thực tập sinh kỹ năng': ['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Thực tập sinh 3 Go'],
-    'Kỹ năng đặc định': ['Đặc định đầu Việt', 'Đặc định đầu Nhật', 'Đặc định đi mới'],
-    'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật']
-};
 const visaTypes = Object.keys(visaDetailsByVisaType);
 
 
@@ -1575,14 +1571,14 @@ export default function CandidateProfilePage() {
                                     <Label id="HSCV_NGUYENVONG_DIALOG_CHITIETVISA_LABEL">Chi tiết loại hình visa mong muốn</Label>
                                     <Select id="HSCV_NGUYENVONG_DIALOG_CHITIETVISA_INPUT" value={temp.aspirations?.desiredVisaDetail || ''} onValueChange={value => handleChange('aspirations', 'desiredVisaDetail', value)} disabled={!temp.aspirations?.desiredVisaType}>
                                         <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
-                                        <SelectContent>{(visaDetailsByVisaType[temp.aspirations?.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd} value={vd}>{vd}</SelectItem>)}</SelectContent>
+                                        <SelectContent>{(visaDetailsByVisaType[temp.aspirations?.desiredVisaType as keyof typeof visaDetailsByVisaType] || []).map(vd => <SelectItem key={vd.slug} value={vd.name.vi}>{vd.name.vi}</SelectItem>)}</SelectContent>
                                     </Select>
                                 </div>
                                  <div className="space-y-2">
                                     <Label id="HSCV_NGUYENVONG_DIALOG_NGANHNGHE_LABEL">Ngành nghề mong muốn</Label>
-                                    <Select id="HSCV_NGUYENVONG_DIALOG_NGANHNGHE_INPUT" value={temp.desiredIndustry} onValueChange={value => handleChange('desiredIndustry', 'desiredIndustry', value)} disabled={!temp.aspirations?.desiredVisaType}>
+                                    <Select id="HSCV_NGUYENVONG_DIALOG_NGANHNGHE_INPUT" value={temp.desiredIndustry} onValueChange={value => handleChange('desiredIndustry' as any, null, value)} disabled={!temp.aspirations?.desiredVisaType}>
                                         <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
-                                        <SelectContent>{(industriesByJobType[temp.aspirations?.desiredVisaType as keyof typeof industriesByJobType] || allIndustries).map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}</SelectContent>
+                                        <SelectContent>{(industriesByJobType[temp.aspirations?.desiredVisaType as keyof typeof industriesByJobType] || allIndustries).map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}</SelectContent>
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
