@@ -149,17 +149,17 @@ export async function getJobs(filter: SearchFilters, page: number, limit: number
 
     if (!!workLocation && workLocation.length > 0) {
         const matchingLocations = Object.assign([], workLocation);
-        workLocation.forEach((location: string) => {
-            const locationLower = location.toLowerCase();
-            const province = PROVINCES.find((item) => item.label.toLowerCase() === locationLower && item.level > 0);
-            if (!!province) {
-                const parentCode = province.parentCode;
-                const parentRegion = PROVINCES?.find((item) => item.value === parentCode)?.label;
-                if (!!parentRegion && matchingLocations.indexOf(parentRegion) === -1) {
-                    matchingLocations.push(parentRegion);
-                }
-            }
-        });
+        // workLocation.forEach((location: string) => {
+        //     const locationLower = location.toLowerCase();
+        //     const province = PROVINCES.find((item) => item.label.toLowerCase() === locationLower && item.level > 0);
+        //     if (!!province) {
+        //         const parentCode = province.parentCode;
+        //         const parentRegion = PROVINCES?.find((item) => item.value === parentCode)?.label;
+        //         if (!!parentRegion && matchingLocations.indexOf(parentRegion) === -1) {
+        //             matchingLocations.push(parentRegion);
+        //         }
+        //     }
+        // });
         const shouldLocation: any = [
             {
                 bool: {
@@ -249,9 +249,30 @@ export async function getJobs(filter: SearchFilters, page: number, limit: number
             },
         });
     }
+    Object.keys(filter).forEach((key) => {
+        // Bỏ qua các trường đặc biệt đã xử lý ở trên
+        if (['visaDetail', 'workLocation', 'specialConditions','career','job', 'gender', 'age', 'interviewDateType', 'q','height','weight'].includes(key)) return;
+
+        const value = filter[key as keyof SearchFilters];
+        if (value === undefined || value === null || value === '' || value === 'all' || (Array.isArray(value) && value.length === 0)) return;
+        if (Array.isArray(value)) {
+            searchQuery.query.bool.must.push({
+                terms: {
+                    [`filter.${key}.keyword`]: value,
+                },
+            });
+        } else if (typeof value === 'string') {
+            searchQuery.query.bool.must.push({
+                term: {
+                    [`filter.${key}.keyword`]: value,
+                },
+            });
+        }
+    });
     console.log(JSON.stringify(searchQuery));
 
     try {
+        console.log(page)
         const results = await searchDocuments<any>(CANDIDATES_INDEX, searchQuery, page, limit);
         const mappedDocs: any[] = results.docs.map(doc => {
             const name = doc.fullName || doc.sender;

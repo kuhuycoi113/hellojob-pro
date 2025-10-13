@@ -332,7 +332,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     <div className="p-3 hover:bg-secondary/30">
                         <div className="flex flex-col items-stretch gap-4 md:flex-row">
                             <div className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
-                                <Image src={job.avatar || getJobImage(job.job,job.career)} alt={jobTitle} fill className="rounded-lg object-cover" />
+                                <Image src={job.avatar || getJobImage(job.job,job.career)} alt={jobTitle} fill sizes='100%' className="rounded-lg object-cover" />
                                 <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                                     <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                                     <span>{job.code}</span>

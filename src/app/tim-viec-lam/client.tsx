@@ -11,8 +11,6 @@ import { Loader2 } from 'lucide-react';
 import { SearchModule } from '@/components/job-search/search-module';
 import { industriesByJobType, type Industry, allIndustries } from '@/lib/industry-data';
 import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements, visionRequirements } from '@/lib/visa-data';
-import { recommendJobs } from '@/ai/flows/recommend-jobs-flow';
-import { JsonLdScript } from '@/components/json-ld-script';
 import { getJobs } from './action';
 
 
@@ -203,21 +201,26 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
     const [pageTitle, setPageTitle] = useState("Tìm kiếm việc làm tại Nhật Bản");
     const [pageDescription, setPageDescription] = useState("Tìm kiếm hàng ngàn cơ hội việc làm tại Nhật Bản.");
     const [totalJobs, setTotalJobs] = useState(0);
+    const [totalPage, setTotalPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const loadedPages = [1];
 
-    const runFilter = useCallback(async (filtersToApply: SearchFilters, sortOption: string) => {
-        const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, 1, 20);
-        setFilteredJobs(jobs);
+    const runFilter = useCallback(async (filtersToApply: SearchFilters, sortOption: string, page: number) => {
+        const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, page, 20);
+        setFilteredJobs(prevJobs => [...prevJobs, ...jobs]);
         setTotalJobs(total);
+        setTotalPage(totalPages);
     }, []);
 
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
     }, []);
 
 
+
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters, workLocation: [], specialConditions: [], otherSkillRequirement: [] };
         let sortOption = 'newest';
-
+        let page = 1;
         for (const [key, value] of readOnlySearchParams.entries()) {
             const internalKey = reverseKeyMap[key] || key;
             if (internalKey === 'sortBy') {
@@ -247,11 +250,12 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
                 }
             }
         }
-
+        setCurrentPage(1);
+        loadedPages.splice(0, loadedPages.length, 1);
         setSortBy(sortOption);
         setAppliedFilters(newFilters);
         setStagedFilters(newFilters);
-        runFilter(newFilters, sortOption);
+        runFilter(newFilters, sortOption, page);
         countStagedResults(newFilters);
         console.log('Filters from URL:', newFilters);
     }, [readOnlySearchParams, runFilter, countStagedResults]);
@@ -307,6 +311,13 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
         router.push(`/tim-viec-lam?${query.toString()}`);
     };
 
+    const loadMoreJobs = async () => {
+        const { docs: jobs } = await getJobs(appliedFilters, loadedPages[loadedPages.length - 1] + 1, 20);
+        setFilteredJobs(prevJobs => [...prevJobs, ...jobs]);
+        setCurrentPage(loadedPages[loadedPages.length - 1] + 1);
+        loadedPages.push(loadedPages[loadedPages.length - 1] + 1);
+    };
+
     const handleResetFilters = useCallback(() => {
     }, [router, runFilter, countStagedResults, readOnlySearchParams]);
 
@@ -338,6 +349,9 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
                 resultCount={stagedResultCount}
                 sortBy={sortBy}
                 onSortChange={handleSortChange}
+                loadMoreJobs={loadMoreJobs}
+                totalPage={totalPage}
+                currentPage={currentPage}
             />
         </div>
     );

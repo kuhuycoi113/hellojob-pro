@@ -62,35 +62,35 @@ type SearchResultsProps = {
     resultCount: number;
     sortBy: string;
     onSortChange: (value: string) => void;
+    loadMoreJobs: () => void;
+    totalPage: number;
+    currentPage: number;
 }
 
-export const SearchResults = ({ jobs,total, filters, appliedFilters, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange }: SearchResultsProps) => {
-    const [visibleJobsCount, setVisibleJobsCount] = useState(24);
+export const SearchResults = ({ jobs, total, filters, appliedFilters, totalPage, currentPage, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange, loadMoreJobs }: SearchResultsProps) => {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
 
-    const loadMoreJobs = useCallback(() => {
+    const nextPage = useCallback(async() => {
         setIsLoadingMore(true);
-        setTimeout(() => {
-            setVisibleJobsCount(prevCount => Math.min(prevCount + 24, jobs.length));
-            setIsLoadingMore(false);
-        }, 1000); // Simulate network delay
-    }, [jobs.length]);
+        await loadMoreJobs();
+        setIsLoadingMore(false);
+    }, []);
 
     const lastJobElementRef = useCallback((node: HTMLDivElement) => {
         if (isLoadingMore) return;
         if (observer.current) observer.current.disconnect();
 
         observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && visibleJobsCount < jobs.length) {
-                loadMoreJobs();
+            if (entries[0].isIntersecting && currentPage < totalPage) {
+                nextPage();
             }
         });
 
         if (node) observer.current.observe(node);
-    }, [isLoadingMore, loadMoreJobs, visibleJobsCount, jobs.length]);
-      
+    }, [isLoadingMore, currentPage, totalPage, nextPage]);
+
     const handleApply = () => {
         applyFilters();
         setIsSheetOpen(false); // Close sheet on apply
@@ -102,83 +102,83 @@ export const SearchResults = ({ jobs,total, filters, appliedFilters, onFilterCha
     }
 
     return (
-     <div className="w-full bg-secondary">
-        <div className="container mx-auto px-4 md:px-6 py-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8">
-                <div className="hidden md:block">
-                  <FilterSidebar filters={filters} appliedFilters={appliedFilters} onFilterChange={onFilterChange} onApply={applyFilters} onReset={resetFilters} resultCount={resultCount} />
-                </div>
-
-                <div className="md:col-span-3 lg:col-span-3">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">Kết quả ({total})</h2>
-                        <div className="flex items-center gap-2">
-                            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-                              <SheetTrigger asChild>
-                                 <Button variant="ghost" size="sm" className="flex items-center gap-1 md:hidden">
-                                    <ListFilter className="w-4 h-4" />
-                                    Lọc
-                                </Button>
-                              </SheetTrigger>
-                              <SheetContent>
-                                <SheetHeader>
-                                  <SheetTitle>Bộ lọc tìm kiếm</SheetTitle>
-                                  <SheetDescription>
-                                    Tinh chỉnh kết quả tìm kiếm của bạn.
-                                  </SheetDescription>
-                                </SheetHeader>
-                                <div className="py-4 h-[calc(100vh-8rem)] overflow-y-auto">
-                                  <FilterSidebar filters={filters} appliedFilters={appliedFilters} onFilterChange={onFilterChange} onApply={handleApply} onReset={handleReset} resultCount={resultCount}/>
-                                </div>
-                              </SheetContent>
-                            </Sheet>
-                            
-                             <Select value={sortBy} onValueChange={onSortChange}>
-                                <SelectTrigger id="SAPXEP01" className="w-auto md:w-[180px]">
-                                    <SelectValue placeholder="Sắp xếp theo" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="newest">Mới nhất</SelectItem>
-                                    <SelectItem value="salary_desc">Lương cơ bản: Cao {'>'} Thấp</SelectItem>
-                                    <SelectItem value="salary_asc">Lương cơ bản: Thấp {'>'} Cao</SelectItem>
-                                    <SelectItem value="net_salary_desc">Thực lĩnh: Cao {'>'} Thấp</SelectItem>
-                                    <SelectItem value="net_salary_asc">Thực lĩnh: Thấp {'>'} Cao</SelectItem>
-                                    <SelectItem value="fee_asc">Phí thấp {'>'} Cao</SelectItem>
-                                    <SelectItem value="fee_desc">Phí cao {'>'} Thấp</SelectItem>
-                                    <SelectItem value="interview_date_asc">Ngày phỏng vấn: Gần nhất</SelectItem>
-                                    <SelectItem value="interview_date_desc">Ngày phỏng vấn: Xa nhất</SelectItem>
-                                    <SelectItem value="has_image">Ưu tiên có ảnh</SelectItem>
-                                    <SelectItem value="has_video">Ưu tiên có video</SelectItem>
-                                    <SelectItem value="hot">Độ hot</SelectItem>
-                                    <SelectItem value="most_applicants">Nhiều người ứng tuyển</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+        <div className="w-full bg-secondary">
+            <div className="container mx-auto px-4 md:px-6 py-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8">
+                    <div className="hidden md:block">
+                        <FilterSidebar filters={filters} appliedFilters={appliedFilters} onFilterChange={onFilterChange} onApply={applyFilters} onReset={resetFilters} resultCount={resultCount} />
                     </div>
-                    {jobs.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-4">
-                        {jobs.slice(0, visibleJobsCount).map((job, index) => {
-                            const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} />;
-                            if (index === visibleJobsCount - 1) {
-                                return <div ref={lastJobElementRef} key={job.id}>{card}</div>
-                            }
-                            return <div key={job.id}>{card}</div>
-                        })}
+
+                    <div className="md:col-span-3 lg:col-span-3">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold">Kết quả ({total})</h2>
+                            <div className="flex items-center gap-2">
+                                <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                                    <SheetTrigger asChild>
+                                        <Button variant="ghost" size="sm" className="flex items-center gap-1 md:hidden">
+                                            <ListFilter className="w-4 h-4" />
+                                            Lọc
+                                        </Button>
+                                    </SheetTrigger>
+                                    <SheetContent>
+                                        <SheetHeader>
+                                            <SheetTitle>Bộ lọc tìm kiếm</SheetTitle>
+                                            <SheetDescription>
+                                                Tinh chỉnh kết quả tìm kiếm của bạn.
+                                            </SheetDescription>
+                                        </SheetHeader>
+                                        <div className="py-4 h-[calc(100vh-8rem)] overflow-y-auto">
+                                            <FilterSidebar filters={filters} appliedFilters={appliedFilters} onFilterChange={onFilterChange} onApply={handleApply} onReset={handleReset} resultCount={resultCount} />
+                                        </div>
+                                    </SheetContent>
+                                </Sheet>
+
+                                <Select value={sortBy} onValueChange={onSortChange}>
+                                    <SelectTrigger id="SAPXEP01" className="w-auto md:w-[180px]">
+                                        <SelectValue placeholder="Sắp xếp theo" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="newest">Mới nhất</SelectItem>
+                                        <SelectItem value="salary_desc">Lương cơ bản: Cao {'>'} Thấp</SelectItem>
+                                        <SelectItem value="salary_asc">Lương cơ bản: Thấp {'>'} Cao</SelectItem>
+                                        <SelectItem value="net_salary_desc">Thực lĩnh: Cao {'>'} Thấp</SelectItem>
+                                        <SelectItem value="net_salary_asc">Thực lĩnh: Thấp {'>'} Cao</SelectItem>
+                                        <SelectItem value="fee_asc">Phí thấp {'>'} Cao</SelectItem>
+                                        <SelectItem value="fee_desc">Phí cao {'>'} Thấp</SelectItem>
+                                        <SelectItem value="interview_date_asc">Ngày phỏng vấn: Gần nhất</SelectItem>
+                                        <SelectItem value="interview_date_desc">Ngày phỏng vấn: Xa nhất</SelectItem>
+                                        <SelectItem value="has_image">Ưu tiên có ảnh</SelectItem>
+                                        <SelectItem value="has_video">Ưu tiên có video</SelectItem>
+                                        <SelectItem value="hot">Độ hot</SelectItem>
+                                        <SelectItem value="most_applicants">Nhiều người ứng tuyển</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
-                    ) : (
-                        <div className="text-center py-16 bg-background rounded-lg">
-                            <p className="text-lg font-semibold text-muted-foreground">Không tìm thấy công việc nào phù hợp.</p>
-                            <p className="text-sm text-muted-foreground mt-2">Hãy thử thay đổi bộ lọc hoặc tìm kiếm lại.</p>
-                        </div>
-                    )}
-                    {isLoadingMore && (
-                        <div className="flex justify-center items-center p-4">
-                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        </div>
-                    )}
+                        {jobs.length > 0 ? (
+                            <div className="grid grid-cols-1 gap-4">
+                                {jobs.map((job, index) => {
+                                    const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} />;
+                                    if (index === jobs.length - 3) {
+                                        return <div ref={lastJobElementRef} key={job.id}>{card}</div>
+                                    }
+                                    return <div key={job.id}>{card}</div>
+                                })}
+                            </div>
+                        ) : (
+                            <div className="text-center py-16 bg-background rounded-lg">
+                                <p className="text-lg font-semibold text-muted-foreground">Không tìm thấy công việc nào phù hợp.</p>
+                                <p className="text-sm text-muted-foreground mt-2">Hãy thử thay đổi bộ lọc hoặc tìm kiếm lại.</p>
+                            </div>
+                        )}
+                        {isLoadingMore && (
+                            <div className="flex justify-center items-center p-4">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
-     </div>
     )
-  };
+};

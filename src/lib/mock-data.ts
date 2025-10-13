@@ -8,26 +8,27 @@ import { allJapanLocations } from './location-data';
 
 export interface Job {
     id: string;
+    code?: string
     isRecording: boolean;
     image: {
-      src: string;
-      type: 'minhhoa' | 'thucte';
+        src: string;
+        type: 'minhhoa' | 'thucte';
     };
     likes: string;
     salary: {
-      actual?: string;
-      basic: string;
-      annualIncome?: string;
-      annualBonus?: string;
+        actual?: string;
+        basic: string;
+        annualIncome?: string;
+        annualBonus?: string;
     };
     title: string;
     support?: string[];
     recruiter: {
-      id: string; // Add recruiter ID
-      name: string;
-      avatarUrl: string; // Changed from avatar
-      company: string;
-      mainExpertise?: string;
+        id: string; // Add recruiter ID
+        name: string;
+        avatarUrl: string; // Changed from avatar
+        company: string;
+        mainExpertise?: string;
     };
     status: 'Đang tuyển' | 'Tạm dừng';
     interviewDateOffset: number; // Offset from today in days
@@ -83,19 +84,19 @@ const tattooOptions = ["Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "
 
 // Fee limits
 export const feeLimits: { [key: string]: number } = {
-  'Thực tập sinh 3 năm': 4200,
-  'Thực tập sinh 1 năm': 1800,
-  'Đặc định đầu Việt': 3000,
-  'Đặc định đi mới': 4200,
-  'Kỹ sư, tri thức đầu Việt': 3800,
+    'Thực tập sinh 3 năm': 4200,
+    'Thực tập sinh 1 năm': 1800,
+    'Đặc định đầu Việt': 3000,
+    'Đặc định đi mới': 4200,
+    'Kỹ sư, tri thức đầu Việt': 3800,
 };
 
 export const publicFeeLimits: { [key: string]: number } = {
-  'Thực tập sinh 3 năm': 3800,
-  'Thực tập sinh 1 năm': 1500,
-  'Đặc định đầu Việt': 2500,
-  'Đặc định đi mới': 3800,
-  'Kỹ sư, tri thức đầu Việt': 3800,
+    'Thực tập sinh 3 năm': 3800,
+    'Thực tập sinh 1 năm': 1500,
+    'Đặc định đầu Việt': 2500,
+    'Đặc định đi mới': 3800,
+    'Kỹ sư, tri thức đầu Việt': 3800,
 };
 
 const otherSkills = [
@@ -173,7 +174,7 @@ const generateUniqueJobId = (index: number): string => {
 
 const getRandomItem = <T>(arr: T[], index: number): T => {
     if (!arr || arr.length === 0) {
-        return null as any; 
+        return null as any;
     }
     return arr[index % arr.length];
 };
@@ -198,18 +199,18 @@ const createJobList = (): Job[] => {
         for (const detail of details) {
             const industries = industriesByJobType[visaType.slug];
             if (!industries) continue;
-            
+
             for (const industry of industries) {
                 const keywords = industry.keywords && industry.keywords.length > 0 ? [...industry.keywords] : [industry.name];
-                
+
                 for (const keyword of keywords) {
                     const location = getRandomItem(locations, jobIndex);
                     const gender = getRandomItem(['Nam', 'Nữ', 'Cả nam và nữ'], jobIndex) as 'Nam' | 'Nữ' | 'Cả nam và nữ';
                     const quantity = (jobIndex % 10) + 1;
                     const languageRequirement = getRandomItem(languageLevels, jobIndex);
-                    
+
                     const title = `${keyword}, ${location}, tuyển ${quantity} ${gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender}`;
-                    
+
                     const findMatchingConsultant = () => {
                         const lowerCaseIndustry = industry.name.toLowerCase();
                         const lowerCaseVisaType = visaType.name.toLowerCase();
@@ -219,7 +220,7 @@ const createJobList = (): Job[] => {
                         });
                         return expertConsultants.length > 0 ? getRandomItem(expertConsultants, jobIndex) : getRandomItem(consultants, jobIndex);
                     };
-                    
+
                     const assignedConsultant = findMatchingConsultant();
 
                     const imageCase = jobIndex % 5;
@@ -234,10 +235,10 @@ const createJobList = (): Job[] => {
                     } else if (imageCase === 2) {
                         jobImages.push({ src: getRandomItem(workImagePlaceholders, jobIndex), alt: 'Ảnh công việc', dataAiHint: 'workplace action' });
                     } else if (imageCase === 3) {
-                         jobImages.push({ src: getRandomItem(jobOrderImages, jobIndex), alt: 'Ảnh đơn hàng', dataAiHint: 'job order form' });
+                        jobImages.push({ src: getRandomItem(jobOrderImages, jobIndex), alt: 'Ảnh đơn hàng', dataAiHint: 'job order form' });
                     }
 
-                    
+
                     const detailSlug = detail.slug;
                     const applicableConditions = allSpecialConditions.filter(cond => {
                         const conditionList = conditionsByVisaDetail[detailSlug as keyof typeof conditionsByVisaDetail];
@@ -262,11 +263,11 @@ const createJobList = (): Job[] => {
                             selectedOtherSkills.push(otherSkills[(otherSkillsStartIndex + j) % otherSkills.length]);
                         }
                     }
-                    
+
                     const otherSkillsText = selectedOtherSkills.map(s => `<li>${s.name}</li>`).join('');
                     const isEngineer = visaType.name.includes('Kỹ sư');
                     const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
-                    
+
                     let netFee: string | undefined = undefined;
                     let netFeeNoTicket: string | undefined = undefined;
                     let netFeeWithTuition: string | undefined = undefined;
@@ -283,14 +284,14 @@ const createJobList = (): Job[] => {
                                 netFee = String(feeValue);
                             }
                         } else {
-                           if (jobIndex % 2 === 0) { // Phí có vé
+                            if (jobIndex % 2 === 0) { // Phí có vé
                                 netFee = String(feeValue);
                             } else { // Phí không vé
                                 netFeeNoTicket = String(feeValue);
                             }
                         }
                     }
-                    
+
                     const isTTS = visaType.name.includes('Thực tập sinh');
 
                     const job: Job = {
@@ -367,20 +368,20 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             const details = visaDetailsByVisaType[visaType.slug];
             if (!details) continue;
             const detail = getRandomItem(details, jobIndex);
-    
+
             const industries = industriesByJobType[visaType.slug];
             if (!industries) continue;
             const industry = getRandomItem(industries, jobIndex);
-    
+
             const keywords = industry.keywords && industry.keywords.length > 0 ? [...industry.keywords] : [industry.name];
             const keyword = getRandomItem(keywords, jobIndex);
-    
+
             const gender = getRandomItem(['Nam', 'Nữ', 'Cả nam và nữ'], jobIndex) as 'Nam' | 'Nữ' | 'Cả nam và nữ';
             const quantity = (jobIndex % 10) + 1;
             const languageRequirement = getRandomItem(languageLevels, jobIndex);
-            
+
             const title = `${keyword}, ${location}, tuyển ${quantity} ${gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender}`;
-            
+
             const findMatchingConsultant = () => {
                 const lowerCaseIndustry = industry.name.toLowerCase();
                 const lowerCaseVisaType = visaType.name.toLowerCase();
@@ -390,12 +391,12 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 });
                 return expertConsultants.length > 0 ? getRandomItem(expertConsultants, jobIndex) : getRandomItem(consultants, jobIndex);
             };
-            
+
             const assignedConsultant = findMatchingConsultant();
-            
+
             const isTTS = visaType.name.includes('Thực tập sinh');
             const isEngineer = visaType.name.includes('Kỹ sư');
-    
+
             const imageCase = jobIndex % 5;
             let jobImages = [];
             if (imageCase === 0) {
@@ -410,13 +411,13 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             } else if (imageCase === 3) {
                 jobImages.push({ src: getRandomItem(jobOrderImages, jobIndex), alt: 'Ảnh đơn hàng', dataAiHint: 'job order form' });
             }
-    
+
             const detailSlug = detail.slug;
             const applicableConditions = allSpecialConditions.filter(cond => {
                 const conditionList = conditionsByVisaDetail[detailSlug as keyof typeof conditionsByVisaDetail];
                 return conditionList ? conditionList.includes(cond.name) : false;
             });
-    
+
             const selectedConditionsCount = 2 + (jobIndex % 2);
             const startIndexCond = jobIndex % (applicableConditions.length > 0 ? applicableConditions.length : 1);
             const selectedConditions = [];
@@ -426,7 +427,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 }
             }
             const specialConditions = selectedConditions.map(c => c.name).join(', ');
-    
+
             const selectedOtherSkillsCount = 1 + (jobIndex % 2);
             const otherSkillsStartIndex = jobIndex % (otherSkills.length > 0 ? otherSkills.length : 1);
             const selectedOtherSkills = [];
@@ -435,10 +436,10 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                     selectedOtherSkills.push(otherSkills[(otherSkillsStartIndex + j) % otherSkills.length]);
                 }
             }
-            
+
             const otherSkillsText = selectedOtherSkills.map(s => `<li>${s.name}</li>`).join('');
             const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
-    
+
             let netFee: string | undefined = undefined;
             let netFeeNoTicket: string | undefined = undefined;
             let netFeeWithTuition: string | undefined = undefined;
@@ -455,7 +456,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                         netFee = String(feeValue);
                     }
                 } else {
-                   if (jobIndex % 2 === 0) { // Phí có vé
+                    if (jobIndex % 2 === 0) { // Phí có vé
                         netFee = String(feeValue);
                     } else { // Phí không vé
                         netFeeNoTicket = String(feeValue);
@@ -537,7 +538,7 @@ let newlyAddedJobs: Job[] = [];
 let currentIndex = initialJobs.length;
 
 missingPrefectures.forEach((prefecture, i) => {
-    const numJobsToCreate = 5 + ((currentIndex + i) % 8); 
+    const numJobsToCreate = 5 + ((currentIndex + i) % 8);
     const jobsForPrefecture = createJobsForLocations([prefecture], numJobsToCreate, currentIndex);
     newlyAddedJobs.push(...jobsForPrefecture);
     currentIndex += numJobsToCreate;
@@ -545,12 +546,12 @@ missingPrefectures.forEach((prefecture, i) => {
 
 // List of visa details that have special fee handling
 export const controlledFeeVisas = [
-  'Thực tập sinh 3 năm',
-  'Thực tập sinh 1 năm',
-  'Đặc định đi mới',
-  'Kỹ sư, tri thức đầu Việt',
-  'Đặc định đầu Việt'
+    'Thực tập sinh 3 năm',
+    'Thực tập sinh 1 năm',
+    'Đặc định đi mới',
+    'Kỹ sư, tri thức đầu Việt',
+    'Đặc định đầu Việt'
 ];
 
 export const jobData: Job[] = [...initialJobs, ...newlyAddedJobs];
-    
+
