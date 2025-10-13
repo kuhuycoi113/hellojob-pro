@@ -1039,47 +1039,6 @@ export default function CandidateProfilePage() {
   };
   
 
-  const BodyPhotosCarousel = ({items, onImageChange}: {items: MediaItem[], onImageChange: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void}) => (
-    <Card id="HSCV_ANHHINHTHE">
-        <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="font-headline text-xl flex items-center"><ImageIcon className="mr-3 text-primary"/> {t.bodyPhotos}</CardTitle>
-             <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant="ghost" size="icon"><PlusCircle className="h-5 w-5"/></Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Cập nhật ảnh hình thể</DialogTitle>
-                        <DialogDescription>Tải lên các ảnh theo yêu cầu để hoàn thiện hồ sơ.</DialogDescription>
-                    </DialogHeader>
-                </DialogContent>
-             </Dialog>
-        </CardHeader>
-        <CardContent>
-            <Carousel className="w-full" opts={{align: "start"}}>
-                <CarouselContent className="-ml-2 md:-ml-4">
-                    {items.map((item, index) => (
-                        <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/3 md:basis-1/4 lg:basis-1/5">
-                           <div className="space-y-2">
-                                <div className="relative group aspect-[3/4] rounded-lg overflow-hidden border">
-                                     <Image src={item.src} alt={item.alt} fill className="object-cover" data-ai-hint={item['data-ai-hint']} />
-                                     <Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                        <Camera className="h-8 w-8 text-white"/>
-                                     </Label>
-                                     <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => onImageChange(e, index)} />
-                                </div>
-                                <p className="text-center text-sm font-semibold text-muted-foreground">{item.alt}</p>
-                            </div>
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-                <CarouselPrevious className="hidden md:flex" />
-                <CarouselNext className="hidden md:flex" />
-            </Carousel>
-        </CardContent>
-    </Card>
-  )
-
   const SendOptionsDialog = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
     
     const handleSendToConsultant = () => {
@@ -1230,10 +1189,6 @@ export default function CandidateProfilePage() {
                   </CardContent>
                 </Card>
 
-                
-                {candidate.images.length > 0 && <BodyPhotosCarousel items={candidate.images} onImageChange={(e, index) => handleMediaChange('image', e, index)} />}
-
-
                 <Card id="HSCV_KINHNGHIEM">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><Briefcase className="mr-3 text-primary"/>{t.workExperience}</CardTitle>
@@ -1357,7 +1312,7 @@ export default function CandidateProfilePage() {
                   </CardContent>
                 </Card>
                 
-                <Card id="HSCV_GIAYTO">
+                 <Card id="HSCV_GIAYTO">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="font-headline text-xl flex items-center"><FileArchive className="mr-3 text-primary"/> {t.documentsSection}</CardTitle>
                      <EditDialog
@@ -1867,5 +1822,6 @@ const DocumentGrid = ({
     
 
     
+
 
 
