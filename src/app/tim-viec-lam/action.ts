@@ -1,14 +1,15 @@
 'use server';
 
 import { SearchFilters } from "@/components/job-search/search-results";
-import { searchDocuments } from "@/lib/elasticsearch";
+import { countDocuments, searchDocuments } from "@/lib/elasticsearch";
 import { PaginatedResponse } from "@/lib/types";
 import { visaMapping } from "@/lib/visa-data";
 import JOBS from '@/lib/jobs.json';
 const CANDIDATES_INDEX = 'hellojobv5-job-crawled';
 import PROVINCES from "@/lib/provinces.json";
 
-export async function getJobs(filter: SearchFilters, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {
+function createSearchQuery(filter: SearchFilters): any {
+
     const {
         q, visaDetail, career, workLocation, job, interviewLocation, quantity, netFee, netFeeNoTicket, interviewRounds, interviewDate, interviewDateType,
         basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
@@ -251,7 +252,7 @@ export async function getJobs(filter: SearchFilters, page: number, limit: number
     }
     Object.keys(filter).forEach((key) => {
         // Bỏ qua các trường đặc biệt đã xử lý ở trên
-        if (['visaDetail', 'workLocation', 'specialConditions','career','job', 'gender', 'age', 'interviewDateType', 'q','height','weight'].includes(key)) return;
+        if (['visa', 'visaDetail', 'workLocation', 'specialConditions', 'career', 'job', 'gender', 'age', 'interviewDateType', 'q', 'height', 'weight'].includes(key)) return;
 
         const value = filter[key as keyof SearchFilters];
         if (value === undefined || value === null || value === '' || value === 'all' || (Array.isArray(value) && value.length === 0)) return;
@@ -269,11 +270,13 @@ export async function getJobs(filter: SearchFilters, page: number, limit: number
             });
         }
     });
-    console.log(JSON.stringify(searchQuery));
+    return searchQuery;
+}
+export async function getJobs(filter: SearchFilters, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {
 
     try {
-        console.log(page)
-        const results = await searchDocuments<any>(CANDIDATES_INDEX, searchQuery, page, limit);
+        const query = createSearchQuery(filter);
+        const results = await searchDocuments<any>(CANDIDATES_INDEX, query, page, limit);
         const mappedDocs: any[] = results.docs.map(doc => {
             const name = doc.fullName || doc.sender;
             return {
@@ -290,5 +293,19 @@ export async function getJobs(filter: SearchFilters, page: number, limit: number
             console.log(`Index ${CANDIDATES_INDEX} not found. Returning empty results.`);
         }
         return { docs: [], total: 0, page, limit, totalPages: 0 };
+    }
+}
+export async function countJobs(filter: SearchFilters): Promise<number> {
+    try {
+        const query = createSearchQuery(filter);
+        delete query.sort;
+        const total = await countDocuments(CANDIDATES_INDEX, query);
+        return total;
+    } catch (error: any) {
+        console.error("Failed to fetch new candidates from Elasticsearch:", error);
+        if (error.meta?.body?.error?.type === 'index_not_found_exception') {
+            console.log(`Index ${CANDIDATES_INDEX} not found. Returning empty results.`);
+        }
+        return 0;
     }
 }

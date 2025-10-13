@@ -1226,7 +1226,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                 <div className="grid grid-cols-3 gap-2 w-full">
                     <Button variant="outline" onClick={onReset} className="col-span-1">Xóa</Button>
                     <Button className="w-full bg-primary text-white col-span-2" onClick={onApply}>
-                        Áp dụng <Badge variant="secondary" className="ml-2">{42753}</Badge>
+                        Áp dụng <Badge variant="secondary" className="ml-2" id='filter-staged-count-badge'>0</Badge>
                     </Button>
                 </div>
             </div>

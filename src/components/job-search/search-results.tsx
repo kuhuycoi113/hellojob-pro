@@ -159,7 +159,8 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, totalPage,
                             <div className="grid grid-cols-1 gap-4">
                                 {jobs.map((job, index) => {
                                     const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} />;
-                                    if (index === jobs.length - 3) {
+                                    if (index === jobs.length - 1) {
+                                        return <button disabled={isLoadingMore} key={job.id} onClick={nextPage}>Load more</button>
                                         return <div ref={lastJobElementRef} key={job.id}>{card}</div>
                                     }
                                     return <div key={job.id}>{card}</div>

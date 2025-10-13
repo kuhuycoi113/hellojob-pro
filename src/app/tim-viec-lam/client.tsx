@@ -2,16 +2,13 @@
 
 'use client';
 
-import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { SearchResults, type SearchFilters, experienceYears } from '@/components/job-search/search-results';
-import { Job, jobData } from '@/lib/mock-data';
-import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/location-data';
-import { Loader2 } from 'lucide-react';
+import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
+import { Job } from '@/lib/mock-data';
 import { SearchModule } from '@/components/job-search/search-module';
-import { industriesByJobType, type Industry, allIndustries } from '@/lib/industry-data';
-import { visaDetailsByVisaType, japanJobTypes, allSpecialConditions, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements, visionRequirements } from '@/lib/visa-data';
-import { getJobs } from './action';
+import { allSpecialConditions } from '@/lib/visa-data';
+import { countJobs, getJobs } from './action';
 
 
 const initialSearchFilters: SearchFilters = {
@@ -197,7 +194,7 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
     const [sortBy, setSortBy] = useState('newest');
 
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-    const [stagedResultCount, setStagedResultCount] = useState<number>(jobData.length);
+    const [stagedResultCount, setStagedResultCount] = useState<number>(0);
     const [pageTitle, setPageTitle] = useState("Tìm kiếm việc làm tại Nhật Bản");
     const [pageDescription, setPageDescription] = useState("Tìm kiếm hàng ngàn cơ hội việc làm tại Nhật Bản.");
     const [totalJobs, setTotalJobs] = useState(0);
@@ -207,12 +204,15 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
 
     const runFilter = useCallback(async (filtersToApply: SearchFilters, sortOption: string, page: number) => {
         const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, page, 20);
-        setFilteredJobs(prevJobs => [...prevJobs, ...jobs]);
+        setFilteredJobs(jobs);
         setTotalJobs(total);
         setTotalPage(totalPages);
     }, []);
 
-    const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
+    const countStagedResults = useCallback(async (filtersToCount: SearchFilters) => {
+        const total = await countJobs(filtersToCount);
+        document.getElementById('filter-staged-count-badge')!.textContent = total.toString();
+        setStagedResultCount(total);
     }, []);
 
 
@@ -220,7 +220,6 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
     useEffect(() => {
         const newFilters: SearchFilters = { ...initialSearchFilters, workLocation: [], specialConditions: [], otherSkillRequirement: [] };
         let sortOption = 'newest';
-        let page = 1;
         for (const [key, value] of readOnlySearchParams.entries()) {
             const internalKey = reverseKeyMap[key] || key;
             if (internalKey === 'sortBy') {
@@ -250,23 +249,25 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
                 }
             }
         }
-        setCurrentPage(1);
-        loadedPages.splice(0, loadedPages.length, 1);
-        setSortBy(sortOption);
-        setAppliedFilters(newFilters);
-        setStagedFilters(newFilters);
-        runFilter(newFilters, sortOption, page);
-        countStagedResults(newFilters);
-        console.log('Filters from URL:', newFilters);
+        const updateFilters = async () => {
+            setCurrentPage(1);
+            loadedPages.splice(0, loadedPages.length, 1);
+            setSortBy(sortOption);
+            setAppliedFilters(newFilters);
+            setStagedFilters(newFilters);
+            await runFilter(newFilters, sortOption, 1);
+            console.log('Filters from URL:', newFilters);
+        };
+        updateFilters();
     }, [readOnlySearchParams, runFilter, countStagedResults]);
 
     const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
-        setStagedFilters(prev => {
-            const updated = { ...prev, ...newFilters };
-            countStagedResults(updated);
-            return updated;
-        });
-    }, [countStagedResults]);
+        setStagedFilters(prev => ({ ...prev, ...newFilters }));
+    }, []);
+
+    useEffect(() => {
+        countStagedResults(stagedFilters);
+    }, [stagedFilters]);
 
 
 
@@ -312,10 +313,11 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
     };
 
     const loadMoreJobs = async () => {
-        const { docs: jobs } = await getJobs(appliedFilters, loadedPages[loadedPages.length - 1] + 1, 20);
-        setFilteredJobs(prevJobs => [...prevJobs, ...jobs]);
-        setCurrentPage(loadedPages[loadedPages.length - 1] + 1);
-        loadedPages.push(loadedPages[loadedPages.length - 1] + 1);
+        const nextPage = loadedPages[loadedPages.length - 1] + 1;
+        const { docs: jobs } = await getJobs(appliedFilters, nextPage, 20);
+        setFilteredJobs([...filteredJobs, ...jobs]);
+        setCurrentPage(nextPage);
+        loadedPages.push(nextPage);
     };
 
     const handleResetFilters = useCallback(() => {

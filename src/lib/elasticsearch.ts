@@ -142,3 +142,13 @@ export const searchDocuments = async <T = any>(
         totalPages: Math.ceil(total / limit),
     };
 };
+export const countDocuments = async (
+  index: string,
+  query: RequestBody
+): Promise<number> => {
+  const response = await client.count({
+    index,
+    body: query,
+  });
+  return (response.body.count as number) ?? 0;
+};
