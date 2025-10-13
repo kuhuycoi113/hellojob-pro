@@ -869,7 +869,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         const merged = { ...base };
         for (const key in updates) {
             if (updates[key] !== null && updates[key] !== undefined) {
-                 if (typeof updates[key] === 'object' && !Array.isArray(updates[key]) && key !== 'industries') {
+                 if (key === 'industries' && updates.location) {
+                    updates.industries.secondary = { vi: updates.location, ja: updates.location, en: updates.location };
+                    delete updates.location;
+                 }
+                 if (typeof updates[key] === 'object' && !Array.isArray(updates[key])) {
                     merged[key] = { ...(base[key] || {}), ...updates[key] };
                  } else {
                     merged[key] = updates[key];
