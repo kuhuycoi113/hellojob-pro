@@ -789,10 +789,15 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             name = lang === 'ja' ? regionKanjiMap[region?.name as keyof typeof regionKanjiMap] : region?.name;
         } else {
              item = dataMap[context]?.find((i: any) => i.slug === slug);
-             name = item?.name[lang] || item?.name?.vi || item?.name || slug;
+             if (item?.name && typeof item.name === 'object') {
+                 name = item.name[lang] || item.name.vi;
+             } else {
+                 name = item?.name || slug;
+             }
         }
         return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>;
     });
+
     return <div id={
         context === 'visaType' ? 'DKLV_LOAIHINH_DISPLAY' :
         context === 'visaDetail' ? 'DKLV_CHITIETVISA_DISPLAY' :
@@ -1471,8 +1476,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             {employer.logo && <AvatarImage src={employer.logo} />}
                             <AvatarFallback>{(employer.name?.[lang] || 'A').charAt(0)}</AvatarFallback>
                           </Avatar>
-                           {!isConfirmationMode && (
-                           <Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
+                           {!isConfirmationMode && (<Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
                               <Camera className="h-4 w-4 text-secondary-foreground" />
                            </Label>)}
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} disabled={isConfirmationMode}/>
