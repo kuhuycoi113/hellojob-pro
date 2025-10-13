@@ -34,8 +34,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
-import { visaDetailsByVisaType } from '@/lib/visa-data';
-import { japanRegions } from '@/lib/location-data';
+import { visaDetailsByVisaType, japanJobTypes as localizedJapanJobTypes } from '@/lib/visa-data';
+import { japanRegions, allJapanLocations } from '@/lib/location-data';
 import { Skeleton } from '@/components/ui/skeleton';
 
 
@@ -459,12 +459,6 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, 
     </Card>
 );
 
-const localizedJapanJobTypes = [
-    { name: { vi: 'Thực tập sinh kỹ năng', ja: '技能実習', en: 'Technical Intern Training' }, slug: 'thuc-tap-sinh-ky-nang' },
-    { name: { vi: 'Kỹ năng đặc định', ja: '特定技能', en: 'Specified Skilled Worker' }, slug: 'ky-nang-dac-dinh' },
-    { name: { vi: 'Kỹ sư, tri thức', ja: '技術・人文知識・国際業務', en: 'Engineer/Specialist' }, slug: 'ky-su-tri-thuc' }
-];
-
 const regionKanjiMap: { [key: string]: string } = {
   Hokkaido: '北海道',
   Tohoku: '東北',
@@ -743,9 +737,9 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     });
   }, [lang]);
 
-  const getArrayValue = useCallback((value: { [key in Language]?: string[] }, context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
-    const items = value?.[lang] || [];
-    if (items.length === 0) {
+  const getArrayValue = useCallback((value: { [key in Language]?: string[] } | string[], context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
+    const items = (typeof value === 'object' && !Array.isArray(value) ? value?.[lang] : value) || [];
+    if (!items || items.length === 0) {
       const clickHandler = () => {
           if(context === 'interest' || context === 'valueInterest') {
               handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest');
@@ -829,6 +823,33 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       router.push(fromPath);
   }
 
+  const ensureNestedObjects = (data: any) => {
+    data.name = data.name || { vi: '', ja: '', en: '' };
+    data.type = data.type || { vi: '', ja: '', en: '' };
+    data.location = data.location || { vi: '', ja: '', en: '' };
+    data.about = data.about || { vi: '', ja: '', en: '' };
+    data.info = data.info || { ...emptyEmployerData.info };
+    data.info.size = data.info.size || { vi: '', ja: '', en: '' };
+    data.visaType = data.visaType || { vi: [], ja: [], en: [] };
+    data.visaDetail = data.visaDetail || { vi: [], ja: [], en: [] };
+    data.industries = data.industries || { main: { vi: [], ja: [], en: [] }, secondary: { vi: [], ja: [], en: [] } };
+    data.history = data.history || [];
+    data.benefits = data.benefits || [];
+    data.images = data.images || [];
+    data.interest = data.interest || { vi: [], ja: [], en: [] };
+    data.valueInterest = data.valueInterest || [];
+    // Correctly map location to industries.secondary
+    if (data.location && Array.isArray(data.location) && (!data.industries.secondary?.vi?.length || data.industries.secondary?.vi.length === 0)) {
+        data.industries.secondary = {
+            vi: data.location,
+            ja: data.location,
+            en: data.location,
+        };
+    }
+    return data;
+  };
+
+
   React.useEffect(() => {
     const partnerIdParam = searchParams.get('partnerId');
     if (!partnerIdParam) {
@@ -844,12 +865,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     
     let finalData;
 
-    // Define a function to merge data safely
     const mergeData = (base: any, updates: any) => {
         const merged = { ...base };
         for (const key in updates) {
             if (updates[key] !== null && updates[key] !== undefined) {
-                 if (typeof updates[key] === 'object' && !Array.isArray(updates[key])) {
+                 if (typeof updates[key] === 'object' && !Array.isArray(updates[key]) && key !== 'industries') {
                     merged[key] = { ...(base[key] || {}), ...updates[key] };
                  } else {
                     merged[key] = updates[key];
@@ -861,11 +881,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
     if (existingProfileRaw) {
         const existingProfile = JSON.parse(existingProfileRaw);
-        finalData = { ...emptyEmployerData, ...existingProfile }; // Start with a full default structure
+        finalData = { ...emptyEmployerData, ...existingProfile };
 
         if (tempOnboardingDataRaw) {
             const tempOnboardingData = JSON.parse(tempOnboardingDataRaw);
-            // Merge onboarding data into the existing profile
             finalData = mergeData(finalData, tempOnboardingData);
 
             localStorage.setItem(`recruiterProfile_${partnerIdParam}`, JSON.stringify(finalData));
@@ -882,25 +901,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         finalData = { ...emptyEmployerData, id: partnerIdParam };
         setIsUpdateMode(false);
     }
-    
-    // Ensure all nested objects exist to prevent runtime errors
-    const ensureNestedObjects = (data: any) => {
-        data.name = data.name || { vi: '', ja: '', en: '' };
-        data.type = data.type || { vi: '', ja: '', en: '' };
-        data.location = data.location || { vi: '', ja: '', en: '' };
-        data.about = data.about || { vi: '', ja: '', en: '' };
-        data.info = data.info || { ...emptyEmployerData.info };
-        data.info.size = data.info.size || { vi: '', ja: '', en: '' };
-        data.visaType = data.visaType || { vi: [], ja: [], en: [] };
-        data.visaDetail = data.visaDetail || { vi: [], ja: [], en: [] };
-        data.industries = data.industries || { main: { vi: [], ja: [], en: [] }, secondary: { vi: [], ja: [], en: [] } };
-        data.history = data.history || [];
-        data.benefits = data.benefits || [];
-        data.images = data.images || [];
-        data.interest = data.interest || { vi: [], ja: [], en: [] };
-        data.valueInterest = data.valueInterest || [];
-        return data;
-    };
     
     finalData = ensureNestedObjects(finalData);
     
@@ -1515,7 +1515,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
               <div className="lg:col-span-2 space-y-8">
                   <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                        <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">
-                            {employer.about?.[lang] || (
+                            {employer?.about?.[lang] || (
                                 <span className="italic">
                                     {t.notUpdated}{' '}
                                     <button
@@ -1703,5 +1703,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
-
-    
