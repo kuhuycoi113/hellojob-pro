@@ -16,10 +16,10 @@ export type SearchFilters = {
     q?: string;
     visa: string;
     visaDetail: string;
-    industry: string;
-    location: string[];
+    career: string;
+    workLocation: string[];
     interviewLocation: string;
-    jobDetail?: string;
+    job?: string;
     experienceRequirement?: string;
     gender?: 'nam' | 'nu' | '';
     height?: [number, number];

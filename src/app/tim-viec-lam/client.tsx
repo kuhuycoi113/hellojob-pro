@@ -20,10 +20,10 @@ const initialSearchFilters: SearchFilters = {
     q: '',
     visa: '',
     visaDetail: '',
-    industry: '',
-    location: [],
+    career: '',
+    workLocation: [],
     interviewLocation: '',
-    jobDetail: '',
+    job: '',
     experienceRequirement: '',
     gender: '',
     height: [135, 210],
@@ -57,10 +57,10 @@ const keyMap: { [key: string]: string } = {
     q: 'q',
     visa: 'loai-visa',
     visaDetail: 'chi-tiet-loai-hinh-visa',
-    industry: 'nganh-nghe',
-    location: 'dia-diem',
+    career: 'nganh-nghe',
+    workLocation: 'dia-diem',
     interviewLocation: 'dia-diem-phong-van',
-    jobDetail: 'chi-tiet-cong-viec',
+    job: 'chi-tiet-cong-viec',
     gender: 'gioi-tinh',
     age: 'do-tuoi',
     height: 'chieu-cao',
@@ -204,13 +204,56 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
     const [pageDescription, setPageDescription] = useState("Tìm kiếm hàng ngàn cơ hội việc làm tại Nhật Bản.");
     const [totalJobs, setTotalJobs] = useState(0);
 
-    const runFilter = useCallback((filtersToApply: SearchFilters, sortOption: string) => {
+    const runFilter = useCallback(async (filtersToApply: SearchFilters, sortOption: string) => {
+        const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, 1, 20);
+        setFilteredJobs(jobs);
+        setTotalJobs(total);
     }, []);
 
     const countStagedResults = useCallback((filtersToCount: SearchFilters) => {
     }, []);
 
+
     useEffect(() => {
+        const newFilters: SearchFilters = { ...initialSearchFilters, workLocation: [], specialConditions: [], otherSkillRequirement: [] };
+        let sortOption = 'newest';
+
+        for (const [key, value] of readOnlySearchParams.entries()) {
+            const internalKey = reverseKeyMap[key] || key;
+            if (internalKey === 'sortBy') {
+                sortOption = reverseSortOptionMap[value] || 'newest';
+            } else if (internalKey === 'workLocation' || internalKey === 'otherSkillRequirement') {
+                const currentValues = newFilters[internalKey as 'workLocation' | 'otherSkillRequirement'] || [];
+                // @ts-ignore
+                newFilters[internalKey as 'workLocation' | 'otherSkillRequirement'] = [...currentValues, value];
+            } else if (internalKey === 'age' || internalKey === 'height' || internalKey === 'weight') {
+                const values = readOnlySearchParams.getAll(key);
+                if (values.length === 2) {
+                    // @ts-ignore
+                    newFilters[internalKey] = [parseInt(values[0], 10), parseInt(values[1], 10)];
+                }
+            } else if (internalKey === 'specialConditions') {
+                const currentConditions = newFilters.specialConditions || [];
+                const conditionName = allSpecialConditions.find(c => c.slug === value)?.name;
+                if (conditionName) {
+                    newFilters.specialConditions = [...currentConditions, conditionName];
+                }
+            } else if (key === 'yoe') { // Legacy key support
+                newFilters['yearsOfExperience'] = value;
+            } else {
+                if (internalKey in newFilters) {
+                    // @ts-ignore
+                    newFilters[internalKey] = value;
+                }
+            }
+        }
+
+        setSortBy(sortOption);
+        setAppliedFilters(newFilters);
+        setStagedFilters(newFilters);
+        runFilter(newFilters, sortOption);
+        countStagedResults(newFilters);
+        console.log('Filters from URL:', newFilters);
     }, [readOnlySearchParams, runFilter, countStagedResults]);
 
     const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
@@ -221,7 +264,36 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
         });
     }, [countStagedResults]);
 
+
+
     const handleApplyFilters = useCallback(() => {
+        const query = new URLSearchParams();
+        Object.entries(stagedFilters).forEach(([key, value]) => {
+            const urlKey = keyMap[key] || key;
+            if (value && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
+                if (key !== 'visa') {
+                    if (Array.isArray(value)) {
+                        if (key === 'specialConditions') {
+                            value.forEach(item => {
+                                const conditionSlug = allSpecialConditions.find(c => c.name === item)?.slug;
+                                if (conditionSlug) {
+                                    query.append(urlKey, conditionSlug);
+                                }
+                            });
+                        } else {
+                            value.forEach(item => query.append(urlKey, String(item)));
+                        }
+                    } else {
+                        query.set(urlKey, String(value));
+                    }
+                }
+            }
+        });
+
+        if (sortBy !== 'newest') {
+            query.set(keyMap['sortBy'], sortOptionMap[sortBy]);
+        }
+        router.push(`/tim-viec-lam?${query.toString()}`);
     }, [stagedFilters, sortBy, router]);
 
     const handleSortChange = (value: string) => {
@@ -241,16 +313,6 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
     const handleNewSearch = useCallback((filters: Partial<SearchFilters>) => {
         // Thực hiện logic tìm kiếm ở đây
     }, []);
-
-    // This effect runs once when the component mounts to set the initial document title
-    const fetchData = useCallback(async () => {
-        const { docs: jobs, total, totalPages } = await getJobs(1,20);
-        setFilteredJobs(jobs);
-        setTotalJobs(total);
-    }, []);
-    useEffect(() => {
-        fetchData();
-    }, [pageTitle, pageDescription]);
 
 
     return (

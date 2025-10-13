@@ -20,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { format, startOfTomorrow, parse } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
@@ -29,6 +29,7 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import JOBS from '@/lib/jobs.json';
+import PROVINCES from "@/lib/provinces.json";
 
 const createSlug = (str: string) => {
     if (!str) return '';
@@ -252,13 +253,28 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
     );
 });
 MonthlySalaryContent.displayName = 'MonthlySalaryContent';
-
+const japanProvinces = PROVINCES.filter((item) => item.groupCode === "JP");
 
 export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply, onReset, resultCount }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<any[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<String[]>(allIndustries);
     const isMobile = useIsMobile();
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+    const [japanRegions, setJapanRegions] = useState(() => {
+        const regions: { [key: string]: any[] } = {};
+        japanProvinces.filter(item => item.groupCode === 'JP').forEach((region: any) => {
+            if (!region.parentCode) {
+                regions[region.label] = [];
+            } else {
+                const parentRegion = japanProvinces.find(r => r.value === region.parentCode);
+                if (!!parentRegion) {
+                    regions[parentRegion.label].push(region);
+                }
+            }
+        });
+        return regions;
+    });
+
 
     const getFutureMonths = () => {
         const months = [];
@@ -272,146 +288,146 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         return months;
     };
 
-    const { jobCountsByRegion, jobCountsByPrefecture } = useMemo(() => {
-        const countsByPrefecture: { [key: string]: number } = {};
-        const countsByRegion: { [key: string]: number } = {};
+    // const { jobCountsByRegion, jobCountsByPrefecture } = useMemo(() => {
+    //     const countsByPrefecture: { [key: string]: number } = {};
+    //     const countsByRegion: { [key: string]: number } = {};
 
-        // Initialize all locations with 0
-        allJapanLocations.forEach(p => {
-            countsByPrefecture[p.name] = 0;
-        });
-        japanRegions.forEach(r => {
-            countsByRegion[r.name] = 0;
-        });
+    //     // Initialize all locations with 0
+    //     allJapanLocations.forEach(p => {
+    //         countsByPrefecture[p.name] = 0;
+    //     });
+    //     japanRegions.forEach(r => {
+    //         countsByRegion[r.name] = 0;
+    //     });
 
-        const filtersToApply = { ...filters };
-        const industryObject = allIndustries.find(i => i === filtersToApply.industry);
-        const industryName = industryObject || filtersToApply.industry;
-        const feeLimit = parseSalary(filtersToApply.netFee);
-        const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
-        const interviewLocationName = allInterviewLocations.find(l => l.slug === filtersToApply.interviewLocation)?.name;
-        const roundsSlug = filtersToApply.interviewRounds;
-        const roundsToMatch = roundsSlug ? parseInt(roundsSlug.split('-')[0], 10) : null;
-        const basicSalaryMin = parseSalary(filtersToApply.basicSalary);
-        const netSalaryMin = parseSalary(filtersToApply.netSalary);
-        const hourlySalaryMin = parseSalary(filtersToApply.hourlySalary);
-        const annualIncomeMin = parseSalary(filtersToApply.annualIncome);
-        const annualBonusMin = parseSalary(filtersToApply.annualBonus);
-        const yoeSlug = filtersToApply.yearsOfExperience || '';
-        const yoeName = experienceYears.find(y => y.slug === yoeSlug)?.name || '';
-        const [minExp, maxExp] = parseExperienceToRange(yoeName);
-        const expReqSlug = filtersToApply.experienceRequirement || '';
-        const eduReqName = educationLevels.find(e => e.slug === filtersToApply.educationRequirement)?.name;
-        const dominantHandName = dominantHands.find(d => d.slug === filtersToApply.dominantHand)?.name;
+    //     const filtersToApply = { ...filters };
+    //     const industryObject = allIndustries.find(i => i === filtersToApply.industry);
+    //     const industryName = industryObject || filtersToApply.industry;
+    //     const feeLimit = parseSalary(filtersToApply.netFee);
+    //     const allInterviewLocations = [...interviewLocations['Việt Nam'], ...interviewLocations['Nhật Bản']];
+    //     const interviewLocationName = allInterviewLocations.find(l => l.slug === filtersToApply.interviewLocation)?.name;
+    //     const roundsSlug = filtersToApply.interviewRounds;
+    //     const roundsToMatch = roundsSlug ? parseInt(roundsSlug.split('-')[0], 10) : null;
+    //     const basicSalaryMin = parseSalary(filtersToApply.basicSalary);
+    //     const netSalaryMin = parseSalary(filtersToApply.netSalary);
+    //     const hourlySalaryMin = parseSalary(filtersToApply.hourlySalary);
+    //     const annualIncomeMin = parseSalary(filtersToApply.annualIncome);
+    //     const annualBonusMin = parseSalary(filtersToApply.annualBonus);
+    //     const yoeSlug = filtersToApply.yearsOfExperience || '';
+    //     const yoeName = experienceYears.find(y => y.slug === yoeSlug)?.name || '';
+    //     const [minExp, maxExp] = parseExperienceToRange(yoeName);
+    //     const expReqSlug = filtersToApply.experienceRequirement || '';
+    //     const eduReqName = educationLevels.find(e => e.slug === filtersToApply.educationRequirement)?.name;
+    //     const dominantHandName = dominantHands.find(d => d.slug === filtersToApply.dominantHand)?.name;
 
-        // Filter jobs based on all criteria EXCEPT location
-        const preFilteredJobs = jobData.filter(job => {
-            let visaMatch = true;
-            if (filtersToApply.visaDetail && filtersToApply.visaDetail !== 'all-details') {
-                const targetVisaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === filtersToApply.visaDetail)?.name;
-                visaMatch = job.visaDetail === targetVisaName;
-            } else if (filtersToApply.visa && filtersToApply.visa !== 'all') {
-                const targetVisaTypeObject = japanJobTypes.find(v => v.slug === filtersToApply.visa);
-                visaMatch = job.visaType === targetVisaTypeObject?.name;
-            }
+    //     // Filter jobs based on all criteria EXCEPT location
+    //     const preFilteredJobs = jobData.filter(job => {
+    //         let visaMatch = true;
+    //         if (filtersToApply.visaDetail && filtersToApply.visaDetail !== 'all-details') {
+    //             const targetVisaName = Object.values(visaDetailsByVisaType).flat().find(v => v.slug === filtersToApply.visaDetail)?.name;
+    //             visaMatch = job.visaDetail === targetVisaName;
+    //         } else if (filtersToApply.visa && filtersToApply.visa !== 'all') {
+    //             const targetVisaTypeObject = japanJobTypes.find(v => v.slug === filtersToApply.visa);
+    //             visaMatch = job.visaType === targetVisaTypeObject?.name;
+    //         }
 
-            const industryMatch = !filtersToApply.industry || filtersToApply.industry === 'all' || (job.industry && job.industry === industryName);
-            const jobDetailMatch = !filtersToApply.jobDetail || (job.title && createSlug(job.title).includes(filtersToApply.jobDetail)) || (job.details.description && createSlug(job.details.description).includes(filtersToApply.jobDetail));
-            const expReqMatch = !expReqSlug || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(expReqSlug);
-            const [jobMinExp] = parseExperienceToRange(job.yearsOfExperience);
-            const yearsOfExperienceMatch = !yoeSlug || (jobMinExp <= maxExp);
-            const interviewLocationMatch = !interviewLocationName || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocationName.toLowerCase()));
-            const quantityMatch = !filtersToApply.quantity || job.quantity >= parseInt(filtersToApply.quantity, 10);
-            const feeMatch = feeLimit === null || !job.netFee || (parseSalary(job.netFee) || 0) <= feeLimit;
-            const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
+    //         const industryMatch = !filtersToApply.industry || filtersToApply.industry === 'all' || (job.industry && job.industry === industryName);
+    //         const jobDetailMatch = !filtersToApply.jobDetail || (job.title && createSlug(job.title).includes(filtersToApply.jobDetail)) || (job.details.description && createSlug(job.details.description).includes(filtersToApply.jobDetail));
+    //         const expReqMatch = !expReqSlug || !job.experienceRequirement || createSlug(job.experienceRequirement).includes(expReqSlug);
+    //         const [jobMinExp] = parseExperienceToRange(job.yearsOfExperience);
+    //         const yearsOfExperienceMatch = !yoeSlug || (jobMinExp <= maxExp);
+    //         const interviewLocationMatch = !interviewLocationName || (job.interviewLocation && job.interviewLocation.toLowerCase().includes(interviewLocationName.toLowerCase()));
+    //         const quantityMatch = !filtersToApply.quantity || job.quantity >= parseInt(filtersToApply.quantity, 10);
+    //         const feeMatch = feeLimit === null || !job.netFee || (parseSalary(job.netFee) || 0) <= feeLimit;
+    //         const roundsMatch = !roundsToMatch || job.interviewRounds === roundsToMatch;
 
-            let interviewDateMatch = true;
-            if (filtersToApply.interviewDate && filtersToApply.interviewDate !== 'flexible') {
-                const selectedDate = new Date(filtersToApply.interviewDate).getTime();
-                const jobDate = new Date(new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000).setHours(0, 0, 0, 0);
-                if (filtersToApply.interviewDateType === 'until') {
-                    interviewDateMatch = jobDate <= selectedDate;
-                } else if (filtersToApply.interviewDateType === 'exact') {
-                    interviewDateMatch = jobDate === selectedDate;
-                } else if (filtersToApply.interviewDateType === 'from') {
-                    interviewDateMatch = jobDate >= selectedDate;
-                }
-            } else if (filtersToApply.interviewDate && filtersToApply.interviewDate === 'flexible') {
-                interviewDateMatch = true;
-            }
+    //         let interviewDateMatch = true;
+    //         if (filtersToApply.interviewDate && filtersToApply.interviewDate !== 'flexible') {
+    //             const selectedDate = new Date(filtersToApply.interviewDate).getTime();
+    //             const jobDate = new Date(new Date().getTime() + job.interviewDateOffset * 24 * 3600 * 1000).setHours(0, 0, 0, 0);
+    //             if (filtersToApply.interviewDateType === 'until') {
+    //                 interviewDateMatch = jobDate <= selectedDate;
+    //             } else if (filtersToApply.interviewDateType === 'exact') {
+    //                 interviewDateMatch = jobDate === selectedDate;
+    //             } else if (filtersToApply.interviewDateType === 'from') {
+    //                 interviewDateMatch = jobDate >= selectedDate;
+    //             }
+    //         } else if (filtersToApply.interviewDate && filtersToApply.interviewDate === 'flexible') {
+    //             interviewDateMatch = true;
+    //         }
 
-            const jobBasicSalary = parseSalary(job.salary.basic);
-            const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);
-            const jobNetSalary = parseSalary(job.salary.actual);
-            const netSalaryMatch = netSalaryMin === null || (jobNetSalary !== null && jobNetSalary >= netSalaryMin);
-            const hourlySalaryMatch = hourlySalaryMin === null;
-            const jobAnnualIncome = parseSalary(job.salary.annualIncome);
-            const annualIncomeMatch = annualIncomeMin === null || (jobAnnualIncome !== null && jobAnnualIncome >= annualIncomeMin);
-            const jobAnnualBonus = parseSalary(job.salary.annualBonus);
-            const annualBonusMatch = annualBonusMin === null || (jobAnnualBonus !== null && jobAnnualBonus >= annualBonusMin);
-            let genderMatch = true;
-            if (filtersToApply.gender) {
-                const targetGender = filtersToApply.gender === 'nam' ? 'Nam' : 'Nữ';
-                genderMatch = job.gender === targetGender || job.gender === 'Cả nam và nữ';
-            }
-            let ageMatch = true;
-            if (filtersToApply.age && job.ageRequirement) {
-                const jobAgeRange = parseAgeRequirement(job.ageRequirement);
-                if (jobAgeRange) {
-                    const [filterMinAge, filterMaxAge] = filtersToApply.age;
-                    const [jobMinAge, jobMaxAge] = jobAgeRange;
-                    ageMatch = Math.max(filterMinAge, jobMinAge) <= Math.min(filterMaxAge, jobMaxAge);
-                }
-            }
-            let heightMatch = true;
-            if (filtersToApply.height) {
-                const [jobMinHeight, jobMaxHeight] = parsePhysicalRequirement(job.heightRequirement);
-                const [filterMinHeight, filterMaxHeight] = filtersToApply.height;
-                heightMatch = filterMinHeight <= jobMaxHeight && filterMaxHeight >= jobMinHeight;
-            }
-            let weightMatch = true;
-            if (filtersToApply.weight) {
-                const [jobMinWeight, jobMaxWeight] = parsePhysicalRequirement(job.weightRequirement);
-                const [filterMinWeight, filterMaxHeight] = filtersToApply.weight;
-                weightMatch = filterMinWeight <= jobMaxWeight && filterMaxHeight >= jobMinWeight;
-            }
-            const visionMatch = !filtersToApply.visionRequirement || filtersToApply.visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(filtersToApply.visionRequirement);
-            const tattooReqName = tattooRequirements.find(t => t.slug === filtersToApply.tattooRequirement)?.name;
-            const tattooMatch = !filtersToApply.tattooRequirement || filtersToApply.tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
-            const langReqName = languageLevels.find(l => l.slug === filtersToApply.languageRequirement)?.name;
-            const languageReqMatch = !filtersToApply.languageRequirement || filtersToApply.languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
-            const educationReqMatch = !eduReqName || eduReqName === 'Tất cả' || !job.educationRequirement || job.educationRequirement === eduReqName;
-            const dominantHandMatch = !dominantHandName || dominantHandName === 'Tất cả' || !job.details.description || job.details.description.includes(dominantHandName);
-            const otherSkillMatch = !filtersToApply.otherSkillRequirement || filtersToApply.otherSkillRequirement.length === 0 || filtersToApply.otherSkillRequirement.every(skillSlug => {
-                const skillName = otherSkills.find(s => s.slug === skillSlug)?.name;
-                return skillName ? (job.details.description.includes(skillName) || job.details.requirements.includes(skillName)) : true;
-            });
-            const specialConditionsMatch = !filtersToApply.specialConditions || filtersToApply.specialConditions.length === 0 || filtersToApply.specialConditions.every(cond => {
-                return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
-            });
+    //         const jobBasicSalary = parseSalary(job.salary.basic);
+    //         const basicSalaryMatch = basicSalaryMin === null || (jobBasicSalary !== null && jobBasicSalary >= basicSalaryMin);
+    //         const jobNetSalary = parseSalary(job.salary.actual);
+    //         const netSalaryMatch = netSalaryMin === null || (jobNetSalary !== null && jobNetSalary >= netSalaryMin);
+    //         const hourlySalaryMatch = hourlySalaryMin === null;
+    //         const jobAnnualIncome = parseSalary(job.salary.annualIncome);
+    //         const annualIncomeMatch = annualIncomeMin === null || (jobAnnualIncome !== null && jobAnnualIncome >= annualIncomeMin);
+    //         const jobAnnualBonus = parseSalary(job.salary.annualBonus);
+    //         const annualBonusMatch = annualBonusMin === null || (jobAnnualBonus !== null && jobAnnualBonus >= annualBonusMin);
+    //         let genderMatch = true;
+    //         if (filtersToApply.gender) {
+    //             const targetGender = filtersToApply.gender === 'nam' ? 'Nam' : 'Nữ';
+    //             genderMatch = job.gender === targetGender || job.gender === 'Cả nam và nữ';
+    //         }
+    //         let ageMatch = true;
+    //         if (filtersToApply.age && job.ageRequirement) {
+    //             const jobAgeRange = parseAgeRequirement(job.ageRequirement);
+    //             if (jobAgeRange) {
+    //                 const [filterMinAge, filterMaxAge] = filtersToApply.age;
+    //                 const [jobMinAge, jobMaxAge] = jobAgeRange;
+    //                 ageMatch = Math.max(filterMinAge, jobMinAge) <= Math.min(filterMaxAge, jobMaxAge);
+    //             }
+    //         }
+    //         let heightMatch = true;
+    //         if (filtersToApply.height) {
+    //             const [jobMinHeight, jobMaxHeight] = parsePhysicalRequirement(job.heightRequirement);
+    //             const [filterMinHeight, filterMaxHeight] = filtersToApply.height;
+    //             heightMatch = filterMinHeight <= jobMaxHeight && filterMaxHeight >= jobMinHeight;
+    //         }
+    //         let weightMatch = true;
+    //         if (filtersToApply.weight) {
+    //             const [jobMinWeight, jobMaxWeight] = parsePhysicalRequirement(job.weightRequirement);
+    //             const [filterMinWeight, filterMaxHeight] = filtersToApply.weight;
+    //             weightMatch = filterMinWeight <= jobMaxWeight && filterMaxHeight >= jobMinWeight;
+    //         }
+    //         const visionMatch = !filtersToApply.visionRequirement || filtersToApply.visionRequirement === 'all' || !job.visionRequirement || createSlug(job.visionRequirement).includes(filtersToApply.visionRequirement);
+    //         const tattooReqName = tattooRequirements.find(t => t.slug === filtersToApply.tattooRequirement)?.name;
+    //         const tattooMatch = !filtersToApply.tattooRequirement || filtersToApply.tattooRequirement === 'all' || !job.tattooRequirement || job.tattooRequirement === tattooReqName;
+    //         const langReqName = languageLevels.find(l => l.slug === filtersToApply.languageRequirement)?.name;
+    //         const languageReqMatch = !filtersToApply.languageRequirement || filtersToApply.languageRequirement === 'all' || !job.languageRequirement || job.languageRequirement === langReqName;
+    //         const educationReqMatch = !eduReqName || eduReqName === 'Tất cả' || !job.educationRequirement || job.educationRequirement === eduReqName;
+    //         const dominantHandMatch = !dominantHandName || dominantHandName === 'Tất cả' || !job.details.description || job.details.description.includes(dominantHandName);
+    //         const otherSkillMatch = !filtersToApply.otherSkillRequirement || filtersToApply.otherSkillRequirement.length === 0 || filtersToApply.otherSkillRequirement.every(skillSlug => {
+    //             const skillName = otherSkills.find(s => s.slug === skillSlug)?.name;
+    //             return skillName ? (job.details.description.includes(skillName) || job.details.requirements.includes(skillName)) : true;
+    //         });
+    //         const specialConditionsMatch = !filtersToApply.specialConditions || filtersToApply.specialConditions.length === 0 || filtersToApply.specialConditions.every(cond => {
+    //             return job.specialConditions && job.specialConditions.toLowerCase().includes(cond.toLowerCase());
+    //         });
 
-            const arrivalTimeMatch = !filtersToApply.companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === filtersToApply.companyArrivalTime);
-            const workShiftMatch = !filters.workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(filters.workShift));
+    //         const arrivalTimeMatch = !filtersToApply.companyArrivalTime || (job.companyArrivalTime && job.companyArrivalTime === filtersToApply.companyArrivalTime);
+    //         const workShiftMatch = !filters.workShift || !job.details.description || createSlug(job.details.description).includes(createSlug(filters.workShift));
 
-            const englishRequirementMatch = !filters.englishRequirement || filters.englishRequirement === 'all' || !job.languageRequirement || createSlug(job.languageRequirement).includes(filters.englishRequirement);
+    //         const englishRequirementMatch = !filters.englishRequirement || filters.englishRequirement === 'all' || !job.languageRequirement || createSlug(job.languageRequirement).includes(filters.englishRequirement);
 
-            return visaMatch && industryMatch && jobDetailMatch && expReqMatch && yearsOfExperienceMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishRequirementMatch;
-        });
+    //         return visaMatch && industryMatch && jobDetailMatch && expReqMatch && yearsOfExperienceMatch && interviewLocationMatch && quantityMatch && feeMatch && roundsMatch && interviewDateMatch && basicSalaryMatch && netSalaryMatch && hourlySalaryMatch && annualIncomeMatch && annualBonusMatch && genderMatch && ageMatch && heightMatch && weightMatch && visionMatch && tattooMatch && languageReqMatch && educationReqMatch && dominantHandMatch && otherSkillMatch && specialConditionsMatch && arrivalTimeMatch && workShiftMatch && englishRequirementMatch;
+    //     });
 
-        // Count jobs in the pre-filtered list
-        for (const job of preFilteredJobs) {
-            const prefectureName = job.workLocation;
-            if (countsByPrefecture.hasOwnProperty(prefectureName)) {
-                countsByPrefecture[prefectureName]++;
-            }
-        }
+    //     // Count jobs in the pre-filtered list
+    //     for (const job of preFilteredJobs) {
+    //         const prefectureName = job.workLocation;
+    //         if (countsByPrefecture.hasOwnProperty(prefectureName)) {
+    //             countsByPrefecture[prefectureName]++;
+    //         }
+    //     }
 
-        for (const region of japanRegions) {
-            countsByRegion[region.name] = region.prefectures.reduce((sum, p) => sum + (countsByPrefecture[p.name] || 0), 0);
-        }
+    //     for (const region of japanRegions) {
+    //         countsByRegion[region.name] = region.prefectures.reduce((sum, p) => sum + (countsByPrefecture[p.name] || 0), 0);
+    //     }
 
-        return { jobCountsByRegion: countsByRegion, jobCountsByPrefecture: countsByPrefecture };
-    }, [filters]);
+    //     return { jobCountsByRegion: countsByRegion, jobCountsByPrefecture: countsByPrefecture };
+    // }, [filters]);
 
 
     const allJobDetailsForExperience = useMemo(() => {
@@ -453,10 +469,10 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
         const isEngineerVisa = parentVisaSlug === 'ky-su-tri-thuc';
         const isTokuteiServiceIndustry =
             parentVisaSlug === 'ky-nang-dac-dinh' &&
-            ['nha-hang-tokutei', 'hang-khong-tokutei', 've-sinh-toa-nha-tokutei', 'luu-tru-khach-san-tokutei'].includes(activeFilters.industry || '');
+            ['nha-hang-tokutei', 'hang-khong-tokutei', 've-sinh-toa-nha-tokutei', 'luu-tru-khach-san-tokutei'].includes(activeFilters.career || '');
 
         return isEngineerVisa || isTokuteiServiceIndustry;
-    }, [activeFilters.visa, activeFilters.visaDetail, activeFilters.industry]);
+    }, [activeFilters.visa, activeFilters.visaDetail, activeFilters.career]);
 
     useEffect(() => {
         const parentVisaSlug = filters.visa || Object.keys(visaDetailsByVisaType).find(key =>
@@ -471,10 +487,10 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
             (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === filters.visaDetail)
         );
         const visaCode = japanJobTypes.find(v => v.slug === parentVisaSlug)?.code;
-        const parentIndustry = filters.industry;
-        const jobDetails = JOBS.filter(item => item.parent === parentIndustry &&item.value.startsWith(visaCode || ''));
+        const parentIndustry = filters.career;
+        const jobDetails = JOBS.filter(item => item.parent === parentIndustry && item.value.startsWith(visaCode || ''));
         setAvailableJobDetails(jobDetails);
-    }, [filters.industry]);
+    }, [filters.career]);
 
     const handleDateSelect = (date: Date | undefined) => {
         onFilterChange({ interviewDate: date ? format(date, 'yyyy-MM-dd') : '' });
@@ -496,8 +512,8 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
 
         if (parentTypeSlug && filters.visa !== parentTypeSlug) {
             newFilters.visa = parentTypeSlug;
-            newFilters.industry = '';
-            newFilters.jobDetail = '';
+            newFilters.career = '';
+            newFilters.job = '';
         }
 
         const vietnamVisas = ["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam", "dac-dinh-dau-viet", "dac-dinh-di-moi", "ky-su-tri-thuc-dau-viet"];
@@ -625,8 +641,8 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                             <AccordionContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
                                     <Label>Ngành nghề</Label>
-                                    <Select value={filters.industry} onValueChange={(value) => onFilterChange({ industry: value, jobDetail: '' })}>
-                                        <SelectTrigger className={cn(filters.industry && filters.industry !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
+                                    <Select value={filters.career} onValueChange={(value) => onFilterChange({ career: value, job: '' })}>
+                                        <SelectTrigger className={cn(filters.career && filters.career !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả ngành nghề</SelectItem>
                                             {availableIndustries.map((ind: any, index: number) => <SelectItem key={`${ind}-${index}`} value={ind}>{ind}</SelectItem>)}
@@ -635,8 +651,8 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Chi tiết công việc</Label>
-                                    <Select value={filters.jobDetail} onValueChange={(value) => onFilterChange({ jobDetail: value })} disabled={!filters.industry || filters.industry === 'all'}>
-                                        <SelectTrigger className={cn(filters.jobDetail && 'text-primary')}><SelectValue placeholder="Chọn công việc" /></SelectTrigger>
+                                    <Select value={filters.job} onValueChange={(value) => onFilterChange({ job: value })} disabled={!filters.career || filters.career === 'all'}>
+                                        <SelectTrigger className={cn(filters.job && 'text-primary')}><SelectValue placeholder="Chọn công việc" /></SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all-details">Tất cả công việc</SelectItem>
                                             {availableJobDetails.map(detail => <SelectItem key={detail.value} value={detail.value}>{detail.label}</SelectItem>)}
@@ -653,60 +669,61 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                             <AccordionContent className="pt-4">
                                 <div className="space-y-3">
                                     <div className='p-3 bg-secondary rounded-md'>
-                                        <p className='text-sm font-semibold'>Đã chọn ({Array.isArray(filters.location) ? filters.location.length : 0})</p>
-                                        {Array.isArray(filters.location) && filters.location.length > 0 && (
+                                        <p className='text-sm font-semibold'>Đã chọn ({Array.isArray(filters.workLocation) ? filters.workLocation.length : 0})</p>
+                                        {Array.isArray(filters.workLocation) && filters.workLocation.length > 0 && (
                                             <div className='flex flex-wrap gap-1 mt-2 text-xs'>
-                                                {filters.location.map(locSlug => (
-                                                    <Badge key={locSlug} variant="secondary" className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>
-                                                        {allJapanLocations.find(l => l.slug === locSlug)?.name || japanRegions.find(r => r.slug === locSlug)?.name || locSlug}
+                                                {filters.workLocation.map(loc => (
+                                                    <Badge key={loc} variant="secondary" className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>
+                                                        {loc}
                                                     </Badge>
                                                 ))}
                                             </div>
                                         )}
                                     </div>
                                     <Accordion type="multiple" className="w-full">
-                                        {japanRegions.map((region) => (
-                                            <AccordionItem key={region.slug} value={region.slug}>
+                                        {Object.keys(japanRegions).map((region) => (
+                                            <AccordionItem key={region} value={region}>
                                                 <div className="flex items-center gap-2 py-2 text-sm hover:no-underline" >
                                                     <Checkbox
-                                                        id={`region-${region.slug}`}
-                                                        checked={Array.isArray(filters.location) && region.prefectures.every(p => filters.location.includes(p.slug))}
+                                                        id={`region-${region}`}
+                                                        checked={Array.isArray(filters.workLocation) && japanRegions[region].every(p => filters.workLocation.includes(p.label))}
                                                         onCheckedChange={(checked) => {
-                                                            const currentSelection = new Set(Array.isArray(filters.location) ? filters.location : []);
+                                                            const currentSelection = new Set(Array.isArray(filters.workLocation) ? filters.workLocation : []);
                                                             if (checked) {
-                                                                region.prefectures.forEach(p => currentSelection.add(p.slug));
+                                                                japanRegions[region].forEach(p => currentSelection.add(p.label));
+                                                                [].every
                                                             } else {
-                                                                region.prefectures.forEach(p => currentSelection.delete(p.slug));
+                                                                japanRegions[region].forEach(p => currentSelection.delete(p.label));
                                                             }
-                                                            onFilterChange({ location: Array.from(currentSelection) });
+                                                            onFilterChange({ workLocation: Array.from(currentSelection) });
                                                         }}
                                                     />
                                                     <AccordionTrigger className="flex-1 p-0 hover:no-underline">
-                                                        <Label htmlFor={`region-${region.slug}`} className="flex-grow text-left font-semibold cursor-pointer flex justify-between w-full">
-                                                            <span>Vùng {region.name}</span>
-                                                            <span className="text-muted-foreground text-xs ml-1">{jobCountsByRegion[region.name] || 0} việc</span>
+                                                        <Label htmlFor={`region-${region}`} className="flex-grow text-left font-semibold cursor-pointer flex justify-between w-full">
+                                                            <span>Vùng {region}</span>
+                                                            {/* <span className="text-muted-foreground text-xs ml-1">{jobCountsByRegion[region.name] || 0} việc</span> */}
                                                         </Label>
                                                     </AccordionTrigger>
                                                 </div>
                                                 <AccordionContent className="pl-6 space-y-2">
-                                                    {region.prefectures.map((prefecture) => (
-                                                        <div key={prefecture.slug} className="flex items-center gap-2">
+                                                    {japanRegions[region].map((province) => (
+                                                        <div key={province.label} className="flex items-center gap-2">
                                                             <Checkbox
-                                                                id={`pref-${prefecture.slug}`}
-                                                                checked={Array.isArray(filters.location) && filters.location.includes(prefecture.slug)}
+                                                                id={`pref-${province.label}`}
+                                                                checked={Array.isArray(filters.workLocation) && filters.workLocation.includes(province.label)}
                                                                 onCheckedChange={(checked) => {
-                                                                    const currentSelection = new Set(Array.isArray(filters.location) ? filters.location : []);
+                                                                    const currentSelection = new Set(Array.isArray(filters.workLocation) ? filters.workLocation : []);
                                                                     if (checked) {
-                                                                        currentSelection.add(prefecture.slug);
+                                                                        currentSelection.add(province.label);
                                                                     } else {
-                                                                        currentSelection.delete(prefecture.slug);
+                                                                        currentSelection.delete(province.label);
                                                                     }
-                                                                    onFilterChange({ location: Array.from(currentSelection) });
+                                                                    onFilterChange({ workLocation: Array.from(currentSelection) });
                                                                 }}
                                                             />
-                                                            <Label htmlFor={`pref-${prefecture.slug}`} className="flex w-full items-center justify-between font-normal cursor-pointer">
-                                                                <span>{prefecture.name}</span>
-                                                                <span className="text-muted-foreground text-xs ml-1">{jobCountsByPrefecture[prefecture.name] || 0}</span>
+                                                            <Label htmlFor={`pref-${province.label}`} className="flex w-full items-center justify-between font-normal cursor-pointer">
+                                                                <span>{province.label}</span>
+                                                                {/* <span className="text-muted-foreground text-xs ml-1">{jobCountsByPrefecture[prefecture.name] || 0}</span> */}
                                                             </Label>
                                                         </div>
                                                     ))}
