@@ -463,6 +463,24 @@ const regionKanjiMap: { [key: string]: string } = {
   Okinawa: '沖縄',
 };
 
+const roleTexts: Record<string, Record<Language, string>> = {
+  'nhan-vien-phai-cu': { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
+  'nhan-vien-nhan-luc-nhat': { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
+  'sending': { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
+  'support': { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
+  'company': { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
+  'supervising-organization': { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
+  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Employment Placement Agency' },
+  'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
+};
+
+const subRoleTexts: Record<string, Record<Language, string>> = {
+    'phu-trach-doi-ngoai': { vi: 'Phụ trách đối ngoại', ja: '渉外担当', en: 'External Relations' },
+    'phu-trach-tuyen-dung': { vi: 'Phụ trách tuyển dụng', ja: '採用担当', en: 'Recruitment' },
+    'vietnamese': { vi: 'Nhân sự người Việt', ja: 'ベトナム人事', en: 'Vietnamese Staff' },
+    'japanese': { vi: 'Nhân sự người Nhật', ja: '日本人事', en: 'Japanese Staff' }
+};
+
 const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, onSave, onEditClick }: { isOpen: boolean; onOpenChange: (open: boolean) => void; employer: any; lang: Language; isConfirmationMode: boolean; onSave: (data: any) => void; onEditClick: () => void; }) => {
     const t = contentByLang[lang];
     const [tempInfo, setTempInfo] = useState(employer.info);
@@ -811,7 +829,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   React.useEffect(() => {
     const partnerIdParam = searchParams.get('partnerId');
     if (!partnerIdParam) {
-        // This case will now be handled by the parent page component's redirect logic.
         return;
     }
     setPartnerId(partnerIdParam);
@@ -825,25 +842,23 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     let finalData;
 
     if (existingProfileRaw) {
-        // Update mode
         const existingProfile = JSON.parse(existingProfileRaw);
         if (tempOnboardingDataRaw) {
-            // Merge new selections from Y-L01 with existing profile
             const tempOnboardingData = JSON.parse(tempOnboardingDataRaw);
             finalData = { ...existingProfile, ...tempOnboardingData };
+            localStorage.setItem(`recruiterProfile_${partnerIdParam}`, JSON.stringify(finalData)); // Persist the merge
             localStorage.removeItem(`onboardingData_${partnerIdParam}`); // Clean up temp data
         } else {
             finalData = existingProfile;
         }
         setIsUpdateMode(true);
     } else if (tempOnboardingDataRaw) {
-        // New registration mode
         finalData = JSON.parse(tempOnboardingDataRaw);
+        localStorage.setItem(`recruiterProfile_${partnerIdParam}`, tempOnboardingDataRaw); // Persist initial data
         localStorage.removeItem(`onboardingData_${partnerIdParam}`); // Clean up temp data
         setIsUpdateMode(false);
     } else {
-        // Fallback or direct access, now handled by parent redirect.
-        // For safety during development, we'll still load empty data.
+        // This case is handled by parent redirect, but keep a fallback
         finalData = JSON.parse(JSON.stringify(emptyEmployerData));
         finalData.id = partnerIdParam;
         setIsUpdateMode(false);
@@ -1618,7 +1633,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
        {!isConfirmationMode && (
         <div id="DANGKY_NTD_FOOTER" className={cn(
           "sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300",
-          showFooter && isMobile ? "translate-y-0" : "-translate-y-full"
+          showFooter && isMobile ? "translate-y-0" : "translate-y-full md:translate-y-0"
         )}>
           <div className="container mx-auto flex justify-start gap-4">
             <Button variant="outline" size="lg" onClick={handleBack}>
@@ -1650,3 +1665,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
+
+    
