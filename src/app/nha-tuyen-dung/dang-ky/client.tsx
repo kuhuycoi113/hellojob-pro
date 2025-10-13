@@ -242,6 +242,7 @@ const contentByLang = {
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
+        reRegisterAction: 'Đăng ký lại',
         visaTypeLabel: 'Loại hình',
         visaDetailLabel: 'Chi tiết loại hình visa',
         selectVisaTypePlaceholder: 'Chọn Loại hình',
@@ -249,7 +250,7 @@ const contentByLang = {
         rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         newRecruiterPlaceholder: 'Nhà tuyển dụng mới',
         partnerIdLabel: 'Mã đối tác',
-        continueButton: 'Đăng ký',
+        continueButton: 'Tiếp tục',
         backButton: 'Quay lại',
         cancelButton: 'Huỷ',
         saveButton: 'Lưu thay đổi',
@@ -306,6 +307,7 @@ const contentByLang = {
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
         registerAction: '登録',
+        reRegisterAction: '再登録',
         visaTypeLabel: '種別',
         visaDetailLabel: 'ビザ詳細',
         selectVisaTypePlaceholder: '種別を選択',
@@ -370,6 +372,7 @@ const contentByLang = {
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
         registerAction: 'Register',
+        reRegisterAction: 'Re-register',
         visaTypeLabel: 'Type',
         visaDetailLabel: 'Visa Details',
         selectVisaTypePlaceholder: 'Select Type',
@@ -377,7 +380,7 @@ const contentByLang = {
         rolePlaceholder: '[Type/Role/Title...]',
         newRecruiterPlaceholder: 'New Recruiter',
         partnerIdLabel: 'Partner ID',
-        continueButton: 'Register',
+        continueButton: 'Continue',
         backButton: 'Back',
         cancelButton: 'Cancel',
         saveButton: 'Save Changes',
@@ -427,24 +430,6 @@ const valueInterestOptions = {
 };
 
 
-
-const roleTexts: Record<string, Record<Language, string>> = {
-  'nhan-vien-phai-cu': { vi: 'Nhân viên phái cử', ja: '送り出し機関の社員', en: 'Sending Company Staff' },
-  'nhan-vien-nhan-luc-nhat': { vi: 'Nhân viên Nhân lực Nhật', ja: '日本人材法人の社員', en: 'Japan-side HR Staff' },
-  'sending': { vi: 'Công ty phái cử', ja: '送り出し機関', en: 'Sending Company' },
-  'support': { vi: 'Cơ quan hỗ trợ (Shien Kikan)', ja: '支援機関', en: 'Support Organization' },
-  'company': { vi: 'Xí nghiệp tiếp nhận', ja: '受け入れ企業', en: 'Accepting Company' },
-  'supervising-organization': { vi: 'Nghiệp đoàn (Kumiai)', ja: '監理団体 (組合)', en: 'Supervising Organization' },
-  'paid-placement-agency': { vi: 'Công ty giới thiệu có phí', ja: '有料職業紹介事業所', en: 'Paid Placement Agency' },
-  'haken': { vi: 'Công ty Haken', ja: '派遣会社', en: 'Staffing Agency' },
-};
-
-const subRoleTexts: Record<string, Record<Language, string>> = {
-    'phu-trach-doi-ngoai': { vi: 'Phụ trách đối ngoại', ja: '渉外担当', en: 'External Relations' },
-    'phu-trach-tuyen-dung': { vi: 'Phụ trách tuyển dụng', ja: '採用担当', en: 'Recruitment' },
-    'vietnamese': { vi: 'Nhân sự người Việt', ja: 'ベトナム人事', en: 'Vietnamese Staff' },
-    'japanese': { vi: '日本人事', ja: 'Japanese Staff' }
-};
 
 const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, isConfirmationMode }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, id?: string, isConfirmationMode?: boolean }) => (
     <Card className={cn("shadow-lg", className)} id={id}>
@@ -684,7 +669,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const [isIndividual, setIsIndividual] = React.useState(false);
   const [displayName, setDisplayName] = React.useState('');
   const [roleText, setRoleText] = React.useState('');
-  const [recruiterId, setRecruiterId] = React.useState('');
+  const [partnerId, setPartnerId] = React.useState('');
   const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false);
   const [showFooter, setShowFooter] = React.useState(true);
   const [lastScrollY, setLastScrollY] = React.useState(0);
@@ -692,6 +677,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const [mainContactError, setMainContactError] = React.useState(false);
   const infoCardRef = React.useRef<HTMLDivElement>(null);
   const mobileInfoCardRef = React.useRef<HTMLDivElement>(null);
+  const [isUpdateMode, setIsUpdateMode] = React.useState(false);
 
 
   const t = contentByLang[lang] || contentByLang['vi'];
@@ -822,51 +808,63 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       router.push(fromPath);
   }
 
-  const generateRecruiterId = (roleSlug: string): string => {
-    const prefixes: { [key: string]: string } = {
-        'nhan-vien-phai-cu': 'OKS',
-        'nhan-vien-nhan-luc-nhat': 'NJS',
-        'sending': 'OKK',
-        'support': 'SKK',
-        'company': 'UKG',
-        'supervising-organization': 'KND',
-        'paid-placement-agency': 'YSS',
-        'haken': 'HAK'
-    };
-    const prefix = prefixes[roleSlug] || 'NTD';
-    const now = new Date();
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const year = now.getFullYear().toString().slice(-2);
-    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
-    return `${prefix}${month}${year}${randomPart}`;
-  };
-
   React.useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    const langFromParams = (params.get('lang') || 'vi') as Language;
+    const partnerIdParam = searchParams.get('partnerId');
+    if (!partnerIdParam) {
+        // Handle case where partnerId is missing, maybe redirect or show error
+        console.error("Partner ID is missing!");
+        setEmployer(JSON.parse(JSON.stringify(emptyEmployerData))); // Load empty data to prevent crash
+        return;
+    }
+    setPartnerId(partnerIdParam);
+
+    const langFromParams = (searchParams.get('lang') || 'vi') as Language;
     setLang(langFromParams);
 
-    const roleParam = params.get('role');
-    const subRoleParam = params.get('sub_role');
-    const nationalityParam = params.get('nationality');
-    const companyNameParam = params.get('company_name');
-    const nameParam = params.get('name');
-    const isIndividualRole = roleParam === 'nhan-vien-phai-cu' || roleParam === 'nhan-vien-nhan-luc-nhat';
+    const tempOnboardingDataRaw = localStorage.getItem(`onboardingData_${partnerIdParam}`);
+    const existingProfileRaw = localStorage.getItem(`recruiterProfile_${partnerIdParam}`);
     
-    setRecruiterId(generateRecruiterId(roleParam || ''));
-    setDisplayName(isIndividualRole ? (nameParam || '') : (companyNameParam || 'Nhà tuyển dụng mới'));
+    let finalData;
+
+    if (existingProfileRaw) {
+        // Update mode
+        const existingProfile = JSON.parse(existingProfileRaw);
+        if (tempOnboardingDataRaw) {
+            // Merge new selections from Y-L01 with existing profile
+            const tempOnboardingData = JSON.parse(tempOnboardingDataRaw);
+            finalData = { ...existingProfile, ...tempOnboardingData };
+            localStorage.removeItem(`onboardingData_${partnerIdParam}`); // Clean up temp data
+        } else {
+            finalData = existingProfile;
+        }
+        setIsUpdateMode(true);
+    } else if (tempOnboardingDataRaw) {
+        // New registration mode
+        finalData = JSON.parse(tempOnboardingDataRaw);
+        localStorage.removeItem(`onboardingData_${partnerIdParam}`); // Clean up temp data
+        setIsUpdateMode(false);
+    } else {
+        // Fallback or direct access
+        console.warn("No onboarding or existing profile data found for this partner ID.");
+        finalData = JSON.parse(JSON.stringify(emptyEmployerData));
+        finalData.id = partnerIdParam;
+        setIsUpdateMode(false);
+    }
+
+    const isIndividualRole = finalData.role === 'nhan-vien-phai-cu' || finalData.role === 'nhan-vien-nhan-luc-nhat';
+    setDisplayName(isIndividualRole ? (finalData.name || '') : (finalData.company_name || t.newRecruiterPlaceholder));
     setIsIndividual(isIndividualRole);
 
     const roleParts: string[] = [];
-    const roleKey = roleParam || '';
-    const subRoleKey = subRoleParam || '';
-    const nationalityKey = nationalityParam || '';
+    const roleKey = finalData.role || '';
+    const subRoleKey = finalData.sub_role || '';
+    const nationalityKey = finalData.nationality || '';
 
     if (isIndividualRole) {
         if (roleKey === 'nhan-vien-phai-cu' && subRoleTexts[subRoleKey]) {
             roleParts.push(subRoleTexts[subRoleKey][langFromParams]);
             roleParts.push(roleTexts[roleKey][langFromParams]);
-            if (companyNameParam) roleParts.push(companyNameParam);
+            if (finalData.company_name) roleParts.push(finalData.company_name);
         } else if (roleKey === 'nhan-vien-nhan-luc-nhat') {
             if (subRoleTexts[nationalityKey]) {
                 roleParts.push(subRoleTexts[nationalityKey][langFromParams]);
@@ -874,7 +872,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             if(roleTexts[subRoleKey]) {
                  roleParts.push(roleTexts[subRoleKey][langFromParams]);
             }
-            if (companyNameParam) roleParts.push(companyNameParam);
+            if (finalData.company_name) roleParts.push(finalData.company_name);
         }
     } else if (!isIndividualRole && roleTexts[roleKey]) {
         roleParts.push(roleTexts[roleKey][langFromParams]);
@@ -883,55 +881,13 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     let finalRoleText = roleParts.join(' - ');
     
     if (!finalRoleText) {
-        finalRoleText = '[Loại hình/Vai trò/Chức danh...]';
+        finalRoleText = t.rolePlaceholder;
     }
     setRoleText(finalRoleText);
     
-    let employerData = JSON.parse(JSON.stringify(emptyEmployerData));
+    setEmployer(finalData);
 
-    employerData.name[langFromParams] = companyNameParam;
-    
-    const visaTypes = params.getAll('visa_type');
-    if (visaTypes.length > 0) {
-        employerData.visaType = { vi: visaTypes, ja: visaTypes, en: visaTypes };
-    }
-    
-    const visaDetails = params.getAll('visa_detail');
-    if (visaDetails.length > 0) {
-        employerData.visaDetail = { vi: visaDetails, ja: visaDetails, en: visaDetails };
-    }
-    
-    const industries = params.getAll('industry');
-    if (industries.length > 0) {
-        employerData.industries.main = { vi: industries, ja: industries, en: industries };
-    }
-
-    const locations = params.getAll('location');
-    if (locations.length > 0) {
-        employerData.industries.secondary = { vi: locations, ja: locations, en: locations };
-    }
-    
-    const interests = params.getAll('interest');
-    if (interests.length > 0) {
-        employerData.interest = { vi: interests, ja: interests, en: interests };
-    }
-    
-    const valueInterests = params.getAll('value_interest');
-    if (valueInterests.length > 0) {
-         employerData.valueInterest = valueInterests.map(id => {
-            const viOption = valueInterestOptions['vi'].find(o => o.id === id);
-            return {
-                id,
-                vi: viOption?.title,
-                ja: valueInterestOptions['ja'].find(o => o.id === id)?.title,
-                en: valueInterestOptions['en'].find(o => o.id === id)?.title
-            }
-        }).filter(Boolean);
-    }
-
-    setEmployer(employerData);
-
-  }, [searchParams]);
+}, [searchParams, t.newRecruiterPlaceholder, t.rolePlaceholder]);
 
   const handleEditClick = (title: string, currentContent: any, field: string) => {
     setEditingModule({ title, field });
@@ -983,6 +939,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         } else {
             newState[field] = tempContent;
         }
+        // After updating, save the entire profile to localStorage
+        localStorage.setItem(`recruiterProfile_${partnerId}`, JSON.stringify(newState));
         return newState;
     });
 
@@ -1025,6 +983,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                  } else if (field === 'images' && index !== undefined) {
                     newState.images[index].src = newUrl;
                  }
+                localStorage.setItem(`recruiterProfile_${partnerId}`, JSON.stringify(newState));
                 return newState;
             });
         }
@@ -1037,6 +996,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         setEmployer((prev: any) => {
             const newState = JSON.parse(JSON.stringify(prev));
             newState.images[index] = placeholderEmployerData.images[index];
+            localStorage.setItem(`recruiterProfile_${partnerId}`, JSON.stringify(newState));
             return newState;
         });
     };
@@ -1435,6 +1395,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   
   const headerName = displayName || (isIndividual ? `[${t.namePlaceholder}]` : `[${t.companyNamePlaceholder}]`);
   const headerRoleText = roleText || t.rolePlaceholder;
+  const continueButtonText = isUpdateMode ? t.reRegisterAction : t.registerAction;
 
   return (
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -1475,7 +1436,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                             <p id="DKTC_VAITRO" className="font-semibold text-primary">{headerRoleText}</p>
                              <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location[lang] || `[${t.locationPlaceholder}]`}</p>
                             <p className="text-sm text-muted-foreground mt-1">
-                                <Badge variant="outline">{t.partnerIdLabel}: {recruiterId}</Badge>
+                                <Badge variant="outline">{t.partnerIdLabel}: {partnerId}</Badge>
                             </p>
                           </div>
                           <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 w-full justify-center md:w-auto md:mt-0 flex-shrink-0 md:ml-auto">
@@ -1538,7 +1499,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 </div>
                             ) : (
                                 <div id="HIENTHILIENHE03-mobile-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                    <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                                    <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
                                 </div>
                             )}
                         </SectionCard>
@@ -1625,7 +1586,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 </div>
                             ) : (
                                 <div id="HIENTHILIENHE03-desktop-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                    <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                                    <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
                                 </div>
                             )}
                         </SectionCard>
@@ -1666,7 +1627,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                 {t.backButton}
             </Button>
             <Button size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleContinue}>
-                {t.continueButton}
+                {continueButtonText}
             </Button>
           </div>
         </div>
@@ -1691,6 +1652,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
-
-
-    

@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -383,6 +383,25 @@ export function YL01Dialog({
   const [selectedValueInterests, setSelectedValueInterests] = React.useState<string[]>([]);
   const [currentLang, setCurrentLang] = React.useState<Language>(initialLang);
 
+  const generateRecruiterId = (roleSlug: string): string => {
+    const prefixes: { [key: string]: string } = {
+        'nhan-vien-phai-cu': 'OKS',
+        'nhan-vien-nhan-luc-nhat': 'NJS',
+        'sending': 'OKK',
+        'support': 'SKK',
+        'company': 'UKG',
+        'supervising-organization': 'KND',
+        'paid-placement-agency': 'YSS',
+        'haken': 'HAK'
+    };
+    const prefix = prefixes[roleSlug] || 'NTD';
+    const now = new Date();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const year = now.getFullYear().toString().slice(-2);
+    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `${prefix}${month}${year}${randomPart}`;
+  };
+
   React.useEffect(() => {
     if (isOpen) {
       setStep(initialStep);
@@ -406,8 +425,9 @@ export function YL01Dialog({
   }
 
   const handleComplete = () => {
-    if (onComplete) {
-      onComplete({
+    const partnerId = generateRecruiterId(selectedRole || '');
+    const data = {
+        partnerId,
         role: selectedRole,
         sub_role: selectedSubRole,
         nationality: selectedNationality,
@@ -420,9 +440,15 @@ export function YL01Dialog({
         industry: selectedIndustry,
         location: selectedRegion,
         lang: currentLang,
-        from: fromPath, // Pass the fromPath
-      });
-    }
+        from: fromPath,
+    };
+    
+    // Use localStorage instead of URL parameters
+    localStorage.setItem(`onboardingData_${partnerId}`, JSON.stringify(data));
+    
+    // Navigate with only the partnerId
+    router.push(`/nha-tuyen-dung/dang-ky?partnerId=${partnerId}`);
+    onOpenChange(false);
   };
 
   const handleMultiSelect = (
