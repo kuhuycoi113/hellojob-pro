@@ -249,7 +249,7 @@ const contentByLang = {
         rolePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         newRecruiterPlaceholder: 'Nhà tuyển dụng mới',
         partnerIdLabel: 'Mã đối tác',
-        continueButton: 'Lưu và tiếp tục',
+        continueButton: 'Đăng ký',
         backButton: 'Quay lại',
         cancelButton: 'Huỷ',
         saveButton: 'Lưu thay đổi',
@@ -313,7 +313,7 @@ const contentByLang = {
         rolePlaceholder: '[種別/役割/役職...]',
         newRecruiterPlaceholder: '新規採用担当者',
         partnerIdLabel: 'パートナーID',
-        continueButton: '保存して続行',
+        continueButton: '登録する',
         backButton: '戻る',
         cancelButton: 'キャンセル',
         saveButton: '変更を保存',
@@ -377,7 +377,7 @@ const contentByLang = {
         rolePlaceholder: '[Type/Role/Title...]',
         newRecruiterPlaceholder: 'New Recruiter',
         partnerIdLabel: 'Partner ID',
-        continueButton: 'Save and Continue',
+        continueButton: 'Register',
         backButton: 'Back',
         cancelButton: 'Cancel',
         saveButton: 'Save Changes',
@@ -443,7 +443,7 @@ const subRoleTexts: Record<string, Record<Language, string>> = {
     'phu-trach-doi-ngoai': { vi: 'Phụ trách đối ngoại', ja: '渉外担当', en: 'External Relations' },
     'phu-trach-tuyen-dung': { vi: 'Phụ trách tuyển dụng', ja: '採用担当', en: 'Recruitment' },
     'vietnamese': { vi: 'Nhân sự người Việt', ja: 'ベトナム人事', en: 'Vietnamese Staff' },
-    'japanese': { vi: 'Nhân sự người Nhật', ja: '日本人事', en: 'Japanese Staff' }
+    'japanese': { vi: '日本人事', ja: 'Japanese Staff' }
 };
 
 const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, isConfirmationMode }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, id?: string, isConfirmationMode?: boolean }) => (
@@ -1466,8 +1466,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                            {!isConfirmationMode && (
                            <Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
                               <Camera className="h-4 w-4 text-secondary-foreground" />
-                           </Label>
-                           )}
+                           </Label>)}
                            <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} disabled={isConfirmationMode}/>
                       </div>
                       <div className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16 w-full">
@@ -1692,5 +1691,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
+
 
     
