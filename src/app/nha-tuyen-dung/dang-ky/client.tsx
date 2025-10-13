@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { notFound, useSearchParams, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -485,15 +485,15 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
     const [zaloCountry, setZaloCountry] = useState('+84');
     const [errors, setErrors] = useState<{ email?: string; messenger?: string; line?: string }>({});
     const [contactError, setContactError] = useState(false);
+    const errorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setTempInfo(employer.info);
-        setContactError(false); // Reset error state when dialog opens
+        setContactError(false);
     }, [employer.info]);
 
     const handleInfoChange = (field: string, value: string) => {
-        setTempInfo({ ...tempInfo, [field]: value });
-        // If any contact field has value, clear the error
+        setTempInfo((prev: any) => ({ ...prev, [field]: value }));
         if (value.trim() !== '' && ['email', 'phone', 'zalo', 'messenger', 'line'].includes(field)) {
             setContactError(false);
         }
@@ -517,18 +517,15 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
     };
 
     const handleSave = () => {
-        let allValid = true;
-        
-        // Check if at least one contact method is filled
         const hasContactInfo = tempInfo.email || tempInfo.phone || tempInfo.zalo || tempInfo.messenger || tempInfo.line;
         if (!hasContactInfo) {
             setContactError(true);
-            allValid = false;
-        } else {
-            setContactError(false);
+            errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
         }
+        setContactError(false);
 
-        // Validate individual fields
+        let allValid = true;
         if (tempInfo.email && !validateEmail(tempInfo.email)) {
             setErrors(prev => ({ ...prev, email: "Email không hợp lệ" }));
             allValid = false;
@@ -661,7 +658,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                              {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                       </div>
-                      <div className={cn("mt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all", contactError && 'border-destructive ring-2 ring-destructive/40')}>
+                      <div ref={errorRef} className={cn("mt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all", contactError && 'border-destructive ring-2 ring-destructive/40')}>
                           <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                       </div>
                   </div>
@@ -674,7 +671,6 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
         </Dialog>
     );
 };
-
 
 export default function EmployerDetailPage({ isConfirmationMode = false }: { isConfirmationMode?: boolean }) {
   const searchParams = useSearchParams();
