@@ -691,6 +691,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const [mainContactError, setMainContactError] = React.useState(false);
   const infoCardRef = React.useRef<HTMLDivElement>(null);
+  const mobileInfoCardRef = React.useRef<HTMLDivElement>(null);
 
 
   const t = contentByLang[lang] || contentByLang['vi'];
@@ -808,7 +809,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const handleContinue = () => {
     if (!hasContactInfo) {
         setMainContactError(true);
-        infoCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const refToScroll = isMobile ? mobileInfoCardRef : infoCardRef;
+        refToScroll.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
     }
     const params = new URLSearchParams(searchParams.toString());
@@ -999,7 +1001,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   };
 
   const removeTempArrayItem = (index: number) => {
-    setTempContent((prev: any[]) => prev.filter((_, i) => i !== index));
+    setTempContent((prev: any[]) => prev.filter((_: any, i: number) => i !== index));
   };
 
 
@@ -1518,7 +1520,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   </SectionCard>
                   
                   {/* Info card for Mobile */}
-                  <div className="block lg:hidden" ref={infoCardRef}>
+                  <div className="block lg:hidden" ref={mobileInfoCardRef}>
                     <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
                         <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
                             <div className="space-y-3 text-sm">
@@ -1536,7 +1538,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                    {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                                 </div>
                             ) : (
-                                <div id="HIENTHILIENHE03-mobile" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
+                                <div id="HIENTHILIENHE03-mobile-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
                                     <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                                 </div>
                             )}
@@ -1623,7 +1625,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                    {employer.info.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
                                 </div>
                             ) : (
-                                <div id="HIENTHILIENHE03-desktop" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
+                                <div id="HIENTHILIENHE03-desktop-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
                                     <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                                 </div>
                             )}
@@ -1691,3 +1693,4 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   )
 }
 
+    
