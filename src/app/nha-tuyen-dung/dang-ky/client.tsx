@@ -36,6 +36,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { visaDetailsByVisaType } from '@/lib/visa-data';
 import { japanRegions } from '@/lib/location-data';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 const employersData: { [key: string]: any } = {
@@ -699,7 +700,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
 
   const t = contentByLang[lang] || contentByLang['vi'];
-  const hasContactInfo = employer?.info.phone || employer?.info.zalo || employer?.info.messenger || employer?.info.line || employer?.info.email;
+  const hasContactInfo = employer?.info?.phone || employer?.info?.zalo || employer?.info?.messenger || employer?.info?.line || employer?.info?.email;
 
   const controlNavbar = useCallback(() => {
     if (typeof window !== 'undefined') {
@@ -807,7 +808,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     setLang(newLang);
     const params = new URLSearchParams(searchParams.toString());
     params.set('lang', newLang);
-    router.replace(`?${params.toString()}`);
+    router.replace(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
   };
   
   const handleContinue = () => {
@@ -829,6 +830,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   React.useEffect(() => {
     const partnerIdParam = searchParams.get('partnerId');
     if (!partnerIdParam) {
+        // This case is handled by page.tsx redirect, but as a fallback:
+        setEmployer(JSON.parse(JSON.stringify(emptyEmployerData)));
         return;
     }
     setPartnerId(partnerIdParam);
@@ -845,27 +848,27 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         const existingProfile = JSON.parse(existingProfileRaw);
         if (tempOnboardingDataRaw) {
             const tempOnboardingData = JSON.parse(tempOnboardingDataRaw);
-            finalData = { ...existingProfile, ...tempOnboardingData };
-            localStorage.setItem(`recruiterProfile_${partnerIdParam}`, JSON.stringify(finalData)); // Persist the merge
-            localStorage.removeItem(`onboardingData_${partnerIdParam}`); // Clean up temp data
+            // Merge: new data from onboarding overwrites existing data
+            finalData = { ...existingProfile, ...tempOnboardingData, info: {...existingProfile.info, ...tempOnboardingData.info} };
+            localStorage.setItem(`recruiterProfile_${partnerIdParam}`, JSON.stringify(finalData));
+            localStorage.removeItem(`onboardingData_${partnerIdParam}`);
         } else {
             finalData = existingProfile;
         }
         setIsUpdateMode(true);
     } else if (tempOnboardingDataRaw) {
         finalData = JSON.parse(tempOnboardingDataRaw);
-        localStorage.setItem(`recruiterProfile_${partnerIdParam}`, tempOnboardingDataRaw); // Persist initial data
-        localStorage.removeItem(`onboardingData_${partnerIdParam}`); // Clean up temp data
+        localStorage.setItem(`recruiterProfile_${partnerIdParam}`, tempOnboardingDataRaw);
+        localStorage.removeItem(`onboardingData_${partnerIdParam}`);
         setIsUpdateMode(false);
     } else {
-        // This case is handled by parent redirect, but keep a fallback
         finalData = JSON.parse(JSON.stringify(emptyEmployerData));
         finalData.id = partnerIdParam;
         setIsUpdateMode(false);
     }
 
     const isIndividualRole = finalData.role === 'nhan-vien-phai-cu' || finalData.role === 'nhan-vien-nhan-luc-nhat';
-    setDisplayName(isIndividualRole ? (finalData.name || '') : (finalData.company_name || t.newRecruiterPlaceholder));
+    setDisplayName(isIndividualRole ? (finalData.name || '') : (finalData.company_name || ''));
     setIsIndividual(isIndividualRole);
 
     const roleParts: string[] = [];
@@ -900,7 +903,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     
     setEmployer(finalData);
 
-}, [searchParams, t.newRecruiterPlaceholder, t.rolePlaceholder]);
+}, [searchParams, t.rolePlaceholder]);
 
   const handleEditClick = (title: string, currentContent: any, field: string) => {
     setEditingModule({ title, field });
@@ -1403,7 +1406,25 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   };
   
   if (!employer) {
-      return <div className="flex h-screen items-center justify-center">Loading...</div>;
+      return (
+        <div className="bg-secondary">
+          <div className="container mx-auto px-4 md:px-6 py-12">
+            <div className="max-w-7xl mx-auto">
+              <Skeleton className="h-64 w-full mb-8" />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-8">
+                  <Skeleton className="h-48 w-full" />
+                  <Skeleton className="h-48 w-full" />
+                </div>
+                <div className="lg:col-span-1 space-y-6">
+                  <Skeleton className="h-64 w-full" />
+                  <Skeleton className="h-48 w-full" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
   }
   
   const headerName = displayName || (isIndividual ? `[${t.namePlaceholder}]` : `[${t.companyNamePlaceholder}]`);
@@ -1665,5 +1686,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     </Dialog>
   )
 }
-
-    
