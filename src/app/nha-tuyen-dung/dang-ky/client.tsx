@@ -811,9 +811,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   React.useEffect(() => {
     const partnerIdParam = searchParams.get('partnerId');
     if (!partnerIdParam) {
-        // Handle case where partnerId is missing, maybe redirect or show error
-        console.error("Partner ID is missing!");
-        setEmployer(JSON.parse(JSON.stringify(emptyEmployerData))); // Load empty data to prevent crash
+        // This case will now be handled by the parent page component's redirect logic.
         return;
     }
     setPartnerId(partnerIdParam);
@@ -844,8 +842,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         localStorage.removeItem(`onboardingData_${partnerIdParam}`); // Clean up temp data
         setIsUpdateMode(false);
     } else {
-        // Fallback or direct access
-        console.warn("No onboarding or existing profile data found for this partner ID.");
+        // Fallback or direct access, now handled by parent redirect.
+        // For safety during development, we'll still load empty data.
         finalData = JSON.parse(JSON.stringify(emptyEmployerData));
         finalData.id = partnerIdParam;
         setIsUpdateMode(false);
@@ -1620,13 +1618,13 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
        {!isConfirmationMode && (
         <div id="DANGKY_NTD_FOOTER" className={cn(
           "sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300",
-          !showFooter && isMobile ? "translate-y-full" : "translate-y-0"
+          showFooter && isMobile ? "translate-y-0" : "-translate-y-full"
         )}>
           <div className="container mx-auto flex justify-start gap-4">
             <Button variant="outline" size="lg" onClick={handleBack}>
                 {t.backButton}
             </Button>
-            <Button size="lg" className="bg-accent-orange hover:bg-accent-orange/90 text-white" onClick={handleContinue}>
+            <Button size="lg" className={cn("bg-accent-orange hover:bg-accent-orange/90 text-white", isUpdateMode ? "bg-accent-green hover:bg-accent-green/90": "")} onClick={handleContinue}>
                 {continueButtonText}
             </Button>
           </div>

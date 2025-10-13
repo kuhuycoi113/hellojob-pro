@@ -1,11 +1,37 @@
 
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import EmployerDetailPage from './client';
+import { useSearchParams, useRouter } from 'next/navigation';
 
-// This is now a Server Component by default
+function PageLogic() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const partnerId = searchParams.get('partnerId');
+
+  useEffect(() => {
+    if (!partnerId) {
+      // If there's no partnerId, redirect to the main employers page.
+      router.replace('/nha-tuyen-dung');
+    }
+  }, [partnerId, router]);
+
+  // If partnerId doesn't exist, we'll be redirecting, so we can show a loader.
+  // If it exists, EmployerDetailPage will be rendered.
+  if (!partnerId) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-secondary">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
+  return <EmployerDetailPage />;
+}
+
+// This is the main page component
 export default function EmployerRegisterPage() {
     return (
         <Suspense fallback={
@@ -13,8 +39,7 @@ export default function EmployerRegisterPage() {
                 <Loader2 className="h-16 w-16 animate-spin text-primary"/>
             </div>
         }>
-            {/* The actual page content is in the Client Component */}
-            <EmployerDetailPage />
+            <PageLogic />
         </Suspense>
     );
 }
