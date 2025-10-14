@@ -476,7 +476,7 @@ const regionKanjiMap: { [key: string]: string } = {
 
 
 
-const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, onSave, onEditClick }: { isOpen: boolean; onOpenChange: (open: boolean) => void; employer: any; lang: Language; isConfirmationMode: boolean; onSave: (data: any) => void; onEditClick: () => void; }) => {
+const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, onSave }: { isOpen: boolean; onOpenChange: (open: boolean) => void; employer: any; lang: Language; isConfirmationMode: boolean; onSave: (data: any) => void; }) => {
     const t = contentByLang[lang];
     const [tempInfo, setTempInfo] = useState(employer.info);
     const [phoneCountry, setPhoneCountry] = useState('+84');
@@ -553,7 +553,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                 <DialogHeader>
                     <DialogTitle>{t.infoTitle}</DialogTitle>
                 </DialogHeader>
-                <div id="DKTHONGTINDOANHNGHIEP_DIALOG" className="space-y-4 max-h-[70vh] overflow-y-auto pr-4">
+                <div id="DKTHONGTINDOANHNGHIEP_DIALOG_CONTENT" className="space-y-4 max-h-[70vh] overflow-y-auto pr-4">
                     <div id="DKDN_THONGTINCHUNG" className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label id="DKDN_NAMTHANHLAP_LABEL" htmlFor="founded">{t.foundedLabel}</Label>
@@ -625,9 +625,19 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                     </SelectContent>
                                 </Select>
                                 <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo?.zalo || '', zaloCountry)} onChange={(e) => handleInfoChange('zalo', e.target.value.replace(/\D/g, ''))} />
-                                <div onClick={onEditClick} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
-                                    <QrCode className="h-5 w-5"/>
-                                </div>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <div className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
+                                            <QrCode className="h-5 w-5"/>
+                                        </div>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Tải lên mã QR Zalo</DialogTitle>
+                                        </DialogHeader>
+                                        {/* QR upload content will go here */}
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                           </div>
                           <div className="space-y-1">
@@ -659,7 +669,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                       </div>
                       <div ref={errorRef} className={cn("mt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", showContactError && 'border-destructive ring-2 ring-destructive/40')}>
                            {(!tempInfo?.email && !tempInfo?.phone && !tempInfo?.zalo && !tempInfo?.messenger && !tempInfo?.line) && (
-                              <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                              <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isConfirmationMode ? t.reRegisterAction : t.registerAction}</Badge></div>
                            )}
                       </div>
                   </div>
@@ -740,7 +750,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       });
     }, [lang]);
 
-    const getArrayValue = React.useCallback((value: { [key in Language]?: string[] } | string[], context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
+    const getArrayValue = React.useCallback((value: { [key in Language]?: string[] } | string[] | undefined, context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
         const items = (typeof value === 'object' && !Array.isArray(value) ? value?.[lang] : value) || [];
         if (!items || items.length === 0) {
           const clickHandler = () => {
@@ -780,7 +790,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             let name;
             if (context === 'visaDetail') {
                 item = dataMap[context]?.find((i: any) => i.slug === slug);
-                name = item?.name[lang] || item?.name?.vi || slug;
+                name = item?.name?.[lang] || item?.name?.vi || slug;
             } else if (context === 'regions') {
                 const region = japanRegions.find(r => r.slug === slug);
                 name = lang === 'ja' ? regionKanjiMap[region?.name as keyof typeof regionKanjiMap] : region?.name;
@@ -876,16 +886,24 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             for (const key in updates) {
                 if (updates[key] !== null && updates[key] !== undefined) {
                      if (key === 'location' && updates.location) {
-                        updates.industries = {
-                            ...(updates.industries || {}),
+                        merged.industries = {
+                            ...(merged.industries || {}),
                             secondary: {
                                 vi: updates.location,
                                 ja: updates.location,
                                 en: updates.location
                             }
                         };
-                     }
-                     if (typeof updates[key] === 'object' && !Array.isArray(updates[key])) {
+                     } else if (key === 'visa_type' && updates.visa_type) {
+                        merged.visaType = { ...merged.visaType, [langFromParams]: updates.visa_type };
+                     } else if (key === 'visa_detail' && updates.visa_detail) {
+                        merged.visaDetail = { ...merged.visaDetail, [langFromParams]: updates.visa_detail };
+                     } else if (key === 'industry' && updates.industry) {
+                         merged.industries = {
+                            ...(merged.industries || {}),
+                            main: { ...merged.industries?.main, [langFromParams]: updates.industry }
+                         };
+                     } else if (typeof updates[key] === 'object' && !Array.isArray(updates[key])) {
                         merged[key] = { ...(base[key] || {}), ...updates[key] };
                      } else {
                         merged[key] = updates[key];
@@ -1573,7 +1591,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 lang={lang}
                                 isConfirmationMode={isConfirmationMode}
                                 onSave={(data) => setEmployer(data)}
-                                onEditClick={() => {}}
                             />
                         </Dialog>
                       </div>
@@ -1660,7 +1677,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 lang={lang}
                                 isConfirmationMode={isConfirmationMode}
                                 onSave={(data) => setEmployer(data)}
-                                onEditClick={() => {}}
+                                onEditClick={() => setIsInfoDialogOpen(true)}
                             />
                         </Dialog>
                       </div>
@@ -1716,4 +1733,4 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       )
     }
 
-
+    
