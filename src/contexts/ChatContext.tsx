@@ -2,9 +2,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { Conversation, Message, User, conversations, getCurrentUser, helloJobBot, Attachment } from '@/lib/chat-data';
+import { Conversation, Message, User, conversations, helloJobBot, Attachment } from '@/lib/chat-data';
 import { consultants } from "@/lib/consultant-data";
-import { recommendJobs, type JobRecommendationResponse } from '@/ai/flows/recommend-jobs-flow';
 import { useAuth } from '@/contexts/AuthContext';
 import { Job } from '@/lib/mock-data';
 
@@ -32,83 +31,83 @@ interface ChatProviderProps {
 }
 
 export const ChatProvider = ({ children }: ChatProviderProps) => {
-  const { role } = useAuth();
+  const { role, user: currentUser } = useAuth();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
   const [assignedConsultant, setAssignedConsultant] = useState<User | null>(null);
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
     // Predictable random assignment based on user ID
     // This ensures a user always gets the same consultant, but different users get different ones.
-    const userIdNumber = parseInt(currentUser.id.replace(/[^0-9]/g, ''), 10) || 0;
+    const userIdNumber = parseInt(currentUser?.id?.replace(/[^0-9]/g, ''), 10) || 0;
     const consultantIndex = userIdNumber % consultants.length;
     const consultant = consultants[consultantIndex];
     setAssignedConsultant(consultant);
 
     const botConversation = conversations.find(c => c.id === 'convo-bot-hellojob');
     if (botConversation) {
-        // Clear previous welcome messages to regenerate with the correct consultant
-        botConversation.messages = botConversation.messages.filter(m => m.id !== 'msg-bot-welcome');
-        
-        // Add the new welcome message if it doesn't exist
-        if (botConversation.messages.length === 0) {
-            botConversation.messages.push({
-                id: 'msg-bot-welcome',
-                sender: consultant,
-                text: `Chào bạn, tôi là ${consultant.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`,
-                timestamp: new Date().toISOString(),
-            });
-        }
+      // Clear previous welcome messages to regenerate with the correct consultant
+      botConversation.messages = botConversation.messages.filter(m => m.id !== 'msg-bot-welcome');
+
+      // Add the new welcome message if it doesn't exist
+      if (botConversation.messages.length === 0) {
+        botConversation.messages.push({
+          id: 'msg-bot-welcome',
+          sender: consultant,
+          text: `Chào bạn, tôi là ${consultant.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`,
+          timestamp: new Date().toISOString(),
+        });
+      }
+      // Update participants
+      botConversation.participants = [currentUser, helloJobBot];
     }
-  }, [role]); // Rerun this logic when the role (and thus currentUser) changes
+  }, [role, currentUser]); // Rerun this logic when the role/user changes
 
   const openChat = (user?: User, job?: Job, initialMessage?: string) => {
-    const currentUser = getCurrentUser();
     const targetUser = user || assignedConsultant || helloJobBot;
-    
+
     let conversation = conversations.find(c => c.participants.some(p => p.id === targetUser.id));
-    
+
     if (!conversation) {
-        const initialBotMessage = `Chào bạn, tôi là ${targetUser.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`;
-        
-        conversation = {
-            id: `convo-${targetUser.id}`,
-            participants: [currentUser, targetUser],
-            messages: [
-                {
-                    id: `msg-${Date.now()}`,
-                    sender: targetUser,
-                    text: initialBotMessage,
-                    timestamp: new Date().toISOString()
-                }
-            ]
-        }
-        if (!conversations.some(c => c.id === conversation!.id)) {
-            conversations.push(conversation);
-        }
+      const initialBotMessage = `Chào bạn, tôi là ${targetUser.name}, tư vấn viên của HelloJob. Tôi có thể giúp gì cho bạn?`;
+
+      conversation = {
+        id: `convo-${targetUser.id}`,
+        participants: [currentUser, targetUser],
+        messages: [
+          {
+            id: `msg-${Date.now()}`,
+            sender: targetUser,
+            text: initialBotMessage,
+            timestamp: new Date().toISOString()
+          }
+        ]
+      }
+      if (!conversations.some(c => c.id === conversation!.id)) {
+        conversations.push(conversation);
+      }
     }
 
     // If a job is passed, send the job card and initial message
     if (job) {
-        const jobMessage: Message = {
-            id: `msg-job-${Date.now()}`,
-            sender: currentUser,
-            text: '',
-            timestamp: new Date().toISOString(),
-            job: job, // Attach the job object
-        };
+      const jobMessage: Message = {
+        id: `msg-job-${Date.now()}`,
+        sender: currentUser,
+        text: '',
+        timestamp: new Date().toISOString(),
+        job: job, // Attach the job object
+      };
 
-        const textMessage: Message = {
-            id: `msg-text-${Date.now()}`,
-            sender: currentUser,
-            text: initialMessage || 'Cho mình hỏi về việc làm này.',
-            timestamp: new Date().toISOString(),
-        };
-        
-        conversation.messages.push(jobMessage, textMessage);
+      const textMessage: Message = {
+        id: `msg-text-${Date.now()}`,
+        sender: currentUser,
+        text: initialMessage || 'Cho mình hỏi về việc làm này.',
+        timestamp: new Date().toISOString(),
+      };
+
+      conversation.messages.push(jobMessage, textMessage);
     }
-    
+
     setActiveConversation(conversation);
     setIsChatOpen(true);
   };
@@ -119,7 +118,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
   const sendMessage = async (text: string, attachment?: Attachment) => {
     if (!activeConversation) return;
-    const currentUser = getCurrentUser();
 
     const newMessage: Message = {
       id: `msg-${Date.now()}`,
@@ -129,15 +127,15 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
       attachment: attachment,
     };
 
-    const updatedConversation = { 
-        ...activeConversation, 
-        messages: [...activeConversation.messages, newMessage] 
+    const updatedConversation = {
+      ...activeConversation,
+      messages: [...activeConversation.messages, newMessage]
     };
     setActiveConversation(updatedConversation);
-    
+
     const convoIndex = conversations.findIndex(c => c.id === activeConversation.id);
-    if(convoIndex !== -1) {
-        conversations[convoIndex] = updatedConversation;
+    if (convoIndex !== -1) {
+      conversations[convoIndex] = updatedConversation;
     }
   };
 

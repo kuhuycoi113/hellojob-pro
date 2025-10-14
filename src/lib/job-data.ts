@@ -202,7 +202,7 @@ const createJobList = (): Job[] => {
             if (!industries) continue;
             
             for (const industry of industries) {
-                const keywords = industry.keywords && industry.keywords.length > 0 ? [...industry.keywords] : [industry.name.vi];
+                const keywords = industry.keywords && industry.keywords.length > 0 ? [...industry.keywords] : [industry.name];
                 
                 for (const keyword of keywords) {
                     const location = getRandomItem(locations, jobIndex);
@@ -213,7 +213,7 @@ const createJobList = (): Job[] => {
                     const title = `${keyword}, ${location}, tuyển ${quantity} ${gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender}`;
                     
                     const findMatchingConsultant = () => {
-                        const lowerCaseIndustry = industry.name.vi.toLowerCase();
+                        const lowerCaseIndustry = industry.name.toLowerCase();
                         const lowerCaseVisaType = visaType.name.toLowerCase();
                         const expertConsultants = consultants.filter(c => {
                             const expertise = c.mainExpertise?.toLowerCase() || '';
@@ -267,7 +267,7 @@ const createJobList = (): Job[] => {
                     
                     const otherSkillsText = selectedOtherSkills.map(s => `<li>${s.name}</li>`).join('');
                     const isEngineer = visaType.name.includes('Kỹ sư');
-                    const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name.vi}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
+                    const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
                     
                     let netFee: string | undefined = undefined;
                     let netFeeNoTicket: string | undefined = undefined;
@@ -275,7 +275,7 @@ const createJobList = (): Job[] => {
 
                     const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
                     if (feeVisas.includes(detail.slug) && jobIndex % 5 < 4) { // 80% have fees
-                        const maxFee = feeLimits[detail.name.vi];
+                        const maxFee = feeLimits[detail.name];
                         const feeValue = 1000 + Math.floor(((jobIndex * 137) % (maxFee - 1000)));
 
                         if (['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam'].includes(detail.slug)) {
@@ -322,10 +322,10 @@ const createJobList = (): Job[] => {
                         netFeeWithTuition,
                         target: `${(jobIndex % 5) + 1}tr`,
                         backFee: `${(jobIndex % 5) + 1}tr`,
-                        tags: [industry.name.vi, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
+                        tags: [industry.name, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
                         visaType: visaType.name,
-                        visaDetail: detail.name.vi,
-                        industry: industry.name.vi,
+                        visaDetail: detail.name,
+                        industry: industry.name,
                         workLocation: location,
                         interviewLocation: getRandomItem(interviewLocations, jobIndex),
                         gender: gender,
@@ -333,7 +333,7 @@ const createJobList = (): Job[] => {
                         ageRequirement: `${18 + (jobIndex % 5)}-${35 + (jobIndex % 15)}`,
                         languageRequirement: languageRequirement,
                         educationRequirement: isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : getRandomItem(educationLevels, jobIndex),
-                        experienceRequirement: jobIndex % 3 === 0 ? 'Không yêu cầu kinh nghiệm' : `Kinh nghiệm ngành ${industry.name.vi} là một lợi thế`,
+                        experienceRequirement: jobIndex % 3 === 0 ? 'Không yêu cầu kinh nghiệm' : `Kinh nghiệm ngành ${industry.name} là một lợi thế`,
                         yearsOfExperience: jobIndex % 3 === 0 ? 'Không yêu cầu' : '1-2 năm',
                         heightRequirement: `Trên ${150 + (jobIndex % 15)} cm`,
                         weightRequirement: `Trên ${40 + (jobIndex % 10)} kg`,
@@ -374,7 +374,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             if (!industries) continue;
             const industry = getRandomItem(industries, jobIndex);
     
-            const keywords = industry.keywords && industry.keywords.length > 0 ? [...industry.keywords] : [industry.name.vi];
+            const keywords = industry.keywords && industry.keywords.length > 0 ? [...industry.keywords] : [industry.name];
             const keyword = getRandomItem(keywords, jobIndex);
     
             const gender = getRandomItem(['Nam', 'Nữ', 'Cả nam và nữ'], jobIndex) as 'Nam' | 'Nữ' | 'Cả nam và nữ';
@@ -384,7 +384,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             const title = `${keyword}, ${location}, tuyển ${quantity} ${gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender}`;
             
             const findMatchingConsultant = () => {
-                const lowerCaseIndustry = industry.name.vi.toLowerCase();
+                const lowerCaseIndustry = industry.name.toLowerCase();
                 const lowerCaseVisaType = visaType.name.toLowerCase();
                 const expertConsultants = consultants.filter(c => {
                     const expertise = c.mainExpertise?.toLowerCase() || '';
@@ -439,7 +439,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
             }
             
             const otherSkillsText = selectedOtherSkills.map(s => `<li>${s.name}</li>`).join('');
-            const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name.vi}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
+            const requirementsBase = `<ul><li>Yêu cầu: ${isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : 'Tốt nghiệp THPT trở lên'}.</li><li>Sức khỏe tốt, không mắc các bệnh truyền nhiễm theo quy định.</li><li>Chăm chỉ, chịu khó, có tinh thần học hỏi.</li><li>${languageRequirement !== 'Không yêu cầu' ? `Trình độ tiếng Nhật tương đương ${languageRequirement}.` : 'Không yêu cầu tiếng Nhật.'}</li><li>${jobIndex % 3 !== 0 ? `Có kinh nghiệm tối thiểu 1 năm trong lĩnh vực ${industry.name}.` : 'Không yêu cầu kinh nghiệm, sẽ được đào tạo.'}</li></ul>`;
     
             let netFee: string | undefined = undefined;
             let netFeeNoTicket: string | undefined = undefined;
@@ -447,7 +447,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
 
             const feeVisas = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam', 'dac-dinh-dau-viet', 'dac-dinh-di-moi', 'ky-su-tri-thuc-dau-viet'];
             if (feeVisas.includes(detail.slug) && jobIndex % 5 < 4) { // 80% have fees
-                const maxFee = feeLimits[detail.name.vi];
+                const maxFee = feeLimits[detail.name];
                 const feeValue = 1000 + Math.floor(((jobIndex * 137) % (maxFee - 1000)));
 
                 if (['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam'].includes(detail.slug)) {
@@ -493,10 +493,10 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 netFeeWithTuition,
                 target: `${(jobIndex % 5) + 1}tr`,
                 backFee: `${(jobIndex % 5) + 1}tr`,
-                tags: [industry.name.vi, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
+                tags: [industry.name, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
                 visaType: visaType.name,
-                visaDetail: detail.name.vi,
-                industry: industry.name.vi,
+                visaDetail: detail.name,
+                industry: industry.name,
                 workLocation: location,
                 interviewLocation: getRandomItem(interviewLocations, jobIndex),
                 gender: gender,
@@ -504,7 +504,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 ageRequirement: `${18 + (jobIndex % 5)}-${35 + (jobIndex % 15)}`,
                 languageRequirement: languageRequirement,
                 educationRequirement: isEngineer ? 'Tốt nghiệp Cao đẳng trở lên' : getRandomItem(educationLevels, jobIndex),
-                experienceRequirement: jobIndex % 3 === 0 ? 'Không yêu cầu kinh nghiệm' : `Kinh nghiệm ngành ${industry.name.vi} là một lợi thế`,
+                experienceRequirement: jobIndex % 3 === 0 ? 'Không yêu cầu kinh nghiệm' : `Kinh nghiệm ngành ${industry.name} là một lợi thế`,
                 yearsOfExperience: jobIndex % 3 === 0 ? 'Không yêu cầu' : '1-2 năm',
                 heightRequirement: `Trên ${150 + (jobIndex % 15)} cm`,
                 weightRequirement: `Trên ${40 + (jobIndex % 10)} kg`,

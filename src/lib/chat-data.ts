@@ -26,7 +26,7 @@ export type Attachment = {
 
 export type Message = {
   id: string;
-  sender: User;
+  sender: User | any;
   text: string;
   timestamp: string;
   isLoading?: boolean;
@@ -38,7 +38,7 @@ export type Message = {
 
 export type Conversation = {
   id: string;
-  participants: User[];
+  participants: any[];
   messages: Message[];
 };
 
@@ -57,11 +57,11 @@ export const guestUser: User = {
 
 // AI Bot persona
 export const helloJobBot: User = {
-    id: 'bot-hellojob',
-    name: 'HelloJob AI',
-    avatarUrl: '/img/favi2.png',
-    dataAiHint: 'friendly robot mascot',
-    isBot: true,
+  id: 'bot-hellojob',
+  name: 'HelloJob AI',
+  avatarUrl: '/img/favi2.png',
+  dataAiHint: 'friendly robot mascot',
+  isBot: true,
 };
 
 
