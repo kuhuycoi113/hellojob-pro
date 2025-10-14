@@ -85,7 +85,7 @@ const employersData: { [key: string]: any } = {
             ja: 'ベトナム、ハノイ',
             en: 'Hanoi, Vietnam'
         },
-        logo: '/img/viet-img/company3.png',
+        logo: '/img/ANH CHUNG/company3.png',
         banner: '/img/viet-img/anh-bia.jpg',
         
         about: {
@@ -1320,13 +1320,13 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKLV_LOAIHINH_BUTTON">
                                         <div className="flex flex-wrap gap-1">
-                                        {currentVisaTypes.length > 0 ? (
-                                            currentVisaTypes.map((slug: string, index: number) => {
-                                                const item = localizedJapanJobTypes.find(t => t.slug === slug);
-                                                const name = item?.name[lang] || item?.name?.vi || item?.name || slug;
-                                                return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
-                                            })
-                                        ) : t.selectVisaTypePlaceholder}
+                                            {currentVisaTypes.length > 0 ? (
+                                                currentVisaTypes.map((slug: string, index: number) => {
+                                                    const item = localizedJapanJobTypes.find(t => t.slug === slug);
+                                                    const name = item?.name?.[lang] || item?.name?.vi || item?.name || slug;
+                                                    return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
+                                                })
+                                            ) : t.selectVisaTypePlaceholder}
                                         </div>
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -1731,5 +1731,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         </Dialog>
       )
     }
+
+    
 
     
