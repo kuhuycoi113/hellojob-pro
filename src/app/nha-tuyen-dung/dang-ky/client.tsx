@@ -220,7 +220,7 @@ const contentByLang = {
         edit: 'Sửa',
         aboutTitle: 'Giới thiệu doanh nghiệp',
         imagesTitle: 'Ảnh về doanh nghiệp',
-        historyTitle: 'Lịch sử & các mốc sự kiện',
+        historyTitle: 'Lịch sử &amp; các mốc sự kiện',
         infoTitle: 'Thông tin doanh nghiệp',
         foundedLabel: 'Năm thành lập',
         foundedPlaceholder: 'Ví dụ: 2010',
@@ -245,8 +245,8 @@ const contentByLang = {
         companyNamePlaceholder: 'Ví dụ: Công ty Cổ phần ABC',
         typePlaceholder: '[Loại hình/Vai trò/Chức danh...]',
         locationPlaceholder: 'Ví dụ: Hà Nội, Việt Nam',
-        benefitsTitle: 'Phúc lợi & Môi trường',
-        valueInterestTitle: "Nghiệp vụ & Giá trị quan tâm",
+        benefitsTitle: 'Phúc lợi &amp; Môi trường',
+        valueInterestTitle: "Nghiệp vụ &amp; Giá trị quan tâm",
         interestLabel: "Nghiệp vụ quan tâm",
         interestDescription: "Hãy cho chúng tôi biết mục tiêu chính của bạn để có trải nghiệm tốt nhất. Bạn có thể chọn nhiều mục.",
         valueInterestLabel: "Giá trị quan tâm",
@@ -276,8 +276,8 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "Chọn khu vực",
         selectInterestLabel: 'Chọn nghiệp vụ',
         selectValueInterestLabel: 'Chọn giá trị (sắp xếp theo ưu tiên)',
-        visaAndIndustriesTitle: "Visa, Ngành nghề & Khu vực",
-        visaAndIndustriesDialogTitle: "Chỉnh sửa Visa, Ngành nghề & Khu vực",
+        visaAndIndustriesTitle: "Visa, Ngành nghề &amp; Khu vực",
+        visaAndIndustriesDialogTitle: "Chỉnh sửa Visa, Ngành nghề &amp; Khu vực",
         mainIndustriesLabel: "Ngành nghề chính",
         secondaryIndustriesLabel: "Khu vực chính",
     },
@@ -350,7 +350,7 @@ const contentByLang = {
         edit: 'Edit',
         aboutTitle: 'About the Company',
         imagesTitle: 'Company Photos',
-        historyTitle: 'History & Milestones',
+        historyTitle: 'History &amp; Milestones',
         infoTitle: 'Company Information',
         foundedLabel: 'Founded',
         foundedPlaceholder: 'E.g., 2010',
@@ -375,8 +375,8 @@ const contentByLang = {
         companyNamePlaceholder: 'E.g., ABC Corporation',
         typePlaceholder: '[Type/Role/Title...]',
         locationPlaceholder: 'E.g., Hanoi, Vietnam',
-        benefitsTitle: 'Benefits & Environment',
-        valueInterestTitle: 'Operations & Values',
+        benefitsTitle: 'Benefits &amp; Environment',
+        valueInterestTitle: 'Operations &amp; Values',
         interestLabel: "Operations of Interest",
         interestDescription: "Tell us your main goal for the best experience. You can select multiple items.",
         valueInterestLabel: "Desired Values",
@@ -406,8 +406,8 @@ const contentByLang = {
         selectSecondaryIndustriesPlaceholder: "Select Region",
         selectInterestLabel: 'Select Operations',
         selectValueInterestLabel: 'Select Values (sort by priority)',
-        visaAndIndustriesTitle: "Visa, Industry & Region",
-        visaAndIndustriesDialogTitle: "Edit Visa, Industry & Region",
+        visaAndIndustriesTitle: "Visa, Industry &amp; Region",
+        visaAndIndustriesDialogTitle: "Edit Visa, Industry &amp; Region",
         mainIndustriesLabel: "Main Industries",
         secondaryIndustriesLabel: "Main Recruitment Areas",
     }
@@ -433,9 +433,9 @@ const valueInterestOptions = {
       { id: 'cham-soc-khach-hang', title: '最高の顧客ケアサービス' },
     ],
     en: [
-      { id: 'ung-vien-nhieu-nhanh', title: 'Most & Fastest Candidates' },
+      { id: 'ung-vien-nhieu-nhanh', title: 'Most &amp; Fastest Candidates' },
       { id: 'ung-vien-chat-luong', title: 'Quality Candidates' },
-      { id: 'viec-lam-ro-rang', title: 'Clear & Quality Jobs' },
+      { id: 'viec-lam-ro-rang', title: 'Clear &amp; Quality Jobs' },
       { id: 'chi-phi-thap', title: 'Lowest Recruitment Cost' },
       { id: 'loi-nhuan-cao', title: 'Highest Profit' },
       { id: 'quan-ly-ho-tro', title: 'Best Support Management Service' },
@@ -451,7 +451,7 @@ const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, 
             <CardTitle className="font-headline text-xl flex items-center gap-3">
                 <Icon className="text-primary h-6 w-6"/>{title}
             </CardTitle>
-            {onEditClick && !isConfirmationMode && (
+            {onEditClick &amp;&amp; !isConfirmationMode &amp;&amp; (
               <Button variant="ghost" size="icon" onClick={onEditClick}><Edit className="h-4 w-4"/></Button>
             )}
         </CardHeader>
@@ -473,21 +473,21 @@ const regionKanjiMap: { [key: string]: string } = {
 
 
 
-const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, onSave, onEditClick }: { isOpen: boolean; onOpenChange: (open: boolean) => void; employer: any; lang: Language; isConfirmationMode: boolean; onSave: (data: any) => void; onEditClick: () => void; }) => {
+const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, onSave, onEditClick }: { isOpen: boolean; onOpenChange: (open: boolean) =&gt; void; employer: any; lang: Language; isConfirmationMode: boolean; onSave: (data: any) =&gt; void; onEditClick: () =&gt; void; }) =&gt; {
     const t = contentByLang[lang];
     const [tempInfo, setTempInfo] = useState(employer.info);
     const [phoneCountry, setPhoneCountry] = useState('+84');
     const [zaloCountry, setZaloCountry] = useState('+84');
-    const [errors, setErrors] = useState<{ email?: string; messenger?: string; line?: string }>({});
+    const [errors, setErrors] = useState&lt;{ email?: string; messenger?: string; line?: string }&gt;({});
     const [showContactError, setShowContactError] = useState(false);
-    const errorRef = useRef<HTMLDivElement>(null);
+    const errorRef = useRef&lt;HTMLDivElement&gt;(null);
 
-    useEffect(() => {
+    useEffect(() =&gt; {
         setTempInfo(employer.info);
         setShowContactError(false);
     }, [employer.info]);
 
-    const handleInfoChange = (field: string, value: string) => {
+    const handleInfoChange = (field: string, value: string) =&gt; {
         const newInfo = { ...tempInfo, [field]: value };
         setTempInfo(newInfo);
         if (value.trim() !== '') {
@@ -495,10 +495,10 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
         }
     };
     
-    const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const validateEmail = (email: string) =&gt; /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    const validateField = (field: 'messenger' | 'line', value: string) => {
-        if (!value) { setErrors(prev => ({...prev, [field]: undefined })); return true; }
+    const validateField = (field: 'messenger' | 'line', value: string) =&gt; {
+        if (!value) { setErrors(prev =&gt; ({...prev, [field]: undefined })); return true; }
         let isValid = false;
         let errorMessage = "Định dạng không hợp lệ.";
         if (field === 'messenger') {
@@ -508,11 +508,11 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
             isValid = /^(https?:\/\/line\.me\/|@?[\w.-]+)/.test(value);
             errorMessage = "Vui lòng nhập link Line hoặc Line ID hợp lệ.";
         }
-        setErrors(prev => ({ ...prev, [field]: isValid ? undefined : errorMessage }));
+        setErrors(prev =&gt; ({ ...prev, [field]: isValid ? undefined : errorMessage }));
         return isValid;
     };
 
-    const handleSave = () => {
+    const handleSave = () =&gt; {
         const hasContactInfo = tempInfo.email || tempInfo.phone || tempInfo.zalo || tempInfo.messenger || tempInfo.line;
         if (!hasContactInfo) {
             setShowContactError(true);
@@ -522,11 +522,11 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
         setShowContactError(false);
 
         let allValid = true;
-        if (tempInfo.email && !validateEmail(tempInfo.email)) {
-            setErrors(prev => ({ ...prev, email: "Email không hợp lệ" }));
+        if (tempInfo.email &amp;&amp; !validateEmail(tempInfo.email)) {
+            setErrors(prev =&gt; ({ ...prev, email: "Email không hợp lệ" }));
             allValid = false;
         } else {
-             setErrors(prev => ({ ...prev, email: undefined }));
+             setErrors(prev =&gt; ({ ...prev, email: undefined }));
         }
         if (!validateField('messenger', tempInfo.messenger || '')) allValid = false;
         if (!validateField('line', tempInfo.line || '')) allValid = false;
@@ -554,22 +554,22 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                     <div id="DKDN_THONGTINCHUNG" className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label id="DKDN_NAMTHANHLAP_LABEL" htmlFor="founded">{t.foundedLabel}</Label>
-                            <Input id="DKDN_NAMTHANHLAP_INPUT" placeholder={t.foundedPlaceholder} value={tempInfo?.founded || ''} onChange={(e) => handleInfoChange('founded', e.target.value)} />
+                            <Input id="DKDN_NAMTHANHLAP_INPUT" placeholder={t.foundedPlaceholder} value={tempInfo?.founded || ''} onChange={(e) =&gt; handleInfoChange('founded', e.target.value)} />
                         </div>
                         <div className="space-y-2">
                             <Label id="DKDN_QUYMO_LABEL" htmlFor="size">{t.sizeLabel}</Label>
-                            <Input id="DKDN_QUYMO_INPUT" placeholder={t.sizePlaceholder} value={tempInfo?.size?.[lang] || ''} onChange={(e) => {
+                            <Input id="DKDN_QUYMO_INPUT" placeholder={t.sizePlaceholder} value={tempInfo?.size?.[lang] || ''} onChange={(e) =&gt; {
                                 const newSize = {...tempInfo.size, [lang]: e.target.value};
                                 setTempInfo({...tempInfo, size: newSize});
                             }} />
                         </div>
                         <div className="space-y-2">
                             <Label id="DKDN_GIAYPHEP_LABEL" htmlFor="license">{t.licenseLabel}</Label>
-                            <Input id="DKDN_GIAYPHEP_INPUT" placeholder={t.licensePlaceholder} value={tempInfo?.license || ''} onChange={(e) => handleInfoChange('license', e.target.value)} />
+                            <Input id="DKDN_GIAYPHEP_INPUT" placeholder={t.licensePlaceholder} value={tempInfo?.license || ''} onChange={(e) =&gt; handleInfoChange('license', e.target.value)} />
                         </div>
                         <div className="space-y-2">
                            <Label id="DKDN_WEBSITE_LABEL" htmlFor="website">{t.websiteLabel}</Label>
-                           <Input id="DKDN_WEBSITE_INPUT" placeholder="https://example.com" value={tempInfo?.website || ''} onChange={(e) => handleInfoChange('website', e.target.value)} />
+                           <Input id="DKDN_WEBSITE_INPUT" placeholder="https://example.com" value={tempInfo?.website || ''} onChange={(e) =&gt; handleInfoChange('website', e.target.value)} />
                         </div>
                     </div>
                     
@@ -583,17 +583,17 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                 id="DKDN_EMAIL_INPUT"
                                 placeholder="contact@company.com" 
                                 value={tempInfo?.email || ''} 
-                                onChange={(e) => handleInfoChange('email', e.target.value)} 
-                                onBlur={(e) => {
-                                  if (e.target.value && !validateEmail(e.target.value)) {
-                                    setErrors(prev => ({...prev, email: "Email không hợp lệ" }));
+                                onChange={(e) =&gt; handleInfoChange('email', e.target.value)} 
+                                onBlur={(e) =&gt; {
+                                  if (e.target.value &amp;&amp; !validateEmail(e.target.value)) {
+                                    setErrors(prev =&gt; ({...prev, email: "Email không hợp lệ" }));
                                   } else {
-                                     setErrors(prev => ({ ...prev, email: undefined }));
+                                     setErrors(prev =&gt; ({ ...prev, email: undefined }));
                                   }
                                 }}
-                                className={cn(errors?.email && "border-destructive")}
+                                className={cn(errors?.email &amp;&amp; "border-destructive")}
                               />
-                               {errors?.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                               {errors?.email &amp;&amp; <p className="text-xs text-destructive">{errors.email}</p>}
                            </div>
                           <div className="space-y-2">
                               <Label id="DKDN_SODIENTHOAI_LABEL" htmlFor="phone" className="flex items-center gap-2">
@@ -608,7 +608,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                         <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="DKDN_SODIENTHOAI_INPUT" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo?.phone || '', phoneCountry)} onChange={(e) => handleInfoChange('phone', e.target.value.replace(/\D/g, ''))} />
+                                <Input id="DKDN_SODIENTHOAI_INPUT" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo?.phone || '', phoneCountry)} onChange={(e) =&gt; handleInfoChange('phone', e.target.value.replace(/\D/g, ''))} />
                             </div>
                           </div>
                           <div className="space-y-2">
@@ -621,7 +621,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                         <SelectItem value="+81">JP</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo?.zalo || '', zaloCountry)} onChange={(e) => handleInfoChange('zalo', e.target.value.replace(/\D/g, ''))} />
+                                <Input id="DKDN_ZALO_INPUT" type="tel" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempInfo?.zalo || '', zaloCountry)} onChange={(e) =&gt; handleInfoChange('zalo', e.target.value.replace(/\D/g, ''))} />
                                 <div onClick={onEditClick} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
                                     <QrCode className="h-5 w-5"/>
                                 </div>
@@ -633,12 +633,12 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                 id="DKDN_MESSENGER_INPUT"
                                 placeholder={t.messengerPlaceholder}
                                 value={tempInfo?.messenger || ''}
-                                onChange={(e) => handleInfoChange('messenger', e.target.value)}
-                                onBlur={(e) => validateField('messenger', e.target.value)}
-                                className={cn(errors.messenger && "border-destructive")}
+                                onChange={(e) =&gt; handleInfoChange('messenger', e.target.value)}
+                                onBlur={(e) =&gt; validateField('messenger', e.target.value)}
+                                className={cn(errors.messenger &amp;&amp; "border-destructive")}
                             />
-                            {!errors.messenger && <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
-                            {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
+                            {!errors.messenger &amp;&amp; <p className="text-xs text-muted-foreground">{t.messengerHelper}</p>}
+                            {errors.messenger &amp;&amp; <p className="text-xs text-destructive">{errors.messenger}</p>}
                         </div>
                          <div className="space-y-1">
                             <Label id="DKDN_LINE_LABEL" htmlFor="line" className="flex items-center gap-2"><LineIcon className="h-4 w-4" />{t.lineLabel}</Label>
@@ -646,23 +646,23 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                                 id="DKDN_LINE_INPUT"
                                 placeholder={t.linePlaceholder}
                                 value={tempInfo?.line || ''}
-                                onChange={(e) => handleInfoChange('line', e.target.value)}
-                                onBlur={(e) => validateField('line', e.target.value)}
-                                className={cn(errors.line && "border-destructive")}
+                                onChange={(e) =&gt; handleInfoChange('line', e.target.value)}
+                                onBlur={(e) =&gt; validateField('line', e.target.value)}
+                                className={cn(errors.line &amp;&amp; "border-destructive")}
                             />
-                             {!errors.line && <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
-                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
+                             {!errors.line &amp;&amp; <p className="text-xs text-muted-foreground">{t.lineHelper}</p>}
+                             {errors.line &amp;&amp; <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                       </div>
-                      <div ref={errorRef} className={cn("mt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", showContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                           {(!tempInfo?.email && !tempInfo?.phone && !tempInfo?.zalo && !tempInfo?.messenger && !tempInfo?.line) && (
+                      <div ref={errorRef} className={cn("mt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", showContactError &amp;&amp; 'border-destructive ring-2 ring-destructive/40')}>
+                           {(!tempInfo?.email &amp;&amp; !tempInfo?.phone &amp;&amp; !tempInfo?.zalo &amp;&amp; !tempInfo?.messenger &amp;&amp; !tempInfo?.line) &amp;&amp; (
                               <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                            )}
                       </div>
                   </div>
                 </div>
                  <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>{t.cancelButton}</Button>
+                    <Button variant="outline" onClick={() =&gt; onOpenChange(false)}>{t.cancelButton}</Button>
                     <Button onClick={handleSave}>{t.saveButton}</Button>
                 </DialogFooter>
             </DialogContent>
@@ -674,8 +674,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  const [employer, setEmployer] = React.useState<any | null>(null);
-  const [lang, setLang] = React.useState<Language>('vi');
+  const [employer, setEmployer] = React.useState&lt;any | null&gt;(null);
+  const [lang, setLang] = React.useState&lt;Language&gt;('vi');
   const [isIndividual, setIsIndividual] = React.useState(false);
   const [displayName, setDisplayName] = React.useState('');
   const [roleText, setRoleText] = React.useState('');
@@ -683,19 +683,19 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false);
   const [showFooter, setShowFooter] = React.useState(true);
   const [lastScrollY, setLastScrollY] = React.useState(0);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const isMobile = typeof window !== 'undefined' &amp;&amp; window.innerWidth &lt; 768;
   const [mainContactError, setMainContactError] = React.useState(false);
-  const infoCardRef = React.useRef<HTMLDivElement>(null);
-  const mobileInfoCardRef = React.useRef<HTMLDivElement>(null);
+  const infoCardRef = React.useRef&lt;HTMLDivElement&gt;(null);
+  const mobileInfoCardRef = React.useRef&lt;HTMLDivElement&gt;(null);
   const [isUpdateMode, setIsUpdateMode] = React.useState(false);
 
 
   const t = contentByLang[lang] || contentByLang['vi'];
-  const hasContactInfo = employer?.info && (employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line || employer.info.email);
+  const hasContactInfo = employer?.info &amp;&amp; (employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line || employer.info.email);
 
-  const controlNavbar = useCallback(() => {
+  const controlNavbar = useCallback(() =&gt; {
     if (typeof window !== 'undefined') {
-      if (window.scrollY > lastScrollY) { // if scroll down
+      if (window.scrollY &gt; lastScrollY) { // if scroll down
         setShowFooter(false);
       } else { // if scroll up
         setShowFooter(true);
@@ -704,10 +704,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     }
   }, [lastScrollY]);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && isMobile) {
+  useEffect(() =&gt; {
+    if (typeof window !== 'undefined' &amp;&amp; isMobile) {
       window.addEventListener('scroll', controlNavbar);
-      return () => {
+      return () =&gt; {
         window.removeEventListener('scroll', controlNavbar);
       };
     }
@@ -715,39 +715,39 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
 
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
-  const [editingModule, setEditingModule] = React.useState<{title: string, field: string } | null>(null);
-  const [tempContent, setTempContent] = React.useState<any>('');
+  const [editingModule, setEditingModule] = React.useState&lt;{title: string, field: string } | null&gt;(null);
+  const [tempContent, setTempContent] = React.useState&lt;any&gt;('');
   
   const [phoneCountry, setPhoneCountry] = React.useState('+84');
   const [zaloCountry, setZaloCountry] = React.useState('+84');
   const { toast } = useToast();
-  const [errors, setErrors] = React.useState<{ email?: string; messenger?: string, line?: string }>({});
+  const [errors, setErrors] = React.useState&lt;{ email?: string; messenger?: string, line?: string }&gt;({});
   
-  const handleTempArrayChange = React.useCallback((index: number, field: string, value: string) => {
-    setTempContent((prev: any[]) => {
+  const handleTempArrayChange = React.useCallback((index: number, field: string, value: string) =&gt; {
+    setTempContent((prev: any[]) =&gt; {
       const newArray = [...prev];
-      if (typeof newArray[index] === 'object' && newArray[index] !== null && 'event' in newArray[index]) { // History object
+      if (typeof newArray[index] === 'object' &amp;&amp; newArray[index] !== null &amp;&amp; 'event' in newArray[index]) { // History object
         newArray[index] = { ...newArray[index], [field]: { ...newArray[index][field], [lang]: value } };
-      } else if (typeof newArray[index] === 'object' && newArray[index] !== null && 'alt' in newArray[index]) { // Image object
+      } else if (typeof newArray[index] === 'object' &amp;&amp; newArray[index] !== null &amp;&amp; 'alt' in newArray[index]) { // Image object
          newArray[index] = { ...newArray[index], alt: { ...newArray[index].alt, [lang]: value } };
-      } else if (typeof newArray[index] === 'object' && newArray[index] !== null) { // Benefits object
+      } else if (typeof newArray[index] === 'object' &amp;&amp; newArray[index] !== null) { // Benefits object
         newArray[index] = { ...newArray[index], [lang]: value };
       }
       return newArray;
     });
   }, [lang]);
 
-  const getArrayValue = useCallback((value: { [key in Language]?: string[] } | string[], context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
-    const items = (typeof value === 'object' && !Array.isArray(value) ? value?.[lang] : value) || [];
+  const getArrayValue = useCallback((value: { [key in Language]?: string[] } | string[], context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) =&gt; {
+    const items = (typeof value === 'object' &amp;&amp; !Array.isArray(value) ? value?.[lang] : value) || [];
     if (!items || items.length === 0) {
-      const clickHandler = () => {
+      const clickHandler = () =&gt; {
           if(context === 'interest' || context === 'valueInterest') {
               handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest');
           } else {
               handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
           }
       };
-      return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={clickHandler}>{t.clickToUpdate}</button>
+      return &lt;button disabled={isConfirmationMode} className="italic text-primary underline" onClick={clickHandler}&gt;{t.clickToUpdate}&lt;/button&gt;
     }
     const dataMap: any = {
         industries: allIndustries,
@@ -758,56 +758,56 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     
     if (context === 'interest') {
         const interestDisplayOptions = interestOptions[lang];
-        const content = items.map((slug: string, index: number) => {
-            const item = interestDisplayOptions.find((i: any) => i.id === slug);
-            return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item?.title || slug}</Badge>;
+        const content = items.map((slug: string, index: number) =&gt; {
+            const item = interestDisplayOptions.find((i: any) =&gt; i.id === slug);
+            return &lt;Badge key={index} variant="secondary" className="font-normal"&gt;&lt;span className="font-bold mr-1.5"&gt;{index + 1}.&lt;/span&gt;{item?.title || slug}&lt;/Badge&gt;;
         });
-        return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
+        return &lt;div className="flex flex-wrap gap-1 mt-1"&gt;{content}&lt;/div&gt;
     }
     
     if (context === 'valueInterest') {
-        const content = employer.valueInterest.map((item: any, index: number) => {
-             return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item[lang] || item.vi}</Badge>
+        const content = employer.valueInterest.map((item: any, index: number) =&gt; {
+             return &lt;Badge key={index} variant="secondary" className="font-normal"&gt;&lt;span className="font-bold mr-1.5"&gt;{index + 1}.&lt;/span&gt;{item[lang] || item.vi}&lt;/Badge&gt;
         });
-        return <div className="flex flex-wrap gap-1 mt-1">{content}</div>
+        return &lt;div className="flex flex-wrap gap-1 mt-1"&gt;{content}&lt;/div&gt;
     }
 
-    const content = items.map((slug: string, index: number) => {
+    const content = items.map((slug: string, index: number) =&gt; {
         let item;
         let name;
         if (context === 'visaDetail') {
-            item = dataMap[context]?.find((i: any) => i.slug === slug);
+            item = dataMap[context]?.find((i: any) =&gt; i.slug === slug);
             name = item?.name[lang] || item?.name?.vi || slug;
         } else if (context === 'regions') {
-            const region = japanRegions.find(r => r.slug === slug);
+            const region = japanRegions.find(r =&gt; r.slug === slug);
             name = lang === 'ja' ? regionKanjiMap[region?.name as keyof typeof regionKanjiMap] : region?.name;
         } else {
-             item = dataMap[context]?.find((i: any) => i.slug === slug);
-             if (item?.name && typeof item.name === 'object') {
+             item = dataMap[context]?.find((i: any) =&gt; i.slug === slug);
+             if (item?.name &amp;&amp; typeof item.name === 'object') {
                  name = item.name[lang] || item.name.vi;
              } else {
                  name = item?.name || slug;
              }
         }
-        return <Badge key={index} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>;
+        return &lt;Badge key={index} variant="secondary" className="font-normal"&gt;&lt;span className="font-bold mr-1.5"&gt;{index + 1}.&lt;/span&gt;{name}&lt;/Badge&gt;;
     });
 
-    return <div id={
+    return &lt;div id={
         context === 'visaType' ? 'DKLV_LOAIHINH_DISPLAY' :
         context === 'visaDetail' ? 'DKLV_CHITIETVISA_DISPLAY' :
         context === 'industries' ? 'DKNN_NGANHNGHE_DISPLAY' :
         context === 'regions' ? 'DKNN_KHUVUC_DISPLAY' : undefined
-    } className="flex flex-wrap gap-1 mt-1">{content}</div>
+    } className="flex flex-wrap gap-1 mt-1"&gt;{content}&lt;/div&gt;
   }, [lang, isConfirmationMode, t, employer]);
   
-  const handleLangChange = (newLang: Language) => {
+  const handleLangChange = (newLang: Language) =&gt; {
     setLang(newLang);
     const params = new URLSearchParams(searchParams.toString());
     params.set('lang', newLang);
     router.replace(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
   };
   
-  const handleContinue = () => {
+  const handleContinue = () =&gt; {
     if (!hasContactInfo) {
         setMainContactError(true);
         const refToScroll = isMobile ? mobileInfoCardRef : infoCardRef;
@@ -818,12 +818,12 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     router.push(`/nha-tuyen-dung/dang-ky/xac-nhan?${params.toString()}`);
   };
 
-  const handleBack = () => {
+  const handleBack = () =&gt; {
       const fromPath = searchParams.get('from') || '/nha-tuyen-dung';
       router.push(fromPath);
   }
 
-  const ensureNestedObjects = (data: any) => {
+  const ensureNestedObjects = (data: any) =&gt; {
     data.name = data.name || { vi: '', ja: '', en: '' };
     data.type = data.type || { vi: '', ja: '', en: '' };
     data.location = data.location || { vi: '', ja: '', en: '' };
@@ -839,7 +839,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     data.interest = data.interest || { vi: [], ja: [], en: [] };
     data.valueInterest = data.valueInterest || [];
     // Correctly map location to industries.secondary
-    if (data.location && Array.isArray(data.location) && (!data.industries.secondary?.vi?.length || data.industries.secondary?.vi.length === 0)) {
+    if (data.location &amp;&amp; Array.isArray(data.location) &amp;&amp; (!data.industries.secondary?.vi?.length || data.industries.secondary?.vi.length === 0)) {
         data.industries.secondary = {
             vi: data.location,
             ja: data.location,
@@ -850,7 +850,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   };
 
 
-  React.useEffect(() => {
+  React.useEffect(() =&gt; {
     const partnerIdParam = searchParams.get('partnerId');
     if (!partnerIdParam) {
         return;
@@ -865,15 +865,22 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     
     let finalData;
 
-    const mergeData = (base: any, updates: any) => {
+    const mergeData = (base: any, updates: any) =&gt; {
         const merged = { ...base };
         for (const key in updates) {
-            if (updates[key] !== null && updates[key] !== undefined) {
-                 if (key === 'industries' && updates.location) {
-                    updates.industries.secondary = { vi: updates.location, ja: updates.location, en: updates.location };
+            if (updates[key] !== null &amp;&amp; updates[key] !== undefined) {
+                 if (key === 'location' &amp;&amp; updates.location) {
+                    updates.industries = {
+                        ...(updates.industries || {}),
+                        secondary: {
+                            vi: updates.location,
+                            ja: updates.location,
+                            en: updates.location
+                        }
+                    };
                     delete updates.location;
                  }
-                 if (typeof updates[key] === 'object' && !Array.isArray(updates[key])) {
+                 if (typeof updates[key] === 'object' &amp;&amp; !Array.isArray(updates[key])) {
                     merged[key] = { ...(base[key] || {}), ...updates[key] };
                  } else {
                     merged[key] = updates[key];
@@ -918,7 +925,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     const nationalityKey = finalData.nationality || '';
 
     if (isIndividualRole) {
-        if (roleKey === 'nhan-vien-phai-cu' && subRoleTexts[subRoleKey]) {
+        if (roleKey === 'nhan-vien-phai-cu' &amp;&amp; subRoleTexts[subRoleKey]) {
             roleParts.push(subRoleTexts[subRoleKey]?.[langFromParams] || '');
             roleParts.push(roleTexts[roleKey]?.[langFromParams] || '');
             if (finalData.company_name) roleParts.push(finalData.company_name);
@@ -931,7 +938,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             }
             if (finalData.company_name) roleParts.push(finalData.company_name);
         }
-    } else if (!isIndividualRole && roleTexts[roleKey]) {
+    } else if (!isIndividualRole &amp;&amp; roleTexts[roleKey]) {
         roleParts.push(roleTexts[roleKey]?.[langFromParams] || '');
     }
     
@@ -946,23 +953,23 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
 }, [searchParams, t.rolePlaceholder]);
 
-  const handleEditClick = (title: string, currentContent: any, field: string) => {
+  const handleEditClick = (title: string, currentContent: any, field: string) =&gt; {
     setEditingModule({ title, field });
     setTempContent(JSON.parse(JSON.stringify(currentContent)));
     setErrors({});
     setIsEditDialogOpen(true);
   };
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = () =&gt; {
     if (!editingModule) return;
     
     let allValid = true;
     if (editingModule.field === 'info') {
-        if (tempContent.email && !validateEmail(tempContent.email)) {
-             setErrors(prev => ({ ...prev, email: "Email không hợp lệ" }));
+        if (tempContent.email &amp;&amp; !validateEmail(tempContent.email)) {
+             setErrors(prev =&gt; ({ ...prev, email: "Email không hợp lệ" }));
              allValid = false;
         } else {
-            setErrors(prev => ({ ...prev, email: undefined }));
+            setErrors(prev =&gt; ({ ...prev, email: undefined }));
         }
         if (!validateField('messenger', tempContent.messenger || '')) allValid = false;
         if (!validateField('line', tempContent.line || '')) allValid = false;
@@ -973,7 +980,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         return;
     }
 
-    setEmployer((prev: any) => {
+    setEmployer((prev: any) =&gt; {
         const newState = { ...prev };
         const { field } = editingModule;
         if (field === 'header') {
@@ -1005,39 +1012,39 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     setEditingModule(null);
   };
 
-  const addTempArrayItem = (field: string) => {
+  const addTempArrayItem = (field: string) =&gt; {
     if (field === 'history') {
-      setTempContent((prev: any[]) => [...prev, { year: new Date().getFullYear().toString(), event: { vi: '', ja: '', en: '' } }]);
+      setTempContent((prev: any[]) =&gt; [...prev, { year: new Date().getFullYear().toString(), event: { vi: '', ja: '', en: '' } }]);
     } else if (field === 'benefits') {
-       setTempContent((prev: any[]) => [...prev, { vi: '', ja: '', en: '' }]);
+       setTempContent((prev: any[]) =&gt; [...prev, { vi: '', ja: '', en: '' }]);
     } else if (field === 'images') {
-       setTempContent((prev: any[]) => [...prev, { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới', ja: '新しい写真', en: 'New Photo' }, dataAiHint: 'new image' }]);
+       setTempContent((prev: any[]) =&gt; [...prev, { src: 'https://placehold.co/600x400.png', alt: { vi: 'Ảnh mới', ja: '新しい写真', en: 'New Photo' }, dataAiHint: 'new image' }]);
     }
   };
 
-  const removeTempArrayItem = (index: number) => {
-    setTempContent((prev: any[]) => prev.filter((_: any, i: number) => i !== index));
+  const removeTempArrayItem = (index: number) =&gt; {
+    setTempContent((prev: any[]) =&gt; prev.filter((_: any, i: number) =&gt; i !== index));
   };
 
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: string, index?: number) => {
+  const handleFileChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;, field: string, index?: number) =&gt; {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = (event) =&gt; {
         const newUrl = event.target?.result as string;
-        if (editingModule?.field === 'images' && index !== undefined) {
-             setTempContent((prev: any[]) => {
+        if (editingModule?.field === 'images' &amp;&amp; index !== undefined) {
+             setTempContent((prev: any[]) =&gt; {
                 const newImages = [...prev];
                 newImages[index].src = newUrl;
                 return newImages;
             });
         } else {
-            setEmployer((prev: any) => {
+            setEmployer((prev: any) =&gt; {
                 const newState = JSON.parse(JSON.stringify(prev));
                  if (field === 'banner' || field === 'logo') {
                    newState[field] = newUrl;
-                 } else if (field === 'images' && index !== undefined) {
+                 } else if (field === 'images' &amp;&amp; index !== undefined) {
                     newState.images[index].src = newUrl;
                  }
                 localStorage.setItem(`recruiterProfile_${partnerId}`, JSON.stringify(newState));
@@ -1049,8 +1056,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     }
   };
 
-   const handleDeleteImage = (index: number) => {
-        setEmployer((prev: any) => {
+   const handleDeleteImage = (index: number) =&gt; {
+        setEmployer((prev: any) =&gt; {
             const newState = JSON.parse(JSON.stringify(prev));
             newState.images[index] = placeholderEmployerData.images[index];
             localStorage.setItem(`recruiterProfile_${partnerId}`, JSON.stringify(newState));
@@ -1058,191 +1065,191 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         });
     };
   
-  const renderEditContent = () => {
-    if (!editingModule) return <p>Chức năng đang được phát triển.</p>;
+  const renderEditContent = () =&gt; {
+    if (!editingModule) return &lt;p&gt;Chức năng đang được phát triển.&lt;/p&gt;;
 
     switch(editingModule.field) {
         case 'header':
             return (
-                 <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label>{isIndividual ? t.namePlaceholder : t.companyNamePlaceholder}</Label>
-                        <Input placeholder={isIndividual ? t.namePlaceholder : t.companyNamePlaceholder} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} />
-                    </div>
-                    <div className="space-y-2"><Label>{t.typePlaceholder}</Label><Input placeholder={placeholderEmployerData.type[lang]} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
-                    <div className="space-y-2"><Label>{t.locationPlaceholder}</Label><Input placeholder={placeholderEmployerData.location[lang]} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
-                </div>
+                 &lt;div className="space-y-4"&gt;
+                    &lt;div className="space-y-2"&gt;
+                        &lt;Label&gt;{isIndividual ? t.namePlaceholder : t.companyNamePlaceholder}&lt;/Label&gt;
+                        &lt;Input placeholder={isIndividual ? t.namePlaceholder : t.companyNamePlaceholder} value={tempContent.name[lang] || ''} onChange={(e) =&gt; setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} /&gt;
+                    &lt;/div&gt;
+                    &lt;div className="space-y-2"&gt;&lt;Label&gt;{t.typePlaceholder}&lt;/Label&gt;&lt;Input placeholder={placeholderEmployerData.type[lang]} value={tempContent.type[lang] || ''} onChange={(e) =&gt; setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /&gt;&lt;/div&gt;
+                    &lt;div className="space-y-2"&gt;&lt;Label&gt;{t.locationPlaceholder}&lt;/Label&gt;&lt;Input placeholder={placeholderEmployerData.location[lang]} value={tempContent.location[lang] || ''} onChange={(e) =&gt; setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /&gt;&lt;/div&gt;
+                &lt;/div&gt;
             );
         case 'about':
-            return <Textarea id="DKGT_TEXTAREA" className="min-h-[150px]" placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />;
+            return &lt;Textarea id="DKGT_TEXTAREA" className="min-h-[150px]" placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) =&gt; setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} /&gt;;
         
         case 'images':
             return (
-                <div className="space-y-4">
-                    {tempContent.map((img: any, index: number) => (
-                    <div key={index} className="flex items-center gap-4">
-                        <Label htmlFor={`dialog-image-upload-${index}`} className="relative w-20 h-20 flex-shrink-0 cursor-pointer group">
-                           <Image src={img.src} alt={img.alt?.[lang] || ''} fill className="object-cover rounded-md"/>
-                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                               <Camera className="h-6 w-6 text-white"/>
-                           </div>
-                           <Input id={`dialog-image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} />
-                        </Label>
-                        <Input 
+                &lt;div className="space-y-4"&gt;
+                    {tempContent.map((img: any, index: number) =&gt; (
+                    &lt;div key={index} className="flex items-center gap-4"&gt;
+                        &lt;Label htmlFor={`dialog-image-upload-${index}`} className="relative w-20 h-20 flex-shrink-0 cursor-pointer group"&gt;
+                           &lt;Image src={img.src} alt={img.alt?.[lang] || ''} fill className="object-cover rounded-md"/&gt;
+                           &lt;div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"&gt;
+                               &lt;Camera className="h-6 w-6 text-white"/&gt;
+                           &lt;/div&gt;
+                           &lt;Input id={`dialog-image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) =&gt; handleFileChange(e, 'images', index)} /&gt;
+                        &lt;/Label&gt;
+                        &lt;Input 
                             placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.images[index]?.alt[lang] || 'Văn phòng hiện đại'}`}
                             value={img.alt?.[lang] || ''}
-                            onChange={(e) => handleTempArrayChange(index, 'alt', e.target.value)}
-                        />
-                        <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                    </div>
+                            onChange={(e) =&gt; handleTempArrayChange(index, 'alt', e.target.value)}
+                        /&gt;
+                        &lt;Button variant="ghost" size="icon" onClick={() =&gt; removeTempArrayItem(index)}&gt;&lt;Trash2 className="h-4 w-4 text-destructive"/&gt;&lt;/Button&gt;
+                    &lt;/div&gt;
                     ))}
-                    <Button variant="outline" onClick={() => addTempArrayItem('images')}><PlusCircle className="mr-2"/> {t.addImageButton}</Button>
-                </div>
+                    &lt;Button variant="outline" onClick={() =&gt; addTempArrayItem('images')}&gt;&lt;PlusCircle className="mr-2"/&gt; {t.addImageButton}&lt;/Button&gt;
+                &lt;/div&gt;
             );
 
         case 'history':
             return (
-                <div className="space-y-4">
-                    {tempContent.map((item: any, index: number) => (
-                        <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
-                            <Input placeholder={t.foundedPlaceholder} value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
-                            <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
-                            <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                        </div>
+                &lt;div className="space-y-4"&gt;
+                    {tempContent.map((item: any, index: number) =&gt; (
+                        &lt;div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center"&gt;
+                            &lt;Input placeholder={t.foundedPlaceholder} value={item.year} onChange={(e) =&gt; { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} /&gt;
+                            &lt;Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) =&gt; handleTempArrayChange(index, 'event', e.target.value)} /&gt;
+                            &lt;Button variant="ghost" size="icon" onClick={() =&gt; removeTempArrayItem(index)}&gt;&lt;Trash2 className="h-4 w-4 text-destructive"/&gt;&lt;/Button&gt;
+                        &lt;/div&gt;
                     ))}
-                    <Button variant="outline" onClick={() => addTempArrayItem('history')}>
-                        <PlusCircle className="mr-2"/> {t.addMilestoneButton}
-                    </Button>
-                </div>
+                    &lt;Button variant="outline" onClick={() =&gt; addTempArrayItem('history')}&gt;
+                        &lt;PlusCircle className="mr-2"/&gt; {t.addMilestoneButton}
+                    &lt;/Button&gt;
+                &lt;/div&gt;
             );
         
         case 'benefits':
              return (
-                <div className="space-y-4">
-                     {tempContent.map((item: any, index: number) => (
-                        <div key={index} className="flex items-center gap-2">
-                            <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.benefits[index]?.[lang] || ''}`} value={item[lang] || ''} onChange={(e) => {
+                &lt;div className="space-y-4"&gt;
+                     {tempContent.map((item: any, index: number) =&gt; (
+                        &lt;div key={index} className="flex items-center gap-2"&gt;
+                            &lt;Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.benefits[index]?.[lang] || ''}`} value={item[lang] || ''} onChange={(e) =&gt; {
                                 const newBenefits = [...tempContent];
                                 newBenefits[index] = {...newBenefits[index], [lang]: e.target.value};
                                 setTempContent(newBenefits);
-                            }} />
-                             <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                        </div>
+                            }} /&gt;
+                             &lt;Button variant="ghost" size="icon" onClick={() =&gt; removeTempArrayItem(index)}&gt;&lt;Trash2 className="h-4 w-4 text-destructive"/&gt;&lt;/Button&gt;
+                        &lt;/div&gt;
                     ))}
-                    <Button variant="outline" onClick={() => addTempArrayItem('benefits')}><PlusCircle className="mr-2"/> {t.addBenefitButton}</Button>
-                </div>
+                    &lt;Button variant="outline" onClick={() =&gt; addTempArrayItem('benefits')}&gt;&lt;PlusCircle className="mr-2"/&gt; {t.addBenefitButton}&lt;/Button&gt;
+                &lt;/div&gt;
              );
         case 'valueInterest':
             const currentInterest = tempContent.interest?.[lang] || [];
-            const handleInterestChange = (checked: boolean, interestId: string) => {
+            const handleInterestChange = (checked: boolean, interestId: string) =&gt; {
                 const newSelection = checked
                     ? [...currentInterest, interestId]
-                    : currentInterest.filter((id: string) => id !== interestId);
+                    : currentInterest.filter((id: string) =&gt; id !== interestId);
                 setTempContent({ ...tempContent, interest: { ...tempContent.interest, [lang]: newSelection }});
             };
 
-            const currentValueInterests = Array.isArray(tempContent.valueInterest) ? tempContent.valueInterest.map((item: any) => item.id) : [];
-            const handleValueInterestChange = (checked: boolean, interestId: string) => {
+            const currentValueInterests = Array.isArray(tempContent.valueInterest) ? tempContent.valueInterest.map((item: any) =&gt; item.id) : [];
+            const handleValueInterestChange = (checked: boolean, interestId: string) =&gt; {
                 let newSelection;
                 if (checked) {
                     newSelection = [...currentValueInterests, interestId];
                 } else {
-                    newSelection = currentValueInterests.filter((id: string) => id !== interestId);
+                    newSelection = currentValueInterests.filter((id: string) =&gt; id !== interestId);
                 }
-                const newObjects = newSelection.map(id => {
-                    const viOption = valueInterestOptions['vi'].find(o=>o.id===id);
+                const newObjects = newSelection.map(id =&gt; {
+                    const viOption = valueInterestOptions['vi'].find(o=&gt;o.id===id);
                     return {
                         id,
                         vi: viOption?.title,
-                        ja: valueInterestOptions['ja'].find(o => o.id === id)?.title,
-                        en: valueInterestOptions['en'].find(o => o.id === id)?.title
+                        ja: valueInterestOptions['ja'].find(o =&gt; o.id === id)?.title,
+                        en: valueInterestOptions['en'].find(o =&gt; o.id === id)?.title
                     }
                 }).filter(Boolean);
                 setTempContent({ ...tempContent, valueInterest: newObjects });
             };
 
             return (
-                <div id="DKNGHIEPVUGIATRIQUANTAM_DIALOG" className="space-y-6">
-                    <div className="space-y-2">
-                        <Label id="DKNV_NGHIEPVU_LABEL" className="font-semibold text-base">{t.interestLabel}</Label>
-                        <p className="text-sm text-muted-foreground">{t.interestDescription}</p>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button id="DKNV_NGHIEPVU_BUTTON" variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                    <div className="flex flex-wrap gap-1">
-                                        {currentInterest.length > 0 ? (
-                                            currentInterest.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(interestOptions[lang].find(o => o.id === id))?.title}</Badge>)
+                &lt;div id="DKNGHIEPVUGIATRIQUANTAM_DIALOG" className="space-y-6"&gt;
+                    &lt;div className="space-y-2"&gt;
+                        &lt;Label id="DKNV_NGHIEPVU_LABEL" className="font-semibold text-base"&gt;{t.interestLabel}&lt;/Label&gt;
+                        &lt;p className="text-sm text-muted-foreground"&gt;{t.interestDescription}&lt;/p&gt;
+                        &lt;DropdownMenu&gt;
+                            &lt;DropdownMenuTrigger asChild&gt;
+                                &lt;Button id="DKNV_NGHIEPVU_BUTTON" variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10"&gt;
+                                    &lt;div className="flex flex-wrap gap-1"&gt;
+                                        {currentInterest.length &gt; 0 ? (
+                                            currentInterest.map((id: string, index: number) =&gt; &lt;Badge key={id} variant="secondary" className="font-normal"&gt;&lt;span className="font-bold mr-1.5"&gt;{index + 1}.&lt;/span&gt;{(interestOptions[lang].find(o =&gt; o.id === id))?.title}&lt;/Badge&gt;)
                                         ) : t.selectInterestPlaceholder}
-                                    </div>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>{t.selectInterestLabel}</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {(interestOptions[lang] || []).map((option) => (
-                                     <DropdownMenuCheckboxItem
+                                    &lt;/div&gt;
+                                &lt;/Button&gt;
+                            &lt;/DropdownMenuTrigger&gt;
+                            &lt;DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]"&gt;
+                                &lt;DropdownMenuLabel&gt;{t.selectInterestLabel}&lt;/DropdownMenuLabel&gt;
+                                &lt;DropdownMenuSeparator /&gt;
+                                {(interestOptions[lang] || []).map((option) =&gt; (
+                                     &lt;DropdownMenuCheckboxItem
                                         key={option.id}
                                         id={`DKNV_ITEM_${option.id}`}
                                         checked={currentInterest.includes(option.id)}
-                                        onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleInterestChange(Boolean(checked), option.id)}
-                                    >
-                                        <span className="font-bold w-6 mr-2">{currentInterest.includes(option.id) ? `${currentInterest.indexOf(option.id) + 1}.` : ''}</span>
+                                        onSelect={(e) =&gt; e.preventDefault()}
+                                        onCheckedChange={(checked) =&gt; handleInterestChange(Boolean(checked), option.id)}
+                                    &gt;
+                                        &lt;span className="font-bold w-6 mr-2"&gt;{currentInterest.includes(option.id) ? `${currentInterest.indexOf(option.id) + 1}.` : ''}&lt;/span&gt;
                                         {option.title}
-                                    </DropdownMenuCheckboxItem>
+                                    &lt;/DropdownMenuCheckboxItem&gt;
                                 ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                    <div className="space-y-2">
-                        <Label id="DKNV_GIATRI_LABEL" className="font-semibold text-base">{t.valueInterestLabel}</Label>
-                        <p className="text-sm text-muted-foreground">{t.valueInterestDescription}</p>
-                        <DropdownMenu>
-                           <DropdownMenuTrigger asChild>
-                                <Button id="DKNV_GIATRI_BUTTON" variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                     <div className="flex flex-wrap gap-1">
-                                    {currentValueInterests.length > 0 ? (
-                                        currentValueInterests.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(valueInterestOptions[lang].find(o => o.id === id))?.title}</Badge>)
+                            &lt;/DropdownMenuContent&gt;
+                        &lt;/DropdownMenu&gt;
+                    &lt;/div&gt;
+                    &lt;div className="space-y-2"&gt;
+                        &lt;Label id="DKNV_GIATRI_LABEL" className="font-semibold text-base"&gt;{t.valueInterestLabel}&lt;/Label&gt;
+                        &lt;p className="text-sm text-muted-foreground"&gt;{t.valueInterestDescription}&lt;/p&gt;
+                        &lt;DropdownMenu&gt;
+                           &lt;DropdownMenuTrigger asChild&gt;
+                                &lt;Button id="DKNV_GIATRI_BUTTON" variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10"&gt;
+                                     &lt;div className="flex flex-wrap gap-1"&gt;
+                                    {currentValueInterests.length &gt; 0 ? (
+                                        currentValueInterests.map((id: string, index: number) =&gt; &lt;Badge key={id} variant="secondary" className="font-normal"&gt;&lt;span className="font-bold mr-1.5"&gt;{index + 1}.&lt;/span&gt;{(valueInterestOptions[lang].find(o =&gt; o.id === id))?.title}&lt;/Badge&gt;)
                                     ) : t.selectValueInterestPlaceholder}
-                                    </div>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>{t.selectValueInterestLabel}</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {valueInterestOptions[lang].map((option) => (
-                                     <DropdownMenuCheckboxItem
+                                    &lt;/div&gt;
+                                &lt;/Button&gt;
+                            &lt;/DropdownMenuTrigger&gt;
+                            &lt;DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]"&gt;
+                                &lt;DropdownMenuLabel&gt;{t.selectValueInterestLabel}&lt;/DropdownMenuLabel&gt;
+                                &lt;DropdownMenuSeparator /&gt;
+                                {valueInterestOptions[lang].map((option) =&gt; (
+                                     &lt;DropdownMenuCheckboxItem
                                         key={option.id}
                                         id={`DKNV_ITEM_${option.id}`}
                                         checked={currentValueInterests.includes(option.id)}
-                                        onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleValueInterestChange(Boolean(checked), option.id)}
-                                    >
-                                        <span className="font-bold w-6 mr-2">{currentValueInterests.includes(option.id) ? `${currentValueInterests.indexOf(option.id) + 1}.` : ''}</span>
+                                        onSelect={(e) =&gt; e.preventDefault()}
+                                        onCheckedChange={(checked) =&gt; handleValueInterestChange(Boolean(checked), option.id)}
+                                    &gt;
+                                        &lt;span className="font-bold w-6 mr-2"&gt;{currentValueInterests.includes(option.id) ? `${currentValueInterests.indexOf(option.id) + 1}.` : ''}&lt;/span&gt;
                                         {option.title}
-                                    </DropdownMenuCheckboxItem>
+                                    &lt;/DropdownMenuCheckboxItem&gt;
                                 ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                </div>
+                            &lt;/DropdownMenuContent&gt;
+                        &lt;/DropdownMenu&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
             );
         case 'visaAndIndustries':
             const currentVisaTypes = tempContent.visaType?.[lang] || [];
-            const handleVisaTypeChange = (checked: boolean, typeSlug: string) => {
+            const handleVisaTypeChange = (checked: boolean, typeSlug: string) =&gt; {
                 const newSelection = checked
                     ? [...currentVisaTypes, typeSlug]
-                    : currentVisaTypes.filter((slug: string) => slug !== typeSlug);
+                    : currentVisaTypes.filter((slug: string) =&gt; slug !== typeSlug);
 
-                const newVisaDetails = (tempContent.visaDetail?.[lang] || []).filter((detailSlug: string) => 
-                    newSelection.some((visaSlug: string) => 
-                        (visaDetailsByVisaType[visaSlug as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === detailSlug)
+                const newVisaDetails = (tempContent.visaDetail?.[lang] || []).filter((detailSlug: string) =&gt; 
+                    newSelection.some((visaSlug: string) =&gt; 
+                        (visaDetailsByVisaType[visaSlug as keyof typeof visaDetailsByVisaType] || []).some(detail =&gt; detail.slug === detailSlug)
                     )
                 );
                 
-                const newIndustries = (tempContent.industries?.main?.[lang] || []).filter((industrySlug: string) =>
-                   newSelection.some((visaSlug: string) =>
-                       (industriesByJobType[visaSlug as keyof typeof industriesByJobType] || []).some(ind => ind.slug === industrySlug)
+                const newIndustries = (tempContent.industries?.main?.[lang] || []).filter((industrySlug: string) =&gt;
+                   newSelection.some((visaSlug: string) =&gt;
+                       (industriesByJobType[visaSlug as keyof typeof industriesByJobType] || []).some(ind =&gt; ind.slug === industrySlug)
                    )
                 );
 
@@ -1255,197 +1262,197 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
             };
 
             const currentVisaDetails = tempContent.visaDetail?.[lang] || [];
-            const handleDetailCheckboxChange = (checked: boolean, detailSlug: string) => {
+            const handleDetailCheckboxChange = (checked: boolean, detailSlug: string) =&gt; {
                 const newSelection = checked
                     ? [...currentVisaDetails, detailSlug]
-                    : currentVisaDetails.filter((slug: string) => slug !== detailSlug);
+                    : currentVisaDetails.filter((slug: string) =&gt; slug !== detailSlug);
                 setTempContent({ ...tempContent, visaDetail: { ...tempContent.visaDetail, [lang]: newSelection } });
             };
 
             const availableIndustries = Array.from(new Map(
-                currentVisaTypes.flatMap((vSlug: string) => (industriesByJobType[vSlug as keyof typeof industriesByJobType] || [])).map((item: Industry) => [item.slug, item])
+                currentVisaTypes.flatMap((vSlug: string) =&gt; (industriesByJobType[vSlug as keyof typeof industriesByJobType] || [])).map((item: Industry) =&gt; [item.slug, item])
             ).values());
             
             const currentIndustries = tempContent.industries?.main?.[lang] || [];
-            const handleIndustryChange = (checked: boolean, industrySlug: string) => {
+            const handleIndustryChange = (checked: boolean, industrySlug: string) =&gt; {
                 const newSelection = checked
                     ? [...currentIndustries, industrySlug]
-                    : currentIndustries.filter((slug: string) => slug !== industrySlug);
+                    : currentIndustries.filter((slug: string) =&gt; slug !== industrySlug);
                 setTempContent({ ...tempContent, industries: { ...tempContent.industries, main: { ...tempContent.industries.main, [lang]: newSelection } } });
             };
             
             const currentRegions = tempContent.industries?.secondary?.[lang] || [];
-            const handleRegionChange = (checked: boolean, regionSlug: string) => {
+            const handleRegionChange = (checked: boolean, regionSlug: string) =&gt; {
                 const newSelection = checked
                     ? [...currentRegions, regionSlug]
-                    : currentRegions.filter((slug: string) => slug !== regionSlug);
+                    : currentRegions.filter((slug: string) =&gt; slug !== regionSlug);
                 setTempContent({ ...tempContent, industries: { ...tempContent.industries, secondary: { ...tempContent.industries.secondary, [lang]: newSelection } }});
             };
 
             return (
-                <div className="space-y-4" id="DKVISA_NGANHNGHE_KHUVUC_DIALOG">
-                     <div className="space-y-2" id="DKLV_LOAIHINH">
-                        <Label id="DKLV_LOAIHINH_LABEL">{t.visaTypeLabel}</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKLV_LOAIHINH_BUTTON">
-                                    <div className="flex flex-wrap gap-1">
-                                    {currentVisaTypes.length > 0 ? (
-                                        currentVisaTypes.map((slug: string, index: number) => {
-                                            const item = localizedJapanJobTypes.find(t => t.slug === slug);
+                &lt;div className="space-y-4" id="DKVISA_NGANHNGHE_KHUVUC_DIALOG"&gt;
+                     &lt;div className="space-y-2" id="DKLV_LOAIHINH"&gt;
+                        &lt;Label id="DKLV_LOAIHINH_LABEL"&gt;{t.visaTypeLabel}&lt;/Label&gt;
+                        &lt;DropdownMenu&gt;
+                            &lt;DropdownMenuTrigger asChild&gt;
+                                &lt;Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKLV_LOAIHINH_BUTTON"&gt;
+                                    &lt;div className="flex flex-wrap gap-1"&gt;
+                                    {currentVisaTypes.length &gt; 0 ? (
+                                        currentVisaTypes.map((slug: string, index: number) =&gt; {
+                                            const item = localizedJapanJobTypes.find(t =&gt; t.slug === slug);
                                             const name = item?.name[lang] || slug;
-                                            return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
+                                            return &lt;Badge key={slug} variant="secondary"&gt;&lt;span className="font-bold mr-1.5"&gt;{index + 1}.&lt;/span&gt;{name}&lt;/Badge&gt;
                                         })
                                     ) : t.selectVisaTypePlaceholder}
-                                    </div>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>{t.selectVisaTypePlaceholder}</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {localizedJapanJobTypes.map(type => (
-                                    <DropdownMenuCheckboxItem
+                                    &lt;/div&gt;
+                                &lt;/Button&gt;
+                            &lt;/DropdownMenuTrigger&gt;
+                            &lt;DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]"&gt;
+                                &lt;DropdownMenuLabel&gt;{t.selectVisaTypePlaceholder}&lt;/DropdownMenuLabel&gt;
+                                &lt;DropdownMenuSeparator /&gt;
+                                {localizedJapanJobTypes.map(type =&gt; (
+                                    &lt;DropdownMenuCheckboxItem
                                         key={type.slug}
                                         id={`DKLV_ITEM_${type.slug}`}
                                         checked={currentVisaTypes.includes(type.slug)}
-                                        onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleVisaTypeChange(Boolean(checked), type.slug)}
-                                    >
-                                       <span className="font-bold w-6 mr-2">{currentVisaTypes.includes(type.slug) ? `${currentVisaTypes.indexOf(type.slug) + 1}.` : ''}</span>
+                                        onSelect={(e) =&gt; e.preventDefault()}
+                                        onCheckedChange={(checked) =&gt; handleVisaTypeChange(Boolean(checked), type.slug)}
+                                    &gt;
+                                       &lt;span className="font-bold w-6 mr-2"&gt;{currentVisaTypes.includes(type.slug) ? `${currentVisaTypes.indexOf(type.slug) + 1}.` : ''}&lt;/span&gt;
                                         {type.name[lang]}
-                                    </DropdownMenuCheckboxItem>
+                                    &lt;/DropdownMenuCheckboxItem&gt;
                                 ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                     <div className="space-y-2" id="DKLV_CHITIETVISA">
-                        <Label id="DKLV_CHITIETVISA_LABEL">{t.visaDetailLabel}</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0} id="DKLV_CHITIETVISA_BUTTON">
-                                     <div className="flex flex-wrap gap-1">
-                                        {currentVisaDetails.length > 0 ? (
-                                            currentVisaDetails.map((slug: string, index: number) => {
-                                                const detail = Object.values(visaDetailsByVisaType).flat().find(d => d.slug === slug);
-                                                return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{detail?.name[lang] || slug}</Badge>
+                            &lt;/DropdownMenuContent&gt;
+                        &lt;/DropdownMenu&gt;
+                    &lt;/div&gt;
+                     &lt;div className="space-y-2" id="DKLV_CHITIETVISA"&gt;
+                        &lt;Label id="DKLV_CHITIETVISA_LABEL"&gt;{t.visaDetailLabel}&lt;/Label&gt;
+                        &lt;DropdownMenu&gt;
+                            &lt;DropdownMenuTrigger asChild&gt;
+                                &lt;Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0} id="DKLV_CHITIETVISA_BUTTON"&gt;
+                                     &lt;div className="flex flex-wrap gap-1"&gt;
+                                        {currentVisaDetails.length &gt; 0 ? (
+                                            currentVisaDetails.map((slug: string, index: number) =&gt; {
+                                                const detail = Object.values(visaDetailsByVisaType).flat().find(d =&gt; d.slug === slug);
+                                                return &lt;Badge key={slug} variant="secondary"&gt;&lt;span className="font-bold mr-1.5"&gt;{index + 1}.&lt;/span&gt;{detail?.name[lang] || slug}&lt;/Badge&gt;
                                             })
                                         ) : t.selectVisaDetailPlaceholder}
-                                    </div>
-                                </Button>
-                            </DropdownMenuTrigger>
-                             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>{t.selectVisaDetailPlaceholder}</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {currentVisaTypes.map((visaTypeSlug: string) => {
-                                    const visaType = localizedJapanJobTypes.find(t => t.slug === visaTypeSlug);
+                                    &lt;/div&gt;
+                                &lt;/Button&gt;
+                            &lt;/DropdownMenuTrigger&gt;
+                             &lt;DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]"&gt;
+                                &lt;DropdownMenuLabel&gt;{t.selectVisaDetailPlaceholder}&lt;/DropdownMenuLabel&gt;
+                                &lt;DropdownMenuSeparator /&gt;
+                                {currentVisaTypes.map((visaTypeSlug: string) =&gt; {
+                                    const visaType = localizedJapanJobTypes.find(t =&gt; t.slug === visaTypeSlug);
                                     if (!visaType) return null;
                                     return (
-                                        <DropdownMenuGroup key={visaTypeSlug}>
-                                            <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">{visaType.name[lang]}</DropdownMenuLabel>
-                                            {(visaDetailsByVisaType[visaTypeSlug as keyof typeof visaDetailsByVisaType] || []).map((detail: any) => (
-                                                <DropdownMenuCheckboxItem
+                                        &lt;DropdownMenuGroup key={visaTypeSlug}&gt;
+                                            &lt;DropdownMenuLabel className="text-xs font-semibold text-muted-foreground"&gt;{visaType.name[lang]}&lt;/DropdownMenuLabel&gt;
+                                            {(visaDetailsByVisaType[visaTypeSlug as keyof typeof visaDetailsByVisaType] || []).map((detail: any) =&gt; (
+                                                &lt;DropdownMenuCheckboxItem
                                                     key={detail.slug}
                                                     id={`DKLV_ITEM_${detail.slug}`}
                                                     checked={currentVisaDetails.includes(detail.slug)}
-                                                    onSelect={(e) => e.preventDefault()}
-                                                    onCheckedChange={(checked) => handleDetailCheckboxChange(Boolean(checked), detail.slug)}
-                                                >
-                                                   <span className="font-bold w-6 mr-2">{currentVisaDetails.includes(detail.slug) ? `${currentVisaDetails.indexOf(detail.slug) + 1}.` : ''}</span>
+                                                    onSelect={(e) =&gt; e.preventDefault()}
+                                                    onCheckedChange={(checked) =&gt; handleDetailCheckboxChange(Boolean(checked), detail.slug)}
+                                                &gt;
+                                                   &lt;span className="font-bold w-6 mr-2"&gt;{currentVisaDetails.includes(detail.slug) ? `${currentVisaDetails.indexOf(detail.slug) + 1}.` : ''}&lt;/span&gt;
                                                     {detail.name[lang]}
-                                                </DropdownMenuCheckboxItem>
+                                                &lt;/DropdownMenuCheckboxItem&gt;
                                             ))}
-                                        </DropdownMenuGroup>
+                                        &lt;/DropdownMenuGroup&gt;
                                     )
                                 })}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                     <div className="space-y-2" id="DKNN_NGANHNGHE">
-                        <Label id="DKNN_NGANHNGHE_LABEL">{t.mainIndustriesLabel}</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={availableIndustries.length === 0} id="DKNN_NGANHNGHE_BUTTON">
-                                    <div className="flex flex-wrap gap-1">
-                                        {currentIndustries.length > 0 ? (
-                                            currentIndustries.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(allIndustries.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)
+                            &lt;/DropdownMenuContent&gt;
+                        &lt;/DropdownMenu&gt;
+                    &lt;/div&gt;
+                     &lt;div className="space-y-2" id="DKNN_NGANHNGHE"&gt;
+                        &lt;Label id="DKNN_NGANHNGHE_LABEL"&gt;{t.mainIndustriesLabel}&lt;/Label&gt;
+                        &lt;DropdownMenu&gt;
+                            &lt;DropdownMenuTrigger asChild&gt;
+                                &lt;Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={availableIndustries.length === 0} id="DKNN_NGANHNGHE_BUTTON"&gt;
+                                    &lt;div className="flex flex-wrap gap-1"&gt;
+                                        {currentIndustries.length &gt; 0 ? (
+                                            currentIndustries.map((slug: string, index: number) =&gt; &lt;Badge key={slug} variant="secondary"&gt;&lt;span className="font-bold mr-1.5"&gt;{index + 1}.&lt;/span&gt;{(allIndustries.find(i =&gt; i.slug === slug))?.name[lang] || slug}&lt;/Badge&gt;)
                                         ) : t.selectMainIndustriesPlaceholder}
-                                    </div>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>{t.selectMainIndustriesPlaceholder}</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {availableIndustries.map(industry => (
-                                     <DropdownMenuCheckboxItem
+                                    &lt;/div&gt;
+                                &lt;/Button&gt;
+                            &lt;/DropdownMenuTrigger&gt;
+                            &lt;DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]"&gt;
+                                &lt;DropdownMenuLabel&gt;{t.selectMainIndustriesPlaceholder}&lt;/DropdownMenuLabel&gt;
+                                &lt;DropdownMenuSeparator /&gt;
+                                {availableIndustries.map(industry =&gt; (
+                                     &lt;DropdownMenuCheckboxItem
                                         key={industry.slug}
                                         id={`DKNN_ITEM_${industry.slug}`}
                                         checked={currentIndustries.includes(industry.slug)}
-                                        onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleIndustryChange(Boolean(checked), industry.slug)}
-                                    >
-                                        <span className="font-bold w-6 mr-2">{currentIndustries.includes(industry.slug) ? `${currentIndustries.indexOf(industry.slug) + 1}.` : ''}</span>
+                                        onSelect={(e) =&gt; e.preventDefault()}
+                                        onCheckedChange={(checked) =&gt; handleIndustryChange(Boolean(checked), industry.slug)}
+                                    &gt;
+                                        &lt;span className="font-bold w-6 mr-2"&gt;{currentIndustries.includes(industry.slug) ? `${currentIndustries.indexOf(industry.slug) + 1}.` : ''}&lt;/span&gt;
                                         {industry.name[lang]}
-                                    </DropdownMenuCheckboxItem>
+                                    &lt;/DropdownMenuCheckboxItem&gt;
                                 ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                     <div className="space-y-2" id="DKNN_KHUVUC">
-                        <Label id="DKNN_KHUVUC_LABEL">{t.secondaryIndustriesLabel}</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKNN_KHUVUC_BUTTON">
-                                     <div className="flex flex-wrap gap-1">
-                                        {currentRegions.length > 0 ? (
-                                            currentRegions.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{lang === 'ja' ? regionKanjiMap[(japanRegions.find(r => r.slug === slug))?.name as keyof typeof regionKanjiMap] : (japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)
+                            &lt;/DropdownMenuContent&gt;
+                        &lt;/DropdownMenu&gt;
+                    &lt;/div&gt;
+                     &lt;div className="space-y-2" id="DKNN_KHUVUC"&gt;
+                        &lt;Label id="DKNN_KHUVUC_LABEL"&gt;{t.secondaryIndustriesLabel}&lt;/Label&gt;
+                        &lt;DropdownMenu&gt;
+                            &lt;DropdownMenuTrigger asChild&gt;
+                                &lt;Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKNN_KHUVUC_BUTTON"&gt;
+                                     &lt;div className="flex flex-wrap gap-1"&gt;
+                                        {currentRegions.length &gt; 0 ? (
+                                            currentRegions.map((slug: string, index: number) =&gt; &lt;Badge key={slug} variant="secondary"&gt;&lt;span className="font-bold mr-1.5"&gt;{index + 1}.&lt;/span&gt;{lang === 'ja' ? regionKanjiMap[(japanRegions.find(r =&gt; r.slug === slug))?.name as keyof typeof regionKanjiMap] : (japanRegions.find(r =&gt; r.slug === slug))?.name || slug}&lt;/Badge&gt;)
                                         ) : t.selectSecondaryIndustriesPlaceholder}
-                                    </div>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuLabel>{t.selectSecondaryIndustriesPlaceholder}</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {japanRegions.map(region => (
-                                     <DropdownMenuCheckboxItem
+                                    &lt;/div&gt;
+                                &lt;/Button&gt;
+                            &lt;/DropdownMenuTrigger&gt;
+                            &lt;DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]"&gt;
+                                &lt;DropdownMenuLabel&gt;{t.selectSecondaryIndustriesPlaceholder}&lt;/DropdownMenuLabel&gt;
+                                &lt;DropdownMenuSeparator /&gt;
+                                {japanRegions.map(region =&gt; (
+                                     &lt;DropdownMenuCheckboxItem
                                         key={region.slug}
                                         id={`DKNN_ITEM_${region.slug}`}
                                         checked={currentRegions.includes(region.slug)}
-                                        onSelect={(e) => e.preventDefault()}
-                                        onCheckedChange={(checked) => handleRegionChange(Boolean(checked), region.slug)}
-                                    >
-                                        <span className="font-bold w-6 mr-2">{currentRegions.includes(region.slug) ? `${currentRegions.indexOf(region.slug) + 1}.` : ''}</span>
+                                        onSelect={(e) =&gt; e.preventDefault()}
+                                        onCheckedChange={(checked) =&gt; handleRegionChange(Boolean(checked), region.slug)}
+                                    &gt;
+                                        &lt;span className="font-bold w-6 mr-2"&gt;{currentRegions.includes(region.slug) ? `${currentRegions.indexOf(region.slug) + 1}.` : ''}&lt;/span&gt;
                                         {lang === 'ja' ? regionKanjiMap[region.name] : region.name}
-                                    </DropdownMenuCheckboxItem>
+                                    &lt;/DropdownMenuCheckboxItem&gt;
                                 ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                </div>
+                            &lt;/DropdownMenuContent&gt;
+                        &lt;/DropdownMenu&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
             );
         default:
-            return <p>Chức năng đang được phát triển.</p>;
+            return &lt;p&gt;Chức năng đang được phát triển.&lt;/p&gt;;
     }
   };
   
   if (!employer) {
       return (
-        <div className="bg-secondary">
-          <div className="container mx-auto px-4 md:px-6 py-12">
-            <div className="max-w-7xl mx-auto">
-              <Skeleton className="h-64 w-full mb-8" />
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-8">
-                  <Skeleton className="h-48 w-full" />
-                  <Skeleton className="h-48 w-full" />
-                </div>
-                <div className="lg:col-span-1 space-y-6">
-                  <Skeleton className="h-64 w-full" />
-                  <Skeleton className="h-48 w-full" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        &lt;div className="bg-secondary"&gt;
+          &lt;div className="container mx-auto px-4 md:px-6 py-12"&gt;
+            &lt;div className="max-w-7xl mx-auto"&gt;
+              &lt;Skeleton className="h-64 w-full mb-8" /&gt;
+              &lt;div className="grid grid-cols-1 lg:grid-cols-3 gap-8"&gt;
+                &lt;div className="lg:col-span-2 space-y-8"&gt;
+                  &lt;Skeleton className="h-48 w-full" /&gt;
+                  &lt;Skeleton className="h-48 w-full" /&gt;
+                &lt;/div&gt;
+                &lt;div className="lg:col-span-1 space-y-6"&gt;
+                  &lt;Skeleton className="h-64 w-full" /&gt;
+                  &lt;Skeleton className="h-48 w-full" /&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
       );
   }
   
@@ -1454,256 +1461,257 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
   const continueButtonText = isUpdateMode ? t.reRegisterAction : t.registerAction;
 
   return (
-    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-      <div id="Y062" className="bg-secondary pb-24">
-        <div className="container mx-auto px-4 md:px-6 py-12">
-          <div className="max-w-7xl mx-auto">
+    &lt;Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}&gt;
+      &lt;div id="Y062" className="bg-secondary pb-24"&gt;
+        &lt;div className="container mx-auto px-4 md:px-6 py-12"&gt;
+          &lt;div className="max-w-7xl mx-auto"&gt;
             {/* Header Section */}
-            <Card className="shadow-2xl overflow-hidden mb-8">
-              <CardHeader className="p-0 relative">
-                <div className="relative w-full h-48">
-                  {employer.banner && <Image src={employer.banner} alt={`${employer.name?.[lang] || ''} banner`} fill className="object-cover" />}
-                  <div className="absolute inset-0 bg-black/40" />
-                   {!isConfirmationMode && (
-                  <Label htmlFor="banner-upload" className="absolute top-4 right-4 z-10 cursor-pointer">
-                     <Button variant="secondary" size="sm" asChild>
-                       <span><Camera className="mr-2 h-4 w-4" /> {t.edit}</span>
-                     </Button>
-                     <Input id="banner-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'banner')} />
-                  </Label>
+            &lt;Card className="shadow-2xl overflow-hidden mb-8"&gt;
+              &lt;CardHeader className="p-0 relative"&gt;
+                &lt;div className="relative w-full h-48"&gt;
+                  {employer.banner &amp;&amp; &lt;Image src={employer.banner} alt={`${employer.name?.[lang] || ''} banner`} fill className="object-cover" /&gt;}
+                  &lt;div className="absolute inset-0 bg-black/40" /&gt;
+                   {!isConfirmationMode &amp;&amp; (
+                  &lt;Label htmlFor="banner-upload" className="absolute top-4 right-4 z-10 cursor-pointer"&gt;
+                     &lt;Button variant="secondary" size="sm" asChild&gt;
+                       &lt;span&gt;&lt;Camera className="mr-2 h-4 w-4" /&gt; {t.edit}&lt;/span&gt;
+                     &lt;/Button&gt;
+                     &lt;Input id="banner-upload" type="file" className="hidden" accept="image/*" onChange={(e) =&gt; handleFileChange(e, 'banner')} /&gt;
+                  &lt;/Label&gt;
                   )}
-                </div>
-                <div id="DKTHONGTINCHUNG" className="p-6 bg-card relative">
-                  <div className="flex flex-col sm:flex-row items-start gap-4 -mt-24 md:-mt-20">
-                      <div className="relative flex-shrink-0">
-                        <Avatar id="DKTC_AVATAR" className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
-                            {employer.logo && <AvatarImage src={employer.logo} />}
-                            <AvatarFallback>{(employer.name?.[lang] || 'A').charAt(0)}</AvatarFallback>
-                          </Avatar>
-                           {!isConfirmationMode && (<Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
-                              <Camera className="h-4 w-4 text-secondary-foreground" />
-                           </Label>)}
-                           <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} disabled={isConfirmationMode}/>
-                      </div>
-                      <div className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16 w-full">
-                          <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
-                            <h1 id="DKTC_TEN" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                            <p id="DKTC_VAITRO" className="font-semibold text-primary">{headerRoleText}</p>
-                             <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location?.[lang] || `[${t.locationPlaceholder}]`}</p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                                <Badge variant="outline">{t.partnerIdLabel}: {partnerId}</Badge>
-                            </p>
-                          </div>
-                          <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 w-full justify-center md:w-auto md:mt-0 flex-shrink-0 md:ml-auto">
-                              <div className="flex items-center gap-2">
-                                <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
-                                    <TabsList id="DKXN_CHUYEN_NGON_NGU" className="grid w-full grid-cols-3">
-                                        <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span><span className="sm:hidden">VI</span></TabsTrigger>
-                                        <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="hidden sm:inline">日本語</span><span className="sm:hidden">JA</span></TabsTrigger>
-                                        <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="hidden sm:inline">English</span><span className="sm:hidden">EN</span></TabsTrigger>
-                                    </TabsList>
-                                </Tabs>
-                                {!isConfirmationMode && (<DialogTrigger asChild><Button variant="ghost" size="icon" className="hidden md:flex" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button></DialogTrigger>)}
-                              </div>
-                          </div>
-                      </div>
-                      {!isConfirmationMode && (<DialogTrigger asChild><Button variant="ghost" size="icon" className="absolute top-4 right-4 md:hidden" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button></DialogTrigger>)}
-                </div>
-                </div>
-              </CardHeader>
-            </Card>
+                &lt;/div&gt;
+                &lt;div id="DKTHONGTINCHUNG" className="p-6 bg-card relative"&gt;
+                  &lt;div className="flex flex-col sm:flex-row items-start gap-4 -mt-24 md:-mt-20"&gt;
+                      &lt;div className="relative flex-shrink-0"&gt;
+                        &lt;Avatar id="DKTC_AVATAR" className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg"&gt;
+                            {employer.logo &amp;&amp; &lt;AvatarImage src={employer.logo} /&gt;}
+                            &lt;AvatarFallback&gt;{(employer.name?.[lang] || 'A').charAt(0)}&lt;/AvatarFallback&gt;
+                          &lt;/Avatar&gt;
+                           {!isConfirmationMode &amp;&amp; (&lt;Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card"&gt;
+                              &lt;Camera className="h-4 w-4 text-secondary-foreground" /&gt;
+                           &lt;/Label&gt;)}
+                           &lt;Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) =&gt; handleFileChange(e, 'logo')} disabled={isConfirmationMode}/&gt;
+                      &lt;/div&gt;
+                      &lt;div className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16 w-full"&gt;
+                          &lt;div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0"&gt;
+                            &lt;h1 id="DKTC_TEN" className="text-2xl md:text-3xl font-headline font-bold"&gt;{headerName}&lt;/h1&gt;
+                            &lt;p id="DKTC_VAITRO" className="font-semibold text-primary"&gt;{headerRoleText}&lt;/p&gt;
+                             &lt;p id="DKTC_DIADIEM" className="text-sm text-muted-foreground"&gt;{employer.location?.[lang] || `[${t.locationPlaceholder}]`}&lt;/p&gt;
+                            &lt;p className="text-sm text-muted-foreground mt-1"&gt;
+                                &lt;Badge variant="outline"&gt;{t.partnerIdLabel}: {partnerId}&lt;/Badge&gt;
+                            &lt;/p&gt;
+                          &lt;/div&gt;
+                          &lt;div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 w-full justify-center md:w-auto md:mt-0 flex-shrink-0 md:ml-auto"&gt;
+                              &lt;div className="flex items-center gap-2"&gt;
+                                &lt;Tabs defaultValue={lang} onValueChange={(value) =&gt; handleLangChange(value as Language)} className="w-auto"&gt;
+                                    &lt;TabsList id="DKXN_CHUYEN_NGON_NGU" className="grid w-full grid-cols-3"&gt;
+                                        &lt;TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"&gt;&lt;VnFlagIcon /&gt; &lt;span className="hidden sm:inline"&gt;Tiếng Việt&lt;/span&gt;&lt;span className="sm:hidden"&gt;VI&lt;/span&gt;&lt;/TabsTrigger&gt;
+                                        &lt;TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"&gt;&lt;JpFlagIcon /&gt; &lt;span className="hidden sm:inline"&gt;日本語&lt;/span&gt;&lt;span className="sm:hidden"&gt;JA&lt;/span&gt;&lt;/TabsTrigger&gt;
+                                        &lt;TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"&gt;&lt;EnFlagIcon /&gt; &lt;span className="hidden sm:inline"&gt;English&lt;/span&gt;&lt;span className="sm:hidden"&gt;EN&lt;/span&gt;&lt;/TabsTrigger&gt;
+                                    &lt;/TabsList&gt;
+                                &lt;/Tabs&gt;
+                                {!isConfirmationMode &amp;&amp; (&lt;DialogTrigger asChild&gt;&lt;Button variant="ghost" size="icon" className="hidden md:flex" onClick={() =&gt; handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}&gt;&lt;Edit className="h-5 w-5"/&gt;&lt;/Button&gt;&lt;/DialogTrigger&gt;)}
+                              &lt;/div&gt;
+                          &lt;/div&gt;
+                      &lt;/div&gt;
+                      {!isConfirmationMode &amp;&amp; (&lt;DialogTrigger asChild&gt;&lt;Button variant="ghost" size="icon" className="absolute top-4 right-4 md:hidden" onClick={() =&gt; handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}&gt;&lt;Edit className="h-5 w-5"/&gt;&lt;/Button&gt;&lt;/DialogTrigger&gt;)}
+                &lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/CardHeader&gt;
+            &lt;/Card&gt;
 
             {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            &lt;div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start"&gt;
               {/* Left Column */}
-              <div className="lg:col-span-2 space-y-8">
-                  <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                       <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">
+              &lt;div className="lg:col-span-2 space-y-8"&gt;
+                  &lt;SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () =&gt; handleEditClick(t.aboutTitle, employer.about, 'about')}&gt;
+                       &lt;p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line"&gt;
                             {employer?.about?.[lang] || (
-                                <span className="italic">
+                                &lt;span className="italic"&gt;
                                     {t.notUpdated}{' '}
-                                    <button
+                                    &lt;button
                                         disabled={isConfirmationMode}
                                         className="underline text-primary"
-                                        onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}
-                                    >
+                                        onClick={() =&gt; handleEditClick(t.aboutTitle, employer.about, 'about')}
+                                    &gt;
                                         {t.clickToUpdate}
-                                    </button>
-                                </span>
+                                    &lt;/button&gt;
+                                &lt;/span&gt;
                             )}
-                        </p>
-                  </SectionCard>
+                        &lt;/p&gt;
+                  &lt;/SectionCard&gt;
                   
                   {/* Info card for Mobile */}
-                  <div className="block lg:hidden" ref={mobileInfoCardRef}>
-                    <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
-                        <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
-                            <div className="space-y-3 text-sm">
-                                <p><strong>{t.foundedLabel}:</strong> {employer.info?.founded || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                <p><strong>{t.sizeLabel}:</strong> {employer.info?.size?.[lang] || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                <p><strong>{t.licenseLabel}:</strong> {employer.info?.license || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                <p><strong>{t.websiteLabel}:</strong> {employer.info?.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                            </div>
+                  &lt;div className="block lg:hidden" ref={mobileInfoCardRef}&gt;
+                    &lt;Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}&gt;
+                        &lt;SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () =&gt; setIsInfoDialogOpen(true)}&gt;
+                            &lt;div className="space-y-3 text-sm"&gt;
+                                &lt;p&gt;&lt;strong&gt;{t.foundedLabel}:&lt;/strong&gt; {employer.info?.founded || &lt;DialogTrigger asChild&gt;&lt;button disabled={isConfirmationMode} className="italic text-primary underline"&gt;{t.clickToUpdate}&lt;/button&gt;&lt;/DialogTrigger&gt;}&lt;/p&gt;
+                                &lt;p&gt;&lt;strong&gt;{t.sizeLabel}:&lt;/strong&gt; {employer.info?.size?.[lang] || &lt;DialogTrigger asChild&gt;&lt;button disabled={isConfirmationMode} className="italic text-primary underline"&gt;{t.clickToUpdate}&lt;/button&gt;&lt;/DialogTrigger&gt;}&lt;/p&gt;
+                                &lt;p&gt;&lt;strong&gt;{t.licenseLabel}:&lt;/strong&gt; {employer.info?.license || &lt;DialogTrigger asChild&gt;&lt;button disabled={isConfirmationMode} className="italic text-primary underline"&gt;{t.clickToUpdate}&lt;/button&gt;&lt;/DialogTrigger&gt;}&lt;/p&gt;
+                                &lt;p&gt;&lt;strong&gt;{t.websiteLabel}:&lt;/strong&gt; {employer.info?.website ? &lt;a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline"&gt;{employer.info.website}&lt;/a&gt; : &lt;DialogTrigger asChild&gt;&lt;button disabled={isConfirmationMode} className="italic text-primary underline"&gt;{t.clickToUpdate}&lt;/button&gt;&lt;/DialogTrigger&gt;}&lt;/p&gt;
+                            &lt;/div&gt;
                             {hasContactInfo ? (
-                                <div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4 space-y-2">
-                                   {employer.info?.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                                   {employer.info?.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
-                                   {employer.info?.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                                   {employer.info?.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
-                                   {employer.info?.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
-                                </div>
+                                &lt;div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4 space-y-2"&gt;
+                                   {employer.info?.email &amp;&amp; &lt;Button asChild variant="outline" className="w-full justify-start"&gt;&lt;Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}&gt;&lt;Mail className="mr-2 h-4 w-4"/&gt;{employer.info.email}&lt;/Link&gt;&lt;/Button&gt;}
+                                   {employer.info?.phone &amp;&amp; &lt;Button asChild variant="outline" className="w-full justify-start"&gt;&lt;Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}&gt;&lt;Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" /&gt;{formatPhoneNumberInput(employer.info.phone, phoneCountry)}&lt;/Link&gt;&lt;/Button&gt;}
+                                   {employer.info?.messenger &amp;&amp; &lt;Button asChild variant="outline" className="w-full justify-start"&gt;&lt;Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"&gt;&lt;MessengerIcon className="h-4 w-4 flex-shrink-0"/&gt;&lt;span className="truncate"&gt;{`https://facebook.com/${employer.info.messenger}`}&lt;/span&gt;&lt;/Link&gt;&lt;/Button&gt;}
+                                   {employer.info?.zalo &amp;&amp; &lt;Button asChild variant="outline" className="w-full justify-start"&gt;&lt;Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"&gt;&lt;ZaloIcon className="mr-2 h-4 w-4"/&gt;{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}&lt;/Link&gt;&lt;/Button&gt;}
+                                   {employer.info?.line &amp;&amp; &lt;Button asChild variant="outline" className="w-full justify-start"&gt;&lt;Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"&gt;&lt;LineIcon className="h-4 w-4 flex-shrink-0"/&gt;&lt;span className="truncate"&gt;{`https://line.me/ti/p/${employer.info.line}`}&lt;/span&gt;&lt;/Link&gt;&lt;/Button&gt;}
+                                &lt;/div&gt;
                             ) : (
-                                <div id="HIENTHILIENHE03-mobile-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                    <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
-                                </div>
+                                &lt;div id="HIENTHILIENHE03-mobile-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError &amp;&amp; 'border-destructive ring-2 ring-destructive/40')}&gt;
+                                    &lt;div className="text-muted-foreground"&gt;{t.registerCTA} &lt;Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs"&gt;{isUpdateMode ? t.reRegisterAction : t.registerAction}&lt;/Badge&gt;&lt;/div&gt;
+                                &lt;/div&gt;
                             )}
-                        </SectionCard>
-                         <InfoDialog 
+                        &lt;/SectionCard&gt;
+                         &lt;InfoDialog 
                             isOpen={isInfoDialogOpen}
                             onOpenChange={setIsInfoDialogOpen}
                             employer={employer}
                             lang={lang}
                             isConfirmationMode={isConfirmationMode}
-                            onSave={(data) => setEmployer(data)}
-                            onEditClick={() => {}}
-                        />
-                    </Dialog>
-                  </div>
+                            onSave={(data) =&gt; setEmployer(data)}
+                            onEditClick={() =&gt; {}}
+                        /&gt;
+                    &lt;/Dialog&gt;
+                  &lt;/div&gt;
 
-                  <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
-                    <div className="space-y-3 text-sm">
-                        <div id="DKNV_NGHIEPVU">
-                            <p id="DKNV_NGHIEPVU_LABEL" className="font-semibold mb-1">{t.interestLabel}:</p>
+                  &lt;SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={isConfirmationMode ? undefined : () =&gt; handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}&gt;
+                    &lt;div className="space-y-3 text-sm"&gt;
+                        &lt;div id="DKNV_NGHIEPVU"&gt;
+                            &lt;p id="DKNV_NGHIEPVU_LABEL" className="font-semibold mb-1"&gt;{t.interestLabel}:&lt;/p&gt;
                             {getArrayValue(employer.interest, 'interest')}
-                        </div>
-                        <div id="DKNV_GIATRI">
-                            <p id="DKNV_GIATRI_LABEL" className="font-semibold mb-1">{t.valueInterestLabel}:</p>
-                            {getArrayValue({[lang]: employer.valueInterest.map((item:any) => item.id)}, 'valueInterest')}
-                        </div>
-                    </div>
-                  </SectionCard>
-                  <SectionCard id="DKLICHSU" title={t.historyTitle} icon={History} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.historyTitle, employer.history, 'history')}>
-                       <ul id="DKLS_DANHSACH" className="space-y-4 text-sm">
-                          {employer.history?.length > 0 ? employer.history.map((item: any, index: number) => (
-                              <li key={index} className="relative pl-6">
-                                  <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
-                                  <p className="font-bold text-primary mb-1">{item.year}</p>
-                                  <p className="text-muted-foreground">{item.event?.[lang]}</p>
-                              </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated} <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
-                      </ul>
-                  </SectionCard>
-                  <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
-                      <div id="DKHA_LUOIANH" className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          {employer.images?.map((img: any, index: number) => (
-                              <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
-                                  {img.src && <Image src={img.src} alt={img.alt?.[lang] || ''} fill className="object-cover" />}
-                                   {!isConfirmationMode && (<Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                                        <Camera className="h-6 w-6 text-white"/>
-                                   </Label>)}
-                                   <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} disabled={isConfirmationMode}/>
-                                   {!isConfirmationMode && (<Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
-                                        <Trash2 className="h-3 w-3"/>
-                                   </Button>)}
-                              </div>
+                        &lt;/div&gt;
+                        &lt;div id="DKNV_GIATRI"&gt;
+                            &lt;p id="DKNV_GIATRI_LABEL" className="font-semibold mb-1"&gt;{t.valueInterestLabel}:&lt;/p&gt;
+                            {getArrayValue({[lang]: employer.valueInterest.map((item:any) =&gt; item.id)}, 'valueInterest')}
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                  &lt;/SectionCard&gt;
+                  &lt;SectionCard id="DKLICHSU" title={t.historyTitle} icon={History} onEditClick={isConfirmationMode ? undefined : () =&gt; handleEditClick(t.historyTitle, employer.history, 'history')}&gt;
+                       &lt;ul id="DKLS_DANHSACH" className="space-y-4 text-sm"&gt;
+                          {employer.history?.length &gt; 0 ? employer.history.map((item: any, index: number) =&gt; (
+                              &lt;li key={index} className="relative pl-6"&gt;
+                                  &lt;div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" /&gt;
+                                  &lt;p className="font-bold text-primary mb-1"&gt;{item.year}&lt;/p&gt;
+                                  &lt;p className="text-muted-foreground"&gt;{item.event?.[lang]}&lt;/p&gt;
+                              &lt;/li&gt;
+                          )) : &lt;p className="italic text-muted-foreground"&gt;{t.notUpdated} &lt;button disabled={isConfirmationMode} className="underline text-primary" onClick={() =&gt; handleEditClick(t.historyTitle, employer.history, 'history')}&gt;{t.clickToUpdate}&lt;/button&gt;.&lt;/p&gt;}
+                      &lt;/ul&gt;
+                  &lt;/SectionCard&gt;
+                  &lt;SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () =&gt; handleEditClick(t.imagesTitle, employer.images, 'images')}&gt;
+                      &lt;div id="DKHA_LUOIANH" className="grid grid-cols-2 md:grid-cols-4 gap-4"&gt;
+                          {employer.images?.map((img: any, index: number) =&gt; (
+                              &lt;div key={index} className="relative aspect-square rounded-lg overflow-hidden group"&gt;
+                                  {img.src &amp;&amp; &lt;Image src={img.src} alt={img.alt?.[lang] || ''} fill className="object-cover" /&gt;}
+                                   {!isConfirmationMode &amp;&amp; (&lt;Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"&gt;
+                                        &lt;Camera className="h-6 w-6 text-white"/&gt;
+                                   &lt;/Label&gt;)}
+                                   &lt;Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) =&gt; handleFileChange(e, 'images', index)} disabled={isConfirmationMode}/&gt;
+                                   {!isConfirmationMode &amp;&amp; (&lt;Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) =&gt; { e.stopPropagation(); handleDeleteImage(index); }}&gt;
+                                        &lt;Trash2 className="h-3 w-3"/&gt;
+                                   &lt;/Button&gt;)}
+                              &lt;/div&gt;
                           ))}
-                      </div>
-                  </SectionCard>
-                  <SectionCard id="DKPHUCLOI" title={t.benefitsTitle} icon={Award} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
-                      <ul id="DKPL_DANHSACH" className="space-y-2 text-sm">
-                          {employer.benefits?.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
-                              <li key={index} className="flex items-start gap-2">
-                                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
-                              </li>
-                          )) : <p className="italic text-muted-foreground">{t.notUpdated} <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
-                      </ul>
-                  </SectionCard>
-              </div>
+                      &lt;/div&gt;
+                  &lt;/SectionCard&gt;
+                  &lt;SectionCard id="DKPHUCLOI" title={t.benefitsTitle} icon={Award} onEditClick={isConfirmationMode ? undefined : () =&gt; handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}&gt;
+                      &lt;ul id="DKPL_DANHSACH" className="space-y-2 text-sm"&gt;
+                          {employer.benefits?.length &gt; 0 ? employer.benefits.map((benefit: any, index: number) =&gt; (
+                              &lt;li key={index} className="flex items-start gap-2"&gt;
+                                  &lt;CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/&gt; &lt;span className="text-muted-foreground"&gt;{benefit[lang]}&lt;/span&gt;
+                              &lt;/li&gt;
+                          )) : &lt;p className="italic text-muted-foreground"&gt;{t.notUpdated} &lt;button disabled={isConfirmationMode} className="underline text-primary" onClick={() =&gt; handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}&gt;{t.clickToUpdate}&lt;/button&gt;.&lt;/p&gt;}
+                      &lt;/ul&gt;
+                  &lt;/SectionCard&gt;
+              &lt;/div&gt;
               
                 {/* Right Column (order-first on desktop) */}
-              <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
-                  <div className="hidden lg:block" ref={infoCardRef}>
-                    <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
-                        <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
-                            <div className="space-y-3 text-sm">
-                                <p><strong>{t.foundedLabel}:</strong> {employer.info?.founded || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                <p><strong>{t.sizeLabel}:</strong> {employer.info?.size?.[lang] || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                <p><strong>{t.licenseLabel}:</strong> {employer.info?.license || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                <p><strong>{t.websiteLabel}:</strong> {employer.info?.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                            </div>
+              &lt;div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24"&gt;
+                  &lt;div className="hidden lg:block" ref={infoCardRef}&gt;
+                    &lt;Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}&gt;
+                        &lt;SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () =&gt; setIsInfoDialogOpen(true)}&gt;
+                            &lt;div className="space-y-3 text-sm"&gt;
+                                &lt;p&gt;&lt;strong&gt;{t.foundedLabel}:&lt;/strong&gt; {employer.info?.founded || &lt;DialogTrigger asChild&gt;&lt;button disabled={isConfirmationMode} className="italic text-primary underline"&gt;{t.clickToUpdate}&lt;/button&gt;&lt;/DialogTrigger&gt;}&lt;/p&gt;
+                                &lt;p&gt;&lt;strong&gt;{t.sizeLabel}:&lt;/strong&gt; {employer.info?.size?.[lang] || &lt;DialogTrigger asChild&gt;&lt;button disabled={isConfirmationMode} className="italic text-primary underline"&gt;{t.clickToUpdate}&lt;/button&gt;&lt;/DialogTrigger&gt;}&lt;/p&gt;
+                                &lt;p&gt;&lt;strong&gt;{t.licenseLabel}:&lt;/strong&gt; {employer.info?.license || &lt;DialogTrigger asChild&gt;&lt;button disabled={isConfirmationMode} className="italic text-primary underline"&gt;{t.clickToUpdate}&lt;/button&gt;&lt;/DialogTrigger&gt;}&lt;/p&gt;
+                                &lt;p&gt;&lt;strong&gt;{t.websiteLabel}:&lt;/strong&gt; {employer.info?.website ? &lt;a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline"&gt;{employer.info.website}&lt;/a&gt; : &lt;DialogTrigger asChild&gt;&lt;button disabled={isConfirmationMode} className="italic text-primary underline"&gt;{t.clickToUpdate}&lt;/button&gt;&lt;/DialogTrigger&gt;}&lt;/p&gt;
+                            &lt;/div&gt;
                             {hasContactInfo ? (
-                                <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4 space-y-2">
-                                   {employer.info?.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
-                                   {employer.info?.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
-                                   {employer.info?.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                                   {employer.info?.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
-                                   {employer.info?.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
-                                </div>
+                                &lt;div id="HIENTHILIENHE03" className="mt-6 border-t pt-4 space-y-2"&gt;
+                                   {employer.info?.email &amp;&amp; &lt;Button asChild variant="outline" className="w-full justify-start"&gt;&lt;Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}&gt;&lt;Mail className="mr-2 h-4 w-4"/&gt;{employer.info.email}&lt;/Link&gt;&lt;/Button&gt;}
+                                   {employer.info?.phone &amp;&amp; &lt;Button asChild variant="outline" className="w-full justify-start"&gt;&lt;Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}&gt;&lt;Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" /&gt;{formatPhoneNumberInput(employer.info.phone, phoneCountry)}&lt;/Link&gt;&lt;/Button&gt;}
+                                   {employer.info?.messenger &amp;&amp; &lt;Button asChild variant="outline" className="w-full justify-start"&gt;&lt;Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"&gt;&lt;MessengerIcon className="h-4 w-4 flex-shrink-0"/&gt;&lt;span className="truncate"&gt;{`https://facebook.com/${employer.info.messenger}`}&lt;/span&gt;&lt;/Link&gt;&lt;/Button&gt;}
+                                   {employer.info?.zalo &amp;&amp; &lt;Button asChild variant="outline" className="w-full justify-start"&gt;&lt;Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"&gt;&lt;ZaloIcon className="mr-2 h-4 w-4"/&gt;{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}&lt;/Link&gt;&lt;/Button&gt;}
+                                   {employer.info?.line &amp;&amp; &lt;Button asChild variant="outline" className="w-full justify-start"&gt;&lt;Link id="DKDN_LINE" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"&gt;&lt;LineIcon className="h-4 w-4 flex-shrink-0"/&gt;&lt;span className="truncate"&gt;{`https://line.me/ti/p/${employer.info.line}`}&lt;/span&gt;&lt;/Link&gt;&lt;/Button&gt;}
+                                &lt;/div&gt;
                             ) : (
-                                <div id="HIENTHILIENHE03-desktop-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                    <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
-                                </div>
+                                &lt;div id="HIENTHILIENHE03-desktop-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError &amp;&amp; 'border-destructive ring-2 ring-destructive/40')}&gt;
+                                    &lt;div className="text-muted-foreground"&gt;{t.registerCTA} &lt;Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs"&gt;{isUpdateMode ? t.reRegisterAction : t.registerAction}&lt;/Badge&gt;&lt;/div&gt;
+                                &lt;/div&gt;
                             )}
-                        </SectionCard>
-                         <InfoDialog 
+                        &lt;/SectionCard&gt;
+                         &lt;InfoDialog 
                             isOpen={isInfoDialogOpen}
                             onOpenChange={setIsInfoDialogOpen}
                             employer={employer}
                             lang={lang}
                             isConfirmationMode={isConfirmationMode}
-                            onSave={(data) => setEmployer(data)}
-                            onEditClick={() => {}}
-                        />
-                    </Dialog>
-                  </div>
-                   <SectionCard id="DKVISA_NGANHNGHE_KHUVUC" title={t.visaAndIndustriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries')}>
-                    <div className="space-y-3 text-sm">
-                        <div id="DKLV_LOAIHINH"><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
-                        <div id="DKLV_CHITIETVISA"><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
-                        <div id="DKNN_NGANHNGHE"><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
-                        <div id="DKNN_KHUVUC"><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
-                    </div>
-                </SectionCard>
-              </div>
+                            onSave={(data) =&gt; setEmployer(data)}
+                            onEditClick={() =&gt; {}}
+                        /&gt;
+                    &lt;/Dialog&gt;
+                  &lt;/div&gt;
+                   &lt;SectionCard id="DKVISA_NGANHNGHE_KHUVUC" title={t.visaAndIndustriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () =&gt; handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries')}&gt;
+                    &lt;div className="space-y-3 text-sm"&gt;
+                        &lt;div id="DKLV_LOAIHINH"&gt;&lt;strong&gt;{t.visaTypeLabel}:&lt;/strong&gt; {getArrayValue(employer.visaType, 'visaType')}&lt;/div&gt;
+                        &lt;div id="DKLV_CHITIETVISA"&gt;&lt;strong&gt;{t.visaDetailLabel}:&lt;/strong&gt; {getArrayValue(employer.visaDetail, 'visaDetail')}&lt;/div&gt;
+                        &lt;div id="DKNN_NGANHNGHE"&gt;&lt;strong&gt;{t.mainIndustriesLabel}:&lt;/strong&gt; {getArrayValue(employer.industries.main, 'industries')}&lt;/div&gt;
+                        &lt;div id="DKNN_KHUVUC"&gt;&lt;strong&gt;{t.secondaryIndustriesLabel}:&lt;/strong&gt; {getArrayValue(employer.industries.secondary, 'regions')}&lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/SectionCard&gt;
+              &lt;/div&gt;
 
               
-            </div>
-          </div>
-        </div>
-      </div>
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
 
-       {!isConfirmationMode && (
-        <div id="DANGKY_NTD_FOOTER" className={cn(
+       {!isConfirmationMode &amp;&amp; (
+        &lt;div id="DANGKY_NTD_FOOTER" className={cn(
           "sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300",
-          showFooter && isMobile ? "translate-y-0" : "translate-y-full md:translate-y-0"
-        )}>
-          <div className="container mx-auto flex justify-start gap-4">
-            <Button variant="outline" size="lg" onClick={handleBack}>
+          showFooter &amp;&amp; isMobile ? "translate-y-0" : "translate-y-full md:translate-y-0"
+        )}&gt;
+          &lt;div className="container mx-auto flex justify-start gap-4"&gt;
+            &lt;Button variant="outline" size="lg" onClick={handleBack}&gt;
                 {t.backButton}
-            </Button>
-            <Button size="lg" className={cn("bg-accent-orange hover:bg-accent-orange/90 text-white", isUpdateMode ? "bg-accent-green hover:bg-accent-green/90": "")} onClick={handleContinue}>
+            &lt;/Button&gt;
+            &lt;Button size="lg" className={cn("bg-accent-orange hover:bg-accent-orange/90 text-white", isUpdateMode ? "bg-accent-green hover:bg-accent-green/90": "")} onClick={handleContinue}&gt;
                 {continueButtonText}
-            </Button>
-          </div>
-        </div>
+            &lt;/Button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
       )}
 
-      <DialogContent id={`${editingModule?.field}_DIALOG`} className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
-        </DialogHeader>
-          <div className="py-4 max-h-[60vh] overflow-y-auto pr-4">
+      &lt;DialogContent id={`${editingModule?.field}_DIALOG`} className="sm:max-w-2xl"&gt;
+        &lt;DialogHeader&gt;
+          &lt;DialogTitle className="font-headline text-2xl"&gt;{editingModule?.title}&lt;/DialogTitle&gt;
+        &lt;/DialogHeader&gt;
+          &lt;div className="py-4 max-h-[60vh] overflow-y-auto pr-4"&gt;
             {renderEditContent()}
-          </div>
-        <DialogFooter>
-          <DialogClose asChild>
-              <Button variant="outline">{t.cancelButton}</Button>
-          </DialogClose>
-            {(editingModule) && (
-              <Button onClick={handleSaveChanges}>{t.saveButton}</Button>
+          &lt;/div&gt;
+        &lt;DialogFooter&gt;
+          &lt;DialogClose asChild&gt;
+              &lt;Button variant="outline"&gt;{t.cancelButton}&lt;/Button&gt;
+          &lt;/DialogClose&gt;
+            {(editingModule) &amp;&amp; (
+              &lt;Button onClick={handleSaveChanges}&gt;{t.saveButton}&lt;/Button&gt;
             )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        &lt;/DialogFooter&gt;
+      &lt;/DialogContent&gt;
+    &lt;/Dialog&gt;
   )
 }
+
