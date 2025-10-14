@@ -27,7 +27,7 @@ export function CtaNhaTuyenDung() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                         <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90" id="DANGTINTUYENDUNG01">
-                          <Link href="/nha-tuyen-dung">
+                          <Link href="/nha-tuyen-dung/landing/can-bo-tuyen-dung">
                             <div className="text-center">
                                 <span className="font-semibold">Xem chi tiết</span>
                                 <div className="text-xs opacity-80">詳細を確認 / Learn More</div>
