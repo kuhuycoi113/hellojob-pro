@@ -58,6 +58,7 @@ export interface Job {
     experienceRequirement?: string;
     yearsOfExperience?: string;
     heightRequirement?: string;
+    hepatitisBRequirement?:any
     weightRequirement?: string;
     visionRequirement?: string;
     tattooRequirement?: string;

@@ -548,4 +548,4 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         </div>
     );
 
-    
+}
