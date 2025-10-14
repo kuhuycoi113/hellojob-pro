@@ -269,7 +269,7 @@ const contentByLang = {
         backButton: 'Quay lại',
         cancelButton: 'Huỷ',
         saveButton: 'Lưu thay đổi',
-        examplePlaceholder: 'Ví dụ:',
+        examplePlaceholder: 'Ví dụ：',
         addMilestoneButton: 'Thêm mốc',
         addBenefitButton: 'Thêm phúc lợi',
         addImageButton: 'Thêm ảnh',
@@ -894,10 +894,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 en: updates.location
                             }
                         };
-                     } else if (key === 'visa_type' && updates.visa_type) {
-                        merged.visaType = { ...merged.visaType, [langFromParams]: updates.visa_type };
-                     } else if (key === 'visa_detail' && updates.visa_detail) {
-                        merged.visaDetail = { ...merged.visaDetail, [langFromParams]: updates.visa_detail };
+                     } else if (key === 'visaType' && updates.visaType) {
+                        merged.visaType = { ...merged.visaType, [langFromParams]: updates.visaType };
+                     } else if (key === 'visaDetail' && updates.visaDetail) {
+                        merged.visaDetail = { ...merged.visaDetail, [langFromParams]: updates.visaDetail };
                      } else if (key === 'industry' && updates.industry) {
                          merged.industries = {
                             ...(merged.industries || {}),
