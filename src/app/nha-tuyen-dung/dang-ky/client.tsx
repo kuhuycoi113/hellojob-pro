@@ -180,7 +180,7 @@ const emptyEmployerData = {
     visaDetail: { vi: [], ja: [], en: [] }, // Changed to array
     industries: { main: { vi: [], ja: [], en: [] }, secondary: { vi: [], ja: [], en: [] } },
     location: { vi: '', ja: '', en: '' },
-    logo: '',
+    logo: '/img/ANH CHUNG/company3.png',
     banner: '',
     about: { vi: '', ja: '', en: '' },
     images: [],
@@ -1731,6 +1731,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         </Dialog>
       )
     }
+
+    
 
     
 
