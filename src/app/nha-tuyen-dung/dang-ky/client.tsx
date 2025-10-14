@@ -901,7 +901,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                      } else if (key === 'industry' && updates.industry) {
                          merged.industries = {
                             ...(merged.industries || {}),
-                            main: { ...merged.industries?.main, [langFromParams]: updates.industry }
+                            main: { ...merged.industries.main, [langFromParams]: updates.industry }
                          };
                      } else if (typeof updates[key] === 'object' && !Array.isArray(updates[key])) {
                         merged[key] = { ...(base[key] || {}), ...updates[key] };
@@ -1677,7 +1677,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 lang={lang}
                                 isConfirmationMode={isConfirmationMode}
                                 onSave={(data) => setEmployer(data)}
-                                onEditClick={() => setIsInfoDialogOpen(true)}
                             />
                         </Dialog>
                       </div>
