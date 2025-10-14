@@ -41,7 +41,7 @@ import type { SearchFilters } from './job-search/search-results';
 
 const formatCurrency = (value?: string) => {
     if (!value) return 'N/A';
-    return (''+value).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return ('' + value).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
 // CANHANHOA01: Function to log user interaction
@@ -111,7 +111,7 @@ const visasForVndDisplay = [
 const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): string => {
     if (!salaryValue) return 'Liên hệ';
 
-    const numericValue = parseInt((''+salaryValue).replace(/[^0-9]/g, ''), 10);
+    const numericValue = parseInt(('' + salaryValue).replace(/[^0-9]/g, ''), 10);
     if (isNaN(numericValue)) return salaryValue;
 
     if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
@@ -133,7 +133,7 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 };
 
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false,fakeID }: { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, fakeID?: string }) => {
+export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, fakeID }: { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, fakeID?: string }) => {
     const { isLoggedIn, setPostLoginAction } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
@@ -150,14 +150,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     const [badgeClassName, setBadgeClassName] = useState<string>('opacity-0');
     const [jobTitle, setJobTitle] = useState(generateBulletJobCrawl(job));
     const recruiter = {
-        id: 'nguyen-thi-ngoc-oanh',
-        name: 'Nguyễn Thị Ngọc Oanh',
-        avatarUrl: '/img/TVV003.png',
+        id: 'pham-thi-ha',
+        name: 'Phạm Thị Hà',
+        avatarUrl: '/img/TVV004.png',
         dataAiHint: 'professional woman portrait',
-        experience: '5 năm',
-        mainExpertise: 'Tư vấn Tokutei Vận tải, Xây dựng, Thực phẩm',
-        successfulCandidates: 450,
-        strengths: ['Nhiều đơn gấp', 'Hỗ trợ nhiệt tình', 'Kinh nghiệm'],
+        experience: '4 năm',
+        mainExpertise: 'Tư vấn Nhà hàng, Cơ khí, Điều dưỡng, Nông nghiệp',
+        successfulCandidates: 320,
+        strengths: ['Tận tâm', 'Am hiểu thủ tục', 'Hỗ trợ chi tiết'],
     }
 
     useEffect(() => {
@@ -332,7 +332,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     <div className="p-3 hover:bg-secondary/30">
                         <div className="flex flex-col items-stretch gap-4 md:flex-row">
                             <div className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
-                                <Image src={job.avatar || getJobImage(job.job,job.career)} alt={jobTitle} fill sizes='100%' className="rounded-lg object-cover" />
+                                <Image src={job.avatar || getJobImage(job.job, job.career)} alt={jobTitle} fill sizes='100%' className="rounded-lg object-cover" />
                                 <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                                     <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                                     <span>{job.code}</span>
