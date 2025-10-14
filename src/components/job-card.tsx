@@ -133,7 +133,7 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 };
 
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false }: { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean }) => {
+export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false,fakeID }: { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, fakeID?: string }) => {
     const { isLoggedIn, setPostLoginAction } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
@@ -264,7 +264,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             return;
         }
         logInteraction(job, 'view');
-        router.push(`/viec-lam/${job.id}`);
+        router.push(`/viec-lam/${fakeID}`);
     };
 
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';

@@ -158,7 +158,7 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, totalPage,
                         {jobs.length > 0 ? (
                             <div className="grid grid-cols-1 gap-4">
                                 {jobs.map((job, index) => {
-                                    const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} />;
+                                    const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} fakeID={jobData[0].id} />;
                                     if (index === jobs.length - 3) {
                                         // return <div key={job.id} style={{ textAlign: 'center' }}>
                                         //     <Button disabled={isLoadingMore} onClick={nextPage} asChild size="lg">
