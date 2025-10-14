@@ -82,7 +82,7 @@ function createSearchQuery(filter: SearchFilters): any {
             { createdDate: { order: 'desc' } }
         ]
     };
-    if (!!visaDetail && visaDetail !== "all" && visaDetail !== "") {
+    if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== "") {
         const visaLabel = visaMapping[visaDetail as keyof typeof visaMapping];
         searchQuery.query.bool.must.push({
             term: {
@@ -114,7 +114,7 @@ function createSearchQuery(filter: SearchFilters): any {
             },
         });
     }
-    if ((!!career && career !== 'all') || !!job) {
+    if ((!!career && career !== 'all') || (!!job && job !== 'all-details')) {
         const jobObj = JOBS.find(j => j.value === job);
         const jobCodeArr = jobObj?.valueArr;
         let should = [];
