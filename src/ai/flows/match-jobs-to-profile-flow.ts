@@ -9,7 +9,7 @@
  */
 
 import { CandidateProfile } from '@/ai/schemas';
-import { Job, jobData } from '@/lib/mock-data';
+import { Job, jobData } from '@/lib/job-data';
 import { z } from 'zod';
 import { ai } from '@/ai/genkit';
 import { locations } from '@/lib/location-data';

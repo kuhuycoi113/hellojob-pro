@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Send, Phone, Video, X, Paperclip, Image as ImageIcon } from 'lucide-react';
 import { ChatMessage } from './chat-message';
-import { type Conversation, type Message, type User, type Attachment, helloJobBot, getCurrentUser } from '@/lib/chat-data';
+import { type Conversation, type Message, type User, type Attachment, helloJobBot } from '@/lib/chat-data';
 import { useChat } from '@/contexts/ChatContext';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -15,6 +15,7 @@ import { VideoCallDialog } from '../video-call-dialog';
 import { VoiceCallDialog } from '../voice-call-dialog';
 import { usePathname, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ChatWindowProps {
   conversation: Conversation;
@@ -22,6 +23,7 @@ interface ChatWindowProps {
 
 export function ChatWindow({ conversation }: ChatWindowProps) {
   const { sendMessage, closeChat, assignedConsultant } = useChat();
+  const { currentUser } = useAuth();
   const { toast } = useToast();
   const [newMessage, setNewMessage] = useState('');
   const [isVideoCallDialogOpen, setIsVideoCallDialogOpen] = useState(false);
@@ -31,7 +33,6 @@ export function ChatWindow({ conversation }: ChatWindowProps) {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const pathname = usePathname();
   const router = useRouter();
-  const currentUser = getCurrentUser();
   
   const displayContact = assignedConsultant || conversation.participants.find(p => p.id !== currentUser.id) || helloJobBot;
 

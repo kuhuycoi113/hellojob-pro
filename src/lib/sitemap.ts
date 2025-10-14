@@ -1,5 +1,4 @@
 
-
 import { MetadataRoute } from 'next';
 import { articles } from '@/lib/handbook-data';
 import { jobData } from '@/lib/mock-data';
@@ -22,7 +21,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/ho-so-cua-toi',
     '/nha-tuyen-dung',
     '/nhuong-quyen',
-    '/doi-tac',
     '/doi-tac/dang-tin-tuyen-dung',
     '/bang-dieu-khien',
     '/gop-y',
@@ -31,10 +29,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/viec-lam',
     '/tim-viec-lam',
     '/chat', // Assuming /chat is a valid route not needing translation
-    '/viec-lam-cua-toi',
-    '/dang-ky',
-    '/goi-video',
-    '/goi-thoai'
+    '/viec-lam-cua-toi'
   ].map((route) => ({
     url: `${siteUrl}${route}`,
     lastModified: new Date(),

@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { industriesByJobType, type Industry } from "@/lib/industry-data";
-import { locations } from '@/lib/location-data';
+import { locations, interviewLocations } from '@/lib/location-data';
 import { conditionsByVisaDetail, otherSkills, visaDetailsByVisaType } from '@/lib/visa-data';
 
 // Represents all possible fields
@@ -457,11 +457,11 @@ export default function PartnerPostJobPage() {
                               <SelectContent>
                                   <SelectGroup>
                                       <SelectLabel>Việt Nam</SelectLabel>
-                                      {locations["Việt Nam"].map(province => <SelectItem key={province} value={province}>{province}</SelectItem>)}
+                                      {interviewLocations["Việt Nam"].map(province => <SelectItem key={province.slug} value={province.name}>{province.name}</SelectItem>)}
                                   </SelectGroup>
                                   <SelectGroup>
                                       <SelectLabel>Nhật Bản</SelectLabel>
-                                      {locations["Phỏng vấn tại Nhật Bản"].map(prefecture => <SelectItem key={prefecture} value={prefecture}>{prefecture}</SelectItem>)}
+                                      {interviewLocations["Nhật Bản"].map(prefecture => <SelectItem key={prefecture.slug} value={prefecture.name}>{prefecture.name}</SelectItem>)}
                                   </SelectGroup>
                               </SelectContent>
                           </Select>

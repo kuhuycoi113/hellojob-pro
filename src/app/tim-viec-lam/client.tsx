@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -9,7 +8,6 @@ import { Job } from '@/lib/mock-data';
 import { SearchModule } from '@/components/job-search/search-module';
 import { allSpecialConditions } from '@/lib/visa-data';
 import { countJobs, getJobs } from './action';
-
 
 const initialSearchFilters: SearchFilters = {
     q: '',
@@ -110,7 +108,6 @@ const reverseSortOptionMap: { [key: string]: string } = Object.fromEntries(
     Object.entries(sortOptionMap).map(([key, value]) => [value, key])
 );
 
-
 // Helper function to escape regex special characters
 function escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
@@ -124,7 +121,7 @@ const createSlug = (str: string) => {
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/đ/g, "d")
         .replace(/\s+/g, '-')
-        .replace(/[^\w\-]+/g, '');
+        .replace(/[^\w\-.]+/g, '');
 };
 
 
@@ -233,13 +230,9 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
                     newFilters[internalKey] = [parseInt(values[0], 10), parseInt(values[1], 10)];
                 }
             } else if (internalKey === 'specialConditions') {
-                const currentConditions = newFilters.specialConditions || [];
-                const conditionName = allSpecialConditions.find(c => c.slug === value)?.name;
-                if (conditionName) {
-                    newFilters.specialConditions = [...currentConditions, conditionName];
-                }
-            } else if (key === 'yoe') { // Legacy key support
-                newFilters['yearsOfExperience'] = value;
+                const values = Array.isArray(value) ? value : [value];
+                const conditionNames = values.map(v => allSpecialConditions.find(c => c.slug === v)?.name).filter(Boolean) as string[];
+                newFilters.specialConditions = [...(newFilters.specialConditions || []), ...conditionNames];
             } else {
                 if (internalKey in newFilters) {
                     // @ts-ignore

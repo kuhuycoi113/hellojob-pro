@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import Link from 'next/link';
@@ -7,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { mobileFooterLinks } from '@/lib/nav-data';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Briefcase, Compass, LifeBuoy, UserSearch, Info } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 
@@ -44,7 +42,9 @@ export function MobileSecondaryHeader() {
       setLastScrollY(window.scrollY);
     };
 
+    window.removeEventListener('scroll', controlNavbar);
     window.addEventListener('scroll', controlNavbar);
+
     return () => window.removeEventListener('scroll', controlNavbar);
   }, [isClient, isMobile, lastScrollY]);
 
@@ -53,6 +53,16 @@ export function MobileSecondaryHeader() {
         <header className="md:hidden sticky top-16 z-30 w-full bg-background/95 h-14 border-b" />
     )
   }
+
+  const icons: { [key: string]: React.ElementType } = {
+    '/viec-lam-cua-toi': Briefcase,
+    '/lo-trinh': Compass,
+    '/tao-ho-so-ai': Sparkles,
+    '/cam-nang': LifeBuoy,
+    '/tu-van-vien': UserSearch,
+    '/gioi-thieu': Info,
+  };
+
 
   return (
     <header className={cn(
@@ -64,21 +74,20 @@ export function MobileSecondaryHeader() {
             {mobileFooterLinks.map(({ href, label }) => {
                 const isActive = (href !== '/' && activePath.startsWith(href)) || (href === '/' && activePath === '/');
                 const isAiProfile = href === '/tao-ho-so-ai';
+                const Icon = icons[href];
                 
                 return (
                     <Link href={href} key={href} className={cn(
                         "flex items-center justify-center text-sm text-muted-foreground hover:text-primary transition-colors flex-shrink-0 w-auto px-4 py-2 rounded-md",
                         isActive ? 'text-primary font-bold bg-primary/10' : ''
                     )}>
-                    {isAiProfile ? (
-                        <div className="flex items-center gap-1">
-                            <Sparkles className="h-4 w-4 text-accent-orange" />
+                    {Icon && isAiProfile ? (
+                        <div className="flex items-center gap-2">
+                            <Icon className={cn("h-4 w-4", isAiProfile && "text-accent-orange")} />
                             <span className="text-center leading-tight">{label}</span>
                         </div>
                     ) : (
-                       
                         <span className="text-center leading-tight">{label}</span>
-                       
                     )}
                     </Link>
                 )

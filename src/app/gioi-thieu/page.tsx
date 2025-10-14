@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lightbulb, Target, Users, TrendingUp, Handshake, BarChart, FileSignature, Heart, Zap, Sparkles, Brain, CheckCircle, Shield } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { CtaNhaTuyenDung } from '@/components/cta-nha-tuyen-dung';
+import { CtaViecLamPhuHop } from '@/components/cta-viec-lam-phu-hop';
+import { CtaViecLamGoiY } from '@/components/cta-viec-lam-goi-y';
 
 export const metadata: Metadata = {
   title: 'Về HelloJob',
@@ -17,37 +20,37 @@ const teamMembers = [
   {
     name: 'Nguyễn Quốc Việt',
     role: 'Founder & CEO',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Viet05.png',
     dataAiHint: 'male ceo portrait',
   },
   {
     name: 'Phùng Thị Tuyết Nhung',
     role: 'Founder & COO',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Nhung03.png',
     dataAiHint: 'female coo portrait',
   },
   {
     name: 'Trương Quỳnh Phương',
     role: 'Co-Founder - Thành viên HĐQT',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Phuong01.png',
     dataAiHint: 'female board member portrait',
   },
    {
     name: 'Nguyễn Ngọc Hà',
     role: 'Co-Founder - Thành viên HĐQT',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Ha01.png',
     dataAiHint: 'female board member portrait',
   },
   {
     name: 'Bùi Quang Huy',
     role: 'CTO',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Huy05.png',
     dataAiHint: 'male cto portrait',
   },
   {
     name: 'Lê Mạnh Hùng',
     role: 'Head of Marketing',
-    avatar: 'https://placehold.co/200x200.png',
+    avatar: '/img/HDQT/Hung01.png',
     dataAiHint: 'male marketing head portrait',
   },
 ];
@@ -79,6 +82,35 @@ const values = [
     },
 ]
 
+const activityImages = [
+    "/img/anhgioithieu/congty001.webp",
+    "/img/anhgioithieu/congty005.webp",
+    "/img/anhgioithieu/khachhang001.webp",
+    "/img/anhgioithieu/khachhang002.webp",
+    "/img/anhgioithieu/khachhang007.webp",
+    "/img/anhgioithieu/khachhang004.webp",
+    "/img/anhgioithieu/khachhang009.webp",
+    "/img/anhgioithieu/khachhang008.webp",
+    "/img/anhgioithieu/laodong002.webp",
+    "/img/anhgioithieu/laodong003.webp",
+    "/img/anhgioithieu/laodong004.webp",
+    "/img/anhgioithieu/laodong005.webp",
+    "/img/anhgioithieu/laodong006.webp",
+    "/img/anhgioithieu/laodong007.webp",
+    "/img/anhgioithieu/nhanvien009.webp",
+    "/img/anhgioithieu/laodong009.webp",
+    "/img/anhgioithieu/nhanvien008.webp",
+    "/img/anhgioithieu/laodong011.webp",
+    "/img/anhgioithieu/laodong012.webp",
+    "/img/anhgioithieu/laodong013.webp",
+    "/img/anhgioithieu/laodong020.webp",
+    "/img/anhgioithieu/nhanvien001.webp",
+    "/img/anhgioithieu/nhanvien002.webp",
+    "/img/anhgioithieu/nhanvien004.webp",
+    "/img/anhgioithieu/nhanvien005.webp",
+];
+
+
 export default function AboutPage() {
   return (
     <>
@@ -95,13 +127,13 @@ export default function AboutPage() {
       {/* Mission & Vision Section */}
       <section className="py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div className="relative aspect-[4/3] max-h-[450px]">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="relative aspect-[1250/735]">
               <Image
-                src="https://placehold.co/600x450.png"
+                src="/img/viet-img/HJALL.jpg"
                 alt="Đội ngũ HelloJob"
                 fill
-                className="object-contain rounded-lg shadow-xl"
+                className="object-cover rounded-lg shadow-xl"
                 data-ai-hint="diverse team working"
               />
             </div>
@@ -112,6 +144,9 @@ export default function AboutPage() {
                 <p className="text-muted-foreground text-lg">
                   Tạo ra một thế giới việc làm giúp con người phát triển và hạnh phúc
                 </p>
+                <p className="text-sm italic text-muted-foreground/80 mt-2">
+                  Bằng hệ thống công nghệ, chúng tôi mong muốn mang đến thật nhiều lựa chọn việc làm phù hợp cho mọi người, thông qua đó chúng tôi đồng hành, giúp các bạn phát triển tư duy, thái độ, kỹ năng, kiến thức để phát huy tối đa giá trị tốt nhất của các bạn, hướng mọi người tới cuộc sống thành công và hạnh phúc.
+                </p>
               </div>
               <div>
                 <Lightbulb className="h-12 w-12 text-accent-green mb-4" />
@@ -119,6 +154,7 @@ export default function AboutPage() {
                 <p className="text-muted-foreground text-lg">
                   Trở thành giải pháp dịch chuyển lao động trên toàn cầu
                 </p>
+                <p className="text-sm italic text-muted-foreground/80 mt-2">Với xu thế Toàn cầu hoá và Thế giới ngày càng phẳng, chúng tôi tin rằng tương lai của người lao động sẽ là những nhân lực được phát huy tối đa tài năng, có thể làm việc ở nhiều nơi khác nhau trên Thế giới một cách dễ dàng, những nơi mà cần đến tài năng tốt nhất của các bạn. HelloJob sẽ là nơi cung cấp cho những ước mơ phát triển tối đa đó, làm cho Thế giới ngày càng tươi đẹp.</p>
               </div>
             </div>
           </div>
@@ -143,8 +179,34 @@ export default function AboutPage() {
          </div>
       </section>
 
-      {/* Team Section */}
+      {/* Activity Photos Section */}
       <section className="py-20 md:py-28 bg-secondary">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-headline font-bold text-primary">Hình ảnh hoạt động</h2>
+            <p className="text-muted-foreground mt-4 max-w-3xl mx-auto text-lg">
+              Những khoảnh khắc đáng nhớ trong hành trình phát triển và kết nối của HelloJob.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {activityImages.map((src, index) => (
+              <div key={index} className="relative aspect-square w-full overflow-hidden rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105">
+                <Image
+                  src={src}
+                  alt={`Hoạt động HelloJob ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  data-ai-hint="team building event"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      {/*
+      <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-headline font-bold text-primary">Đội ngũ của chúng tôi</h2>
@@ -171,24 +233,14 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+      */}
 
-      {/* CTA Section */}
-      <section className="bg-accent text-white py-20 md:py-28">
-        <div className="container mx-auto px-4 md:px-6 text-center">
-            <h2 className="text-3xl font-headline font-bold mb-4">Trở thành đối tác của HelloJob</h2>
-            <p className="text-white/80 mb-8 max-w-2xl mx-auto text-lg">
-                Bạn là một nhà tuyển dụng, một công ty phái cử hay một nhà đầu tư có tầm nhìn? Hãy liên hệ với chúng tôi để cùng khai thác tiềm năng của thị trường.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                 <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                    <Link href="/nhuong-quyen">Tìm hiểu mô hình Nhượng quyền <FileSignature/></Link>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 hover:text-white">
-                    <Link href="/nha-tuyen-dung">Dành cho Đối tác tuyển dụng <BarChart/></Link>
-                </Button>
-            </div>
-        </div>
-      </section>
+       {/* CTA Section */}
+       <div className="space-y-20 md:space-y-28 py-20 md:py-28">
+        <CtaViecLamPhuHop />
+        <CtaViecLamGoiY />
+        <CtaNhaTuyenDung />
+      </div>
     </>
   );
 }

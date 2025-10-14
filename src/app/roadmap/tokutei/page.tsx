@@ -1,5 +1,3 @@
-
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileSignature, School, Plane, UserCheck, CheckCircle, TrendingUp, User, Briefcase, Calendar, Map, DollarSign, ChevronRight, Sparkles, Award } from 'lucide-react';
 import React from 'react';
@@ -22,7 +20,7 @@ const programDetails = {
     suitableFor: 'Thực tập sinh đã hoàn thành hợp đồng; du học sinh; hoặc người lao động mới vượt qua kỳ thi kỹ năng và tiếng Nhật.',
     pros: [
         'Mức lương tương đương hoặc cao hơn người Nhật cùng vị trí',
-        'Được phép chuyển việc trong cùng ngành nghề',
+        'Được phép chuyển việc trong cùng một ngành nghề',
         'Có cơ hội nâng cấp lên Tokutei Ginou 2 để bảo lãnh gia đình và xin vĩnh trú',
         'Nhiều lựa chọn ngành nghề đa dạng'
     ],
@@ -200,12 +198,12 @@ export default function TokuteiRoadmapPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                  {featuredJobs.map(job => (
-                    <JobCard key={job.id} job={job} variant="grid-item"/>
+                    <JobCard key={job.id} job={job} variant="grid-item" showApplyButtons={true} />
                  ))}
             </div>
             <div className="text-center mt-12">
                 <Button asChild size="lg">
-                    <Link href="/jobs">Xem tất cả việc làm Tokutei <ChevronRight /></Link>
+                    <Link href="/viec-lam">Xem tất cả việc làm Tokutei <ChevronRight /></Link>
                 </Button>
             </div>
         </div>
@@ -220,10 +218,10 @@ export default function TokuteiRoadmapPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                  <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90">
-                    <Link href="/ai-profile">Tạo hồ sơ bằng AI <Sparkles/></Link>
+                    <Link href="/tao-ho-so-ai">Tạo hồ sơ bằng AI <Sparkles/></Link>
                 </Button>
                 <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
-                    <Link href="/jobs">Tìm việc làm Tokutei <Briefcase/></Link>
+                    <Link href="/viec-lam">Tìm việc làm Tokutei <Briefcase/></Link>
                 </Button>
             </div>
         </div>

@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,7 +13,8 @@ import { ContactButtons } from '../contact-buttons';
 
 
 const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[0] }) => {
-    const { openChat } = useChat();
+    // Find the corresponding full consultant data for the chat context
+    const chatConsultant = consultantChatData.find(c => c.id === consultant.id);
 
     return (
         <Card className="shadow-xl text-center p-6 flex flex-col h-full transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
@@ -36,7 +36,7 @@ const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[
                 </div>
             </Link>
             <div className="mt-4 pt-4 border-t">
-                <ContactButtons contact={consultant} />
+                {chatConsultant && <ContactButtons contact={chatConsultant} />}
             </div>
         </Card>
     );
@@ -61,5 +61,3 @@ export default function ConsultantListPage() {
     </div>
   );
 }
-
-  

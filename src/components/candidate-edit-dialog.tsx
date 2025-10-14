@@ -12,14 +12,27 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { format } from "date-fns";
 import { vi } from 'date-fns/locale';
-import { CalendarIcon, Info, QrCode, UploadCloud, Image as ImageIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { JpFlagIcon, VnFlagIcon } from './custom-icons';
+import { CalendarIcon, Info, QrCode, UploadCloud, Image as ImageIcon, Phone, MessageSquare } from 'lucide-react';
+import { cn, parseMessengerInput, parseZaloInput, parseLineInput } from '@/lib/utils';
+import { JpFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon } from './custom-icons';
 import type { CandidateProfile } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Badge } from './ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { validateProfileForApplication } from '@/lib/validators';
 
 
 type EnrichedCandidateProfile = CandidateProfile & { avatarUrl?: string };
@@ -28,55 +41,9 @@ interface EditProfileDialogProps {
     isOpen: boolean;
     onOpenChange: (isOpen: boolean) => void;
     onSaveSuccess: () => void;
+    onCancel?: () => void;
+    source?: 'application' | 'profile';
 }
-
-const parseMessengerInput = (input: string): string => {
-    if (!input) return '';
-    const trimmedInput = input.trim();
-    try {
-        if (trimmedInput.startsWith('http') || trimmedInput.startsWith('www.')) {
-            const url = new URL(trimmedInput.startsWith('http') ? trimmedInput : `https://${trimmedInput}`);
-            
-            if (url.hostname.includes('facebook.com') || url.hostname.includes('m.facebook.com')) {
-                if (url.pathname.includes('profile.php')) {
-                    const id = url.searchParams.get('id');
-                    if (id) return id;
-                }
-                const pathParts = url.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0) {
-                    const lastPart = pathParts[pathParts.length - 1];
-                    if (lastPart !== 'profile.php' && lastPart !== 'home.php') {
-                        return lastPart;
-                    }
-                }
-            }
-             if (url.hostname.includes('m.me')) {
-                const pathParts = url.pathname.split('/').filter(Boolean);
-                if (pathParts.length > 0) {
-                     return pathParts[pathParts.length - 1];
-                }
-            }
-        }
-    } catch (error) {
-        console.warn("Could not parse input as URL, treating as username:", error);
-    }
-    return trimmedInput.split('/').pop() || trimmedInput;
-};
-
-const parseZaloInput = (input: string): string => {
-    if (!input) return '';
-    const trimmedInput = input.trim();
-    if (trimmedInput.includes('zalo.me/')) {
-        const parts = trimmedInput.split('/');
-        return parts.pop()?.replace(/\D/g, '') || '';
-    }
-    return trimmedInput.replace(/\D/g, '');
-};
-
-const parseLineInput = (input: string): string => {
-    if (!input) return '';
-    return input.trim();
-};
 
 const formatPhoneNumberInput = (value: string, country: string): string => {
     if (!value) return '';
@@ -85,7 +52,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
     if (country === '+84') { // Vietnam (10 digits total)
         if (!cleanValue.startsWith('0')) return cleanValue.slice(0,9);
         if (cleanValue.length === 0) return '';
-        if (cleanValue.length === 1) return '(0)';
+        if (cleanValue.length === 1) return `(0)`;
 
         const mobilePart = cleanValue.substring(1);
         if (mobilePart.length <= 3) return `(0) ${mobilePart}`;
@@ -96,7 +63,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
     if (country === '+81') { // Japan (11 digits total starting with 0)
         if (!cleanValue.startsWith('0')) return cleanValue.slice(0,10);
         if (cleanValue.length === 0) return '';
-        if (cleanValue.length === 1) return '(0)';
+        if (cleanValue.length === 1) return `(0)`;
         
         const mobilePart = cleanValue.substring(1); 
         if (mobilePart.length <= 2) return `(0)${mobilePart}`;
@@ -108,8 +75,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
 };
 
 
-const japaneseLevels = ["JLPT N5", "JLPT N4", "JLPT N3", "JLPT N2", "JLPT N1", "Kaiwa N5", "Kaiwa N4", "Kaiwa N3", "Kaiwa N2", "Kaiwa N1", "Trình độ tương đương N5", "Trình độ tương đương N4", "Trình độ tương đương N3", "Trình độ tương đương N2", "Trình độ tương đương N1"];
-const englishLevels = ["Không yêu cầu", "Giao tiếp cơ bản", "Giao tiếp tốt", "TOEIC 400+", "TOEIC 500+", "TOEIC 600+", "TOEIC 700+", "TOEIC 800+", "TOEIC 900+", "IELTS 4.0+", "IELTS 5.0+", "IELTS 6.0+", "IELTS 7.0+"];
+const japaneseLevels = ["Chưa biết tiếng Nhật", "JLPT N5", "JLPT N4", "JLPT N3", "JLPT N2", "JLPT N1", "Kaiwa N5", "Kaiwa N4", "Kaiwa N3", "Kaiwa N2", "Kaiwa N1", "Trình độ tương đương N5", "Trình độ tương đương N4", "Trình độ tương đương N3", "Trình độ tương đương N2", "Trình độ tương đương N1"];
 
 
 const renderLevel1Edit = (
@@ -123,10 +89,35 @@ const renderLevel1Edit = (
     setPhoneCountry: (value: string) => void,
     zaloCountry: string,
     setZaloCountry: (value: string) => void,
-    onQrClick: () => void
+    onQrClick: () => void,
+    isMobile: boolean,
+    isDatePickerOpen: boolean,
+    setIsDatePickerOpen: (open: boolean) => void,
+    errors: { messenger?: string; line?: string },
+    validateField: (field: 'messenger' | 'line', value: string) => void
 ) => {
-    const height = parseInt(tempCandidate.personalInfo?.height || '160', 10);
-    const weight = parseInt(tempCandidate.personalInfo?.weight || '50', 10);
+    const height = parseInt(tempCandidate.personalInfo?.height || '0', 10);
+    const weight = parseInt(tempCandidate.personalInfo?.weight || '0', 10);
+
+    const handleDateSelect = (date: Date | undefined) => {
+        handleTempChange('personalInfo', 'dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '');
+    };
+
+    const CalendarComponent = () => (
+         <Calendar
+            mode="single"
+            locale={vi}
+            selected={tempCandidate.personalInfo.dateOfBirth ? new Date(tempCandidate.personalInfo.dateOfBirth) : undefined}
+            onSelect={(date) => {
+                handleDateSelect(date);
+                if (isMobile) setIsDatePickerOpen(false); // Close sheet on select
+            }}
+            initialFocus
+            captionLayout="dropdown-buttons"
+            fromYear={1950}
+            toYear={new Date().getFullYear() - 16}
+        />
+    );
 
     return (
         <div className="space-y-4">
@@ -134,49 +125,65 @@ const renderLevel1Edit = (
                 <Info className="h-4 w-4" />
                 <AlertTitle className="font-bold">Lưu ý quan trọng</AlertTitle>
                 <AlertDescription>
-                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên lạc (Zalo, SĐT...) để có thể sử dụng nút 
-                    <Badge className="mx-1 bg-accent-orange text-white align-middle">Ứng tuyển</Badge> 
-                    trên các tin tuyển dụng.
+                    Cần nhập đủ thông tin cá nhân và ít nhất 1 phương thức liên lạc (Số điện thoại, Zalo, Messenger, Line...) để có thể sử dụng nút <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge> trên các tin tuyển dụng.
                 </AlertDescription>
             </Alert>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 <div className="space-y-2">
                 <Label>Họ và tên</Label>
-                <Input value={tempCandidate.name} onChange={(e) => handleTempChange('name' as any, 'name' as any, e.target.value)} />
+                <Input value={tempCandidate.name || ''} onChange={(e) => handleTempChange('name' as any, 'name', e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                <Label>Ngày sinh</Label>
-                <Popover>
-                    <PopoverTrigger asChild>
-                    <Button
-                        variant={"outline"}
-                        className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
-                        )}
-                    >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {tempCandidate.personalInfo.dateOfBirth ? (
-                        format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
-                        ) : (
-                        <span>Chọn ngày sinh</span>
-                        )}
-                    </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                    <Calendar
-                        mode="single"
-                        locale={vi}
-                        selected={tempCandidate.personalInfo.dateOfBirth ? new Date(tempCandidate.personalInfo.dateOfBirth) : undefined}
-                        onSelect={(date) => handleTempChange('personalInfo', 'dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '')}
-                        initialFocus
-                        captionLayout="dropdown-buttons"
-                        fromYear={1950}
-                        toYear={new Date().getFullYear() - 16}
-                    />
-                    </PopoverContent>
-                </Popover>
+                    <Label>Ngày sinh</Label>
+                     {isMobile ? (
+                        <Sheet open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                            <SheetTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {tempCandidate.personalInfo.dateOfBirth ? (
+                                    format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
+                                    ) : (
+                                    <span>Chọn ngày sinh</span>
+                                    )}
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side="bottom" className="h-auto">
+                                <SheetHeader>
+                                <SheetTitle>Chọn ngày sinh</SheetTitle>
+                                </SheetHeader>
+                                <CalendarComponent />
+                            </SheetContent>
+                        </Sheet>
+                    ) : (
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {tempCandidate.personalInfo.dateOfBirth ? (
+                                    format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
+                                    ) : (
+                                    <span>Chọn ngày sinh</span>
+                                    )}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <CalendarComponent />
+                            </PopoverContent>
+                        </Popover>
+                    )}
                 </div>
                 <div className="space-y-2">
                 <Label>Giới tính</Label>
@@ -196,26 +203,16 @@ const renderLevel1Edit = (
                             <SelectValue placeholder="Chọn trình độ tiếng Nhật" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="Không yêu cầu">Không yêu cầu</SelectItem>
                             {japaneseLevels.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="englishProficiency">Năng lực tiếng Anh</Label>
-                    <Select value={tempCandidate.personalInfo.englishProficiency || ''} onValueChange={value => handleTempChange('personalInfo', 'englishProficiency', value)}>
-                        <SelectTrigger id="englishProficiency">
-                            <SelectValue placeholder="Chọn trình độ tiếng Anh" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {englishLevels.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}
                         </SelectContent>
                     </Select>
                 </div>
                 <div className="space-y-2">
                 <div className="flex justify-between items-center">
                     <Label>Chiều cao (cm)</Label>
-                    <span className="text-sm font-semibold text-primary">{height} cm</span>
+                    <span className={cn("text-sm font-semibold", height > 0 ? "text-primary" : "text-muted-foreground")}>
+                        {height > 0 ? `${height} cm` : 'Chưa chọn'}
+                    </span>
                 </div>
                 <Slider
                     value={[height]}
@@ -228,7 +225,9 @@ const renderLevel1Edit = (
                 <div className="space-y-2">
                     <div className="flex justify-between items-center">
                         <Label>Cân nặng (kg)</Label>
-                        <span className="text-sm font-semibold text-primary">{weight} kg</span>
+                         <span className={cn("text-sm font-semibold", weight > 0 ? "text-primary" : "text-muted-foreground")}>
+                            {weight > 0 ? `${weight} kg` : 'Chưa chọn'}
+                         </span>
                     </div>
                     <Slider
                         value={[weight]}
@@ -260,58 +259,88 @@ const renderLevel1Edit = (
                     </SelectContent>
                 </Select>
                 </div>
-                <div className="md:col-span-2 mt-6 pt-6 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="phone">Số điện thoại</Label>
-                        <div className="flex items-center">
-                            <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-                            <SelectTrigger className="w-[100px] rounded-r-none">
-                                <SelectValue>
-                                <div className="flex items-center gap-2">
-                                    {phoneCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
-                                    {phoneCountry}
-                                </div>
-                                </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
-                                <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
-                            </SelectContent>
-                            </Select>
-                            <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="zalo">Zalo (Số điện thoại)</Label>
-                        <div className="flex items-center relative">
-                            <Select value={zaloCountry} onValueChange={setZaloCountry}>
-                                <SelectTrigger className="w-[100px] rounded-r-none">
-                                <SelectValue>
-                                    <div className="flex items-center gap-2">
-                                    {zaloCountry === '+84' ? <VnFlagIcon className="w-5 h-5 rounded-sm" /> : <JpFlagIcon className="w-5 h-5 rounded-sm" />}
-                                    {zaloCountry}
+                <div className="md:col-span-2 mt-6 pt-6 border-t">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="phone" className="flex items-center gap-2">
+                                 <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
+                                 Số điện thoại
+                            </Label>
+                            <div className="flex items-center">
+                                <Select value={phoneCountry} onValueChange={setPhoneCountry}>
+                                <SelectTrigger className="w-[120px] rounded-r-none">
+                                    <SelectValue>
+                                    <div className="flex items-center gap-1">
+                                        <span>{phoneCountry === '+84' ? 'VN' : 'JP'}</span>
+                                        <span>{phoneCountry}</span>
                                     </div>
-                                </SelectValue>
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="+84"><div className="flex items-center gap-2"><VnFlagIcon className="w-5 h-5 rounded-sm" /> VN (+84)</div></SelectItem>
-                                    <SelectItem value="+81"><div className="flex items-center gap-2"><JpFlagIcon className="w-5 h-5 rounded-sm" /> JP (+81)</div></SelectItem>
+                                    <SelectItem value="+84"><div className="flex items-center gap-2">VN (+84)</div></SelectItem>
+                                    <SelectItem value="+81"><div className="flex items-center gap-2">JP (+81)</div></SelectItem>
                                 </SelectContent>
-                            </Select>
-                            <Input id="zalo" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
-                            <div onClick={onQrClick} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
-                                <QrCode className="h-5 w-5"/>
+                                </Select>
+                                <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
                             </div>
                         </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="zalo" className="flex items-center gap-2">
+                                 <ZaloIcon />
+                                 Zalo (Số điện thoại)
+                            </Label>
+                            <div className="flex items-center relative">
+                                <Select value={zaloCountry} onValueChange={setZaloCountry}>
+                                    <SelectTrigger className="w-[120px] rounded-r-none">
+                                    <SelectValue>
+                                        <div className="flex items-center gap-1">
+                                            <span>{zaloCountry === '+84' ? 'VN' : 'JP'}</span>
+                                            <span>{zaloCountry}</span>
+                                        </div>
+                                    </SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="+84"><div className="flex items-center gap-2">VN (+84)</div></SelectItem>
+                                        <SelectItem value="+81"><div className="flex items-center gap-2">JP (+81)</div></SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Input id="zalo" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
+                                <div onClick={onQrClick} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
+                                    <QrCode className="h-5 w-5"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                             <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon />Facebook Messenger</Label>
+                            <Input
+                                id="messenger"
+                                placeholder="Dán link Facebook / Messenger hoặc username"
+                                value={tempCandidate.personalInfo.messenger || ''}
+                                onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)}
+                                onBlur={(e) => validateField('messenger', e.target.value)}
+                                className={cn(errors.messenger && "border-destructive")}
+                            />
+                            {!errors.messenger && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>}
+                            {errors.messenger && <p className="text-xs text-destructive">{errors.messenger}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="line" className="flex items-center gap-2"><LineIcon />Line</Label>
+                            <Input
+                                id="line"
+                                placeholder="Dán link Line hoặc nhập ID của bạn"
+                                value={tempCandidate.personalInfo.line || ''}
+                                onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)}
+                                onBlur={(e) => validateField('line', e.target.value)}
+                                className={cn(errors.line && "border-destructive")}
+                            />
+                             {!errors.line && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>}
+                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="messenger">Facebook Messenger</Label>
-                        <Input id="messenger" placeholder="Dán link Facebook / Messenger hoặc nhập username" value={tempCandidate.personalInfo.messenger || ''} onChange={(e) => handleTempChange('personalInfo', 'messenger', e.target.value)} />
-                        <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="line">Line (Link hồ sơ)</Label>
-                        <Input id="line" placeholder="Dán link Line của bạn vào đây" value={tempCandidate.personalInfo.line || ''} onChange={(e) => handleTempChange('personalInfo', 'line', e.target.value)} />
+                    <div className="mt-4 text-center text-sm">
+                        <div className="text-muted-foreground">
+                            Cung cấp ít nhất một phương thức liên lạc để <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">Ứng tuyển</Badge>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -319,13 +348,19 @@ const renderLevel1Edit = (
     );
 };
 
-export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditProfileDialogProps) {
+export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source = 'profile', onCancel }: EditProfileDialogProps) {
     const { toast } = useToast();
     const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile | null>(null);
     const [phoneCountry, setPhoneCountry] = useState('+84');
     const [zaloCountry, setZaloCountry] = useState('+84');
     const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
     const [qrImagePreview, setQrImagePreview] = useState<string | null>(null);
+    const isMobile = useIsMobile();
+    const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+    const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
+    const [isConfirmSaveOpen, setIsConfirmSaveOpen] = useState(false);
+    const [errors, setErrors] = useState<{ messenger?: string, line?: string }>({});
+
 
     useEffect(() => {
         if (isOpen) {
@@ -340,7 +375,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                     about: '',
                     education: [],
                     experience: [],
-                    personalInfo: { birthYear: 2000, gender: '', phone: '', japaneseProficiency: '', englishProficiency: '' },
+                    personalInfo: { birthYear: 2000, gender: 'Nữ', phone: '', japaneseProficiency: '' , height: '0', weight: '0'},
                     skills: [],
                     interests: [],
                     certifications: [],
@@ -352,44 +387,110 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                     images: [],
                 });
             }
+             setErrors({});
         }
     }, [isOpen]);
 
-    const handleSave = () => {
+    const validateField = (field: 'messenger' | 'line', value: string) => {
+        if (!value) {
+            setErrors(prev => ({...prev, [field]: undefined }));
+            return true;
+        }
+
+        let isValid = false;
+        let errorMessage = "Định dạng không hợp lệ.";
+
+        if (field === 'messenger') {
+            isValid = /^(https?:\/\/(www\.)?(facebook|m)\.com\/|m\.me\/|[\w.]{5,})/.test(value);
+            errorMessage = "Vui lòng nhập link Facebook/Messenger hoặc username hợp lệ.";
+        } else if (field === 'line') {
+            isValid = /^(https?:\/\/line\.me\/|@?[\w.-]+)/.test(value);
+            errorMessage = "Vui lòng nhập link Line hoặc Line ID hợp lệ.";
+        }
+        
+        if (isValid) {
+            setErrors(prev => ({ ...prev, [field]: undefined }));
+        } else {
+            setErrors(prev => ({ ...prev, [field]: errorMessage }));
+        }
+        return isValid;
+    };
+
+
+    const forceSave = () => {
         if (tempCandidate) {
-            localStorage.setItem('generatedCandidateProfile', JSON.stringify(tempCandidate));
+            const finalCandidate = { ...tempCandidate };
+            if (finalCandidate.personalInfo.messenger) {
+                finalCandidate.personalInfo.messenger = parseMessengerInput(finalCandidate.personalInfo.messenger);
+            }
+            if (finalCandidate.personalInfo.line) {
+                finalCandidate.personalInfo.line = parseLineInput(finalCandidate.personalInfo.line);
+            }
+            if (finalCandidate.personalInfo.zalo) {
+                finalCandidate.personalInfo.zalo = parseZaloInput(finalCandidate.personalInfo.zalo);
+            }
+            localStorage.setItem('generatedCandidateProfile', JSON.stringify(finalCandidate));
             onSaveSuccess();
+            onOpenChange(false);
+            setIsConfirmSaveOpen(false);
+        }
+    }
+
+    const handleSave = () => {
+        if (!tempCandidate) return;
+
+        const isMessengerValid = validateField('messenger', tempCandidate.personalInfo.messenger || '');
+        const isLineValid = validateField('line', tempCandidate.personalInfo.line || '');
+        
+        if (!isMessengerValid || !isLineValid) {
+            toast({
+                variant: 'destructive',
+                title: 'Thông tin không hợp lệ',
+                description: 'Vui lòng sửa các lỗi được hiển thị trước khi lưu.',
+            });
+            return;
+        }
+
+
+        if (source === 'application') {
+            const missingFields = validateProfileForApplication(tempCandidate);
+            if (missingFields.length > 0) {
+                setIsConfirmSaveOpen(true);
+                return;
+            }
+        }
+        
+        forceSave();
+    };
+    
+    const handleCancel = () => {
+        if (source === 'application') {
+            setIsConfirmCancelOpen(true);
+        } else if (onCancel) {
+            onCancel();
+        } else {
             onOpenChange(false);
         }
     };
 
     const handleTempChange = (
         section: keyof EnrichedCandidateProfile | 'personalInfo' | 'aspirations' | 'documents',
-        ...args: any[]
+        field: any,
+        value?: any
     ) => {
         setTempCandidate(prev => {
             if (!prev) return null;
             const newCandidate = JSON.parse(JSON.stringify(prev)); // Deep copy
-
+    
             if (section === 'name') {
-                 newCandidate.name = args[2];
-            } else if (section === 'personalInfo' || section === 'aspirations') {
-                const [field, value] = args;
-                if (section === 'personalInfo' && field === 'messenger') {
-                     newCandidate[section] = { ...newCandidate[section]!, [field]: parseMessengerInput(value) };
-                } else if (section === 'personalInfo' && field === 'zalo') {
-                    newCandidate[section] = { ...newCandidate[section]!, [field]: parseZaloInput(value) };
-                } else if (section === 'personalInfo' && field === 'line') {
-                     newCandidate[section] = { ...newCandidate[section]!, [field]: parseLineInput(value) };
-                } else {
-                     newCandidate[section] = { ...newCandidate[section], [field]: value };
-                }
+                newCandidate.name = field; // In this case, 'field' is the value
+            } else if (section === 'personalInfo') {
+                newCandidate.personalInfo = { ...newCandidate.personalInfo, [field]: value };
             } else {
-                const [value] = args;
-                 // @ts-ignore
-                newCandidate[section] = value;
+                // @ts-ignore
+                newCandidate[section as keyof EnrichedCandidateProfile] = field;
             }
-
+    
             return newCandidate;
         });
     };
@@ -406,7 +507,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                     const mockPhoneNumber = '0912345678';
                     handleTempChange('personalInfo', 'zalo', mockPhoneNumber);
                     toast({
-                        title: "Quét QR thành công (mô phỏng)",
+                        title: "Quét QR thành công",
                         description: `Số Zalo đã được cập nhật thành: ${mockPhoneNumber}`,
                     });
                     setIsQrDialogOpen(false);
@@ -423,7 +524,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     return (
         <>
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-[600px]" id="DIENTHONGTINCANHAN01">
+                <DialogContent className="sm:max-w-3xl" id="DIENTHONGTINCANHAN01">
                     <DialogHeader>
                         <DialogTitle className="font-headline text-2xl">Chỉnh sửa Thông tin Cá nhân</DialogTitle>
                         <DialogDescription>Cập nhật thông tin của bạn để nhà tuyển dụng có thể liên hệ.</DialogDescription>
@@ -434,13 +535,16 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                             handleTempChange as any, 
                             phoneCountry, setPhoneCountry, 
                             zaloCountry, setZaloCountry,
-                            () => setIsQrDialogOpen(true)
+                            () => setIsQrDialogOpen(true),
+                            isMobile,
+                            isDatePickerOpen,
+                            setIsDatePickerOpen,
+                            errors,
+                            validateField
                         )}
                     </div>
                     <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">Hủy</Button>
-                        </DialogClose>
+                        <Button variant="outline" onClick={handleCancel}>Hủy</Button>
                         <Button type="button" onClick={handleSave} className="bg-primary text-white">
                             Lưu thay đổi
                         </Button>
@@ -448,6 +552,36 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
                 </DialogContent>
             </Dialog>
 
+             <AlertDialog open={isConfirmCancelOpen} onOpenChange={setIsConfirmCancelOpen}>
+                <AlertDialogContent id="UNGTUYEN-L02-HUY01">
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Bạn chắc chắn muốn hủy?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Hồ sơ của bạn vẫn cần thêm thông tin để có thể ứng tuyển. Bạn có muốn dừng việc cập nhật lúc này không?
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Ở lại</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => { setIsConfirmCancelOpen(false); onOpenChange(false); }}>Vẫn hủy</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            
+            <AlertDialog open={isConfirmSaveOpen} onOpenChange={setIsConfirmSaveOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Lưu hồ sơ chưa hoàn chỉnh?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Bạn vẫn chưa điền đủ dữ liệu để Ứng tuyển, bạn chắc chắn muốn lưu chứ?
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Tiếp tục sửa</AlertDialogCancel>
+                    <AlertDialogAction onClick={forceSave}>Vẫn lưu</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            
             <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
                 <DialogContent className="sm:max-w-xl">
                     <DialogHeader>
@@ -501,8 +635,3 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess }: EditP
     );
 }
 
-    
-
-    
-
-    

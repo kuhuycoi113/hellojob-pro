@@ -5,7 +5,6 @@ import { AuthProvider, User } from '@/contexts/AuthContext';
 import { filterStandardClaims } from 'next-firebase-auth-edge/auth/claims';
 import { authConfig } from '@/lib/firebase-server';
 import { cookies } from 'next/headers';
-import { LayoutManager } from './layout.manager';
 export const toUser = ({ decodedToken }: Tokens): User => {
     const {
         uid,
@@ -44,7 +43,7 @@ export async function RootProvider({
     return (
         <AuthProvider serverUser={user}>
             <ChatProvider>
-                <LayoutManager>{children}</LayoutManager>
+                {children}
             </ChatProvider>
         </AuthProvider>
     );

@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { use } from 'react';
@@ -75,7 +73,7 @@ const getJobsByGroupedExpertise = (expertise: string): Job[] | null => {
 }
 
 
-export default function ConsultantDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function ConsultantDetailPage({ params }: { params: { id: string } }) {
     const resolvedParams = use(params);
     const consultant = consultantData.find(c => c.id === resolvedParams.id);
 

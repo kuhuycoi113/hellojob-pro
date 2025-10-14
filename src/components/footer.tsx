@@ -1,5 +1,4 @@
 
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -10,7 +9,7 @@ const Logo = () => (
 
 export function Footer() {
   return (
-    <footer className="bg-secondary text-secondary-foreground">
+    <footer id="CHANTRANG01" className="bg-secondary text-secondary-foreground">
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
@@ -27,16 +26,15 @@ export function Footer() {
               <li><Link href="/dang-ky" className="hover:text-primary">Đăng ký hồ sơ</Link></li>
               <li><Link href="/ho-so-cua-toi" className="hover:text-primary">Hồ sơ của tôi</Link></li>
               <li><Link href="/lo-trinh" className="hover:text-primary">Lộ trình sự nghiệp</Link></li>
-              <li><Link href="/hoc-tap" className="hover:text-primary">Khóa học online</Link></li>
               <li><Link href="/tu-van-vien" className="hover:text-primary">Tư vấn viên</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold mb-4">Dành cho nhà tuyển dụng</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/doi-tac/dang-tin-tuyen-dung" className="hover:text-primary">Đăng tin tuyển dụng</Link></li>
-              <li><Link href="/nha-tuyen-dung" className="hover:text-primary">Danh sách công ty</Link></li>
-              <li><Link href="/bang-dieu-khien" className="hover:text-primary">Báo cáo dữ liệu</Link></li>
+              <li><Link href="/nha-tuyen-dung" className="hover:text-primary">Đăng ký Đối tác</Link></li>
+              <li><Link href="/doi-tac/dang-tin-tuyen-dung" className="hover:text-primary">Đăng tin Tuyển dụng</Link></li>
+              <li><Link href="/doi-tac" className="hover:text-primary">Bảng điều khiển Đối tác</Link></li>
               <li><Link href="/nhuong-quyen" className="hover:text-primary">Đối tác tại Nhật</Link></li>
             </ul>
           </div>

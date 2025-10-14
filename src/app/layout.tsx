@@ -2,6 +2,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { RootProvider } from '@/components/layout/root-provider';
+import { LayoutManager } from '@/components/layout/layout-manager';
 import { Montserrat } from 'next/font/google';
 import { cn } from '@/lib/utils';
 
@@ -93,7 +94,11 @@ export default function RootLayout({
   return (
     <html lang="vi" className={cn("scroll-smooth", montserrat.variable)}>
       <body className="antialiased pb-20 md:pb-0 font-body">
-        <RootProvider>{children}</RootProvider>
+        <RootProvider>
+          <LayoutManager>
+            {children}
+          </LayoutManager>
+        </RootProvider>
       </body>
     </html>
   );

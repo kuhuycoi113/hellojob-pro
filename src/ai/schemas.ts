@@ -1,6 +1,17 @@
 
 import { z } from 'zod';
 
+const DocumentItemSchema = z.object({
+  name: z.object({
+    vi: z.string(),
+    ja: z.string().optional(),
+    en: z.string().optional(),
+  }),
+  url: z.string().optional(),
+});
+export type DocumentItem = z.infer<typeof DocumentItemSchema>;
+
+
 export const CandidateProfileSchema = z.object({
   name: z.string().describe('The full name of the candidate.'),
   headline: z.string().describe('A professional headline for the candidate (e.g., "Software Engineer at Google").'),
@@ -36,9 +47,9 @@ export const CandidateProfileSchema = z.object({
   skills: z.array(z.string()).describe('A list of key skills.'),
   certifications: z.array(z.string()).describe('A list of certifications or awards.'),
   documents: z.object({
-      vietnam: z.array(z.string()).optional().describe('List of Vietnamese documents.'),
-      japan: z.array(z.string()).optional().describe('List of Japanese documents.'),
-      other: z.array(z.string()).optional().describe('List of other/foreign documents.'),
+      vietnam: z.array(DocumentItemSchema).optional().describe('List of Vietnamese documents.'),
+      japan: z.array(DocumentItemSchema).optional().describe('List of Japanese documents.'),
+      other: z.array(DocumentItemSchema).optional().describe('List of other/foreign documents.'),
   }).optional().describe('A collection of the candidate\'s legal documents.'),
   desiredIndustry: z.string().describe('The desired industry for future roles.'),
   aspirations: z.object({
@@ -50,7 +61,7 @@ export const CandidateProfileSchema = z.object({
     desiredJobDetail: z.string().optional().describe('A more specific job role or task the candidate wants (e.g., "Vận hành máy CNC", "Làm cơm hộp").'),
     financialAbility: z.string().optional().describe('Financial ability (e.g., "90 triệu").'),
     interviewLocation: z.string().optional().describe('The location for job interviews (e.g., "Hà Nội").'),
-    specialAspirations: z.string().optional().describe('Special requests or aspirations (e.g., "Tăng ca, hỗ trợ...").'),
+    specialAspirations: z.array(z.string()).optional().describe('A list of special requests or aspirations (e.g., ["Tăng ca", "Hỗ trợ nhà ở"]).'),
   }).optional(),
   notes: z.string().optional().describe('Additional notes or descriptions.'),
 });

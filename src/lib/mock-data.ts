@@ -554,4 +554,3 @@ export const controlledFeeVisas = [
 ];
 
 export const jobData: Job[] = [...initialJobs, ...newlyAddedJobs];
-

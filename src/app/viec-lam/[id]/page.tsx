@@ -2,11 +2,11 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
-import { jobData, type Job, publicFeeLimits } from '@/lib/mock-data';
+import { jobData, type Job, publicFeeLimits, controlledFeeVisas } from '@/lib/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle } from 'lucide-react';
+import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle, MoreHorizontal, Copy } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -30,6 +30,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from '@/hooks/use-toast';
 import { EditProfileDialog } from '@/components/candidate-edit-dialog';
 import type { SearchFilters } from '@/components/job-search/search-results';
@@ -37,6 +44,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { JsonLdScript } from '@/components/json-ld-script';
+import { validateProfileForApplication } from '@/lib/validators';
+import { CtaViecLamGoiY } from '@/components/cta-viec-lam-goi-y';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -78,279 +87,59 @@ const convertCurrency = (value?: string, from: 'JPY' | 'USD' = 'JPY') => {
     return `≈ ${vndValue.toLocaleString('vi-VN')} VNĐ`;
 };
 
-const validateProfileForApplication = (profile: CandidateProfile): boolean => {
-    if (!profile || !profile.personalInfo) return false;
-
-    const { name, personalInfo } = profile;
-    const { gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = personalInfo;
-
-    const hasRequiredPersonalInfo = name && gender && height && weight && tattooStatus && hepatitisBStatus;
-    const hasContactInfo = phone || zalo || messenger || line;
-
-    return !!hasRequiredPersonalInfo && !!hasContactInfo;
-};
-
-// List of visa details that have special fee handling
-const controlledFeeVisas = [
-  'Thực tập sinh 3 năm',
-  'Thực tập sinh 1 năm',
-  'Đặc định đầu Việt',
-  'Đặc định đi mới',
-  'Kỹ sư, tri thức đầu Việt'
+const visasForVndDisplay = [
+    'Thực tập sinh 3 năm',
+    'Thực tập sinh 1 năm',
+    'Đặc định đi mới',
+    'Kỹ sư, tri thức đầu Việt',
 ];
 
-const CTAForGuest = ({ title, icon: Icon, onLoginClick }: { title: string, icon: React.ElementType, onLoginClick: () => void }) => (
-    <section>
-        <h2 className="text-2xl font-bold font-headline mb-6"><Icon className="inline-block mr-3 text-primary h-7 w-7"/>{title}</h2>
-        <Card className="text-center py-12 px-6 shadow-lg">
-             <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
-                <Briefcase className="h-10 w-10 text-primary"/>
-            </div>
-            <p className="font-semibold text-lg">Xem gợi ý việc làm dành riêng cho bạn</p>
-            <p className="text-muted-foreground mt-2 mb-6">Đăng nhập hoặc tạo hồ sơ để nhận được những gợi ý phù hợp nhất từ HelloJob AI.</p>
-            <Button onClick={onLoginClick}>
-                <LogIn className="mr-2 h-4 w-4" />
-                Đăng nhập / Đăng ký
-            </Button>
-        </Card>
-    </section>
-);
+const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): string => {
+    if (!salaryValue) return 'N/A';
 
-const CTAForEmptyProfile = ({ title, icon: Icon }: { title: string, icon: React.ElementType }) => {
-    const router = useRouter();
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [profileCreationStep, setProfileCreationStep] = useState(1);
-    const [selectedVisa, setSelectedVisa] = useState<{name: string, slug: string} | null>(null);
-    const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
-    const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
-    const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-    const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
-    const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
-    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-    const { isLoggedIn } = useAuth();
+    const numericValue = parseInt(salaryValue.replace(/[^0-9]/g, ''), 10);
+    if (isNaN(numericValue)) return salaryValue;
 
-    const handleCreateProfileRedirect = () => {
-        const preferences = {
-          desiredVisaType: selectedVisa?.name || undefined,
-          desiredVisaDetail: selectedVisaDetail || undefined,
-          desiredIndustry: selectedIndustry?.name || undefined,
-          desiredLocation: selectedRegion || undefined,
-        };
-    
-        if (isLoggedIn) {
-          const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
-          let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
-          
-          const updatedAspirations = { ...profile.aspirations };
-          if (preferences.desiredVisaType) updatedAspirations.desiredVisaType = preferences.desiredVisaType;
-          if (preferences.desiredVisaDetail) updatedAspirations.desiredVisaDetail = preferences.desiredVisaDetail;
-          if (preferences.desiredLocation) updatedAspirations.desiredLocation = preferences.desiredLocation;
-
-          profile = {
-            ...profile,
-            aspirations: updatedAspirations,
-          };
-          if (preferences.desiredIndustry) profile.desiredIndustry = preferences.desiredIndustry;
-    
-          localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
-          setIsDialogOpen(false);
-          router.push('/viec-lam-cua-toi?highlight=suggested');
-        } else {
-          sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
-          sessionStorage.setItem('postLoginRedirect', '/viec-lam-cua-toi?highlight=suggested');
-          setIsDialogOpen(false);
-          setIsConfirmLoginOpen(true);
-        }
-      };
-    
-    const handleConfirmLogin = () => {
-        setIsConfirmLoginOpen(false);
-        setIsAuthDialogOpen(true);
-    };
-    
-    const handleCreateDetailedProfile = (method: 'ai' | 'manual') => {
-        setIsCreateDetailOpen(false);
-        setIsDialogOpen(false);
-        if (method === 'ai') {
-            router.push('/tao-ho-so-ai');
-        } else {
-            router.push('/ho-so-cua-toi');
-        }
-    };
-    
-    const FirstStepDialog = () => (
-        <>
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
-                <DialogDescription className="text-center">
-                    Bạn muốn tạo hồ sơ để làm gì?
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                    <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
-                    <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
-                </Card>
-                 <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                    <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
-                    <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
-                </Card>
-            </div>
-        </>
-    );
-
-    const QuickCreateStepDialog = () => (
-        <>
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
-                <DialogDescription className="text-center">
-                Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
-                    <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
-                </Button>
-                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
-                    <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
-                </Button>
-                <Button onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                    <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                    <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
-                    <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
-                </Button>
-            </div>
-            <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
-        </>
-    );
-
-    const VisaDetailStepDialog = () => {
-        if (!selectedVisa) return null;
-        const options = visaDetailsByVisaType[selectedVisa.slug] || [];
+    if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
+        const vndValue = numericValue * JPY_VND_RATE;
+        const valueInMillions = vndValue / 1000000;
         
-        return (
-            <>
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisa.name}</DialogTitle>
-                <DialogDescription className="text-center">
-                Chọn loại hình chi tiết để tiếp tục.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                {options.map(option => (
-                    <Button key={option.name} onClick={() => { setSelectedVisaDetail(option.name); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <h3 className="font-bold text-base mb-1">{option.name}</h3>
-                        <p className="text-muted-foreground text-xs">{option.slug}</p>
-                    </Button>
-                ))}
-            </div>
-            <Button variant="link" onClick={() => setProfileCreationStep(2)} className="mt-4 mx-auto block">Quay lại</Button>
-            </>
-        )
-    };
-    
-    const renderDialogContent = () => {
-        switch(profileCreationStep) {
-            case 1: return <FirstStepDialog />;
-            case 2: return <QuickCreateStepDialog />;
-            case 3: return <VisaDetailStepDialog />;
-            default: return <FirstStepDialog />;
+        if (valueInMillions % 1 === 0) {
+            return `${valueInMillions.toLocaleString('vi-VN')}tr`;
         }
+        
+        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        });
+        return `${formattedVnd.replace('.',',')}tr`;
     }
-
-    return (
-        <section>
-            <h2 className="text-2xl font-bold font-headline mb-6"><Icon className="inline-block mr-3 text-primary h-7 w-7" />{title}</h2>
-            <Card className="text-center py-12 px-6 shadow-lg">
-                <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
-                    <UserPlus className="h-10 w-10 text-primary" />
-                </div>
-                <p className="font-semibold text-lg">Tạo hồ sơ để được hiển thị việc làm phù hợp</p>
-                <p className="text-muted-foreground mt-2 mb-6">Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
-                        <DialogTrigger asChild>
-                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
-                                <Sparkles className="mr-2 h-4 w-4" />
-                                Tạo hồ sơ nhanh
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-2xl">
-                           {renderDialogContent()}
-                        </DialogContent>
-                    </Dialog>
-                    <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
-                        <DialogTrigger asChild>
-                             <Button>
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                Tạo hồ sơ chi tiết
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-xl">
-                            <DialogHeader>
-                                <DialogTitle className="text-2xl font-headline text-center">Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</DialogTitle>
-                            </DialogHeader>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                                <Card onClick={() => handleCreateDetailedProfile('ai')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                                    <Sparkles className="h-8 w-8 text-primary mx-auto mb-2" />
-                                    <h3 className="font-bold text-base mb-1">Dùng AI</h3>
-                                    <p className="text-muted-foreground text-xs">Tải lên CV, AI sẽ tự động điền thông tin.</p>
-                                </Card>
-                                <Card onClick={() => handleCreateDetailedProfile('manual')} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                                    <Pencil className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                                    <h3 className="font-bold text-base mb-1">Thủ công</h3>
-                                    <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
-                                </Card>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
-                </div>
-            </Card>
-            <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-             <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Bạn cần có tài khoản để lưu các lựa chọn và xem việc làm phù hợp. Đi đến trang đăng ký/đăng nhập?
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Từ chối</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </section>
-    )
+    
+    return `${formatCurrency(salaryValue)} JPY`;
 };
-
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const router = useRouter();
     const { toast } = useToast();
-    const { role, isLoggedIn } = useAuth();
+    const { role, isLoggedIn, setPostLoginAction } = useAuth();
     const job = jobData.find(j => j.id === resolvedParams.id);
     const [isClient, setIsClient] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const [hasApplied, setHasApplied] = useState(false);
-    const [profileSuggestions, setProfileSuggestions] = useState<Job[]>([]);
     const [behavioralSuggestions, setBehavioralSuggestions] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
     const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
     const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
     const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
+    const [missingProfileFields, setMissingProfileFields] = useState<string[]>([]);
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
+    const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
+
+    const appliedFilters: Partial<SearchFilters> = {};
+
 
     useEffect(() => {
         setIsClient(true);
@@ -360,7 +149,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
             setHasApplied(appliedJobs.includes(job.id));
 
-            // Safely calculate dates on the client
+            // Safely calculate dates on the client to avoid hydration mismatch
             const today = new Date();
             const postedDate = new Date(today);
             postedDate.setDate(today.getDate() + job.postedTimeOffset);
@@ -373,40 +162,33 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         }
 
         const fetchSuggestions = async () => {
-            setIsLoading(true);
             setIsLoadingBehavioral(true);
             try {
                 const storedProfile = localStorage.getItem('generatedCandidateProfile');
                 const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-                
                 const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
-
-                if (isLoggedIn && profile) {
-                    const profileResults = await matchJobsToProfile(profile, 'related');
-                    setProfileSuggestions(profileResults.map(r => r.job).filter(j => j.id !== resolvedParams.id).slice(0, 4));
-                }
-
                 const behavioralResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
                 setBehavioralSuggestions(behavioralResults.filter(r => r.job.id !== resolvedParams.id).slice(0, 4));
 
             } catch (error) {
                 console.error("Failed to fetch job suggestions:", error);
             } finally {
-                setIsLoading(false);
                 setIsLoadingBehavioral(false);
             }
         };
 
         fetchSuggestions();
 
-    }, [job, resolvedParams.id, isLoggedIn]);
+    }, [job, resolvedParams.id]);
 
 
     if (!job) {
         notFound();
     }
     
-    const handleSaveJob = () => {
+    const handleSaveJob = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
         if (isSaved) {
             const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
@@ -416,20 +198,22 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             savedJobs.push(job.id);
             localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
             setIsSaved(true);
-            logInteraction(job, 'save'); // CANHANHOA01: Log save interaction
         }
         window.dispatchEvent(new Event('storage'));
     };
 
-    const handleApplyClick = () => {
+    const handleApplyClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
         if (!isLoggedIn) {
-            sessionStorage.setItem('postLoginRedirect', `/viec-lam/${job.id}`);
+            setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: job.title } });
             setIsConfirmLoginOpen(true);
         } else {
             const profileRaw = localStorage.getItem('generatedCandidateProfile');
             if (profileRaw) {
                 const profile: CandidateProfile = JSON.parse(profileRaw);
-                if (validateProfileForApplication(profile)) {
+                const missingFields = validateProfileForApplication(profile);
+                if (missingFields.length === 0) {
                      const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
                      appliedJobs.push(job.id);
                      localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
@@ -440,9 +224,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                          className: 'bg-green-500 text-white'
                      });
                 } else {
+                    setMissingProfileFields(missingFields);
                     setIsProfileIncompleteAlertOpen(true);
                 }
             } else {
+                 // No profile found, show alert to update
                  setIsProfileIncompleteAlertOpen(true);
             }
         }
@@ -456,7 +242,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const handleConfirmUpdateProfile = () => {
         setIsProfileIncompleteAlertOpen(false);
         setIsProfileEditDialogOpen(true);
-    }
+    };
     
     const handleShare = async () => {
         const shareUrl = `https://vi.hellojob.jp/viec-lam/${job.id}`;
@@ -526,7 +312,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
     return (
         <div className="bg-secondary">
-            {job && <JsonLdScript job={job} />}
+            {job && <JsonLdScript job={job} appliedFilters={appliedFilters}/>}
             <div className="container mx-auto px-4 md:px-6 py-12">
                 <div className="mb-6">
                     <Button asChild variant="outline" size="sm">
@@ -659,11 +445,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                             <CardContent className="space-y-4">
                                <div className="space-y-2">
                                     <p className="text-sm text-muted-foreground">Lương cơ bản</p>
-                                    <p className="text-2xl font-bold text-accent-green">{formatCurrency(job.salary.basic, 'JPY')}</p>
+                                    <p className="text-2xl font-bold text-accent-green">{formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</p>
                                     {job.salary.basic && <p className="text-xs text-muted-foreground">{convertCurrency(job.salary.basic, 'JPY')}</p>}
                                     {job.salary.actual && (
                                         <div className="pt-2">
-                                            <p className="font-semibold text-muted-foreground">Thực lĩnh: ~{formatCurrency(job.salary.actual, 'JPY')}</p>
+                                            <p className="font-semibold text-muted-foreground">Thực lĩnh: ~{formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</p>
                                             {job.salary.actual && <p className="text-xs text-muted-foreground">{convertCurrency(job.salary.actual, 'JPY')}</p>}
                                         </div>
                                     )}
@@ -676,31 +462,23 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         </Card>
                         <Card 
                             id="MDTVV01"
-                            className="shadow-lg group hover:shadow-xl hover:border-primary transition-all cursor-pointer"
-                            onClick={(e) => {
-                                if ((e.target as HTMLElement).closest('a, button')) return;
-                                router.push(`/tu-van-vien/${assignedConsultant.id}`);
-                            }}
+                            className="shadow-lg group hover:shadow-xl hover:border-primary transition-all"
                         >
                             <CardHeader>
                                 <CardTitle className="text-lg font-bold flex items-center gap-2 group-hover:text-primary transition-colors"><UserRound/>Tư vấn viên</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <div onClick={(e) => e.stopPropagation()}>
-                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`} >
-                                            <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
-                                                <AvatarImage src={assignedConsultant.avatarUrl} alt={assignedConsultant.name} />
-                                                <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
-                                            </Avatar>
-                                        </Link>
-                                    </div>
+                                    <Link href={`/tu-van-vien/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
+                                        <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
+                                            <AvatarImage src={assignedConsultant.avatarUrl} alt={assignedConsultant.name} />
+                                            <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                    </Link>
                                     <div>
-                                        <div onClick={(e) => e.stopPropagation()}>
-                                            <Link href={`/tu-van-vien/${assignedConsultant.id}`} >
-                                                <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
-                                            </Link>
-                                        </div>
+                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
+                                            <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
+                                        </Link>
                                         <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
                                     </div>
                                 </div>
@@ -708,61 +486,22 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                                     <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
                                 </div>
                             </CardContent>
-                            <div className="border-t p-4 flex justify-center">
-                                {isClient ? (
-                                    <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                        <Share2 className="mr-2 h-4 w-4"/>Chia sẻ thông tin việc làm này
-                                    </Button>
-                                ) : <Skeleton className="h-8 w-48" />}
+                             <div className="border-t p-4 grid grid-cols-2 gap-2">
+                                 <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
+                                    <Copy className="mr-2 h-4 w-4"/>Giới thiệu việc làm
+                                </Button>
+                                 <Button variant="ghost" className="text-muted-foreground text-sm">
+                                    <Share2 className="mr-2 h-4 w-4"/>Giới thiệu tư vấn viên
+                                </Button>
+                                 <Button asChild variant="ghost" className="text-muted-foreground text-sm">
+                                    <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4"/>Tư vấn viên khác</Link>
+                                </Button>
+                                <Button asChild variant="ghost" className="text-muted-foreground text-sm">
+                                    <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4"/>Xem hồ sơ chi tiết</Link>
+                                </Button>
                             </div>
                         </Card>
                     </aside>
-                </div>
-                <div className="mt-16 pt-12 border-t space-y-12">
-                     <section id="behavioral-suggestions">
-                        <h2 className="text-2xl font-bold font-headline mb-6"><BrainCircuit className="inline-block mr-3 text-primary h-7 w-7"/>Có thể bạn quan tâm</h2>
-                        {isLoadingBehavioral ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
-                            </div>
-                        ) : behavioralSuggestions.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {behavioralSuggestions.map((item) => (
-                                    <JobCard key={item.job.id} job={item.job} />
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-muted-foreground">Không có gợi ý nào. Hãy xem thêm các công việc khác để chúng tôi hiểu bạn hơn!</p>
-                        )}
-                    </section>
-                    
-                    {role === 'guest' && (
-                        <CTAForGuest title="Gợi ý cho bạn" icon={Star} onLoginClick={() => setIsAuthDialogOpen(true)} />
-                    )}
-                    {role === 'candidate-empty-profile' && (
-                        <CTAForEmptyProfile title="Gợi ý cho bạn" icon={Star} />
-                    )}
-                    {role === 'candidate' && (
-                        <section>
-                            <h2 className="text-2xl font-bold font-headline mb-6"><Star className="inline-block mr-3 text-primary h-7 w-7"/>Gợi ý cho bạn</h2>
-                            {isLoading ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
-                                </div>
-                            ) : profileSuggestions.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {profileSuggestions.map((job) => <JobCard key={job.id} job={job} />)}
-                                </div>
-                            ) : (
-                                <p className="text-muted-foreground">Không có gợi ý nào dựa trên hồ sơ của bạn. Hãy cập nhật hồ sơ để nhận gợi ý tốt hơn.</p>
-                            )}
-                        </section>
-                    )}
-
-                    {role === 'candidate' && (
-                        <section id="VL001">
-                        </section>
-                    )}
                 </div>
             </div>
             <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
@@ -776,14 +515,12 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                     <AlertDialogCancel>Để sau</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleConfirmLogin}>
-                        Đồng ý
-                    </AlertDialogAction>
+                    <AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
              <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
-                <AlertDialogContent>
+                <AlertDialogContent id="UNGTUYEN-L02-B1">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
                         <AlertDialogDescription>
@@ -806,7 +543,9 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         className: 'bg-green-500 text-white'
                     });
                 }}
+                source="application"
             />
         </div>
     );
-}
+
+    

@@ -30,7 +30,7 @@ export const japanJobTypes: VisaType[] = [
     { name: 'Kỹ năng đặc định', slug: 'ky-nang-dac-dinh', code: '1.2' },
     { name: 'Kỹ sư, tri thức', slug: 'ky-su-tri-thuc', code: '1.3' }
 ];
-export const visaMapping={
+export const visaMapping = {
     'thuc-tap-sinh-3-nam': 'Thực tập sinh 3 năm',
     'thuc-tap-sinh-1-nam': 'Thực tập sinh 1 năm',
     'thuc-tap-sinh-3-go': 'Thực tập sinh 3 Go',

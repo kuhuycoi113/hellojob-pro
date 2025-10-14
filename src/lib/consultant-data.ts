@@ -1,6 +1,7 @@
 
-
 import type { User } from './chat-data';
+
+// This file now only contains raw data and no component imports to prevent circular dependencies.
 
 export const consultants: User[] = [
     {
@@ -64,6 +65,3 @@ export const consultants: User[] = [
     strengths: ['Nhiệt tình', 'Am hiểu ngành', 'Hỗ trợ nhanh'],
   },
 ];
-
-
-  
