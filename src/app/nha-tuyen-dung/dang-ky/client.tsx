@@ -7,7 +7,7 @@ import { notFound, useSearchParams, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, Mail, QrCode, CheckCircle, FileSignature, HardHat, UserCheck, Globe, Users2, FastForward, ListChecks, GraduationCap, Users, UserSquare, UserCog, UserPlus, Handshake, Plane } from 'lucide-react';
+import { Building, History, FileText, Briefcase, Award, Edit, Camera, Info, PlusCircle, Trash2, ImageIcon, Phone, MessageSquare, QrCode, CheckCircle, FileSignature, HardHat, UserCheck, Globe, Users2, FastForward, ListChecks, GraduationCap, Users, UserSquare, UserCog, UserPlus, Handshake, Plane } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn, parseMessengerInput, parseZaloInput, parseLineInput, formatPhoneNumberInput } from '@/lib/utils';
@@ -580,7 +580,10 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                       <h4 className="font-semibold mb-4">{t.contactTitle}</h4>
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                            <div className="space-y-1 md:col-span-2">
-                              <Label id="DKDN_EMAIL_LABEL" htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4"/> {t.emailLabel}</Label>
+                              <Label id="DKDN_EMAIL_LABEL" htmlFor="email" className="flex items-center gap-2">
+                                <Image src="/img/Mail.svg" alt="Mail" width={20} height={20} className="h-4 w-4" /> 
+                                {t.emailLabel}
+                              </Label>
                               <Input 
                                 type="email" 
                                 id="DKDN_EMAIL_INPUT"
@@ -671,13 +674,13 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                            {(!tempInfo?.email && !tempInfo?.phone && !tempInfo?.zalo && !tempInfo?.messenger && !tempInfo?.line) && (
                               <div id="HIENTHILIENHE04" className="space-y-3">
                                 <div className="flex justify-center gap-4 text-muted-foreground">
-                                    <Mail className="h-6 w-6"/>
+                                    <Image src="/img/Mail.svg" alt="Mail" width={24} height={24} className="h-6 w-6" />
                                     <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
                                     <ZaloIcon className="h-6 w-6"/>
                                     <MessengerIcon className="h-6 w-6"/>
                                     <LineIcon className="h-6 w-6"/>
                                 </div>
-                                <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                                <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isConfirmationMode ? t.reRegisterAction : t.registerAction}</Badge></div>
                               </div>
                            )}
                       </div>
@@ -1578,7 +1581,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 </div>
                                 {hasContactInfo ? (
                                     <div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4 space-y-2">
-                                       {employer.info?.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
+                                       {employer.info?.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Image src="/img/Mail.svg" alt="Mail" width={20} height={20} className="mr-2 h-4 w-4" />{employer.info.email}</Link></Button>}
                                        {employer.info?.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
                                        {employer.info?.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
                                        {employer.info?.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
@@ -1588,7 +1591,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     <div id="HIENTHILIENHE03-mobile-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
                                           <div id="HIENTHILIENHE04-mobile" className="space-y-3">
                                             <div className="flex justify-center gap-4 text-muted-foreground">
-                                                <Mail className="h-6 w-6"/>
+                                                <Image src="/img/Mail.svg" alt="Mail" width={24} height={24} className="h-6 w-6" />
                                                 <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
                                                 <ZaloIcon className="h-6 w-6"/>
                                                 <MessengerIcon className="h-6 w-6"/>
@@ -1673,7 +1676,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 </div>
                                 {hasContactInfo ? (
                                     <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4 space-y-2">
-                                       {employer.info?.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Mail className="mr-2 h-4 w-4"/>{employer.info.email}</Link></Button>}
+                                       {employer.info?.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Image src="/img/Mail.svg" alt="Mail" width={20} height={20} className="mr-2 h-4 w-4" />{employer.info.email}</Link></Button>}
                                        {employer.info?.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
                                        {employer.info?.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
                                        {employer.info?.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
@@ -1683,7 +1686,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     <div id="HIENTHILIENHE03-desktop-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
                                           <div id="HIENTHILIENHE04" className="space-y-3">
                                             <div className="flex justify-center gap-4 text-muted-foreground">
-                                                <Mail className="h-6 w-6"/>
+                                                <Image src="/img/Mail.svg" alt="Mail" width={24} height={24} className="h-6 w-6" />
                                                 <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
                                                 <ZaloIcon className="h-6 w-6"/>
                                                 <MessengerIcon className="h-6 w-6"/>
