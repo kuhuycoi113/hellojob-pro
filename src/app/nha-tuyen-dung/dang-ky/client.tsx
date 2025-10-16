@@ -386,8 +386,8 @@ const contentByLang = {
         selectValueInterestPlaceholder: "Select desired values",
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
-        registerAction: 'Register',
-        reRegisterAction: 'Register',
+        registerAction: 'Đăng ký',
+        reRegisterAction: 'Đăng ký',
         visaTypeLabel: 'Type',
         visaDetailLabel: 'Visa Details',
         selectVisaTypePlaceholder: 'Select Type',
@@ -669,7 +669,16 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                       </div>
                       <div ref={errorRef} className={cn("mt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", showContactError && 'border-destructive ring-2 ring-destructive/40')}>
                            {(!tempInfo?.email && !tempInfo?.phone && !tempInfo?.zalo && !tempInfo?.messenger && !tempInfo?.line) && (
-                              <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                              <div id="HIENTHILIENHE04" className="space-y-3">
+                                <div className="flex justify-center gap-4 text-muted-foreground">
+                                    <Mail className="h-6 w-6"/>
+                                    <Phone className="h-6 w-6"/>
+                                    <ZaloIcon className="h-6 w-6"/>
+                                    <MessengerIcon className="h-6 w-6"/>
+                                    <LineIcon className="h-6 w-6"/>
+                                </div>
+                                <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                              </div>
                            )}
                       </div>
                   </div>
@@ -1577,7 +1586,12 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     </div>
                                 ) : (
                                     <div id="HIENTHILIENHE03-mobile-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                         <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
+                                         <div id="HIENTHILIENHE04-mobile" className="space-y-3">
+                                            <div className="flex justify-center gap-4 text-muted-foreground">
+                                                <Mail className="h-6 w-6"/><Phone className="h-6 w-6"/><ZaloIcon className="h-6 w-6"/><MessengerIcon className="h-6 w-6"/><LineIcon className="h-6 w-6"/>
+                                            </div>
+                                            <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                                          </div>
                                     </div>
                                 )}
                             </SectionCard>
@@ -1663,7 +1677,12 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     </div>
                                 ) : (
                                     <div id="HIENTHILIENHE03-desktop-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                         <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
+                                          <div id="HIENTHILIENHE04" className="space-y-3">
+                                            <div className="flex justify-center gap-4 text-muted-foreground">
+                                                <Mail className="h-6 w-6"/><Phone className="h-6 w-6"/><ZaloIcon className="h-6 w-6"/><MessengerIcon className="h-6 w-6"/><LineIcon className="h-6 w-6"/>
+                                            </div>
+                                            <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
+                                          </div>
                                     </div>
                                 )}
                             </SectionCard>
