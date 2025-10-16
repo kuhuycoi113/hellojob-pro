@@ -86,7 +86,7 @@ const employersData: { [key: string]: any } = {
             en: 'Hanoi, Vietnam'
         },
         logo: '/img/ANH CHUNG/company3.png',
-        banner: '/img/viet-img/anh-bia.jpg',
+        banner: '/img/ANH CHUNG/anh-bia.jpg',
         
         about: {
             vi: '',
@@ -239,7 +239,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'Dán link Line hoặc nhập ID của bạn',
         lineHelper: 'Hệ thống sẽ tự động lấy username của bạn.',
-        notUpdated: 'Chưa có thông tin.',
+        notUpdated: 'Chưa có thông tin',
         clickToUpdate: 'Nhấn để cập nhật.',
         headerTitle: 'Thông tin chung',
         namePlaceholder: 'Ví dụ: Nguyễn Văn An',
@@ -304,7 +304,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'LineのリンクまたはIDを入力してください',
         lineHelper: 'システムが自動的にユーザー名を取得します。',
-        notUpdated: '情報がありません。',
+        notUpdated: '情報がありません',
         clickToUpdate: 'クリックして更新。',
         headerTitle: '一般情報',
         namePlaceholder: '例: グエン・ヴァン・アン',
@@ -369,7 +369,7 @@ const contentByLang = {
         lineLabel: 'Line',
         linePlaceholder: 'Paste Line link or enter your ID',
         lineHelper: 'The system will automatically extract your username.',
-        notUpdated: 'No information yet.',
+        notUpdated: 'No information yet',
         clickToUpdate: 'Click to update.',
         headerTitle: 'General Information',
         namePlaceholder: 'E.g., An Nguyen Van',
@@ -1553,7 +1553,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   <div className="lg:col-span-2 space-y-8">
                       <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                            <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">
-                                {employer?.about?.[lang] || ( isConfirmationMode ? notUpdatedText : clickToUpdateText )}
+                                {employer?.about?.[lang] ? employer.about[lang] : (isConfirmationMode ? notUpdatedText : clickToUpdateText)}
                             </p>
                       </SectionCard>
                       
@@ -1577,7 +1577,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     </div>
                                 ) : (
                                     <div id="HIENTHILIENHE03-mobile-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                        <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
+                                         <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
                                     </div>
                                 )}
                             </SectionCard>
@@ -1728,6 +1728,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         </Dialog>
       )
     }
-
 
     
