@@ -281,7 +281,7 @@ const EmptyProfileView = () => {
 
 
     const renderDialogContent = () => {
-        switch (profileCreationStep) {
+        switch(profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -919,8 +919,8 @@ const LoggedInView = () => {
             </div>
         </div>
         <ProfileViewersDialog isOpen={isViewersDialogOpen} onClose={() => setIsViewersDialogOpen(false)} />
-        <Dialog open={isAspirationsDialogOpen} onOpenChange={setIsAspirationsDialogOpen}>
-            <DialogContent className="sm:max-w-2xl" id="HSCN_SUAGOIY_DIALOG">
+        <Dialog open={isAspirationsDialogOpen} onOpenChange={setIsAspirationsDialogOpen} id="HSCN_SUAGOIY_DIALOG">
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Sửa điều kiện gợi ý</DialogTitle>
                     <DialogDescription>
@@ -928,66 +928,70 @@ const LoggedInView = () => {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
-                    <div className="space-y-2">
-                        <Label htmlFor="visa-type-modal">Loại visa mong muốn</Label>
-                        <Select
-                            value={tempAspirations.desiredVisaType || ''}
-                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }))}
-                        >
-                            <SelectTrigger id="visa-type-modal"><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
-                            <SelectContent>
-                                {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="visa-type-modal">Loại visa mong muốn</Label>
+                            <Select
+                                value={tempAspirations.desiredVisaType || ''}
+                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }))}
+                            >
+                                <SelectTrigger id="visa-type-modal"><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
+                                <SelectContent>
+                                    {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="visa-detail-modal">Chi tiết visa</Label>
+                            <Select
+                                value={tempAspirations.desiredVisaDetail || ''}
+                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaDetail: value }))}
+                                disabled={!tempAspirations.desiredVisaType}
+                            >
+                                <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
+                                <SelectContent>
+                                    {(visaDetailsOptions[tempAspirations.desiredVisaType as keyof typeof visaDetailsByVisaType] || []).map(vd => <SelectItem key={vd.slug} value={vd.name.vi}>{vd.name.vi}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="visa-detail-modal">Chi tiết visa</Label>
-                        <Select
-                            value={tempAspirations.desiredVisaDetail || ''}
-                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaDetail: value }))}
-                            disabled={!tempAspirations.desiredVisaType}
-                        >
-                            <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
-                            <SelectContent>
-                                {(visaDetailsOptions[tempAspirations.desiredVisaType as keyof typeof visaDetailsByVisaType] || []).map(vd => <SelectItem key={vd.slug} value={vd.name.vi}>{vd.name.vi}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="industry-modal">Ngành nghề mong muốn</Label>
-                        <Select
-                            value={tempDesiredIndustry}
-                            onValueChange={value => setTempDesiredIndustry(value)}
-                            disabled={!tempAspirations.desiredVisaType}
-                        >
-                             <SelectTrigger id="industry-modal">
-                                <SelectValue placeholder="Chọn ngành nghề" >
-                                    {tempDesiredIndustry || "Chọn ngành nghề"}
-                                </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                                {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="location-modal">Địa điểm mong muốn</Label>
-                        <Select
-                            value={tempAspirations.desiredLocation || ''}
-                            onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredLocation: value }))}
-                        >
-                            <SelectTrigger id="location-modal"><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
-                            <SelectContent className="max-h-[300px]">
-                                <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                                {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
-                                    <SelectGroup key={region}>
-                                        <SelectLabel>{region}</SelectLabel>
-                                        <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
-                                        {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                                    </SelectGroup>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="industry-modal">Ngành nghề mong muốn</Label>
+                            <Select
+                                value={tempDesiredIndustry}
+                                onValueChange={value => setTempDesiredIndustry(value)}
+                                disabled={!tempAspirations.desiredVisaType}
+                            >
+                                 <SelectTrigger id="industry-modal">
+                                    <SelectValue placeholder="Chọn ngành nghề" >
+                                        {tempDesiredIndustry || "Chọn ngành nghề"}
+                                    </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="location-modal">Địa điểm mong muốn</Label>
+                            <Select
+                                value={tempAspirations.desiredLocation || ''}
+                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredLocation: value }))}
+                            >
+                                <SelectTrigger id="location-modal"><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
+                                <SelectContent className="max-h-[300px]">
+                                    <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
+                                    {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
+                                        <SelectGroup key={region}>
+                                            <SelectLabel>{region}</SelectLabel>
+                                            <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
+                                            {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                        </SelectGroup>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     <div className="space-y-2 pt-2">
@@ -1360,4 +1364,5 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
+
 
