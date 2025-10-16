@@ -23,10 +23,10 @@ import { Card } from './ui/card';
 import { FastForward, ListChecks, HardHat, UserCheck, GraduationCap, Pencil, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { AuthDialog } from './auth-dialog';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
 import { Dialog, DialogContent } from './ui/dialog';
-import { AuthDialog } from './auth-dialog';
 
 
 interface CreateProfileDialogsProps {
@@ -265,12 +265,11 @@ export function CreateProfileDialogs({ onClose }: CreateProfileDialogsProps) {
             default: return <FirstStepDialog />;
         }
     }
-
     return (
         <>
             {renderDialogContent()}
-             <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
-                 <DialogContent className="sm:max-w-xl">
+            <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
+                <DialogContent className="sm:max-w-xl">
                     <DialogHeader>
                         <DialogTitle className="text-2xl font-headline text-center">Bạn muốn tạo hồ sơ chi tiết bằng cách nào?</DialogTitle>
                     </DialogHeader>
@@ -286,13 +285,13 @@ export function CreateProfileDialogs({ onClose }: CreateProfileDialogsProps) {
                             <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
                         </Card>
                     </div>
-                     <div className="mt-4 text-center">
+                    <div className="mt-4 text-center">
                         <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); onClose(); }}>Quay lại</Button>
                     </div>
                 </DialogContent>
             </Dialog>
             <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-             <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
+            <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                     <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>

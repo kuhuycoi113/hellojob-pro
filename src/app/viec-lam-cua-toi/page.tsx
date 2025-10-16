@@ -321,8 +321,10 @@ const LoggedInView = () => {
             localStorage.removeItem('suggestionPrinciple');
         }
         localStorage.setItem('suggestionType', suggestionType);
+        console.log("Suggestion principle saved:", suggestionPrinciple);
+        console.log("Suggestion type saved:", suggestionType);
         setIsAspirationsDialogOpen(false);
-        setForceUpdate(prev => prev + 1); 
+        setForceUpdate(prev => prev + 1); // Trigger a re-fetch
     };
 
     const openFeeDialog = () => {
@@ -344,6 +346,7 @@ const LoggedInView = () => {
         });
     };
     
+    // Logic for the Fee Dialog (MPMM01)
     const getFeePlaceholder = () => {
         const visaDetail = tempAspirations.desiredVisaDetail;
         if (visaDetail === 'Thực tập sinh 1 năm') return "1000";
@@ -664,11 +667,14 @@ const LoggedInView = () => {
                             <Label htmlFor="visa-type-modal">Loại visa mong muốn</Label>
                             <Select
                                 value={tempAspirations.desiredVisaType || ''}
-                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }))}
+                                onValueChange={value => {
+                                    const visaSlug = japanJobTypes.find(v => v.name === value)?.slug || '';
+                                    setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }));
+                                }}
                             >
                                 <SelectTrigger id="visa-type-modal"><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
                                 <SelectContent>
-                                    {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
+                                    {japanJobTypes.map(vt => <SelectItem key={vt.slug} value={vt.name}>{vt.name}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -681,7 +687,7 @@ const LoggedInView = () => {
                             >
                                 <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                                 <SelectContent>
-                                    {(visaDetailsByVisaType[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.slug}>{vd.name.vi}</SelectItem>)}
+                                    {(visaDetailsByVisaType[japanJobTypes.find(v => v.name === tempAspirations.desiredVisaType)?.slug || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.slug}>{vd.name.vi}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -1061,7 +1067,7 @@ const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) 
 
 function MyJobsDashboardPageContent() {
     const { role } = useAuth();
-    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile';
+    const isLoggedIn = role === 'candidate' || role === 'candidate-empty-profile' || role === 'candidate-full-profile';
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 
