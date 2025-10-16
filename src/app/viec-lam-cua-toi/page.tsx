@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
@@ -26,7 +24,7 @@ import { AuthDialog } from '@/components/auth-dialog';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
-import { Industry, industriesByJobType } from '@/lib/industry-data';
+import { Industry, allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -171,7 +169,7 @@ const EmptyProfileView = () => {
                 <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
             </Button>
             <Button 
-                onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }}
+                onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!; setProfileCreationStep(3); }}
                 variant="outline" 
                 className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                 <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
@@ -281,7 +279,7 @@ const EmptyProfileView = () => {
 
 
     const renderDialogContent = () => {
-        switch(profileCreationStep) {
+        switch (profileCreationStep) {
             case 1: return <FirstStepDialog />;
             case 2: return <QuickCreateStepDialog />;
             case 3: return <VisaDetailStepDialog />;
@@ -665,8 +663,6 @@ const LoggedInView = () => {
         return <EmptyProfileView />;
     }
     
-    const visaDetailsOptions: { [key: string]: { name: {vi: string, ja: string, en: string}, slug: string }[] } = visaDetailsByVisaType;
-    const visaTypes = Object.keys(visaDetailsOptions);
     const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
@@ -928,29 +924,35 @@ const LoggedInView = () => {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="visa-type-modal">Loại visa mong muốn</Label>
                             <Select
-                                value={tempAspirations.desiredVisaType || ''}
-                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }))}
+                                value={tempAspirations.desiredVisaType ? japanJobTypes.find(t => t.name === tempAspirations.desiredVisaType)?.slug : ''}
+                                onValueChange={(slug) => {
+                                    const selectedType = japanJobTypes.find(t => t.slug === slug);
+                                    setTempAspirations(prev => ({ ...prev, desiredVisaType: selectedType?.name, desiredVisaDetail: '' }));
+                                }}
                             >
                                 <SelectTrigger id="visa-type-modal"><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
                                 <SelectContent>
-                                    {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
+                                    {japanJobTypes.map(vt => <SelectItem key={vt.slug} value={vt.slug}>{vt.name}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="visa-detail-modal">Chi tiết visa</Label>
                             <Select
-                                value={tempAspirations.desiredVisaDetail || ''}
-                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaDetail: value }))}
+                                value={tempAspirations.desiredVisaDetail ? (Object.values(visaDetailsByVisaType).flat().find(d => d.name.vi === tempAspirations.desiredVisaDetail))?.slug : ''}
+                                onValueChange={(slug) => {
+                                    const selectedDetail = Object.values(visaDetailsByVisaType).flat().find(d => d.slug === slug);
+                                    setTempAspirations(prev => ({ ...prev, desiredVisaDetail: selectedDetail?.name.vi }));
+                                }}
                                 disabled={!tempAspirations.desiredVisaType}
                             >
                                 <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                                 <SelectContent>
-                                    {(visaDetailsOptions[tempAspirations.desiredVisaType as keyof typeof visaDetailsByVisaType] || []).map(vd => <SelectItem key={vd.slug} value={vd.name.vi}>{vd.name.vi}</SelectItem>)}
+                                    {(visaDetailsByVisaType[japanJobTypes.find(t=>t.name === tempAspirations.desiredVisaType)?.slug || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.slug}>{vd.name.vi}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -959,17 +961,18 @@ const LoggedInView = () => {
                         <div className="space-y-2">
                             <Label htmlFor="industry-modal">Ngành nghề mong muốn</Label>
                             <Select
-                                value={tempDesiredIndustry}
-                                onValueChange={value => setTempDesiredIndustry(value)}
+                                value={tempDesiredIndustry ? allIndustries.find(i => i.name.vi === tempDesiredIndustry)?.slug : ''}
+                                onValueChange={slug => {
+                                    const selectedIndustry = allIndustries.find(i => i.slug === slug);
+                                    setTempDesiredIndustry(selectedIndustry?.name.vi || '');
+                                }}
                                 disabled={!tempAspirations.desiredVisaType}
                             >
-                                 <SelectTrigger id="industry-modal">
-                                    <SelectValue placeholder="Chọn ngành nghề" >
-                                        {tempDesiredIndustry || "Chọn ngành nghề"}
-                                    </SelectValue>
+                                <SelectTrigger id="industry-modal">
+                                    <SelectValue placeholder="Chọn ngành nghề" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name.vi}>{ind.name.vi}</SelectItem>)}
+                                    {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.slug}>{ind.name.vi}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -1192,7 +1195,7 @@ const LoggedOutView = () => {
 
 const FloatingPrioritySelector = ({ onHighlight }: { onHighlight: () => void }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
+    const [isClosing, setIsClosing] = useState(isClosing);
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [transformStyle, setTransformStyle] = useState({});
@@ -1364,5 +1367,4 @@ export default function MyJobsDashboardPage() {
         </Suspense>
     )
 }
-
-
+    
