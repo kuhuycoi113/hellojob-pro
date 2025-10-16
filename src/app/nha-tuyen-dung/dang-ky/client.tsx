@@ -704,6 +704,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
 
     const t = contentByLang[lang] || contentByLang['vi'];
+    const notUpdatedText = <span className="italic text-muted-foreground">{t.notUpdated}</span>;
+    const clickToUpdateText = <button disabled={isConfirmationMode} className="italic text-primary underline ml-1" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button>;
     const hasContactInfo = employer?.info && (employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line || employer.info.email);
 
     const controlNavbar = useCallback(() => {
@@ -753,14 +755,15 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     const getArrayValue = React.useCallback((value: { [key in Language]?: string[] } | string[] | undefined, context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
         const items = (typeof value === 'object' && !Array.isArray(value) ? value?.[lang] : value) || [];
         if (!items || items.length === 0) {
-          const clickHandler = () => {
-              if(context === 'interest' || context === 'valueInterest') {
-                  handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest');
-              } else {
-                  handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
-              }
-          };
-          return <button disabled={isConfirmationMode} className="italic text-primary underline" onClick={clickHandler}>{t.clickToUpdate}</button>
+            const clickHandler = () => {
+                if(isConfirmationMode) return;
+                if(context === 'interest' || context === 'valueInterest') {
+                    handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest');
+                } else {
+                    handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
+                }
+            };
+            return isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline" onClick={clickHandler}>{t.clickToUpdate}</button>
         }
         const dataMap: any = {
             industries: allIndustries,
@@ -820,7 +823,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         setLang(newLang);
         const params = new URLSearchParams(searchParams.toString());
         params.set('lang', newLang);
-        router.replace(`/nha-tuyen-dung/dang-ky?${params.toString()}`);
+        const currentPath = isConfirmationMode ? '/nha-tuyen-dung/dang-ky/xac-nhan' : '/nha-tuyen-dung/dang-ky';
+        router.replace(`${currentPath}?${params.toString()}`);
     };
     
     const handleContinue = () => {
@@ -1549,14 +1553,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   <div className="lg:col-span-2 space-y-8">
                       <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                            <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">
-                                {employer?.about?.[lang] || (
-                                    <span className="italic">
-                                        {t.notUpdated}{' '}
-                                        <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                                            {t.clickToUpdate}
-                                        </button>
-                                    </span>
-                                )}
+                                {employer?.about?.[lang] || ( isConfirmationMode ? notUpdatedText : clickToUpdateText )}
                             </p>
                       </SectionCard>
                       
@@ -1565,10 +1562,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
                             <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
                                 <div className="space-y-3 text-sm">
-                                    <p><strong>{t.foundedLabel}:</strong> {employer.info?.founded || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                    <p><strong>{t.sizeLabel}:</strong> {employer.info?.size?.[lang] || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                    <p><strong>{t.licenseLabel}:</strong> {employer.info?.license || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                    <p><strong>{t.websiteLabel}:</strong> {employer.info?.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                                    <p><strong>{t.foundedLabel}:</strong> {employer.info?.founded || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
+                                    <p><strong>{t.sizeLabel}:</strong> {employer.info?.size?.[lang] || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
+                                    <p><strong>{t.licenseLabel}:</strong> {employer.info?.license || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
+                                    <p><strong>{t.websiteLabel}:</strong> {employer.info?.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
                                 </div>
                                 {hasContactInfo ? (
                                     <div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4 space-y-2">
@@ -1615,7 +1612,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                       <p className="font-bold text-primary mb-1">{item.year}</p>
                                       <p className="text-muted-foreground">{item.event?.[lang]}</p>
                                   </li>
-                              )) : <p className="italic text-muted-foreground">{t.notUpdated} <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>.</p>}
+                              )) : ( isConfirmationMode ? notUpdatedText : clickToUpdateText )}
                           </ul>
                       </SectionCard>
                       <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
@@ -1640,7 +1637,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                   <li key={index} className="flex items-start gap-2">
                                       <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
                                   </li>
-                              )) : <p className="italic text-muted-foreground">{t.notUpdated} <button disabled={isConfirmationMode} className="underline text-primary" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>.</p>}
+                              )) : ( isConfirmationMode ? notUpdatedText : clickToUpdateText )}
                           </ul>
                       </SectionCard>
                   </div>
@@ -1651,10 +1648,10 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
                             <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
                                 <div className="space-y-3 text-sm">
-                                    <p><strong>{t.foundedLabel}:</strong> {employer.info?.founded || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                    <p><strong>{t.sizeLabel}:</strong> {employer.info?.size?.[lang] || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                    <p><strong>{t.licenseLabel}:</strong> {employer.info?.license || <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
-                                    <p><strong>{t.websiteLabel}:</strong> {employer.info?.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : <DialogTrigger asChild><button disabled={isConfirmationMode} className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>}</p>
+                                    <p><strong>{t.foundedLabel}:</strong> {employer.info?.founded || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
+                                    <p><strong>{t.sizeLabel}:</strong> {employer.info?.size?.[lang] || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
+                                    <p><strong>{t.licenseLabel}:</strong> {employer.info?.license || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
+                                    <p><strong>{t.websiteLabel}:</strong> {employer.info?.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
                                 </div>
                                 {hasContactInfo ? (
                                     <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4 space-y-2">
@@ -1666,7 +1663,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     </div>
                                 ) : (
                                     <div id="HIENTHILIENHE03-desktop-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                        <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
+                                         <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
                                     </div>
                                 )}
                             </SectionCard>
@@ -1732,10 +1729,5 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
       )
     }
 
-    
-
-    
-
-    
 
     
