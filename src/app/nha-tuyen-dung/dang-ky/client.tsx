@@ -257,7 +257,7 @@ const contentByLang = {
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
-        reRegisterAction: 'Đăng ký',
+        reRegisterAction: 'Đăng ký lại',
         visaTypeLabel: 'Loại hình',
         visaDetailLabel: 'Chi tiết loại hình visa',
         selectVisaTypePlaceholder: 'Chọn Loại hình',
@@ -322,7 +322,7 @@ const contentByLang = {
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
         registerAction: '登録',
-        reRegisterAction: '登録',
+        reRegisterAction: '再登録',
         visaTypeLabel: '種別',
         visaDetailLabel: 'ビザ詳細',
         selectVisaTypePlaceholder: '種別を選択',
@@ -386,8 +386,8 @@ const contentByLang = {
         selectValueInterestPlaceholder: "Select desired values",
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
-        registerAction: 'Đăng ký',
-        reRegisterAction: 'Đăng ký',
+        registerAction: 'Register',
+        reRegisterAction: 'Re-register',
         visaTypeLabel: 'Type',
         visaDetailLabel: 'Visa Details',
         selectVisaTypePlaceholder: 'Select Type',
@@ -672,7 +672,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                               <div id="HIENTHILIENHE04" className="space-y-3">
                                 <div className="flex justify-center gap-4 text-muted-foreground">
                                     <Mail className="h-6 w-6"/>
-                                    <Phone className="h-6 w-6"/>
+                                    <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
                                     <ZaloIcon className="h-6 w-6"/>
                                     <MessengerIcon className="h-6 w-6"/>
                                     <LineIcon className="h-6 w-6"/>
@@ -1586,11 +1586,15 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     </div>
                                 ) : (
                                     <div id="HIENTHILIENHE03-mobile-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                         <div id="HIENTHILIENHE04-mobile" className="space-y-3">
+                                          <div id="HIENTHILIENHE04-mobile" className="space-y-3">
                                             <div className="flex justify-center gap-4 text-muted-foreground">
-                                                <Mail className="h-6 w-6"/><Phone className="h-6 w-6"/><ZaloIcon className="h-6 w-6"/><MessengerIcon className="h-6 w-6"/><LineIcon className="h-6 w-6"/>
+                                                <Mail className="h-6 w-6"/>
+                                                <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
+                                                <ZaloIcon className="h-6 w-6"/>
+                                                <MessengerIcon className="h-6 w-6"/>
+                                                <LineIcon className="h-6 w-6"/>
                                             </div>
-                                            <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                                            <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
                                           </div>
                                     </div>
                                 )}
@@ -1679,7 +1683,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                     <div id="HIENTHILIENHE03-desktop-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
                                           <div id="HIENTHILIENHE04" className="space-y-3">
                                             <div className="flex justify-center gap-4 text-muted-foreground">
-                                                <Mail className="h-6 w-6"/><Phone className="h-6 w-6"/><ZaloIcon className="h-6 w-6"/><MessengerIcon className="h-6 w-6"/><LineIcon className="h-6 w-6"/>
+                                                <Mail className="h-6 w-6"/>
+                                                <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
+                                                <ZaloIcon className="h-6 w-6"/>
+                                                <MessengerIcon className="h-6 w-6"/>
+                                                <LineIcon className="h-6 w-6"/>
                                             </div>
                                             <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
                                           </div>
@@ -1747,7 +1755,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         </Dialog>
       )
     }
-
-    
-
-    
