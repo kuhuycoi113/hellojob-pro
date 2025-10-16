@@ -920,7 +920,7 @@ const LoggedInView = () => {
         </div>
         <ProfileViewersDialog isOpen={isViewersDialogOpen} onClose={() => setIsViewersDialogOpen(false)} />
         <Dialog open={isAspirationsDialogOpen} onOpenChange={setIsAspirationsDialogOpen}>
-            <DialogContent className="sm:max-w-2xl">
+            <DialogContent className="sm:max-w-2xl" id="HSCN_SUAGOIY_DIALOG">
                 <DialogHeader>
                     <DialogTitle>Sửa điều kiện gợi ý</DialogTitle>
                     <DialogDescription>
@@ -949,7 +949,7 @@ const LoggedInView = () => {
                         >
                             <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
                             <SelectContent>
-                                {(visaDetailsByVisaType[tempAspirations.desiredVisaType as keyof typeof visaDetailsByVisaType] || []).map(vd => <SelectItem key={vd.slug} value={vd.name.vi}>{vd.name.vi}</SelectItem>)}
+                                {(visaDetailsOptions[tempAspirations.desiredVisaType as keyof typeof visaDetailsByVisaType] || []).map(vd => <SelectItem key={vd.slug} value={vd.name.vi}>{vd.name.vi}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -1361,5 +1361,3 @@ export default function MyJobsDashboardPage() {
     )
 }
 
-
-    
