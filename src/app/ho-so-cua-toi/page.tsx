@@ -1148,8 +1148,10 @@ export default function CandidateProfilePage() {
                         <DropdownMenuItem onSelect={() => handleLanguageChange('en')}><EnFlagIcon className="w-4 h-4 mr-2"/>English</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button variant="outline" size="icon" className="sm:hidden" onClick={() => setIsProfileEditDialogOpen(true)}><Edit /></Button>
-                    <Button variant="outline" className="hidden sm:inline-flex" onClick={() => setIsProfileEditDialogOpen(true)}><Edit /> {editButtonText}</Button>
+                     <Button variant="outline" size="icon" className="sm:hidden" onClick={() => setIsProfileEditDialogOpen(true)}><Edit /></Button>
+                     <Button variant="outline" className="hidden sm:inline-flex" onClick={() => {}}>
+                        <Edit /> {editButtonText}
+                    </Button>
                  </div>
               </div>
             </CardHeader>
@@ -1822,6 +1824,7 @@ const DocumentGrid = ({
     
 
     
+
 
 
 
