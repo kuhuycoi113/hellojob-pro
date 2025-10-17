@@ -257,7 +257,7 @@ const contentByLang = {
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
-        reRegisterAction: 'Đăng ký',
+        reRegisterAction: 'Đăng ký lại',
         visaTypeLabel: 'Loại hình',
         visaDetailLabel: 'Chi tiết loại hình visa',
         selectVisaTypePlaceholder: 'Chọn Loại hình',
@@ -322,7 +322,7 @@ const contentByLang = {
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
         registerAction: '登録',
-        reRegisterAction: '登録',
+        reRegisterAction: '再登録',
         visaTypeLabel: '種別',
         visaDetailLabel: 'ビザ詳細',
         selectVisaTypePlaceholder: '種別を選択',
@@ -387,7 +387,7 @@ const contentByLang = {
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
         registerAction: 'Register',
-        reRegisterAction: 'Register',
+        reRegisterAction: 'Re-register',
         visaTypeLabel: 'Type',
         visaDetailLabel: 'Visa Details',
         selectVisaTypePlaceholder: 'Select Type',
@@ -1668,12 +1668,25 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                           </div>
                       </SectionCard>
                       <SectionCard id="DKPHUCLOI" title={t.benefitsTitle} icon={Award} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
-                          <ul id="DKPL_DANHSACH" className="space-y-2 text-sm">
+                           <ul id="DKPL_DANHSACH" className="space-y-2 text-sm">
                               {employer.benefits?.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
                                   <li key={index} className="flex items-start gap-2">
                                       <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
                                   </li>
-                              )) : ( <> {notUpdatedText} {clickToUpdateText} </> )}
+                              )) : (
+                                <>
+                                  {notUpdatedText}
+                                  <DialogTrigger asChild>
+                                    <button
+                                      disabled={isConfirmationMode}
+                                      className="italic text-primary underline ml-1"
+                                      onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}
+                                    >
+                                      {t.clickToUpdate}
+                                    </button>
+                                  </DialogTrigger>
+                                </>
+                              )}
                           </ul>
                       </SectionCard>
                   </div>
@@ -1777,3 +1790,4 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     
 
     
+
