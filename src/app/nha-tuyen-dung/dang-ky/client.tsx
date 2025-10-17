@@ -1571,11 +1571,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                 {employer?.about?.[lang] || (
                                   <>
                                       <span className="italic text-muted-foreground">{t.notUpdated}</span>
-                                      <DialogTrigger asChild>
-                                        <button disabled={isConfirmationMode} className="italic text-primary underline ml-1" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                                          {t.clickToUpdate}
-                                        </button>
-                                      </DialogTrigger>
+                                      {clickToUpdateText}
                                   </>
                                 )}
                             </p>
@@ -1645,7 +1641,20 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                       <p className="font-bold text-primary mb-1">{item.year}</p>
                                       <p className="text-muted-foreground">{item.event?.[lang]}</p>
                                   </li>
-                              )) : ( <> {notUpdatedText} {clickToUpdateText} </> )}
+                              )) : (
+                                <>
+                                  <span className="italic text-muted-foreground">{t.notUpdated}</span>
+                                  <DialogTrigger asChild>
+                                    <button
+                                      disabled={isConfirmationMode}
+                                      className="italic text-primary underline ml-1"
+                                      onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}
+                                    >
+                                      {t.clickToUpdate}
+                                    </button>
+                                  </DialogTrigger>
+                                </>
+                              )}
                           </ul>
                       </SectionCard>
                       <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
@@ -1783,6 +1792,8 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         </Dialog>
       )
     }
+
+    
 
     
 
