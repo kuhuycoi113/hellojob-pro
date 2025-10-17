@@ -711,21 +711,14 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     const t = contentByLang[lang] || contentByLang['vi'];
     const notUpdatedText = <span className="italic text-muted-foreground">{t.notUpdated}</span>;
     const clickToUpdateText = (
+      <DialogTrigger asChild>
         <button
             disabled={isConfirmationMode}
             className="italic text-primary underline ml-1"
-            onClick={(e) => {
-                e.stopPropagation();
-                // Determine which dialog to open based on context
-                const section = (e.currentTarget.closest('[data-section]') as HTMLElement)?.dataset?.section;
-                if (section === 'about') {
-                    handleEditClick(t.aboutTitle, employer.about, 'about');
-                }
-                // Add other sections here...
-            }}
         >
             {t.clickToUpdate}
         </button>
+      </DialogTrigger>
     );
     
     const hasContactInfo = employer?.info && (employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line || employer.info.email);
@@ -1577,8 +1570,12 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                            <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">
                                 {employer?.about?.[lang] || (
                                   <>
-                                      {notUpdatedText}
-                                      {clickToUpdateText}
+                                      <span className="italic text-muted-foreground">{t.notUpdated}</span>
+                                      <DialogTrigger asChild>
+                                        <button disabled={isConfirmationMode} className="italic text-primary underline ml-1" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>
+                                          {t.clickToUpdate}
+                                        </button>
+                                      </DialogTrigger>
                                   </>
                                 )}
                             </p>
@@ -1790,4 +1787,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     
 
     
-
