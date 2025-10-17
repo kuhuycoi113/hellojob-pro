@@ -710,7 +710,24 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
     const t = contentByLang[lang] || contentByLang['vi'];
     const notUpdatedText = <span className="italic text-muted-foreground">{t.notUpdated}</span>;
-    const clickToUpdateText = <button disabled={isConfirmationMode} className="italic text-primary underline ml-1" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button>;
+    const clickToUpdateText = (
+        <button
+            disabled={isConfirmationMode}
+            className="italic text-primary underline ml-1"
+            onClick={(e) => {
+                e.stopPropagation();
+                // Determine which dialog to open based on context
+                const section = (e.currentTarget.closest('[data-section]') as HTMLElement)?.dataset?.section;
+                if (section === 'about') {
+                    handleEditClick(t.aboutTitle, employer.about, 'about');
+                }
+                // Add other sections here...
+            }}
+        >
+            {t.clickToUpdate}
+        </button>
+    );
+    
     const hasContactInfo = employer?.info && (employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line || employer.info.email);
 
     const controlNavbar = useCallback(() => {
@@ -1631,7 +1648,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                       <p className="font-bold text-primary mb-1">{item.year}</p>
                                       <p className="text-muted-foreground">{item.event?.[lang]}</p>
                                   </li>
-                              )) : ( isConfirmationMode ? notUpdatedText : (<>{notUpdatedText}{clickToUpdateText}</>) )}
+                              )) : ( <> {notUpdatedText} {clickToUpdateText} </> )}
                           </ul>
                       </SectionCard>
                       <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
@@ -1656,7 +1673,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                   <li key={index} className="flex items-start gap-2">
                                       <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
                                   </li>
-                              )) : ( isConfirmationMode ? notUpdatedText : clickToUpdateText )}
+                              )) : ( <> {notUpdatedText} {clickToUpdateText} </> )}
                           </ul>
                       </SectionCard>
                   </div>
