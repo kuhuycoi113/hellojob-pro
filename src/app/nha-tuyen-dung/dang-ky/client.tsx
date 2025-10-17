@@ -257,7 +257,7 @@ const contentByLang = {
         contactTitle: 'Thông tin liên hệ',
         registerCTA: 'Cung cấp ít nhất 1 phương thức liên hệ để',
         registerAction: 'Đăng ký',
-        reRegisterAction: 'Đăng ký',
+        reRegisterAction: 'Đăng ký lại',
         visaTypeLabel: 'Loại hình',
         visaDetailLabel: 'Chi tiết loại hình visa',
         selectVisaTypePlaceholder: 'Chọn Loại hình',
@@ -322,7 +322,7 @@ const contentByLang = {
         contactTitle: '連絡先情報',
         registerCTA: '登録するには、少なくとも1つの連絡方法を提供してください',
         registerAction: '登録',
-        reRegisterAction: '登録',
+        reRegisterAction: '再登録',
         visaTypeLabel: '種別',
         visaDetailLabel: 'ビザ詳細',
         selectVisaTypePlaceholder: '種別を選択',
@@ -387,7 +387,7 @@ const contentByLang = {
         contactTitle: 'Contact Information',
         registerCTA: 'Provide at least 1 contact method to',
         registerAction: 'Register',
-        reRegisterAction: 'Register',
+        reRegisterAction: 'Re-register',
         visaTypeLabel: 'Type',
         visaDetailLabel: 'Visa Details',
         selectVisaTypePlaceholder: 'Select Type',
@@ -1558,7 +1558,12 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                   <div className="lg:col-span-2 space-y-8">
                       <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                            <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">
-                                {employer?.about?.[lang] ? employer.about[lang] : (isConfirmationMode ? notUpdatedText : clickToUpdateText)}
+                                {employer?.about?.[lang] ? employer.about[lang] : (
+                                  <>
+                                      {notUpdatedText}
+                                      {clickToUpdateText}
+                                  </>
+                                )}
                             </p>
                       </SectionCard>
                       
