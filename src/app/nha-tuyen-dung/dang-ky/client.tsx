@@ -1239,7 +1239,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                         <div className="lg:col-span-2 space-y-8">
                             <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
                                <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">
-                                    {employer?.about?.[lang] || ( isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button> )}
+                                    {employer?.about?.[lang] || ( isConfirmationMode ? notUpdatedText : <span>{notUpdatedText} <button className="italic text-primary underline ml-1" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button></span> )}
                                 </p>
                             </SectionCard>
                             <div className="block lg:hidden" ref={mobileInfoCardRef}>
@@ -1369,7 +1369,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                                     <MessengerIcon className="h-6 w-6"/>
                                                     <LineIcon className="h-6 w-6"/>
                                                 </div>
-                                                <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
+                                                <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
                                               </div>
                                         </div>
                                     )}
