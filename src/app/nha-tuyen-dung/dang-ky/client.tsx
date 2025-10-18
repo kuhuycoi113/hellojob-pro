@@ -444,6 +444,38 @@ const valueInterestOptions = {
     ]
 };
 
+const EditDialog = ({
+  isOpen,
+  onOpenChange,
+  title,
+  children,
+  onSave,
+  footerContent
+}: {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  children: React.ReactNode;
+  onSave: () => void;
+  footerContent?: React.ReactNode;
+}) => {
+  const { vi: t } = contentByLang;
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="font-headline text-2xl">{title}</DialogTitle>
+        </DialogHeader>
+        <div className="py-4 max-h-[60vh] overflow-y-auto pr-4">{children}</div>
+        <DialogFooter>
+          {footerContent}
+          <DialogClose asChild><Button variant="outline">{t.cancelButton}</Button></DialogClose>
+          <Button onClick={onSave}>{t.saveButton}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 
 const SectionCard = ({ title, icon: Icon, children, className, onEditClick, id, isConfirmationMode }: { title: string, icon: React.ElementType, children: React.ReactNode, className?: string, onEditClick?: () => void, id?: string, isConfirmationMode?: boolean }) => {
@@ -706,20 +738,11 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     const infoCardRef = React.useRef<HTMLDivElement>(null);
     const mobileInfoCardRef = React.useRef<HTMLDivElement>(null);
     const [isUpdateMode, setIsUpdateMode] = React.useState(false);
-
+    const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+    const [editingModule, setEditingModule] = React.useState<{title: string, field: string, data: any } | null>(null);
 
     const t = contentByLang[lang] || contentByLang['vi'];
     const notUpdatedText = <span className="italic text-muted-foreground">{t.notUpdated}</span>;
-    const clickToUpdateText = (
-      <DialogTrigger asChild>
-        <button
-            disabled={isConfirmationMode}
-            className="italic text-primary underline ml-1"
-        >
-            {t.clickToUpdate}
-        </button>
-      </DialogTrigger>
-    );
     
     const hasContactInfo = employer?.info && (employer.info.phone || employer.info.zalo || employer.info.messenger || employer.info.line || employer.info.email);
 
@@ -744,8 +767,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     }, [isMobile, lastScrollY, controlNavbar]);
 
 
-    const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
-    const [editingModule, setEditingModule] = React.useState<{title: string, field: string } | null>(null);
     const [tempContent, setTempContent] = React.useState<any>('');
     
     const [phoneCountry, setPhoneCountry] = React.useState('+84');
@@ -761,7 +782,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         } else if (typeof newArray[index] === 'object' && newArray[index] !== null && 'alt' in newArray[index]) { // Image object
            newArray[index] = { ...newArray[index], alt: { ...newArray[index].alt, [lang]: value } };
         } else if (typeof newArray[index] === 'object' && newArray[index] !== null) { // Benefits object
-          newArray[index] = { ...newArray[index], [lang]: value };
+          newArray[index] = {...newArray[index], [lang]: value};
         }
         return newArray;
       });
@@ -770,15 +791,22 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     const getArrayValue = React.useCallback((value: { [key in Language]?: string[] } | string[] | undefined, context: 'interest' | 'valueInterest' | 'industries' | 'regions' | 'visaType' | 'visaDetail' ) => {
         const items = (typeof value === 'object' && !Array.isArray(value) ? value?.[lang] : value) || [];
         if (!items || items.length === 0) {
-            const clickHandler = () => {
-                if(isConfirmationMode) return;
-                if(context === 'interest' || context === 'valueInterest') {
-                    handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest');
-                } else {
-                    handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
-                }
-            };
-            return isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline" onClick={clickHandler}>{t.clickToUpdate}</button>
+            return isConfirmationMode ? notUpdatedText : (
+              <button
+                  disabled={isConfirmationMode}
+                  className="italic text-primary underline ml-1"
+                  onClick={(e) => {
+                      e.stopPropagation();
+                      if(context === 'interest' || context === 'valueInterest') {
+                          handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest');
+                      } else {
+                          handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries');
+                      }
+                  }}
+              >
+                  {t.clickToUpdate}
+              </button>
+            );
         }
         const dataMap: any = {
             industries: allIndustries,
@@ -995,65 +1023,65 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
 
     }, [searchParams, t.rolePlaceholder]);
 
-    const handleEditClick = (title: string, currentContent: any, field: string) => {
-        setEditingModule({ title, field });
-        setTempContent(JSON.parse(JSON.stringify(currentContent)));
-        setErrors({});
-        setIsEditDialogOpen(true);
+    const handleEditClick = (title: string, data: any, field: string) => {
+      setEditingModule({ title, field, data });
+      setTempContent(JSON.parse(JSON.stringify(data)));
+      setErrors({});
+      setIsEditDialogOpen(true);
     };
 
     const handleSaveChanges = () => {
-        if (!editingModule) return;
-        
-        let allValid = true;
-        if (editingModule.field === 'info') {
-            if (tempContent.email && !validateEmail(tempContent.email)) {
-                 setErrors(prev => ({ ...prev, email: "Email không hợp lệ" }));
-                 allValid = false;
-            } else {
-                setErrors(prev => ({ ...prev, email: undefined }));
-            }
-            if (!validateField('messenger', tempContent.messenger || '')) allValid = false;
-            if (!validateField('line', tempContent.line || '')) allValid = false;
-        }
+      if (!editingModule) return;
+      
+      let allValid = true;
+      if (editingModule.field === 'info') {
+          if (tempContent.email && !validateEmail(tempContent.email)) {
+               setErrors(prev => ({ ...prev, email: "Email không hợp lệ" }));
+               allValid = false;
+          } else {
+              setErrors(prev => ({ ...prev, email: undefined }));
+          }
+          if (!validateField('messenger', tempContent.messenger || '')) allValid = false;
+          if (!validateField('line', tempContent.line || '')) allValid = false;
+      }
 
-        if (!allValid) {
-            toast({ variant: 'destructive', title: 'Thông tin không hợp lệ', description: 'Vui lòng sửa các lỗi được hiển thị trước khi lưu.' });
-            return;
-        }
+      if (!allValid) {
+          toast({ variant: 'destructive', title: 'Thông tin không hợp lệ', description: 'Vui lòng sửa các lỗi được hiển thị trước khi lưu.' });
+          return;
+      }
 
-        setEmployer((prev: any) => {
-            const newState = { ...prev };
-            const { field } = editingModule;
-            if (field === 'header') {
-                newState.name = tempContent.name;
-                newState.type = tempContent.type;
-                newState.location = tempContent.location;
-            } else if (field === 'info') {
-                const finalInfo = { ...tempContent };
-                if (finalInfo.messenger) finalInfo.messenger = parseMessengerInput(finalInfo.messenger);
-                if (finalInfo.line) finalInfo.line = parseLineInput(finalInfo.line);
-                if (finalInfo.zalo) finalInfo.zalo = parseZaloInput(finalInfo.zalo);
-                newState[field] = finalInfo;
-            } else if (field === 'visaAndIndustries') {
-                 newState.visaType = tempContent.visaType;
-                 newState.visaDetail = tempContent.visaDetail;
-                 newState.industries = tempContent.industries;
-            } else if (field === 'valueInterest') {
-                 newState.interest = { ...newState.interest, [lang]: tempContent.interest[lang] };
-                 newState.valueInterest = tempContent.valueInterest;
-            } else {
-                newState[field] = tempContent;
-            }
-            // After updating, save the entire profile to localStorage
-            localStorage.setItem(`recruiterProfile_${partnerId}`, JSON.stringify(newState));
-            return newState;
-        });
+      setEmployer((prev: any) => {
+          const newState = { ...prev };
+          const { field } = editingModule;
+          if (field === 'header') {
+              newState.name = tempContent.name;
+              newState.type = tempContent.type;
+              newState.location = tempContent.location;
+          } else if (field === 'info') {
+              const finalInfo = { ...tempContent };
+              if (finalInfo.messenger) finalInfo.messenger = parseMessengerInput(finalInfo.messenger);
+              if (finalInfo.line) finalInfo.line = parseLineInput(finalInfo.line);
+              if (finalInfo.zalo) finalInfo.zalo = parseZaloInput(finalInfo.zalo);
+              newState[field] = finalInfo;
+          } else if (field === 'visaAndIndustries') {
+               newState.visaType = tempContent.visaType;
+               newState.visaDetail = tempContent.visaDetail;
+               newState.industries = tempContent.industries;
+          } else if (field === 'valueInterest') {
+               newState.interest = { ...newState.interest, [lang]: tempContent.interest[lang] };
+               newState.valueInterest = tempContent.valueInterest;
+          } else {
+              newState[field] = tempContent;
+          }
+          // After updating, save the entire profile to localStorage
+          localStorage.setItem(`recruiterProfile_${partnerId}`, JSON.stringify(newState));
+          return newState;
+      });
 
-        setIsEditDialogOpen(false);
-        setEditingModule(null);
+      setIsEditDialogOpen(false);
+      setEditingModule(null);
     };
-
+    
     const addTempArrayItem = (field: string) => {
         if (field === 'history') {
           setTempContent((prev: any[]) => [...prev, { year: new Date().getFullYear().toString(), event: { vi: '', ja: '', en: '' } }]);
@@ -1107,375 +1135,6 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         });
     };
     
-    const renderEditContent = () => {
-        if (!editingModule) return <p>Chức năng đang được phát triển.</p>;
-
-        switch(editingModule.field) {
-            case 'header':
-                return (
-                     <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label>{isIndividual ? t.namePlaceholder : t.companyNamePlaceholder}</Label>
-                            <Input placeholder={isIndividual ? t.namePlaceholder : t.companyNamePlaceholder} value={tempContent.name[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} />
-                        </div>
-                        <div className="space-y-2"><Label>{t.typePlaceholder}</Label><Input placeholder={placeholderEmployerData.type[lang]} value={tempContent.type[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
-                        <div className="space-y-2"><Label>{t.locationPlaceholder}</Label><Input placeholder={placeholderEmployerData.location[lang]} value={tempContent.location[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
-                    </div>
-                );
-            case 'about':
-                return <Textarea id="DKGT_TEXTAREA" className="min-h-[150px]" placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />;
-            
-            case 'images':
-                return (
-                    <div className="space-y-4">
-                        {tempContent.map((img: any, index: number) => (
-                        <div key={index} className="flex items-center gap-4">
-                            <Label htmlFor={`dialog-image-upload-${index}`} className="relative w-20 h-20 flex-shrink-0 cursor-pointer group">
-                               <Image src={img.src} alt={img.alt?.[lang] || ''} fill className="object-cover rounded-md"/>
-                               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                   <Camera className="h-6 w-6 text-white"/>
-                               </div>
-                               <Input id={`dialog-image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} />
-                            </Label>
-                            <Input 
-                                placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.images[index]?.alt[lang] || 'Văn phòng hiện đại'}`}
-                                value={img.alt?.[lang] || ''}
-                                onChange={(e) => handleTempArrayChange(index, 'alt', e.target.value)}
-                            />
-                            <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                        </div>
-                        ))}
-                        <Button variant="outline" onClick={() => addTempArrayItem('images')}><PlusCircle className="mr-2"/> {t.addImageButton}</Button>
-                    </div>
-                );
-
-            case 'history':
-                return (
-                    <div className="space-y-4">
-                        {tempContent.map((item: any, index: number) => (
-                            <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
-                                <Input placeholder={t.foundedPlaceholder} value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
-                                <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
-                                <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                            </div>
-                        ))}
-                        <Button variant="outline" onClick={() => addTempArrayItem('history')}>
-                            <PlusCircle className="mr-2"/> {t.addMilestoneButton}
-                        </Button>
-                    </div>
-                );
-            
-            case 'benefits':
-                 return (
-                    <div className="space-y-4">
-                         {tempContent.map((item: any, index: number) => (
-                            <div key={index} className="flex items-center gap-2">
-                                <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.benefits[index]?.[lang] || ''}`} value={item[lang] || ''} onChange={(e) => {
-                                    const newBenefits = [...tempContent];
-                                    newBenefits[index] = {...newBenefits[index], [lang]: e.target.value};
-                                    setTempContent(newBenefits);
-                                }} />
-                                 <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                            </div>
-                        ))}
-                        <Button variant="outline" onClick={() => addTempArrayItem('benefits')}><PlusCircle className="mr-2"/> {t.addBenefitButton}</Button>
-                    </div>
-                 );
-            case 'valueInterest':
-                const currentInterest = tempContent.interest?.[lang] || [];
-                const handleInterestChange = (checked: boolean, interestId: string) => {
-                    const newSelection = checked
-                        ? [...currentInterest, interestId]
-                        : currentInterest.filter((id: string) => id !== interestId);
-                    setTempContent({ ...tempContent, interest: { ...tempContent.interest, [lang]: newSelection }});
-                };
-
-                const currentValueInterests = Array.isArray(tempContent.valueInterest) ? tempContent.valueInterest.map((item: any) => item.id) : [];
-                const handleValueInterestChange = (checked: boolean, interestId: string) => {
-                    let newSelection;
-                    if (checked) {
-                        newSelection = [...currentValueInterests, interestId];
-                    } else {
-                        newSelection = currentValueInterests.filter((id: string) => id !== interestId);
-                    }
-                    const newObjects = newSelection.map(id => {
-                        const viOption = valueInterestOptions['vi'].find(o=>o.id===id);
-                        return {
-                            id,
-                            vi: viOption?.title,
-                            ja: valueInterestOptions['ja'].find(o => o.id === id)?.title,
-                            en: valueInterestOptions['en'].find(o => o.id === id)?.title
-                        }
-                    }).filter(Boolean);
-                    setTempContent({ ...tempContent, valueInterest: newObjects });
-                };
-
-                return (
-                    <div id="DKNGHIEPVUGIATRIQUANTAM_DIALOG" className="space-y-6">
-                        <div className="space-y-2">
-                            <Label id="DKNV_NGHIEPVU_LABEL" className="font-semibold text-base">{t.interestLabel}</Label>
-                            <p className="text-sm text-muted-foreground">{t.interestDescription}</p>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button id="DKNV_NGHIEPVU_BUTTON" variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                        <div className="flex flex-wrap gap-1">
-                                            {currentInterest.length > 0 ? (
-                                                currentInterest.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(interestOptions[lang].find(o => o.id === id))?.title}</Badge>)
-                                            ) : t.selectInterestPlaceholder}
-                                        </div>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                    <DropdownMenuLabel>{t.selectInterestLabel}</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    {(interestOptions[lang] || []).map((option) => (
-                                         <DropdownMenuCheckboxItem
-                                            key={option.id}
-                                            id={`DKNV_ITEM_${option.id}`}
-                                            checked={currentInterest.includes(option.id)}
-                                            onSelect={(e) => e.preventDefault()}
-                                            onCheckedChange={(checked) => handleInterestChange(Boolean(checked), option.id)}
-                                        >
-                                            <span className="font-bold w-6 mr-2">{currentInterest.includes(option.id) ? `${currentInterest.indexOf(option.id) + 1}.` : ''}</span>
-                                            {option.title}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                        <div className="space-y-2">
-                            <Label id="DKNV_GIATRI_LABEL" className="font-semibold text-base">{t.valueInterestLabel}</Label>
-                            <p className="text-sm text-muted-foreground">{t.valueInterestDescription}</p>
-                            <DropdownMenu>
-                               <DropdownMenuTrigger asChild>
-                                    <Button id="DKNV_GIATRI_BUTTON" variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
-                                         <div className="flex flex-wrap gap-1">
-                                        {currentValueInterests.length > 0 ? (
-                                            currentValueInterests.map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(valueInterestOptions[lang].find(o => o.id === id))?.title}</Badge>)
-                                        ) : t.selectValueInterestPlaceholder}
-                                        </div>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                    <DropdownMenuLabel>{t.selectValueInterestLabel}</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    {valueInterestOptions[lang].map((option) => (
-                                         <DropdownMenuCheckboxItem
-                                            key={option.id}
-                                            id={`DKNV_ITEM_${option.id}`}
-                                            checked={currentValueInterests.includes(option.id)}
-                                            onSelect={(e) => e.preventDefault()}
-                                            onCheckedChange={(checked) => handleValueInterestChange(Boolean(checked), option.id)}
-                                        >
-                                            <span className="font-bold w-6 mr-2">{currentValueInterests.includes(option.id) ? `${currentValueInterests.indexOf(option.id) + 1}.` : ''}</span>
-                                            {option.title}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </div>
-                );
-            case 'visaAndIndustries':
-                const currentVisaTypes = tempContent.visaType?.[lang] || [];
-                const handleVisaTypeChange = (checked: boolean, typeSlug: string) => {
-                    const newSelection = checked
-                        ? [...currentVisaTypes, typeSlug]
-                        : currentVisaTypes.filter((slug: string) => slug !== typeSlug);
-
-                    const newVisaDetails = (tempContent.visaDetail?.[lang] || []).filter((detailSlug: string) => 
-                        newSelection.some((visaSlug: string) => 
-                            (visaDetailsByVisaType[visaSlug as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === detailSlug)
-                        )
-                    );
-                    
-                    const newIndustries = (tempContent.industries?.main?.[lang] || []).filter((industrySlug: string) =>
-                       newSelection.some((visaSlug: string) =>
-                           (industriesByJobType[visaSlug as keyof typeof industriesByJobType] || []).some(ind => ind.slug === industrySlug)
-                       )
-                    );
-
-                    setTempContent({
-                        ...tempContent,
-                        visaType: { ...tempContent.visaType, [lang]: newSelection },
-                        visaDetail: { ...tempContent.visaDetail, [lang]: newVisaDetails },
-                        industries: { ...tempContent.industries, main: { ...tempContent.industries.main, [lang]: newIndustries } }
-                    });
-                };
-
-                const currentVisaDetails = tempContent.visaDetail?.[lang] || [];
-                const handleDetailCheckboxChange = (checked: boolean, detailSlug: string) => {
-                    const newSelection = checked
-                        ? [...currentVisaDetails, detailSlug]
-                        : currentVisaDetails.filter((slug: string) => slug !== detailSlug);
-                    setTempContent({ ...tempContent, visaDetail: { ...tempContent.visaDetail, [lang]: newSelection } });
-                };
-
-                const availableIndustries = Array.from(new Map(
-                    currentVisaTypes.flatMap((vSlug: string) => (industriesByJobType[vSlug as keyof typeof industriesByJobType] || [])).map((item: Industry) => [item.slug, item])
-                ).values());
-                
-                const currentIndustries = tempContent.industries?.main?.[lang] || [];
-                const handleIndustryChange = (checked: boolean, industrySlug: string) => {
-                    const newSelection = checked
-                        ? [...currentIndustries, industrySlug]
-                        : currentIndustries.filter((slug: string) => slug !== industrySlug);
-                    setTempContent({ ...tempContent, industries: { ...tempContent.industries, main: { ...tempContent.industries.main, [lang]: newSelection } } });
-                };
-                
-                const currentRegions = tempContent.industries?.secondary?.[lang] || [];
-                const handleRegionChange = (checked: boolean, regionSlug: string) => {
-                    const newSelection = checked
-                        ? [...currentRegions, regionSlug]
-                        : currentRegions.filter((slug: string) => slug !== regionSlug);
-                    setTempContent({ ...tempContent, industries: { ...tempContent.industries, secondary: { ...tempContent.industries.secondary, [lang]: newSelection } }});
-                };
-
-                return (
-                    <div className="space-y-4" id="DKVISA_NGANHNGHE_KHUVUC_DIALOG">
-                         <div className="space-y-2" id="DKLV_LOAIHINH">
-                            <Label id="DKLV_LOAIHINH_LABEL">{t.visaTypeLabel}</Label>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKLV_LOAIHINH_BUTTON">
-                                        <div className="flex flex-wrap gap-1">
-                                            {currentVisaTypes.length > 0 ? (
-                                                currentVisaTypes.map((slug: string, index: number) => {
-                                                    const item = localizedJapanJobTypes.find(t => t.slug === slug);
-                                                    const name = item?.name?.[lang] || item?.name?.vi || item?.name || slug;
-                                                    return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
-                                                })
-                                            ) : t.selectVisaTypePlaceholder}
-                                        </div>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                    <DropdownMenuLabel>{t.selectVisaTypePlaceholder}</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    {localizedJapanJobTypes.map(type => (
-                                        <DropdownMenuCheckboxItem
-                                            key={type.slug}
-                                            id={`DKLV_ITEM_${type.slug}`}
-                                            checked={currentVisaTypes.includes(type.slug)}
-                                            onSelect={(e) => e.preventDefault()}
-                                            onCheckedChange={(checked) => handleVisaTypeChange(Boolean(checked), type.slug)}
-                                        >
-                                           <span className="font-bold w-6 mr-2">{currentVisaTypes.includes(type.slug) ? `${currentVisaTypes.indexOf(type.slug) + 1}.` : ''}</span>
-                                            {type.name[lang]}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                         <div className="space-y-2" id="DKLV_CHITIETVISA">
-                            <Label id="DKLV_CHITIETVISA_LABEL">{t.visaDetailLabel}</Label>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={currentVisaTypes.length === 0} id="DKLV_CHITIETVISA_BUTTON">
-                                         <div className="flex flex-wrap gap-1">
-                                            {currentVisaDetails.length > 0 ? (
-                                                currentVisaDetails.map((slug: string, index: number) => {
-                                                    const detail = Object.values(visaDetailsByVisaType).flat().find(d => d.slug === slug);
-                                                    return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{detail?.name[lang] || slug}</Badge>
-                                                })
-                                            ) : t.selectVisaDetailPlaceholder}
-                                        </div>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                 <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                    <DropdownMenuLabel>{t.selectVisaDetailPlaceholder}</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    {currentVisaTypes.map((visaTypeSlug: string) => {
-                                        const visaType = localizedJapanJobTypes.find(t => t.slug === visaTypeSlug);
-                                        if (!visaType) return null;
-                                        return (
-                                            <DropdownMenuGroup key={visaTypeSlug}>
-                                                <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">{visaType.name[lang]}</DropdownMenuLabel>
-                                                {(visaDetailsByVisaType[visaTypeSlug as keyof typeof visaDetailsByVisaType] || []).map((detail: any) => (
-                                                    <DropdownMenuCheckboxItem
-                                                        key={detail.slug}
-                                                        id={`DKLV_ITEM_${detail.slug}`}
-                                                        checked={currentVisaDetails.includes(detail.slug)}
-                                                        onSelect={(e) => e.preventDefault()}
-                                                        onCheckedChange={(checked) => handleDetailCheckboxChange(Boolean(checked), detail.slug)}
-                                                    >
-                                                       <span className="font-bold w-6 mr-2">{currentVisaDetails.includes(detail.slug) ? `${currentVisaDetails.indexOf(detail.slug) + 1}.` : ''}</span>
-                                                        {detail.name[lang]}
-                                                    </DropdownMenuCheckboxItem>
-                                                ))}
-                                            </DropdownMenuGroup>
-                                        )
-                                    })}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                         <div className="space-y-2" id="DKNN_NGANHNGHE">
-                            <Label id="DKNN_NGANHNGHE_LABEL">{t.mainIndustriesLabel}</Label>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={availableIndustries.length === 0} id="DKNN_NGANHNGHE_BUTTON">
-                                        <div className="flex flex-wrap gap-1">
-                                            {currentIndustries.length > 0 ? (
-                                                currentIndustries.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(allIndustries.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)
-                                            ) : t.selectMainIndustriesPlaceholder}
-                                        </div>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                    <DropdownMenuLabel>{t.selectMainIndustriesPlaceholder}</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    {availableIndustries.map(industry => (
-                                         <DropdownMenuCheckboxItem
-                                            key={industry.slug}
-                                            id={`DKNN_ITEM_${industry.slug}`}
-                                            checked={currentIndustries.includes(industry.slug)}
-                                            onSelect={(e) => e.preventDefault()}
-                                            onCheckedChange={(checked) => handleIndustryChange(Boolean(checked), industry.slug)}
-                                        >
-                                            <span className="font-bold w-6 mr-2">{currentIndustries.includes(industry.slug) ? `${currentIndustries.indexOf(industry.slug) + 1}.` : ''}</span>
-                                            {industry.name[lang]}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                         <div className="space-y-2" id="DKNN_KHUVUC">
-                            <Label id="DKNN_KHUVUC_LABEL">{t.secondaryIndustriesLabel}</Label>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKNN_KHUVUC_BUTTON">
-                                         <div className="flex flex-wrap gap-1">
-                                            {currentRegions.length > 0 ? (
-                                                currentRegions.map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{lang === 'ja' ? regionKanjiMap[(japanRegions.find(r => r.slug === slug))?.name as keyof typeof regionKanjiMap] : (japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)
-                                            ) : t.selectSecondaryIndustriesPlaceholder}
-                                        </div>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                    <DropdownMenuLabel>{t.selectSecondaryIndustriesPlaceholder}</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    {japanRegions.map(region => (
-                                         <DropdownMenuCheckboxItem
-                                            key={region.slug}
-                                            id={`DKNN_ITEM_${region.slug}`}
-                                            checked={currentRegions.includes(region.slug)}
-                                            onSelect={(e) => e.preventDefault()}
-                                            onCheckedChange={(checked) => handleRegionChange(Boolean(checked), region.slug)}
-                                        >
-                                            <span className="font-bold w-6 mr-2">{currentRegions.includes(region.slug) ? `${currentRegions.indexOf(region.slug) + 1}.` : ''}</span>
-                                            {lang === 'ja' ? regionKanjiMap[region.name] : region.name}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </div>
-                );
-            default:
-                return <p>Chức năng đang được phát triển.</p>;
-        }
-    };
-    
     if (!employer) {
         return (
           <div className="bg-secondary">
@@ -1503,298 +1162,547 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
     const continueButtonText = isUpdateMode ? t.reRegisterAction : t.registerAction;
 
     return (
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <div id="Y062" className="bg-secondary pb-24">
+        <div id="Y062" className="bg-secondary pb-24">
             <div className="container mx-auto px-4 md:px-6 py-12">
-              <div className="max-w-7xl mx-auto">
-                {/* Header Section */}
-                <Card className="shadow-2xl overflow-hidden mb-8">
-                  <CardHeader className="p-0 relative">
-                    <div className="relative w-full h-48">
-                      {employer.banner && <Image src={employer.banner} alt={`${employer.name?.[lang] || ''} banner`} fill className="object-cover" />}
-                      <div className="absolute inset-0 bg-black/40" />
-                       {!isConfirmationMode && (
-                      <Label htmlFor="banner-upload" className="absolute top-4 right-4 z-10 cursor-pointer">
-                         <Button variant="secondary" size="sm" asChild>
-                           <span><Camera className="mr-2 h-4 w-4" /> {t.edit}</span>
-                         </Button>
-                         <Input id="banner-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'banner')} />
-                      </Label>
-                      )}
-                    </div>
-                    <div id="DKTHONGTINCHUNG" className="p-6 bg-card relative">
-                      <div className="flex flex-col sm:flex-row items-start gap-4 -mt-24 md:-mt-20">
-                          <div className="relative flex-shrink-0">
-                            <Avatar id="DKTC_AVATAR" className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
-                                {employer.logo && <AvatarImage src={employer.logo} />}
-                                <AvatarFallback>{(employer.name?.[lang] || 'A').charAt(0)}</AvatarFallback>
-                              </Avatar>
-                               {!isConfirmationMode && (<Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
-                                  <Camera className="h-4 w-4 text-secondary-foreground" />
-                               </Label>)}
-                               <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} disabled={isConfirmationMode}/>
-                          </div>
-                          <div className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16 w-full">
-                              <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
-                                <h1 id="DKTC_TEN" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
-                                <p id="DKTC_VAITRO" className="font-semibold text-primary">{headerRoleText}</p>
-                                 <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location?.[lang] || `[${t.locationPlaceholder}]`}</p>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                    <Badge variant="outline">{t.partnerIdLabel}: {partnerId}</Badge>
+                <div className="max-w-7xl mx-auto">
+                    {/* Header Section */}
+                    <EditDialog
+                        isOpen={isEditDialogOpen && editingModule?.field === 'header'}
+                        onOpenChange={(open) => !open && setIsEditDialogOpen(false)}
+                        title={editingModule?.title || ''}
+                        onSave={handleSaveChanges}
+                    >
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>{isIndividual ? t.namePlaceholder : t.companyNamePlaceholder}</Label>
+                            <Input placeholder={isIndividual ? t.namePlaceholder : t.companyNamePlaceholder} value={tempContent?.name?.[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} />
+                        </div>
+                        <div className="space-y-2"><Label>{t.typePlaceholder}</Label><Input placeholder={placeholderEmployerData.type[lang]} value={tempContent?.type?.[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
+                        <div className="space-y-2"><Label>{t.locationPlaceholder}</Label><Input placeholder={placeholderEmployerData.location[lang]} value={tempContent?.location?.[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
+                      </div>
+                    </EditDialog>
+                    <Card className="shadow-2xl overflow-hidden mb-8">
+                        <CardHeader className="p-0 relative">
+                            <div className="relative w-full h-48">
+                                {employer.banner && <Image src={employer.banner} alt={`${employer.name?.[lang] || ''} banner`} fill className="object-cover" />}
+                                <div className="absolute inset-0 bg-black/40" />
+                                {!isConfirmationMode && (
+                                <Label htmlFor="banner-upload" className="absolute top-4 right-4 z-10 cursor-pointer">
+                                    <Button variant="secondary" size="sm" asChild>
+                                    <span><Camera className="mr-2 h-4 w-4" /> {t.edit}</span>
+                                    </Button>
+                                    <Input id="banner-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'banner')} />
+                                </Label>
+                                )}
+                            </div>
+                            <div id="DKTHONGTINCHUNG" className="p-6 bg-card relative">
+                                <div className="flex flex-col sm:flex-row items-start gap-4 -mt-24 md:-mt-20">
+                                    <div className="relative flex-shrink-0">
+                                        <Avatar id="DKTC_AVATAR" className="h-28 w-28 md:h-36 md:w-36 border-4 border-card bg-card shadow-lg">
+                                            {employer.logo && <AvatarImage src={employer.logo} />}
+                                            <AvatarFallback>{(employer.name?.[lang] || 'A').charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        {!isConfirmationMode && (<Label htmlFor="logo-upload" className="absolute bottom-1 right-1 cursor-pointer bg-secondary p-2 rounded-full border-2 border-card">
+                                            <Camera className="h-4 w-4 text-secondary-foreground" />
+                                        </Label>)}
+                                        <Input id="logo-upload" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} disabled={isConfirmationMode}/>
+                                    </div>
+                                    <div className="flex flex-col md:flex-row flex-grow min-w-0 md:mt-16 w-full">
+                                        <div className="flex-grow min-w-0 text-center md:text-left mt-2 md:mt-0">
+                                            <h1 id="DKTC_TEN" className="text-2xl md:text-3xl font-headline font-bold">{headerName}</h1>
+                                            <p id="DKTC_VAITRO" className="font-semibold text-primary">{headerRoleText}</p>
+                                            <p id="DKTC_DIADIEM" className="text-sm text-muted-foreground">{employer.location?.[lang] || `[${t.locationPlaceholder}]`}</p>
+                                            <p className="text-sm text-muted-foreground mt-1">
+                                                <Badge variant="outline">{t.partnerIdLabel}: {partnerId}</Badge>
+                                            </p>
+                                        </div>
+                                        <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 w-full justify-center md:w-auto md:mt-0 flex-shrink-0 md:ml-auto">
+                                            <div className="flex items-center gap-2">
+                                                <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
+                                                    <TabsList id="DKXN_CHUYEN_NGON_NGU" className="grid w-full grid-cols-3">
+                                                        <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span><span className="sm:hidden">VI</span></TabsTrigger>
+                                                        <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="hidden sm:inline">日本語</span><span className="sm:hidden">JA</span></TabsTrigger>
+                                                        <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="hidden sm:inline">English</span><span className="sm:hidden">EN</span></TabsTrigger>
+                                                    </TabsList>
+                                                </Tabs>
+                                                {!isConfirmationMode && (<Button variant="ghost" size="icon" className="hidden md:flex" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {!isConfirmationMode && (<Button variant="ghost" size="icon" className="absolute top-4 right-4 md:hidden" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button>)}
+                                </div>
+                            </div>
+                        </CardHeader>
+                    </Card>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                        <div className="lg:col-span-2 space-y-8">
+                            <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
+                               <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">
+                                    {employer?.about?.[lang] || ( isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline" onClick={() => handleEditClick(t.aboutTitle, employer.about, 'about')}>{t.clickToUpdate}</button> )}
                                 </p>
-                              </div>
-                              <div id="DKTC_HANHDONG" className="flex items-center gap-2 mt-4 w-full justify-center md:w-auto md:mt-0 flex-shrink-0 md:ml-auto">
-                                  <div className="flex items-center gap-2">
-                                    <Tabs defaultValue={lang} onValueChange={(value) => handleLangChange(value as Language)} className="w-auto">
-                                        <TabsList id="DKXN_CHUYEN_NGON_NGU" className="grid w-full grid-cols-3">
-                                            <TabsTrigger value="vi" className="flex items-center gap-1.5 p-2 h-auto text-xs"><VnFlagIcon /> <span className="hidden sm:inline">Tiếng Việt</span><span className="sm:hidden">VI</span></TabsTrigger>
-                                            <TabsTrigger value="ja" className="flex items-center gap-1.5 p-2 h-auto text-xs"><JpFlagIcon /> <span className="hidden sm:inline">日本語</span><span className="sm:hidden">JA</span></TabsTrigger>
-                                            <TabsTrigger value="en" className="flex items-center gap-1.5 p-2 h-auto text-xs"><EnFlagIcon /> <span className="hidden sm:inline">English</span><span className="sm:hidden">EN</span></TabsTrigger>
-                                        </TabsList>
-                                    </Tabs>
-                                    {!isConfirmationMode && (<DialogTrigger asChild><Button variant="ghost" size="icon" className="hidden md:flex" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button></DialogTrigger>)}
-                                  </div>
-                              </div>
-                          </div>
-                          {!isConfirmationMode && (<DialogTrigger asChild><Button variant="ghost" size="icon" className="absolute top-4 right-4 md:hidden" onClick={() => handleEditClick(t.headerTitle, { name: employer.name, type: {vi: roleText}, location: employer.location }, 'header')}><Edit className="h-5 w-5"/></Button></DialogTrigger>)}
-                    </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-    
-                {/* Main Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                  {/* Left Column */}
-                  <div className="lg:col-span-2 space-y-8">
-                      <SectionCard id="DKGIOITHIEU" title={t.aboutTitle} icon={FileText} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.aboutTitle, employer.about, 'about')}>
-                           <p id="DKGT_NOIDUNG" className="text-sm text-muted-foreground whitespace-pre-line">
-                                {employer?.about?.[lang] || (
-                                  <>
-                                      <span className="italic text-muted-foreground">{t.notUpdated}</span>
-                                      {clickToUpdateText}
-                                  </>
-                                )}
-                            </p>
-                      </SectionCard>
-                      
-                      {/* Info card for Mobile */}
-                      <div className="block lg:hidden" ref={mobileInfoCardRef}>
-                        <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
-                            <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
-                                <div className="space-y-3 text-sm">
-                                    <p><strong>{t.foundedLabel}:</strong> {employer.info?.founded || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
-                                    <p><strong>{t.sizeLabel}:</strong> {employer.info?.size?.[lang] || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
-                                    <p><strong>{t.licenseLabel}:</strong> {employer.info?.license || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
-                                    <p><strong>{t.websiteLabel}:</strong> {employer.info?.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
-                                </div>
-                                {hasContactInfo ? (
-                                    <div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4 space-y-2">
-                                       {employer.info?.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Image src="/img/Mail.svg" alt="Mail" width={20} height={20} className="mr-2 h-4 w-4" />{employer.info.email}</Link></Button>}
-                                       {employer.info?.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
-                                       {employer.info?.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                                       {employer.info?.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
-                                       {employer.info?.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
-                                    </div>
-                                ) : (
-                                    <div id="HIENTHILIENHE03-mobile-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                          <div id="HIENTHILIENHE04-mobile" className="space-y-3">
-                                            <div className="flex justify-center gap-4 text-muted-foreground">
-                                                <Image src="/img/Mail.svg" alt="Mail" width={24} height={24} className="h-6 w-6" />
-                                                <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
-                                                <ZaloIcon className="h-6 w-6"/>
-                                                <MessengerIcon className="h-6 w-6"/>
-                                                <LineIcon className="h-6 w-6"/>
-                                            </div>
-                                            <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
-                                          </div>
-                                    </div>
-                                )}
                             </SectionCard>
-                             <InfoDialog 
-                                isOpen={isInfoDialogOpen}
-                                onOpenChange={setIsInfoDialogOpen}
-                                employer={employer}
-                                lang={lang}
-                                isConfirmationMode={isConfirmationMode}
-                                onSave={(data) => setEmployer(data)}
-                            />
-                        </Dialog>
-                      </div>
-    
-                      <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
-                        <div className="space-y-3 text-sm">
-                            <div id="DKNV_NGHIEPVU">
-                                <p id="DKNV_NGHIEPVU_LABEL" className="font-semibold mb-1">{t.interestLabel}:</p>
-                                {getArrayValue(employer.interest, 'interest')}
-                            </div>
-                            <div id="DKNV_GIATRI">
-                                <p id="DKNV_GIATRI_LABEL" className="font-semibold mb-1">{t.valueInterestLabel}:</p>
-                                {getArrayValue({[lang]: employer.valueInterest.map((item:any) => item.id)}, 'valueInterest')}
-                            </div>
-                        </div>
-                      </SectionCard>
-                      <SectionCard id="DKLICHSU" title={t.historyTitle} icon={History} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.historyTitle, employer.history, 'history')}>
-                           <ul id="DKLS_DANHSACH" className="space-y-4 text-sm">
-                              {employer.history?.length > 0 ? employer.history.map((item: any, index: number) => (
-                                  <li key={index} className="relative pl-6">
-                                      <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
-                                      <p className="font-bold text-primary mb-1">{item.year}</p>
-                                      <p className="text-muted-foreground">{item.event?.[lang]}</p>
-                                  </li>
-                              )) : (
-                                <>
-                                  <span className="italic text-muted-foreground">{t.notUpdated}</span>
-                                  <DialogTrigger asChild>
-                                    <button
-                                      disabled={isConfirmationMode}
-                                      className="italic text-primary underline ml-1"
-                                      onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}
-                                    >
-                                      {t.clickToUpdate}
-                                    </button>
-                                  </DialogTrigger>
-                                </>
-                              )}
-                          </ul>
-                      </SectionCard>
-                      <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
-                          <div id="DKHA_LUOIANH" className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              {employer.images?.map((img: any, index: number) => (
-                                  <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
-                                      {img.src && <Image src={img.src} alt={img.alt?.[lang] || ''} fill className="object-cover" />}
-                                       {!isConfirmationMode && (<Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                                            <Camera className="h-6 w-6 text-white"/>
-                                       </Label>)}
-                                       <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} disabled={isConfirmationMode}/>
-                                       {!isConfirmationMode && (<Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
-                                            <Trash2 className="h-3 w-3"/>
-                                       </Button>)}
+                            <div className="block lg:hidden" ref={mobileInfoCardRef}>
+                                <SectionCard id="DKTHONGTINDOANHNGHIEP-mobile" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
+                                  <div className="space-y-3 text-sm">
+                                      <p><strong>{t.foundedLabel}:</strong> {employer.info?.founded || (isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>)}</p>
+                                      <p><strong>{t.sizeLabel}:</strong> {employer.info?.size?.[lang] || (isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>)}</p>
+                                      <p><strong>{t.licenseLabel}:</strong> {employer.info?.license || (isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>)}</p>
+                                      <p><strong>{t.websiteLabel}:</strong> {employer.info?.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : (isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>)}</p>
                                   </div>
-                              ))}
-                          </div>
-                      </SectionCard>
-                      <SectionCard id="DKPHUCLOI" title={t.benefitsTitle} icon={Award} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
-                           <ul id="DKPL_DANHSACH" className="space-y-2 text-sm">
-                              {employer.benefits?.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
-                                  <li key={index} className="flex items-start gap-2">
-                                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
-                                  </li>
-                              )) : (
-                                <>
-                                  {notUpdatedText}
-                                  <DialogTrigger asChild>
-                                    <button
-                                      disabled={isConfirmationMode}
-                                      className="italic text-primary underline ml-1"
-                                      onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}
-                                    >
-                                      {t.clickToUpdate}
-                                    </button>
-                                  </DialogTrigger>
-                                </>
-                              )}
-                          </ul>
-                      </SectionCard>
-                  </div>
-                  
-                    {/* Right Column (order-first on desktop) */}
-                  <div className="lg:col-start-3 lg:col-span-1 space-y-6 lg:sticky lg:top-24">
-                      <div className="hidden lg:block" ref={infoCardRef}>
-                        <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
-                            <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
-                                <div className="space-y-3 text-sm">
-                                    <p><strong>{t.foundedLabel}:</strong> {employer.info?.founded || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
-                                    <p><strong>{t.sizeLabel}:</strong> {employer.info?.size?.[lang] || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
-                                    <p><strong>{t.licenseLabel}:</strong> {employer.info?.license || (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
-                                    <p><strong>{t.websiteLabel}:</strong> {employer.info?.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : (isConfirmationMode ? notUpdatedText : <DialogTrigger asChild><button className="italic text-primary underline">{t.clickToUpdate}</button></DialogTrigger>)}</p>
-                                </div>
-                                {hasContactInfo ? (
-                                    <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4 space-y-2">
-                                       {employer.info?.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Image src="/img/Mail.svg" alt="Mail" width={20} height={20} className="mr-2 h-4 w-4" />{employer.info.email}</Link></Button>}
-                                       {employer.info?.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
-                                       {employer.info?.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
-                                       {employer.info?.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
-                                       {employer.info?.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
-                                    </div>
-                                ) : (
-                                    <div id="HIENTHILIENHE03-desktop-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
-                                          <div id="HIENTHILIENHE04" className="space-y-3">
-                                            <div className="flex justify-center gap-4 text-muted-foreground">
-                                                <Image src="/img/Mail.svg" alt="Mail" width={24} height={24} className="h-6 w-6" />
-                                                <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
-                                                <ZaloIcon className="h-6 w-6"/>
-                                                <MessengerIcon className="h-6 w-6"/>
-                                                <LineIcon className="h-6 w-6"/>
+                                  {hasContactInfo ? (
+                                      <div id="HIENTHILIENHE03-mobile" className="mt-6 border-t pt-4 space-y-2">
+                                         {employer.info?.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL-mobile" href={`mailto:${employer.info.email}`}><Image src="/img/Mail.svg" alt="Mail" width={20} height={20} className="mr-2 h-4 w-4" />{employer.info.email}</Link></Button>}
+                                         {employer.info?.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI-mobile" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
+                                         {employer.info?.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER-mobile" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
+                                         {employer.info?.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO-mobile" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
+                                         {employer.info?.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE-mobile" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
+                                      </div>
+                                  ) : (
+                                      <div id="HIENTHILIENHE03-mobile-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
+                                            <div id="HIENTHILIENHE04-mobile" className="space-y-3">
+                                              <div className="flex justify-center gap-4 text-muted-foreground">
+                                                  <Image src="/img/Mail.svg" alt="Mail" width={24} height={24} className="h-6 w-6" />
+                                                  <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
+                                                  <ZaloIcon className="h-6 w-6"/>
+                                                  <MessengerIcon className="h-6 w-6"/>
+                                                  <LineIcon className="h-6 w-6"/>
+                                              </div>
+                                              <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
                                             </div>
-                                            <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
-                                          </div>
+                                      </div>
+                                  )}
+                              </SectionCard>
+                            </div>
+                            <SectionCard id="DKNGHIEPVUGIATRIQUANTAM" title={t.valueInterestTitle} icon={CheckCircle} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.valueInterestTitle, { interest: employer.interest, valueInterest: employer.valueInterest }, 'valueInterest')}>
+                                <div className="space-y-3 text-sm">
+                                    <div id="DKNV_NGHIEPVU">
+                                        <p id="DKNV_NGHIEPVU_LABEL" className="font-semibold mb-1">{t.interestLabel}:</p>
+                                        {getArrayValue(employer.interest, 'interest')}
                                     </div>
-                                )}
+                                    <div id="DKNV_GIATRI">
+                                        <p id="DKNV_GIATRI_LABEL" className="font-semibold mb-1">{t.valueInterestLabel}:</p>
+                                        {getArrayValue(undefined, 'valueInterest')}
+                                    </div>
+                                </div>
                             </SectionCard>
-                             <InfoDialog 
-                                isOpen={isInfoDialogOpen}
-                                onOpenChange={setIsInfoDialogOpen}
-                                employer={employer}
-                                lang={lang}
-                                isConfirmationMode={isConfirmationMode}
-                                onSave={(data) => setEmployer(data)}
-                            />
-                        </Dialog>
-                      </div>
-                       <SectionCard id="DKVISA_NGANHNGHE_KHUVUC" title={t.visaAndIndustriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries')}>
-                        <div className="space-y-3 text-sm">
-                            <div id="DKLV_LOAIHINH"><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
-                            <div id="DKLV_CHITIETVISA"><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
-                            <div id="DKNN_NGANHNGHE"><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
-                            <div id="DKNN_KHUVUC"><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
+                            <SectionCard id="DKLICHSU" title={t.historyTitle} icon={History} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.historyTitle, employer.history, 'history')}>
+                               <ul id="DKLS_DANHSACH" className="space-y-4 text-sm">
+                                  {employer.history?.length > 0 ? employer.history.map((item: any, index: number) => (
+                                      <li key={index} className="relative pl-6">
+                                          <div className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
+                                          <p className="font-bold text-primary mb-1">{item.year}</p>
+                                          <p className="text-muted-foreground">{item.event?.[lang]}</p>
+                                      </li>
+                                  )) : (
+                                    <>
+                                      {notUpdatedText}
+                                      <button disabled={isConfirmationMode} className="italic text-primary underline ml-1" onClick={() => handleEditClick(t.historyTitle, employer.history, 'history')}>{t.clickToUpdate}</button>
+                                    </>
+                                  )}
+                              </ul>
+                            </SectionCard>
+                             <SectionCard id="DKHINHANH" title={t.imagesTitle} icon={ImageIcon} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.imagesTitle, employer.images, 'images')}>
+                                <div id="DKHA_LUOIANH" className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {employer.images?.map((img: any, index: number) => (
+                                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
+                                            {img.src && <Image src={img.src} alt={img.alt?.[lang] || ''} fill className="object-cover" />}
+                                            {!isConfirmationMode && (<Label htmlFor={`image-upload-${index}`} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                                                    <Camera className="h-6 w-6 text-white"/>
+                                            </Label>)}
+                                            <Input id={`image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} disabled={isConfirmationMode}/>
+                                            {!isConfirmationMode && (<Button variant="destructive" size="icon" className="absolute bottom-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
+                                                    <Trash2 className="h-3 w-3"/>
+                                            </Button>)}
+                                        </div>
+                                    ))}
+                                </div>
+                            </SectionCard>
+                             <SectionCard id="DKPHUCLOI" title={t.benefitsTitle} icon={Award} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>
+                               <ul id="DKPL_DANHSACH" className="space-y-2 text-sm">
+                                  {employer.benefits?.length > 0 ? employer.benefits.map((benefit: any, index: number) => (
+                                      <li key={index} className="flex items-start gap-2">
+                                          <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0"/> <span className="text-muted-foreground">{benefit[lang]}</span>
+                                      </li>
+                                  )) : (
+                                    <>
+                                      {notUpdatedText}
+                                      <button disabled={isConfirmationMode} className="italic text-primary underline ml-1" onClick={() => handleEditClick(t.benefitsTitle, employer.benefits, 'benefits')}>{t.clickToUpdate}</button>
+                                    </>
+                                  )}
+                              </ul>
+                            </SectionCard>
                         </div>
-                    </SectionCard>
-                  </div>
-    
-                  
+                        
+                        <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
+                            <div className="hidden lg:block" ref={infoCardRef}>
+                                <InfoDialog 
+                                    isOpen={isInfoDialogOpen}
+                                    onOpenChange={setIsInfoDialogOpen}
+                                    employer={employer}
+                                    lang={lang}
+                                    isConfirmationMode={isConfirmationMode}
+                                    onSave={(data) => setEmployer(data)}
+                                />
+                                <SectionCard id="DKTHONGTINDOANHNGHIEP" title={t.infoTitle} icon={Building} onEditClick={isConfirmationMode ? undefined : () => setIsInfoDialogOpen(true)}>
+                                    <div className="space-y-3 text-sm">
+                                        <p><strong>{t.foundedLabel}:</strong> {employer.info?.founded || (isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline ml-1" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>)}</p>
+                                        <p><strong>{t.sizeLabel}:</strong> {employer.info?.size?.[lang] || (isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline ml-1" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>)}</p>
+                                        <p><strong>{t.licenseLabel}:</strong> {employer.info?.license || (isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline ml-1" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>)}</p>
+                                        <p><strong>{t.websiteLabel}:</strong> {employer.info?.website ? <a href={employer.info.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{employer.info.website}</a> : (isConfirmationMode ? notUpdatedText : <button className="italic text-primary underline ml-1" onClick={() => setIsInfoDialogOpen(true)}>{t.clickToUpdate}</button>)}</p>
+                                    </div>
+                                    {hasContactInfo ? (
+                                        <div id="HIENTHILIENHE03" className="mt-6 border-t pt-4 space-y-2">
+                                           {employer.info?.email && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_EMAIL" href={`mailto:${employer.info.email}`}><Image src="/img/Mail.svg" alt="Mail" width={20} height={20} className="mr-2 h-4 w-4" />{employer.info.email}</Link></Button>}
+                                           {employer.info?.phone && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_SODIENTHOAI" href={`tel:${employer.info.phone}`}><Image src="/img/phone.svg" alt="Phone" width={20} height={20} className="mr-2 h-4 w-4" />{formatPhoneNumberInput(employer.info.phone, phoneCountry)}</Link></Button>}
+                                           {employer.info?.messenger && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_MESSENGER" href={`https://m.me/${employer.info.messenger}`} target="_blank" className="flex items-center gap-2"><MessengerIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://facebook.com/${employer.info.messenger}`}</span></Link></Button>}
+                                           {employer.info?.zalo && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_ZALO" href={`https://zalo.me/${employer.info.zalo}`} target="_blank"><ZaloIcon className="mr-2 h-4 w-4"/>{formatPhoneNumberInput(employer.info.zalo, zaloCountry)}</Link></Button>}
+                                           {employer.info?.line && <Button asChild variant="outline" className="w-full justify-start"><Link id="DKDN_LINE" href={`https://line.me/ti/p/${employer.info.line}`} target="_blank" className="flex items-center gap-2"><LineIcon className="h-4 w-4 flex-shrink-0"/><span className="truncate">{`https://line.me/ti/p/${employer.info.line}`}</span></Link></Button>}
+                                        </div>
+                                    ) : (
+                                        <div id="HIENTHILIENHE03-desktop-error" className={cn("mt-6 border-t pt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", mainContactError && 'border-destructive ring-2 ring-destructive/40')}>
+                                              <div id="HIENTHILIENHE04" className="space-y-3">
+                                                <div className="flex justify-center gap-4 text-muted-foreground">
+                                                    <Image src="/img/Mail.svg" alt="Mail" width={24} height={24} className="h-6 w-6" />
+                                                    <Image src="/img/phone.svg" alt="Phone" width={24} height={24} className="h-6 w-6" />
+                                                    <ZaloIcon className="h-6 w-6"/>
+                                                    <MessengerIcon className="h-6 w-6"/>
+                                                    <LineIcon className="h-6 w-6"/>
+                                                </div>
+                                                <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
+                                              </div>
+                                        </div>
+                                    )}
+                                </SectionCard>
+                            </div>
+                            <SectionCard id="DKVISA_NGANHNGHE_KHUVUC" title={t.visaAndIndustriesTitle} icon={Briefcase} onEditClick={isConfirmationMode ? undefined : () => handleEditClick(t.visaAndIndustriesDialogTitle, { visaType: employer.visaType, visaDetail: employer.visaDetail, industries: employer.industries }, 'visaAndIndustries')}>
+                               <div className="space-y-3 text-sm">
+                                  <div id="DKLV_LOAIHINH"><strong>{t.visaTypeLabel}:</strong> {getArrayValue(employer.visaType, 'visaType')}</div>
+                                  <div id="DKLV_CHITIETVISA"><strong>{t.visaDetailLabel}:</strong> {getArrayValue(employer.visaDetail, 'visaDetail')}</div>
+                                  <div id="DKNN_NGANHNGHE"><strong>{t.mainIndustriesLabel}:</strong> {getArrayValue(employer.industries.main, 'industries')}</div>
+                                  <div id="DKNN_KHUVUC"><strong>{t.secondaryIndustriesLabel}:</strong> {getArrayValue(employer.industries.secondary, 'regions')}</div>
+                              </div>
+                            </SectionCard>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-    
-           {!isConfirmationMode && (
-            <div id="DANGKY_NTD_FOOTER" className={cn(
-              "sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300",
-              showFooter && isMobile ? "translate-y-0" : "translate-y-full md:translate-y-0"
-            )}>
-              <div className="container mx-auto flex justify-start gap-4">
-                <Button variant="outline" size="lg" onClick={handleBack}>
-                    {t.backButton}
-                </Button>
-                <Button size="lg" className={cn("bg-accent-orange hover:bg-accent-orange/90 text-white", isUpdateMode ? "bg-accent-green hover:bg-accent-green/90": "")} onClick={handleContinue}>
-                    {continueButtonText}
-                </Button>
-              </div>
-            </div>
-          )}
-    
-          <DialogContent id={`${editingModule?.field}_DIALOG`} className="sm:max-w-2xl">
-            <DialogHeader>
-              <DialogTitle className="font-headline text-2xl">{editingModule?.title}</DialogTitle>
-            </DialogHeader>
-              <div className="py-4 max-h-[60vh] overflow-y-auto pr-4">
-                {renderEditContent()}
-              </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                  <Button variant="outline">{t.cancelButton}</Button>
-              </DialogClose>
-                {(editingModule) && (
-                  <Button onClick={handleSaveChanges}>{t.saveButton}</Button>
-                )}
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )
-    }
-
-    
-
-    
+            {!isConfirmationMode && (
+                <div id="DANGKY_NTD_FOOTER" className={cn("sticky bottom-0 z-40 bg-background/95 p-4 border-t shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)] transition-transform duration-300", showFooter && isMobile ? "translate-y-0" : "translate-y-full md:translate-y-0")}>
+                    <div className="container mx-auto flex justify-start gap-4">
+                        <Button variant="outline" size="lg" onClick={handleBack}>{t.backButton}</Button>
+                        <Button size="lg" className={cn("bg-accent-orange hover:bg-accent-orange/90 text-white", isUpdateMode ? "bg-accent-green hover:bg-accent-green/90": "")} onClick={handleContinue}>
+                            {continueButtonText}
+                        </Button>
+                    </div>
+                </div>
+            )}
+             <EditDialog
+                isOpen={isEditDialogOpen}
+                onOpenChange={setIsEditDialogOpen}
+                title={editingModule?.title || ''}
+                onSave={handleSaveChanges}
+             >
+                {editingModule ? (
+                    editingModule.field === 'header' ? (
+                         <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label>{isIndividual ? t.namePlaceholder : t.companyNamePlaceholder}</Label>
+                                <Input placeholder={isIndividual ? t.namePlaceholder : t.companyNamePlaceholder} value={tempContent?.name?.[lang] || ''} onChange={(e) => setTempContent({...tempContent, name: {...tempContent.name, [lang]: e.target.value}})} />
+                            </div>
+                            <div className="space-y-2"><Label>{t.typePlaceholder}</Label><Input placeholder={placeholderEmployerData.type[lang]} value={tempContent?.type?.[lang] || ''} onChange={(e) => setTempContent({...tempContent, type: {...tempContent.type, [lang]: e.target.value}})} /></div>
+                            <div className="space-y-2"><Label>{t.locationPlaceholder}</Label><Input placeholder={placeholderEmployerData.location[lang]} value={tempContent?.location?.[lang] || ''} onChange={(e) => setTempContent({...tempContent, location: {...tempContent.location, [lang]: e.target.value}})} /></div>
+                        </div>
+                    ) : editingModule.field === 'about' ? (
+                        <Textarea id="DKGT_TEXTAREA" className="min-h-[150px]" placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.about[lang]}`} value={tempContent[lang] || ''} onChange={(e) => setTempContent({ ...tempContent, [lang]: e.target.value })} rows={8} />
+                    ) : editingModule.field === 'images' ? (
+                         <div className="space-y-4">
+                            {tempContent.map((img: any, index: number) => (
+                            <div key={index} className="flex items-center gap-4">
+                                <Label htmlFor={`dialog-image-upload-${index}`} className="relative w-20 h-20 flex-shrink-0 cursor-pointer group">
+                                <Image src={img.src} alt={img.alt?.[lang] || ''} fill className="object-cover rounded-md"/>
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Camera className="h-6 w-6 text-white"/>
+                                </div>
+                                <Input id={`dialog-image-upload-${index}`} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'images', index)} />
+                                </Label>
+                                <Input 
+                                    placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.images[index]?.alt[lang] || 'Văn phòng hiện đại'}`}
+                                    value={img.alt?.[lang] || ''}
+                                    onChange={(e) => handleTempArrayChange(index, 'alt', e.target.value)}
+                                />
+                                <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                            </div>
+                            ))}
+                            <Button variant="outline" onClick={() => addTempArrayItem('images')}><PlusCircle className="mr-2"/> {t.addImageButton}</Button>
+                        </div>
+                    ) : editingModule.field === 'history' ? (
+                        <div className="space-y-4">
+                            {tempContent.map((item: any, index: number) => (
+                                <div key={index} className="grid grid-cols-[80px_1fr_auto] gap-3 items-center">
+                                    <Input placeholder={t.foundedPlaceholder} value={item.year} onChange={(e) => { const newHistory = [...tempContent]; newHistory[index].year = e.target.value; setTempContent(newHistory); }} />
+                                    <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.history[index]?.event[lang] || 'Thành lập công ty'}`} value={item.event[lang] || ''} onChange={(e) => handleTempArrayChange(index, 'event', e.target.value)} />
+                                    <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                </div>
+                            ))}
+                            <Button variant="outline" onClick={() => addTempArrayItem('history')}>
+                                <PlusCircle className="mr-2"/> {t.addMilestoneButton}
+                            </Button>
+                        </div>
+                    ) : editingModule.field === 'benefits' ? (
+                        <div className="space-y-4">
+                            {tempContent.map((item: any, index: number) => (
+                                <div key={index} className="flex items-center gap-2">
+                                    <Input placeholder={`${t.examplePlaceholder} ${placeholderEmployerData.benefits[index]?.[lang] || ''}`} value={item[lang] || ''} onChange={(e) => {
+                                        const newBenefits = [...tempContent];
+                                        newBenefits[index] = {...newBenefits[index], [lang]: e.target.value};
+                                        setTempContent(newBenefits);
+                                    }} />
+                                    <Button variant="ghost" size="icon" onClick={() => removeTempArrayItem(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>
+                                </div>
+                            ))}
+                            <Button variant="outline" onClick={() => addTempArrayItem('benefits')}><PlusCircle className="mr-2"/> {t.addBenefitButton}</Button>
+                        </div>
+                    ) : editingModule.field === 'valueInterest' ? (
+                         <div id="DKNGHIEPVUGIATRIQUANTAM_DIALOG" className="space-y-6">
+                           <div className="space-y-2">
+                               <Label id="DKNV_NGHIEPVU_LABEL" className="font-semibold text-base">{t.interestLabel}</Label>
+                               <p className="text-sm text-muted-foreground">{t.interestDescription}</p>
+                               <DropdownMenu>
+                                   <DropdownMenuTrigger asChild>
+                                       <Button id="DKNV_NGHIEPVU_BUTTON" variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                           <div className="flex flex-wrap gap-1">
+                                               {(tempContent.interest?.[lang] || []).length > 0 ? (
+                                                   (tempContent.interest?.[lang] || []).map((id: string, index: number) => <Badge key={id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{(interestOptions[lang].find(o => o.id === id))?.title}</Badge>)
+                                               ) : t.selectInterestPlaceholder}
+                                           </div>
+                                       </Button>
+                                   </DropdownMenuTrigger>
+                                   <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                       <DropdownMenuLabel>{t.selectInterestLabel}</DropdownMenuLabel>
+                                       <DropdownMenuSeparator />
+                                       {(interestOptions[lang] || []).map((option) => (
+                                            <DropdownMenuCheckboxItem
+                                               key={option.id}
+                                               id={`DKNV_ITEM_${option.id}`}
+                                               checked={(tempContent.interest?.[lang] || []).includes(option.id)}
+                                               onSelect={(e) => e.preventDefault()}
+                                               onCheckedChange={(checked) => {
+                                                  const current = tempContent.interest?.[lang] || [];
+                                                  const newSelection = checked ? [...current, option.id] : current.filter((id: string) => id !== option.id);
+                                                  setTempContent({ ...tempContent, interest: { ...tempContent.interest, [lang]: newSelection }});
+                                               }}
+                                           >
+                                               <span className="font-bold w-6 mr-2">{(tempContent.interest?.[lang] || []).includes(option.id) ? `${(tempContent.interest?.[lang] || []).indexOf(option.id) + 1}.` : ''}</span>
+                                               {option.title}
+                                           </DropdownMenuCheckboxItem>
+                                       ))}
+                                   </DropdownMenuContent>
+                               </DropdownMenu>
+                           </div>
+                           <div className="space-y-2">
+                               <Label id="DKNV_GIATRI_LABEL" className="font-semibold text-base">{t.valueInterestLabel}</Label>
+                               <p className="text-sm text-muted-foreground">{t.valueInterestDescription}</p>
+                               <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                       <Button id="DKNV_GIATRI_BUTTON" variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
+                                            <div className="flex flex-wrap gap-1">
+                                           {tempContent.valueInterest.length > 0 ? (
+                                               tempContent.valueInterest.map((item: any, index: number) => <Badge key={item.id} variant="secondary" className="font-normal"><span className="font-bold mr-1.5">{index + 1}.</span>{item[lang] || item.vi}</Badge>)
+                                           ) : t.selectValueInterestPlaceholder}
+                                           </div>
+                                       </Button>
+                                   </DropdownMenuTrigger>
+                                   <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                       <DropdownMenuLabel>{t.selectValueInterestLabel}</DropdownMenuLabel>
+                                       <DropdownMenuSeparator />
+                                       {valueInterestOptions[lang].map((option) => (
+                                            <DropdownMenuCheckboxItem
+                                               key={option.id}
+                                               id={`DKNV_GIATRI_ITEM_${option.id}`}
+                                               checked={tempContent.valueInterest.some((item: any) => item.id === option.id)}
+                                               onSelect={(e) => e.preventDefault()}
+                                               onCheckedChange={(checked) => {
+                                                  let newSelection;
+                                                  if (checked) {
+                                                      const fullOption = { id: option.id, vi: valueInterestOptions.vi.find(o=>o.id===option.id)?.title, ja: valueInterestOptions.ja.find(o=>o.id===option.id)?.title, en: valueInterestOptions.en.find(o=>o.id===option.id)?.title };
+                                                      newSelection = [...tempContent.valueInterest, fullOption];
+                                                  } else {
+                                                      newSelection = tempContent.valueInterest.filter((item: any) => item.id !== option.id);
+                                                  }
+                                                  setTempContent({ ...tempContent, valueInterest: newSelection });
+                                               }}
+                                           >
+                                               <span className="font-bold w-6 mr-2">{tempContent.valueInterest.some((item: any) => item.id === option.id) ? `${tempContent.valueInterest.findIndex((item: any) => item.id === option.id) + 1}.` : ''}</span>
+                                               {option.title}
+                                           </DropdownMenuCheckboxItem>
+                                       ))}
+                                   </DropdownMenuContent>
+                               </DropdownMenu>
+                           </div>
+                       </div>
+                    ) : editingModule.field === 'visaAndIndustries' ? (
+                       <div className="space-y-4" id="DKVISA_NGANHNGHE_KHUVUC_DIALOG">
+                         <div className="space-y-2" id="DKLV_LOAIHINH">
+                            <Label id="DKLV_LOAIHINH_LABEL">{t.visaTypeLabel}</Label>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKLV_LOAIHINH_BUTTON">
+                                        <div className="flex flex-wrap gap-1">
+                                            {(tempContent.visaType?.[lang] || []).length > 0 ? (
+                                                (tempContent.visaType?.[lang] || []).map((slug: string, index: number) => {
+                                                    const item = localizedJapanJobTypes.find(t => t.slug === slug);
+                                                    const name = item?.name?.[lang] || item?.name?.vi || item?.name || slug;
+                                                    return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{name}</Badge>
+                                                })
+                                            ) : t.selectVisaTypePlaceholder}
+                                        </div>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                    <DropdownMenuLabel>{t.selectVisaTypePlaceholder}</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    {localizedJapanJobTypes.map(type => (
+                                        <DropdownMenuCheckboxItem
+                                            key={type.slug}
+                                            id={`DKLV_ITEM_${type.slug}`}
+                                            checked={(tempContent.visaType?.[lang] || []).includes(type.slug)}
+                                            onSelect={(e) => e.preventDefault()}
+                                            onCheckedChange={(checked) => {
+                                                const currentVisaTypes = tempContent.visaType?.[lang] || [];
+                                                const newSelection = checked ? [...currentVisaTypes, type.slug] : currentVisaTypes.filter((slug: string) => slug !== type.slug);
+                                                const newVisaDetails = (tempContent.visaDetail?.[lang] || []).filter((detailSlug: string) => newSelection.some((visaSlug: string) => (visaDetailsByVisaType[visaSlug as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === detailSlug)));
+                                                const newIndustries = (tempContent.industries?.main?.[lang] || []).filter((industrySlug: string) => newSelection.some((visaSlug: string) => (industriesByJobType[visaSlug as keyof typeof industriesByJobType] || []).some(ind => ind.slug === industrySlug)));
+                                                setTempContent({ ...tempContent, visaType: { ...tempContent.visaType, [lang]: newSelection }, visaDetail: { ...tempContent.visaDetail, [lang]: newVisaDetails }, industries: { ...tempContent.industries, main: { ...tempContent.industries.main, [lang]: newIndustries } } });
+                                            }}
+                                        >
+                                           <span className="font-bold w-6 mr-2">{(tempContent.visaType?.[lang] || []).includes(type.slug) ? `${(tempContent.visaType?.[lang] || []).indexOf(type.slug) + 1}.` : ''}</span>
+                                            {type.name[lang]}
+                                        </DropdownMenuCheckboxItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                         <div className="space-y-2" id="DKLV_CHITIETVISA">
+                            <Label id="DKLV_CHITIETVISA_LABEL">{t.visaDetailLabel}</Label>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={(tempContent.visaType?.[lang] || []).length === 0} id="DKLV_CHITIETVISA_BUTTON">
+                                         <div className="flex flex-wrap gap-1">
+                                            {(tempContent.visaDetail?.[lang] || []).length > 0 ? (
+                                                (tempContent.visaDetail?.[lang] || []).map((slug: string, index: number) => {
+                                                    const detail = Object.values(visaDetailsByVisaType).flat().find(d => d.slug === slug);
+                                                    return <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{detail?.name[lang] || slug}</Badge>
+                                                })
+                                            ) : t.selectVisaDetailPlaceholder}
+                                        </div>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                 <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                    <DropdownMenuLabel>{t.selectVisaDetailPlaceholder}</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    {(tempContent.visaType?.[lang] || []).map((visaTypeSlug: string) => {
+                                        const visaType = localizedJapanJobTypes.find(t => t.slug === visaTypeSlug);
+                                        if (!visaType) return null;
+                                        return (
+                                            <DropdownMenuGroup key={visaTypeSlug}>
+                                                <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">{visaType.name[lang]}</DropdownMenuLabel>
+                                                {(visaDetailsByVisaType[visaTypeSlug as keyof typeof visaDetailsByVisaType] || []).map((detail: any) => (
+                                                    <DropdownMenuCheckboxItem
+                                                        key={detail.slug}
+                                                        id={`DKLV_ITEM_${detail.slug}`}
+                                                        checked={(tempContent.visaDetail?.[lang] || []).includes(detail.slug)}
+                                                        onSelect={(e) => e.preventDefault()}
+                                                        onCheckedChange={(checked) => {
+                                                            const currentDetails = tempContent.visaDetail?.[lang] || [];
+                                                            const newSelection = checked ? [...currentDetails, detail.slug] : currentDetails.filter((slug: string) => slug !== detail.slug);
+                                                            setTempContent({ ...tempContent, visaDetail: { ...tempContent.visaDetail, [lang]: newSelection } });
+                                                        }}
+                                                    >
+                                                       <span className="font-bold w-6 mr-2">{(tempContent.visaDetail?.[lang] || []).includes(detail.slug) ? `${(tempContent.visaDetail?.[lang] || []).indexOf(detail.slug) + 1}.` : ''}</span>
+                                                        {detail.name[lang]}
+                                                    </DropdownMenuCheckboxItem>
+                                                ))}
+                                            </DropdownMenuGroup>
+                                        )
+                                    })}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                         <div className="space-y-2" id="DKNN_NGANHNGHE">
+                            <Label id="DKNN_NGANHNGHE_LABEL">{t.mainIndustriesLabel}</Label>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" disabled={Array.from(new Map((tempContent.visaType?.[lang] || []).flatMap((vSlug: string) => (industriesByJobType[vSlug as keyof typeof industriesByJobType] || [])).map((item: Industry) => [item.slug, item])).values()).length === 0} id="DKNN_NGANHNGHE_BUTTON">
+                                        <div className="flex flex-wrap gap-1">
+                                            {(tempContent.industries?.main?.[lang] || []).length > 0 ? (
+                                                (tempContent.industries?.main?.[lang] || []).map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{(allIndustries.find(i => i.slug === slug))?.name[lang] || slug}</Badge>)
+                                            ) : t.selectMainIndustriesPlaceholder}
+                                        </div>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                    <DropdownMenuLabel>{t.selectMainIndustriesPlaceholder}</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    {Array.from(new Map((tempContent.visaType?.[lang] || []).flatMap((vSlug: string) => (industriesByJobType[vSlug as keyof typeof industriesByJobType] || [])).map((item: Industry) => [item.slug, item])).values()).map(industry => (
+                                         <DropdownMenuCheckboxItem
+                                            key={industry.slug}
+                                            id={`DKNN_ITEM_${industry.slug}`}
+                                            checked={(tempContent.industries?.main?.[lang] || []).includes(industry.slug)}
+                                            onSelect={(e) => e.preventDefault()}
+                                            onCheckedChange={(checked) => {
+                                                const currentIndustries = tempContent.industries?.main?.[lang] || [];
+                                                const newSelection = checked ? [...currentIndustries, industry.slug] : currentIndustries.filter((slug: string) => slug !== industry.slug);
+                                                setTempContent({ ...tempContent, industries: { ...tempContent.industries, main: { ...tempContent.industries.main, [lang]: newSelection } }});
+                                            }}
+                                        >
+                                            <span className="font-bold w-6 mr-2">{(tempContent.industries?.main?.[lang] || []).includes(industry.slug) ? `${(tempContent.industries?.main?.[lang] || []).indexOf(industry.slug) + 1}.` : ''}</span>
+                                            {industry.name[lang]}
+                                        </DropdownMenuCheckboxItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                         <div className="space-y-2" id="DKNN_KHUVUC">
+                            <Label id="DKNN_KHUVUC_LABEL">{t.secondaryIndustriesLabel}</Label>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10" id="DKNN_KHUVUC_BUTTON">
+                                         <div className="flex flex-wrap gap-1">
+                                            {(tempContent.industries?.secondary?.[lang] || []).length > 0 ? (
+                                                (tempContent.industries?.secondary?.[lang] || []).map((slug: string, index: number) => <Badge key={slug} variant="secondary"><span className="font-bold mr-1.5">{index + 1}.</span>{lang === 'ja' ? regionKanjiMap[(japanRegions.find(r => r.slug === slug))?.name as keyof typeof regionKanjiMap] : (japanRegions.find(r => r.slug === slug))?.name || slug}</Badge>)
+                                            ) : t.selectSecondaryIndustriesPlaceholder}
+                                        </div>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                    <DropdownMenuLabel>{t.selectSecondaryIndustriesPlaceholder}</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    {japanRegions.map(region => (
+                                         <DropdownMenuCheckboxItem
+                                            key={region.slug}
+                                            id={`DKNN_ITEM_${region.slug}`}
+                                            checked={(tempContent.industries?.secondary?.[lang] || []).includes(region.slug)}
+                                            onSelect={(e) => e.preventDefault()}
+                                            onCheckedChange={(checked) => {
+                                                 const currentRegions = tempContent.industries?.secondary?.[lang] || [];
+                                                 const newSelection = checked ? [...currentRegions, region.slug] : currentRegions.filter((slug: string) => slug !== region.slug);
+                                                 setTempContent({ ...tempContent, industries: { ...tempContent.industries, secondary: { ...tempContent.industries.secondary, [lang]: newSelection } }});
+                                            }}
+                                        >
+                                            <span className="font-bold w-6 mr-2">{(tempContent.industries?.secondary?.[lang] || []).includes(region.slug) ? `${(tempContent.industries?.secondary?.[lang] || []).indexOf(region.slug) + 1}.` : ''}</span>
+                                            {lang === 'ja' ? regionKanjiMap[region.name] : region.name}
+                                        </DropdownMenuCheckboxItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    </div>
+                ) : <p>Đang phát triển</p>
+                ) : <p>Vui lòng chọn một mục để chỉnh sửa.</p>}
+            </EditDialog>
+        </div>
+    )
+}
 
     
