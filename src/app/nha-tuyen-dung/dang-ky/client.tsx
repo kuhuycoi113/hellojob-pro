@@ -705,7 +705,7 @@ const InfoDialog = ({ isOpen, onOpenChange, employer, lang, isConfirmationMode, 
                       <div ref={errorRef} className={cn("mt-4 text-center text-sm p-2 rounded-md border border-transparent transition-all duration-300", showContactError && 'border-destructive ring-2 ring-destructive/40')}>
                            {(!tempInfo?.email && !tempInfo?.phone && !tempInfo?.zalo && !tempInfo?.messenger && !tempInfo?.line) && (
                               <div id="HIENTHILIENHE04_DIALOG" className="space-y-3">
-                                <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isConfirmationMode ? t.reRegisterAction : t.registerAction}</Badge></div>
+                                <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                               </div>
                            )}
                       </div>
@@ -1704,5 +1704,3 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
         </div>
     )
 }
-
-    
