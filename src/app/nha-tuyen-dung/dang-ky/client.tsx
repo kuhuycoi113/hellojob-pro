@@ -1369,7 +1369,7 @@ export default function EmployerDetailPage({ isConfirmationMode = false }: { isC
                                                     <MessengerIcon className="h-6 w-6"/>
                                                     <LineIcon className="h-6 w-6"/>
                                                 </div>
-                                                <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{isUpdateMode ? t.reRegisterAction : t.registerAction}</Badge></div>
+                                                <div className="text-muted-foreground">{t.registerCTA} <Badge className="mx-1 bg-accent-orange text-white align-middle px-1.5 py-0.5 text-xs">{t.registerAction}</Badge></div>
                                               </div>
                                         </div>
                                     )}
