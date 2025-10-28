@@ -1,21 +1,18 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
-import { jobData, type Job, publicFeeLimits, controlledFeeVisas } from '@/lib/mock-data';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { publicFeeLimits, controlledFeeVisas } from '@/lib/mock-data';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, CalendarDays, DollarSign, Heart, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Video, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle, MoreHorizontal, Copy } from 'lucide-react';
+import { Briefcase, CalendarDays, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle, MoreHorizontal, Copy } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
 import { use, useState, useEffect } from 'react';
-import { cn, findVisaByVisaDetail, generateBulletJobCrawl, getJobImage } from '@/lib/utils';
+import { cn, convertTime, findVisaByVisaDetail, generateBulletJobCrawl, getJobImage } from '@/lib/utils';
 import { consultants } from '@/lib/consultant-data';
 import { ContactButtons } from '@/components/contact-buttons';
-import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
 import type { CandidateProfile } from '@/ai/schemas';
-import { JobCard } from '@/components/job-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/components/../contexts/AuthContext';
 import { AuthDialog } from '@/components/auth-dialog';
@@ -29,23 +26,14 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useToast } from '@/hooks/use-toast';
 import { EditProfileDialog } from '@/components/candidate-edit-dialog';
 import type { SearchFilters } from '@/components/job-search/search-results';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
-import { Industry, industriesByJobType } from '@/lib/industry-data';
-import { JsonLdScript } from '@/components/json-ld-script';
 import { validateProfileForApplication } from '@/lib/validators';
 import { CtaViecLamGoiY } from '@/components/cta-viec-lam-goi-y';
-import { getJobByCode } from '../action';
+import { findSuggestedJobs, getJobByCode } from '../action';
+import { CtaViecLamPhuHop } from '@/components/cta-viec-lam-phu-hop';
+import { CtaViecLamTuongTu } from '@/components/cta-viec-lam-tuong-tu';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -63,7 +51,7 @@ const USD_VND_RATE = 26300; // Example rate
 
 
 const formatCurrency = (value?: any, currency: 'JPY' | 'VND' | 'USD' = 'JPY') => {
-    if (!value) return 'Không rõ';
+    if (!value) return 'Liên hệ';
     const numericValue = typeof value === 'number' ? value : parseInt(value.replace(/[^0-9]/g, ''), 10);
     if (isNaN(numericValue)) return value;
 
@@ -129,38 +117,25 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                     setHasApplied(appliedJobs.includes(jobData.id));
 
                     // Safely calculate dates on the client to avoid hydration mismatch
-                    const date = jobData.postedDate ? jobData.postedDate * 1000 : job.createdDate;
-                    if (!!date) {
-                        const postedDate = new Date(date);
-                        setPostedTime(`10:00 ${postedDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`);
+                    setPostedTime(convertTime(jobData?.time || jobData?.postedDate || jobData?.createdDate));
 
-                    }
-                    if (!!jobData.interviewDate) {
-                        setInterviewDate(jobData.interviewDate);
+                    if (!!jobData.interviewDay) {
+                        setInterviewDate(jobData.interviewDay);
                     }
 
                 }
+
+                setIsLoadingBehavioral(true);
+                findSuggestedJobs(jobData).then((behavioralResult) => {
+                    setBehavioralSuggestions(behavioralResult.docs);
+                }).catch((error) => {
+                    console.error("Failed to fetch job suggestions:", error);
+                }).finally(() => {
+                    setIsLoadingBehavioral(false);
+                });
                 setJob(jobData);
             });
         }
-
-        // const fetchSuggestions = async () => {
-        //     setIsLoadingBehavioral(true);
-        //     try {
-        //         const storedProfile = localStorage.getItem('generatedCandidateProfile');
-        //         const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-        //         const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
-        //         const behavioralResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
-        //         setBehavioralSuggestions(behavioralResults.filter(r => r.job.id !== resolvedParams.id).slice(0, 4));
-
-        //     } catch (error) {
-        //         console.error("Failed to fetch job suggestions:", error);
-        //     } finally {
-        //         setIsLoadingBehavioral(false);
-        //     }
-        // };
-
-        // fetchSuggestions();
 
     }, [resolvedParams.id]);
 
@@ -295,228 +270,243 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay';
 
     const feeWithTuitionDisplay = getFeeDisplay(job.fee, "Phí và vé và học phí");
-    const feeDisplay = getFeeDisplay(job.getFeeDisplay, job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé");
+    const feeDisplay = getFeeDisplay(job.fee, job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé");
     const feeNoTicketDisplay = getFeeDisplay(job.netFeeNoTicket, "Phí không vé");
     const avatar = job.avatar || getJobImage(job.job, job.career);
     if (!!job) {
         return (
-            <div className="bg-secondary">
-                {/* {job && <JsonLdScript job={job} appliedFilters={appliedFilters} />} */}
-                <div className="container mx-auto px-4 md:px-6 py-12">
-                    <div className="mb-6">
-                        <Button asChild variant="outline" size="sm">
-                            <Link href="/tim-viec-lam"><ArrowLeft className="mr-2 h-4 w-4" />Quay lại trang Việc làm</Link>
-                        </Button>
-                    </div>
-                    <div className="grid lg:grid-cols-3 gap-8 items-start">
-                        {/* Main Content */}
-                        <div className="lg:col-span-2 space-y-6">
-                            <Card className="overflow-hidden">
-                                <CardHeader>
-                                    <h1 className="text-2xl md:text-3xl font-bold font-headline">{job.title}</h1>
-                                    <p className="flex items-center gap-2 text-xs bg-white py-1 rounded-md w-fit mb-3">
-                                        <Image src="/img/japanflag.png" alt="Japan flag" width={16} height={16} className="h-4 w-4" />
-                                        <span className="text-primary">Mã việc làm: <span className="text-[#FF1400]">{job.code}</span></span>
-                                    </p>
-                                    <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
-                                        <p className="flex items-center gap-2"><MapPin className="h-4 w-4" /> {job.workLocation}</p>
-                                        <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" /> <span className="text-primary">Đăng lúc:</span> {postedTime || "Đang tải..."}</p>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    {isClient ? (
-                                        <div className="flex flex-col sm:flex-row gap-4">
-                                            <Button size="lg" variant="outline" className={cn("w-full sm:w-auto", isSaved && "border-accent-orange text-accent-orange bg-accent-orange/5")} onClick={handleSaveJob}>
-                                                <Bookmark className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
-                                                {isSaved ? 'Việc đã lưu' : 'Lưu việc làm'}
-                                            </Button>
-                                            <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
+            <>
+
+                <div className="bg-secondary">
+                    {/* {job && <JsonLdScript job={job} appliedFilters={appliedFilters} />} */}
+                    <div className="container mx-auto px-4 md:px-6 py-12">
+                        <div className="mb-6">
+                            <Button asChild variant="outline" size="sm">
+                                <Link href="/tim-viec-lam"><ArrowLeft className="mr-2 h-4 w-4" />Quay lại trang Việc làm</Link>
+                            </Button>
+                        </div>
+                        <div className="grid lg:grid-cols-3 gap-8 items-start">
+                            {/* Main Content */}
+                            <div className="lg:col-span-2 space-y-6">
+                                <Card className="overflow-hidden">
+                                    <CardHeader>
+                                        <h1 className="text-2xl md:text-3xl font-bold font-headline">{job.title}</h1>
+                                        <p className="flex items-center gap-2 text-xs bg-white py-1 rounded-md w-fit mb-3">
+                                            <Image src="/img/japanflag.png" alt="Japan flag" width={16} height={16} className="h-4 w-4" />
+                                            <span className="text-primary">Mã việc làm: <span className="text-[#FF1400]">{job.code}</span></span>
+                                        </p>
+                                        <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
+                                            {job.workLocation && <p className="flex items-center gap-2"><MapPin className="h-4 w-4" /> {job.workLocation}</p>}
+                                            <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" /> <span className="text-primary">Đăng lúc:</span> {postedTime || "Đang tải..."}</p>
                                         </div>
-                                    ) : (
-                                        <div className="flex flex-col sm:flex-row gap-4">
-                                            <Skeleton className="h-11 w-full sm:w-40" />
-                                            <Skeleton className="h-11 w-full sm:w-40" />
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-3 font-headline text-xl"><Info className="text-primary h-6 w-6" />Thông tin cơ bản</CardTitle>
-                                </CardHeader>
-                                <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                    <RequirementItem icon={Milestone} label="Loại Visa" value={findVisaByVisaDetail(job.visa)} />
-                                    <RequirementItem icon={ChevronsRight} label="Chi tiết Visa" value={job.visa} />
-                                    <RequirementItem icon={Briefcase} label="Ngành nghề" value={job.job ?? job.career} />
-                                    <RequirementItem icon={MapPin} label="Nơi phỏng vấn" value={job.interviewLocation} />
-                                    <RequirementItem icon={User} label="Giới tính" value={job.gender} />
-                                    <RequirementItem icon={Users} label="Số lượng" value={job.quantity ? `${job.quantity} người` : null} />
-                                    <RequirementItem icon={Cake} label="Yêu cầu tuổi" value={job.minAge && job.maxAge ? `${job.minAge} - ${job.maxAge}` : job.minAge ? `Từ ${job.minAge}` : job.maxAge ? `Đến ${job.maxAge}` : null} />
-                                    <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageLevel} />
-                                    <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={interviewDate ? new Date(interviewDate).toLocaleDateString('vi-VN') : 'Linh hoạt'} />
-                                    <RequirementItem icon={ClipboardCheck} label="Số vòng" value={job.interviewRounds ? `${job.interviewRounds} vòng` : null} />
-                                    <RequirementItem icon={Wallet} label="Phí và vé và học phí" value={feeWithTuitionDisplay} />
-                                    <RequirementItem icon={Wallet} label={job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé"} value={feeDisplay} />
-                                    <RequirementItem icon={Wallet} label="Phí không vé" value={feeNoTicketDisplay} />
-                                    <RequirementItem icon={Star} label="Điều kiện đặc biệt" value={job.specialConditions} />
-                                </CardContent>
-                            </Card>
-
-                            {(job.educationLevel || job.experience || job.experienceYear || job.height || job.weight || job.vgb || job.haveTattoo || job.vision || job.interviewFormat) && <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-3 font-headline text-xl"><UserCheck className="text-primary h-6 w-6" />Yêu cầu chi tiết</CardTitle>
-                                </CardHeader>
-                                <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                    <RequirementItem icon={GraduationCap} label="Yêu cầu học vấn" value={job.educationLevel} />
-                                    <RequirementItem icon={Briefcase} label="Kinh nghiệm" value={job.experience} />
-                                    <RequirementItem icon={CalendarDays} label="Số năm kinh nghiệm" value={job.experienceYear} />
-                                    <RequirementItem icon={Ruler} label="Chiều cao" value={job.height} />
-                                    <RequirementItem icon={Weight} label="Cân nặng" value={job.weight} />
-                                    <RequirementItem icon={Dna} label="Viêm gan B" value={job.vgb} />
-                                    <RequirementItem icon={User} label="Hình xăm" value={job.haveTattoo} />
-                                    <RequirementItem icon={ImageIcon} label="Yêu cầu thị lực" value={job.vision} />
-                                    <RequirementItem icon={ClipboardCheck} label="Hình thức phỏng vấn" value={job.interviewFormat} />
-                                </CardContent>
-                            </Card>}
-
-                            <JobDetailSection title="Mô tả công việc & Ghi chú" icon={FileText}>
-                                <div dangerouslySetInnerHTML={{ __html: job.aiContent ?? job.job }} />
-                            </JobDetailSection>
-
-                            {job.benefits && <JobDetailSection title="Quyền lợi & Chế độ" icon={Sparkles}>
-                                <div dangerouslySetInnerHTML={{ __html: job.benefits }} />
-                            </JobDetailSection>}
-
-                            {(job.videoUrl || job.avatar) &&
-                                <JobDetailSection title="Hình ảnh & Video công việc" icon={ImageIcon}>
-                                    <div className="space-y-6">
-                                        {job.videoUrl && (
-                                            <div className="aspect-video">
-                                                <iframe id="VIDEOVIECLAM01" className="w-full h-full rounded-lg" src={job.videoUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {isClient ? (
+                                            <div className="flex flex-col sm:flex-row gap-4">
+                                                <Button size="lg" variant="outline" className={cn("w-full sm:w-auto", isSaved && "border-accent-orange text-accent-orange bg-accent-orange/5")} onClick={handleSaveJob}>
+                                                    <Bookmark className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
+                                                    {isSaved ? 'Việc đã lưu' : 'Lưu việc làm'}
+                                                </Button>
+                                                <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col sm:flex-row gap-4">
+                                                <Skeleton className="h-11 w-full sm:w-40" />
+                                                <Skeleton className="h-11 w-full sm:w-40" />
                                             </div>
                                         )}
-                                        {!!avatar && (
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div className="relative aspect-[5/3] overflow-hidden rounded-lg border-2 border-[#9B999A]">
-                                                    <Image id={job.code} src={avatar} alt={job.code} fill className="object-cover" quality={100} unoptimized />
-                                                </div>
-                                            </div>
-                                        )}
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-3 font-headline text-xl"><Info className="text-primary h-6 w-6" />Thông tin cơ bản</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                        <RequirementItem icon={Milestone} label="Loại Visa" value={findVisaByVisaDetail(job.visa)} />
+                                        <RequirementItem icon={ChevronsRight} label="Chi tiết Visa" value={job.visa} />
+                                        <RequirementItem icon={Briefcase} label="Ngành nghề" value={job.job ?? job.career ?? 'Liên hệ'} />
+                                        <RequirementItem icon={MapPin} label="Nơi phỏng vấn" value={job.interviewLocation ?? 'Liên hệ'} />
+                                        <RequirementItem icon={User} label="Giới tính" value={job.gender ?? 'Liên hệ'} />
+                                        <RequirementItem icon={Users} label="Số lượng" value={job.quantity ? `${job.quantity} người` : null} />
+                                        <RequirementItem icon={Cake} label="Yêu cầu tuổi" value={job.minAge && job.maxAge ? `${job.minAge} - ${job.maxAge}` : job.minAge ? `Từ ${job.minAge}` : job.maxAge ? `Đến ${job.maxAge}` : null} />
+                                        <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageLevel ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={interviewDate ? interviewDate : 'Linh hoạt'} />
+                                        <RequirementItem icon={ClipboardCheck} label="Số vòng" value={job.interviewRounds ? `${job.interviewRounds} vòng` : null} />
+                                        <RequirementItem icon={Wallet} label="Phí và vé và học phí" value={feeWithTuitionDisplay ?? 'Liên hệ'} />
+                                        <RequirementItem icon={Wallet} label={job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé"} value={feeDisplay} />
+                                        <RequirementItem icon={Wallet} label="Phí không vé" value={feeNoTicketDisplay ?? 'Liên hệ'} />
+                                        <RequirementItem icon={Star} label="Điều kiện đặc biệt" value={job.specialConditions} />
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-3 font-headline text-xl"><UserCheck className="text-primary h-6 w-6" />Yêu cầu chi tiết</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                        <RequirementItem icon={GraduationCap} label="Yêu cầu học vấn" value={job.educationLevel ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={Briefcase} label="Kinh nghiệm" value={job.experience ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={CalendarDays} label="Số năm kinh nghiệm" value={job.experienceYear ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={Ruler} label="Chiều cao" value={job.height ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={Weight} label="Cân nặng" value={job.weight ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={Dna} label="Viêm gan B" value={job.vgb ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={User} label="Hình xăm" value={job.haveTattoo ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={ImageIcon} label="Yêu cầu thị lực" value={job.vision ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={ClipboardCheck} label="Hình thức phỏng vấn" value={job.interviewFormat ?? 'Không yêu cầu'} />
+                                    </CardContent>
+                                </Card>
+
+                                <JobDetailSection title="Mô tả công việc & Ghi chú" icon={FileText}>
+                                    <div>
+                                        <p>Mô tả chi tiết cho công việc {(job.career || job.job) &&<strong>{job.job ?? job.career}, {job.workLocation}{job.quantity ? `, tuyển ${job.quantity} ${job.gender}` : ''}</strong>}
+                                            . Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản
+                                            . Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p>
+                                        <ul>
+                                            {(job.career || job.job) && <li>Chi tiết công việc: {job.job ?? job.career}.</li>}
+                                            <li>Môi trường làm việc sạch sẽ, hiện đại.</li>
+                                        </ul>
                                     </div>
                                 </JobDetailSection>
-                            }
 
-                        </div>
+                                <JobDetailSection title="Quyền lợi & Chế độ" icon={Sparkles}>
+                                    {job.benefits && <div dangerouslySetInnerHTML={{ __html: job.benefits }} />}
+                                    {!job.benefits && <div><ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li><li>Thưởng 1-2 lần/năm tùy theo kết quả kinh doanh.</li></ul></div>}
+                                </JobDetailSection>
 
-                        {/* Sidebar */}
-                        <aside className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
-                            <Card className="shadow-lg">
-                                <CardHeader>
-                                    <CardTitle className="text-lg">Mức lương</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="space-y-2">
-                                        <p className="text-sm text-muted-foreground">Lương cơ bản</p>
-                                        <p className="text-2xl font-bold text-accent-green">{formatCurrency(job.basicSalary, job?.basicSalaryCode)}</p>
-                                        {job.realSalary>0 && (
-                                            <div className="pt-2">
-                                                <p className="font-semibold text-muted-foreground">Thực lĩnh: ~{formatCurrency(job.realSalary, job?.realSalaryCode)}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                    {(job.annualIncome || job.annualBonus) && <div className="border-t pt-4 space-y-2 text-sm">
-                                        {job.annualIncome && <p>Thu nhập năm: <strong>{job.annualIncome ?? 'Liên hệ'}</strong></p>}
-                                        {job.annualBonus && <p>Thưởng: <strong>{job.annualBonus ?? 'Liên hệ'}</strong></p>}
-                                    </div>}
-                                </CardContent>
-                            </Card>
-                            <Card
-                                id="MDTVV01"
-                                className="shadow-lg group hover:shadow-xl hover:border-primary transition-all"
-                            >
-                                <CardHeader>
-                                    <CardTitle className="text-lg font-bold flex items-center gap-2 group-hover:text-primary transition-colors"><UserRound />Tư vấn viên</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
-                                            <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
-                                                <AvatarImage src={assignedConsultant.avatarUrl} alt={assignedConsultant.name} />
-                                                <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
-                                            </Avatar>
-                                        </Link>
-                                        <div>
-                                            <Link href={`/tu-van-vien/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
-                                                <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
-                                            </Link>
-                                            <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
+                                {(job.videoUrl || job.avatar) &&
+                                    <JobDetailSection title="Hình ảnh & Video công việc" icon={ImageIcon}>
+                                        <div className="space-y-6">
+                                            {job.videoUrl && (
+                                                <div className="aspect-video">
+                                                    <iframe id="VIDEOVIECLAM01" className="w-full h-full rounded-lg" src={job.videoUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                                </div>
+                                            )}
+                                            {!!avatar && (
+                                                <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                                                    <div className="relative aspect-[5/3] overflow-hidden rounded-lg border-2 border-[#9B999A]">
+                                                        <Image id={job.code} src={avatar} alt={job.code} fill className="object-cover" quality={100} unoptimized />
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
+                                    </JobDetailSection>
+                                }
+
+                            </div>
+
+                            {/* Sidebar */}
+                            <aside className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
+                                <Card className="shadow-lg">
+                                    <CardHeader>
+                                        <CardTitle className="text-lg">Mức lương</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="space-y-2">
+                                            <p className="text-sm text-muted-foreground">Lương cơ bản</p>
+                                            <p className="text-2xl font-bold text-accent-green">{formatCurrency(job.basicSalary, job?.basicSalaryCode)}</p>
+                                            {job.realSalary > 0 && (
+                                                <div className="pt-2">
+                                                    <p className="font-semibold text-muted-foreground">Thực lĩnh: ~{formatCurrency(job.realSalary, job?.realSalaryCode)}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {(job.annualIncome || job.annualBonus) && <div className="border-t pt-4 space-y-2 text-sm">
+                                            {job.annualIncome && <p>Thu nhập năm: <strong>{job.annualIncome ?? 'Liên hệ'}</strong></p>}
+                                            {job.annualBonus && <p>Thưởng: <strong>{job.annualBonus ?? 'Liên hệ'}</strong></p>}
+                                        </div>}
+                                    </CardContent>
+                                </Card>
+                                <Card
+                                    id="MDTVV01"
+                                    className="shadow-lg group hover:shadow-xl hover:border-primary transition-all"
+                                >
+                                    <CardHeader>
+                                        <CardTitle className="text-lg font-bold flex items-center gap-2 group-hover:text-primary transition-colors"><UserRound />Tư vấn viên</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <Link href={`/tu-van-vien/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
+                                                <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
+                                                    <AvatarImage src={assignedConsultant.avatarUrl} alt={assignedConsultant.name} />
+                                                    <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
+                                                </Avatar>
+                                            </Link>
+                                            <div>
+                                                <Link href={`/tu-van-vien/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
+                                                    <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
+                                                </Link>
+                                                <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
+                                        </div>
+                                    </CardContent>
+                                    <div className="border-t p-4 grid grid-cols-2 gap-2">
+                                        <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
+                                            <Copy className="mr-2 h-4 w-4" />Giới thiệu việc làm
+                                        </Button>
+                                        <Button variant="ghost" className="text-muted-foreground text-sm">
+                                            <Share2 className="mr-2 h-4 w-4" />Giới thiệu tư vấn viên
+                                        </Button>
+                                        <Button asChild variant="ghost" className="text-muted-foreground text-sm">
+                                            <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4" />Tư vấn viên khác</Link>
+                                        </Button>
+                                        <Button asChild variant="ghost" className="text-muted-foreground text-sm">
+                                            <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4" />Xem hồ sơ chi tiết</Link>
+                                        </Button>
                                     </div>
-                                    <div className="space-y-2">
-                                        <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
-                                    </div>
-                                </CardContent>
-                                <div className="border-t p-4 grid grid-cols-2 gap-2">
-                                    <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                        <Copy className="mr-2 h-4 w-4" />Giới thiệu việc làm
-                                    </Button>
-                                    <Button variant="ghost" className="text-muted-foreground text-sm">
-                                        <Share2 className="mr-2 h-4 w-4" />Giới thiệu tư vấn viên
-                                    </Button>
-                                    <Button asChild variant="ghost" className="text-muted-foreground text-sm">
-                                        <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4" />Tư vấn viên khác</Link>
-                                    </Button>
-                                    <Button asChild variant="ghost" className="text-muted-foreground text-sm">
-                                        <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4" />Xem hồ sơ chi tiết</Link>
-                                    </Button>
-                                </div>
-                            </Card>
-                        </aside>
+                                </Card>
+                            </aside>
+                        </div>
                     </div>
+                    <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+                    <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Bạn cần đăng nhập để ứng tuyển, bạn có muốn đăng nhập không?
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Để sau</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                    <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
+                        <AlertDialogContent id="UNGTUYEN-L02-B1">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Để sau</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                    <EditProfileDialog
+                        isOpen={isProfileEditDialogOpen}
+                        onOpenChange={setIsProfileEditDialogOpen}
+                        onSaveSuccess={() => {
+                            toast({
+                                title: 'Cập nhật thành công!',
+                                description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
+                                className: 'bg-green-500 text-white'
+                            });
+                        }}
+                        source="application"
+                    />
                 </div>
-                <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-                <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Bạn cần đăng nhập để ứng tuyển, bạn có muốn đăng nhập không?
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Để sau</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleConfirmLogin}>Đồng ý</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-                <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
-                    <AlertDialogContent id="UNGTUYEN-L02-B1">
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Để sau</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-                <EditProfileDialog
-                    isOpen={isProfileEditDialogOpen}
-                    onOpenChange={setIsProfileEditDialogOpen}
-                    onSaveSuccess={() => {
-                        toast({
-                            title: 'Cập nhật thành công!',
-                            description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
-                            className: 'bg-green-500 text-white'
-                        });
-                    }}
-                    source="application"
-                />
-            </div>
+                <div className="space-t-20 md:space-t-28 pt-20 md:pt-28">
+                    <CtaViecLamTuongTu isLoading={isLoadingBehavioral} suggestions={behavioralSuggestions} />
+                </div>
+            </>
         );
     }
 

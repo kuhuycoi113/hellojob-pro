@@ -159,13 +159,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         setHasApplied(appliedJobs.includes(job.id));
 
         // Safely calculate dates on the client to avoid hydration mismatch
-        const today = new Date();
-        const postedDate = new Date(job?.time || job?.postedDate || job?.createdDate);
-        setPostedTime(convertTime(postedDate));
-
-        const interviewFullDate = new Date(today);
-        interviewFullDate.setDate(today.getDate() + job.interviewDay);
-        setInterviewDate(interviewFullDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+        setPostedTime(convertTime(job?.time || job?.postedDate || job?.createdDate));
+        setInterviewDate(job.interviewDay);
 
         // Safely calculate badge class names on client
         let classes = 'transition-opacity opacity-100 ';
@@ -190,7 +185,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         }
         setBadgeClassName(classes);
 
-    }, [job.id, job.postedTimeOffset, job.interviewDateOffset, job.visaDetail, job.visaType]);
+    }, [job.id, job.postedDate, job.interviewDate, job.visa]);
 
     const handleSaveJob = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -343,10 +338,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                     variant="outline"
                                                     className={badgeClassName}
                                                 >
-                                                    {job.visaDetail}
+                                                    {job.visa}
                                                 </Badge>
                                             )}
-                                            {!!job.realSalary && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, job.visaDetail)}</Badge>}
+                                            {job.realSalary > 0 && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, job.visaDetail)}</Badge>}
                                             <Badge variant="secondary" className="text-xs">Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, job.visaDetail)}</Badge>
                                             {feeFilterIsActive && feeInfo.shouldShow && (
                                                 <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
@@ -359,7 +354,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <div className="text-sm text-muted-foreground">
                                     <p className="flex items-center gap-1.5">
                                         <span className="text-primary">Ngày phỏng vấn:</span>
-                                        <span>{job.interviewDate || "Liên hệ"}</span>
+                                        <span>{interviewDate || "Liên hệ"}</span>
                                     </p>
                                 </div>
                                 <div className="text-sm text-muted-foreground">
@@ -521,10 +516,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             <Card id="HIENTHIVIEC02" className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-border shadow-sm transition-shadow duration-300 hover:shadow-lg")}>
                 <div className="group cursor-pointer" onClick={handleCardClick}>
                     <div className="relative aspect-video w-full">
-                        <Image src={job.image.src} alt={jobTitle} fill className="object-cover transition-transform group-hover:scale-105" />
+                        <Image src={job.avatar || getJobImage(job.job, job.career)} alt={jobTitle} fill className="object-cover transition-transform group-hover:scale-105" />
                         <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                             <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
-                            <span>{job.id}</span>
+                            <span>{job.code}</span>
                         </div>
                         {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={handleSaveJob}>
                             <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
@@ -532,26 +527,26 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     </div>
                     <div className="flex flex-grow flex-col p-3">
                         <h3 className="mb-2 h-10 text-sm font-bold leading-tight line-clamp-2 group-hover:text-primary">{jobTitle}</h3>
-                        <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <div className="mb-2 flex flex-wrap items-start gap-x-1 gap-y-1" style={{ height: '42px' }}>
                             {isClient && (
                                 <>
-                                    {job.visaDetail && (
+                                    {job.visa && (
                                         <Badge
                                             variant="outline"
                                             className={badgeClassName}
                                         >
-                                            {job.visaDetail}
+                                            {job.visa}
                                         </Badge>
                                     )}
-                                    {job.salary.actual && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.salary.actual, job.visaDetail)}</Badge>}
-                                    <Badge variant="secondary" className="px-1.5 py-0 text-xs">Lương cơ bản: {formatSalaryForDisplay(job.salary.basic, job.visaDetail)}</Badge>
+                                    {job.realSalary > 0 && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, job.visa)}</Badge>}
+                                    <Badge variant="secondary" className="px-1.5 py-0 text-xs">Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, job.visa)}</Badge>
                                 </>
                             )}
                         </div>
                         <div className="text-xs text-muted-foreground">
                             <p className="flex items-center gap-1.5">
                                 <span className="text-primary">Ngày phỏng vấn:</span>
-                                <span>{interviewDate || "N/A"}</span>
+                                <span>{interviewDate || "Liên hệ"}</span>
                             </p>
                         </div>
                         <div className="my-2 flex items-center gap-1 text-xs text-muted-foreground">
@@ -568,7 +563,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             <AvatarFallback>{recruiter.name.charAt(0)}</AvatarFallback>
                                         </Avatar>
                                     </Link>
-                                    <ContactButtons contact={job.recruiter as any} job={job} />
+                                    <ContactButtons contact={recruiter as any} job={job} />
                                 </div>
                                 {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
                             </div>

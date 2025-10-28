@@ -1,18 +1,14 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState} from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, LogIn, UserPlus, Sparkles, Star, FastForward, ListChecks, HardHat, UserCheck, GraduationCap, PlusCircle, Pencil, BrainCircuit } from 'lucide-react';
+import { Card} from '@/components/ui/card';
+import { LogIn, UserPlus, Sparkles, Star, FastForward, ListChecks, HardHat, UserCheck, GraduationCap, PlusCircle, Pencil, BrainCircuit } from 'lucide-react';
 import { JobCard } from '@/components/job-card';
-import { jobData, type Job } from '@/lib/mock-data';
-import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
-import { matchJobsToProfile } from '@/ai/flows/match-jobs-to-profile-flow';
-import type { CandidateProfile } from '@/ai/schemas';
 import { Skeleton } from './ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
@@ -342,42 +338,9 @@ const CTAForEmptyProfile = () => {
 };
 
 
-export function CtaViecLamPhuHop() {
+export function CtaViecLamTuongTu({isLoading, suggestions}: { isLoading: boolean, suggestions: any[] }) {
   const { role, isLoggedIn } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [suggestions, setSuggestions] = useState<any[]>([]);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-
-  const fetchSuggestions = useCallback(async () => {
-    setIsLoading(true);
-    try {
-        const storedProfile = localStorage.getItem('generatedCandidateProfile');
-        const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-        const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
-
-        // API is called for all users. If profile & signals are null/empty, it returns default jobs.
-        const matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
-        setSuggestions(matchResults.slice(0, 4));
-    } catch (error) {
-        console.error("Failed to fetch behavioral suggestions for CTA:", error);
-        // Fallback to generic popular jobs on error
-        setSuggestions(jobData.slice(4, 8).map(job => ({ job })));
-    } finally {
-        setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchSuggestions();
-    // Re-fetch when user behavior changes
-    const handleStorageChange = (event: StorageEvent) => {
-        if (event.key === 'behavioralSignals' || event.key === 'generatedCandidateProfile' || event.key === null) {
-            fetchSuggestions();
-        }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [fetchSuggestions]);
   
   const handleLoginClick = () => {
       setIsAuthDialogOpen(true);
@@ -400,7 +363,7 @@ export function CtaViecLamPhuHop() {
 
     return (
         suggestions.map((item) => (
-            <JobCard key={item.job.id} job={item.job} />
+            <JobCard key={item.id} job={item} showPostedTime={true} />
         ))
     );
   };

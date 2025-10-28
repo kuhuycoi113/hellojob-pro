@@ -16,6 +16,7 @@ import { EditProfileDialog } from '../candidate-edit-dialog';
 import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
 import { CtaViecLamGoiY } from '../cta-viec-lam-goi-y';
 import { CtaViecLamPhuHop } from '../cta-viec-lam-phu-hop';
+import path from 'path';
 
 const FloatingChatWidget = dynamic(() => import('@/components/chat/floating-chat-widget').then(mod => mod.FloatingChatWidget), { ssr: false });
 
@@ -32,27 +33,28 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         setIsClient(true);
     }, []);
-    
+
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
     const isNtdLandingNdPage = pathname === '/nha-tuyen-dung/landing/nd';
 
     const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky', '/nha-tuyen-dung/landing/nd'];
-    
+
     // Determine whether to show CTAs based on client-side path
     const showDefaultCtas = isClient && !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
+    const showProfileSuggestions = !pathname.startsWith('/viec-lam');
     const showNtdLandingCta = isClient && isNtdLandingNdPage;
 
 
     useEffect(() => {
-      if (isLoggedIn && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
-        setIsPostLoginApplyDialogOpen(true);
-      }
+        if (isLoggedIn && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
+            setIsPostLoginApplyDialogOpen(true);
+        }
     }, [isLoggedIn, postLoginAction]);
-    
+
     const handlePostLoginApply = (apply: boolean) => {
         setIsPostLoginApplyDialogOpen(false); // Close the first dialog
-        
+
         if (apply && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
             const { jobId, jobTitle } = postLoginAction.data;
             const profileRaw = localStorage.getItem('generatedCandidateProfile');
@@ -84,11 +86,11 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
                     setIsProfileIncompleteAlertOpen(true);
                 }
             } else {
-                 // No profile found, show alert to update
-                 setIsProfileIncompleteAlertOpen(true);
+                // No profile found, show alert to update
+                setIsProfileIncompleteAlertOpen(true);
             }
         }
-        
+
         clearPostLoginAction();
     };
 
@@ -103,12 +105,12 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
             <main className="min-h-screen">{children}</main>
             {showDefaultCtas && (
                 <div className="space-y-20 md:space-y-28 py-20 md:py-28">
-                    <CtaViecLamPhuHop />
+                    {showProfileSuggestions && <CtaViecLamPhuHop />}
                     <CtaViecLamGoiY />
                     <CtaNhaTuyenDung />
                 </div>
             )}
-             {showNtdLandingCta && (
+            {showNtdLandingCta && (
                 <div className="space-y-20 md:space-y-28 py-20 md:py-28">
                     <CtaNhaTuyenDung />
                 </div>
@@ -124,14 +126,14 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
             }}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                    <AlertDialogTitle>Tiếp tục ứng tuyển?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Bạn có muốn tiếp tục ứng tuyển công việc "{postLoginAction?.data.jobTitle}" không?
-                    </AlertDialogDescription>
+                        <AlertDialogTitle>Tiếp tục ứng tuyển?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Bạn có muốn tiếp tục ứng tuyển công việc "{postLoginAction?.data.jobTitle}" không?
+                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => handlePostLoginApply(false)}>Từ chối</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handlePostLoginApply(true)}>Đồng ý</AlertDialogAction>
+                        <AlertDialogCancel onClick={() => handlePostLoginApply(false)}>Từ chối</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handlePostLoginApply(true)}>Đồng ý</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -149,9 +151,9 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <EditProfileDialog 
-                isOpen={isProfileEditDialogOpen} 
-                onOpenChange={setIsProfileEditDialogOpen} 
+            <EditProfileDialog
+                isOpen={isProfileEditDialogOpen}
+                onOpenChange={setIsProfileEditDialogOpen}
                 onSaveSuccess={() => {
                     toast({
                         title: 'Cập nhật thành công!',

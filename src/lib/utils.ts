@@ -93,7 +93,7 @@ export const getGenderLabel = (gender: any) => {
   }
 };
 export const generateBulletJobCrawl = (data: any) => {
-  const { job, career, languageLevel, numberRecruits, gender, workLocation } = data;
+  const { job, career, languageLevel, numberRecruits, gender, workLocation, basicSalary } = data;
   let specialConditions = data.specialConditions;
   specialConditions = formatSpecialCondition(specialConditions);
   const details = [
@@ -101,6 +101,7 @@ export const generateBulletJobCrawl = (data: any) => {
     workLocation,
     languageLevel,
     numberRecruits ? `${numberRecruits} ${getGenderLabel(gender)}` : null,
+    basicSalary ? `LCB ${basicSalary}` : null,
     specialConditions ? specialConditions.join(",") : null,
   ]
     .filter(Boolean)

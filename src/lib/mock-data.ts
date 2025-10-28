@@ -87,16 +87,16 @@ const tattooOptions = ["Không nhận hình xăm", "Nhận xăm nhỏ (kín)", "
 export const feeLimits: { [key: string]: number } = {
     'Thực tập sinh 3 năm': 4200,
     'Thực tập sinh 1 năm': 1800,
-    'Đặc định đầu Việt': 3000,
-    'Đặc định đi mới': 4200,
+    'Tokutei đầu Việt': 3000,
+    'Tokutei đi mới': 4200,
     'Kỹ sư, tri thức đầu Việt': 3800,
 };
 
 export const publicFeeLimits: { [key: string]: number } = {
     'Thực tập sinh 3 năm': 3800,
     'Thực tập sinh 1 năm': 1500,
-    'Đặc định đầu Việt': 2500,
-    'Đặc định đi mới': 3800,
+    'Tokutei đầu Việt': 2500,
+    'Tokutei đi mới': 3800,
     'Kỹ sư, tri thức đầu Việt': 3800,
 };
 
