@@ -44,7 +44,7 @@ export async function getJobByCode(code: string): Promise<any> {
 function createSearchQuery(jobObj: any): any {
 
     const {
-        visaDetail, career, workLocation, job, gender, specialConditions
+        visaDetail, career, workLocation, job, gender, specialConditions, id
     } = jobObj;
     const now = new Date();
     const fifteenDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
@@ -100,6 +100,13 @@ function createSearchQuery(jobObj: any): any {
                     {
                         exists: {
                             field: "createdDate",
+                        },
+                    },
+                ],
+                must_not: [
+                    {
+                        term: {
+                            "id.keyword": id,
                         },
                     },
                 ],
