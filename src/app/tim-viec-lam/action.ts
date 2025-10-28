@@ -6,7 +6,6 @@ import { PaginatedResponse } from "@/lib/types";
 import { visaMapping } from "@/lib/visa-data";
 import JOBS from '@/lib/jobs.json';
 const CANDIDATES_INDEX = 'hellojobv5-job-crawled';
-import PROVINCES from "@/lib/provinces.json";
 
 function createSearchQuery(filter: SearchFilters): any {
 
@@ -83,6 +82,7 @@ function createSearchQuery(filter: SearchFilters): any {
         ]
     };
     if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== "") {
+        console.log(visaDetail)
         const visaLabel = visaMapping[visaDetail as keyof typeof visaMapping];
         searchQuery.query.bool.must.push({
             term: {

@@ -34,9 +34,9 @@ export const visaMapping = {
     'thuc-tap-sinh-3-nam': 'Thực tập sinh 3 năm',
     'thuc-tap-sinh-1-nam': 'Thực tập sinh 1 năm',
     'thuc-tap-sinh-3-go': 'Thực tập sinh 3 Go',
-    'dac-dinh-dau-viet': 'Đặc định đầu Việt',
-    'dac-dinh-dau-nhat': 'Đặc định đầu Nhật',
-    'dac-dinh-di-moi': 'Đặc định đi mới',
+    'dac-dinh-dau-viet': 'Tokutei đầu Việt',
+    'dac-dinh-dau-nhat': 'Tokutei đầu Nhật',
+    'dac-dinh-di-moi': 'Tokutei đi mới',
     'ky-su-tri-thuc-dau-viet': 'Kỹ sư, tri thức đầu Việt',
     'ky-su-tri-thuc-dau-nhat': 'Kỹ sư, tri thức đầu Nhật'
 }

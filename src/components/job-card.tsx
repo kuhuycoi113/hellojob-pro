@@ -36,6 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from './candidate-edit-dialog';
 import type { SearchFilters } from './job-search/search-results';
+import { consultants } from '@/lib/consultant-data';
 
 
 const formatCurrency = (value?: string) => {
@@ -148,16 +149,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
     const [badgeClassName, setBadgeClassName] = useState<string>('opacity-0');
     const [jobTitle, setJobTitle] = useState(generateBulletJobCrawl(job));
-    const recruiter = {
-        id: 'pham-thi-ha',
-        name: 'Phạm Thị Hà',
-        avatarUrl: '/img/TVV004.png',
-        dataAiHint: 'professional woman portrait',
-        experience: '4 năm',
-        mainExpertise: 'Tư vấn Nhà hàng, Cơ khí, Điều dưỡng, Nông nghiệp',
-        successfulCandidates: 320,
-        strengths: ['Tận tâm', 'Am hiểu thủ tục', 'Hỗ trợ chi tiết'],
-    }
+    const recruiter = consultants[3];
 
     useEffect(() => {
         setIsClient(true);
@@ -263,7 +255,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             return;
         }
         logInteraction(job, 'view');
-        router.push(`/viec-lam/${fakeID}`);
+        router.push(`/viec-lam/${job.code}`);
     };
 
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
@@ -478,7 +470,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
     if (variant === 'chat') {
         return (
-            <div id="HIENTHIVIEC03" onClick={() => router.push(`/viec-lam/${job.id}`)} className="block w-full cursor-pointer">
+            <div id="HIENTHIVIEC03" onClick={() => router.push(`/viec-lam/${job.code}`)} className="block w-full cursor-pointer">
                 <Card className="flex items-start p-3 gap-3 hover:bg-secondary/50 transition-colors">
                     <div className="relative w-20 h-20 flex-shrink-0">
                         <Image src={job.avatar || 'https://placehold.co/60x40.png'} alt={jobTitle} fill className="object-cover rounded-md" />
@@ -487,7 +479,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <h4 className="font-semibold text-sm leading-tight line-clamp-2">{jobTitle}</h4>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
                             <FileText className="h-3 w-3 flex-shrink-0" />
-                            Mã: {job.id}
+                            Mã: {job.code}
                         </p>
                         {isClient && job.visaDetail && (
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
