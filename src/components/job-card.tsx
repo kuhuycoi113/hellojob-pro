@@ -333,7 +333,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
                                     {isClient && (
                                         <>
-                                            {job.visaDetail && (
+                                            {job.visa && (
                                                 <Badge
                                                     variant="outline"
                                                     className={badgeClassName}
@@ -360,7 +360,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <div className="text-sm text-muted-foreground">
                                     <p className="flex items-center gap-1.5">
                                         <MapPin className="h-4 w-4 flex-shrink-0" />
-                                        <span>{job.workLocation}</span>
+                                        <span>{job.workLocation || "Liên hệ"}</span>
                                     </p>
                                 </div>
 
@@ -549,10 +549,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <span>{interviewDate || "Liên hệ"}</span>
                             </p>
                         </div>
-                        <div className="my-2 flex items-center gap-1 text-xs text-muted-foreground">
+                        {job.workLocation && <div className="my-2 flex items-center gap-1 text-xs text-muted-foreground">
                             <MapPin className="h-3 w-3 flex-shrink-0" />
                             <span>{job.workLocation}</span>
-                        </div>
+                        </div>}
 
                         <div className="mt-auto">
                             <div className="flex flex-wrap items-center justify-between gap-2">

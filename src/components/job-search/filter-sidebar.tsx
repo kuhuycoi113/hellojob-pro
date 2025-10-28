@@ -616,10 +616,10 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                     <Label>Chi tiết loại hình visa</Label>
                                     <Select key={filters.visa || 'all'} value={filters.visaDetail} onValueChange={handleVisaDetailChange}>
                                         <SelectTrigger className={cn(filters.visaDetail && filters.visaDetail !== 'all-details' && 'text-primary')}>
-                                            <SelectValue placeholder="Tất cả chi tiết" />
+                                            <SelectValue placeholder="Tất cả loại hình" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all-details">Tất cả chi tiết</SelectItem>
+                                            <SelectItem value="all-details">Tất cả loại hình</SelectItem>
                                             {japanJobTypes.map(type => (
                                                 <SelectGroup key={type.slug}>
                                                     <SelectLabel>{type.name}</SelectLabel>

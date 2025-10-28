@@ -148,7 +148,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
                             <div className="space-y-2 lg:col-span-1">
                                 <Label htmlFor="search-type" className="text-foreground text-sm">Chi tiết loại hình visa</Label>
-                                <Select onValueChange={(value) => handleVisaDetailChange(value)} value={filters.visaDetail || 'all-details'}>
+                                <Select onValueChange={(value) => handleVisaDetailChange(value)} value={filters.visaDetail}>
                                     <SelectTrigger id="search-type">
                                         <SelectValue placeholder="Tất cả loại hình" />
                                     </SelectTrigger>

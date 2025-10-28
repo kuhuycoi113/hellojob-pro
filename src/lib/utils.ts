@@ -157,11 +157,11 @@ export const findVisaByVisaDetail = (visaDetail: string) => {
     return 'Không rõ';
   }
   visaDetail = visaDetail.replace('Tokutei', 'Đặc định');
-  japanJobTypes.forEach(visa => {
+  for(let visa of japanJobTypes){
     const details = visaDetailsByVisaType[visa.slug];
     if (details.findIndex(detail => detail.name === visaDetail) > -1) {
       return visa.name;
     }
-  });
+  }
   return visaDetail ?? 'Không rõ';
 };
