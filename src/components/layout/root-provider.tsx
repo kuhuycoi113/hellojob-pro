@@ -1,45 +1,104 @@
+'use client'
 import React from 'react';
 import { ChatProvider } from '@/contexts/ChatContext';
-import { getTokens, Tokens } from 'next-firebase-auth-edge';
 import { AuthProvider, User } from '@/contexts/AuthContext';
-import { filterStandardClaims } from 'next-firebase-auth-edge/auth/claims';
-import { authConfig } from '@/lib/firebase-server';
-import { cookies } from 'next/headers';
-export const toUser = ({ decodedToken }: Tokens): User => {
-    const {
-        uid,
-        email,
-        picture: photoURL,
-        email_verified: emailVerified,
-        phone_number: phoneNumber,
-        name: displayName,
-        auth_time: authTime,
-        source_sign_in_provider: signInProvider
-    } = decodedToken;
+import { filterStandardClaims } from 'next-firebase-auth-edge/lib/auth/claims';
+import { onIdTokenChanged, User as FirebaseUser, IdTokenResult } from 'firebase/auth';
+import { login, logout } from '../../../api';
+import { useSearchParams } from 'next/navigation';
+import { setUserData } from '@/lib/auth.util';
+import { app, auth, db } from "@/lib/firebase";
+export const toUser = (user: FirebaseUser, idTokenResult: IdTokenResult): User => {
 
-    const customClaims = filterStandardClaims(decodedToken);
+    // return {
+    //     uid,
+    //     email: email ?? null,
+    //     displayName: displayName ?? null,
+    //     photoURL: photoURL ?? null,
+    //     phoneNumber: phoneNumber ?? null,
+    //     emailVerified: emailVerified ?? false,
+    //     providerId: signInProvider,
+    //     customClaims,
+    //     authTime
+    // };
 
     return {
-        uid,
-        email: email ?? null,
-        displayName: displayName ?? null,
-        photoURL: photoURL ?? null,
-        phoneNumber: phoneNumber ?? null,
-        emailVerified: emailVerified ?? false,
-        providerId: signInProvider,
-        customClaims,
-        authTime
+        ...user,
+        emailVerified:
+            user.emailVerified || (idTokenResult.claims.email_verified as boolean),
+        customClaims: filterStandardClaims(idTokenResult.claims),
+        authTime: toAuthTime(idTokenResult.issuedAtTime)
     };
 };
 
-
-export async function RootProvider({
-    children,
-}: {
+function toAuthTime(date: string) {
+    return new Date(date).getTime() / 1000;
+}
+export interface AuthProviderProps {
+    serverUser: User | null;
     children: React.ReactNode;
-}) {
-    const tokens = await getTokens(await cookies(), authConfig);
-    let user = tokens ? toUser(tokens) : null;
+}
+
+
+export function RootProvider({
+    children,
+    serverUser
+}: AuthProviderProps) {
+    const [user, setUser] = React.useState(serverUser);
+    const searchParams = useSearchParams();
+    const refID = searchParams?.get('refID');
+    React.useEffect(() => {
+        if (user === serverUser) {
+            return;
+        }
+        setUser(serverUser);
+    }, [serverUser]);
+    React.useEffect(() => {
+        if (!!serverUser?.uid && !!user) {
+            setUser({ ...user });
+        }
+    }, []);
+    const handleLogout = async () => {
+        if (!user) {
+            return;
+        }
+
+        await logout();
+        window.location.href = '/';
+    };
+
+    const handleLogin = async (firebaseUser: FirebaseUser) => {
+        const idTokenResult = await firebaseUser.getIdTokenResult();
+        const issuedAtTime = toAuthTime(idTokenResult.issuedAtTime);
+        if (
+            user?.authTime &&
+            user.authTime >= issuedAtTime
+        ) {
+            return;
+        }
+        const decodedUser = toUser(firebaseUser, idTokenResult);
+        await login(idTokenResult.token);
+        const res = await setUserData(decodedUser, refID);
+        decodedUser.userInfo = res.userInfo;
+        // console.log(decodedUser)
+        // if(!res.isNewUser){
+
+        // }else{
+        //   decodedUser.
+        // }
+        setUser(decodedUser);
+    };
+
+    const handleIdTokenChanged = async (firebaseUser: FirebaseUser | null) => {
+        if (!firebaseUser) {
+            await handleLogout();
+            return;
+        }
+        await handleLogin(firebaseUser);
+    };
+    React.useEffect(() => {
+        return onIdTokenChanged(auth, handleIdTokenChanged);
+    }, [user]);
     return (
         <AuthProvider serverUser={user}>
             <ChatProvider>

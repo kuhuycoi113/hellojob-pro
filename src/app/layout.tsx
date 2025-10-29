@@ -5,6 +5,12 @@ import { RootProvider } from '@/components/layout/root-provider';
 import { LayoutManager } from '@/components/layout/layout-manager';
 import { Montserrat } from 'next/font/google';
 import { cn } from '@/lib/utils';
+import { getTokens } from 'next-firebase-auth-edge';
+import { cookies } from 'next/headers';
+import { authConfig } from '@/lib/firebase-server';
+import { toUser } from '@/lib/auth.util';
+import { getFirestore } from "firebase-admin/firestore";
+import { getFirebaseAdminApp } from '@/lib/firebase-admin';
 
 const siteConfig = {
   name: "HelloJob",
@@ -86,15 +92,38 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const tokens = await getTokens(await cookies(), authConfig);
+  let user = tokens ? toUser(tokens) : null;
+  try {
+    if (!!user?.uid) {
+      // const adminApp = getFirebaseAdminApp();
+      // const db = adminApp.firestore();
+      // const fetchedUser = (await db.doc(`/users/${user.uid}`).get())?.data();
+      // if (!!fetchedUser?.createdDate?.seconds) {
+      //   fetchedUser.createdDate = fetchedUser.createdDate.seconds * 1000;
+      // }
+      // if (!!fetchedUser?.dateOfBirth?.seconds) {
+      //   fetchedUser.dateOfBirth = fetchedUser.dateOfBirth.seconds * 1000;
+      // }
+      // if (!!fetchedUser?.dateOfFirstIssue?.seconds) {
+      //   fetchedUser.dateOfFirstIssue = fetchedUser.dateOfFirstIssue.seconds * 1000;
+      // }
+      // user.userInfo = fetchedUser;
+      // user.isAdmin = fetchedUser?.role?.indexOf("ADMIN") > -1;
+      // user.role = fetchedUser?.role;
+    }
+  } catch (error) {
+    console.log(error);
+  }
   return (
     <html lang="vi" className={cn("scroll-smooth", montserrat.variable)}>
       <body className="antialiased pb-20 md:pb-0 font-body">
-        <RootProvider>
+        <RootProvider serverUser={user}>
           <LayoutManager>
             {children}
           </LayoutManager>

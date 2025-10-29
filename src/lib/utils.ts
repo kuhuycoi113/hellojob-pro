@@ -165,3 +165,84 @@ export const findVisaByVisaDetail = (visaDetail: string) => {
   }
   return visaDetail ?? 'Không rõ';
 };
+
+
+export async function exitInAppBrowser(url: string) {
+  try {
+    const standalone = window.navigator.standalone,
+      userAgent = window.navigator.userAgent.toLowerCase(),
+      safari = /safari/.test(userAgent),
+      isIOS = /iphone|ipod|ipad/.test(userAgent);
+    const isAndroid = /android/.test(userAgent),
+      isWebView = /wv/.test(userAgent) || /webview/.test(userAgent),
+      isPWA = window.matchMedia("(display-mode: standalone)").matches;
+
+    // Kiểm tra WebView trên iOS (nếu không có `window.navigator.standalone`)
+    if (isIOS) {
+      if (!safari && !standalone) {
+        try {
+          // Try safari - 15, 17, 18
+          const iosUrl = `x-safari-${url}`;
+          window.location.href = iosUrl;
+        } catch (error) {
+          try {
+            // Try safari old way
+            const iosOldUrl = `com-apple-mobilesafari-tab:${url}`;
+            window.location.href = iosOldUrl;
+          } catch (error) {
+            try {
+              // Try google chrome
+              const chromeUrl = `googlechrome://${url?.replace("https://", "")?.replace("http://", "")}`;
+              window.location.href = chromeUrl;
+            } catch (error) {
+              try {
+                // Try google chrome
+                const firefoxUrl = ` firefox://open-url?url=${url}`;
+                window.location.href = firefoxUrl;
+              } catch (error) {
+                try {
+                  // Try google chrome
+                  const firefoxUrl = ` firefox://open-url?url=${url}`;
+                  window.location.href = firefoxUrl;
+                } catch (error) {
+                  const iosSearchUrl = `x-web-search://?cicd.aitracuuluat.vn`;
+                  window.location.href = iosSearchUrl;
+                }
+              }
+            }
+          }
+        }
+        return true;
+      }
+    } else if (isAndroid) {
+      if (!!isWebView) {
+        try {
+          // try chrome
+          const androidIntent = `intent://${url.replace(
+            "https://",
+            ""
+          )}#Intent;scheme=https;package=com.android.chrome;end;`;
+          window.location.href = androidIntent;
+        } catch (error) {
+          try {
+            // try chrome
+            const chromeUrl = `googlechrome://navigate?url=${url}`;
+            window.location.href = chromeUrl;
+          } catch (error) {
+            try {
+              // try fireforx
+              const firefoxUrl = ` firefox://open-url?url=${url}`;
+              window.location.href = firefoxUrl;
+            } catch (error) {}
+          }
+        }
+        return true;
+      }
+    }
+
+    return false; // Đang chạy trong trình duyệt đầy đủ
+  } catch (error) {
+    // console.log(error);
+    return false;
+  }
+}
