@@ -27,7 +27,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
-import { EditProfileDialog } from '@/components/candidate-edit-dialog';
+import { EditProfileDialog } from '@/app/ho-so-cua-toi/components/candidate-edit-dialog';
 import type { SearchFilters } from '@/components/job-search/search-results';
 import { validateProfileForApplication } from '@/lib/validators';
 import { CtaViecLamGoiY } from '@/components/cta-viec-lam-goi-y';

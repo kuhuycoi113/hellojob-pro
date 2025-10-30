@@ -52,7 +52,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { locations } from '@/lib/location-data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { EditProfileDialog } from '@/components/candidate-edit-dialog';
+import { EditProfileDialog } from '@/app/ho-so-cua-toi/components/candidate-edit-dialog';
 
 
 type MediaItem = {

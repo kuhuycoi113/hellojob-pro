@@ -9,7 +9,7 @@ import {
   User as FirebaseUser,
   UserInfo
 } from 'firebase/auth';
-import { Claims,filterStandardClaims } from "next-firebase-auth-edge/lib/auth/claims";
+import { Claims, filterStandardClaims } from "next-firebase-auth-edge/lib/auth/claims";
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
 
@@ -72,7 +72,7 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
   // Xác định role dựa vào serverUser
   let role: Role = 'guest';
   if (serverUser) {
-    if (!serverUser.phoneNumber || !serverUser.email) {
+    if (!serverUser.phone && !serverUser.messenger && !serverUser.line && !serverUser.messenger) {
       role = 'candidate-empty-profile';
     } else {
       role = 'candidate';
@@ -83,7 +83,7 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
   const isLoggedIn = role !== 'guest';
 
   // setRole không còn cần thiết, nhưng giữ lại hàm rỗng để không lỗi các nơi gọi
-  const setRole = (_role: Role) => {};
+  const setRole = (_role: Role) => { };
 
   const clearPostLoginAction = () => {
     setPostLoginAction(null);

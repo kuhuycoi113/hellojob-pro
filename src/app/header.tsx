@@ -303,7 +303,7 @@ export function Header() {
                       </Avatar>
                     </Link>
                   ) : (
-                    <Button onClick={() => setIsAuthDialogOpen(true)}>Đăng nhập / Đăng ký</Button>
+                    <Button><Link href={'/xac-thuc'}>Đăng nhập / Đăng ký</Link></Button>
                   )}
 
                   <CreateProfileDialog>

@@ -34,7 +34,7 @@ import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from '@/compon
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { CandidateProfile } from '@/ai/schemas';
-import { EditProfileDialog } from './candidate-edit-dialog';
+import { EditProfileDialog } from '../app/ho-so-cua-toi/components/candidate-edit-dialog';
 import type { SearchFilters } from './job-search/search-results';
 import { consultants } from '@/lib/consultant-data';
 

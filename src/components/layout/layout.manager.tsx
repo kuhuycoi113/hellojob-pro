@@ -3,9 +3,8 @@
 import { FloatingChatWidget } from '@/components/chat/floating-chat-widget';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { validateProfileForApplication } from '@/lib/utils';
 import type { CandidateProfile } from '@/ai/schemas';
-import { EditProfileDialog } from '../candidate-edit-dialog';
+import { EditProfileDialog } from '../../app/ho-so-cua-toi/components/candidate-edit-dialog';
 
 import { usePathname } from 'next/navigation';
 import { Header } from '@/components/header';
@@ -13,6 +12,7 @@ import { Footer } from '@/components/footer';
 import { Toaster } from '@/components/ui/toaster';
 import React, { type ReactNode, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { validateProfileForApplication } from '@/lib/validators';
 export function LayoutManager({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const { toast } = useToast();
@@ -21,6 +21,7 @@ export function LayoutManager({ children }: { children: ReactNode }) {
     const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
 
+    const isAuthPage = pathname.startsWith('/xac-thuc');
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
 

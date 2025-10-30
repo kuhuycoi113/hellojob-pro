@@ -14,33 +14,41 @@ import { format } from "date-fns";
 import { vi } from 'date-fns/locale';
 import { CalendarIcon, Info, QrCode, UploadCloud, Image as ImageIcon, Phone, MessageSquare } from 'lucide-react';
 import { cn, parseMessengerInput, parseZaloInput, parseLineInput } from '@/lib/utils';
-import { JpFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon } from './custom-icons';
+import { JpFlagIcon, VnFlagIcon, ZaloIcon, MessengerIcon, LineIcon } from '../../../components/custom-icons';
 import type { CandidateProfile } from '@/ai/schemas';
-import { Alert, AlertDescription, AlertTitle } from './ui/alert';
-import { Badge } from './ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert';
+import { Badge } from '../../../components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { validateProfileForApplication } from '@/lib/validators';
+import { useAuth } from '@/contexts/AuthContext';
+import { updateProfile } from '../action';
 
 
-type EnrichedCandidateProfile = CandidateProfile & { avatarUrl?: string };
+type EnrichedCandidateProfile = CandidateProfile & {
+    avatarUrl?: string;
+    videos?: any[];               // thêm nếu bạn lưu mảng url / object video
+    images?: any[];               // thêm nếu bạn lưu mảng ảnh
+    documents?: Record<string, any>; // thêm nếu có trường documents
+    aspirations?: Record<string, any>; // thêm nếu có trường aspirations
+};
 
 interface EditProfileDialogProps {
     isOpen: boolean;
     onOpenChange: (isOpen: boolean) => void;
-    onSaveSuccess: () => void;
+    onSaveSuccess: (updatedProfile: any) => void;
     onCancel?: () => void;
     source?: 'application' | 'profile';
 }
@@ -50,7 +58,7 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
     const cleanValue = value.replace(/\D/g, '');
 
     if (country === '+84') { // Vietnam (10 digits total)
-        if (!cleanValue.startsWith('0')) return cleanValue.slice(0,9);
+        if (!cleanValue.startsWith('0')) return cleanValue.slice(0, 9);
         if (cleanValue.length === 0) return '';
         if (cleanValue.length === 1) return `(0)`;
 
@@ -61,14 +69,14 @@ const formatPhoneNumberInput = (value: string, country: string): string => {
     }
 
     if (country === '+81') { // Japan (11 digits total starting with 0)
-        if (!cleanValue.startsWith('0')) return cleanValue.slice(0,10);
+        if (!cleanValue.startsWith('0')) return cleanValue.slice(0, 10);
         if (cleanValue.length === 0) return '';
         if (cleanValue.length === 1) return `(0)`;
-        
-        const mobilePart = cleanValue.substring(1); 
+
+        const mobilePart = cleanValue.substring(1);
         if (mobilePart.length <= 2) return `(0)${mobilePart}`;
-        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2, 6)}`;
-        return `(0)${mobilePart.slice(0,2)} ${mobilePart.slice(2,6)} ${mobilePart.slice(6,10)}`;
+        if (mobilePart.length <= 6) return `(0)${mobilePart.slice(0, 2)} ${mobilePart.slice(2, 6)}`;
+        return `(0)${mobilePart.slice(0, 2)} ${mobilePart.slice(2, 6)} ${mobilePart.slice(6, 10)}`;
     }
 
     return cleanValue;
@@ -104,7 +112,7 @@ const renderLevel1Edit = (
     };
 
     const CalendarComponent = () => (
-         <Calendar
+        <Calendar
             mode="single"
             locale={vi}
             selected={tempCandidate.personalInfo.dateOfBirth ? new Date(tempCandidate.personalInfo.dateOfBirth) : undefined}
@@ -131,32 +139,32 @@ const renderLevel1Edit = (
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 <div className="space-y-2">
-                <Label>Họ và tên</Label>
-                <Input value={tempCandidate.name || ''} onChange={(e) => handleTempChange('name' as any, 'name', e.target.value)} />
+                    <Label>Họ và tên</Label>
+                    <Input value={tempCandidate.personalInfo.fullName || ''} onChange={(e) => handleTempChange('personalInfo', 'fullName', e.target.value)} />
                 </div>
                 <div className="space-y-2">
                     <Label>Ngày sinh</Label>
-                     {isMobile ? (
+                    {isMobile ? (
                         <Sheet open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
                             <SheetTrigger asChild>
                                 <Button
                                     variant={"outline"}
                                     className={cn(
-                                    "w-full justify-start text-left font-normal",
-                                    !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
+                                        "w-full justify-start text-left font-normal",
+                                        !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
                                     )}
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {tempCandidate.personalInfo.dateOfBirth ? (
-                                    format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
+                                        format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
                                     ) : (
-                                    <span>Chọn ngày sinh</span>
+                                        <span>Chọn ngày sinh</span>
                                     )}
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="bottom" className="h-auto">
                                 <SheetHeader>
-                                <SheetTitle>Chọn ngày sinh</SheetTitle>
+                                    <SheetTitle>Chọn ngày sinh</SheetTitle>
                                 </SheetHeader>
                                 <CalendarComponent />
                             </SheetContent>
@@ -167,15 +175,15 @@ const renderLevel1Edit = (
                                 <Button
                                     variant={"outline"}
                                     className={cn(
-                                    "w-full justify-start text-left font-normal",
-                                    !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
+                                        "w-full justify-start text-left font-normal",
+                                        !tempCandidate.personalInfo.dateOfBirth && "text-muted-foreground"
                                     )}
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {tempCandidate.personalInfo.dateOfBirth ? (
-                                    format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
+                                        format(new Date(tempCandidate.personalInfo.dateOfBirth), "dd/MM/yyyy")
                                     ) : (
-                                    <span>Chọn ngày sinh</span>
+                                        <span>Chọn ngày sinh</span>
                                     )}
                                 </Button>
                             </PopoverTrigger>
@@ -186,17 +194,17 @@ const renderLevel1Edit = (
                     )}
                 </div>
                 <div className="space-y-2">
-                <Label>Giới tính</Label>
-                <Select value={tempCandidate.personalInfo.gender || ''} onValueChange={value => handleTempChange('personalInfo', 'gender', value)}>
-                    <SelectTrigger><SelectValue placeholder="Chọn giới tính" /></SelectTrigger>
-                    <SelectContent>
-                    <SelectItem value="Nam">Nam</SelectItem>
-                    <SelectItem value="Nữ">Nữ</SelectItem>
-                    <SelectItem value="Khác">Khác</SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Label>Giới tính</Label>
+                    <Select value={tempCandidate.personalInfo.gender || ''} onValueChange={value => handleTempChange('personalInfo', 'gender', value)}>
+                        <SelectTrigger><SelectValue placeholder="Chọn giới tính" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Nam">Nam</SelectItem>
+                            <SelectItem value="Nữ">Nữ</SelectItem>
+                            <SelectItem value="Khác">Khác</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
-                 <div className="space-y-2">
+                <div className="space-y-2">
                     <Label htmlFor="japaneseProficiency">Năng lực tiếng Nhật</Label>
                     <Select value={tempCandidate.personalInfo.japaneseProficiency || ''} onValueChange={value => handleTempChange('personalInfo', 'japaneseProficiency', value)}>
                         <SelectTrigger id="japaneseProficiency">
@@ -208,26 +216,26 @@ const renderLevel1Edit = (
                     </Select>
                 </div>
                 <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                    <Label>Chiều cao (cm)</Label>
-                    <span className={cn("text-sm font-semibold", height > 0 ? "text-primary" : "text-muted-foreground")}>
-                        {height > 0 ? `${height} cm` : 'Chưa chọn'}
-                    </span>
-                </div>
-                <Slider
-                    value={[height]}
-                    onValueChange={([value]) => handleTempChange('personalInfo', 'height', String(value))}
-                    min={140}
-                    max={205}
-                    step={1}
-                />
+                    <div className="flex justify-between items-center">
+                        <Label>Chiều cao (cm)</Label>
+                        <span className={cn("text-sm font-semibold", height > 0 ? "text-primary" : "text-muted-foreground")}>
+                            {height > 0 ? `${height} cm` : 'Chưa chọn'}
+                        </span>
+                    </div>
+                    <Slider
+                        value={[height]}
+                        onValueChange={([value]) => handleTempChange('personalInfo', 'height', String(value))}
+                        min={140}
+                        max={205}
+                        step={1}
+                    />
                 </div>
                 <div className="space-y-2">
                     <div className="flex justify-between items-center">
                         <Label>Cân nặng (kg)</Label>
-                         <span className={cn("text-sm font-semibold", weight > 0 ? "text-primary" : "text-muted-foreground")}>
+                        <span className={cn("text-sm font-semibold", weight > 0 ? "text-primary" : "text-muted-foreground")}>
                             {weight > 0 ? `${weight} kg` : 'Chưa chọn'}
-                         </span>
+                        </span>
                     </div>
                     <Slider
                         value={[weight]}
@@ -238,66 +246,66 @@ const renderLevel1Edit = (
                     />
                 </div>
                 <div className="space-y-2">
-                <Label>Hình xăm</Label>
-                <Select value={tempCandidate.personalInfo.tattooStatus || ''} onValueChange={value => handleTempChange('personalInfo', 'tattooStatus', value)}>
-                    <SelectTrigger><SelectValue placeholder="Chọn tình trạng hình xăm" /></SelectTrigger>
-                    <SelectContent>
-                    <SelectItem value="Không có">Không có</SelectItem>
-                    <SelectItem value="Có xăm nhỏ (kín)">Có xăm nhỏ (kín)</SelectItem>
-                    <SelectItem value="Có xăm to (lộ)">Có xăm to (lộ)</SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Label>Hình xăm</Label>
+                    <Select value={tempCandidate.personalInfo.tattooStatus || ''} onValueChange={value => handleTempChange('personalInfo', 'tattooStatus', value)}>
+                        <SelectTrigger><SelectValue placeholder="Chọn tình trạng hình xăm" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Không có">Không có</SelectItem>
+                            <SelectItem value="Có xăm nhỏ (kín)">Có xăm nhỏ (kín)</SelectItem>
+                            <SelectItem value="Có xăm to (lộ)">Có xăm to (lộ)</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className="space-y-2">
-                <Label>Viêm gan B</Label>
-                <Select value={tempCandidate.personalInfo.hepatitisBStatus || ''} onValueChange={value => handleTempChange('personalInfo', 'hepatitisBStatus', value)}>
-                    <SelectTrigger><SelectValue placeholder="Chọn tình trạng viêm gan B" /></SelectTrigger>
-                    <SelectContent>
-                    <SelectItem value="Không viêm gan B">Không viêm gan B</SelectItem>
-                    <SelectItem value="Viêm gan B thể tĩnh">Viêm gan B thể tĩnh</SelectItem>
-                    <SelectItem value="Viêm gan B thể động">Viêm gan B thể động</SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Label>Viêm gan B</Label>
+                    <Select value={tempCandidate.personalInfo.hepatitisBStatus || ''} onValueChange={value => handleTempChange('personalInfo', 'hepatitisBStatus', value)}>
+                        <SelectTrigger><SelectValue placeholder="Chọn tình trạng viêm gan B" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Không viêm gan B">Không viêm gan B</SelectItem>
+                            <SelectItem value="Viêm gan B thể tĩnh">Viêm gan B thể tĩnh</SelectItem>
+                            <SelectItem value="Viêm gan B thể động">Viêm gan B thể động</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className="md:col-span-2 mt-6 pt-6 border-t">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="phone" className="flex items-center gap-2">
-                                 <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
-                                 Số điện thoại
+                                <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
+                                Số điện thoại
                             </Label>
                             <div className="flex items-center">
                                 <Select value={phoneCountry} onValueChange={setPhoneCountry}>
-                                <SelectTrigger className="w-[120px] rounded-r-none">
-                                    <SelectValue>
-                                    <div className="flex items-center gap-1">
-                                        <span>{phoneCountry === '+84' ? 'VN' : 'JP'}</span>
-                                        <span>{phoneCountry}</span>
-                                    </div>
-                                    </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="+84"><div className="flex items-center gap-2">VN (+84)</div></SelectItem>
-                                    <SelectItem value="+81"><div className="flex items-center gap-2">JP (+81)</div></SelectItem>
-                                </SelectContent>
+                                    <SelectTrigger className="w-[120px] rounded-r-none">
+                                        <SelectValue>
+                                            <div className="flex items-center gap-1">
+                                                <span>{phoneCountry === '+84' ? 'VN' : 'JP'}</span>
+                                                <span>{phoneCountry}</span>
+                                            </div>
+                                        </SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="+84"><div className="flex items-center gap-2">VN (+84)</div></SelectItem>
+                                        <SelectItem value="+81"><div className="flex items-center gap-2">JP (+81)</div></SelectItem>
+                                    </SelectContent>
                                 </Select>
                                 <Input id="phone" type="tel" placeholder={phoneCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.phone || '', phoneCountry)} onChange={e => handleTempChange('personalInfo', 'phone', e.target.value.replace(/\D/g, ''))} />
                             </div>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="zalo" className="flex items-center gap-2">
-                                 <ZaloIcon />
-                                 Zalo (Số điện thoại)
+                                <ZaloIcon />
+                                Zalo (Số điện thoại)
                             </Label>
                             <div className="flex items-center relative">
                                 <Select value={zaloCountry} onValueChange={setZaloCountry}>
                                     <SelectTrigger className="w-[120px] rounded-r-none">
-                                    <SelectValue>
-                                        <div className="flex items-center gap-1">
-                                            <span>{zaloCountry === '+84' ? 'VN' : 'JP'}</span>
-                                            <span>{zaloCountry}</span>
-                                        </div>
-                                    </SelectValue>
+                                        <SelectValue>
+                                            <div className="flex items-center gap-1">
+                                                <span>{zaloCountry === '+84' ? 'VN' : 'JP'}</span>
+                                                <span>{zaloCountry}</span>
+                                            </div>
+                                        </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="+84"><div className="flex items-center gap-2">VN (+84)</div></SelectItem>
@@ -306,12 +314,12 @@ const renderLevel1Edit = (
                                 </Select>
                                 <Input id="zalo" placeholder={zaloCountry === '+84' ? '(0) 901 234 567' : '(0)90 1234 5678'} className="rounded-l-none" value={formatPhoneNumberInput(tempCandidate.personalInfo.zalo || '', zaloCountry)} onChange={(e) => handleTempChange('personalInfo', 'zalo', e.target.value.replace(/\D/g, ''))} />
                                 <div onClick={onQrClick} className="absolute right-2 cursor-pointer text-muted-foreground hover:text-primary">
-                                    <QrCode className="h-5 w-5"/>
+                                    <QrCode className="h-5 w-5" />
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-1">
-                             <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon />Facebook Messenger</Label>
+                            <Label htmlFor="messenger" className="flex items-center gap-2"><MessengerIcon />Facebook Messenger</Label>
                             <Input
                                 id="messenger"
                                 placeholder="Dán link Facebook / Messenger hoặc username"
@@ -333,8 +341,8 @@ const renderLevel1Edit = (
                                 onBlur={(e) => validateField('line', e.target.value)}
                                 className={cn(errors.line && "border-destructive")}
                             />
-                             {!errors.line && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>}
-                             {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
+                            {!errors.line && <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động lấy username của bạn.</p>}
+                            {errors.line && <p className="text-xs text-destructive">{errors.line}</p>}
                         </div>
                     </div>
                     <div className="mt-4 text-center text-sm">
@@ -350,6 +358,7 @@ const renderLevel1Edit = (
 
 export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source = 'profile', onCancel }: EditProfileDialogProps) {
     const { toast } = useToast();
+    const { role, user } = useAuth();
     const [tempCandidate, setTempCandidate] = useState<EnrichedCandidateProfile | null>(null);
     const [phoneCountry, setPhoneCountry] = useState('+84');
     const [zaloCountry, setZaloCountry] = useState('+84');
@@ -364,18 +373,36 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
 
     useEffect(() => {
         if (isOpen) {
-            const storedProfile = localStorage.getItem('generatedCandidateProfile');
-            if (storedProfile) {
-                setTempCandidate(JSON.parse(storedProfile));
+            const emptyUser = {
+                headline: '',
+                location: '',
+                about: '',
+                education: [],
+                experience: [],
+                personalInfo: {},
+                skills: [],
+                interests: [],
+                certifications: [],
+                documents: {},
+                desiredIndustry: '',
+                aspirations: {},
+                notes: '',
+                videos: [],
+                images: [],
+            };
+            if (user) {
+                setTempCandidate({
+                    ...emptyUser,
+                    ...user
+                });
             } else {
-                 setTempCandidate({
-                    name: '',
+                setTempCandidate({
                     headline: '',
                     location: '',
                     about: '',
                     education: [],
                     experience: [],
-                    personalInfo: { birthYear: 2000, gender: 'Nữ', phone: '', japaneseProficiency: '' , height: '0', weight: '0'},
+                    personalInfo: {},
                     skills: [],
                     interests: [],
                     certifications: [],
@@ -387,13 +414,13 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                     images: [],
                 });
             }
-             setErrors({});
+            setErrors({});
         }
     }, [isOpen]);
 
     const validateField = (field: 'messenger' | 'line', value: string) => {
         if (!value) {
-            setErrors(prev => ({...prev, [field]: undefined }));
+            setErrors(prev => ({ ...prev, [field]: undefined }));
             return true;
         }
 
@@ -407,7 +434,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
             isValid = /^(https?:\/\/line\.me\/|@?[\w.-]+)/.test(value);
             errorMessage = "Vui lòng nhập link Line hoặc Line ID hợp lệ.";
         }
-        
+
         if (isValid) {
             setErrors(prev => ({ ...prev, [field]: undefined }));
         } else {
@@ -417,7 +444,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
     };
 
 
-    const forceSave = () => {
+    const forceSave = async () => {
         if (tempCandidate) {
             const finalCandidate = { ...tempCandidate };
             if (finalCandidate.personalInfo.messenger) {
@@ -429,8 +456,11 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
             if (finalCandidate.personalInfo.zalo) {
                 finalCandidate.personalInfo.zalo = parseZaloInput(finalCandidate.personalInfo.zalo);
             }
+            console.log(finalCandidate)
+
+            const res = await updateProfile(user?.uid, finalCandidate);
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(finalCandidate));
-            onSaveSuccess();
+            onSaveSuccess(finalCandidate);
             onOpenChange(false);
             setIsConfirmSaveOpen(false);
         }
@@ -441,7 +471,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
 
         const isMessengerValid = validateField('messenger', tempCandidate.personalInfo.messenger || '');
         const isLineValid = validateField('line', tempCandidate.personalInfo.line || '');
-        
+
         if (!isMessengerValid || !isLineValid) {
             toast({
                 variant: 'destructive',
@@ -459,10 +489,10 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                 return;
             }
         }
-        
+
         forceSave();
     };
-    
+
     const handleCancel = () => {
         if (source === 'application') {
             setIsConfirmCancelOpen(true);
@@ -481,16 +511,18 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
         setTempCandidate(prev => {
             if (!prev) return null;
             const newCandidate = JSON.parse(JSON.stringify(prev)); // Deep copy
-    
-            if (section === 'name') {
-                newCandidate.name = field; // In this case, 'field' is the value
-            } else if (section === 'personalInfo') {
+
+            // Nếu section là tên trường đơn lẻ và value được truyền => gán value
+            if (section === 'personalInfo') {
                 newCandidate.personalInfo = { ...newCandidate.personalInfo, [field]: value };
+            } else if (section === 'aspirations' || section === 'documents') {
+                // nếu muốn hỗ trợ cập nhật object nested
+                newCandidate[section] = { ...(newCandidate as any)[section], [field]: value };
             } else {
-                // @ts-ignore
-                newCandidate[section as keyof EnrichedCandidateProfile] = field;
+                // Ở đây field có thể là toàn bộ giá trị thay thế cho section (ví dụ set array)
+                (newCandidate as any)[section] = value === undefined ? field : value;
             }
-    
+
             return newCandidate;
         });
     };
@@ -501,7 +533,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
             const reader = new FileReader();
             reader.onload = (event) => {
                 setQrImagePreview(event.target?.result as string);
-                
+
                 // --- SIMULATION of QR Code scan ---
                 setTimeout(() => {
                     const mockPhoneNumber = '0912345678';
@@ -531,9 +563,9 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                     </DialogHeader>
                     <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
                         {renderLevel1Edit(
-                            tempCandidate, 
-                            handleTempChange as any, 
-                            phoneCountry, setPhoneCountry, 
+                            tempCandidate,
+                            handleTempChange as any,
+                            phoneCountry, setPhoneCountry,
                             zaloCountry, setZaloCountry,
                             () => setIsQrDialogOpen(true),
                             isMobile,
@@ -552,36 +584,36 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                 </DialogContent>
             </Dialog>
 
-             <AlertDialog open={isConfirmCancelOpen} onOpenChange={setIsConfirmCancelOpen}>
+            <AlertDialog open={isConfirmCancelOpen} onOpenChange={setIsConfirmCancelOpen}>
                 <AlertDialogContent id="UNGTUYEN-L02-HUY01">
                     <AlertDialogHeader>
-                    <AlertDialogTitle>Bạn chắc chắn muốn hủy?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Hồ sơ của bạn vẫn cần thêm thông tin để có thể ứng tuyển. Bạn có muốn dừng việc cập nhật lúc này không?
-                    </AlertDialogDescription>
+                        <AlertDialogTitle>Bạn chắc chắn muốn hủy?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Hồ sơ của bạn vẫn cần thêm thông tin để có thể ứng tuyển. Bạn có muốn dừng việc cập nhật lúc này không?
+                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel>Ở lại</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => { setIsConfirmCancelOpen(false); onOpenChange(false); }}>Vẫn hủy</AlertDialogAction>
+                        <AlertDialogCancel>Ở lại</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => { setIsConfirmCancelOpen(false); onOpenChange(false); }}>Vẫn hủy</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            
+
             <AlertDialog open={isConfirmSaveOpen} onOpenChange={setIsConfirmSaveOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                    <AlertDialogTitle>Lưu hồ sơ chưa hoàn chỉnh?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Bạn vẫn chưa điền đủ dữ liệu để Ứng tuyển, bạn chắc chắn muốn lưu chứ?
-                    </AlertDialogDescription>
+                        <AlertDialogTitle>Lưu hồ sơ chưa hoàn chỉnh?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Bạn vẫn chưa điền đủ dữ liệu để Ứng tuyển, bạn chắc chắn muốn lưu chứ?
+                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel>Tiếp tục sửa</AlertDialogCancel>
-                    <AlertDialogAction onClick={forceSave}>Vẫn lưu</AlertDialogAction>
+                        <AlertDialogCancel>Tiếp tục sửa</AlertDialogCancel>
+                        <AlertDialogAction onClick={forceSave}>Vẫn lưu</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            
+
             <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
                 <DialogContent className="sm:max-w-xl">
                     <DialogHeader>
@@ -606,7 +638,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                                 <div className="space-y-2 text-center">
                                     <UploadCloud className="w-12 h-12 mx-auto text-muted-foreground" />
                                     <p className="font-semibold text-foreground">
-                                    Nhấp hoặc kéo thả file vào đây
+                                        Nhấp hoặc kéo thả file vào đây
                                     </p>
                                     <p className="text-xs text-muted-foreground">PNG, JPG</p>
                                 </div>
@@ -619,13 +651,13 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
                                 onChange={handleZaloQrUpload}
                             />
                         </Label>
-                        
+
                         <div className="space-y-3">
-                             <h4 className="font-semibold text-center">Các bước lấy mã QR trên Zalo</h4>
-                             {/* Placeholder for instruction images */}
-                             <div className="p-8 text-center bg-gray-100 rounded-md">
+                            <h4 className="font-semibold text-center">Các bước lấy mã QR trên Zalo</h4>
+                            {/* Placeholder for instruction images */}
+                            <div className="p-8 text-center bg-gray-100 rounded-md">
                                 <p className="text-sm text-gray-500">Khu vực hiển thị ảnh hướng dẫn sẽ được thêm vào sau.</p>
-                             </div>
+                            </div>
                         </div>
 
                     </div>

@@ -13,7 +13,6 @@ export type DocumentItem = z.infer<typeof DocumentItemSchema>;
 
 
 export const CandidateProfileSchema = z.object({
-  name: z.string().describe('The full name of the candidate.'),
   headline: z.string().describe('A professional headline for the candidate (e.g., "Software Engineer at Google").'),
   location: z.string().describe('The city and country where the candidate is located.'),
   about: z.string().describe('A brief summary or about section from the CV.'),
@@ -29,9 +28,10 @@ export const CandidateProfileSchema = z.object({
     description: z.string().describe('A description of the responsibilities and achievements in the role.'),
   })).describe('A list of work experiences.'),
   personalInfo: z.object({
-    birthYear: z.number().describe('The birth year of the candidate.'),
-    gender: z.string().describe('The gender of the candidate.'),
-    phone: z.string().describe('The phone number of the candidate.'),
+    fullName: z.string().optional().describe('The full name of the candidate.'),
+    birthYear: z.number().optional().describe('The birth year of the candidate.'),
+    gender: z.string().optional().describe('The gender of the candidate.'),
+    phone: z.string().optional().describe('The phone number of the candidate.'),
     japaneseProficiency: z.string().optional().describe('Japanese language proficiency (e.g., "N3").'),
     englishProficiency: z.string().optional().describe('English language proficiency (e.g., "TOEIC 700").'),
     dateOfBirth: z.string().optional().describe('The full date of birth (e.g., "12/12/2006").'),
@@ -47,9 +47,9 @@ export const CandidateProfileSchema = z.object({
   skills: z.array(z.string()).describe('A list of key skills.'),
   certifications: z.array(z.string()).describe('A list of certifications or awards.'),
   documents: z.object({
-      vietnam: z.array(DocumentItemSchema).optional().describe('List of Vietnamese documents.'),
-      japan: z.array(DocumentItemSchema).optional().describe('List of Japanese documents.'),
-      other: z.array(DocumentItemSchema).optional().describe('List of other/foreign documents.'),
+    vietnam: z.array(DocumentItemSchema).optional().describe('List of Vietnamese documents.'),
+    japan: z.array(DocumentItemSchema).optional().describe('List of Japanese documents.'),
+    other: z.array(DocumentItemSchema).optional().describe('List of other/foreign documents.'),
   }).optional().describe('A collection of the candidate\'s legal documents.'),
   desiredIndustry: z.string().describe('The desired industry for future roles.'),
   aspirations: z.object({
@@ -68,4 +68,4 @@ export const CandidateProfileSchema = z.object({
 
 export type CandidateProfile = z.infer<typeof CandidateProfileSchema>;
 
-    
+

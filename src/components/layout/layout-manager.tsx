@@ -12,7 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import { validateProfileForApplication } from '@/lib/validators';
 import type { CandidateProfile } from '@/ai/schemas';
-import { EditProfileDialog } from '../candidate-edit-dialog';
+import { EditProfileDialog } from '../../app/ho-so-cua-toi/components/candidate-edit-dialog';
 import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
 import { CtaViecLamGoiY } from '../cta-viec-lam-goi-y';
 import { CtaViecLamPhuHop } from '../cta-viec-lam-phu-hop';
@@ -34,6 +34,7 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
         setIsClient(true);
     }, []);
 
+    const isAuthPage = pathname.startsWith('/xac-thuc');
     const isCallPage = pathname.startsWith('/goi-video') || pathname.startsWith('/goi-thoai');
     const isPartnerPage = pathname.startsWith('/doi-tac') || pathname.startsWith('/partner');
     const isNtdLandingNdPage = pathname === '/nha-tuyen-dung/landing/nd';
@@ -41,7 +42,7 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
     const excludedCtaPages = ['/', '/gioi-thieu', '/nha-tuyen-dung', '/nhuong-quyen', '/viec-lam', '/nha-tuyen-dung/dang-ky', '/nha-tuyen-dung/landing/nd'];
 
     // Determine whether to show CTAs based on client-side path
-    const showDefaultCtas = isClient && !isCallPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
+    const showDefaultCtas = isClient && !isCallPage && !isAuthPage && !isPartnerPage && !excludedCtaPages.includes(pathname);
     const showProfileSuggestions = !pathname.startsWith('/viec-lam');
     const showNtdLandingCta = isClient && isNtdLandingNdPage;
 
@@ -101,8 +102,8 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
 
     return (
         <>
-            {!isCallPage && !isPartnerPage && <Header />}
-            <main className="min-h-screen">{children}</main>
+            {!isCallPage && !isPartnerPage&&!isAuthPage && <Header />}
+            <main className={!isAuthPage?"min-h-screen":""}>{children}</main>
             {showDefaultCtas && (
                 <div className="space-y-20 md:space-y-28 py-20 md:py-28">
                     {showProfileSuggestions && <CtaViecLamPhuHop />}
@@ -115,7 +116,7 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
                     <CtaNhaTuyenDung />
                 </div>
             )}
-            {!isCallPage && !isPartnerPage && <Footer />}
+            {!isCallPage && !isPartnerPage&&!isAuthPage && <Footer />}
             {!isCallPage && !isPartnerPage && <FloatingChatWidget />}
             <Toaster />
             <AlertDialog open={isPostLoginApplyDialogOpen} onOpenChange={(open) => {

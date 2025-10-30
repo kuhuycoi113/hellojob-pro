@@ -45,8 +45,6 @@ export function RootProvider({
     serverUser
 }: AuthProviderProps) {
     const [user, setUser] = React.useState(serverUser);
-    const searchParams = useSearchParams();
-    const refID = searchParams?.get('refID');
     React.useEffect(() => {
         if (user === serverUser) {
             return;
@@ -76,16 +74,17 @@ export function RootProvider({
         ) {
             return;
         }
-        const decodedUser = toUser(firebaseUser, idTokenResult);
+        let decodedUser = toUser(firebaseUser, idTokenResult);
         await login(idTokenResult.token);
-        const res = await setUserData(decodedUser, refID);
-        decodedUser.userInfo = res.userInfo;
+        const res = await setUserData(decodedUser, null);
+        decodedUser = { ...decodedUser, ...res.userInfo };
         // console.log(decodedUser)
         // if(!res.isNewUser){
 
         // }else{
         //   decodedUser.
         // }
+        console.log(decodedUser)
         setUser(decodedUser);
     };
 

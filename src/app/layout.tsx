@@ -101,21 +101,19 @@ export default async function RootLayout({
   let user = tokens ? toUser(tokens) : null;
   try {
     if (!!user?.uid) {
-      // const adminApp = getFirebaseAdminApp();
-      // const db = adminApp.firestore();
-      // const fetchedUser = (await db.doc(`/users/${user.uid}`).get())?.data();
-      // if (!!fetchedUser?.createdDate?.seconds) {
-      //   fetchedUser.createdDate = fetchedUser.createdDate.seconds * 1000;
-      // }
-      // if (!!fetchedUser?.dateOfBirth?.seconds) {
-      //   fetchedUser.dateOfBirth = fetchedUser.dateOfBirth.seconds * 1000;
-      // }
-      // if (!!fetchedUser?.dateOfFirstIssue?.seconds) {
-      //   fetchedUser.dateOfFirstIssue = fetchedUser.dateOfFirstIssue.seconds * 1000;
-      // }
-      // user.userInfo = fetchedUser;
-      // user.isAdmin = fetchedUser?.role?.indexOf("ADMIN") > -1;
-      // user.role = fetchedUser?.role;
+      const adminApp = getFirebaseAdminApp();
+      const db = adminApp.firestore();
+      const fetchedUser = (await db.doc(`/users/${user.uid}`).get())?.data();
+      if (!!fetchedUser?.createdDate?.seconds) {
+        fetchedUser.createdDate = fetchedUser.createdDate.seconds * 1000;
+      }
+      if (!!fetchedUser?.dateOfBirth?.seconds) {
+        fetchedUser.dateOfBirth = fetchedUser.dateOfBirth.seconds * 1000;
+      }
+      if (!!fetchedUser?.dateOfFirstIssue?.seconds) {
+        fetchedUser.dateOfFirstIssue = fetchedUser.dateOfFirstIssue.seconds * 1000;
+      }
+      user = { ...user, ...fetchedUser };
     }
   } catch (error) {
     console.log(error);
