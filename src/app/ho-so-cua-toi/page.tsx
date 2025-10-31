@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon, Ruler, QrCode, Info, UploadCloud } from 'lucide-react';
+import { Briefcase, Building, Cake, Dna, Edit, GraduationCap, MapPin, Phone, School, User, Award, Languages, Star, FileDown, Video, Image as ImageIcon, PlusCircle, Trash2, RefreshCw, X, Camera, MessageSquare, Facebook, Contact, UserCog, Trophy, PlayCircle, LogOut, Wallet, Target, Milestone, FilePen, Globe, ChevronDown, Loader2, Send, FileArchive, Eye, Link2, Share2, FileType, FileJson, FileSpreadsheet, FileCode, FileText, Sheet, ArrowRightLeft, CalendarIcon, Ruler, QrCode, Info, UploadCloud, CakeIcon } from 'lucide-react';
 import Image from 'next/image';
 import { auth as firebaseAuth } from "@/lib/firebase";
 import {
@@ -60,6 +60,7 @@ import { SendProfileDialog } from './components/send-profile-dialog';
 import { MediaCarousel } from './components/media-carousel';
 import { BodyPhotosCarousel } from './components/body-photos-carousel';
 import { SendOptionsDialog } from './components/send-options-dialog';
+import { format } from "date-fns";
 const translations = {
     vi: {
         personalInfo: "Thông tin cá nhân",
@@ -633,7 +634,7 @@ export default function CandidateProfilePage() {
                                     <h1 className="text-3xl font-headline font-bold" style={{ textTransform: 'capitalize' }}>{user?.personalInfo?.fullName || 'Chưa có tên'}</h1>
                                     <p className="text-muted-foreground">{user?.profileHeadline || 'Cập nhật hồ sơ của bạn'}</p>
                                     <p className="text-sm text-muted-foreground flex items-center justify-center md:justify-start gap-2 mt-1">
-                                        <MapPin className="h-4 w-4" /> {candidate.location??'Chưa cập nhật vị trí'}
+                                        <CakeIcon className="h-4 w-4" /> {user?.personalInfo?.dateOfBirth ? format(user?.personalInfo?.dateOfBirth, 'dd/MM/yyyy') : 'Chưa cập nhật'}
                                     </p>
                                 </div>
                                 <div className="md:ml-auto mt-4 md:mt-0 flex items-center gap-2">

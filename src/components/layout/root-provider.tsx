@@ -56,6 +56,16 @@ export function RootProvider({
             setUser({ ...user });
         }
     }, []);
+    React.useEffect(() => {
+        const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
+            if (!firebaseUser) {
+                await handleLogout();
+                return;
+            }
+            await handleLogin(firebaseUser);
+        });
+        return unsubscribe;
+    }, []); // <-- run once, not on every user change
     const handleLogout = async () => {
         if (!user) {
             return;
@@ -87,17 +97,6 @@ export function RootProvider({
         console.log(decodedUser)
         setUser(decodedUser);
     };
-
-    const handleIdTokenChanged = async (firebaseUser: FirebaseUser | null) => {
-        if (!firebaseUser) {
-            await handleLogout();
-            return;
-        }
-        await handleLogin(firebaseUser);
-    };
-    React.useEffect(() => {
-        return onIdTokenChanged(auth, handleIdTokenChanged);
-    }, [user]);
     return (
         <AuthProvider serverUser={user}>
             <ChatProvider>
