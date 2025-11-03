@@ -10,10 +10,12 @@ import {
     getSalaryUnitByNumber
 } from './utils';
 import sharp from 'sharp';
-
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 // Constants cho cấu hình JOB và RECRUITMENT
 const JOB_KEYS = [
-    { key: 'code', backgroundColor: '#fff', color: '#FF1400' },
+    { key: 'code', backgroundColor: 'rgba(0,0,0,.6)', color: '#fff' },
     { key: 'visa,workLocation', backgroundColor: '#fff', color: '#FF5A00' },
     { key: 'job,numberRecruits,interviewDay', backgroundColor: '#fff', color: '#0D8DC8' },
     { key: 'specialConditions', backgroundColor: '#fff', color: '#afc536' },
@@ -34,7 +36,7 @@ const RECRUITMENT_KEYS = [
 export const generateJobMetaDataImage = async (job: any) => {
     try {
 
-        const { canvas, ctx, width, height, fontSize, font400, font600, startX, maxTextWidth } = createCanvasBase();
+        const { canvas, ctx, width, height, fontSize, font200, font400, font700, startX, maxTextWidth } = createCanvasBase();
 
         // Load ảnh nền
         const avatarUrl = job.avatar?.url ?? job.avatar ?? '/img/metadata/opengraph-image.jpg';
@@ -43,14 +45,16 @@ export const generateJobMetaDataImage = async (job: any) => {
         let startY = 50;
         for (const { key, backgroundColor, color } of JOB_KEYS) {
             const keys = key.split(',');
+            ctx.font = font400;
             switch (key) {
                 case 'code': {
+                    ctx.font = font700;
                     const text = job.code;
                     const textWidth = ctx.measureText(text).width;
-                    drawRoundedRect(ctx, startX - 15, startY - 15, textWidth + 35 + fontSize, fontSize + 30, 10, backgroundColor);
+                    drawRoundedRect(ctx, startX - 15, startY - 15, textWidth + 35 + fontSize, fontSize + 30, 40, backgroundColor);
                     const flag = await loadImage(`${process.env.DOMAIN}/img/flags/png/jp.png?v=191`);
                     drawImage(ctx, flag, startX, startY, fontSize, fontSize);
-                    drawText(ctx, breakLine(ctx, text, maxTextWidth - fontSize - 5), color, startX + fontSize + 5, startY + 43);
+                    drawText(ctx, breakLine(ctx, text, maxTextWidth - fontSize - 5), color, startX + fontSize + 5, startY + 40);
                     break;
                 }
                 case 'realSalary': {
@@ -71,7 +75,7 @@ export const generateJobMetaDataImage = async (job: any) => {
                     break;
                 }
                 case 'fee': {
-                    const parts = buildFeeParts(job, color, font400, font600);
+                    const parts = buildFeeParts(job, color, font200, font700);
                     const fullText = parts.map(p => p.text).join('');
                     const textWidth = ctx.measureText(fullText).width;
                     if (textWidth > 0) {
@@ -84,6 +88,20 @@ export const generateJobMetaDataImage = async (job: any) => {
                         }
                         ctx.font = font400;
                     }
+                    break;
+                }
+                case 'basicSalary': {
+                    const firstText = 'Lương cơ bản: ';
+                    const secondText = `${formatNumberDot(job['basicSalary'])} ${getSalaryUnitByNumber(job['basicSalary'])}`;
+                    const firstTextWidth = ctx.measureText(firstText).width;
+                    ctx.font = font700;
+                    const secondTextWidth = ctx.measureText(secondText).width;
+                    ctx.font = font400;
+                    const textWidth = firstTextWidth + secondTextWidth;
+                    drawRoundedRect(ctx, startX - 15, startY - 15, textWidth + 30, fontSize + 30, 10, backgroundColor);
+                    drawText(ctx, breakLine(ctx, firstText, maxTextWidth), color, startX, startY + 39);
+                    ctx.font = font700;
+                    drawText(ctx, breakLine(ctx, secondText, maxTextWidth), color, startX + firstTextWidth, startY + 39);
                     break;
                 }
                 default: {
@@ -114,8 +132,6 @@ export const generateJobMetaDataImage = async (job: any) => {
 
 // ⬇️ Helper Functions
 const createCanvasBase = () => {
-    registerFont(`./src/lib/fonts/SFProDisplay-Regular.ttf`, { family: 'ArialRegular' });
-    registerFont(`./src/lib/fonts/SFProDisplay-Bold.ttf`, { family: 'ArialMedium' });
     const width = 1200;
     const height = 630;
     const scale = 2;
@@ -126,31 +142,93 @@ const createCanvasBase = () => {
     ctx.antialias = 'subpixel';
     ctx.patternQuality = 'bilinear';
     ctx.quality = 'best';
-    const font400 = `${fontSize}px ArialRegular`;
-    const font600 = `${fontSize}px ArialMedium`;
-    ctx.font = font400;
-    return { canvas, ctx, width, height, fontSize, font400, font600, startX: 85, maxTextWidth: 1000 };
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    const thinPath = path.resolve(__dirname, './fonts/Montserrat-Thin.ttf');
+    const extraLightPath = path.resolve(__dirname, './fonts/Montserrat-ExtraLight.ttf');
+    const regularPath = path.resolve(__dirname, './fonts/Montserrat-Regular.ttf');
+    const boldPath = path.resolve(__dirname, './fonts/Montserrat-Bold.ttf');
+
+    console.log('Registering fonts:', {
+        thin: fs.existsSync(thinPath),
+        extraLight: fs.existsSync(extraLightPath),
+        regular: fs.existsSync(regularPath),
+        bold: fs.existsSync(boldPath),
+    });
+
+    // Register each file with numeric weight under family "Montserrat"
+    // and also register an alias family as a fallback if weight mapping fails.
+    try {
+        if (fs.existsSync(thinPath)) {
+            registerFont(thinPath, { family: 'Montserrat', weight: '100', style: 'normal' });
+            registerFont(thinPath, { family: 'Montserrat-Thin', weight: '400', style: 'normal' });
+        }
+        if (fs.existsSync(extraLightPath)) {
+            registerFont(extraLightPath, { family: 'Montserrat', weight: '200', style: 'normal' });
+            registerFont(extraLightPath, { family: 'Montserrat-ExtraLight', weight: '400', style: 'normal' });
+        }
+        if (fs.existsSync(regularPath)) {
+            registerFont(regularPath, { family: 'Montserrat', weight: '400', style: 'normal' });
+            registerFont(regularPath, { family: 'Montserrat-Regular', weight: '400', style: 'normal' });
+        }
+        if (fs.existsSync(boldPath)) {
+            registerFont(boldPath, { family: 'Montserrat', weight: '700', style: 'normal' });
+            registerFont(boldPath, { family: 'Montserrat-Bold', weight: '400', style: 'normal' });
+        }
+    } catch (e) {
+        console.warn('registerFont failed:', e);
+    }
+
+    // preferred font strings (use quoted family)
+    const font100 = `100 ${fontSize}px 'Montserrat'`;
+    const font200 = `200 ${fontSize}px 'Montserrat'`;
+    const font400 = `400 ${fontSize}px 'Montserrat'`;
+    const font700 = `700 ${fontSize}px 'Montserrat'`;
+
+    // fallback font strings that reference explicit alias families if mapping fails
+    const font200Fallback = `${fontSize}px 'Montserrat-ExtraLight'`;
+    const font700Fallback = `${fontSize}px 'Montserrat-Bold'`;
+
+    // set a default font (try preferred first, if not working you can switch to fallback)
+    ctx.font = font400; // use "200 46px 'Montserrat'"
+
+    return {
+        canvas,
+        ctx,
+        width,
+        height,
+        fontSize,
+        // return both preferred and fallback strings so calling code can choose:
+        font200,
+        font400,
+        font700,
+        font700Fallback,
+        startX: 85,
+        maxTextWidth: 1000
+    };
 };
 
-const buildFeeParts = (job: any, color: string, font400: string, font600: string) => {
+const buildFeeParts = (job: any, color: string, font200: string, font700: string) => {
     const parts: { text: string; color: string; font: string }[] = [];
     const feeText = job.totalFee ?? job.fee ? formatFee(job.totalFee ?? job.fee) : null;
     const backText = job.back ? formatBackText(job.back, job.visa) : null;
     const quantityText = job.quantity ? `${job.quantity / 1000000}tr` : null;
 
     if (feeText) {
-        parts.push({ text: 'Phí ', color, font: font400 });
-        parts.push({ text: `${feeText}`, color: '#AFC536', font: font600 });
+        parts.push({ text: 'Phí ', color, font: font200 });
+        parts.push({ text: `${feeText}`, color: '#AFC536', font: font700 });
     }
     if (backText) {
-        if (parts.length) parts.push({ text: ', ', color, font: font400 });
-        parts.push({ text: 'Back ', color, font: font400 });
-        parts.push({ text: backText, color: '#FF5A00', font: font600 });
+        if (parts.length) parts.push({ text: ', ', color, font: font200 });
+        parts.push({ text: 'Back ', color, font: font200 });
+        parts.push({ text: backText, color: '#FF5A00', font: font700 });
     }
     if (quantityText) {
-        if (parts.length) parts.push({ text: ', ', color, font: font400 });
-        parts.push({ text: 'Chỉ tiêu ', color: font400, font: font400 });
-        parts.push({ text: quantityText, color: '#FF5A00', font: font600 });
+        if (parts.length) parts.push({ text: ', ', color, font: font200 });
+        parts.push({ text: 'Chỉ tiêu ', color: font200, font: font200 });
+        parts.push({ text: quantityText, color: '#FF5A00', font: font700 });
     }
     return parts;
 };
@@ -276,8 +354,9 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             width,
             height,
             fontSize,
+            font200,
             font400,
-            font600,
+            font700,
         } = createCanvasBase();
 
         const cols = 2;
@@ -287,8 +366,8 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
 
         const titleFontSize = 33;
         const salaryFontSize = 33;
-        const titleFont = `${titleFontSize}px ArialRegular`;
-        const salaryFont = `${salaryFontSize}px ArialMedium`;
+        const titleFont = `400 ${titleFontSize}px Montserrat`;
+        const salaryFont = `700 ${salaryFontSize}px Montserrat`;
         await drawRoundedRect(ctx, 0, 0, width, height, 0, '#fff')
 
         for (let index = 0; index < 4; index++) {
@@ -376,7 +455,7 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
                     } else {
                         salary += ` ${formatNumberDot(job['realSalary'])} ${getSalaryUnitByNumber(job['realSalary'])}`;
                     }
-                    ctx.font = font600;
+                    ctx.font = font700;
                     ctx.fillStyle = '#f06424';
                     const salaryMetrics = ctx.measureText(salary);
                     const salaryWidth = salaryMetrics.width;
@@ -394,11 +473,11 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             if (index === 3 && total > 4) {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
                 ctx.fillRect(x, y, cardWidth, cardHeight);
-                ctx.font = font600;
+                ctx.font = font700;
                 ctx.fillStyle = '#fff';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.font = `90px ArialMedium`;
+                ctx.font = `700 90px Montserrat`;
                 ctx.fillText(`+${total - 3}`, cardWidth / 2 + x, cardHeight / 2 + y);
                 ctx.textAlign = 'start';
                 ctx.textBaseline = 'alphabetic';
@@ -411,8 +490,8 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             width,
             height,
             fontSize,
-            font400,
-            font600
+            font200,
+            font700
         };
     } catch (err) {
         return null;
@@ -427,8 +506,8 @@ export const generateWarehouseMetaDataImage = async (user: any, jobs: any[], tot
             width,
             height,
             fontSize,
-            font400,
-            font600
+            font200,
+            font700
         } = await generateJobMetaDataJobsImage(jobs, total);
         const warehouseNameCardWidth = width * 0.5869
         const warehouseNameCardHeight = height * 0.4038
@@ -441,7 +520,7 @@ export const generateWarehouseMetaDataImage = async (user: any, jobs: any[], tot
         x = x + leftPadding;
         y = y + (warehouseNameCardHeight - diameter) / 2;
         await drawCircleImage(ctx, user?.avatarUrl ?? `${process.env.NEXT_PUBLIC_URL}/img/loading-ani.png`, x, y, diameter, diameter, 2, "#e4e4e4");
-        const font = `60px ArialMedium`;
+        const font = `700 60px Montserrat`;
         x += diameter + leftPadding;
         y += 70;
         ctx.font = font;

@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateJobMetaDataImage } from "@/lib/meta-data-util";
 import { getJobByCode } from "@/actions/job-action";
+import { makeTestImageBuffer } from "@/lib/testcanvas";
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const jobCode = searchParams.get("jobCode") ?? null;
-    if(!jobCode){
+    if (!jobCode) {
       throw new Error("Missing jobCode parameter");
     }
     const job = await getJobByCode(jobCode);
     const buffer = await generateJobMetaDataImage(job);
+    // const buffer = await makeTestImageBuffer();
 
     if (!buffer) {
       return new NextResponse("Image generation failed", { status: 500 });
