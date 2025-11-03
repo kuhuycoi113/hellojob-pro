@@ -80,7 +80,7 @@ const sortSlugToNameMap: { [key: string]: string } = {
     'nhieu-nguoi-ung-tuyen': 'Nhiều người ứng tuyển',
 };
 
-export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: { searchParams: any }): Promise<Metadata> {
   const siteName = 'HelloJob';
   const baseUrl = 'https://vi.hellojob.jp';
   const params = await searchParams;
@@ -309,47 +309,12 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     : 'Tìm kiếm hàng ngàn cơ hội việc làm tại Nhật Bản. HelloJob là nền tảng giúp bạn tìm kiếm việc làm theo ngành nghề, địa điểm và loại visa phù hợp nhất.';
   
   // Safely construct URLSearchParams
-  const cleanSearchParams: { [key: string]: string | string[] } = {};
-  if (q) cleanSearchParams.q = q;
-  if (visaDetailSlug) cleanSearchParams['chi-tiet-loai-hinh-visa'] = visaDetailSlug;
-  if (industrySlug) cleanSearchParams['nganh-nghe'] = industrySlug;
-  if (locations.length > 0) cleanSearchParams['dia-diem'] = locations;
-  if (interviewLocationSlug) cleanSearchParams['dia-diem-phong-van'] = interviewLocationSlug;
-  if (specialConditionSlugs.length > 0) cleanSearchParams['dieu-kien-dac-biet'] = specialConditionSlugs;
-  if (sortBySlug) cleanSearchParams['sap-xep'] = sortBySlug;
-  if (quantity) cleanSearchParams['so-luong'] = quantity;
-  if (workShiftSlug) cleanSearchParams['ca-lam-viec'] = workShiftSlug;
-  if (otherSkillSlugs.length > 0) cleanSearchParams['yeu-cau-ky-nang-khac'] = otherSkillSlugs;
-  if (dominantHandSlug) cleanSearchParams['tay-thuan'] = dominantHandSlug;
-  if (educationSlug) cleanSearchParams['hoc-van'] = educationSlug;
-  if (languageSlug) cleanSearchParams['yeu-cau-tieng-nhat'] = languageSlug;
-  if (englishSlug) cleanSearchParams['yeu-cau-tieng-anh'] = englishSlug;
-  if (tattooSlug) cleanSearchParams['hinh-xam'] = tattooSlug;
-  if (visionSlug) cleanSearchParams['yeu-cau-thi-luc'] = visionSlug;
-  if (genderSlug) cleanSearchParams['gioi-tinh'] = genderSlug;
-  if (ages.length > 0) cleanSearchParams['do-tuoi'] = ages;
-  if (heights.length > 0) cleanSearchParams['chieu-cao'] = heights;
-  if (weights.length > 0) cleanSearchParams['can-nang'] = weights;
-  if (experienceSlug) cleanSearchParams['so-nam-kinh-nghiem'] = experienceSlug;
-  if (experienceRequirementSlug) cleanSearchParams['yeu-cau-kinh-nghiem'] = experienceRequirementSlug;
-  if (netSalary) cleanSearchParams['luong-thuc-linh'] = netSalary;
-  if (basicSalary) cleanSearchParams['luong-co-ban'] = basicSalary;
-  if (hourlySalary) cleanSearchParams['luong-gio'] = hourlySalary;
-  if (annualIncome) cleanSearchParams['thu-nhap-nam'] = annualIncome;
-  if (annualBonus) cleanSearchParams['thuong-nam'] = annualBonus;
-  if (netFee) cleanSearchParams['muc-phi'] = netFee;
-  if (netFeeNoTicket) cleanSearchParams['muc-phi-khong-ve'] = netFeeNoTicket;
-  if (interviewDate) cleanSearchParams['ngay-phong-van'] = interviewDate;
-  if (interviewDateType) cleanSearchParams['loai-ngay-phong-van'] = interviewDateType;
-  if (interviewRoundsSlug) cleanSearchParams['so-vong-phong-van'] = interviewRoundsSlug;
-  if (jobDetailSlug) cleanSearchParams['chi-tiet-cong-viec'] = jobDetailSlug;
-  if (ginouExpirySlug) cleanSearchParams['han-ginou'] = ginouExpirySlug;
-  if (companyArrivalTime) cleanSearchParams['thoi-diem-ve-cong-ty'] = companyArrivalTime;
 
 
 
+  const queryString = new URLSearchParams(params).toString();
   
-  const url = `${baseUrl}/tim-viec-lam?${new URLSearchParams(cleanSearchParams as any).toString()}`;
+  const url = `${process.env.DOMAIN}/api/public/getJobMetaImageForJobs?${queryString}`;
 
 
   return {

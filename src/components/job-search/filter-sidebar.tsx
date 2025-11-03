@@ -1189,8 +1189,8 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                         type="number"
                                         min="1"
                                         placeholder="Nhập số người"
-                                        value={filters.quantity || ''}
-                                        onChange={(e) => onFilterChange({ quantity: e.target.value })}
+                                        value={filters.numberRecruits || ''}
+                                        onChange={(e) => onFilterChange({ numberRecruits: e.target.value })}
                                     />
                                 </div>
                             </AccordionContent>

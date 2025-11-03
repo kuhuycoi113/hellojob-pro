@@ -40,7 +40,7 @@ export type SearchFilters = {
     tattooRequirement?: string;
     netFee?: string;
     netFeeNoTicket?: string;
-    quantity?: string;
+    numberRecruits?: string;
     interviewRounds?: string;
     visionRequirement?: string;
     dominantHand?: string;

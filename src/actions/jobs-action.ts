@@ -10,7 +10,7 @@ const CANDIDATES_INDEX = 'hellojobv5-job-crawled';
 function createSearchQuery(filter: SearchFilters): any {
 
     const {
-        q, visaDetail, career, workLocation, job, interviewLocation, quantity, netFee, netFeeNoTicket, interviewRounds, interviewDate, interviewDateType,
+        q, visaDetail, career, workLocation, job, interviewLocation, numberRecruits, netFee, netFeeNoTicket, interviewRounds, interviewDate, interviewDateType,
         basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
         age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
         otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement

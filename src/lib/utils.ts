@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge"
 import MAPPING_IMAGES from "@/lib/mapping_images.json";
 import MAPPING_EXCLUDE_IMAGES from "@/lib/mapping_exclude_images.json";
 import { japanJobTypes, visaDetailsByVisaType } from "./visa-data";
+import { SearchFilters } from "@/components/job-search/search-results";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -317,3 +318,5 @@ export function getSalaryUnitByNumber(input: any) {
   if (input < 100) return "man";
   return ""; // Không nằm trong các trường hợp trên
 }
+
+

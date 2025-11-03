@@ -1,24 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { pagingJobsV2 } from "@/lib/elasticsearch";
 import { generateJobMetaDataJobsImage } from "@/lib/meta-data-util";
-import { Pager } from "@/class/pager.class";
-import { convertQueryParamsToJobFilter } from "@/lib/util";
+import { generateJobFilter } from "@/lib/job-filter-util";
+import { getJobs } from "@/actions/jobs-action";
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const queryParamObj = Object.fromEntries(searchParams.entries());
-    const pager = new Pager();
-    pager.filter = convertQueryParamsToJobFilter(queryParamObj);
-    pager.displayPerPage = 4;
-    const queryResponse = await pagingJobsV2(pager);
-    const totalJob = queryResponse.hits.total.value;
-    const jobs = queryResponse.hits.hits.map((item: any) => ({ ...item._source }));
-    const {canvas} = await generateJobMetaDataJobsImage(jobs, totalJob);
+    const { newFilters } = generateJobFilter(searchParams);
+    const { docs: jobs, total: totalJob } = await getJobs(newFilters, 1, 4);
+    const { canvas } = await generateJobMetaDataJobsImage(jobs, totalJob);
     if (!canvas) {
       return new NextResponse("Image generation failed", { status: 500 });
     }
-    const buffer=canvas.toBuffer('image/jpeg')
+    const buffer = canvas.toBuffer('image/jpeg')
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {

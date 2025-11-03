@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
 import { use, useState, useEffect } from 'react';
-import { cn, convertTime, findVisaByVisaDetail, generateBulletJobCrawl, getJobImage } from '@/lib/utils';
+import { cn, convertTime, findVisaByVisaDetail, formatGender, generateBulletJobCrawl, getJobImage } from '@/lib/utils';
 import { consultants } from '@/lib/consultant-data';
 import { ContactButtons } from '@/components/contact-buttons';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -65,7 +65,7 @@ const formatCurrency = (value?: any, currency: 'JPY' | 'VND' | 'USD' = 'JPY') =>
 
 const convertCurrency = (value?: string, from: 'JPY' | 'USD' = 'JPY') => {
     if (!value) return null;
-    const numericValue = parseInt(value.replace(/[^0-9]/g, ''), 10);
+    const numericValue = parseInt(('' + value).replace(/[^0-9]/g, ''), 10);
     if (isNaN(numericValue)) return null;
 
     const rate = from === 'JPY' ? JPY_VND_RATE : USD_VND_RATE;
@@ -97,7 +97,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
         setIsClient(true);
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
         setIsSaved(savedJobs.includes(job.id));
-
+        console.log(job)
         // Safely calculate dates on the client to avoid hydration mismatch
         setPostedTime(convertTime(job?.time || job?.postedDate || job?.createdDate));
 
@@ -195,13 +195,12 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
         }
     };
 
-    const getFeeDisplay = (feeValue: string | undefined, feeLabel: string) => {
-        const feeLimit = publicFeeLimits[job.visaDetail as keyof typeof publicFeeLimits];
+    const getFeeDisplay = (feeValue: any | undefined, feeLabel: string) => {
         const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
-
         if (!feeValue) {
             return isControlled ? "Không rõ" : null;
         }
+        const feeLimit = publicFeeLimits[job.visa as keyof typeof publicFeeLimits];
 
         const numericFee = parseInt(feeValue);
         if (isControlled && numericFee > feeLimit) {
@@ -291,7 +290,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         <RequirementItem icon={Briefcase} label="Ngành nghề" value={job.job ?? job.career ?? 'Liên hệ'} />
                                         <RequirementItem icon={MapPin} label="Nơi phỏng vấn" value={job.interviewLocation ?? 'Liên hệ'} />
                                         <RequirementItem icon={User} label="Giới tính" value={job.gender ?? 'Liên hệ'} />
-                                        <RequirementItem icon={Users} label="Số lượng" value={job.quantity ? `${job.quantity} người` : null} />
+                                        <RequirementItem icon={Users} label="Số lượng" value={job.numberRecruits ? `${job.numberRecruits} người` : null} />
                                         <RequirementItem icon={Cake} label="Yêu cầu tuổi" value={job.minAge && job.maxAge ? `${job.minAge} - ${job.maxAge}` : job.minAge ? `Từ ${job.minAge}` : job.maxAge ? `Đến ${job.maxAge}` : null} />
                                         <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageLevel ?? 'Không yêu cầu'} />
                                         <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={interviewDate ? interviewDate : 'Linh hoạt'} />
@@ -322,7 +321,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
 
                                 <JobDetailSection title="Mô tả công việc & Ghi chú" icon={FileText}>
                                     <div>
-                                        <p>Mô tả chi tiết cho công việc {(job.career || job.job) && <strong>{job.job ?? job.career}, {job.workLocation}{job.quantity ? `, tuyển ${job.quantity} ${job.gender}` : ''}</strong>}
+                                        <p>Mô tả chi tiết cho công việc {(job.career || job.job) && <strong>{job.job ?? job.career}, {job.workLocation}{job.numberRecruits ? `, tuyển ${job.numberRecruits} ${formatGender(job.gender)} người` : ''}</strong>}
                                             . Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản
                                             . Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p>
                                         <ul>
