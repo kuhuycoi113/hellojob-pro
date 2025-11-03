@@ -82,7 +82,6 @@ const sortSlugToNameMap: { [key: string]: string } = {
 
 export async function generateMetadata({ searchParams }: { searchParams: any }): Promise<Metadata> {
   const siteName = 'HelloJob';
-  const baseUrl = 'https://vi.hellojob.jp';
   const params = await searchParams;
 
   const q = params.q as string || '';
