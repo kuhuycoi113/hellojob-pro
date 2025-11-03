@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { validateProfileForApplication } from '@/lib/validators';
 import { useAuth } from '@/contexts/AuthContext';
-import { updateProfile } from '../action';
+import { updateProfile } from '@/actions/user-action';
 
 
 type EnrichedCandidateProfile = CandidateProfile & {

@@ -5,16 +5,10 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Heart, Briefcase, User, MoreHorizontal, MapPin, MessageSquare, DollarSign, CalendarClock, Bookmark, Phone, LogIn, Star, FileText } from 'lucide-react';
+import { MapPin, DollarSign, Star, FileText, Bookmark } from 'lucide-react';
 import { Job, publicFeeLimits } from '@/lib/mock-data';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -27,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { cn, convertTime, generateBulletJobCrawl, getJobImage } from '@/lib/utils';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, User } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
 import { ContactButtons } from './contact-buttons';
 import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from '@/components/ui/popover';
@@ -37,6 +31,7 @@ import { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from '../app/ho-so-cua-toi/components/candidate-edit-dialog';
 import type { SearchFilters } from './job-search/search-results';
 import { consultants } from '@/lib/consultant-data';
+import { applyJob, updateProfile } from '@/actions/user-action';
 
 
 const formatCurrency = (value?: string) => {
@@ -77,13 +72,13 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
     }
 };
 
-const validateProfileForApplication = (profile: CandidateProfile): boolean => {
+const validateProfileForApplication = (profile: User | null): boolean => {
     if (!profile || !profile.personalInfo) return false;
 
-    const { name, personalInfo } = profile;
-    const { gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = personalInfo;
+    const { personalInfo } = profile;
+    const { fullName, gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = personalInfo;
 
-    const hasRequiredPersonalInfo = name && gender && height && weight && tattooStatus && hepatitisBStatus;
+    const hasRequiredPersonalInfo = fullName && gender && height && weight && tattooStatus && hepatitisBStatus;
     const hasContactInfo = phone || zalo || messenger || line;
 
     return !!hasRequiredPersonalInfo && !!hasContactInfo;
@@ -134,7 +129,7 @@ const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): stri
 
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, fakeID }: { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, fakeID?: string }) => {
-    const { isLoggedIn, setPostLoginAction } = useAuth();
+    const { isLoggedIn, setPostLoginAction, user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
     const [isClient, setIsClient] = useState(false);
@@ -155,8 +150,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         setIsClient(true);
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
         setIsSaved(savedJobs.includes(job.id));
-        const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-        setHasApplied(appliedJobs.includes(job.id));
 
         // Safely calculate dates on the client to avoid hydration mismatch
         setPostedTime(convertTime(job?.time || job?.postedDate || job?.createdDate));
@@ -186,6 +179,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         setBadgeClassName(classes);
 
     }, [job.id, job.postedDate, job.interviewDate, job.visa]);
+    useEffect(() => {
+        if (!!user && !!job?.id) {
+            const appliedJobs = user.appliedJobs || [];
+            setHasApplied(appliedJobs.includes(job.id));
+        }
+    }, [job?.id, user]);
 
     const handleSaveJob = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -205,29 +204,26 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         window.dispatchEvent(new Event('storage'));
     };
 
-    const handleApplyClick = (e: React.MouseEvent) => {
+    const handleApplyClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
+        debugger
         if (!isLoggedIn) {
             setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: jobTitle } });
             setIsConfirmLoginOpen(true);
         } else {
-            const profileRaw = localStorage.getItem('generatedCandidateProfile');
-            if (profileRaw) {
-                const profile: CandidateProfile = JSON.parse(profileRaw);
-                if (validateProfileForApplication(profile)) {
-                    const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
-                    appliedJobs.push(job.id);
-                    localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
-                    setHasApplied(true);
-                    toast({
-                        title: 'Ứng tuyển thành công!',
-                        description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
-                        className: 'bg-green-500 text-white'
-                    });
-                } else {
-                    setIsProfileIncompleteAlertOpen(true);
-                }
+            if (validateProfileForApplication(user) && !!user) {
+                const appliedJobs = user.appliedJobs || [];
+                appliedJobs.push(job.id);
+                await applyJob(user.uid, job);
+                await updateProfile(user.uid, { appliedJobs });
+                user.appliedJobs = Object.assign([], appliedJobs);
+                setHasApplied(true);
+                toast({
+                    title: 'Ứng tuyển thành công!',
+                    description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
+                    className: 'bg-green-500 text-white'
+                });
             } else {
                 setIsProfileIncompleteAlertOpen(true);
             }
@@ -549,10 +545,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <span>{interviewDate || "Liên hệ"}</span>
                             </p>
                         </div>
-                        {job.workLocation && <div className="my-2 flex items-center gap-1 text-xs text-muted-foreground">
+                        <div className="my-2 flex items-center gap-1 text-xs text-muted-foreground">
                             <MapPin className="h-3 w-3 flex-shrink-0" />
-                            <span>{job.workLocation}</span>
-                        </div>}
+                            <span>{job.workLocation??'Liên hệ'}</span>
+                        </div>
 
                         <div className="mt-auto">
                             <div className="flex flex-wrap items-center justify-between gap-2">

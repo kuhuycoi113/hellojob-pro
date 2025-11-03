@@ -94,7 +94,6 @@ export function RootProvider({
         // }else{
         //   decodedUser.
         // }
-        console.log(decodedUser)
         setUser(decodedUser);
     };
     return (

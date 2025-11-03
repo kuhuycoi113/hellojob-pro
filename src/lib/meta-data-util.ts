@@ -1,0 +1,459 @@
+// ✅ Tối ưu và tái cấu trúc code chính cho việc tạo ảnh metadata job và recruitment
+
+import { createCanvas, loadImage, registerFont } from 'canvas';
+import {
+    formatBackText,
+    formatFee,
+    formatGender,
+    formatNumberDot,
+    getJobImage,
+    getSalaryUnitByNumber
+} from './utils';
+import sharp from 'sharp';
+
+// Constants cho cấu hình JOB và RECRUITMENT
+const JOB_KEYS = [
+    { key: 'code', backgroundColor: '#fff', color: '#FF1400' },
+    { key: 'visa,workLocation', backgroundColor: '#fff', color: '#FF5A00' },
+    { key: 'job,numberRecruits,interviewDay', backgroundColor: '#fff', color: '#0D8DC8' },
+    { key: 'specialConditions', backgroundColor: '#fff', color: '#afc536' },
+    { key: 'fee', backgroundColor: '#fff', color: '#000000' },
+    { key: 'realSalary', backgroundColor: '#AFC536', color: '#fff' },
+    { key: 'basicSalary', backgroundColor: '#fff', color: '#0d8dc8' }
+];
+
+const RECRUITMENT_KEYS = [
+    { key: 'code', backgroundColor: '#fff', color: '#2D3C6E' },
+    { key: 'visaType,workLocation', backgroundColor: '#fff', color: '#E75919' },
+    { key: 'jobVisa', backgroundColor: '#fff', color: '#1D91CC' },
+    { key: 'age,height,weight', backgroundColor: '#fff', color: '#B1C63D', joinChar: ' - ' },
+    { key: 'back,quantity', backgroundColor: '#fff', color: '#1D91CC' },
+    { key: 'basicSalary', backgroundColor: '#fff', color: '#1D91CC' }
+];
+
+export const generateJobMetaDataImage = async (job: any) => {
+    try {
+
+        const { canvas, ctx, width, height, fontSize, font400, font600, startX, maxTextWidth } = createCanvasBase();
+
+        // Load ảnh nền
+        const avatarUrl = job.avatar?.url ?? job.avatar ?? '/img/metadata/opengraph-image.jpg';
+        await drawBackgroundImage(ctx, avatarUrl, width, height);
+
+        let startY = 50;
+        for (const { key, backgroundColor, color } of JOB_KEYS) {
+            const keys = key.split(',');
+            switch (key) {
+                case 'code': {
+                    const text = job.code;
+                    const textWidth = ctx.measureText(text).width;
+                    drawRoundedRect(ctx, startX - 15, startY - 15, textWidth + 35 + fontSize, fontSize + 30, 10, backgroundColor);
+                    const flag = await loadImage(`${process.env.DOMAIN}/img/flags/png/jp.png?v=191`);
+                    drawImage(ctx, flag, startX, startY, fontSize, fontSize);
+                    drawText(ctx, breakLine(ctx, text, maxTextWidth - fontSize - 5), color, startX + fontSize + 5, startY + 43);
+                    break;
+                }
+                case 'realSalary': {
+                    const value = keys.map(k => job[k] && job[k]).filter(Boolean).join(', ');
+                    if (value) {
+                        const text = `Thực lĩnh: ${formatNumberDot(value)} ${getSalaryUnitByNumber(job[key])}`;
+                        let textWidth = ctx.measureText(text).width;
+                        let basicSalaryWidth = 0;
+                        if (job['basicSalary']) {
+                            basicSalaryWidth = ctx.measureText(`Lương cơ bản: ${formatNumberDot(job['basicSalary'])} ${getSalaryUnitByNumber(job['basicSalary'])}`)?.width;
+                        }
+                        textWidth = textWidth > basicSalaryWidth ? textWidth : basicSalaryWidth;
+                        const percent = Math.min(1, job['realSalary'] / job['basicSalary']);
+                        drawRoundedRect(ctx, startX - 15, startY - 15, textWidth + 30, fontSize + 30, 10, 'rgba(175, 197, 54, 0.5)');
+                        drawRoundedRect(ctx, startX - 15, startY - 15, (textWidth + 30) * percent, fontSize + 30, 10, backgroundColor);
+                        drawText(ctx, breakLine(ctx, text, maxTextWidth), color, startX, startY + 39);
+                    }
+                    break;
+                }
+                case 'fee': {
+                    const parts = buildFeeParts(job, color, font400, font600);
+                    const fullText = parts.map(p => p.text).join('');
+                    const textWidth = ctx.measureText(fullText).width;
+                    if (textWidth > 0) {
+                        drawRoundedRect(ctx, startX - 15, startY - 15, textWidth + 70, fontSize + 30, 10, '#fff');
+                        let offsetX = startX;
+                        for (const p of parts) {
+                            ctx.font = p.font;
+                            drawText(ctx, p.text, p.color, offsetX, startY + 39);
+                            offsetX += ctx.measureText(p.text).width;
+                        }
+                        ctx.font = font400;
+                    }
+                    break;
+                }
+                default: {
+                    const text = keys.map(k => {
+                        if (k === 'numberRecruits') return `${formatGender(job.gender)}`;
+                        if (k === 'interviewDay') {
+                            return job[k]?.replaceAll('-', '/') ?? null;
+                        }
+                        if (k === 'basicSalary') return `Lương cơ bản: ${formatNumberDot(job['basicSalary'])} ${getSalaryUnitByNumber(job['basicSalary'])}`;
+                        return job[k];
+                    }).filter(Boolean).join(', ');
+                    if (text) {
+                        const textWidth = ctx.measureText(text).width;
+                        drawRoundedRect(ctx, startX - 15, startY - 15, textWidth + 30, fontSize + 30, 10, backgroundColor);
+                        drawText(ctx, breakLine(ctx, text, maxTextWidth), color, startX, startY + 39);
+                    }
+                }
+            }
+            startY += 80;
+        }
+
+        return canvas.toBuffer('image/jpeg');
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+};
+
+// ⬇️ Helper Functions
+const createCanvasBase = () => {
+    registerFont(`./src/lib/fonts/SFProDisplay-Regular.ttf`, { family: 'ArialRegular' });
+    registerFont(`./src/lib/fonts/SFProDisplay-Bold.ttf`, { family: 'ArialMedium' });
+    const width = 1200;
+    const height = 630;
+    const scale = 2;
+    const fontSize = 46;
+    const canvas = createCanvas(width * scale, height * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.antialias = 'subpixel';
+    ctx.patternQuality = 'bilinear';
+    ctx.quality = 'best';
+    const font400 = `${fontSize}px ArialRegular`;
+    const font600 = `${fontSize}px ArialMedium`;
+    ctx.font = font400;
+    return { canvas, ctx, width, height, fontSize, font400, font600, startX: 85, maxTextWidth: 1000 };
+};
+
+const buildFeeParts = (job: any, color: string, font400: string, font600: string) => {
+    const parts: { text: string; color: string; font: string }[] = [];
+    const feeText = job.totalFee ?? job.fee ? formatFee(job.totalFee ?? job.fee) : null;
+    const backText = job.back ? formatBackText(job.back, job.visa) : null;
+    const quantityText = job.quantity ? `${job.quantity / 1000000}tr` : null;
+
+    if (feeText) {
+        parts.push({ text: 'Phí ', color, font: font400 });
+        parts.push({ text: `${feeText}`, color: '#AFC536', font: font600 });
+    }
+    if (backText) {
+        if (parts.length) parts.push({ text: ', ', color, font: font400 });
+        parts.push({ text: 'Back ', color, font: font400 });
+        parts.push({ text: backText, color: '#FF5A00', font: font600 });
+    }
+    if (quantityText) {
+        if (parts.length) parts.push({ text: ', ', color, font: font400 });
+        parts.push({ text: 'Chỉ tiêu ', color: font400, font: font400 });
+        parts.push({ text: quantityText, color: '#FF5A00', font: font600 });
+    }
+    return parts;
+};
+
+const breakLine = (ctx: any, text: string, maxWidth: number) => {
+    const original = text;
+    while (ctx.measureText(text).width > maxWidth) {
+        text = text.substring(0, text.length - 1);
+    }
+    return text + (text.length < original.length ? '...' : '');
+};
+
+const drawText = (ctx: any, text: string, color: string, x: number, y: number) => {
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+};
+
+const drawRoundedRect = (ctx: any, x: number, y: number, w: number, h: number, r: number, bg: string) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h);
+    ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+    ctx.fillStyle = bg;
+    ctx.fill();
+};
+
+const drawImage = async (ctx: any, img: any, x: number, y: number, w: number, h: number) => {
+    await ctx.drawImage(img, x, y, w, h);
+};
+const drawCircleImage = async (
+    ctx: any,
+    imgSource: any,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    borderWidth: number = 2,
+    borderColor: string = '#E4E4E4'
+) => {
+    const radius = Math.min(w, h) / 2;
+    const centerX = x + w / 2;
+    const centerY = y + h / 2;
+
+    ctx.save();
+
+    // Nền trắng hình tròn
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fillStyle = '#FFFFFF'; // Nền trắng
+    ctx.fill();
+
+    // Viền ngoài hình tròn
+    ctx.lineWidth = borderWidth;
+    ctx.strokeStyle = borderColor;
+    ctx.stroke();
+
+    // Tạo clipping path để chỉ vẽ hình tròn
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius - borderWidth / 2, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+
+    // Vẽ ảnh trong phần bị cắt
+
+    const imgUrl: string = imgSource ?? `${process.env.NEXT_PUBLIC_URL}/metadata/opengraph-image.jpg`;
+
+    let img;
+    try {
+        const response = await fetch(imgUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        // const buffer = await sharp(avatarUrl)
+        //     .toFormat('jpeg')
+        //     .toBuffer();
+        const output = await sharp(buffer)
+            .resize(Math.round(w), Math.round(h), {
+                fit: 'cover', // crop ảnh cho đúng khung
+                position: 'center' // có thể là 'top', 'left', 'right', 'bottom', 'entropy', v.v.
+            })
+            .toFormat('png') // hoặc .resize(), .crop(), etc
+            .toBuffer();
+        img = await loadImage(output);
+    } catch (e) {
+        console.log(e)
+        img = await loadImage(`${process.env.NEXT_PUBLIC_URL}/metadata/opengraph-image.jpg`);
+    }
+    await ctx.drawImage(img, x, y, w, h);
+
+    ctx.restore();
+};
+
+const drawBackgroundImage = async (ctx: any, url: string, w: number, h: number) => {
+    let img;
+    try {
+        img = await loadImage(url);
+    } catch (e) {
+        img = await loadImage(`${process.env.NEXT_PUBLIC_URL}/metadata/opengraph-image.jpg`);
+    }
+    const dim = getScaledDimension(img.width, img.height, w, h);
+    drawImage(ctx, img, (w - dim.width) / 2, (h - dim.height) / 2, dim.width, dim.height);
+};
+
+const getScaledDimension = (ow: number, oh: number, tw: number, th: number) => {
+    const ratio = Math.max(tw / ow, th / oh);
+    return { width: ow * ratio, height: oh * ratio };
+};
+
+
+export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): Promise<any> => {
+    try {
+
+        let {
+            canvas,
+            ctx,
+            width,
+            height,
+            fontSize,
+            font400,
+            font600,
+        } = createCanvasBase();
+
+        const cols = 2;
+        const rows = 2;
+        const cardWidth = (width - 10) / cols;
+        const cardHeight = (height - 10) / rows;
+
+        const titleFontSize = 33;
+        const salaryFontSize = 33;
+        const titleFont = `${titleFontSize}px ArialRegular`;
+        const salaryFont = `${salaryFontSize}px ArialMedium`;
+        await drawRoundedRect(ctx, 0, 0, width, height, 0, '#fff')
+
+        for (let index = 0; index < 4; index++) {
+            const col = index % 2;
+            const row = Math.floor(index / 2);
+            const x = (col * (cardWidth + 10));
+            const y = (row * (cardHeight + 10));
+
+            // ctx.save();
+            // ctx.translate(x, y);
+            let job;
+            if (index < jobs?.length) {
+                job = jobs[index];
+            }
+            let avatarUrl;
+            if (!!job) {
+                avatarUrl = job.avatar ?? getJobImage(job.job, job.career) ?? `${process.env.NEXT_PUBLIC_URL}/img/job-default.png`;
+            } else {
+                avatarUrl = `${process.env.NEXT_PUBLIC_URL}/img/nojob.png?v=121`;
+            }
+            let img;
+            try {
+                const response = await fetch(avatarUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                // const buffer = await sharp(avatarUrl)
+                //     .toFormat('jpeg')
+                //     .toBuffer();
+                const output = await sharp(buffer)
+                    .resize(cardWidth, cardHeight, {
+                        fit: 'cover', // crop ảnh cho đúng khung
+                        position: 'center' // có thể là 'top', 'left', 'right', 'bottom', 'entropy', v.v.
+                    })
+                    .toFormat('jpeg') // hoặc .resize(), .crop(), etc
+                    .toBuffer();
+                img = await loadImage(output);
+            } catch (e) {
+                console.log(e)
+                img = await loadImage(`${process.env.NEXT_PUBLIC_URL}/metadata/opengraph-image.jpg`);
+            }
+            // ctx.drawImage(img, sx, sy, sWidth, sHeight, x, y, sWidth, sHeight);
+            await drawImage(ctx, img, x, y, cardWidth, cardHeight);
+
+            // await drawBackgroundImage(ctx, avatarUrl, cardWidth, cardHeight);
+
+            // Draw title (jobName + gender)
+            if (!!job) {
+                let title = `${job.job ?? job.career}`;
+                if (!!job.workLocation) {
+                    title = breakLine(ctx, title, 220);
+                    title += ', ';
+                    title += job.workLocation;
+                    title = breakLine(ctx, title, 450);
+                } else if (job.numberRecruits || job.gender) {
+                    title = breakLine(ctx, title, 200);
+                    title += ', ';
+                    if (job.numberRecruits) {
+                        title += job.numberRecruits + ' ';
+                    }
+                    if (!!job.gender) {
+                        let formatedGender = formatGender(job.gender);
+                        if (formatedGender === 'Cả nam và nữ') {
+                            formatedGender = 'Người'
+                        }
+                        title += formatedGender;
+                    }
+                    title = breakLine(ctx, title, 450);
+                }
+                ctx.font = titleFont;
+                ctx.fillStyle = '#0d8dc8';
+                const titleMetrics = ctx.measureText(title);
+                let titleWidth = titleMetrics.width;
+                const titleHeight = titleFontSize + 30;
+
+                // Draw white rounded rect background behind title
+                drawRoundedRect(ctx, 40 + x, (cardHeight - salaryFontSize * 3 - 40) + y, titleWidth + 20, titleHeight, 16, '#fff');
+                ctx.fillStyle = '#0d8dc8';
+                ctx.fillText(title, 50 + x, (cardHeight - salaryFontSize * 2 - 30) + y);
+
+                // Draw salary
+                if (!!job['basicSalary'] || !!job['realSalary']) {
+                    let salary = `Lương:`;
+                    if (!!job['basicSalary']) {
+                        salary += ` ${formatNumberDot(job['basicSalary'])} ${getSalaryUnitByNumber(job['basicSalary'])}`;
+                    } else {
+                        salary += ` ${formatNumberDot(job['realSalary'])} ${getSalaryUnitByNumber(job['realSalary'])}`;
+                    }
+                    ctx.font = font600;
+                    ctx.fillStyle = '#f06424';
+                    const salaryMetrics = ctx.measureText(salary);
+                    const salaryWidth = salaryMetrics.width;
+                    const salaryHeight = salaryFontSize + 30;
+                    ctx.font = salaryFont;
+
+                    drawRoundedRect(ctx, 40 + x, (cardHeight - salaryFontSize - 40) + y, salaryWidth - 80, salaryHeight, 16, '#fff');
+                    ctx.fillStyle = '#f06424';
+                    ctx.fillText(salary, 50 + x, (cardHeight - 30) + y);
+                }
+            }
+
+
+            // Draw translucent overlay if it's the last block and total > 4
+            if (index === 3 && total > 4) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                ctx.fillRect(x, y, cardWidth, cardHeight);
+                ctx.font = font600;
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = `90px ArialMedium`;
+                ctx.fillText(`+${total - 3}`, cardWidth / 2 + x, cardHeight / 2 + y);
+                ctx.textAlign = 'start';
+                ctx.textBaseline = 'alphabetic';
+            }
+        }
+
+        return {
+            canvas,
+            ctx,
+            width,
+            height,
+            fontSize,
+            font400,
+            font600
+        };
+    } catch (err) {
+        return null;
+    }
+};
+
+export const generateWarehouseMetaDataImage = async (user: any, jobs: any[], total: number) => {
+    try {
+        const {
+            canvas,
+            ctx,
+            width,
+            height,
+            fontSize,
+            font400,
+            font600
+        } = await generateJobMetaDataJobsImage(jobs, total);
+        const warehouseNameCardWidth = width * 0.5869
+        const warehouseNameCardHeight = height * 0.4038
+        let x = (width - warehouseNameCardWidth) / 2
+        let y = (height - warehouseNameCardHeight) / 2
+        drawRoundedRect(ctx, 0, 0, width, height, 0, 'rgba(0, 0, 0, 0.5)');
+        drawRoundedRect(ctx, x, y, warehouseNameCardWidth, warehouseNameCardHeight, 5, '#fff');
+        const diameter = warehouseNameCardWidth * 0.2746;
+        const leftPadding = 0.0429 * warehouseNameCardWidth;
+        x = x + leftPadding;
+        y = y + (warehouseNameCardHeight - diameter) / 2;
+        await drawCircleImage(ctx, user?.avatarUrl ?? `${process.env.NEXT_PUBLIC_URL}/img/loading-ani.png`, x, y, diameter, diameter, 2, "#e4e4e4");
+        const font = `60px ArialMedium`;
+        x += diameter + leftPadding;
+        y += 70;
+        ctx.font = font;
+        ctx.fillStyle = '#0d8dc8';
+        ctx.fillText('Kho đơn', x, y);
+        y += 80;
+        const maxTextWidth = warehouseNameCardWidth - (diameter + leftPadding * 2) - 48
+        const fullName = breakLine(ctx, user?.fullName ?? '<Chưa rõ>', maxTextWidth);
+
+        ctx.fillText(fullName, x, y);
+        return canvas;
+    } catch (error) {
+        return null
+    }
+}

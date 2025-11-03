@@ -157,7 +157,7 @@ export const findVisaByVisaDetail = (visaDetail: string) => {
     return 'Không rõ';
   }
   visaDetail = visaDetail.replace('Tokutei', 'Đặc định');
-  for(let visa of japanJobTypes){
+  for (let visa of japanJobTypes) {
     const details = visaDetailsByVisaType[visa.slug];
     if (details.findIndex(detail => detail.name === visaDetail) > -1) {
       return visa.name;
@@ -233,7 +233,7 @@ export async function exitInAppBrowser(url: string) {
               // try fireforx
               const firefoxUrl = ` firefox://open-url?url=${url}`;
               window.location.href = firefoxUrl;
-            } catch (error) {}
+            } catch (error) { }
           }
         }
         return true;
@@ -245,4 +245,75 @@ export async function exitInAppBrowser(url: string) {
     // console.log(error);
     return false;
   }
+}
+
+// Add helper function to format numbers with thousand separator using dot
+export function formatNumberDot(num: number | string) {
+  if (num === undefined || num === null) return "";
+  const n = typeof num === "number" ? num : Number(num);
+  if (isNaN(n)) return String(num);
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+export function getBackUnit(visa: string) {
+  return visa === "Tokutei đầu Nhật" || visa === "Kỹ sư đầu Nhật" ? "man" : "USD";
+}
+
+export function formatBackText(amount: number, visa: string) {
+  const unit = getBackUnit(visa);
+  if (unit === "man") {
+    return `${formatNumberDot(amount)}`;
+  }
+  // USD: format 0k5
+  if (typeof amount !== "number" || isNaN(amount)) return String(amount);
+  if (amount < 1000) {
+    return `0k${Math.round(amount / 100)}`;
+  } else {
+    const k = Math.floor(amount / 1000);
+    const hundreds = Math.round((amount % 1000) / 100);
+    return `${k}k${hundreds > 0 ? hundreds : ""}`;
+  }
+}
+
+export function formatFee(input: any) {
+  if (input > 3600) return "liên hệ";
+
+  const k = Math.floor(input / 1000);
+  const x = Math.floor((input % 1000) / 100); // Lấy phần trăm của "k" để làm số lẻ
+
+  return `${k}k${x}`;
+}
+
+
+export function formatGender(input: any) {
+  // if (!input?.length) {
+  //   return null;
+  // }
+  // const validKeywords = ["nam", "nữ", "cả nam và nữ", "male", "female", "both", "MALE", "FEMALE", "BOTH"];
+
+  // // Chuyển về chữ thường để so khớp không phân biệt hoa thường
+  // const lowerInput = input.toLowerCase();
+
+  // // Tìm tất cả từ hợp lệ có xuất hiện trong input
+  // const result = validKeywords.filter(keyword => lowerInput.includes(keyword));
+
+  // return result.join(", "); // hoặc trả về mảng `result` nếu bạn muốn giữ dạng array
+  if (input === "MALE") {
+    return "Nam";
+  } else if (input === "FEMALE") {
+    return "Nữ";
+  } else if (input === "BOTH") {
+    return "Cả nam và nữ";
+  } else {
+    return "";
+  }
+}
+
+
+// xử lý các trường hợp tiền tệ
+export function getSalaryUnitByNumber(input: any) {
+  if (input > 10000) return "JPY";
+  if (input > 500) return "yên/giờ";
+  if (input < 100) return "man";
+  return ""; // Không nằm trong các trường hợp trên
 }

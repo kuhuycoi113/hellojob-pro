@@ -7,7 +7,7 @@ import { SearchResults, type SearchFilters } from '@/components/job-search/searc
 import { Job } from '@/lib/mock-data';
 import { SearchModule } from '@/components/job-search/search-module';
 import { allSpecialConditions } from '@/lib/visa-data';
-import { countJobs, getJobs } from './action';
+import { countJobs, getJobs } from '@/actions/jobs-action';
 
 const initialSearchFilters: SearchFilters = {
     q: '',
