@@ -36,7 +36,7 @@ const RECRUITMENT_KEYS = [
 export const generateJobMetaDataImage = async (job: any) => {
     try {
 
-        const { canvas, ctx, width, height, fontSize, font200, font400, font700, startX, maxTextWidth } = createCanvasBase();
+        const { canvas, ctx, width, height, fontSize, font400, font700, startX, maxTextWidth } = createCanvasBase();
 
         // Load ảnh nền
         const avatarUrl = job.avatar?.url ?? job.avatar ?? '/img/metadata/opengraph-image.jpg';
@@ -75,7 +75,7 @@ export const generateJobMetaDataImage = async (job: any) => {
                     break;
                 }
                 case 'fee': {
-                    const parts = buildFeeParts(job, color, font200, font700);
+                    const parts = buildFeeParts(job, color, font400, font700);
                     const fullText = parts.map(p => p.text).join('');
                     const textWidth = ctx.measureText(fullText).width;
                     if (textWidth > 0) {
@@ -201,7 +201,6 @@ const createCanvasBase = () => {
         height,
         fontSize,
         // return both preferred and fallback strings so calling code can choose:
-        font200,
         font400,
         font700,
         font700Fallback,
@@ -354,7 +353,6 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             width,
             height,
             fontSize,
-            font200,
             font400,
             font700,
         } = createCanvasBase();
@@ -490,7 +488,7 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             width,
             height,
             fontSize,
-            font200,
+            font400,
             font700
         };
     } catch (err) {
@@ -505,9 +503,6 @@ export const generateWarehouseMetaDataImage = async (user: any, jobs: any[], tot
             ctx,
             width,
             height,
-            fontSize,
-            font200,
-            font700
         } = await generateJobMetaDataJobsImage(jobs, total);
         const warehouseNameCardWidth = width * 0.5869
         const warehouseNameCardHeight = height * 0.4038
