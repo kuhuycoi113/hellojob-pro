@@ -610,6 +610,7 @@ export default function CandidateProfilePage() {
 
     const handleLogout = async () => {
         await signOut(firebaseAuth);
+        window.location.href = '/';
     };
     return (
         <div className="bg-secondary">

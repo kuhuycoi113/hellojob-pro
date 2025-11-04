@@ -18,6 +18,7 @@ export type PostLoginAction = {
   data: {
     jobId: string;
     jobTitle: string;
+    job?: any;
   };
 } | null;
 

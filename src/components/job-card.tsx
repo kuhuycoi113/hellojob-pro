@@ -32,6 +32,7 @@ import { EditProfileDialog } from '../app/ho-so-cua-toi/components/candidate-edi
 import type { SearchFilters } from './job-search/search-results';
 import { consultants } from '@/lib/consultant-data';
 import { applyJob, updateProfile } from '@/actions/user-action';
+import { validateProfileForApplication } from '@/lib/validators';
 
 
 const formatCurrency = (value?: string) => {
@@ -70,18 +71,6 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
     } catch (error) {
         console.error("Error logging user interaction:", error);
     }
-};
-
-const validateProfileForApplication = (profile: User | null): boolean => {
-    if (!profile || !profile.personalInfo) return false;
-
-    const { personalInfo } = profile;
-    const { fullName, gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = personalInfo;
-
-    const hasRequiredPersonalInfo = fullName && gender && height && weight && tattooStatus && hepatitisBStatus;
-    const hasContactInfo = phone || zalo || messenger || line;
-
-    return !!hasRequiredPersonalInfo && !!hasContactInfo;
 };
 
 // List of visa details that have special fee handling
@@ -184,7 +173,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             const appliedJobs = user.appliedJobs || [];
             setHasApplied(appliedJobs.includes(job.id));
         }
-    }, [job?.id, user]);
+    }, [job?.id, user?.appliedJobs]);
 
     const handleSaveJob = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -207,12 +196,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     const handleApplyClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-        debugger
         if (!isLoggedIn) {
-            setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: jobTitle } });
+            setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: jobTitle, job } });
             setIsConfirmLoginOpen(true);
         } else {
-            if (validateProfileForApplication(user) && !!user) {
+            const missingFields = validateProfileForApplication(user);
+            if (missingFields?.length === 0 && !!user) {
                 const appliedJobs = user.appliedJobs || [];
                 appliedJobs.push(job.id);
                 await applyJob(user.uid, job);
@@ -314,7 +303,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     <div className="p-3 hover:bg-secondary/30">
                         <div className="flex flex-col items-stretch gap-4 md:flex-row">
                             <div className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
-                                <Image src={job.avatar || getJobImage(job.job, job.career)} alt={jobTitle} fill sizes='100%' className="rounded-lg object-cover" />
+                                <Image src={job.avatar || getJobImage(job.job, job.career)} unoptimized alt={jobTitle} fill sizes='100%' className="rounded-lg object-cover" />
                                 <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                                     <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                                     <span>{job.code}</span>
@@ -464,7 +453,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             <div id="HIENTHIVIEC03" onClick={() => router.push(`/viec-lam/${job.code}`)} className="block w-full cursor-pointer">
                 <Card className="flex items-start p-3 gap-3 hover:bg-secondary/50 transition-colors">
                     <div className="relative w-20 h-20 flex-shrink-0">
-                        <Image src={job.avatar || 'https://placehold.co/60x40.png'} alt={jobTitle} fill className="object-cover rounded-md" />
+                        <Image src={job.avatar || getJobImage(job.job, job.career)} unoptimized alt={jobTitle} fill className="object-cover rounded-md" />
                     </div>
                     <div className="flex-grow overflow-hidden space-y-1">
                         <h4 className="font-semibold text-sm leading-tight line-clamp-2">{jobTitle}</h4>
@@ -512,7 +501,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             <Card id="HIENTHIVIEC02" className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-border shadow-sm transition-shadow duration-300 hover:shadow-lg")}>
                 <div className="group cursor-pointer" onClick={handleCardClick}>
                     <div className="relative aspect-video w-full">
-                        <Image src={job.avatar || getJobImage(job.job, job.career)} alt={jobTitle} fill className="object-cover transition-transform group-hover:scale-105" />
+                        <Image src={job.avatar || getJobImage(job.job, job.career)} unoptimized alt={jobTitle} fill className="object-cover transition-transform group-hover:scale-105" />
                         <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                             <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                             <span>{job.code}</span>
@@ -547,7 +536,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         </div>
                         <div className="my-2 flex items-center gap-1 text-xs text-muted-foreground">
                             <MapPin className="h-3 w-3 flex-shrink-0" />
-                            <span>{job.workLocation??'Liên hệ'}</span>
+                            <span>{job.workLocation ?? 'Liên hệ'}</span>
                         </div>
 
                         <div className="mt-auto">

@@ -17,6 +17,7 @@ import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
 import { CtaViecLamGoiY } from '../cta-viec-lam-goi-y';
 import { CtaViecLamPhuHop } from '../cta-viec-lam-phu-hop';
 import path from 'path';
+import { applyJob, updateProfile } from '@/actions/user-action';
 
 const FloatingChatWidget = dynamic(() => import('@/components/chat/floating-chat-widget').then(mod => mod.FloatingChatWidget), { ssr: false });
 
@@ -24,7 +25,7 @@ const FloatingChatWidget = dynamic(() => import('@/components/chat/floating-chat
 export function LayoutManager({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const { toast } = useToast();
-    const { isLoggedIn, postLoginAction, clearPostLoginAction } = useAuth();
+    const { isLoggedIn, postLoginAction, clearPostLoginAction, user } = useAuth();
     const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = useState(false);
     const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
@@ -53,28 +54,27 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
         }
     }, [isLoggedIn, postLoginAction]);
 
-    const handlePostLoginApply = (apply: boolean) => {
+    const handlePostLoginApply = async (apply: boolean) => {
         setIsPostLoginApplyDialogOpen(false); // Close the first dialog
 
         if (apply && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
-            const { jobId, jobTitle } = postLoginAction.data;
-            const profileRaw = localStorage.getItem('generatedCandidateProfile');
+            const { jobId, jobTitle, job } = postLoginAction.data;
 
-            if (profileRaw) {
-                const profile: CandidateProfile = JSON.parse(profileRaw);
-                const missingFields = validateProfileForApplication(profile);
+            if (!!user) {
+                const missingFields = validateProfileForApplication(user);
                 if (missingFields.length === 0) {
-                    // Profile is valid, proceed with application
-                    const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+                    const appliedJobs = user.appliedJobs || [];
                     if (!appliedJobs.includes(jobId)) {
+                        const appliedJobs = user.appliedJobs || [];
                         appliedJobs.push(jobId);
-                        localStorage.setItem('appliedJobs', JSON.stringify(appliedJobs));
+                        await applyJob(user.uid, job);
+                        await updateProfile(user.uid, { appliedJobs });
+                        user.appliedJobs = Object.assign([], appliedJobs);
                         toast({
                             title: 'Ứng tuyển thành công!',
                             description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
                             className: 'bg-green-500 text-white'
                         });
-                        window.dispatchEvent(new Event('storage'));
                     } else {
                         toast({
                             variant: 'destructive',
@@ -102,8 +102,8 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
 
     return (
         <>
-            {!isCallPage && !isPartnerPage&&!isAuthPage && <Header />}
-            <main className={!isAuthPage?"min-h-screen":""}>{children}</main>
+            {!isCallPage && !isPartnerPage && !isAuthPage && <Header />}
+            <main className={!isAuthPage ? "min-h-screen" : ""}>{children}</main>
             {showDefaultCtas && (
                 <div className="space-y-20 md:space-y-28 py-20 md:py-28">
                     {showProfileSuggestions && <CtaViecLamPhuHop />}
@@ -116,7 +116,7 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
                     <CtaNhaTuyenDung />
                 </div>
             )}
-            {!isCallPage && !isPartnerPage&&!isAuthPage && <Footer />}
+            {!isCallPage && !isPartnerPage && !isAuthPage && <Footer />}
             {!isCallPage && !isPartnerPage && <FloatingChatWidget />}
             <Toaster />
             <AlertDialog open={isPostLoginApplyDialogOpen} onOpenChange={(open) => {

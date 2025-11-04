@@ -1,14 +1,7 @@
-
-import type { CandidateProfile } from "./schemas";
-
-export const validateProfileForApplication = (profile: CandidateProfile): string[] => {
+export const validateProfileForApplication = (profile: any): string[] => {
     const missingFields: string[] = [];
     if (!profile) {
         return ['Hồ sơ'];
-    }
-
-    if (!profile.name) {
-        missingFields.push('Họ và tên');
     }
 
     if (!profile.personalInfo) {
@@ -16,8 +9,9 @@ export const validateProfileForApplication = (profile: CandidateProfile): string
         return missingFields;
     }
 
-    const { gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = profile.personalInfo;
+    const { fullName, gender, height, weight, tattooStatus, hepatitisBStatus, phone, zalo, messenger, line } = profile.personalInfo;
 
+    if (!fullName) missingFields.push('Họ và tên');
     if (!gender) missingFields.push('Giới tính');
     if (!height || parseInt(height) === 0) missingFields.push('Chiều cao');
     if (!weight || parseInt(weight) === 0) missingFields.push('Cân nặng');
