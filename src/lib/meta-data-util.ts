@@ -146,14 +146,14 @@ const createCanvasBase = () => {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
 
-    const thinPath = path.resolve(__dirname, './fonts/Montserrat-Thin.ttf');
-    const extraLightPath = path.resolve(__dirname, './fonts/Montserrat-ExtraLight.ttf');
+    // const thinPath = path.resolve(__dirname, './fonts/Montserrat-Thin.ttf');
+    // const extraLightPath = path.resolve(__dirname, './fonts/Montserrat-ExtraLight.ttf');
     const regularPath = path.resolve(__dirname, './fonts/Montserrat-Regular.ttf');
     const boldPath = path.resolve(__dirname, './fonts/Montserrat-Bold.ttf');
 
     console.log('Registering fonts:', {
-        thin: fs.existsSync(thinPath),
-        extraLight: fs.existsSync(extraLightPath),
+        // thin: fs.existsSync(thinPath),
+        // extraLight: fs.existsSync(extraLightPath),
         regular: fs.existsSync(regularPath),
         bold: fs.existsSync(boldPath),
     });
@@ -161,14 +161,14 @@ const createCanvasBase = () => {
     // Register each file with numeric weight under family "Montserrat"
     // and also register an alias family as a fallback if weight mapping fails.
     try {
-        if (fs.existsSync(thinPath)) {
-            registerFont(thinPath, { family: 'Montserrat', weight: '100', style: 'normal' });
-            registerFont(thinPath, { family: 'Montserrat-Thin', weight: '400', style: 'normal' });
-        }
-        if (fs.existsSync(extraLightPath)) {
-            registerFont(extraLightPath, { family: 'Montserrat', weight: '200', style: 'normal' });
-            registerFont(extraLightPath, { family: 'Montserrat-ExtraLight', weight: '400', style: 'normal' });
-        }
+        // if (fs.existsSync(thinPath)) {
+        //     registerFont(thinPath, { family: 'Montserrat', weight: '100', style: 'normal' });
+        //     registerFont(thinPath, { family: 'Montserrat-Thin', weight: '400', style: 'normal' });
+        // }
+        // if (fs.existsSync(extraLightPath)) {
+        //     registerFont(extraLightPath, { family: 'Montserrat', weight: '200', style: 'normal' });
+        //     registerFont(extraLightPath, { family: 'Montserrat-ExtraLight', weight: '400', style: 'normal' });
+        // }
         if (fs.existsSync(regularPath)) {
             registerFont(regularPath, { family: 'Montserrat', weight: '400', style: 'normal' });
             registerFont(regularPath, { family: 'Montserrat-Regular', weight: '400', style: 'normal' });
@@ -182,14 +182,14 @@ const createCanvasBase = () => {
     }
 
     // preferred font strings (use quoted family)
-    const font100 = `100 ${fontSize}px 'Montserrat'`;
-    const font200 = `200 ${fontSize}px 'Montserrat'`;
+    // const font100 = `100 ${fontSize}px 'Montserrat'`;
+    // const font200 = `200 ${fontSize}px 'Montserrat'`;
     const font400 = `400 ${fontSize}px 'Montserrat'`;
     const font700 = `700 ${fontSize}px 'Montserrat'`;
 
     // fallback font strings that reference explicit alias families if mapping fails
-    const font200Fallback = `${fontSize}px 'Montserrat-ExtraLight'`;
-    const font700Fallback = `${fontSize}px 'Montserrat-Bold'`;
+    // const font200Fallback = `${fontSize}px 'Montserrat-ExtraLight'`;
+    // const font700Fallback = `${fontSize}px 'Montserrat-Bold'`;
 
     // set a default font (try preferred first, if not working you can switch to fallback)
     ctx.font = font400; // use "200 46px 'Montserrat'"
@@ -203,7 +203,7 @@ const createCanvasBase = () => {
         // return both preferred and fallback strings so calling code can choose:
         font400,
         font700,
-        font700Fallback,
+        // font700Fallback,
         startX: 85,
         maxTextWidth: 1000
     };
