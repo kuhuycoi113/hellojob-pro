@@ -295,6 +295,40 @@ export async function getJobs(filter: SearchFilters, page: number, limit: number
         return { docs: [], total: 0, page, limit, totalPages: 0 };
     }
 }
+export async function getJobsByIDs(ids: string[]): Promise<PaginatedResponse<any>> {
+
+    try {
+        const query = {
+            query: {
+                bool: {
+                    must: [
+                        { terms: { "id.keyword": ids } }
+                    ]
+                }
+            },
+            sort: [
+                { createdDate: { order: 'desc' } }
+            ]
+        };
+        const results = await searchDocuments<any>(CANDIDATES_INDEX, query, 1, 10);
+        const mappedDocs: any[] = results.docs.map(doc => {
+            const name = doc.fullName || doc.sender;
+            return {
+                ...doc,
+                id: doc.id,
+                source: doc.source, // Fixed: Added back the source field
+            }
+        });
+
+        return { ...results, docs: mappedDocs };
+    } catch (error: any) {
+        console.error("Failed to fetch new candidates from Elasticsearch:", error);
+        if (error.meta?.body?.error?.type === 'index_not_found_exception') {
+            console.log(`Index ${CANDIDATES_INDEX} not found. Returning empty results.`);
+        }
+        return { docs: [], total: 0, page: 1, limit: 10, totalPages: 0 };
+    }
+}
 export async function countJobs(filter: SearchFilters): Promise<number> {
     try {
         const query = createSearchQuery(filter);

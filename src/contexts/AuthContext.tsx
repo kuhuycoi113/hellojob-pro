@@ -10,6 +10,7 @@ import {
   UserInfo
 } from 'firebase/auth';
 import { Claims, filterStandardClaims } from "next-firebase-auth-edge/lib/auth/claims";
+import { validateProfileForApplication } from '@/lib/validators';
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
 
@@ -73,7 +74,7 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
   // Xác định role dựa vào serverUser
   let role: Role = 'guest';
   if (serverUser) {
-    if (!serverUser.phone && !serverUser.messenger && !serverUser.line && !serverUser.messenger) {
+    if (validateProfileForApplication(serverUser)?.length > 0) {
       role = 'candidate-empty-profile';
     } else {
       role = 'candidate';

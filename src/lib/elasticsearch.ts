@@ -130,13 +130,6 @@ export const searchDocuments = async <T = any>(
     size: limit,
     track_total_hits: true,
   });
-  console.log(JSON.stringify({
-    index,
-    body: query,
-    from,
-    size: limit,
-    track_total_hits: true,
-  }));
 
   const hits = response.body.hits.hits as SearchHit<T>[];
   const total = (response.body.hits.total as any).value ?? 0;
