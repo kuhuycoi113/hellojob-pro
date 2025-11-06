@@ -9,11 +9,10 @@ import { cn } from '@/lib/utils';
 import { Loader2, Pencil, Star } from 'lucide-react';
 import React, { useState } from 'react';
 
-export const SuggestedJobs: React.FC<{
-    isSuggestionHighlighted?: boolean, isLoadingSuggestions?: boolean, setTempAspirations: any,
+export const SuggestedJobs: React.FC<{ highlight: string | null, isLoadingSuggestions?: boolean, setTempAspirations: any,
     setIsAspirationsDialogOpen: any, setTempDesiredIndustry: any, setSuggestionPrinciple: any, setSuggestionType: any
 }> =
-    ({ isSuggestionHighlighted = false, isLoadingSuggestions = true, setTempAspirations,
+    ({ highlight, isLoadingSuggestions = true, setTempAspirations,
         setIsAspirationsDialogOpen, setTempDesiredIndustry, setSuggestionPrinciple, setSuggestionType }) => {
         const [suggestedJobs, setSuggestedJobs] = React.useState<any[]>([]);
         const [visibleJobsCount, setVisibleJobsCount] = useState(8);
@@ -50,7 +49,7 @@ export const SuggestedJobs: React.FC<{
         };
         return (<AccordionItem value="item-1" className={cn(
             "border-b-0 transition-all duration-500 ease-in-out",
-            isSuggestionHighlighted ? "ring-2 ring-accent-orange ring-offset-2 shadow-2xl rounded-lg bg-accent-orange/10" : "border rounded-lg"
+            highlight === 'suggested' ? "ring-2 ring-accent-orange ring-offset-2 shadow-2xl rounded-lg bg-accent-orange/10" : "border rounded-lg"
         )}>
             <div className="flex items-center bg-background px-6 rounded-t-lg hover:no-underline">
                 <AccordionTrigger className="flex-grow py-4 font-semibold text-base">

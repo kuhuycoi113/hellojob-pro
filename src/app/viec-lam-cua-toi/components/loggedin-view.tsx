@@ -46,6 +46,13 @@ const aspirations = [
     { id: 2, title: 'Chế biến thực phẩm, Tokyo', salary: '180,000 JPY', type: 'Tokutei' },
 ];
 
+const accordionMappings = {
+    'suggested': 'item-1',
+    'applied': 'item-2',
+    'saved': 'item-3',
+    'behavioral': 'item-4',
+}
+
 export const LoggedInView = () => {
     const { role } = useAuth();
     const router = useRouter();
@@ -61,6 +68,7 @@ export const LoggedInView = () => {
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations'] & { educationRequirement?: string, languageRequirement?: string, yearsOfExperience?: string, specialConditions?: string[] }>>({});
     const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
     const [suggestionPrinciple, setSuggestionPrinciple] = useState<'salary' | 'fee' | 'company' | null>(null);
+    const [highlight, setHighlight] = useState<string | null>(null);
     const [forceUpdate, setForceUpdate] = useState(0);
     const { toast } = useToast();
     const [tempSalary, setTempSalary] = useState('');
@@ -71,7 +79,6 @@ export const LoggedInView = () => {
 
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
-    const [isSuggestionHighlighted, setIsSuggestionHighlighted] = useState(false);
 
     const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
     const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
@@ -90,18 +97,19 @@ export const LoggedInView = () => {
     }, []);
 
     useEffect(() => {
-        if (searchParams.get('highlight') === 'suggested') {
-            setOpenAccordion('item-1');
-            setIsSuggestionHighlighted(true);
-            const timer = setTimeout(() => setIsSuggestionHighlighted(false), 2500);
+        console.log('abc')
+        const highlight = searchParams.get('highlight') ?? '';
+        if (highlight?.length > 0) {
+            if (Object.keys(accordionMappings).includes(highlight)) {
+                setOpenAccordion(accordionMappings[highlight as keyof typeof accordionMappings]);
+                setHighlight(highlight);
+            } else {
+                setOpenAccordion('item-1');
+            }
 
             const nextUrl = new URL(window.location.href);
             nextUrl.searchParams.delete('highlight');
             router.replace(nextUrl.toString(), { scroll: false });
-
-            return () => clearTimeout(timer);
-        } else {
-            setOpenAccordion('item-1');
         }
     }, [searchParams, router]);
 
@@ -147,12 +155,6 @@ export const LoggedInView = () => {
         }
     }, []);
 
-    const fetchSavedJobs = useCallback(() => {
-        const savedJobIds = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-        const savedJobsData = jobData.filter(job => savedJobIds.includes(job.id));
-        setSavedJobs(savedJobsData);
-    }, []);
-
     useEffect(() => {
         if (role === 'candidate-empty-profile') {
             setIsLoadingSuggestions(false);
@@ -161,16 +163,14 @@ export const LoggedInView = () => {
         }
         fetchSuggestedJobs();
         fetchBehavioralSuggestions(); // Fetch behavioral suggestions
-        fetchSavedJobs();
 
         const handleStorageChange = () => {
-            fetchSavedJobs();
             fetchBehavioralSuggestions(); // Re-fetch when behavior changes
         };
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
 
-    }, [role, fetchSuggestedJobs, fetchSavedJobs, fetchBehavioralSuggestions, forceUpdate]);
+    }, [role, fetchSuggestedJobs, fetchBehavioralSuggestions, forceUpdate]);
 
 
     const handleSaveAspirations = () => {
@@ -294,7 +294,7 @@ export const LoggedInView = () => {
                     <SuggestedJobs setIsAspirationsDialogOpen={setIsAspirationsDialogOpen}
                         setSuggestionPrinciple={setSuggestionPrinciple} setSuggestionType={setSuggestionType}
                         setTempAspirations={tempAspirations} setTempDesiredIndustry={setTempDesiredIndustry}
-                        isLoadingSuggestions={isLoadingSuggestions} isSuggestionHighlighted={isSuggestionHighlighted} />
+                        isLoadingSuggestions={isLoadingSuggestions} highlight={highlight} />
                     <AppliedJobs />
                     <SavedJobs />
 
