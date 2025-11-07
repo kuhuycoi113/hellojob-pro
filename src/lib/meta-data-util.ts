@@ -2,6 +2,7 @@
 
 import { createCanvas, loadImage, registerFont } from 'canvas';
 import {
+    findVisaByVisaDetail,
     formatBackText,
     formatFee,
     formatGender,
@@ -48,13 +49,13 @@ export const generateJobMetaDataImage = async (job: any) => {
             ctx.font = font400;
             switch (key) {
                 case 'code': {
-                    ctx.font = font700;
+                    ctx.font = `700 ${fontSize * 0.80}px 'Montserrat'`;
                     const text = job.code;
                     const textWidth = ctx.measureText(text).width;
-                    drawRoundedRect(ctx, startX - 15, startY - 15, textWidth + 35 + fontSize, fontSize + 30, 40, backgroundColor);
+                    drawRoundedRect(ctx, startX - 15, startY - 15, textWidth + 35 + fontSize, (fontSize + 30) * 0.85, 32, backgroundColor);
                     const flag = await loadImage(`${process.env.DOMAIN}/img/flags/png/jp.png?v=191`);
-                    drawImage(ctx, flag, startX, startY, fontSize, fontSize);
-                    drawText(ctx, breakLine(ctx, text, maxTextWidth - fontSize - 5), color, startX + fontSize + 5, startY + 40);
+                    drawImage(ctx, flag, startX + 5, startY - 2, fontSize - 7, fontSize - 7);
+                    drawText(ctx, breakLine(ctx, text, maxTextWidth - fontSize - 5), color, startX + fontSize + 5, startY + 30);
                     break;
                 }
                 case 'realSalary': {
@@ -219,16 +220,16 @@ const buildFeeParts = (job: any, color: string, font200: string, font700: string
         parts.push({ text: 'Phí ', color, font: font200 });
         parts.push({ text: `${feeText}`, color: '#AFC536', font: font700 });
     }
-    if (backText) {
-        if (parts.length) parts.push({ text: ', ', color, font: font200 });
-        parts.push({ text: 'Back ', color, font: font200 });
-        parts.push({ text: backText, color: '#FF5A00', font: font700 });
-    }
-    if (quantityText) {
-        if (parts.length) parts.push({ text: ', ', color, font: font200 });
-        parts.push({ text: 'Chỉ tiêu ', color: font200, font: font200 });
-        parts.push({ text: quantityText, color: '#FF5A00', font: font700 });
-    }
+    // if (backText) {
+    //     if (parts.length) parts.push({ text: ', ', color, font: font200 });
+    //     parts.push({ text: 'Back ', color, font: font200 });
+    //     parts.push({ text: backText, color: '#FF5A00', font: font700 });
+    // }
+    // if (quantityText) {
+    //     if (parts.length) parts.push({ text: ', ', color, font: font200 });
+    //     parts.push({ text: 'Chỉ tiêu ', color: font200, font: font200 });
+    //     parts.push({ text: quantityText, color: '#FF5A00', font: font700 });
+    // }
     return parts;
 };
 
@@ -362,8 +363,8 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
         const cardWidth = (width - 10) / cols;
         const cardHeight = (height - 10) / rows;
 
-        const titleFontSize = 33;
-        const salaryFontSize = 33;
+        const titleFontSize = 35;
+        const salaryFontSize = 35;
         const titleFont = `400 ${titleFontSize}px Montserrat`;
         const salaryFont = `700 ${salaryFontSize}px Montserrat`;
         await drawRoundedRect(ctx, 0, 0, width, height, 0, '#fff')
@@ -413,6 +414,17 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
 
             // Draw title (jobName + gender)
             if (!!job) {
+                ctx.font = titleFont;
+                ctx.fillStyle = '#0d8dc8';
+                let visa = findVisaByVisaDetail(job.visa);
+                visa = breakLine(ctx, visa, 450);
+                const visaMetrics = ctx.measureText(visa);
+                let visaWidth = visaMetrics.width;
+                const visaHeight = titleFontSize + 35;
+                // Draw white rounded rect background behind title
+                drawRoundedRect(ctx, 60 + x, (cardHeight - salaryFontSize * 6.5 - 40) + y, visaWidth + 20, visaHeight, 16, '#fff');
+                ctx.fillStyle = '#0d8dc8';
+                ctx.fillText(visa, 75 + x, (cardHeight - salaryFontSize * 5.5 - 28) + y);
                 let title = `${job.job ?? job.career}`;
                 if (!!job.workLocation) {
                     title = breakLine(ctx, title, 220);
@@ -434,16 +446,14 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
                     }
                     title = breakLine(ctx, title, 450);
                 }
-                ctx.font = titleFont;
-                ctx.fillStyle = '#0d8dc8';
+
                 const titleMetrics = ctx.measureText(title);
                 let titleWidth = titleMetrics.width;
-                const titleHeight = titleFontSize + 30;
-
+                const titleHeight = titleFontSize + 35;
                 // Draw white rounded rect background behind title
-                drawRoundedRect(ctx, 40 + x, (cardHeight - salaryFontSize * 3 - 40) + y, titleWidth + 20, titleHeight, 16, '#fff');
+                drawRoundedRect(ctx, 60 + x, (cardHeight - salaryFontSize * 3 - 80) + y, titleWidth + 20, titleHeight, 16, '#fff');
                 ctx.fillStyle = '#0d8dc8';
-                ctx.fillText(title, 50 + x, (cardHeight - salaryFontSize * 2 - 30) + y);
+                ctx.fillText(title, 75 + x, (cardHeight - salaryFontSize * 2 - 68) + y);
 
                 // Draw salary
                 if (!!job['basicSalary'] || !!job['realSalary']) {
@@ -454,15 +464,15 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
                         salary += ` ${formatNumberDot(job['realSalary'])} ${getSalaryUnitByNumber(job['realSalary'])}`;
                     }
                     ctx.font = font700;
-                    ctx.fillStyle = '#f06424';
+                    ctx.fillStyle = '#FF5A00';
                     const salaryMetrics = ctx.measureText(salary);
                     const salaryWidth = salaryMetrics.width;
-                    const salaryHeight = salaryFontSize + 30;
+                    const salaryHeight = salaryFontSize + 35;
                     ctx.font = salaryFont;
 
-                    drawRoundedRect(ctx, 40 + x, (cardHeight - salaryFontSize - 40) + y, salaryWidth - 80, salaryHeight, 16, '#fff');
-                    ctx.fillStyle = '#f06424';
-                    ctx.fillText(salary, 50 + x, (cardHeight - 30) + y);
+                    drawRoundedRect(ctx, 60 + x, (cardHeight - salaryFontSize - 70) + y, salaryWidth - 80, salaryHeight, 16, '#fff');
+                    ctx.fillStyle = '#FF5A00';
+                    ctx.fillText(salary, 75 + x, (cardHeight - 58) + y);
                 }
             }
 

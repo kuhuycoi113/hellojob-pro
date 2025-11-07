@@ -196,7 +196,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     };
 
     const getFeeDisplay = (feeValue: any | undefined, feeLabel: string) => {
-        const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
+        const isControlled = controlledFeeVisas.includes(job.visa || '');
         if (!feeValue) {
             return isControlled ? "Không rõ" : null;
         }
@@ -232,7 +232,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay';
 
     const feeWithTuitionDisplay = getFeeDisplay(job.fee, "Phí và vé và học phí");
-    const feeDisplay = getFeeDisplay(job.fee, job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé");
+    const feeDisplay = getFeeDisplay(job.fee, job.visa?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé");
     const feeNoTicketDisplay = getFeeDisplay(job.netFeeNoTicket, "Phí không vé");
     const avatar = job.avatar || getJobImage(job.job, job.career);
     if (!!job) {
@@ -296,7 +296,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={interviewDate ? interviewDate : 'Linh hoạt'} />
                                         <RequirementItem icon={ClipboardCheck} label="Số vòng" value={job.interviewRounds ? `${job.interviewRounds} vòng` : null} />
                                         <RequirementItem icon={Wallet} label="Phí và vé và học phí" value={feeWithTuitionDisplay ?? 'Liên hệ'} />
-                                        <RequirementItem icon={Wallet} label={job.visaDetail?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé"} value={feeDisplay} />
+                                        <RequirementItem icon={Wallet} label={job.visa?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé"} value={feeDisplay} />
                                         <RequirementItem icon={Wallet} label="Phí không vé" value={feeNoTicketDisplay ?? 'Liên hệ'} />
                                         <RequirementItem icon={Star} label="Điều kiện đặc biệt" value={job.specialConditions} />
                                     </CardContent>
