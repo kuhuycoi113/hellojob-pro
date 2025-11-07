@@ -23,7 +23,11 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     let title = `HelloJob - ${data?.visa},${data?.job}
               ${data?.numberRecruits ? ` ${data?.numberRecruits} người` : ""}
               ${data?.specialConditions?.length > 0 ? ` (${formatSpecialCondition(data?.specialConditions).join(", ")})` : ""}`;
-    if (!!data?.expired) {
+    let isExpired = false;
+    if (data.expiredDate < Date.now()) {
+        isExpired = true;
+    }
+    if (isExpired) {
         title = "[HẾT HẠN] " + title;
     }
     return {
