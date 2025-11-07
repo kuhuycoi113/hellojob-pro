@@ -8,7 +8,7 @@ import { LoggedInView } from './components/loggedin-view';
 import { FloatingPrioritySelector } from './components/floating-priority-selector';
 
 export default function MyJobsDashboardPage() {
-    const { role,isLoggedIn } = useAuth();
+    const { role,isLoggedIn, } = useAuth();
     const [isHighlighting, setIsHighlighting] = useState(false);
     const [showFloatingSelector, setShowFloatingSelector] = useState(true);
 

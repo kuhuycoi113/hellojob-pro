@@ -121,7 +121,7 @@ export default async function RootLayout({
   return (
     <html lang="vi" className={cn("scroll-smooth", montserrat.variable)}>
       <body className="antialiased pb-20 md:pb-0 font-body">
-        <RootProvider serverUser={user}>
+        <RootProvider serverUser={user} serverTime={Date.now()}>
           <LayoutManager>
             {children}
           </LayoutManager>

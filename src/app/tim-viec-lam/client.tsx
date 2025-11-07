@@ -87,7 +87,7 @@ const parsePhysicalRequirement = (reqStr?: string): [number, number] => {
     return [0, Infinity];
 };
 
-export default function JobSearchPageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+export default function JobSearchPageContent() {
     const router = useRouter();
     const readOnlySearchParams = useSearchParams();
 
@@ -97,8 +97,6 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
 
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
     const [stagedResultCount, setStagedResultCount] = useState<number>(0);
-    const [pageTitle, setPageTitle] = useState("Tìm kiếm việc làm tại Nhật Bản");
-    const [pageDescription, setPageDescription] = useState("Tìm kiếm hàng ngàn cơ hội việc làm tại Nhật Bản.");
     const [totalJobs, setTotalJobs] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -126,7 +124,7 @@ export default function JobSearchPageContent({ searchParams }: { searchParams: {
         setStagedFilters(newFilters);
         runFilter(newFilters, sortOption, 1);
         console.log('Filters from URL:', newFilters);
-    }, [readOnlySearchParams, runFilter, countStagedResults]);
+    }, [readOnlySearchParams]);
 
     const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
         setStagedFilters(prev => ({ ...prev, ...newFilters }));

@@ -54,7 +54,7 @@ const accordionMappings = {
 }
 
 export const LoggedInView = () => {
-    const { role } = useAuth();
+    const { role, clearLastAction } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
@@ -97,7 +97,6 @@ export const LoggedInView = () => {
     }, []);
 
     useEffect(() => {
-        console.log('abc')
         const highlight = searchParams.get('highlight') ?? '';
         if (highlight?.length > 0) {
             if (Object.keys(accordionMappings).includes(highlight)) {
@@ -110,6 +109,7 @@ export const LoggedInView = () => {
             const nextUrl = new URL(window.location.href);
             nextUrl.searchParams.delete('highlight');
             router.replace(nextUrl.toString(), { scroll: false });
+            clearLastAction();
         }
     }, [searchParams, router]);
 

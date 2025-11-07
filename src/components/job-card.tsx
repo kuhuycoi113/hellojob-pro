@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { MapPin, DollarSign, Star, FileText, Bookmark } from 'lucide-react';
-import { Job, publicFeeLimits } from '@/lib/mock-data';
+import { Job } from '@/lib/mock-data';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -19,7 +19,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { cn, convertTime, generateBulletJobCrawl, getJobImage } from '@/lib/utils';
+import { cn, convertTime, formatSalaryForDisplay, formatVisa, generateBulletJobCrawl, getFeeDisplayInfo, getJobImage } from '@/lib/utils';
 import Link from 'next/link';
 import { useAuth, User } from '@/contexts/AuthContext';
 import { AuthDialog } from './auth-dialog';
@@ -27,18 +27,13 @@ import { ContactButtons } from './contact-buttons';
 import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from '@/components/ui/popover';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from '../app/ho-so-cua-toi/components/candidate-edit-dialog';
 import type { SearchFilters } from './job-search/search-results';
 import { consultants } from '@/lib/consultant-data';
 import { applyJob, updateProfile } from '@/actions/user-action';
 import { validateProfileForApplication } from '@/lib/validators';
+import { useServerInfo } from './layout/root-provider';
 
-
-const formatCurrency = (value?: string) => {
-    if (!value) return 'N/A';
-    return ('' + value).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
 
 // CANHANHOA01: Function to log user interaction
 const logInteraction = (job: Job, type: 'view' | 'save') => {
@@ -51,8 +46,7 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
             id: job.id,
             industry: job.industry,
             workLocation: job.workLocation,
-            visaType: job.visaType,
-            visaDetail: job.visaDetail,
+            visa: formatVisa(job?.visa),
             title: generateBulletJobCrawl(job),
             // We can add salary later if needed for more complex logic
         };
@@ -74,51 +68,12 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
 };
 
 // List of visa details that have special fee handling
-const controlledFeeVisas = [
-    'Thực tập sinh 3 năm',
-    'Thực tập sinh 1 năm',
-    'Đặc định đi mới',
-    'Kỹ sư, tri thức đầu Việt',
-    'Đặc định đầu Việt'
-];
-
-const JPY_VND_RATE = 180; // Example rate
-const USD_VND_RATE = 26300; // Example rate
-
-const visasForVndDisplay = [
-    'Thực tập sinh 3 năm',
-    'Thực tập sinh 1 năm',
-    'Đặc định đi mới',
-    'Kỹ sư, tri thức đầu Việt',
-];
-
-const formatSalaryForDisplay = (salaryValue?: string, visaDetail?: string): string => {
-    if (!salaryValue) return 'Liên hệ';
-
-    const numericValue = parseInt(('' + salaryValue).replace(/[^0-9]/g, ''), 10);
-    if (isNaN(numericValue)) return salaryValue;
-
-    if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
-        const vndValue = numericValue * JPY_VND_RATE;
-        const valueInMillions = vndValue / 1000000;
-
-        if (valueInMillions % 1 === 0) {
-            return `${valueInMillions.toLocaleString('vi-VN')}tr`;
-        }
-
-        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1
-        });
-        return `${formattedVnd.replace('.', ',')}tr`;
-    }
-
-    return `${formatCurrency(salaryValue)} JPY`;
-};
 
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, fakeID }: { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, fakeID?: string }) => {
-    const { isLoggedIn, setPostLoginAction, user } = useAuth();
+export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, fakeID }:
+    { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, fakeID?: string }) => {
+    const { serverTime } = useServerInfo()
+    const { isLoggedIn, setPostLoginAction, user, setSavedJobCount, setApplicationCount, setLastAction } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
     const [isClient, setIsClient] = useState(false);
@@ -146,28 +101,31 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
         // Safely calculate badge class names on client
         let classes = 'transition-opacity opacity-100 ';
-        if (job.visaDetail === 'Thực tập sinh 1 năm') {
+        const visa = formatVisa(job.visa);
+        if (visa === 'Thực tập sinh 1 năm') {
             classes += 'border-accent-green/70 bg-green-50 text-[#BDCF58]';
-        } else if (job.visaDetail === 'Thực tập sinh 3 Go') {
+        } else if (visa === 'Thực tập sinh 3 Go') {
             classes += 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
-        } else if (job.visaDetail === 'Đặc định đầu Nhật') {
+        } else if (visa === 'Đặc định đầu Nhật') {
             classes += 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
-        } else if (job.visaDetail === 'Đặc định đi mới') {
+        } else if (visa === 'Đặc định đầu Việt') {
+            classes += 'border-accent-blue/60 bg-blue-40 text-[#19A6DF]';
+        } else if (visa === 'Đặc định đi mới') {
             classes += 'text-[#40B5E4]';
-        } else if (job.visaDetail === 'Kỹ sư, tri thức đầu Việt') {
+        } else if (visa === 'Kỹ sư, tri thức đầu Việt') {
             classes += 'border-accent-orange/70 bg-orange-50 text-[#F2B92A]';
-        } else if (job.visaDetail === 'Kỹ sư, tri thức đầu Nhật') {
+        } else if (visa === 'Kỹ sư, tri thức đầu Nhật') {
             classes += 'border-accent-orange/70 bg-orange-50 text-[#F7B102]';
-        } else if (job.visaType?.includes("Thực tập sinh")) {
+        } else if (visa?.includes("Thực tập sinh")) {
             classes += "border-accent-green/70 bg-green-50 text-accent-green";
-        } else if (job.visaType?.includes("Kỹ năng đặc định")) {
+        } else if (visa?.includes("Kỹ năng đặc định")) {
             classes += "border-accent-blue/70 bg-blue-50 text-accent-blue";
-        } else if (job.visaType?.includes("Kỹ sư, tri thức")) {
+        } else if (visa?.includes("Kỹ sư, tri thức")) {
             classes += "border-accent-orange/70 bg-orange-50 text-orange-500";
         }
         setBadgeClassName(classes);
 
-    }, [job.id, job.postedDate, job.interviewDate, job.visa]);
+    }, [job.id, job.postedDate, job.interviewDate, formatVisa(job.visa)]);
     useEffect(() => {
         if (!!user && !!job?.id) {
             const appliedJobs = user.appliedJobs || [];
@@ -183,11 +141,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
             localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
             setIsSaved(false);
+            setSavedJobCount(prev => (prev - 1) < 0 ? 0 : prev - 1);
         } else {
             savedJobs.push(job.id);
             localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
             setIsSaved(true);
             logInteraction(job, 'save'); // CANHANHOA01: Log save interaction
+            setSavedJobCount(prev => prev + 1);
+            setLastAction('saved');
         }
         // Trigger a storage event to update other components like the "My Jobs" page
         window.dispatchEvent(new Event('storage'));
@@ -208,6 +169,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                 await updateProfile(user.uid, { appliedJobs });
                 user.appliedJobs = Object.assign([], appliedJobs);
                 setHasApplied(true);
+                setApplicationCount(prev => prev + 1);
+                setLastAction('applied');
                 toast({
                     title: 'Ứng tuyển thành công!',
                     description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
@@ -240,70 +203,29 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
 
-    const getFeeDisplayInfo = () => {
-        const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
-        const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
-        const isControlled = controlledFeeVisas.includes(job.visaDetail || '');
-
-        let feeValue: number | undefined;
-        let feeLabel: string | undefined;
-
-        if (netFeeWithTuition) {
-            feeValue = parseInt(netFeeWithTuition);
-            feeLabel = 'Phí và vé và học phí';
-        } else if (netFee) {
-            feeValue = parseInt(netFee);
-            feeLabel = (visaDetail?.includes('Thực tập sinh')) ? 'Phí và vé không học phí' : 'Phí có vé';
-        } else if (netFeeNoTicket) {
-            feeValue = parseInt(netFeeNoTicket);
-            feeLabel = 'Phí không vé';
-        }
-
-        if (!feeLabel || feeValue === undefined) {
-            return { shouldShow: isControlled, text: `Phí: Không rõ` };
-        }
-
-        if (isControlled && feeValue > feeLimit) {
-            return { shouldShow: true, text: `Phí: Không rõ` };
-        }
-
-        if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
-            const vndValue = feeValue * USD_VND_RATE;
-            const valueInMillions = vndValue / 1000000;
-            let formattedVnd: string;
-            // Apply rounding only on search page
-            if (isSearchPage && valueInMillions % 1 === 0) {
-                formattedVnd = valueInMillions.toLocaleString('vi-VN');
-            } else {
-                formattedVnd = valueInMillions.toLocaleString('vi-VN', {
-                    minimumFractionDigits: 1,
-                    maximumFractionDigits: 1
-                });
-            }
-            return { shouldShow: true, text: `Phí: ${formattedVnd.replace('.', ',')}tr` };
-        }
-
-        const visasForUsd = ['Đặc định đầu Việt'];
-        if (visaDetail && visasForUsd.includes(visaDetail)) {
-            return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
-        }
-
-        // Default fallback for other controlled visas or if logic doesn't match
-        return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
-    };
 
 
-    const feeInfo = getFeeDisplayInfo();
+
+    const feeInfo = getFeeDisplayInfo(job, isSearchPage);
     const feeFilterIsActive = !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket);
+    let isExpired = false;
+    if (job.expiredDate < serverTime) {
+        isExpired = true;
+    }
 
     if (variant === 'list-item') {
         return (
             <>
-                <div id="HIENTHIVIEC01" className="w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground" onClick={handleCardClick}>
+                <div id="HIENTHIVIEC01" className={cn("w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground", isExpired && "opacity-60 grayscale cursor-not-allowed")} onClick={handleCardClick}>
                     <div className="p-3 hover:bg-secondary/30">
                         <div className="flex flex-col items-stretch gap-4 md:flex-row">
                             <div className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
                                 <Image src={job.avatar || getJobImage(job.job, job.career)} unoptimized alt={jobTitle} fill sizes='100%' className="rounded-lg object-cover" />
+                                {isExpired && (
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+                                        <Badge variant="destructive" className="text-base px-4 py-2">Đã hết hạn</Badge>
+                                    </div>
+                                )}
                                 <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                                     <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                                     <span>{job.code}</span>
@@ -323,11 +245,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                     variant="outline"
                                                     className={badgeClassName}
                                                 >
-                                                    {job.visa}
+                                                    {formatVisa(job.visa)}
                                                 </Badge>
                                             )}
-                                            {job.realSalary > 0 && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, job.visaDetail)}</Badge>}
-                                            <Badge variant="secondary" className="text-xs">Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, job.visaDetail)}</Badge>
+                                            {job.realSalary > 0 && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, formatVisa(job.visa))}</Badge>}
+                                            {job.basicSalary > 0 && <Badge variant="secondary" className="text-xs">Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, formatVisa(job.visa))}</Badge>}
                                             {feeFilterIsActive && feeInfo.shouldShow && (
                                                 <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
                                                     {feeInfo.text}
@@ -387,7 +309,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             <Bookmark className={cn("mr-2 h-5 w-5", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                                             Lưu
                                         </Button>
-                                        {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
+                                        {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied || isExpired}>{applyButtonContent}</Button>}
                                     </div>}
                                 </div>
                             </div>
@@ -450,26 +372,29 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
     if (variant === 'chat') {
         return (
-            <div id="HIENTHIVIEC03" onClick={() => router.push(`/viec-lam/${job.code}`)} className="block w-full cursor-pointer">
-                <Card className="flex items-start p-3 gap-3 hover:bg-secondary/50 transition-colors">
+            <div id="HIENTHIVIEC03" onClick={!isExpired ? () => router.push(`/viec-lam/${job.id}`) : undefined} className={cn("block w-full relative", isExpired ? "cursor-not-allowed" : "cursor-pointer")}>
+                <Card className={cn(
+                    "flex items-start p-3 gap-3 transition-colors",
+                    !isExpired && "hover:bg-secondary/50" // Only apply hover effect when not expired
+                )}>
                     <div className="relative w-20 h-20 flex-shrink-0">
-                        <Image src={job.avatar || getJobImage(job.job, job.career)} unoptimized alt={jobTitle} fill className="object-cover rounded-md" />
+                        <Image src={job.avatar || getJobImage(job.job, job.career)} unoptimized alt={jobTitle} fill className={cn("object-cover rounded-md", isExpired && "grayscale")} />
                     </div>
-                    <div className="flex-grow overflow-hidden space-y-1">
-                        <h4 className="font-semibold text-sm leading-tight line-clamp-2">{jobTitle}</h4>
+                    <div className={cn("flex-grow overflow-hidden space-y-1", isExpired && "text-muted-foreground")}>
+                        <h4 className={cn("font-semibold text-sm leading-tight line-clamp-2", !isExpired && "text-foreground")}>{jobTitle}</h4>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
                             <FileText className="h-3 w-3 flex-shrink-0" />
                             Mã: {job.code}
                         </p>
-                        {isClient && job.visaDetail && (
+                        {isClient && formatVisa(job.visa) && (
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
                                 <Star className="h-3 w-3 flex-shrink-0" />
-                                Visa: {job.visaDetail}
+                                Visa: {formatVisa(job.visa)}
                             </p>
                         )}
                         <div className="text-xs text-muted-foreground">
                             <p className="flex items-center gap-1.5">
-                                <span className="text-primary">Ngày PV:</span>
+                                <span className={cn(!isExpired && "text-primary")}>Ngày PV:</span>
                                 <span>{interviewDate || "N/A"}</span>
                             </p>
                         </div>
@@ -478,19 +403,28 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             {job.workLocation}
                         </p>
                         <div className="text-xs font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1">
-                            {job.realSalary && (
-                                <span className="flex items-center gap-1 text-green-600">
+                            {job.realSalary > 0 && (
+                                <span className={cn("flex items-center gap-1", !isExpired && "text-green-600")}>
                                     <DollarSign className="h-3 w-3 flex-shrink-0" />
-                                    Thực lĩnh: {formatSalaryForDisplay(job.realSalary, job.visaDetail)}
+                                    Thực lĩnh: {formatSalaryForDisplay(job.realSalary, formatVisa(job.visa))}
                                 </span>
                             )}
-                            <span className="flex items-center gap-1 text-muted-foreground">
+                            {job.basicSalary > 0 && <span className="flex items-center gap-1 text-muted-foreground">
                                 <DollarSign className="h-3 w-3 flex-shrink-0" />
-                                Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, job.visaDetail)}
-                            </span>
+                                Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, formatVisa(job.visa))}
+                            </span>}
                         </div>
+                        <p className="text-right text-[11px] mt-1">
+                            <span className={cn(!isExpired && "text-primary")}>Đăng lúc:</span>
+                            <span> {postedTime ? postedTime.split(' ')[1] : '...'}</span>
+                        </p>
                     </div>
                 </Card>
+                {isExpired && (
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center rounded-lg">
+                        <span className="font-bold text-white text-base px-4 py-1 rounded-full">Đã hết hạn</span>
+                    </div>
+                )}
             </div>
         );
     }
@@ -498,10 +432,15 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     // Default variant: 'grid-item'
     return (
         <>
-            <Card id="HIENTHIVIEC02" className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-border shadow-sm transition-shadow duration-300 hover:shadow-lg")}>
-                <div className="group cursor-pointer" onClick={handleCardClick}>
+            <Card id="HIENTHIVIEC02" className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-border shadow-sm transition-shadow duration-300", isExpired && "grayscale")}>
+                <div className={cn("group cursor-pointer", isExpired && "cursor-not-allowed")} onClick={handleCardClick}>
                     <div className="relative aspect-video w-full">
                         <Image src={job.avatar || getJobImage(job.job, job.career)} unoptimized alt={jobTitle} fill className="object-cover transition-transform group-hover:scale-105" />
+                        {isExpired && (
+                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                <Badge variant="destructive" className="text-base px-4 py-2">Đã hết hạn</Badge>
+                            </div>
+                        )}
                         <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
                             <Image src="/img/japanflag.png" alt="Japan flag" width={12} height={12} className="h-3 w-auto" />
                             <span>{job.code}</span>
@@ -510,7 +449,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                         </Button>}
                     </div>
-                    <div className="flex flex-grow flex-col p-3">
+                    <div className={cn("flex flex-grow flex-col p-3", isExpired && "opacity-60")}>
                         <h3 className="mb-2 h-10 text-sm font-bold leading-tight line-clamp-2 group-hover:text-primary">{jobTitle}</h3>
                         <div className="mb-2 flex flex-wrap items-start gap-x-1 gap-y-1" style={{ height: '42px' }}>
                             {isClient && (
@@ -520,11 +459,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             variant="outline"
                                             className={badgeClassName}
                                         >
-                                            {job.visa}
+                                            {formatVisa(job.visa)}
                                         </Badge>
                                     )}
-                                    {job.realSalary > 0 && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, job.visa)}</Badge>}
-                                    <Badge variant="secondary" className="px-1.5 py-0 text-xs">Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, job.visa)}</Badge>
+                                    {job.realSalary > 0 && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, formatVisa(job.visa))}</Badge>}
+                                    {job.basicSalary > 0 && <Badge variant="secondary" className="px-1.5 py-0 text-xs">Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, formatVisa(job.visa))}</Badge>}
                                 </>
                             )}
                         </div>
@@ -550,7 +489,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     </Link>
                                     <ContactButtons contact={recruiter as any} job={job} />
                                 </div>
-                                {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>}
+                                {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied || isExpired}>{applyButtonContent}</Button>}
                             </div>
                             {showPostedTime && (
                                 <p className="mt-1 text-right text-xs">

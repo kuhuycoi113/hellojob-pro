@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { AuthProvider, User } from '@/contexts/AuthContext';
 import { filterStandardClaims } from 'next-firebase-auth-edge/lib/auth/claims';
@@ -37,12 +37,18 @@ function toAuthTime(date: string) {
 export interface AuthProviderProps {
     serverUser: User | null;
     children: React.ReactNode;
+    serverTime: number;
 }
 
+type ServerInfoContextType = {
+    serverTime: number;
+};
+const ServerInfoContext = createContext<ServerInfoContextType | null>(null);
 
 export function RootProvider({
     children,
-    serverUser
+    serverUser,
+    serverTime
 }: AuthProviderProps) {
     const [user, setUser] = React.useState(serverUser);
     React.useEffect(() => {
@@ -97,10 +103,18 @@ export function RootProvider({
         setUser(decodedUser);
     };
     return (
-        <AuthProvider serverUser={user}>
-            <ChatProvider>
-                {children}
-            </ChatProvider>
-        </AuthProvider>
+        <ServerInfoContext.Provider value={{serverTime}}>
+            <AuthProvider serverUser={user}>
+                <ChatProvider>
+                    {children}
+                </ChatProvider>
+            </AuthProvider>
+        </ServerInfoContext.Provider>
     );
+}
+
+export function useServerInfo() {
+  const context = useContext(ServerInfoContext);
+  if (!context) throw new Error("ServerInfo must be init");
+  return context;
 }

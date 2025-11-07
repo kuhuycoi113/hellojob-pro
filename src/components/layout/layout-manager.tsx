@@ -107,7 +107,7 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
             {showDefaultCtas && (
                 <div className="space-y-20 md:space-y-28 py-20 md:py-28">
                     {showProfileSuggestions && <CtaViecLamPhuHop />}
-                    <CtaViecLamGoiY />
+                    {/* <CtaViecLamGoiY /> */}
                     <CtaNhaTuyenDung />
                 </div>
             )}

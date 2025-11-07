@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import * as chatData from '@/lib/chat-data';
 import {
   IdTokenResult,
@@ -32,6 +32,13 @@ interface AuthContextType {
   postLoginAction: PostLoginAction;
   setPostLoginAction: (action: PostLoginAction) => void;
   clearPostLoginAction: () => void;
+  applicationCount: number;
+  savedJobCount: number;
+  lastAction: 'applied' | 'saved' | null,
+  setLastAction: (action: 'applied' | 'saved' | null) => void,
+  setApplicationCount: (count: number | ((prevCount: number) => number)) => void;
+  setSavedJobCount: (count: number | ((prevCount: number) => number)) => void;
+  clearLastAction: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -72,6 +79,9 @@ function toUser(user: FirebaseUser, idTokenResult: IdTokenResult): User {
 
 export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
   // Xác định role dựa vào serverUser
+  const [savedJobCount, setSavedJobCount] = useState(0);
+  const [applicationCount, setApplicationCount] = useState(0);
+  const [lastAction, setLastAction] = useState<'applied' | 'saved' | null>(null);
   let role: Role = 'guest';
   if (serverUser) {
     if (validateProfileForApplication(serverUser)?.length > 0) {
@@ -90,6 +100,11 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
   const clearPostLoginAction = () => {
     setPostLoginAction(null);
   };
+  const clearLastAction = () => {
+    setApplicationCount(0);
+    setSavedJobCount(0);
+    setLastAction(null);
+  }
 
   useEffect(() => {
     const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
@@ -126,8 +141,15 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
     isLoggedIn,
     setRole,
     postLoginAction,
+    savedJobCount,
+    lastAction,
+    setLastAction,
+    setSavedJobCount,
+    applicationCount,
+    setApplicationCount,
     setPostLoginAction,
     clearPostLoginAction,
+    clearLastAction
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

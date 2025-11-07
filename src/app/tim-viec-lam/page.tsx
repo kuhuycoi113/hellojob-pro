@@ -354,7 +354,7 @@ export default function JobSearchPage({ searchParams }: { searchParams: SearchPa
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
       </div>
     }>
-      <JobSearchPageContent searchParams={searchParams} />
+      <JobSearchPageContent />
     </Suspense>
   );
 }

@@ -45,8 +45,7 @@ export interface Job {
     };
     postedTimeOffset: number; // Offset from today in days
     // New detailed fields based on your schema
-    visaType?: string;
-    visaDetail?: string;
+    visa?: string | null;
     industry: string;
     workLocation: string;
     interviewLocation?: string;
@@ -58,7 +57,7 @@ export interface Job {
     experienceRequirement?: string;
     yearsOfExperience?: string;
     heightRequirement?: string;
-    hepatitisBRequirement?:any
+    hepatitisBRequirement?: any
     weightRequirement?: string;
     visionRequirement?: string;
     tattooRequirement?: string;
@@ -323,8 +322,7 @@ const createJobList = (): Job[] => {
                         target: `${(jobIndex % 5) + 1}tr`,
                         backFee: `${(jobIndex % 5) + 1}tr`,
                         tags: [industry.name, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
-                        visaType: visaType.name,
-                        visaDetail: detail.name,
+                        visa: visaType.name,
                         industry: industry.name,
                         workLocation: location,
                         interviewLocation: getRandomItem(interviewLocations, jobIndex),
@@ -494,8 +492,7 @@ const createJobsForLocations = (locationsToPopulate: string[], countPerLocation:
                 target: `${(jobIndex % 5) + 1}tr`,
                 backFee: `${(jobIndex % 5) + 1}tr`,
                 tags: [industry.name, visaType.name.split(' ')[0], gender === 'Cả nam và nữ' ? 'Nam/Nữ' : gender],
-                visaType: visaType.name,
-                visaDetail: detail.name,
+                visa: visaType.name,
                 industry: industry.name,
                 workLocation: location,
                 interviewLocation: getRandomItem(interviewLocations, jobIndex),

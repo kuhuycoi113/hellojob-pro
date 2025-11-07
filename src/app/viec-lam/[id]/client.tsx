@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
 import { use, useState, useEffect } from 'react';
-import { cn, convertTime, findVisaByVisaDetail, formatGender, generateBulletJobCrawl, getJobImage } from '@/lib/utils';
+import { cn, convertTime, findVisaByVisaDetail, formatGender, formatSalaryForDisplay, formatVisa, generateBulletJobCrawl, getJobImage, getVisaBadgeClassName } from '@/lib/utils';
 import { consultants } from '@/lib/consultant-data';
 import { ContactButtons } from '@/components/contact-buttons';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -32,6 +32,9 @@ import { validateProfileForApplication } from '@/lib/validators';
 import { CtaViecLamTuongTu } from '@/components/cta-viec-lam-tuong-tu';
 import { findSuggestedJobs, getJobByCode } from '@/actions/job-action';
 import { applyJob, updateProfile } from '@/actions/user-action';
+import { useServerInfo } from '@/components/layout/root-provider';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -82,7 +85,8 @@ const visasForVndDisplay = [
 
 export default function JobDetailClientPage({ job, behavioralSuggestions }: { job: any, behavioralSuggestions: any[] }) {
     const { toast } = useToast();
-    const { isLoggedIn, setPostLoginAction, user } = useAuth();
+    const { serverTime } = useServerInfo();
+    const { isLoggedIn, setPostLoginAction, user, setApplicationCount, setSavedJobCount, setLastAction } = useAuth();
     const [isClient, setIsClient] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const [hasApplied, setHasApplied] = useState(false);
@@ -121,10 +125,13 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
             const newSavedJobs = savedJobs.filter((id: string) => id !== job.id);
             localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
             setIsSaved(false);
+            setSavedJobCount(prev => (prev - 1) < 0 ? 0 : prev - 1);
         } else {
             savedJobs.push(job.id);
             localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
             setIsSaved(true);
+            setSavedJobCount(prev => prev + 1);
+            setLastAction('saved');
         }
         window.dispatchEvent(new Event('storage'));
     };
@@ -132,7 +139,6 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     const handleApplyClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-        debugger
         if (!isLoggedIn) {
             setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: job.title } });
             setIsConfirmLoginOpen(true);
@@ -144,6 +150,8 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                 await updateProfile(user.uid, { appliedJobs });
                 user.appliedJobs = Object.assign([], appliedJobs);
                 setHasApplied(true);
+                setApplicationCount(prev => prev + 1);
+                setLastAction('applied');
                 toast({
                     title: 'Ứng tuyển thành công!',
                     description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
@@ -235,10 +243,28 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     const feeDisplay = getFeeDisplay(job.fee, job.visa?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé");
     const feeNoTicketDisplay = getFeeDisplay(job.netFeeNoTicket, "Phí không vé");
     const avatar = job.avatar || getJobImage(job.job, job.career);
+    const badgeClassName = getVisaBadgeClassName(job.visa);
+    let isExpired = false;
+    if (job.expiredDate < serverTime) {
+        isExpired = true;
+    }
+    let annualIncome = null;
+    if (job.basicSalary > 100000 && job.basicSalary < 900000) {
+        annualIncome = job.basicSalary * 12;
+    }
+
+
+    const convertCurrency = (value?: number, from: 'JPY' | 'USD' = 'JPY') => {
+        if (!value) return null;
+        if (isNaN(value)) return null;
+
+        const rate = from === 'JPY' ? JPY_VND_RATE : USD_VND_RATE;
+        const vndValue = value * rate;
+        return `≈ ${vndValue.toLocaleString('vi-VN')} VNĐ`;
+    };
     if (!!job) {
         return (
             <>
-
                 <div className="bg-secondary">
                     {/* {job && <JsonLdScript job={job} appliedFilters={appliedFilters} />} */}
                     <div className="container mx-auto px-4 md:px-6 py-12">
@@ -249,35 +275,68 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                         </div>
                         <div className="grid lg:grid-cols-3 gap-8 items-start">
                             {/* Main Content */}
-                            <div className="lg:col-span-2 space-y-6">
-                                <Card className="overflow-hidden">
-                                    <CardHeader>
-                                        <h1 className="text-2xl md:text-3xl font-bold font-headline">{job.title}</h1>
-                                        <p className="flex items-center gap-2 text-xs bg-white py-1 rounded-md w-fit mb-3">
-                                            <Image src="/img/japanflag.png" alt="Japan flag" width={16} height={16} className="h-4 w-4" />
-                                            <span className="text-primary">Mã việc làm: <span className="text-[#FF1400]">{job.code}</span></span>
-                                        </p>
-                                        <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
-                                            {job.workLocation && <p className="flex items-center gap-2"><MapPin className="h-4 w-4" /> {job.workLocation}</p>}
-                                            <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" /> <span className="text-primary">Đăng lúc:</span> {postedTime || "Đang tải..."}</p>
+                            <div className={cn("lg:col-span-2 space-y-6", isExpired && "grayscale")}>
+                                <Card id="VLCT-HEADER" className="shadow-lg overflow-hidden">
+                                    <div className="p-6">
+                                        <div>
+                                            <h1 className="text-2xl md:text-3xl font-bold font-headline">{job.title}</h1>
+                                            <div id="IDVLCT01" className="flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-xs font-bold text-white w-fit my-3">
+                                                <Image src="/img/japanflag.png" alt="Japan flag" width={16} height={16} className="h-3 w-auto" />
+                                                <span>{job.id}</span>
+                                            </div>
+                                            {isClient && job.visa && (
+                                                <Badge
+                                                    variant="outline"
+                                                    className={cn("mt-3 w-fit", badgeClassName)}
+                                                >
+                                                    {formatVisa(job.visa)}
+                                                </Badge>
+                                            )}
+                                            <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground mt-3">
+                                                {job.workLocation && <p className="flex items-center gap-2"><MapPin className="h-4 w-4" /> {job.workLocation}</p>}
+                                                <p className="flex items-center gap-2">
+                                                    <span className="text-primary font-medium">Ngày phỏng vấn:</span>
+                                                    <span>{interviewDate || "Lịch phỏng vấn linh hoạt"}</span>
+                                                </p>
+                                            </div>
                                         </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        {isClient ? (
-                                            <div className="flex flex-col sm:flex-row gap-4">
-                                                <Button size="lg" variant="outline" className={cn("w-full sm:w-auto", isSaved && "border-accent-orange text-accent-orange bg-accent-orange/5")} onClick={handleSaveJob}>
-                                                    <Bookmark className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
-                                                    {isSaved ? 'Việc đã lưu' : 'Lưu việc làm'}
-                                                </Button>
-                                                <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied}>{applyButtonContent}</Button>
+                                        <div className="mt-6 flex flex-col sm:flex-row items-baseline justify-between gap-4">
+                                            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                                {isClient ? (
+                                                    <>
+                                                        <Button size="lg" variant="outline" className={cn("w-full sm:w-auto text-base", isSaved ? "border-accent-orange text-accent-orange bg-accent-orange/5" : "border-gray-300")} onClick={handleSaveJob}>
+                                                            <Bookmark className={cn("mr-2", isSaved && "fill-current text-accent-orange")} />
+                                                            {isSaved ? 'Việc đã lưu' : 'Lưu việc làm'}
+                                                        </Button>
+                                                        <Button size="lg" className="w-full sm:w-auto bg-accent-orange text-white text-base" onClick={handleApplyClick} disabled={hasApplied || isExpired}>
+                                                            {isExpired ? 'Đã hết hạn' : applyButtonContent}
+                                                        </Button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Skeleton className="h-11 w-full sm:w-40" />
+                                                        <Skeleton className="h-11 w-full sm:w-40" />
+                                                    </>
+                                                )}
                                             </div>
-                                        ) : (
-                                            <div className="flex flex-col sm:flex-row gap-4">
-                                                <Skeleton className="h-11 w-full sm:w-40" />
-                                                <Skeleton className="h-11 w-full sm:w-40" />
+                                            <div className="w-full text-right">
+                                                <p className="text-xs text-muted-foreground flex items-center justify-end gap-2">
+                                                    <span className="text-primary font-medium">Đăng lúc:</span>
+                                                    <span>{postedTime || "..."}</span>
+                                                </p>
                                             </div>
+                                        </div>
+
+                                        {isExpired && (
+                                            <Alert variant="destructive" className="mt-4">
+                                                <Info className="h-4 w-4" />
+                                                <AlertTitle className="font-bold">Việc làm đã hết hạn</AlertTitle>
+                                                <AlertDescription>
+                                                    Tin tuyển dụng này đã hết hạn. Bạn có thể tham khảo các việc làm tương tự bên dưới.
+                                                </AlertDescription>
+                                            </Alert>
                                         )}
-                                    </CardContent>
+                                    </div>
                                 </Card>
 
                                 <Card>
@@ -338,7 +397,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
 
                                 {(job.videoUrl || job.avatar) &&
                                     <JobDetailSection title="Hình ảnh & Video công việc" icon={ImageIcon}>
-                                        <div className="space-y-6">
+                                        <div className={cn("space-y-6", isExpired && "grayscale")}>
                                             {job.videoUrl && (
                                                 <div className="aspect-video">
                                                     <iframe id="VIDEOVIECLAM01" className="w-full h-full rounded-lg" src={job.videoUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
@@ -358,25 +417,28 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                             </div>
 
                             {/* Sidebar */}
-                            <aside className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
+                            <aside className={cn("lg:col-span-1 space-y-6 lg:sticky lg:top-24", isExpired && "grayscale pointer-events-none")}>
                                 <Card className="shadow-lg">
                                     <CardHeader>
                                         <CardTitle className="text-lg">Mức lương</CardTitle>
                                     </CardHeader>
+
                                     <CardContent className="space-y-4">
                                         <div className="space-y-2">
                                             <p className="text-sm text-muted-foreground">Lương cơ bản</p>
-                                            <p className="text-2xl font-bold text-accent-green">{formatCurrency(job.basicSalary, job?.basicSalaryCode)}</p>
+                                            <p className="text-2xl font-bold text-accent-green">{formatSalaryForDisplay(job.basicSalary, formatVisa(job.visa))}</p>
+                                            {job.basicSalary > 0 && <p className="text-xs text-muted-foreground">{convertCurrency(job.basicSalary, 'JPY')}</p>}
                                             {job.realSalary > 0 && (
                                                 <div className="pt-2">
-                                                    <p className="font-semibold text-muted-foreground">Thực lĩnh: ~{formatCurrency(job.realSalary, job?.realSalaryCode)}</p>
+                                                    <p className="font-semibold text-muted-foreground">Thực lĩnh: ~{formatSalaryForDisplay(job.realSalary, formatVisa(job.visa))}</p>
+                                                    {job.realSalary && <p className="text-xs text-muted-foreground">{convertCurrency(job.realSalary, 'JPY')}</p>}
                                                 </div>
                                             )}
                                         </div>
-                                        {(job.annualIncome || job.annualBonus) && <div className="border-t pt-4 space-y-2 text-sm">
-                                            {job.annualIncome && <p>Thu nhập năm: <strong>{job.annualIncome ?? 'Liên hệ'}</strong></p>}
-                                            {job.annualBonus && <p>Thưởng: <strong>{job.annualBonus ?? 'Liên hệ'}</strong></p>}
-                                        </div>}
+                                        <div className="border-t pt-4 space-y-2 text-sm">
+                                            {!!annualIncome && <p>Thu nhập năm: Khoảng <strong>{formatSalaryForDisplay(annualIncome, formatVisa(job.visa))}</strong></p>}
+                                            {job.annualBonus && <p>Thưởng: <strong>{job.annualBonus}</strong></p>}
+                                        </div>
                                     </CardContent>
                                 </Card>
                                 <Card

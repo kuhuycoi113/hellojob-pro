@@ -27,8 +27,8 @@ function createSearchQuery(filter: SearchFilters): any {
                             should: [
                                 {
                                     range: {
-                                        postedDate: {
-                                            gte: secondsTimestamp,
+                                        createdDate: {
+                                            gte: 1762502844446,
                                         },
                                     },
                                 },
@@ -77,8 +77,23 @@ function createSearchQuery(filter: SearchFilters): any {
             },
         },
         sort: [
+            {
+                "_script": {
+                    "type": "number",
+                    "order": "asc",
+                    "script": {
+                        "source": `
+            def now = new Date().getTime();
+            if (doc['expiredDate'].size() == 0) return 0;
+            long exp = doc['expiredDate'].value;
+            // Nếu đã hết hạn thì trả về 1, chưa hết hạn thì 0
+            return now > exp ? 1 : 0;
+          `
+                    }
+                }
+            },
             { "_score": { "order": "desc" } },
-            { createdDate: { order: 'desc' } }
+            { "createdDate": { "order": "desc" } }
         ]
     };
     if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== "") {
@@ -286,6 +301,7 @@ export async function getJobs(filter: SearchFilters, page: number, limit: number
             }
         });
 
+        console.log('fetched')
         return { ...results, docs: mappedDocs };
     } catch (error: any) {
         console.error("Failed to fetch new candidates from Elasticsearch:", error);
@@ -334,6 +350,7 @@ export async function countJobs(filter: SearchFilters): Promise<number> {
         const query = createSearchQuery(filter);
         delete query.sort;
         const total = await countDocuments(CANDIDATES_INDEX, query);
+        console.log('counted')
         return total;
     } catch (error: any) {
         console.error("Failed to fetch new candidates from Elasticsearch:", error);

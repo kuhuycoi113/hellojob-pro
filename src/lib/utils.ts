@@ -6,6 +6,7 @@ import MAPPING_EXCLUDE_IMAGES from "@/lib/mapping_exclude_images.json";
 import { japanJobTypes, visaDetailsByVisaType } from "./visa-data";
 import { SearchFilters } from "@/components/job-search/search-results";
 import { User } from "@/contexts/AuthContext";
+import { publicFeeLimits } from "./mock-data";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -95,7 +96,7 @@ export const getGenderLabel = (gender: any) => {
   }
 };
 export const generateBulletJobCrawl = (data: any) => {
-  const { job, career, languageLevel, numberRecruits, gender, workLocation, basicSalary } = data;
+  const { job, visa, career, languageLevel, numberRecruits, gender, workLocation, basicSalary } = data;
   let specialConditions = data.specialConditions;
   specialConditions = formatSpecialCondition(specialConditions);
   const details = [
@@ -103,13 +104,108 @@ export const generateBulletJobCrawl = (data: any) => {
     workLocation,
     languageLevel,
     numberRecruits ? `${numberRecruits} ${getGenderLabel(gender)}` : null,
-    basicSalary ? `LCB ${basicSalary}` : null,
+    basicSalary ? `LCB ${formatSalaryForDisplay(basicSalary, formatVisa(visa))}` : null,
     specialConditions ? specialConditions.join(",") : null,
   ]
     .filter(Boolean)
     .join(", ");
 
   return details;
+};
+
+export const formatCurrency = (value?: string) => {
+  if (!value) return 'N/A';
+  return ('' + value).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+const visasForVndDisplay = [
+  'Thực tập sinh 3 năm',
+  'Thực tập sinh 1 năm',
+  'Đặc định đi mới',
+  'Kỹ sư, tri thức đầu Việt',
+];
+const JPY_VND_RATE = 180; // Example rate
+const USD_VND_RATE = 26300; // Example rate
+export const formatSalaryForDisplay = (salaryValue?: any, visaDetail?: string | any): string => {
+  if (!salaryValue) return 'Liên hệ';
+
+  const numericValue = parseInt(('' + salaryValue).replace(/[^0-9]/g, ''), 10);
+  if (isNaN(numericValue)) return salaryValue;
+  if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
+    const vndValue = numericValue * JPY_VND_RATE;
+    const valueInMillions = vndValue / 1000000;
+
+    if (valueInMillions % 1 === 0) {
+      return `${valueInMillions.toLocaleString('vi-VN')}tr`;
+    }
+
+    const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1
+    });
+    return `${formattedVnd.replace('.', ',')}tr`;
+  }
+
+  return `${formatCurrency(salaryValue)} JPY`;
+};
+
+const controlledFeeVisas = [
+  'Thực tập sinh 3 năm',
+  'Thực tập sinh 1 năm',
+  'Đặc định đi mới',
+  'Kỹ sư, tri thức đầu Việt',
+  'Đặc định đầu Việt'
+];
+export const getFeeDisplayInfo = (job: any, isSearchPage?: boolean) => {
+  const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
+  const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
+  const isControlled = controlledFeeVisas.includes(formatVisa(job.visa) || '');
+
+  let feeValue: number | undefined;
+  let feeLabel: string | undefined;
+
+  if (netFeeWithTuition) {
+    feeValue = parseInt(netFeeWithTuition);
+    feeLabel = 'Phí và vé và học phí';
+  } else if (netFee) {
+    feeValue = parseInt(netFee);
+    feeLabel = (visaDetail?.includes('Thực tập sinh')) ? 'Phí và vé không học phí' : 'Phí có vé';
+  } else if (netFeeNoTicket) {
+    feeValue = parseInt(netFeeNoTicket);
+    feeLabel = 'Phí không vé';
+  }
+
+  if (!feeLabel || feeValue === undefined) {
+    return { shouldShow: isControlled, text: `Phí: Không rõ` };
+  }
+
+  if (isControlled && feeValue > feeLimit) {
+    return { shouldShow: true, text: `Phí: Không rõ` };
+  }
+
+  if (visaDetail && visasForVndDisplay.includes(visaDetail)) {
+    const vndValue = feeValue * USD_VND_RATE;
+    const valueInMillions = vndValue / 1000000;
+    let formattedVnd: string;
+    // Apply rounding only on search page
+    if (isSearchPage && valueInMillions % 1 === 0) {
+      formattedVnd = valueInMillions.toLocaleString('vi-VN');
+    } else {
+      formattedVnd = valueInMillions.toLocaleString('vi-VN', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      });
+    }
+    return { shouldShow: true, text: `Phí: ${formattedVnd.replace('.', ',')}tr` };
+  }
+
+  const visasForUsd = ['Đặc định đầu Việt'];
+  if (visaDetail && visasForUsd.includes(visaDetail)) {
+    return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
+  }
+
+  // Default fallback for other controlled visas or if logic doesn't match
+  return { shouldShow: true, text: `Phí: $${formatCurrency(String(feeValue))}` };
 };
 
 
@@ -148,11 +244,8 @@ export const getJobImage = (job: string, career: string) => {
   }
   return mappingImage.images[randomInt];
 };
-export const formatVisa = (visa: string) => {
-  if (!visa) {
-    return 'Không rõ';
-  }
-  return visa.replace('Tokutei', 'Đặc định');
+export const formatVisa = (visa: string | null | undefined) => {
+  return visa?.replace('Tokutei', 'Đặc định') ?? null;
 };
 export const findVisaByVisaDetail = (visaDetail: string) => {
   if (!visaDetail) {
@@ -318,4 +411,31 @@ export function getSalaryUnitByNumber(input: any) {
   if (input > 500) return "yên/giờ";
   if (input < 100) return "man";
   return ""; // Không nằm trong các trường hợp trên
+}
+
+
+export function getVisaBadgeClassName(visa: string) {
+  const formatedVisa = formatVisa(visa);
+
+  let badgeClassName = 'transition-opacity opacity-100 ';
+  if (formatedVisa === 'Thực tập sinh 1 năm') {
+    badgeClassName += 'border-accent-green/70 bg-green-50 text-[#BDCF58]';
+  } else if (formatedVisa === 'Thực tập sinh 3 Go') {
+    badgeClassName += 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
+  } else if (formatedVisa === 'Đặc định đầu Nhật') {
+    badgeClassName += 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
+  } else if (formatedVisa === 'Đặc định đi mới') {
+    badgeClassName += 'text-[#40B5E4]';
+  } else if (formatedVisa === 'Kỹ sư, tri thức đầu Việt') {
+    badgeClassName += 'border-accent-orange/70 bg-orange-50 text-[#F2B92A]';
+  } else if (formatedVisa === 'Kỹ sư, tri thức đầu Nhật') {
+    badgeClassName += 'border-accent-orange/70 bg-orange-50 text-[#F7B102]';
+  } else if (formatedVisa?.includes("Thực tập sinh")) {
+    badgeClassName += "border-accent-green/70 bg-green-50 text-accent-green";
+  } else if (formatedVisa?.includes("Kỹ năng đặc định")) {
+    badgeClassName += "border-accent-blue/70 bg-blue-50 text-accent-blue";
+  } else if (formatedVisa?.includes("Kỹ sư, tri thức")) {
+    badgeClassName += "border-accent-orange/70 bg-orange-50 text-orange-500";
+  }
+  return badgeClassName;
 }
