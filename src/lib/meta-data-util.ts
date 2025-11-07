@@ -132,9 +132,9 @@ export const generateJobMetaDataImage = async (job: any) => {
 };
 
 // ⬇️ Helper Functions
-const createCanvasBase = () => {
-    const width = 1200;
-    const height = 630;
+const createCanvasBase = (baseWidth = 1200, baseHeight = 600) => {
+    const width = Math.round(baseWidth);
+    const height = Math.round(baseHeight);
     const scale = 2;
     const fontSize = 46;
     const canvas = createCanvas(width * scale, height * scale);
@@ -356,7 +356,7 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             fontSize,
             font400,
             font700,
-        } = createCanvasBase();
+        } = createCanvasBase(1200,1200*317/563);
 
         const cols = 2;
         const rows = 2;
