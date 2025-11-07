@@ -37,8 +37,9 @@ const RECRUITMENT_KEYS = [
 export const generateJobMetaDataImage = async (job: any) => {
     try {
 
-        const { canvas, ctx, width, height, fontSize, font400, font700, startX, maxTextWidth } = createCanvasBase();
-
+        const props = createCanvasBase();
+        const { canvas, ctx, width, height, fontSize, font400, font700, maxTextWidth } = props;
+        const startX = props.startX + 15;
         // Load ảnh nền
         const avatarUrl = job.avatar?.url ?? job.avatar ?? '/img/metadata/opengraph-image.jpg';
         await drawBackgroundImage(ctx, avatarUrl, width, height);
@@ -416,7 +417,7 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             if (!!job) {
                 ctx.font = titleFont;
                 ctx.fillStyle = '#0d8dc8';
-                let visa = job.visa?.replace('Tokutei','Đặc định');
+                let visa = job.visa?.replace('Tokutei', 'Đặc định');
                 if (visa?.length > 0) {
                     visa = breakLine(ctx, visa, 450);
                     const visaMetrics = ctx.measureText(visa);
