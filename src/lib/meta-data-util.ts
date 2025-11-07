@@ -356,7 +356,7 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             fontSize,
             font400,
             font700,
-        } = createCanvasBase(1200,1200*317/563);
+        } = createCanvasBase(1200, 1200 * 317 / 563);
 
         const cols = 2;
         const rows = 2;
@@ -416,15 +416,17 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             if (!!job) {
                 ctx.font = titleFont;
                 ctx.fillStyle = '#0d8dc8';
-                let visa = findVisaByVisaDetail(job.visa);
-                visa = breakLine(ctx, visa, 450);
-                const visaMetrics = ctx.measureText(visa);
-                let visaWidth = visaMetrics.width;
-                const visaHeight = titleFontSize + 35;
-                // Draw white rounded rect background behind title
-                drawRoundedRect(ctx, 60 + x, (cardHeight - salaryFontSize * 6.5 - 40) + y, visaWidth + 20, visaHeight, 16, '#fff');
-                ctx.fillStyle = '#0d8dc8';
-                ctx.fillText(visa, 75 + x, (cardHeight - salaryFontSize * 5.5 - 28) + y);
+                let visa = job.visa?.replace('Tokutei','Đặc định');
+                if (visa?.length > 0) {
+                    visa = breakLine(ctx, visa, 450);
+                    const visaMetrics = ctx.measureText(visa);
+                    let visaWidth = visaMetrics.width;
+                    const visaHeight = titleFontSize + 35;
+                    // Draw white rounded rect background behind title
+                    drawRoundedRect(ctx, 60 + x, (cardHeight - salaryFontSize * 6.5 - 40) + y, visaWidth + 30, visaHeight, 16, '#fff');
+                    ctx.fillStyle = '#0d8dc8';
+                    ctx.fillText(visa, 75 + x, (cardHeight - salaryFontSize * 5.5 - 28) + y);
+                }
                 let title = `${job.job ?? job.career}`;
                 if (!!job.workLocation) {
                     title = breakLine(ctx, title, 220);
@@ -451,7 +453,7 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
                 let titleWidth = titleMetrics.width;
                 const titleHeight = titleFontSize + 35;
                 // Draw white rounded rect background behind title
-                drawRoundedRect(ctx, 60 + x, (cardHeight - salaryFontSize * 3 - 80) + y, titleWidth + 20, titleHeight, 16, '#fff');
+                drawRoundedRect(ctx, 60 + x, (cardHeight - salaryFontSize * 3 - 80) + y, titleWidth + 30, titleHeight, 16, '#fff');
                 ctx.fillStyle = '#0d8dc8';
                 ctx.fillText(title, 75 + x, (cardHeight - salaryFontSize * 2 - 68) + y);
 
