@@ -19,6 +19,13 @@ export default function AppliedJobs({ }: any) {
             });
         }
     }, []);
+    const fetchAppliedJob = async () => {
+        if (!!user) {
+            const appliedJobIDs = user.appliedJobs;
+            const res = await getJobsByIDs(appliedJobIDs);
+            setAppliedJobs([...res.docs]);
+        }
+    }
 
     return (
         <AccordionItem value="item-2" className="border rounded-lg border-b-0">
@@ -31,7 +38,7 @@ export default function AppliedJobs({ }: any) {
             </AccordionTrigger>
             <AccordionContent className="bg-background p-6 rounded-b-lg">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {appliedJobs.map((job) => (<MemoizedJobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} />))}
+                    {appliedJobs.map((job) => (<MemoizedJobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} showCancelApplication={true} onCancelAppliedJob={fetchAppliedJob} />))}
                 </div>
             </AccordionContent>
         </AccordionItem>

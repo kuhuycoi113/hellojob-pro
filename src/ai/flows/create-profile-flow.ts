@@ -7,7 +7,7 @@
  * - CreateProfileInput - The input type for the createProfile function.
  */
 
-import {ai} from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { CandidateProfileSchema, type CandidateProfile } from '@/ai/schemas';
 
@@ -30,13 +30,14 @@ export async function createProfile(
 ): Promise<CandidateProfile> {
   return createProfileFlow(input);
 }
-
-const prompt = ai.definePrompt({
-  name: 'createProfilePrompt',
-  input: {schema: CreateProfileInputSchema},
-  output: {schema: CandidateProfileSchema, format: 'json'},
-  model: 'googleai/gemini-2.0-flash',
-  prompt: `You are an expert resume analyst. Your task is to extract structured information from the provided document or text and generate a professional profile.
+if (!(globalThis as any).__REGISTERED_CREATE_PROFILE__) {
+  (globalThis as any).__REGISTERED_CREATE_PROFILE__ = true;
+  const prompt = ai.definePrompt({
+    name: 'createProfilePrompt',
+    input: { schema: CreateProfileInputSchema },
+    output: { schema: CandidateProfileSchema, format: 'json' },
+    model: 'googleai/gemini-2.0-flash',
+    prompt: `You are an expert resume analyst. Your task is to extract structured information from the provided document or text and generate a professional profile.
 
   Follow this process carefully:
   1.  **Prioritize Structured Data:** First, meticulously scan the document/text to find and extract information that directly maps to the fields in the provided JSON schema (e.g., 'name', 'school', 'company', dates, etc.). Populate these fields with the exact information found.
@@ -56,22 +57,23 @@ const prompt = ai.definePrompt({
   {{{text}}}
   {{/if}}
   `,
-});
+  });
 
-const createProfileFlow = ai.defineFlow(
-  {
-    name: 'createProfileFlow',
-    inputSchema: CreateProfileInputSchema,
-    outputSchema: CandidateProfileSchema,
-  },
-  async (input) => {
-    if (!input.document && !input.text) {
-      throw new Error("Either a document or text must be provided.");
-    }
-    const {output} = await prompt(input);
-    if (!output) {
+  const createProfileFlow = ai.defineFlow(
+    {
+      name: 'createProfileFlow',
+      inputSchema: CreateProfileInputSchema,
+      outputSchema: CandidateProfileSchema,
+    },
+    async (input) => {
+      if (!input.document && !input.text) {
+        throw new Error("Either a document or text must be provided.");
+      }
+      const { output } = await prompt(input);
+      if (!output) {
         throw new Error("The AI failed to generate a profile. Please try again.");
+      }
+      return output;
     }
-    return output;
-  }
-);
+  );
+}

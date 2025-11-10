@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -10,25 +10,24 @@ import { Toaster } from '@/components/ui/toaster';
 import { useAuth } from '@/contexts/AuthContext';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { validateProfileForApplication } from '@/lib/validators';
-import type { CandidateProfile } from '@/ai/schemas';
 import { EditProfileDialog } from '../../app/ho-so-cua-toi/components/candidate-edit-dialog';
 import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
-import { CtaViecLamGoiY } from '../cta-viec-lam-goi-y';
 import { CtaViecLamPhuHop } from '../cta-viec-lam-phu-hop';
-import path from 'path';
-import { applyJob, updateProfile } from '@/actions/user-action';
+import { Badge } from '../ui/badge';
+import { AuthDialog } from '../auth-dialog';
 
 const FloatingChatWidget = dynamic(() => import('@/components/chat/floating-chat-widget').then(mod => mod.FloatingChatWidget), { ssr: false });
 
 
 export function LayoutManager({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const router = useRouter();
     const { toast } = useToast();
-    const { isLoggedIn, postLoginAction, clearPostLoginAction, user } = useAuth();
+    const { isLoggedIn, postLoginAction, clearPostLoginAction, user,
+        isLimitApplyDialogOpen, setIsLimitApplyDialogOpen, applyForJob,
+        isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen, setIsConfirmLoginOpen, isConfirmLoginOpen,
+        isAuthDialogOpen, setIsAuthDialogOpen, isProfileEditDialogOpen, setIsProfileEditDialogOpen, lastDataApplied } = useAuth();
     const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = useState(false);
-    const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
-    const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
@@ -53,46 +52,21 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
             setIsPostLoginApplyDialogOpen(true);
         }
     }, [isLoggedIn, postLoginAction]);
+    useEffect(() => {
+        if (isLoggedIn && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
+            setIsPostLoginApplyDialogOpen(true);
+        }
+    }, [isLimitApplyDialogOpen]);
 
     const handlePostLoginApply = async (apply: boolean) => {
         setIsPostLoginApplyDialogOpen(false); // Close the first dialog
-
         if (apply && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
-            const { jobId, jobTitle, job } = postLoginAction.data;
-
-            if (!!user) {
-                const missingFields = validateProfileForApplication(user);
-                if (missingFields.length === 0) {
-                    const appliedJobs = user.appliedJobs || [];
-                    if (!appliedJobs.includes(jobId)) {
-                        const appliedJobs = user.appliedJobs || [];
-                        appliedJobs.push(jobId);
-                        await applyJob(user.uid, job);
-                        await updateProfile(user.uid, { appliedJobs });
-                        user.appliedJobs = Object.assign([], appliedJobs);
-                        toast({
-                            title: 'Ứng tuyển thành công!',
-                            description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
-                            className: 'bg-green-500 text-white'
-                        });
-                    } else {
-                        toast({
-                            variant: 'destructive',
-                            title: 'Bạn đã ứng tuyển công việc này',
-                            description: `Bạn đã ứng tuyển công việc "${jobTitle}" trước đó.`,
-                        });
-                    }
-                } else {
-                    // Profile is incomplete, show alert to update
-                    setIsProfileIncompleteAlertOpen(true);
-                }
-            } else {
-                // No profile found, show alert to update
-                setIsProfileIncompleteAlertOpen(true);
+            const { jobTitle, job } = postLoginAction.data;
+            const res = await applyForJob(job, jobTitle);
+            if (!!res) {
+                clearPostLoginAction();
             }
         }
-
-        clearPostLoginAction();
     };
 
     const handleConfirmUpdateProfile = () => {
@@ -100,6 +74,10 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
         setIsProfileEditDialogOpen(true);
     };
 
+    const handleConfirmLogin = () => {
+        setIsConfirmLoginOpen(false);
+        setIsAuthDialogOpen(true);
+    };
     return (
         <>
             {!isCallPage && !isPartnerPage && !isAuthPage && <Header />}
@@ -152,17 +130,55 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <AlertDialog open={isLimitApplyDialogOpen} onOpenChange={setIsLimitApplyDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Đã đạt giới hạn ứng tuyển</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Bạn đã đạt giới hạn tối đa 10 lượt ứng tuyển cùng lúc. Bạn có thể vào mục 'Việc đã ứng tuyển' để quản lý hoặc <Badge variant="outline" className="border-destructive text-destructive">Huỷ ứng tuyển</Badge> các đơn không cần thiết để có thêm lượt mới.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Để sau</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => router.push('/viec-lam-cua-toi?highlight=applied')}>
+                            Đến mục đã ứng tuyển
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             <EditProfileDialog
                 isOpen={isProfileEditDialogOpen}
                 onOpenChange={setIsProfileEditDialogOpen}
-                onSaveSuccess={() => {
+                onSaveSuccess={async () => {
                     toast({
                         title: 'Cập nhật thành công!',
                         description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
                         className: 'bg-green-500 text-white'
                     });
+                    const data = lastDataApplied;
+                    if (!!data?.job) {
+                        const res = await applyForJob(data.job, data.jobTitle);
+                    }
                 }}
             />
+
+            <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+            <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Bạn cần đăng nhập để ứng tuyển, bạn có muốn đăng nhập không?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Để sau</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmLogin}>
+                            Đồng ý
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 }

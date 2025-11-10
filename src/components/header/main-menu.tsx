@@ -8,9 +8,10 @@ import { quickAccessLinks } from "@/lib/nav-data";
 import { CreateProfileDialog } from "../create-profile-dialog";
 import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
+import { NameAvatar } from "../ui/name-avatar";
 
 export const MainMenu = () => {
-    const { isLoggedIn, role, applicationCount, savedJobCount, lastAction } = useAuth();
+    const { isLoggedIn, role, applicationCount, savedJobCount, lastAction, user } = useAuth();
     const [totalNotificationCount, setTotalNotificationCount] = useState(0);
     const [myJobsLink, setMyJobsLink] = useState('/viec-lam-cua-toi');
     const isEditing = role === 'candidate'
@@ -25,10 +26,11 @@ export const MainMenu = () => {
 
         {isLoggedIn ? (
             <Link href="/ho-so-cua-toi" className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
+                <NameAvatar src={user?.avatarUrl} fullName={user?.personalInfo?.fullName} size={35} />
+                {/* <Avatar className="h-10 w-10 cursor-pointer transition-transform duration-300 hover:scale-110 hover:ring-2 hover:ring-primary hover:ring-offset-2">
                     <AvatarImage src={"https://placehold.co/100x100.png"} alt="User Avatar" data-ai-hint="user avatar" />
                     <AvatarFallback>{'A'}</AvatarFallback>
-                </Avatar>
+                </Avatar> */}
             </Link>
         ) : (
             <Button><Link href={'/xac-thuc'}>Đăng nhập / Đăng ký</Link></Button>
@@ -63,14 +65,7 @@ export const MainMenu = () => {
                             className="block hover:bg-accent rounded-md p-2 cursor-pointer"
                         >
                             <div className="flex items-center gap-3">
-                                <Avatar className="h-12 w-12">
-                                    <AvatarImage
-                                        src={"https://placehold.co/100x100.png"}
-                                        alt="User"
-                                        data-ai-hint="user avatar"
-                                    />
-                                    <AvatarFallback>{'A'}</AvatarFallback>
-                                </Avatar>
+                                <NameAvatar src={user?.avatarUrl} fullName={user?.personalInfo?.fullName} size={48} />
                                 <div className="flex flex-col space-y-1 overflow-hidden">
                                     <p className="text-base font-medium leading-none truncate">{'Ứng viên'}</p>
                                     <p className="text-xs leading-none text-muted-foreground truncate">{'Cập nhật hồ sơ của bạn'}</p>

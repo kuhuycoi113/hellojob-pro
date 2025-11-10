@@ -52,7 +52,7 @@ const CTAForEmptyProfile = () => {
         const preferences = {
           desiredVisaType: selectedVisa?.name || undefined,
           desiredVisaDetail: selectedVisaDetail || undefined,
-          desiredIndustry: selectedIndustry?.name.vi || undefined,
+          desiredIndustry: selectedIndustry?.name || undefined,
           desiredLocation: selectedRegion || undefined,
         };
     
@@ -181,8 +181,8 @@ const CTAForEmptyProfile = () => {
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
                 {options.map(option => (
-                    <Button key={option.name.vi} onClick={() => { setSelectedVisaDetail(option.name.vi); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <h3 className="font-bold text-base mb-1">{option.name.vi}</h3>
+                    <Button key={option.name} onClick={() => { setSelectedVisaDetail(option.name); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <h3 className="font-bold text-base mb-1">{option.name}</h3>
                         <p className="text-muted-foreground text-xs">{option.slug}</p>
                     </Button>
                 ))}
@@ -213,7 +213,7 @@ const CTAForEmptyProfile = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                     {industries.map(industry => (
                         <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                            <p className="font-semibold text-sm">{industry.name.vi}</p>
+                            <p className="font-semibold text-sm">{industry.name}</p>
                         </Button>
                     ))}
                 </div>
@@ -346,44 +346,44 @@ export function CtaViecLamGoiY() {
   const [isLoading, setIsLoading] = useState(true);
   const [suggestions, setSuggestions] = useState<Job[]>([]);
 
-  const fetchSuggestions = useCallback(async () => {
-    if (role === 'guest' || role === 'candidate-empty-profile') {
-        setIsLoading(false);
-        return;
-    }
+//   const fetchSuggestions = useCallback(async () => {
+//     if (role === 'guest' || role === 'candidate-empty-profile') {
+//         setIsLoading(false);
+//         return;
+//     }
     
-    setIsLoading(true);
-    try {
-        const storedProfile = localStorage.getItem('generatedCandidateProfile');
-        if (storedProfile) {
-            const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-            const matchResults = await matchJobsToProfile(profile, 'related');
-            setSuggestions(matchResults.map(r => r.job).slice(0, 4));
-        } else {
-            // Fallback for logged-in users without a profile somehow
-            setSuggestions(jobData.slice(0, 4));
-        }
-    } catch (error) {
-        console.error("Failed to fetch job suggestions for CTA:", error);
-        setSuggestions(jobData.slice(0, 4)); // Fallback on error
-    } finally {
-        setIsLoading(false);
-    }
-  }, [role]);
+//     setIsLoading(true);
+//     try {
+//         const storedProfile = localStorage.getItem('generatedCandidateProfile');
+//         if (storedProfile) {
+//             const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+//             const matchResults = await matchJobsToProfile(profile, 'related');
+//             setSuggestions(matchResults.map(r => r.job).slice(0, 4));
+//         } else {
+//             // Fallback for logged-in users without a profile somehow
+//             setSuggestions(jobData.slice(0, 4));
+//         }
+//     } catch (error) {
+//         console.error("Failed to fetch job suggestions for CTA:", error);
+//         setSuggestions(jobData.slice(0, 4)); // Fallback on error
+//     } finally {
+//         setIsLoading(false);
+//     }
+//   }, [role]);
 
-  useEffect(() => {
-    fetchSuggestions();
-     // Re-fetch when profile changes
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'generatedCandidateProfile' || event.key === null) {
-        fetchSuggestions();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [fetchSuggestions]);
+//   useEffect(() => {
+//     fetchSuggestions();
+//      // Re-fetch when profile changes
+//     const handleStorageChange = (event: StorageEvent) => {
+//       if (event.key === 'generatedCandidateProfile' || event.key === null) {
+//         fetchSuggestions();
+//       }
+//     };
+//     window.addEventListener('storage', handleStorageChange);
+//     return () => {
+//       window.removeEventListener('storage', handleStorageChange);
+//     };
+//   }, [fetchSuggestions]);
   
   const handleLoginClick = () => {
       setIsAuthDialogOpen(true);

@@ -253,15 +253,6 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
         annualIncome = job.basicSalary * 12;
     }
 
-
-    const convertCurrency = (value?: number, from: 'JPY' | 'USD' = 'JPY') => {
-        if (!value) return null;
-        if (isNaN(value)) return null;
-
-        const rate = from === 'JPY' ? JPY_VND_RATE : USD_VND_RATE;
-        const vndValue = value * rate;
-        return `≈ ${vndValue.toLocaleString('vi-VN')} VNĐ`;
-    };
     if (!!job) {
         return (
             <>

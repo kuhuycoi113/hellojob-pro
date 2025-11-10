@@ -8,8 +8,8 @@
  * - textToSpeech - A function to convert text to speech audio data.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'zod';
+import { ai } from '@/ai/genkit';
+import { z } from 'zod';
 import { CandidateProfileSchema, type CandidateProfile } from '@/ai/schemas';
 import wav from 'wav';
 
@@ -21,12 +21,14 @@ export async function createProfileFromVoice(
   return createProfileFromVoiceFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'createProfileFromVoicePrompt',
-  input: {schema: z.string()},
-  output: {schema: CandidateProfileSchema, format: 'json'},
-  model: 'googleai/gemini-2.0-flash',
-  prompt: `You are an expert recruiter specializing in the Vietnamese and Japanese labor markets. Your task is to analyze the provided text, which is a transcription of a candidate's voice, and extract structured information to create a professional profile.
+if (!(globalThis as any).__REGISTERED_CREATE_PROFILE_FROM_VOICE__) {
+  (globalThis as any).__REGISTERED_CREATE_PROFILE_FROM_VOICE__ = true;
+  const prompt = ai.definePrompt({
+    name: 'createProfileFromVoicePrompt',
+    input: { schema: z.string() },
+    output: { schema: CandidateProfileSchema, format: 'json' },
+    model: 'googleai/gemini-2.0-flash',
+    prompt: `You are an expert recruiter specializing in the Vietnamese and Japanese labor markets. Your task is to analyze the provided text, which is a transcription of a candidate's voice, and extract structured information to create a professional profile.
 
   Analyze the content carefully and populate all the fields in the provided JSON schema. Pay close attention to details like visa status (e.g., "Thực tập sinh", "Tokutei"), desired job location (e.g., "Kanagawa", "đầu Nhật"), contract end dates, and desired industries ("thực phẩm").
 
@@ -41,27 +43,26 @@ const prompt = ai.definePrompt({
   Candidate's statement:
   "{{{input}}}"
   `,
-});
+  });
 
-const createProfileFromVoiceFlow = ai.defineFlow(
-  {
-    name: 'createProfileFromVoiceFlow',
-    inputSchema: z.string(),
-    outputSchema: CandidateProfileSchema,
-  },
-  async input => {
-    if (!input) {
-      throw new Error('A voice transcription must be provided.');
+  const createProfileFromVoiceFlow = ai.defineFlow(
+    {
+      name: 'createProfileFromVoiceFlow',
+      inputSchema: z.string(),
+      outputSchema: CandidateProfileSchema,
+    },
+    async input => {
+      if (!input) {
+        throw new Error('A voice transcription must be provided.');
+      }
+      const { output } = await prompt(input);
+      if (!output) {
+        throw new Error('The AI failed to generate a profile. Please try again.');
+      }
+      return output;
     }
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('The AI failed to generate a profile. Please try again.');
-    }
-    return output;
-  }
-);
-
-
+  );
+}
 // Optional: Text-to-speech flow
 export const textToSpeechFlow = ai.defineFlow(
   {
@@ -70,13 +71,13 @@ export const textToSpeechFlow = ai.defineFlow(
     outputSchema: z.any(),
   },
   async query => {
-    const {media} = await ai.generate({
+    const { media } = await ai.generate({
       model: 'googleai/gemini-2.5-flash-preview-tts',
       config: {
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: {voiceName: 'Algenib'}, // Choose a suitable voice
+            prebuiltVoiceConfig: { voiceName: 'Algenib' }, // Choose a suitable voice
           },
         },
       },

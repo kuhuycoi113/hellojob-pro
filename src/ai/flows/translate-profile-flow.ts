@@ -15,15 +15,15 @@ import type { TranslateProfileInput } from '@/ai/schemas/translate-profile-schem
 
 // Create a partial schema for translation to avoid re-translating static data
 const TranslatableCandidateProfileSchema = CandidateProfileSchema.partial().pick({
-  name: true,
-  headline: true,
-  location: true,
-  about: true,
-  desiredIndustry: true,
-  notes: true,
-  skills: true,
-  interests: true,
-  certifications: true,
+    name: true,
+    headline: true,
+    location: true,
+    about: true,
+    desiredIndustry: true,
+    notes: true,
+    skills: true,
+    interests: true,
+    certifications: true,
 }).extend({
     education: z.array(z.object({
         school: z.string(),
@@ -49,69 +49,70 @@ const TranslatableCandidateProfileSchema = CandidateProfileSchema.partial().pick
         specialAspirations: z.array(z.string()).optional(),
     }).optional(),
     documents: z.object({
-        vietnam: z.array(z.object({ name: z.object({ vi: z.string() }) })) .optional(),
-        japan: z.array(z.object({ name: z.object({ vi: z.string() }) })) .optional(),
-        other: z.array(z.object({ name: z.object({ vi: z.string() }) })) .optional(),
+        vietnam: z.array(z.object({ name: z.object({ vi: z.string() }) })).optional(),
+        japan: z.array(z.object({ name: z.object({ vi: z.string() }) })).optional(),
+        other: z.array(z.object({ name: z.object({ vi: z.string() }) })).optional(),
     }).optional(),
 });
 
 export async function translateProfile(
-  input: TranslateProfileInput
+    input: TranslateProfileInput
 ): Promise<Partial<CandidateProfile>> {
-  // Before calling the flow, transform the documents array to fit the expected schema if needed.
-  const profileForTranslation = {
-      ...input.profile,
-      documents: {
-          vietnam: input.profile.documents?.vietnam?.map(doc => doc.name.vi),
-          japan: input.profile.documents?.japan?.map(doc => doc.name.vi),
-          other: input.profile.documents?.other?.map(doc => doc.name.vi),
-      }
-  };
+    // Before calling the flow, transform the documents array to fit the expected schema if needed.
+    const profileForTranslation = {
+        ...input.profile,
+        documents: {
+            vietnam: input.profile.documents?.vietnam?.map(doc => doc.name.vi),
+            japan: input.profile.documents?.japan?.map(doc => doc.name.vi),
+            other: input.profile.documents?.other?.map(doc => doc.name.vi),
+        }
+    };
 
-  const flowInput = {
-      ...input,
-      profile: profileForTranslation,
-  };
-  
-  const translatedPartialProfile = await translateProfileFlow(flowInput as any);
+    const flowInput = {
+        ...input,
+        profile: profileForTranslation,
+    };
 
-  // After getting the translation, transform the documents back to the original object structure
-  const finalProfile = { ...translatedPartialProfile };
-  if (translatedPartialProfile.documents && input.profile.documents) {
-      finalProfile.documents = {
-          vietnam: translatedPartialProfile.documents.vietnam?.map((translatedName, index) => ({
-              ...input.profile.documents!.vietnam![index],
-              name: {
-                  ...input.profile.documents!.vietnam![index].name,
-                  [input.targetLanguage.toLowerCase().slice(0, 2)]: translatedName.name.vi, // Assuming translation returns in 'vi' field
-              },
-          })),
-          japan: translatedPartialProfile.documents.japan?.map((translatedName, index) => ({
-              ...input.profile.documents!.japan![index],
-              name: {
-                  ...input.profile.documents!.japan![index].name,
-                  [input.targetLanguage.toLowerCase().slice(0, 2)]: translatedName.name.vi,
-              },
-          })),
-          other: translatedPartialProfile.documents.other?.map((translatedName, index) => ({
-              ...input.profile.documents!.other![index],
-              name: {
-                  ...input.profile.documents!.other![index].name,
-                  [input.targetLanguage.toLowerCase().slice(0, 2)]: translatedName.name.vi,
-              },
-          })),
-      };
-  }
+    const translatedPartialProfile = await translateProfileFlow(flowInput as any);
 
-  return finalProfile;
+    // After getting the translation, transform the documents back to the original object structure
+    const finalProfile = { ...translatedPartialProfile };
+    if (translatedPartialProfile.documents && input.profile.documents) {
+        finalProfile.documents = {
+            vietnam: translatedPartialProfile.documents.vietnam?.map((translatedName, index) => ({
+                ...input.profile.documents!.vietnam![index],
+                name: {
+                    ...input.profile.documents!.vietnam![index].name,
+                    [input.targetLanguage.toLowerCase().slice(0, 2)]: translatedName.name.vi, // Assuming translation returns in 'vi' field
+                },
+            })),
+            japan: translatedPartialProfile.documents.japan?.map((translatedName, index) => ({
+                ...input.profile.documents!.japan![index],
+                name: {
+                    ...input.profile.documents!.japan![index].name,
+                    [input.targetLanguage.toLowerCase().slice(0, 2)]: translatedName.name.vi,
+                },
+            })),
+            other: translatedPartialProfile.documents.other?.map((translatedName, index) => ({
+                ...input.profile.documents!.other![index],
+                name: {
+                    ...input.profile.documents!.other![index].name,
+                    [input.targetLanguage.toLowerCase().slice(0, 2)]: translatedName.name.vi,
+                },
+            })),
+        };
+    }
+
+    return finalProfile;
 }
-
-const prompt = ai.definePrompt({
-  name: 'translateProfilePrompt',
-  input: { schema: TranslateProfileInputSchema },
-  output: { schema: TranslatableCandidateProfileSchema, format: 'json' },
-  model: 'googleai/gemini-2.0-flash',
-  prompt: `Translate the text fields of the following JSON candidate profile into the target language: {{{targetLanguage}}}.
+if (!(globalThis as any).__REGISTERED_TRANSLATE_PROFILE__) {
+    (globalThis as any).__REGISTERED_TRANSLATE_PROFILE__ = true;
+    const prompt = ai.definePrompt({
+        name: 'translateProfilePrompt',
+        input: { schema: TranslateProfileInputSchema },
+        output: { schema: TranslatableCandidateProfileSchema, format: 'json' },
+        model: 'googleai/gemini-2.0-flash',
+        prompt: `Translate the text fields of the following JSON candidate profile into the target language: {{{targetLanguage}}}.
   
   IMPORTANT: 
   - Only translate the string values.
@@ -125,45 +126,46 @@ const prompt = ai.definePrompt({
   Original Profile:
   {{{json profile}}}
   `,
-});
+    });
 
 
-const translateProfileFlow = ai.defineFlow(
-  {
-    name: 'translateProfileFlow',
-    inputSchema: TranslateProfileInputSchema,
-    outputSchema: TranslatableCandidateProfileSchema,
-  },
-  async (input) => {
-    // To handle the schema mismatch, we temporarily flatten the documents for the AI
-    const profileForAI = { ...input.profile };
-    if (profileForAI.documents) {
-        profileForAI.documents = {
-            // @ts-ignore
-            vietnam: profileForAI.documents.vietnam?.map(d => d.name.vi),
-            // @ts-ignore
-            japan: profileForAI.documents.japan?.map(d => d.name.vi),
-            // @ts-ignore
-            other: profileForAI.documents.other?.map(d => d.name.vi),
+    const translateProfileFlow = ai.defineFlow(
+        {
+            name: 'translateProfileFlow',
+            inputSchema: TranslateProfileInputSchema,
+            outputSchema: TranslatableCandidateProfileSchema,
+        },
+        async (input) => {
+            // To handle the schema mismatch, we temporarily flatten the documents for the AI
+            const profileForAI = { ...input.profile };
+            if (profileForAI.documents) {
+                profileForAI.documents = {
+                    // @ts-ignore
+                    vietnam: profileForAI.documents.vietnam?.map(d => d.name.vi),
+                    // @ts-ignore
+                    japan: profileForAI.documents.japan?.map(d => d.name.vi),
+                    // @ts-ignore
+                    other: profileForAI.documents.other?.map(d => d.name.vi),
+                }
+            }
+
+            const { output } = await prompt({ ...input, profile: profileForAI as any });
+
+            if (!output) {
+                throw new Error("The AI failed to translate the profile. Please try again.");
+            }
+
+            // Transform the translated strings back into the object structure
+            if (output.documents && input.profile.documents) {
+                // @ts-ignore
+                output.documents.vietnam = output.documents.vietnam?.map(nameStr => ({ name: { vi: nameStr } }));
+                // @ts-ignore
+                output.documents.japan = output.documents.japan?.map(nameStr => ({ name: { vi: nameStr } }));
+                // @ts-ignore
+                output.documents.other = output.documents.other?.map(nameStr => ({ name: { vi: nameStr } }));
+            }
+
+            return output;
         }
-    }
-
-    const { output } = await prompt({ ...input, profile: profileForAI as any });
-
-    if (!output) {
-      throw new Error("The AI failed to translate the profile. Please try again.");
-    }
-    
-    // Transform the translated strings back into the object structure
-    if (output.documents && input.profile.documents) {
-        // @ts-ignore
-        output.documents.vietnam = output.documents.vietnam?.map(nameStr => ({ name: { vi: nameStr } }));
-        // @ts-ignore
-        output.documents.japan = output.documents.japan?.map(nameStr => ({ name: { vi: nameStr } }));
-        // @ts-ignore
-        output.documents.other = output.documents.other?.map(nameStr => ({ name: { vi: nameStr } }));
-    }
-
-    return output;
-  }
-);
+    );
+}

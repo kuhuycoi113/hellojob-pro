@@ -64,6 +64,8 @@ import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { visaDetailsByVisaType } from '@/lib/visa-data';
+import { NameAvatar } from '@/components/ui/name-avatar';
+import { updateAvatar } from '@/actions/user-action';
 const translations = {
     vi: {
         personalInfo: "Thông tin cá nhân",
@@ -420,11 +422,21 @@ export default function CandidateProfilePage() {
         const file = e.target.files?.[0];
         if (file && profileByLang.vi) {
             const reader = new FileReader();
-            reader.onload = () => {
+            reader.onload = async () => {
                 const newUrl = reader.result as string;
                 const newProfile = JSON.parse(JSON.stringify(profileByLang.vi));
                 if (type === 'avatar') {
-                    newProfile.avatarUrl = newUrl;
+                    if (!!user) {
+                        debugger
+                        const newAvatarUrl = await updateAvatar(user.uid, user.avatarUrl, file)
+                        user.avatarUrl = newAvatarUrl;
+                        toast({
+                            title: "Cập nhật Avatar thành công!",
+                            description: "Bạn đã cập nhật Avatar thành công. Avatar sẽ giúp bạn tiếp cận được nhiều nhà tuyển dụng hơn.",
+                            className: 'bg-green-500 text-white'
+                        });
+                    }
+
                 } else if (type === 'image' && index !== undefined) {
                     newProfile.images[index].src = newUrl;
                 } else if (type === 'document' && docType && index !== undefined) {
@@ -617,10 +629,11 @@ export default function CandidateProfilePage() {
                             <div className="bg-gradient-to-tr from-primary to-accent h-32" />
                             <div className="p-6 flex flex-col md:flex-row items-center md:items-end -mt-16">
                                 <div className="relative group">
-                                    <Avatar id="PROFILEAVATAR01" className="h-32 w-32 border-4 border-background bg-background shadow-lg">
+                                    <NameAvatar src={user?.avatarUrl} fullName={user?.personalInfo?.fullName} size={128} />
+                                    {/* <Avatar id="PROFILEAVATAR01" className="h-32 w-32 border-4 border-background bg-background shadow-lg">
                                         <AvatarImage id="PROFILEAVATAR03" src={user?.avatarUrl || undefined} alt={user?.personalInfo?.fullName} data-ai-hint="professional headshot" className="object-cover" />
                                         <AvatarFallback><b>{user?.personalInfo?.fullName?.charAt(0)?.toUpperCase()}</b></AvatarFallback>
-                                    </Avatar>
+                                    </Avatar> */}
                                     <Label htmlFor="avatar-upload" className="absolute bottom-1 right-1 cursor-pointer bg-black/50 text-white p-2 rounded-full group-hover:bg-black/70 transition-colors">
                                         <Camera className="h-5 w-5" />
                                         <span className="sr-only">Change avatar</span>
@@ -653,7 +666,7 @@ export default function CandidateProfilePage() {
                                     </Dialog>
                                     <SendProfileDialog setLanguageToSend={setLanguageToSend} setIsSendOptionsOpen={setIsSendOptionsOpen} />
 
-                                    <DropdownMenu>
+                                    {/* <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="outline" size="icon" disabled={isTranslating}>
                                                 {isTranslating ? <Loader2 className="h-5 w-5 animate-spin" /> :
@@ -668,7 +681,7 @@ export default function CandidateProfilePage() {
                                             <DropdownMenuItem onSelect={() => handleLanguageChange('ja')}><JpFlagIcon className="w-4 h-4 mr-2" />日本語</DropdownMenuItem>
                                             <DropdownMenuItem onSelect={() => handleLanguageChange('en')}><EnFlagIcon className="w-4 h-4 mr-2" />English</DropdownMenuItem>
                                         </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    </DropdownMenu> */}
                                     <Button variant="outline" size="icon" className="sm:hidden" onClick={() => setIsProfileEditDialogOpen(true)}><Edit /></Button>
                                     <Button variant="outline" className="hidden sm:inline-flex" onClick={() => setIsProfileEditDialogOpen(true)}><Edit /> {editButtonText}</Button>
                                 </div>
@@ -1084,7 +1097,7 @@ export default function CandidateProfilePage() {
                                             {candidate.aspirations?.specialAspirations && (
                                                 Array.isArray(candidate.aspirations.specialAspirations) && candidate.aspirations.specialAspirations.length > 0 ? (
                                                     <div className="flex flex-wrap gap-2">
-                                                        {candidate.aspirations.specialAspirations.map((aspiration:any) => (
+                                                        {candidate.aspirations.specialAspirations.map((aspiration: any) => (
                                                             <Badge key={aspiration} variant="secondary">{aspiration}</Badge>
                                                         ))}
                                                     </div>

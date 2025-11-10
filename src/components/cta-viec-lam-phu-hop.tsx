@@ -348,36 +348,36 @@ export function CtaViecLamPhuHop() {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
 
-  const fetchSuggestions = useCallback(async () => {
-    setIsLoading(true);
-    try {
-        const storedProfile = localStorage.getItem('generatedCandidateProfile');
-        const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-        const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
+//   const fetchSuggestions = useCallback(async () => {
+//     setIsLoading(true);
+//     try {
+//         const storedProfile = localStorage.getItem('generatedCandidateProfile');
+//         const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+//         const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
 
-        // API is called for all users. If profile & signals are null/empty, it returns default jobs.
-        const matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
-        setSuggestions(matchResults.slice(0, 4));
-    } catch (error) {
-        console.error("Failed to fetch behavioral suggestions for CTA:", error);
-        // Fallback to generic popular jobs on error
-        setSuggestions(jobData.slice(4, 8).map(job => ({ job })));
-    } finally {
-        setIsLoading(false);
-    }
-  }, []);
+//         // API is called for all users. If profile & signals are null/empty, it returns default jobs.
+//         const matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
+//         setSuggestions(matchResults.slice(0, 4));
+//     } catch (error) {
+//         console.error("Failed to fetch behavioral suggestions for CTA:", error);
+//         // Fallback to generic popular jobs on error
+//         setSuggestions(jobData.slice(4, 8).map(job => ({ job })));
+//     } finally {
+//         setIsLoading(false);
+//     }
+//   }, []);
 
-  useEffect(() => {
-    fetchSuggestions();
-    // Re-fetch when user behavior changes
-    const handleStorageChange = (event: StorageEvent) => {
-        if (event.key === 'behavioralSignals' || event.key === 'generatedCandidateProfile' || event.key === null) {
-            fetchSuggestions();
-        }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [fetchSuggestions]);
+//   useEffect(() => {
+//     fetchSuggestions();
+//     // Re-fetch when user behavior changes
+//     const handleStorageChange = (event: StorageEvent) => {
+//         if (event.key === 'behavioralSignals' || event.key === 'generatedCandidateProfile' || event.key === null) {
+//             fetchSuggestions();
+//         }
+//     };
+//     window.addEventListener('storage', handleStorageChange);
+//     return () => window.removeEventListener('storage', handleStorageChange);
+//   }, [fetchSuggestions]);
   
   const handleLoginClick = () => {
       setIsAuthDialogOpen(true);

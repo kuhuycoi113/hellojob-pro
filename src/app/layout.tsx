@@ -101,6 +101,7 @@ export default async function RootLayout({
   let user = tokens ? toUser(tokens) : null;
   try {
     if (!!user?.uid) {
+      console.log(user?.uid)
       const adminApp = getFirebaseAdminApp();
       const db = adminApp.firestore();
       const fetchedUser = (await db.doc(`/users/${user.uid}`).get())?.data();

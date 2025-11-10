@@ -114,63 +114,63 @@ export const LoggedInView = () => {
     }, [searchParams, router]);
 
 
-    const fetchSuggestedJobs = useCallback(async () => {
-        setIsLoadingSuggestions(true);
-        try {
-            const storedProfile = localStorage.getItem('generatedCandidateProfile');
-            if (storedProfile) {
-                const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-                const matchResults = await matchJobsToProfile(profile, 'related', []); // Pass empty signals for profile-based suggestions
-                setSuggestedJobs(matchResults.map(r => r.job));
-            } else {
-                setSuggestedJobs(jobData.slice(0, 20));
-            }
-        } catch (error) {
-            console.error("Failed to fetch profile-based suggestions:", error);
-            setSuggestedJobs(jobData.slice(0, 20));
-        } finally {
-            setIsLoadingSuggestions(false);
-        }
-    }, []);
+    // const fetchSuggestedJobs = useCallback(async () => {
+    //     setIsLoadingSuggestions(true);
+    //     try {
+    //         const storedProfile = localStorage.getItem('generatedCandidateProfile');
+    //         if (storedProfile) {
+    //             const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+    //             const matchResults = await matchJobsToProfile(profile, 'related', []); // Pass empty signals for profile-based suggestions
+    //             setSuggestedJobs(matchResults.map(r => r.job));
+    //         } else {
+    //             setSuggestedJobs(jobData.slice(0, 20));
+    //         }
+    //     } catch (error) {
+    //         console.error("Failed to fetch profile-based suggestions:", error);
+    //         setSuggestedJobs(jobData.slice(0, 20));
+    //     } finally {
+    //         setIsLoadingSuggestions(false);
+    //     }
+    // }, []);
 
     // CANHANHOA01: New function to fetch behavior-based suggestions
-    const fetchBehavioralSuggestions = useCallback(async () => {
-        setIsLoadingBehavioral(true);
-        try {
-            const storedProfile = localStorage.getItem('generatedCandidateProfile');
-            if (storedProfile) {
-                const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-                const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-                // The flow will now receive signals. If signals are empty, it will fall back to profile-based matching.
-                const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
-                setBehavioralSuggestedJobs(matchResults);
-            } else {
-                setBehavioralSuggestedJobs([]);
-            }
-        } catch (error) {
-            console.error("Failed to fetch behavioral suggestions:", error);
-            setBehavioralSuggestedJobs([]);
-        } finally {
-            setIsLoadingBehavioral(false);
-        }
-    }, []);
+    // const fetchBehavioralSuggestions = useCallback(async () => {
+    //     setIsLoadingBehavioral(true);
+    //     try {
+    //         const storedProfile = localStorage.getItem('generatedCandidateProfile');
+    //         if (storedProfile) {
+    //             const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
+    //             const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+    //             // The flow will now receive signals. If signals are empty, it will fall back to profile-based matching.
+    //             const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
+    //             setBehavioralSuggestedJobs(matchResults);
+    //         } else {
+    //             setBehavioralSuggestedJobs([]);
+    //         }
+    //     } catch (error) {
+    //         console.error("Failed to fetch behavioral suggestions:", error);
+    //         setBehavioralSuggestedJobs([]);
+    //     } finally {
+    //         setIsLoadingBehavioral(false);
+    //     }
+    // }, []);
 
-    useEffect(() => {
-        if (role === 'candidate-empty-profile') {
-            setIsLoadingSuggestions(false);
-            setIsLoadingBehavioral(false);
-            return;
-        }
-        fetchSuggestedJobs();
-        fetchBehavioralSuggestions(); // Fetch behavioral suggestions
+    // useEffect(() => {
+    //     if (role === 'candidate-empty-profile') {
+    //         setIsLoadingSuggestions(false);
+    //         setIsLoadingBehavioral(false);
+    //         return;
+    //     }
+    //     fetchSuggestedJobs();
+    //     fetchBehavioralSuggestions(); // Fetch behavioral suggestions
 
-        const handleStorageChange = () => {
-            fetchBehavioralSuggestions(); // Re-fetch when behavior changes
-        };
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
+    //     const handleStorageChange = () => {
+    //         fetchBehavioralSuggestions(); // Re-fetch when behavior changes
+    //     };
+    //     window.addEventListener('storage', handleStorageChange);
+    //     return () => window.removeEventListener('storage', handleStorageChange);
 
-    }, [role, fetchSuggestedJobs, fetchBehavioralSuggestions, forceUpdate]);
+    // }, [role, fetchSuggestedJobs, fetchBehavioralSuggestions, forceUpdate]);
 
 
     const handleSaveAspirations = () => {

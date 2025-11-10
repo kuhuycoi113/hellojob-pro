@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { MapPin, DollarSign, Star, FileText, Bookmark } from 'lucide-react';
+import { MapPin, DollarSign, Star, FileText, Bookmark, X } from 'lucide-react';
 import { Job } from '@/lib/mock-data';
 import {
     AlertDialog,
@@ -18,6 +18,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
+    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { cn, convertTime, formatSalaryForDisplay, formatVisa, generateBulletJobCrawl, getFeeDisplayInfo, getJobImage } from '@/lib/utils';
 import Link from 'next/link';
@@ -30,7 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import { EditProfileDialog } from '../app/ho-so-cua-toi/components/candidate-edit-dialog';
 import type { SearchFilters } from './job-search/search-results';
 import { consultants } from '@/lib/consultant-data';
-import { applyJob, updateProfile } from '@/actions/user-action';
+import { applyJob, cancelAppliedJob, updateProfile } from '@/actions/user-action';
 import { validateProfileForApplication } from '@/lib/validators';
 import { useServerInfo } from './layout/root-provider';
 
@@ -70,20 +71,16 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
 // List of visa details that have special fee handling
 
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, fakeID }:
-    { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, fakeID?: string }) => {
+export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, onCancelAppliedJob }:
+    { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, onCancelAppliedJob?: any }) => {
     const { serverTime } = useServerInfo()
-    const { isLoggedIn, setPostLoginAction, user, setSavedJobCount, setApplicationCount, setLastAction } = useAuth();
+    const { isLoggedIn, setPostLoginAction, user, setSavedJobCount, setApplicationCount, setLastAction, isApplying, setIsApplying, applyForJob } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
     const [isClient, setIsClient] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const [hasApplied, setHasApplied] = useState(false);
-    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-    const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
     const [isConsultantPopoverOpen, setIsConsultantPopoverOpen] = useState(false);
-    const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
-    const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
     const [badgeClassName, setBadgeClassName] = useState<string>('opacity-0');
@@ -157,39 +154,53 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     const handleApplyClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-        if (!isLoggedIn) {
-            setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: jobTitle, job } });
-            setIsConfirmLoginOpen(true);
-        } else {
-            const missingFields = validateProfileForApplication(user);
-            if (missingFields?.length === 0 && !!user) {
-                const appliedJobs = user.appliedJobs || [];
-                appliedJobs.push(job.id);
-                await applyJob(user.uid, job);
-                await updateProfile(user.uid, { appliedJobs });
-                user.appliedJobs = Object.assign([], appliedJobs);
-                setHasApplied(true);
-                setApplicationCount(prev => prev + 1);
-                setLastAction('applied');
-                toast({
-                    title: 'Ứng tuyển thành công!',
-                    description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
-                    className: 'bg-green-500 text-white'
-                });
-            } else {
-                setIsProfileIncompleteAlertOpen(true);
+        await applyForJob(job, jobTitle);
+    };
+
+    const handleCancelApplicationClick = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (!!user) {
+            const appliedJobs: any[] = [...(user.appliedJobs || [])];
+            const appliedJobIndex = appliedJobs.indexOf(job.id);
+            if (appliedJobIndex > -1) {
+                appliedJobs.splice(appliedJobIndex, 1);
             }
+            await cancelAppliedJob(user.uid, job.id);
+            await updateProfile(user.uid, { appliedJobs });
+            user.appliedJobs = [...appliedJobs];
+            if (!!onCancelAppliedJob) {
+                onCancelAppliedJob();
+            }
+            toast({
+                title: 'Hủy ứng tuyển thành công!',
+                description: `Lịch sử ứng tuyển của bạn cho công việc "${jobTitle}" đã được thu hồi.`
+                // className: 'bg-green-500 text-white'
+            });
         }
-    };
-
-    const handleConfirmLogin = () => {
-        setIsConfirmLoginOpen(false);
-        setIsAuthDialogOpen(true);
-    };
-
-    const handleConfirmUpdateProfile = () => {
-        setIsProfileIncompleteAlertOpen(false);
-        setIsProfileEditDialogOpen(true);
+        // if (!isLoggedIn) {
+        //     setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: jobTitle, job } });
+        //     setIsConfirmLoginOpen(true);
+        // } else {
+        //     const missingFields = validateProfileForApplication(user);
+        //     if (missingFields?.length === 0 && !!user) {
+        //         const appliedJobs = user.appliedJobs || [];
+        //         appliedJobs.push(job.id);
+        //         await applyJob(user.uid, job);
+        //         await updateProfile(user.uid, { appliedJobs });
+        //         user.appliedJobs = Object.assign([], appliedJobs);
+        //         setHasApplied(true);
+        //         setApplicationCount(prev => prev + 1);
+        //         setLastAction('applied');
+        //         toast({
+        //             title: 'Ứng tuyển thành công!',
+        //             description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
+        //             className: 'bg-green-500 text-white'
+        //         });
+        //     } else {
+        //         setIsProfileIncompleteAlertOpen(true);
+        //     }
+        // }
     };
 
     const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -309,7 +320,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             <Bookmark className={cn("mr-2 h-5 w-5", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                                             Lưu
                                         </Button>
-                                        {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied || isExpired}>{applyButtonContent}</Button>}
+                                        {showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied || isExpired || isApplying}>{applyButtonContent}</Button>}
                                     </div>}
                                 </div>
                             </div>
@@ -324,48 +335,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         )}
                     </div>
                 </div>
-                <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-                <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Bạn cần đăng nhập để ứng tuyển, bạn có muốn đăng nhập không?
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Để sau</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleConfirmLogin}>
-                                Đồng ý
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-                <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Để sau</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-                <EditProfileDialog
-                    isOpen={isProfileEditDialogOpen}
-                    onOpenChange={setIsProfileEditDialogOpen}
-                    onSaveSuccess={() => {
-                        toast({
-                            title: 'Cập nhật thành công!',
-                            description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
-                            className: 'bg-green-500 text-white'
-                        });
-                    }}
-                />
             </>
         );
     }
@@ -489,7 +458,36 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     </Link>
                                     <ContactButtons contact={recruiter as any} job={job} />
                                 </div>
-                                {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied || isExpired}>{applyButtonContent}</Button>}
+                                {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied || isExpired || isApplying}>{applyButtonContent}</Button>}
+                                {hasApplied && showCancelApplication &&
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={cn(
+                                                    "bg-transparent text-muted-foreground",
+                                                    "border-destructive text-destructive hover:bg-destructive/10"
+                                                )}
+                                                size="sm"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <X className="mr-1 h-4 w-4" />Huỷ ứng tuyển
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent id="XNHUT001" onClick={(e) => e.stopPropagation()}>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Xác nhận huỷ ứng tuyển?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này sẽ được ghi nhận ngay lập tức.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Để sau</AlertDialogCancel>
+                                                <AlertDialogAction onClick={handleCancelApplicationClick}>Đồng ý</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                }
                             </div>
                             {showPostedTime && (
                                 <p className="mt-1 text-right text-xs">
@@ -501,48 +499,6 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                     </div>
                 </div>
             </Card>
-            <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-            <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Bạn cần đăng nhập để ứng tuyển, bạn có muốn đăng nhập không?
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Để sau</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmLogin}>
-                            Đồng ý
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-            <AlertDialog open={isProfileIncompleteAlertOpen} onOpenChange={setIsProfileIncompleteAlertOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Hồ sơ của bạn chưa hoàn thiện</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Để có thể ứng tuyển, bạn cần cập nhật đủ thông tin cá nhân và cung cấp ít nhất một phương thức liên lạc (SĐT, Zalo...). Bạn có muốn cập nhật hồ sơ ngay bây giờ không?
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Để sau</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmUpdateProfile}>Đồng ý, cập nhật</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-            <EditProfileDialog
-                isOpen={isProfileEditDialogOpen}
-                onOpenChange={setIsProfileEditDialogOpen}
-                onSaveSuccess={() => {
-                    toast({
-                        title: 'Cập nhật thành công!',
-                        description: 'Thông tin của bạn đã được lưu. Giờ bạn có thể ứng tuyển.',
-                        className: 'bg-green-500 text-white'
-                    });
-                }}
-            />
         </>
     );
 };

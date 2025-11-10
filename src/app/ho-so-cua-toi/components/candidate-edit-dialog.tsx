@@ -458,8 +458,13 @@ export function EditProfileDialog({ isOpen, onOpenChange, onSaveSuccess, source 
             }
             console.log(finalCandidate)
 
-            const res = await updateProfile(user?.uid, finalCandidate);
+            const res = await updateProfile(user?.uid, {
+                personalInfo: finalCandidate.personalInfo
+            });
             localStorage.setItem('generatedCandidateProfile', JSON.stringify(finalCandidate));
+            if (!!user) {
+                user.personalInfo = finalCandidate.personalInfo;
+            }
             onSaveSuccess(finalCandidate);
             onOpenChange(false);
             setIsConfirmSaveOpen(false);

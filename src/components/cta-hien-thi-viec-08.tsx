@@ -68,47 +68,47 @@ export function CtaHienThiViec08({ lang, prioritizedVisaType }: CtaHienThiViec08
   const [isLoading, setIsLoading] = useState(true);
   const [suggestions, setSuggestions] = useState<any[]>([]);
 
-  const fetchSuggestions = useCallback(async () => {
-    setIsLoading(true);
-    try {
-        const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-        const storedProfile = localStorage.getItem('generatedCandidateProfile');
-        const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
+//   const fetchSuggestions = useCallback(async () => {
+//     setIsLoading(true);
+//     try {
+//         const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
+//         const storedProfile = localStorage.getItem('generatedCandidateProfile');
+//         const profile: Partial<CandidateProfile> | null = storedProfile ? JSON.parse(storedProfile) : null;
 
-        let matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
+//         let matchResults = await matchJobsToProfile(profile || {}, 'related', behavioralSignals);
         
-        // If a prioritizedVisaType is provided, sort the results
-        if (prioritizedVisaType) {
-            matchResults.sort((a, b) => {
-                const aIsPrioritized = a.job.visaType === prioritizedVisaType;
-                const bIsPrioritized = b.job.visaType === prioritizedVisaType;
-                if (aIsPrioritized && !bIsPrioritized) return -1;
-                if (!aIsPrioritized && bIsPrioritized) return 1;
-                return 0; // Keep original order for same-type items
-            });
-        }
+//         // If a prioritizedVisaType is provided, sort the results
+//         if (prioritizedVisaType) {
+//             matchResults.sort((a, b) => {
+//                 const aIsPrioritized = a.job.visaType === prioritizedVisaType;
+//                 const bIsPrioritized = b.job.visaType === prioritizedVisaType;
+//                 if (aIsPrioritized && !bIsPrioritized) return -1;
+//                 if (!aIsPrioritized && bIsPrioritized) return 1;
+//                 return 0; // Keep original order for same-type items
+//             });
+//         }
         
-        setSuggestions(matchResults.slice(0, 4));
-    } catch (error) {
-        console.error("Failed to fetch behavioral suggestions for CTA:", error);
-        setSuggestions(jobData.slice(4, 8).map(job => ({ job })));
-    } finally {
-        setIsLoading(false);
-    }
-  }, [prioritizedVisaType]);
+//         setSuggestions(matchResults.slice(0, 4));
+//     } catch (error) {
+//         console.error("Failed to fetch behavioral suggestions for CTA:", error);
+//         setSuggestions(jobData.slice(4, 8).map(job => ({ job })));
+//     } finally {
+//         setIsLoading(false);
+//     }
+//   }, [prioritizedVisaType]);
 
-  useEffect(() => {
-    fetchSuggestions();
-    const handleStorageChange = (event: StorageEvent) => {
-        if (event.key === 'behavioralSignals' || event.key === 'generatedCandidateProfile' || event.key === null) {
-            fetchSuggestions();
-        }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [fetchSuggestions]);
+//   useEffect(() => {
+//     fetchSuggestions();
+//     const handleStorageChange = (event: StorageEvent) => {
+//         if (event.key === 'behavioralSignals' || event.key === 'generatedCandidateProfile' || event.key === null) {
+//             fetchSuggestions();
+//         }
+//     };
+//     window.addEventListener('storage', handleStorageChange);
+//     return () => {
+//       window.removeEventListener('storage', handleStorageChange);
+//     };
+//   }, [fetchSuggestions]);
   
   const handleLoginClick = () => {
       setIsAuthDialogOpen(true);

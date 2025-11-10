@@ -11,6 +11,8 @@ import {
 } from 'firebase/auth';
 import { Claims, filterStandardClaims } from "next-firebase-auth-edge/lib/auth/claims";
 import { validateProfileForApplication } from '@/lib/validators';
+import { applyJob, updateProfile } from '@/actions/user-action';
+import { toast } from '@/hooks/use-toast';
 
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
 
@@ -38,7 +40,22 @@ interface AuthContextType {
   setLastAction: (action: 'applied' | 'saved' | null) => void,
   setApplicationCount: (count: number | ((prevCount: number) => number)) => void;
   setSavedJobCount: (count: number | ((prevCount: number) => number)) => void;
-  clearLastAction: () => void
+  clearLastAction: () => void,
+  isLimitApplyDialogOpen: boolean;
+  setIsLimitApplyDialogOpen: (isOpen: boolean) => void;
+  setIsProfileIncompleteAlertOpen: (isOpen: boolean) => void;
+  isProfileIncompleteAlertOpen: boolean;
+  isConfirmLoginOpen: boolean;
+  setIsConfirmLoginOpen: (isOpen: boolean) => void;
+  applyForJob: (job: any, jobTitle: string) => Promise<boolean>;
+  isApplying: boolean;
+  setIsApplying: (action: boolean) => void;
+  isAuthDialogOpen: boolean;
+  setIsAuthDialogOpen: (isOpen: boolean) => void;
+  isProfileEditDialogOpen: boolean;
+  setIsProfileEditDialogOpen: (isOpen: boolean) => void;
+  lastDataApplied: { job: any, jobTitle: string } | null;
+  setLastDataApplied: (data: { job: any, jobTitle: string } | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -81,7 +98,14 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
   // Xác định role dựa vào serverUser
   const [savedJobCount, setSavedJobCount] = useState(0);
   const [applicationCount, setApplicationCount] = useState(0);
+  const [isLimitApplyDialogOpen, setIsLimitApplyDialogOpen] = useState<boolean>(false);
   const [lastAction, setLastAction] = useState<'applied' | 'saved' | null>(null);
+  const [isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen] = useState(false);
+  const [isConfirmLoginOpen, setIsConfirmLoginOpen] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
+  const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const [lastDataApplied, setLastDataApplied] = useState<{ job: any, jobTitle: string } | null>(null);
   let role: Role = 'guest';
   if (serverUser) {
     if (validateProfileForApplication(serverUser)?.length > 0) {
@@ -105,6 +129,47 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
     setSavedJobCount(0);
     setLastAction(null);
   }
+  const changeEditProfileOpenStage = (open: boolean) => {
+    setIsProfileEditDialogOpen(open);
+  }
+  const applyForJob = async (job: any, jobTitle: string) => {
+    setLastDataApplied(null);
+    if (isApplying) {
+      toast({
+        title: 'Hệ thống đang xử lý!',
+        description: `Yêu cầu ứng tuyển của bạn đang được gửi đi. Vui lòng chờ trong giây lát`,
+        className: 'bg-green-500 text-white'
+      });
+      return false;
+    }
+    if (!isLoggedIn) {
+      setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: jobTitle, job } });
+      setIsConfirmLoginOpen(true);
+    } else {
+      const missingFields = validateProfileForApplication(serverUser);
+      if (missingFields?.length === 0 && !!serverUser) {
+        setIsApplying(true);
+        const appliedJobs = serverUser.appliedJobs || [];
+        appliedJobs.push(job.id);
+        await applyJob(serverUser.uid, job);
+        await updateProfile(serverUser.uid, { appliedJobs });
+        serverUser.appliedJobs = Object.assign([], appliedJobs);
+        setApplicationCount(prev => prev + 1);
+        setLastAction('applied');
+        toast({
+          title: 'Ứng tuyển thành công!',
+          description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
+          className: 'bg-green-500 text-white'
+        });
+        setIsApplying(false);
+        return true;
+      } else {
+        setIsProfileIncompleteAlertOpen(true);
+        setLastDataApplied({ job, jobTitle });
+      }
+    }
+    return false;
+  };
 
   useEffect(() => {
     const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
@@ -149,7 +214,22 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
     setApplicationCount,
     setPostLoginAction,
     clearPostLoginAction,
-    clearLastAction
+    clearLastAction,
+    isLimitApplyDialogOpen,
+    setIsLimitApplyDialogOpen,
+    isProfileIncompleteAlertOpen,
+    setIsProfileIncompleteAlertOpen,
+    isConfirmLoginOpen,
+    setIsConfirmLoginOpen,
+    applyForJob,
+    isApplying,
+    setIsApplying,
+    isProfileEditDialogOpen,
+    setIsProfileEditDialogOpen: changeEditProfileOpenStage,
+    isAuthDialogOpen,
+    setIsAuthDialogOpen,
+    lastDataApplied,
+    setLastDataApplied
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
