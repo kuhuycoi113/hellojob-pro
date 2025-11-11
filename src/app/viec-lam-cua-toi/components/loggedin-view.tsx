@@ -6,9 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Job, jobData } from "@/lib/mock-data";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { EmptyProfileView } from "./empty-profile-view";
-import { visaDetailsByVisaType } from "@/lib/visa-data";
-import { industriesByJobType } from "@/lib/industry-data";
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
 import SuggestedJobs from "./suggested-jobs";
 import AppliedJobs from "./applied-jobs";
@@ -31,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { EditAspirationsDialog } from "./edit-aspirations-dialog";
 
 const viewers = [
     { name: 'A', src: 'https://placehold.co/40x40.png?text=A' },
@@ -54,35 +52,15 @@ const accordionMappings = {
 }
 
 export const LoggedInView = () => {
-    const { role, clearLastAction } = useAuth();
+    const { clearLastAction } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isViewersDialogOpen, setIsViewersDialogOpen] = useState(false);
-    const [suggestedJobs, setSuggestedJobs] = useState<Job[]>([]);
-    const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]); // CANHANHOA01
-    const [savedJobs, setSavedJobs] = useState<Job[]>([]);
-    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
-    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
-    const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
-    const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
-    const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations'] & { educationRequirement?: string, languageRequirement?: string, yearsOfExperience?: string, specialConditions?: string[] }>>({});
-    const [tempDesiredIndustry, setTempDesiredIndustry] = useState('');
-    const [suggestionPrinciple, setSuggestionPrinciple] = useState<'salary' | 'fee' | 'company' | null>(null);
     const [highlight, setHighlight] = useState<string | null>(null);
-    const [forceUpdate, setForceUpdate] = useState(0);
-    const { toast } = useToast();
-    const [tempSalary, setTempSalary] = useState('');
-    const [tempFee, setTempFee] = useState('');
     const [chartData, setChartData] = useState([]);
-    const JPY_VND_RATE = 180;
-    const USD_VND_RATE = 26300;
 
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(undefined);
-
-    const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
-    const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
-    const [suggestionType, setSuggestionType] = useState<'accurate' | 'related'>('accurate');
 
     useEffect(() => {
         // Generate dynamic chart data
@@ -114,168 +92,6 @@ export const LoggedInView = () => {
     }, [searchParams, router]);
 
 
-    // const fetchSuggestedJobs = useCallback(async () => {
-    //     setIsLoadingSuggestions(true);
-    //     try {
-    //         const storedProfile = localStorage.getItem('generatedCandidateProfile');
-    //         if (storedProfile) {
-    //             const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-    //             const matchResults = await matchJobsToProfile(profile, 'related', []); // Pass empty signals for profile-based suggestions
-    //             setSuggestedJobs(matchResults.map(r => r.job));
-    //         } else {
-    //             setSuggestedJobs(jobData.slice(0, 20));
-    //         }
-    //     } catch (error) {
-    //         console.error("Failed to fetch profile-based suggestions:", error);
-    //         setSuggestedJobs(jobData.slice(0, 20));
-    //     } finally {
-    //         setIsLoadingSuggestions(false);
-    //     }
-    // }, []);
-
-    // CANHANHOA01: New function to fetch behavior-based suggestions
-    // const fetchBehavioralSuggestions = useCallback(async () => {
-    //     setIsLoadingBehavioral(true);
-    //     try {
-    //         const storedProfile = localStorage.getItem('generatedCandidateProfile');
-    //         if (storedProfile) {
-    //             const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-    //             const behavioralSignals = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-    //             // The flow will now receive signals. If signals are empty, it will fall back to profile-based matching.
-    //             const matchResults = await matchJobsToProfile(profile, 'related', behavioralSignals);
-    //             setBehavioralSuggestedJobs(matchResults);
-    //         } else {
-    //             setBehavioralSuggestedJobs([]);
-    //         }
-    //     } catch (error) {
-    //         console.error("Failed to fetch behavioral suggestions:", error);
-    //         setBehavioralSuggestedJobs([]);
-    //     } finally {
-    //         setIsLoadingBehavioral(false);
-    //     }
-    // }, []);
-
-    // useEffect(() => {
-    //     if (role === 'candidate-empty-profile') {
-    //         setIsLoadingSuggestions(false);
-    //         setIsLoadingBehavioral(false);
-    //         return;
-    //     }
-    //     fetchSuggestedJobs();
-    //     fetchBehavioralSuggestions(); // Fetch behavioral suggestions
-
-    //     const handleStorageChange = () => {
-    //         fetchBehavioralSuggestions(); // Re-fetch when behavior changes
-    //     };
-    //     window.addEventListener('storage', handleStorageChange);
-    //     return () => window.removeEventListener('storage', handleStorageChange);
-
-    // }, [role, fetchSuggestedJobs, fetchBehavioralSuggestions, forceUpdate]);
-
-
-    const handleSaveAspirations = () => {
-        const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
-        let profile = storedProfileRaw ? JSON.parse(storedProfileRaw) : {};
-        profile = {
-            ...profile,
-            aspirations: tempAspirations,
-            desiredIndustry: tempDesiredIndustry,
-        };
-        localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
-        if (suggestionPrinciple) {
-            localStorage.setItem('suggestionPrinciple', suggestionPrinciple);
-        } else {
-            localStorage.removeItem('suggestionPrinciple');
-        }
-        localStorage.setItem('suggestionType', suggestionType);
-        console.log("Suggestion principle saved:", suggestionPrinciple);
-        console.log("Suggestion type saved:", suggestionType);
-        setIsAspirationsDialogOpen(false);
-        setForceUpdate(prev => prev + 1); // Trigger a re-fetch
-    };
-
-    const openFeeDialog = () => {
-        const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
-        if (storedProfileRaw) {
-            const profile = JSON.parse(storedProfileRaw);
-            setTempAspirations(profile.aspirations || {}); // Load aspirations to get visa detail
-            setTempFee(profile.aspirations?.financialAbility || '');
-        }
-        setIsFeeDialogOpen(true);
-    };
-
-    const handleSaveFee = () => {
-        setTempAspirations(prev => ({ ...prev, financialAbility: tempFee }));
-        setIsFeeDialogOpen(false);
-        toast({
-            title: "Đã cập nhật phí mong muốn",
-            description: `Mức phí tối đa mới là ${parseInt(tempFee || '0').toLocaleString('en-US')} USD.`,
-        });
-    };
-
-    // Logic for the Fee Dialog (MPMM01)
-    const getFeePlaceholder = () => {
-        const visaDetail = tempAspirations.desiredVisaDetail;
-        if (visaDetail === 'Thực tập sinh 1 năm') return "1000";
-        if (visaDetail === 'Đặc định đầu Việt') return "1600";
-        return "3000";
-    };
-
-    const handleFeeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const rawValue = e.target.value;
-        let num = parseInt(rawValue.replace(/[,.]/g, ''), 10);
-
-        if (isNaN(num)) {
-            setTempFee('');
-            return;
-        }
-
-        const visaDetail = tempAspirations.desiredVisaDetail;
-        let limit = 3800; // Default limit
-        if (visaDetail === 'Thực tập sinh 1 năm') limit = 1400;
-        if (visaDetail === 'Đặc định đầu Việt') limit = 2500;
-
-        if (num > limit) {
-            num = limit;
-        }
-
-        setTempFee(String(num));
-    };
-
-    const getFeeDisplayValue = (value: string) => {
-        if (!value) return '';
-        const num = Number(value.replace(/[^0-9]/g, ''));
-        if (isNaN(num)) return '';
-        return num.toLocaleString('en-US');
-    };
-
-    const getConvertedFeeValue = (value: string) => {
-        const num = Number(value);
-        if (isNaN(num) || num === 0) return '≈ 0 triệu VNĐ';
-
-        const vndValue = num * USD_VND_RATE;
-        const valueInMillions = vndValue / 1000000;
-        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1
-        });
-        return `≈ ${formattedVnd.replace('.', ',')} triệu VNĐ`;
-    };
-
-
-    if (role === 'candidate-empty-profile') {
-        return <EmptyProfileView />;
-    }
-
-    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = visaDetailsByVisaType;
-    const visaTypes = Object.keys(visaDetailsByVisaType);
-    const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
-
-    const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
-    const languageLevels = ["Không yêu cầu", "N5", "N4", "N3", "N2", "N1"];
-    const experienceYears = ['Không yêu cầu', 'Dưới 1 năm', '1-2 năm', '2-3 năm', 'Trên 3 năm'];
-    const allSpecialConditions = ['Lương tốt', 'Tăng ca', 'Công ty uy tín', 'Hỗ trợ nhà ở', 'Bay nhanh'];
-
 
     return (
         <>
@@ -291,10 +107,7 @@ export const LoggedInView = () => {
                     value={openAccordion}
                     onValueChange={setOpenAccordion}
                 >
-                    <SuggestedJobs setIsAspirationsDialogOpen={setIsAspirationsDialogOpen}
-                        setSuggestionPrinciple={setSuggestionPrinciple} setSuggestionType={setSuggestionType}
-                        setTempAspirations={tempAspirations} setTempDesiredIndustry={setTempDesiredIndustry}
-                        isLoadingSuggestions={isLoadingSuggestions} highlight={highlight} />
+                    <SuggestedJobs highlight={highlight} />
                     <AppliedJobs />
                     <SavedJobs />
 
@@ -376,241 +189,6 @@ export const LoggedInView = () => {
                 </div>
             </div>
             <ProfileViewersDialog isOpen={isViewersDialogOpen} onClose={() => setIsViewersDialogOpen(false)} />
-            <Dialog open={isAspirationsDialogOpen} onOpenChange={setIsAspirationsDialogOpen}>
-                <DialogContent className="sm:max-w-2xl">
-                    <DialogHeader>
-                        <DialogTitle>Sửa điều kiện gợi ý</DialogTitle>
-                        <DialogDescription>
-                            Thay đổi các nguyện vọng để nhận được gợi ý việc làm phù hợp hơn.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
-                        <div className="space-y-2">
-                            <Label htmlFor="visa-type-modal">Loại visa mong muốn</Label>
-                            <Select
-                                value={tempAspirations.desiredVisaType || ''}
-                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaType: value, desiredVisaDetail: '' }))}
-                            >
-                                <SelectTrigger id="visa-type-modal"><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
-                                <SelectContent>
-                                    {visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="visa-detail-modal">Chi tiết visa</Label>
-                            <Select
-                                value={tempAspirations.desiredVisaDetail || ''}
-                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredVisaDetail: value }))}
-                                disabled={!tempAspirations.desiredVisaType}
-                            >
-                                <SelectTrigger id="visa-detail-modal"><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
-                                <SelectContent>
-                                    {(visaDetailsOptions[tempAspirations.desiredVisaType || ''] || []).map(vd => <SelectItem key={vd.slug} value={vd.name}>{vd.name}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="industry-modal">Ngành nghề mong muốn</Label>
-                            <Select
-                                value={tempDesiredIndustry}
-                                onValueChange={value => setTempDesiredIndustry(value)}
-                                disabled={!tempAspirations.desiredVisaType}
-                            >
-                                <SelectTrigger id="industry-modal">
-                                    <SelectValue placeholder="Chọn ngành nghề" >
-                                        {tempDesiredIndustry || "Chọn ngành nghề"}
-                                    </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="location-modal">Địa điểm mong muốn</Label>
-                            <Select
-                                value={tempAspirations.desiredLocation || ''}
-                                onValueChange={value => setTempAspirations(prev => ({ ...prev, desiredLocation: value }))}
-                            >
-                                <SelectTrigger id="location-modal"><SelectValue placeholder="Chọn địa điểm" /></SelectTrigger>
-                                <SelectContent className="max-h-[300px]">
-                                    <SelectItem value="all">Tất cả Nhật Bản</SelectItem>
-                                    {Object.entries(locations['Nhật Bản']).map(([region, prefectures]) => (
-                                        <SelectGroup key={region}>
-                                            <SelectLabel>{region}</SelectLabel>
-                                            <SelectItem value={region}>Toàn bộ vùng {region}</SelectItem>
-                                            {(prefectures as string[]).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                                        </SelectGroup>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="space-y-2 pt-2">
-                            <Label className="font-semibold">Nguyên tắc gợi ý</Label>
-                            <div className="grid grid-cols-2 gap-2">
-                                <Button
-                                    variant={suggestionType === 'accurate' ? 'default' : 'outline'}
-                                    onClick={() => setSuggestionType('accurate')}
-                                    className="justify-center text-left h-auto py-2"
-                                >
-                                    Chính xác 100%
-                                </Button>
-                                <Button
-                                    variant={suggestionType === 'related' ? 'default' : 'outline'}
-                                    onClick={() => setSuggestionType('related')}
-                                    className="justify-center text-left h-auto py-2"
-                                >
-                                    Thêm cả việc liên quan
-                                </Button>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2 pt-2">
-                            <Label className="font-semibold">Ưu tiên tìm việc</Label>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                        setSuggestionPrinciple('salary');
-                                    }}
-                                    className={cn(
-                                        "justify-start text-left h-auto py-2",
-                                        suggestionPrinciple === 'salary' && "ring-2 ring-primary border-primary bg-primary/10"
-                                    )}
-                                >
-                                    <div>
-                                        <p className="font-semibold">Lương tốt</p>
-                                        <p className="text-xs opacity-80 font-normal">Ưu tiên việc có lương cao</p>
-                                    </div>
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                        setSuggestionPrinciple('fee');
-                                        openFeeDialog();
-                                    }}
-                                    className={cn(
-                                        "justify-start text-left h-auto py-2",
-                                        suggestionPrinciple === 'fee' && "ring-2 ring-primary border-primary bg-primary/10"
-                                    )}
-                                >
-                                    <div>
-                                        <p className="font-semibold">{feeButtonText}</p>
-                                        <p className="text-xs opacity-80 font-normal">Ưu tiên phí thấp / uy tín</p>
-                                    </div>
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => setSuggestionPrinciple('company')}
-                                    className={cn(
-                                        "justify-start text-left h-auto py-2",
-                                        suggestionPrinciple === 'company' && "ring-2 ring-primary border-primary bg-primary/10"
-                                    )}
-                                >
-                                    <div>
-                                        <p className="font-semibold">{companyButtonText}</p>
-                                        <p className="text-xs opacity-80 font-normal">Ưu tiên công ty uy tín</p>
-                                    </div>
-                                </Button>
-                            </div>
-                        </div>
-                        <Collapsible>
-                            <CollapsibleTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-semibold">
-                                    <ChevronDown className="mr-2 h-4 w-4" />
-                                    Thêm điều kiện mở rộng
-                                </Button>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="pt-4 space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label>Học vấn</Label>
-                                        <Select value={tempAspirations.educationRequirement} onValueChange={value => setTempAspirations(prev => ({ ...prev, educationRequirement: value }))}>
-                                            <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
-                                            <SelectContent>
-                                                {educationLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Trình độ tiếng Nhật</Label>
-                                        <Select value={tempAspirations.languageRequirement} onValueChange={value => setTempAspirations(prev => ({ ...prev, languageRequirement: value }))}>
-                                            <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
-                                            <SelectContent>
-                                                {languageLevels.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2 md:col-span-2">
-                                        <Label>Số năm kinh nghiệm</Label>
-                                        <Select value={tempAspirations.yearsOfExperience} onValueChange={value => setTempAspirations(prev => ({ ...prev, yearsOfExperience: value }))}>
-                                            <SelectTrigger><SelectValue placeholder="Bất kỳ" /></SelectTrigger>
-                                            <SelectContent>
-                                                {experienceYears.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                                <div className="space-y-2 pt-2">
-                                    <Label>Các điều kiện khác</Label>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2">
-                                        {allSpecialConditions.map(item => (
-                                            <div key={item} className="flex items-center space-x-2">
-                                                <Checkbox
-                                                    id={`cond-modal-${item}`}
-                                                    checked={tempAspirations.specialConditions?.includes(item)}
-                                                    onCheckedChange={checked => {
-                                                        const current = tempAspirations.specialConditions || [];
-                                                        const newConditions = checked
-                                                            ? [...current, item]
-                                                            : current.filter(c => c !== item);
-                                                        setTempAspirations(prev => ({ ...prev, specialConditions: newConditions }));
-                                                    }}
-                                                />
-                                                <Label htmlFor={`cond-modal-${item}`} className="text-sm font-normal cursor-pointer">{item}</Label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </CollapsibleContent>
-                        </Collapsible>
-                    </div>
-                    <DialogFooter className="flex-row justify-end space-x-2">
-                        <DialogClose asChild>
-                            <Button variant="outline">Hủy</Button>
-                        </DialogClose>
-                        <Button onClick={handleSaveAspirations}>Lưu và tìm lại</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-            <Dialog open={isFeeDialogOpen} onOpenChange={setIsFeeDialogOpen}>
-                <DialogContent className="sm:max-w-md">
-                    {/* MPMM01 */}
-                    <DialogHeader>
-                        <DialogTitle>Mức phí mong muốn</DialogTitle>
-                        <DialogDescription>Nhập mức phí tối đa bạn sẵn sàng chi trả (USD).</DialogDescription>
-                    </DialogHeader>
-                    <div className="pt-4 space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="fee-usd">Phí tối đa (USD)</Label>
-                            <Input
-                                id="fee-usd"
-                                type="text"
-                                placeholder={getFeePlaceholder()}
-                                value={getFeeDisplayValue(tempFee)}
-                                onChange={handleFeeInputChange}
-                            />
-                            <p className="text-xs text-muted-foreground">{getConvertedFeeValue(tempFee)}</p>
-                        </div>
-                    </div>
-                    <DialogFooter className="pt-4">
-                        <Button variant="outline" onClick={() => setIsFeeDialogOpen(false)}>Hủy</Button>
-                        <Button onClick={handleSaveFee}>Lưu thay đổi</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </>
     )
 }
