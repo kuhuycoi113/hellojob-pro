@@ -29,98 +29,9 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
     const [suggestedJobs, setSuggestedJobs] = React.useState<any[]>([]);
     const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [feeButtonText, setFeeButtonText] = useState('Phí thấp');
-    const [companyButtonText, setCompanyButtonText] = useState('Công ty uy tín');
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
-    const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true); // CANHANHOA01
+
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
-    const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations'] & { educationRequirement?: string, languageRequirement?: string, yearsOfExperience?: string, specialConditions?: string[] }>>({});
-    const [suggestionPrinciple, setSuggestionPrinciple] = useState<'basicSalary' | 'fee' | 'realSalary' | null>(null);
-    const [tempFee, setTempFee] = useState('');
-    const JPY_VND_RATE = 180;
-    const USD_VND_RATE = 26300;
-    const getFeePlaceholder = () => {
-        switch (suggestionPrinciple) {
-            case 'basicSalary':
-                return '200,000'
-            case 'realSalary':
-                return '150,000'
-            default: {
-                const visaDetail = tempAspirations.visaDetail;
-                if (visaDetail === 'Thực tập sinh 1 năm') return "1000";
-                if (visaDetail === 'Đặc định đầu Việt') return "1600";
-                return "3000";
-            }
-
-        }
-    };
-
-    const handleFeeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const rawValue = e.target.value;
-        let num = parseInt(rawValue.replace(/[,.]/g, ''), 10);
-
-        if (isNaN(num)) {
-            setTempFee('');
-            return;
-        }
-
-        const visaDetail = tempAspirations.visaDetail;
-        let limit = 3800; // Default limit
-        switch (suggestionPrinciple) {
-            case 'basicSalary':
-            case 'realSalary': {
-                limit = 1000000;
-                break;
-            }
-            default: {
-                if (visaDetail === 'Thực tập sinh 1 năm') limit = 1400;
-                if (visaDetail === 'Đặc định đầu Việt') limit = 2500;
-                break;
-            }
-        }
-        if (num > limit) {
-            num = limit;
-        }
-
-        setTempFee(String(num));
-    };
-
-    const getFeeDisplayValue = () => {
-        if (tempFee?.length) {
-            const num = Number(tempFee.replace(/[^0-9]/g, ''));
-            if (isNaN(num)) return '';
-            return num.toLocaleString('en-US');
-        }
-        let value = null;
-        switch (suggestionPrinciple) {
-            case 'basicSalary':
-                value = tempAspirations.basicSalary || 0;
-                break;
-            case 'realSalary':
-                value = tempAspirations.realSalary || 0;
-                break;
-            case 'fee':
-                value = tempAspirations.fee || 0;
-                break;
-        }
-        if (!value) return '';
-        if (isNaN(value)) return '';
-        return value.toLocaleString('en-US');
-    };
-
-    const getConvertedFeeValue = (value: string) => {
-        const num = Number(value);
-        if (isNaN(num) || num === 0) return '≈ 0 triệu VNĐ';
-        const rate = suggestionPrinciple === 'fee' ? USD_VND_RATE : JPY_VND_RATE;
-        const vndValue = num * rate;
-        const valueInMillions = vndValue / 1000000;
-        const formattedVnd = valueInMillions.toLocaleString('vi-VN', {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1
-        });
-        return `≈ ${formattedVnd.replace('.', ',')} triệu VNĐ`;
-    };
-
 
     if (role === 'candidate-empty-profile') {
         return <EmptyProfileView />;
@@ -128,10 +39,6 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
 
 
     const openEditAspirationsDialog = () => {
-        const aspirations = user.aspirations;
-        if (aspirations) {
-            setTempAspirations({ ...aspirations });
-        }
         setIsAspirationsDialogOpen(true);
     };
 
@@ -143,66 +50,6 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
         }, 500); // Simulate network delay
     };
 
-
-
-    const handleSaveAspirations = async () => {
-        try {
-            console.log(tempAspirations);
-            await updateProfile(user.uid, { aspirations: { ...tempAspirations } });
-            setIsAspirationsDialogOpen(false);
-            toast({
-                title: 'Cập nhật nguyện vọng thành công!',
-                description: 'Thông tin nguyện vọng của bạn đã được lưu. Nội dung việc làm sẽ được hiển thị theo nguyện vọng của bạn.',
-                className: 'bg-green-500 text-white'
-            });
-        }catch (error) {
-            toast({
-                title: 'Cập nhật nguyện vọng thất bại!',
-                description: 'Đã xảy ra lỗi khi lưu thông tin nguyện vọng của bạn. Vui lòng thử lại.',
-                className: 'bg-red-500 text-white'
-            });
-        }
-        // const storedProfileRaw = localStorage.getItem('generatedCandidateProfile');
-        // let profile = storedProfileRaw ? JSON.parse(storedProfileRaw) : {};
-        // profile = {
-        //     ...profile,
-        //     aspirations: tempAspirations
-        // };
-        // localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
-        // if (suggestionPrinciple) {
-        //     localStorage.setItem('suggestionPrinciple', suggestionPrinciple);
-        // } else {
-        //     localStorage.removeItem('suggestionPrinciple');
-        // }
-        // localStorage.setItem('suggestionType', suggestionType);
-        // console.log("Suggestion principle saved:", suggestionPrinciple);
-        // console.log("Suggestion type saved:", suggestionType);
-        // setIsAspirationsDialogOpen(false);
-        // setForceUpdate(prev => prev + 1); // Trigger a re-fetch
-    };
-    const handleSaveFee = () => {
-        let num = null;
-        if (tempFee) {
-            num = parseInt(tempFee.replace(/[,.]/g, ''), 10)
-        }
-        setTempAspirations(prev => ({ ...prev, [suggestionPrinciple || '']: num }));
-        setTempFee('');
-        setSuggestionPrinciple(null);
-        toast({
-            title: `Đã cập nhật ${suggestionPrinciple === 'fee' ? 'phí' : suggestionPrinciple === 'basicSalary' ? 'lương cơ bản' : suggestionPrinciple === 'realSalary' ? 'lương thực nhận' : ''} mong muốn`,
-            description: `Mức ${suggestionPrinciple === 'fee' ? 'phí tối đa' : suggestionPrinciple === 'basicSalary' ? 'lương cơ bản tối thiểu' : suggestionPrinciple === 'realSalary' ? 'lương thực nhận tối thiểu' : ''} mới là ${parseInt(tempFee || '0').toLocaleString('en-US')} USD.`,
-        });
-    };
-    // Logic for the Fee Dialog (MPMM01)
-
-    const visaDetailsOptions: { [key: string]: { name: string, slug: string }[] } = visaDetailsByVisaType;
-    const visaTypes = Object.keys(visaDetailsByVisaType);
-    const availableIndustries = tempAspirations.visa ? (industriesByJobType[tempAspirations.visa as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
-
-    const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
-    const languageLevels = ["Không yêu cầu", "N5", "N4", "N3", "N2", "N1"];
-    const experienceYears = ['Không yêu cầu', 'Dưới 1 năm', '1-2 năm', '2-3 năm', 'Trên 3 năm'];
-    const allSpecialConditions = ['Lương tốt', 'Tăng ca', 'Công ty uy tín', 'Hỗ trợ nhà ở', 'Bay nhanh'];
     return (<>
         <AccordionItem value="item-1" className={cn(
             "border-b-0 transition-all duration-500 ease-in-out",
@@ -276,44 +123,11 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
             </AccordionContent>
         </AccordionItem>
 
+
         <EditAspirationsDialog
             isOpen={isAspirationsDialogOpen}
             onOpenChange={setIsAspirationsDialogOpen}
-            tempAspirations={tempAspirations}
-            setTempAspirations={setTempAspirations}
-            suggestionPrinciple={suggestionPrinciple}
-            setSuggestionPrinciple={setSuggestionPrinciple}
-            feeButtonText={feeButtonText}
-            // companyButtonText={companyButtonText}
-            handleSaveAspirations={handleSaveAspirations}
         />
-
-        <Dialog open={!!suggestionPrinciple} onOpenChange={() => setSuggestionPrinciple(null)}>
-            <DialogContent className="sm:max-w-md">
-                {/* MPMM01 */}
-                <DialogHeader>
-                    <DialogTitle>Mức {suggestionPrinciple === 'fee' ? 'phí' : suggestionPrinciple === 'basicSalary' ? 'lương cơ bản' : 'lương thực lĩnh'} mong muốn</DialogTitle>
-                    <DialogDescription>Nhập {suggestionPrinciple === 'fee' ? 'mức phí tối đa bạn sẵn sàng chi trả (USD).' : suggestionPrinciple === 'basicSalary' ? 'mức lương cơ bản tối thiểu mong muốn (JPY).' : 'mức lương thực lĩnh tối thiểu mong muốn (JPY).'}</DialogDescription>
-                </DialogHeader>
-                <div className="pt-4 space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="fee-usd">{suggestionPrinciple === 'fee' ? 'Phí tối đa (USD)' : suggestionPrinciple === 'basicSalary' ? 'Lương cơ bản (JPY)' : 'Lương thực lĩnh (JPY)'}</Label>
-                        <Input
-                            id="fee-usd"
-                            type="text"
-                            placeholder={getFeePlaceholder()}
-                            value={getFeeDisplayValue()}
-                            onChange={handleFeeInputChange}
-                        />
-                        <p className="text-xs text-muted-foreground">{getConvertedFeeValue(tempFee)}</p>
-                    </div>
-                </div>
-                <DialogFooter className="pt-4">
-                    <Button variant="outline" onClick={() => setSuggestionPrinciple(null)}>Hủy</Button>
-                    <Button onClick={handleSaveFee}>Lưu thay đổi</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
     </>
     );
 };
