@@ -173,30 +173,21 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
 
   useEffect(() => {
     const preferencesRaw = sessionStorage.getItem('onboardingPreferences');
-    if (role === 'candidate-empty-profile' && preferencesRaw) {
+    if (role === 'candidate-empty-profile' && !!serverUser && preferencesRaw) {
       try {
         const preferences = JSON.parse(preferencesRaw);
-        const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
-        let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
-
-        profile = {
-          ...profile,
-          desiredIndustry: preferences.desiredIndustry || profile.desiredIndustry,
-          aspirations: {
-            ...profile.aspirations,
-            desiredVisaType: preferences.desiredVisaType,
-            desiredVisaDetail: preferences.desiredVisaDetail,
-            desiredLocation: preferences.desiredLocation,
-          }
-        };
-        localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+        const existingAspiration = serverUser?.aspiration ?? {};
+        const updatedAspirations = { ...existingAspiration, ...preferences };
+        updateProfile(serverUser?.uid, {
+          aspirations: updatedAspirations
+        }).then(() => {
+          serverUser.aspirations = updatedAspirations;
+        });
         sessionStorage.removeItem('onboardingPreferences');
       } catch (e) {
         console.error("Failed to apply onboarding preferences:", e);
         sessionStorage.removeItem('onboardingPreferences');
       }
-    } else if (role === 'candidate-empty-profile' && !preferencesRaw) {
-      localStorage.removeItem('generatedCandidateProfile');
     }
   }, [role]);
 

@@ -60,12 +60,13 @@ import { SendProfileDialog } from './components/send-profile-dialog';
 import { MediaCarousel } from './components/media-carousel';
 import { BodyPhotosCarousel } from './components/body-photos-carousel';
 import { SendOptionsDialog } from './components/send-options-dialog';
-import { format } from "date-fns";
+import { format, formatDate } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { allIndustries, industriesByJobType } from '@/lib/industry-data';
 import { visaDetailsByVisaType } from '@/lib/visa-data';
 import { NameAvatar } from '@/components/ui/name-avatar';
 import { updateAvatar } from '@/actions/user-action';
+import { EditAspirationsDialog } from '../viec-lam-cua-toi/components/edit-aspirations-dialog';
 const translations = {
     vi: {
         personalInfo: "Thông tin cá nhân",
@@ -91,6 +92,7 @@ const translations = {
         desiredNetSalary: "Thực lĩnh",
         financialAbility: "Khả năng tài chính",
         interviewLocation: "Nơi phỏng vấn",
+        interviewDate: "Ngày phỏng vấn",
         specialAspirations: "Yêu cầu khác",
         about: "Giới thiệu bản thân",
         workExperience: "Kinh nghiệm làm việc",
@@ -104,82 +106,6 @@ const translations = {
         bodyPhotos: "Ảnh hình thể",
         noInfo: "Chưa cập nhật",
         clickToUpdate: "Nhấn vào đây để cập nhật",
-    },
-    ja: {
-        personalInfo: "個人情報",
-        dateOfBirth: "生年月日",
-        gender: "性別",
-        height: "身長",
-        weight: "体重",
-        tattoo: "刺青",
-        hepatitisB: "B型肝炎",
-        japaneseProficiency: "日本語能力",
-        englishProficiency: "英語能力",
-        documentsSection: "書類・証明書",
-        vietnamDocs: "ベトナムの書類",
-        japanDocs: "日本の書類",
-        otherDocs: "外国の書類・留学",
-        aspirations: "希望条件",
-        desiredIndustry: "希望職種",
-        desiredJobDetail: "具体的な仕事内容",
-        desiredVisaType: "希望ビザ",
-        desiredVisaDetail: "ビザ詳細",
-        desiredLocation: "希望勤務地",
-        desiredSalary: "希望基本給",
-        desiredNetSalary: "希望手取り",
-        financialAbility: "経済的能力",
-        interviewLocation: "面接地",
-        specialAspirations: "その他の希望",
-        about: "自己紹介",
-        workExperience: "職務経歴",
-        education: "学歴",
-        skillsAndInterests: "スキル・興味分野",
-        skills: "スキル",
-        interests: "興味分野",
-        certifications: "資格・受賞歴",
-        notes: "備考",
-        videos: "ビデオ",
-        bodyPhotos: "体型写真",
-        noInfo: "情報がありません。",
-        clickToUpdate: "ここをクリックして更新",
-    },
-    en: {
-        personalInfo: "Personal Information",
-        dateOfBirth: "Date of Birth",
-        gender: "Gender",
-        height: "Height",
-        weight: "Weight",
-        tattoo: "Tattoo Status",
-        hepatitisB: "Hepatitis B",
-        japaneseProficiency: "Japanese Proficiency",
-        englishProficiency: "English Proficiency",
-        documentsSection: "Documents & Paperwork",
-        vietnamDocs: "Vietnamese Documents",
-        japanDocs: "Japanese Documents",
-        otherDocs: "Overseas/Study Abroad Docs",
-        aspirations: "Aspirations",
-        desiredIndustry: "Desired Industry",
-        desiredJobDetail: "Detailed Job",
-        desiredVisaType: "Desired Visa Type",
-        desiredVisaDetail: "Visa Detail",
-        desiredLocation: "Desired Location",
-        desiredSalary: "Desired Basic Salary",
-        desiredNetSalary: "Desired Net Salary",
-        financialAbility: "Financial Ability",
-        interviewLocation: "Interview Location",
-        specialAspirations: "Other Aspirations",
-        about: "About Me",
-        workExperience: "Work Experience",
-        education: "Education",
-        skillsAndInterests: "Skills & Interests",
-        skills: "Skills",
-        interests: "Interests",
-        certifications: "Certifications",
-        notes: "Notes",
-        videos: "Videos",
-        bodyPhotos: "Body Photos",
-        noInfo: "No information yet.",
-        clickToUpdate: "Click here to update",
     }
 }
 const emptyCandidate: EnrichedCandidateProfile = {
@@ -221,7 +147,7 @@ export default function CandidateProfilePage() {
     const [newSkill, setNewSkill] = useState('');
     const [newInterest, setNewInterest] = useState('');
     const [isTranslating, setIsTranslating] = useState(false);
-    const [currentLang, setCurrentLang] = useState<Language>('vi');
+    const [currentLang, setCurrentLang] = useState<'vi'>('vi');
     const [isSendOptionsOpen, setIsSendOptionsOpen] = useState(false);
     const [languageToSend, setLanguageToSend] = useState('');
     const [isNewProfile, setIsNewProfile] = useState(false);
@@ -235,6 +161,8 @@ export default function CandidateProfilePage() {
     const [newDocFilePreview, setNewDocFilePreview] = useState<string | null>(null);
     const [expandedGrids, setExpandedGrids] = useState({ vietnam: false, japan: false, other: false });
     const [lastDocumentsState, setLastDocumentsState] = useState<EnrichedCandidateProfile['documents'] | null>(null);
+
+    const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
 
     useEffect(() => {
         let isNew = false;
@@ -298,46 +226,6 @@ export default function CandidateProfilePage() {
     }, [profileByLang.vi, role]);
 
 
-    const handleLanguageChange = async (lang: Language) => {
-        if (lang === currentLang) return;
-
-        if (profileByLang[lang]) {
-            setCurrentLang(lang);
-            return;
-        }
-
-        if (!profileByLang.vi) return;
-
-        setIsTranslating(true);
-        try {
-            const profileToTranslate = { ...profileByLang.vi };
-            if (typeof profileToTranslate.personalInfo.birthYear === 'string' && profileToTranslate.personalInfo.birthYear === '') {
-                profileToTranslate.personalInfo.birthYear = new Date().getFullYear() - 18;
-            }
-
-            const input: TranslateProfileInput = {
-                profile: profileToTranslate as any,
-                targetLanguage: lang === 'ja' ? 'Japanese' : 'English',
-            };
-            const translatedProfile = await translateProfile(input);
-
-            setProfileByLang(prev => ({
-                ...prev,
-                [lang]: translatedProfile,
-            }));
-            setCurrentLang(lang);
-
-        } catch (error) {
-            console.error("Translation failed:", error);
-            toast({
-                variant: "destructive",
-                title: "Dịch thất bại",
-                description: "Đã có lỗi xảy ra khi dịch hồ sơ. Vui lòng thử lại."
-            });
-        } finally {
-            setIsTranslating(false);
-        }
-    };
 
     const getDisplayedProfile = (): EnrichedCandidateProfile | null => {
         const { vi, ja, en } = profileByLang;
@@ -1013,102 +901,77 @@ export default function CandidateProfilePage() {
                                 <div className="hidden lg:block">
                                     <PersonalInfoCard candidate={candidate} setIsProfileEditDialogOpen={setIsProfileEditDialogOpen} translation={t} />
                                 </div>
+                                <EditAspirationsDialog
+                                    isOpen={isAspirationsDialogOpen}
+                                    onOpenChange={(open) => {
+                                        setIsAspirationsDialogOpen(open);
+                                        const vi = profileByLang.vi;
+                                        if (!!vi) {
+                                            vi.aspirations = {
+                                                ...vi.aspirations,
+                                                ...user?.aspirations ?? {}
+                                            }
+                                        }
+                                        console.log(user?.aspirations)
+                                        // const updatetedAspiration:any = {
+                                        //     vi: {
+                                        //         aspiratiopns: user?.aspirations ?? {}
+                                        //     }
+                                        // };
+                                        setProfileByLang(prev => ({ ...prev, ...{ vi } }));
+                                    }}
+                                />
                                 <Card id="HSCV_NGUYENVONG">
                                     <CardHeader id="HSCV_NGUYENVONG_HEADER" className="flex flex-row items-center justify-between">
                                         <CardTitle id="HSCV_NGUYENVONG_LABEL" className="font-headline text-xl flex items-center"><Target className="mr-3 text-primary" /> {t.aspirations}</CardTitle>
-                                        <EditDialog
-                                            title="Chỉnh sửa Nguyện vọng"
-                                            onSave={handleSave}
-                                            dialogId="HSCV_NGUYENVONG_DIALOG"
-                                            renderContent={(temp, handleChange) => (
-                                                <div className="space-y-4">
-                                                    <div className="space-y-2">
-                                                        <Label id="HSCV_NGUYENVONG_DIALOG_LOAIVISA_LABEL">Loại visa mong muốn</Label>
-                                                        <Select value={temp.aspirations?.desiredVisaType || ''} onValueChange={value => handleChange('aspirations', 'desiredVisaType', value)}>
-                                                            <SelectTrigger><SelectValue placeholder="Chọn loại visa" /></SelectTrigger>
-                                                            <SelectContent>{visaTypes.map(vt => <SelectItem key={vt} value={vt}>{vt}</SelectItem>)}</SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label id="HSCV_NGUYENVONG_DIALOG_CHITIETVISA_LABEL">Chi tiết loại hình visa mong muốn</Label>
-                                                        <Select value={temp.aspirations?.desiredVisaDetail || ''} onValueChange={value => handleChange('aspirations', 'desiredVisaDetail', value)} disabled={!temp.aspirations?.desiredVisaType}>
-                                                            <SelectTrigger><SelectValue placeholder="Chọn chi tiết" /></SelectTrigger>
-                                                            <SelectContent>{(visaDetailsByVisaType[temp.aspirations?.desiredVisaType as keyof typeof visaDetailsByVisaType] || []).map(vd => <SelectItem key={vd.slug} value={vd.name}>{vd.name}</SelectItem>)}</SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label id="HSCV_NGUYENVONG_DIALOG_NGANHNGHE_LABEL">Ngành nghề mong muốn</Label>
-                                                        <Select value={temp.desiredIndustry} onValueChange={value => handleChange('desiredIndustry' as any, null, value)} disabled={!temp.aspirations?.desiredVisaType}>
-                                                            <SelectTrigger><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
-                                                            <SelectContent>{(industriesByJobType[temp.aspirations?.desiredVisaType as keyof typeof industriesByJobType] || allIndustries).map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}</SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label id="HSCV_NGUYENVONG_DIALOG_CONGVIECCUTHE_LABEL">Công việc chi tiết mong muốn</Label>
-                                                        <Input id="HSCV_NGUYENVONG_DIALOG_CONGVIECCUTHE_INPUT" value={temp.aspirations?.desiredJobDetail} onChange={e => handleChange('aspirations', 'desiredJobDetail', e.target.value)} />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label id="HSCV_NGUYENVONG_DIALOG_DIADIEM_LABEL">Địa điểm mong muốn</Label>
-                                                        <Input id="HSCV_NGUYENVONG_DIALOG_DIADIEM_INPUT" value={temp.aspirations?.desiredLocation} onChange={e => handleChange('aspirations', 'desiredLocation', e.target.value)} />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label id="HSCV_NGUYENVONG_DIALOG_LUONGCANBAN_LABEL">Lương cơ bản mong muốn/tháng</Label>
-                                                        <Input id="HSCV_NGUYENVONG_DIALOG_LUONGCANBAN_INPUT" value={temp.aspirations?.desiredSalary} onChange={e => handleChange('aspirations', 'desiredSalary', e.target.value)} />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label id="HSCV_NGUYENVONG_DIALOG_THUCLINH_LABEL">Thực lĩnh mong muốn/tháng</Label>
-                                                        <Input id="HSCV_NGUYENVONG_DIALOG_THUCLINH_INPUT" value={temp.aspirations?.desiredNetSalary} onChange={e => handleChange('aspirations', 'desiredNetSalary', e.target.value)} />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label id="HSCV_NGUYENVONG_DIALOG_KHACHINHTAICHINH_LABEL">Khả năng tài chính</Label>
-                                                        <Input id="HSCV_NGUYENVONG_DIALOG_KHACHINHTAICHINH_INPUT" value={temp.aspirations?.financialAbility} onChange={e => handleChange('aspirations', 'financialAbility', e.target.value)} />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label id="HSCV_NGUYENVONG_DIALOG_NOIPHONGVAN_LABEL">Tìm việc, phỏng vấn, tuyển tại</Label>
-                                                        <Input id="HSCV_NGUYENVONG_DIALOG_NOIPHONGVAN_INPUT" value={temp.aspirations?.interviewLocation} onChange={e => handleChange('aspirations', 'interviewLocation', e.target.value)} />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label id="HSCV_NGUYENVONG_DIALOG_YEUCAUKHAC_LABEL">Nguyện vọng đặc biệt</Label>
-                                                        <Textarea id="HSCV_NGUYENVONG_DIALOG_YEUCAUKHAC_INPUT" value={Array.isArray(temp.aspirations?.specialAspirations) ? temp.aspirations.specialAspirations.join(', ') : temp.aspirations?.specialAspirations} onChange={e => handleChange('aspirations', 'specialAspirations', e.target.value)} />
-                                                    </div>
-                                                </div>
-                                            )}
-                                            candidate={profileByLang.vi!}
-                                        >
-                                            <Button id="HSCV_NGUYENVONG_BUTTON_EDIT" variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                                        </EditDialog>
+                                        <Button id="HSCV_NGUYENVONG_BUTTON_EDIT" variant="ghost" size="icon" onClick={() => setIsAspirationsDialogOpen(true)}><Edit className="h-4 w-4" /></Button>
                                     </CardHeader>
                                     <CardContent className="space-y-3 text-sm">
-                                        <div id="HSCV_NGUYENVONG_LOAIVISA"><p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.desiredVisaType || notUpdatedText}</p></div>
-                                        <div id="HSCV_NGUYENVONG_CHITIETVISA"><p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.desiredVisaDetail || notUpdatedText}</p></div>
-                                        <div id="HSCV_NGUYENVONG_NGANHNGHE"><p><strong>{t.desiredIndustry}:</strong> {candidate.desiredIndustry || notUpdatedText}</p></div>
-                                        <div id="HSCV_NGUYENVONG_CONGVIECCUTHE"><p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.desiredJobDetail || notUpdatedText}</p></div>
-                                        <div id="HSCV_NGUYENVONG_DIADIEM"><p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.desiredLocation || notUpdatedText}</p></div>
-                                        <div id="HSCV_NGUYENVONG_LUONGCANBAN"><p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.desiredSalary)}</p></div>
-                                        <div id="HSCV_NGUYENVONG_THUCLINH"><p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.desiredNetSalary)}</p></div>
+                                        <div id="HSCV_NGUYENVONG_LOAIVISA"><p><strong>{t.desiredVisaType}:</strong> {candidate.aspirations?.visa || notUpdatedText}</p></div>
+                                        <div id="HSCV_NGUYENVONG_CHITIETVISA"><p><strong>{t.desiredVisaDetail}:</strong> {candidate.aspirations?.visaDetail || notUpdatedText}</p></div>
+                                        <div id="HSCV_NGUYENVONG_NGANHNGHE"><p><strong>{t.desiredIndustry}:</strong> {candidate.aspirations.career || notUpdatedText}</p></div>
+                                        <div id="HSCV_NGUYENVONG_CONGVIECCUTHE"><p><strong>{t.desiredJobDetail}:</strong> {candidate.aspirations?.job || notUpdatedText}</p></div>
+                                        <div id="HSCV_NGUYENVONG_DIADIEM"><p><strong>{t.desiredLocation}:</strong> {candidate.aspirations?.workLocation || notUpdatedText}</p></div>
+                                        <div id="HSCV_NGUYENVONG_LUONGCANBAN"><p><strong>{t.desiredSalary}:</strong> {formatYen(candidate.aspirations?.basicSalary)}</p></div>
+                                        <div id="HSCV_NGUYENVONG_THUCLINH"><p><strong>{t.desiredNetSalary}:</strong> {formatYen(candidate.aspirations?.realSalary)}</p></div>
                                         <div id="HSCV_NGUYENVONG_KHACHINHTAICHINH">
-                                            {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(candidate.aspirations?.desiredVisaDetail || '') && (
-                                                <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.financialAbility || notUpdatedText}</p>
+                                            {['Thực tập sinh 3 năm', 'Thực tập sinh 1 năm', 'Đặc định đầu Việt', 'Kỹ sư, tri thức đầu Việt'].includes(candidate.aspirations?.visaDetail || '') && (
+                                                <p><strong>{t.financialAbility}:</strong> {candidate.aspirations?.fee || notUpdatedText}</p>
                                             )}
                                         </div>
                                         <div id="HSCV_NGUYENVONG_NOIPHONGVAN"><p><strong>{t.interviewLocation}:</strong> {candidate.aspirations?.interviewLocation || notUpdatedText}</p></div>
+
+                                        <div id="HSCV_NGUYENVONG_TIMEPHONGVAN"><p><strong>{t.interviewDate}:</strong> {
+                                            (() => {
+                                                let text = '';
+                                                switch (candidate.aspirations?.interviewDateType) {
+                                                    case 'flexible': {
+                                                        return 'Đủ người thì phỏng vấn';
+                                                    }
+                                                    case 'util': {
+                                                        text += 'Đến ngày ';
+                                                        break;
+                                                    }
+                                                    case 'exact': {
+                                                        text += 'Đúng ngày ';
+                                                        break;
+                                                    }
+                                                    case 'from': {
+                                                        text += 'Đến ngày ';
+                                                        break;
+                                                    }
+                                                    default: {
+                                                        return notUpdatedText;
+                                                    }
+                                                }
+                                                return text + formatDate(candidate.aspirations?.interviewDate, 'dd/MM/yyyy');
+                                            })()
+                                        }</p></div>
+                                        <div id="HSCV_NGUYENVONG_GIOITINH" className="space-y-1">
+                                            <p><strong>{t.gender}:</strong> {candidate.aspirations?.gender || notUpdatedText}</p>
+                                        </div>
                                         <div id="HSCV_NGUYENVONG_YEUCAUKHAC" className="space-y-1">
-                                            <p><strong>{t.specialAspirations}:</strong></p>
-                                            {candidate.aspirations?.specialAspirations && (
-                                                Array.isArray(candidate.aspirations.specialAspirations) && candidate.aspirations.specialAspirations.length > 0 ? (
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {candidate.aspirations.specialAspirations.map((aspiration: any) => (
-                                                            <Badge key={aspiration} variant="secondary">{aspiration}</Badge>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    typeof candidate.aspirations.specialAspirations === 'string' && candidate.aspirations.specialAspirations ? (
-                                                        <p className="text-muted-foreground">{candidate.aspirations.specialAspirations}</p>
-                                                    ) : (
-                                                        notUpdatedText
-                                                    )
-                                                )
-                                            )}
+                                            <p><strong>{t.tattoo}:</strong> {candidate.aspirations?.tattooRequirement || notUpdatedText}</p>
                                         </div>
                                     </CardContent>
                                 </Card>

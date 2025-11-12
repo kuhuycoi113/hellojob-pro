@@ -93,7 +93,6 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
     const [locationSearchTerm, setLocationSearchTerm] = useState('');
     const [tempAspirations, setTempAspirations] = useState<Partial<CandidateProfile['aspirations'] & { educationRequirement?: string, languageRequirement?: string, yearsOfExperience?: string, specialConditions?: string[] }>>(() => {
         if (!!user?.aspirations) {
-            console.log(user.uid, user.aspirations);
             return { ...user.aspirations };
         }
         return {};
@@ -134,8 +133,10 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
 
     const handleSaveAspirations = async () => {
         try {
-            console.log(tempAspirations);
             await updateProfile(user?.uid, { aspirations: { ...tempAspirations } });
+            if (!!user) {
+                user.aspirations = { ...user.aspirations ?? {}, ...tempAspirations };
+            }
             onOpenChange(false);
             toast({
                 title: 'Cập nhật nguyện vọng thành công!',
@@ -281,10 +282,9 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
         const currentInterviewLocationIsVn = interviewLocations['Việt Nam'].some(l => l.slug === tempAspirations.interviewLocation);
         const currentInterviewLocationIsJp = interviewLocations['Nhật Bản'].some(l => l.slug === tempAspirations.interviewLocation);
 
-        if (vietnamVisas.includes(value) && currentInterviewLocationIsJp) {
-            newFilters.interviewLocation = '';
-        } else if (japanVisas.includes(value) && currentInterviewLocationIsVn) {
-            newFilters.interviewLocation = '';
+        if ((vietnamVisas.includes(value) && currentInterviewLocationIsJp) ||
+            (japanVisas.includes(value) && currentInterviewLocationIsVn)) {
+            newFilters.interviewLocation = null;
         }
 
         setTempAspirations(prev => ({ ...prev, ...newFilters, visa: parentTypeName }));
@@ -330,7 +330,6 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
     };
 
     const handleDateSelect = (date: Date | undefined) => {
-        console.log(date)
         setTempAspirations(prev => ({ ...prev, interviewDate: date ? date.getTime() : null }));
     };
 
@@ -430,11 +429,9 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
                                         <Button variant="outline" className="w-full justify-start text-left font-normal h-auto min-h-10">
                                             <div className="truncate">
                                                 {Array.isArray(tempAspirations.workLocation) && tempAspirations.workLocation.length > 0 ? (
-                                                    tempAspirations.workLocation.map(locSlug => (
-                                                        <Badge key={locSlug} variant="secondary" className='mr-1'>
-                                                            {allJapanLocations.find(l => l.slug === locSlug)?.name ||
-                                                                japanRegions.find(r => r.slug === locSlug)?.name ||
-                                                                locSlug}
+                                                    tempAspirations.workLocation.map(locName => (
+                                                        <Badge key={locName} variant="secondary" className='mr-1'>
+                                                            {locName}
                                                         </Badge>
                                                     ))
                                                 ) : "Chọn địa điểm"}
@@ -464,14 +461,14 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
                                                             <div className="flex items-center gap-2 mb-2 pb-2 border-b">
                                                                 <Checkbox
                                                                     id={`region-${region.slug}`}
-                                                                    checked={region.prefectures.every(p => tempAspirations.workLocation?.includes(p.slug))}
+                                                                    checked={region.prefectures.every(p => tempAspirations.workLocation?.includes(p.name))}
                                                                     onCheckedChange={(checked) => {
                                                                         const currentSelection = new Set(tempAspirations.workLocation || []);
                                                                         region.prefectures.forEach(p => {
                                                                             if (checked) {
-                                                                                currentSelection.add(p.slug);
+                                                                                currentSelection.add(p.name);
                                                                             } else {
-                                                                                currentSelection.delete(p.slug);
+                                                                                currentSelection.delete(p.name);
                                                                             }
                                                                         });
                                                                         setTempAspirations(prev => ({ ...prev, workLocation: Array.from(currentSelection) }));
@@ -488,13 +485,13 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
                                                                         <div key={p.slug} className="flex items-center gap-2">
                                                                             <Checkbox
                                                                                 id={`pref-${p.slug}`}
-                                                                                checked={tempAspirations.workLocation?.includes(p.slug)}
+                                                                                checked={tempAspirations.workLocation?.includes(p.name)}
                                                                                 onCheckedChange={(checked) => {
                                                                                     const currentSelection = new Set(tempAspirations.workLocation || []);
                                                                                     if (checked) {
-                                                                                        currentSelection.add(p.slug);
+                                                                                        currentSelection.add(p.name);
                                                                                     } else {
-                                                                                        currentSelection.delete(p.slug);
+                                                                                        currentSelection.delete(p.name);
                                                                                     }
                                                                                     setTempAspirations(prev => ({ ...prev, workLocation: Array.from(currentSelection) }));
                                                                                 }}
