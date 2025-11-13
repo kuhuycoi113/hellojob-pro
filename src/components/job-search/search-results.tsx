@@ -6,9 +6,8 @@ import { Button } from "../ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { FilterSidebar } from "./filter-sidebar";
-import { Job, jobData } from "@/lib/mock-data";
-import { ChevronLeft, ListFilter, Loader2 } from "lucide-react";
-import { locations } from "@/lib/location-data";
+import { Job } from "@/lib/mock-data";
+import { ListFilter, Loader2 } from "lucide-react";
 import { JobCard } from "../job-card";
 import { experienceYears } from "@/lib/visa-data";
 
@@ -47,6 +46,7 @@ export type SearchFilters = {
     otherSkillRequirement?: string[];
     companyArrivalTime?: string;
     workShift?: string;
+    suggestionType?: 'accurate' | 'related';
 }
 
 export { experienceYears };

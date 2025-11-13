@@ -522,7 +522,7 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
                             <Label className="font-semibold">Nguyên tắc gợi ý</Label>
                             <div className="grid grid-cols-2 gap-2">
                                 <Button
-                                    variant={tempAspirations.suggestionType !== 'related' ? 'default' : 'outline'}
+                                    variant={tempAspirations.suggestionType === 'accurate' ? 'default' : 'outline'}
                                     onClick={() => setTempAspirations(prev => ({ ...prev, suggestionType: 'accurate' }))}
                                     className="justify-center text-left h-auto py-2"
                                 >

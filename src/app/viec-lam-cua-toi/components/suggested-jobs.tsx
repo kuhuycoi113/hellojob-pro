@@ -29,6 +29,7 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
     const [totalJobs, setTotalJobs] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
+    const [firstLoad, setFirstLoad] = useState(false);
 
     if (role === 'candidate-empty-profile') {
         return <EmptyProfileView />;
@@ -47,12 +48,13 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
                 const jobCode = JOBS.find(j => j.label === filters.job && j.value.startsWith(visaCode))?.value;
                 filters.job = jobCode ?? '';
             }
-            const { docs: jobs, total, totalPages } = await getJobs(filters, 1, currentPage * 12);
-            setSuggestedJobs(jobs);
+            const { docs: jobs, total, totalPages } = await getJobs(filters, currentPage, 12);
+            setSuggestedJobs(prev => [...prev, ...jobs]);
             setTotalJobs(total);
             setTotalPage(totalPages);
             setIsLoadingSuggestions(false);
             console.log('User aspirations:', filters);
+            setFirstLoad(true);
         }
     }, [user.aspirations, currentPage]);
 
@@ -62,7 +64,7 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
-        setCurrentPage(prev => prev + 8);
+        setCurrentPage(prev => prev + 1);
         setIsLoadingMore(false);
     };
 
@@ -91,23 +93,22 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
                 </Button>
             </div>
             <AccordionContent className="bg-background p-6 rounded-b-lg">
-                {isLoadingSuggestions ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {Array.from({ length: 4 }).map((_, i) => (
-                            <Card key={i}>
-                                <CardContent className="p-4 space-y-3">
-                                    <Skeleton className="h-28 w-full" />
-                                    <Skeleton className="h-4 w-3/4" />
-                                    <Skeleton className="h-4 w-1/2" />
-                                    <Skeleton className="h-4 w-full" />
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                ) : suggestedJobs.length > 0 ? (
+                {totalJobs > 0 || !firstLoad ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {suggestedJobs.map((job) => (<JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} />))}
+                            {isLoadingSuggestions && (
+                                Array.from({ length: 4 - (suggestedJobs.length % 4) }).map((_, i) => (
+                                    <Card key={i}>
+                                        <CardContent className="p-4 space-y-3">
+                                            <Skeleton className="h-28 w-full" />
+                                            <Skeleton className="h-4 w-3/4" />
+                                            <Skeleton className="h-4 w-1/2" />
+                                            <Skeleton className="h-4 w-full" />
+                                        </CardContent>
+                                    </Card>
+                                ))
+                            )}
                         </div>
                         {currentPage < totalPage && (
                             <div className="text-center mt-8">

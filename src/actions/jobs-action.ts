@@ -13,7 +13,7 @@ function createSearchQuery(filter: SearchFilters): any {
         q, visaDetail, career, workLocation, job, interviewLocation, numberRecruits, netFee, netFeeNoTicket, interviewRounds, interviewDate, interviewDateType,
         basicSalary, realSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
         age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-        otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement
+        otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement, suggestionType
     } = filter;
     const now = new Date();
     const fifteenDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
@@ -96,17 +96,18 @@ function createSearchQuery(filter: SearchFilters): any {
             { "createdDate": { "order": "desc" } }
         ]
     };
+    const conditions = [];
     if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== "") {
         console.log(visaDetail)
         const visaLabel = visaMapping[visaDetail as keyof typeof visaMapping] ?? visaDetail;
-        searchQuery.query.bool.must.push({
+        conditions.push({
             term: {
                 "visa.keyword": visaLabel,
             },
         });
     }
     if (["thực tập sinh 3 năm", "thực tập sinh 1 năm"].includes(visaDetail ?? '')) {
-        searchQuery.query.bool.must.push({
+        conditions.push({
             bool: {
                 should: [
                     {
@@ -135,12 +136,14 @@ function createSearchQuery(filter: SearchFilters): any {
         let should = [];
         if (jobCodeArr?.length === 5) {
             should.push({ term: { "filter.job.value.keyword": job } });
-            should.push({
-                prefix: {
-                    "filter.job.value.keyword": `${jobCodeArr[0]}.${jobCodeArr[1]}.${jobCodeArr[2]}.${jobCodeArr[3]}.`,
-                },
-            });
-            should.push({ prefix: { "filter.job.value.keyword": `${jobCodeArr[0]}.${jobCodeArr[1]}.${jobCodeArr[2]}.` } });
+            if (suggestionType !== 'accurate') {
+                should.push({
+                    prefix: {
+                        "filter.job.value.keyword": `${jobCodeArr[0]}.${jobCodeArr[1]}.${jobCodeArr[2]}.${jobCodeArr[3]}.`,
+                    },
+                });
+                should.push({ prefix: { "filter.job.value.keyword": `${jobCodeArr[0]}.${jobCodeArr[1]}.${jobCodeArr[2]}.` } });
+            }
             // should.push({ prefix: { "filter.job.value.keyword": `${jobCodeArr[0]}.${jobCodeArr[1]}.` } });
         } else {
             if (!!job) {
@@ -155,7 +158,7 @@ function createSearchQuery(filter: SearchFilters): any {
                 // should.push({ match: { job: career } });
             }
         }
-        searchQuery.query.bool.must.push({
+        conditions.push({
             bool: {
                 should: should,
                 minimum_should_match: 1,
@@ -190,7 +193,7 @@ function createSearchQuery(filter: SearchFilters): any {
                 shouldLocation.push({ match: { workLocation: location.trim() } });
             }
         });
-        searchQuery.query.bool.must.push({
+        conditions.push({
             bool: {
                 should: shouldLocation,
                 minimum_should_match: 1,
@@ -198,7 +201,7 @@ function createSearchQuery(filter: SearchFilters): any {
         });
     }
     if (!!specialConditions && specialConditions.length > 0) {
-        searchQuery.query.bool.should.push({
+        conditions.push({
             terms: {
                 specialConditions: specialConditions,
             },
@@ -219,7 +222,7 @@ function createSearchQuery(filter: SearchFilters): any {
             bool: { must_not: { exists: { field: "gender" } } },
         });
         if (shouldClauses.length > 0) {
-            searchQuery.query.bool.must.push({
+            conditions.push({
                 bool: {
                     should: shouldClauses,
                     minimum_should_match: 1,
@@ -228,7 +231,7 @@ function createSearchQuery(filter: SearchFilters): any {
         }
     }
     if (age && age.length === 2) {
-        searchQuery.query.bool.must.push({
+        conditions.push({
             bool: {
                 should: [{
                     range: {
@@ -246,7 +249,7 @@ function createSearchQuery(filter: SearchFilters): any {
                 minimum_should_match: 1,
             },
         });
-        searchQuery.query.bool.must.push({
+        conditions.push({
             bool: {
                 should: [{
                     range: {
@@ -274,19 +277,25 @@ function createSearchQuery(filter: SearchFilters): any {
         const value = filter[key as keyof SearchFilters];
         if (value === undefined || value === null || value === '' || value === 'all' || (Array.isArray(value) && value.length === 0)) return;
         if (Array.isArray(value)) {
-            searchQuery.query.bool.must.push({
+            conditions.push({
                 terms: {
                     [`filter.${key}.keyword`]: value,
                 },
             });
         } else if (typeof value === 'string') {
-            searchQuery.query.bool.must.push({
+            conditions.push({
                 term: {
                     [`filter.${key}.keyword`]: value,
                 },
             });
         }
     });
+    if (suggestionType === 'related') {
+        searchQuery.query.bool.should = conditions;
+        searchQuery.query.bool.minimum_should_match = 1;
+    } else {
+        searchQuery.query.bool.must = conditions;
+    }
     console.log(JSON.stringify(searchQuery));
     return searchQuery;
 }
