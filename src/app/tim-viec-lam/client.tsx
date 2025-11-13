@@ -11,82 +11,6 @@ import { countJobs, getJobs } from '@/actions/jobs-action';
 import { generateJobFilter, initialSearchFilters, keyMap, sortOptionMap } from '@/lib/job-filter-util';
 
 
-
-
-// Helper function to escape regex special characters
-function escapeRegExp(string: string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
-
-const createSlug = (str: string) => {
-    if (!str) return '';
-    return str
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
-        .replace(/\s+/g, '-')
-        .replace(/[^\w\-.]+/g, '');
-};
-
-
-const parseSalary = (salaryStr?: string): number | null => {
-    if (!salaryStr) return null;
-    const numericStr = String(salaryStr).replace(/[^0-9]/g, '');
-    const value = parseInt(numericStr, 10);
-    return isNaN(value) ? null : value;
-};
-
-const parseExperienceToRange = (expStr?: string): [number, number] => {
-    if (!expStr || expStr === 'Không yêu cầu') return [0, Infinity];
-
-    const cleanedStr = expStr.toLowerCase().replace(',', '.');
-
-    if (cleanedStr.startsWith('dưới')) {
-        const val = parseFloat(cleanedStr.replace(/[^0-9.]/g, ''));
-        return [0, val];
-    }
-    if (cleanedStr.startsWith('trên')) {
-        const val = parseFloat(cleanedStr.replace(/[^0-9.]/g, ''));
-        return [val, Infinity];
-    }
-    const parts = cleanedStr.split('-').map(p => parseFloat(p.trim().replace(/[^0-9.]/g, '')));
-    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-        return [parts[0], parts[1]];
-    }
-    return [0, Infinity]; // Default fallback
-};
-
-const parseAgeRequirement = (ageStr?: string): [number, number] | null => {
-    if (!ageStr) return null;
-    const parts = ageStr.split('-').map(p => parseInt(p.trim(), 10));
-    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-        return [parts[0], parts[1]];
-    }
-    return null;
-};
-
-const parsePhysicalRequirement = (reqStr?: string): [number, number] => {
-    if (!reqStr) return [0, Infinity];
-    const cleanedStr = reqStr.toLowerCase();
-    const numbers = cleanedStr.match(/\d+/g)?.map(Number) || [];
-
-    if (cleanedStr.includes('trên')) {
-        return [numbers[0] || 0, Infinity];
-    }
-    if (cleanedStr.includes('dưới')) {
-        return [0, numbers[0] || Infinity];
-    }
-    if (numbers.length === 2) {
-        return [numbers[0], numbers[1]];
-    }
-    if (numbers.length === 1) {
-        return [numbers[0], numbers[0]]; // Exact match
-    }
-
-    return [0, Infinity];
-};
-
 export default function JobSearchPageContent() {
     const router = useRouter();
     const readOnlySearchParams = useSearchParams();
@@ -97,16 +21,18 @@ export default function JobSearchPageContent() {
 
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
     const [stagedResultCount, setStagedResultCount] = useState<number>(0);
-    const [totalJobs, setTotalJobs] = useState(0);
+    const [totalJobs, setTotalJobs] = useState<number | null>(null);
     const [totalPage, setTotalPage] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
+    const [firstLoad, setFirstLoad] = useState(false);
     const loadedPages = [1];
-
+    console.log('start')
     const runFilter = useCallback(async (filtersToApply: SearchFilters, sortOption: string, page: number) => {
         const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, page, 20);
         setFilteredJobs(jobs);
         setTotalJobs(total);
         setTotalPage(totalPages);
+        setFirstLoad(true);
     }, []);
 
     const countStagedResults = useCallback(async (filtersToCount: SearchFilters) => {
@@ -225,6 +151,7 @@ export default function JobSearchPageContent() {
                 loadMoreJobs={loadMoreJobs}
                 totalPage={totalPage}
                 currentPage={currentPage}
+                firstLoad={firstLoad}
             />
         </div>
     );

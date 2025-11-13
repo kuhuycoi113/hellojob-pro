@@ -10,6 +10,8 @@ import { Job } from "@/lib/mock-data";
 import { ListFilter, Loader2 } from "lucide-react";
 import { JobCard } from "../job-card";
 import { experienceYears } from "@/lib/visa-data";
+import { Card, CardContent } from "../ui/card";
+import { Skeleton } from "../ui/skeleton";
 
 export type SearchFilters = {
     q?: string;
@@ -53,7 +55,7 @@ export { experienceYears };
 
 type SearchResultsProps = {
     jobs: Job[];
-    total: number;
+    total: number | null;
     filters: SearchFilters;
     appliedFilters: SearchFilters;
     onFilterChange: (newFilters: Partial<SearchFilters>) => void;
@@ -65,9 +67,10 @@ type SearchResultsProps = {
     loadMoreJobs: () => void;
     totalPage: number;
     currentPage: number;
+    firstLoad?: boolean;
 }
 
-export const SearchResults = ({ jobs, total, filters, appliedFilters, totalPage, currentPage, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange, loadMoreJobs }: SearchResultsProps) => {
+export const SearchResults = ({ jobs, total, filters, appliedFilters, firstLoad = false, totalPage, currentPage, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange, loadMoreJobs }: SearchResultsProps) => {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const observer = useRef<IntersectionObserver | null>(null);
@@ -111,7 +114,7 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, totalPage,
 
                     <div className="md:col-span-3 lg:col-span-3">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-bold">Kết quả ({total})</h2>
+                            <h2 className="text-xl font-bold">Kết quả {total === null ? '' : `(${total})`}</h2>
                             <div className="flex items-center gap-2">
                                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                                     <SheetTrigger asChild>
@@ -155,7 +158,7 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, totalPage,
                                 </Select>
                             </div>
                         </div>
-                        {jobs.length > 0 ? (
+                        {(totalPage > 0 || !firstLoad) ? (
                             <div className="grid grid-cols-1 gap-4">
                                 {jobs.map((job, index) => {
                                     const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} />;
@@ -170,6 +173,15 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, totalPage,
                                     }
                                     return <div key={job.id}>{card}</div>
                                 })}
+                                {(!firstLoad||isLoadingMore) && Array.from({ length: 4 }).map((_, i) => (
+                                    <Card key={i}>
+                                        <CardContent className="p-3 flex flex-col items-stretch gap-4 md:flex-row">
+                                            <Skeleton className="h-48 w-full flex-shrink-0 md:h-40 md:w-60" />
+                                            <Skeleton className="flex flex-grow flex-col" />
+                                        </CardContent>
+                                    </Card>
+                                ))}
+
                             </div>
                         ) : (
                             <div className="text-center py-16 bg-background rounded-lg">
@@ -177,11 +189,11 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, totalPage,
                                 <p className="text-sm text-muted-foreground mt-2">Hãy thử thay đổi bộ lọc hoặc tìm kiếm lại.</p>
                             </div>
                         )}
-                        {isLoadingMore && (
+                        {/* {isLoadingMore && (
                             <div className="flex justify-center items-center p-4">
                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </div>
             </div>

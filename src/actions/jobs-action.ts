@@ -296,7 +296,6 @@ function createSearchQuery(filter: SearchFilters): any {
     } else {
         searchQuery.query.bool.must = conditions;
     }
-    console.log(JSON.stringify(searchQuery));
     return searchQuery;
 }
 export async function getJobs(filter: SearchFilters, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {
