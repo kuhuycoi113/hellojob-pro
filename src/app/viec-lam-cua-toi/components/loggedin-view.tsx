@@ -110,11 +110,11 @@ export const LoggedInView = () => {
                     onValueChange={setOpenAccordion}
                 >
                     <SuggestedJobs highlight={highlight} />
-                    <AppliedJobs />
-                    <SavedJobs />
+                    <AppliedJobs highlight={highlight} />
+                    <SavedJobs highlight={highlight} />
 
                     {/* CANHANHOA01: New Module */}
-                    <BehavioralJobs />
+                    <BehavioralJobs highlight={highlight} />
                 </Accordion>
             </div>
 

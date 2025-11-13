@@ -7,13 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import { BrainCircuit, Briefcase } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
 
-export default function BehavioralJobs({ }: any) {
-    const router=useRouter();
+export default function BehavioralJobs({ highlight }: { highlight: string | null }) {
+    const router = useRouter();
     const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]);
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -37,7 +38,11 @@ export default function BehavioralJobs({ }: any) {
     }, [fetchSuggestedJobs])
 
     return (
-        <AccordionItem value="item-4" id="behavioral-suggestions" className="border rounded-lg border-b-0">
+        
+        <AccordionItem value="item-4" id="behavioral-suggestions" className={cn(
+            "border-b-0 transition-all duration-500 ease-in-out",
+            highlight === 'behavioral' ? "ring-2 ring-accent-orange ring-offset-2 shadow-2xl rounded-lg bg-accent-orange/10" : "border rounded-lg"
+        )}>
             <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                 <div className="flex items-center gap-3">
                     <BrainCircuit className="h-5 w-5 text-purple-500" />
@@ -61,7 +66,7 @@ export default function BehavioralJobs({ }: any) {
                         </div>
 
                         <div className="text-center mt-8">
-                            <Button onClick={()=>router.push('/tim-viec-lam')} variant={'link'}>
+                            <Button onClick={() => router.push('/tim-viec-lam')} variant={'link'}>
                                 Xem thêm
                             </Button>
                         </div>

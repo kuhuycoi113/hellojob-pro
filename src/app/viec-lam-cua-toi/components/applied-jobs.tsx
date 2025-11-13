@@ -4,11 +4,12 @@ import { JobCard } from "@/components/job-card";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 import { Briefcase } from "lucide-react";
 import React, { useEffect, useState, memo } from "react";
 const MemoizedJobCard = memo(JobCard);
 
-export default function AppliedJobs({ }: any) {
+export default function AppliedJobs({ highlight }: { highlight: string | null }) {
     const { user } = useAuth()
     const [appliedJobs, setAppliedJobs] = useState<any[]>([]);
     useEffect(() => {
@@ -28,7 +29,10 @@ export default function AppliedJobs({ }: any) {
     }
 
     return (
-        <AccordionItem value="item-2" className="border rounded-lg border-b-0">
+        <AccordionItem value="item-2" className={cn(
+            "border-b-0 transition-all duration-500 ease-in-out",
+            highlight === 'applied' ? "ring-2 ring-accent-orange ring-offset-2 shadow-2xl rounded-lg bg-accent-orange/10" : "border rounded-lg"
+        )}>
             <AccordionTrigger className="bg-background px-6 rounded-lg font-semibold text-base hover:no-underline">
                 <div className="flex items-center gap-3">
                     <Briefcase className="h-5 w-5 text-blue-500" />

@@ -91,7 +91,7 @@ export const getGenderLabel = (gender: any) => {
   } else if (gender === "FEMALE") {
     return "Nữ";
   } else if (gender === "BOTH") {
-    return "Cả nam và nữ";
+    return "Nam/Nữ";
   } else {
     return "";
   }

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,13 +18,16 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { Industry, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType } from '@/lib/visa-data';
-import { cn } from '@/lib/utils';
+import { cn, stringifyObject } from '@/lib/utils';
+import { SearchFilters } from './job-search/search-results';
+import JOBS from '@/lib/jobs.json';
+import { getJobs } from '@/actions/jobs-action';
 
 
 const CTAForGuest = ({ onLoginClick }: { onLoginClick: () => void }) => (
     <Card className="text-center py-12 px-6 shadow-lg col-span-full">
         <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
-            <UserPlus className="h-10 w-10 text-primary"/>
+            <UserPlus className="h-10 w-10 text-primary" />
         </div>
         <p className="font-semibold text-lg">Đăng ký để nhận gợi ý việc làm phù hợp</p>
         <p className="text-muted-foreground mt-2 mb-6">Tạo hồ sơ của bạn để AI của chúng tôi có thể tìm ra những cơ hội tốt nhất dành cho bạn.</p>
@@ -39,7 +42,7 @@ const CTAForEmptyProfile = () => {
     const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [profileCreationStep, setProfileCreationStep] = useState(1);
-    const [selectedVisa, setSelectedVisa] = useState<{name: string, slug: string} | null>(null);
+    const [selectedVisa, setSelectedVisa] = useState<{ name: string, slug: string } | null>(null);
     const [selectedVisaDetail, setSelectedVisaDetail] = useState<string | null>(null);
     const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
     const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -48,46 +51,46 @@ const CTAForEmptyProfile = () => {
     const { isLoggedIn, setRole } = useAuth();
     const [isCreateDetailOpen, setIsCreateDetailOpen] = useState(false);
 
-     const handleCreateProfileRedirect = () => {
+    const handleCreateProfileRedirect = () => {
         const preferences = {
-          desiredVisaType: selectedVisa?.name || undefined,
-          desiredVisaDetail: selectedVisaDetail || undefined,
-          desiredIndustry: selectedIndustry?.name || undefined,
-          desiredLocation: selectedRegion || undefined,
+            desiredVisaType: selectedVisa?.name || undefined,
+            desiredVisaDetail: selectedVisaDetail || undefined,
+            desiredIndustry: selectedIndustry?.name || undefined,
+            desiredLocation: selectedRegion || undefined,
         };
-    
-        if (isLoggedIn) {
-          const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
-          let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
-          
-          const updatedAspirations = { ...profile.aspirations };
-          if (preferences.desiredVisaType) updatedAspirations.desiredVisaType = preferences.desiredVisaType;
-          if (preferences.desiredVisaDetail) updatedAspirations.desiredVisaDetail = preferences.desiredVisaDetail;
-          if (preferences.desiredLocation) updatedAspirations.desiredLocation = preferences.desiredLocation;
 
-          profile = {
-            ...profile,
-            aspirations: updatedAspirations,
-          };
-          if (preferences.desiredIndustry) profile.desiredIndustry = preferences.desiredIndustry;
-    
-          localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
-          setRole('candidate');
-          setIsDialogOpen(false);
-          router.push('/viec-lam-cua-toi?highlight=suggested');
+        if (isLoggedIn) {
+            const existingProfileRaw = localStorage.getItem('generatedCandidateProfile');
+            let profile = existingProfileRaw ? JSON.parse(existingProfileRaw) : {};
+
+            const updatedAspirations = { ...profile.aspirations };
+            if (preferences.desiredVisaType) updatedAspirations.desiredVisaType = preferences.desiredVisaType;
+            if (preferences.desiredVisaDetail) updatedAspirations.desiredVisaDetail = preferences.desiredVisaDetail;
+            if (preferences.desiredLocation) updatedAspirations.desiredLocation = preferences.desiredLocation;
+
+            profile = {
+                ...profile,
+                aspirations: updatedAspirations,
+            };
+            if (preferences.desiredIndustry) profile.desiredIndustry = preferences.desiredIndustry;
+
+            localStorage.setItem('generatedCandidateProfile', JSON.stringify(profile));
+            setRole('candidate');
+            setIsDialogOpen(false);
+            router.push('/viec-lam-cua-toi?highlight=suggested');
         } else {
-          sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
-          sessionStorage.setItem('postLoginRedirect', '/viec-lam-cua-toi?highlight=suggested');
-          setIsDialogOpen(false);
-          setIsConfirmLoginOpen(true);
+            sessionStorage.setItem('onboardingPreferences', JSON.stringify(preferences));
+            sessionStorage.setItem('postLoginRedirect', '/viec-lam-cua-toi?highlight=suggested');
+            setIsDialogOpen(false);
+            setIsConfirmLoginOpen(true);
         }
-      };
-    
+    };
+
     const handleConfirmLogin = () => {
         setIsConfirmLoginOpen(false);
         setIsAuthDialogOpen(true);
     };
-    
+
     const handleCreateDetailedProfile = (method: 'ai' | 'manual') => {
         setIsCreateDetailOpen(false);
         setIsDialogOpen(false);
@@ -97,28 +100,28 @@ const CTAForEmptyProfile = () => {
             router.push('/dang-ky');
         }
     };
-    
+
     const FirstStepDialog = () => (
         <>
-        {/* Screen: THSN001 */}
-        <DialogHeader>
-            <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
-            <DialogDescription className="text-center">
-                Bạn muốn tạo hồ sơ để làm gì?
-            </DialogDescription>
-        </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-            <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
-                <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
-                <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
-            </Card>
-             <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
-                <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
-                <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
-            </Card>
-        </div>
+            {/* Screen: THSN001 */}
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-headline text-center">Chọn phương thức tạo hồ sơ</DialogTitle>
+                <DialogDescription className="text-center">
+                    Bạn muốn tạo hồ sơ để làm gì?
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                <Card onClick={() => setProfileCreationStep(2)} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                    <FastForward className="h-8 w-8 text-primary mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Tạo nhanh</h3>
+                    <p className="text-muted-foreground text-xs">Để HelloJob AI gợi ý việc làm phù hợp cho bạn ngay lập tức.</p>
+                </Card>
+                <Card onClick={() => { setIsDialogOpen(false); setIsCreateDetailOpen(true); }} className="text-center p-4 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center">
+                    <ListChecks className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Tạo chi tiết</h3>
+                    <p className="text-muted-foreground text-xs">Để hoàn thiện hồ sơ và sẵn sàng ứng tuyển vào công việc mơ ước.</p>
+                </Card>
+            </div>
         </>
     );
 
@@ -128,34 +131,34 @@ const CTAForEmptyProfile = () => {
             <DialogHeader>
                 <DialogTitle className="text-2xl font-headline text-center">Chọn loại hình lao động</DialogTitle>
                 <DialogDescription className="text-center">
-                Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
+                    Hãy chọn loại hình phù hợp nhất với trình độ và mong muốn của bạn.
                 </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-            <Button 
-                onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }} 
-                variant="outline" 
-                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-                <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
-                <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
-            </Button>
-            <Button 
-                onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }}
-                variant="outline" 
-                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
-                <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
-            </Button>
-            <Button 
-                onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }}
-                variant="outline" 
-                className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
-                <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
-            </Button>
+                <Button
+                    onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'thuc-tap-sinh-ky-nang')!); setProfileCreationStep(3); }}
+                    variant="outline"
+                    className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                    <HardHat className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Thực tập sinh kỹ năng</h3>
+                    <p className="text-muted-foreground text-xs">Lao động phổ thông, 18-40 tuổi.</p>
+                </Button>
+                <Button
+                    onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-nang-dac-dinh')!); setProfileCreationStep(3); }}
+                    variant="outline"
+                    className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                    <UserCheck className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Kỹ năng đặc định</h3>
+                    <p className="text-muted-foreground text-xs">Lao động có hoặc cần thi tay nghề.</p>
+                </Button>
+                <Button
+                    onClick={() => { setSelectedVisa(japanJobTypes.find(t => t.slug === 'ky-su-tri-thuc')!); setProfileCreationStep(3); }}
+                    variant="outline"
+                    className="h-auto p-4 text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-w-[170px] min-h-[140px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                    <GraduationCap className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <h3 className="font-bold text-base mb-1">Kỹ sư, tri thức</h3>
+                    <p className="text-muted-foreground text-xs">Tốt nghiệp CĐ, ĐH, có thể định cư.</p>
+                </Button>
             </div>
             <Button variant="link" onClick={() => setProfileCreationStep(1)} className="mt-4 mx-auto block">Quay lại</Button>
         </>
@@ -164,30 +167,30 @@ const CTAForEmptyProfile = () => {
     const VisaDetailStepDialog = () => {
         if (!selectedVisa) return null;
         const options = visaDetailsByVisaType[selectedVisa.slug] || [];
-        
+
         let screenIdComment = '';
         if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN003-1';
         else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN003-2';
         else if (selectedVisa.slug === 'ky-su-tri-thuc') screenIdComment = '// Screen: THSN003-3';
-        
+
         return (
             <>
-            <span className="hidden">{screenIdComment}</span>
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisa.name}</DialogTitle>
-                <DialogDescription className="text-center">
-                Chọn loại hình chi tiết để tiếp tục.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                {options.map(option => (
-                    <Button key={option.name} onClick={() => { setSelectedVisaDetail(option.name); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
-                        <h3 className="font-bold text-base mb-1">{option.name}</h3>
-                        <p className="text-muted-foreground text-xs">{option.slug}</p>
-                    </Button>
-                ))}
-            </div>
-            <Button variant="link" onClick={() => setProfileCreationStep(2)} className="mt-4 mx-auto block">Quay lại</Button>
+                <span className="hidden">{screenIdComment}</span>
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-headline text-center">Chọn loại {selectedVisa.name}</DialogTitle>
+                    <DialogDescription className="text-center">
+                        Chọn loại hình chi tiết để tiếp tục.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                    {options.map(option => (
+                        <Button key={option.name} onClick={() => { setSelectedVisaDetail(option.name); setProfileCreationStep(4); }} variant="outline" className="h-auto p-4 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center min-w-[160px] whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                            <h3 className="font-bold text-base mb-1">{option.name}</h3>
+                            <p className="text-muted-foreground text-xs">{option.slug}</p>
+                        </Button>
+                    ))}
+                </div>
+                <Button variant="link" onClick={() => setProfileCreationStep(2)} className="mt-4 mx-auto block">Quay lại</Button>
             </>
         )
     };
@@ -195,7 +198,7 @@ const CTAForEmptyProfile = () => {
     const IndustryStepDialog = () => {
         if (!selectedVisa) return null;
         const industries = industriesByJobType[selectedVisa.slug as keyof typeof industriesByJobType] || [];
-        
+
         let screenIdComment = '';
         if (selectedVisa.slug === 'thuc-tap-sinh-ky-nang') screenIdComment = '// Screen: THSN004-1';
         else if (selectedVisa.slug === 'ky-nang-dac-dinh') screenIdComment = '// Screen: THSN004-2';
@@ -212,7 +215,7 @@ const CTAForEmptyProfile = () => {
                 </DialogHeader>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
                     {industries.map(industry => (
-                        <Button key={industry.slug} onClick={() => {setSelectedIndustry(industry); setProfileCreationStep(5);}} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
+                        <Button key={industry.slug} onClick={() => { setSelectedIndustry(industry); setProfileCreationStep(5); }} variant="outline" className="h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary">
                             <p className="font-semibold text-sm">{industry.name}</p>
                         </Button>
                     ))}
@@ -221,12 +224,12 @@ const CTAForEmptyProfile = () => {
             </>
         );
     };
-    
+
     const japanRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
 
     const RegionStepDialog = () => {
         return (
-             <>
+            <>
                 {/* Screen: THSN005 */}
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-headline text-center">Chọn khu vực làm việc</DialogTitle>
@@ -235,11 +238,11 @@ const CTAForEmptyProfile = () => {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 max-h-80 overflow-y-auto">
-                     {japanRegions.map(region => (
-                        <Button 
-                            key={region} 
+                    {japanRegions.map(region => (
+                        <Button
+                            key={region}
                             variant="outline"
-                            onClick={() => setSelectedRegion(region)} 
+                            onClick={() => setSelectedRegion(region)}
                             className={cn(
                                 "h-auto p-3 text-center transition-all duration-300 cursor-pointer h-full flex flex-col items-center justify-center whitespace-normal hover:bg-primary/10 hover:ring-2 hover:ring-primary",
                                 selectedRegion === region ? "ring-2 ring-primary border-primary bg-primary/10" : ""
@@ -268,25 +271,25 @@ const CTAForEmptyProfile = () => {
             default: return <FirstStepDialog />;
         }
     }
-    
+
     return (
         <>
             <Card className="text-center py-12 px-6 shadow-lg col-span-full">
-                 <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
+                <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
                     <UserPlus className="h-10 w-10 text-primary" />
                 </div>
                 <p className="font-semibold text-lg">Tạo hồ sơ để được hiển thị việc làm phù hợp</p>
                 <p className="text-muted-foreground mt-2 mb-6">Hoàn thiện hồ sơ của bạn để nhận được những gợi ý việc làm phù hợp nhất từ HelloJob AI.</p>
-                 <div className="mt-6 flex flex-wrap gap-4 justify-center">
-                     <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
+                <div className="mt-6 flex flex-wrap gap-4 justify-center">
+                    <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setProfileCreationStep(1); }}>
                         <DialogTrigger asChild>
-                           <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
+                            <Button className="bg-accent-orange hover:bg-accent-orange/90 text-white">
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 Tạo hồ sơ nhanh
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-2xl">
-                           {renderDialogContent()}
+                            {renderDialogContent()}
                         </DialogContent>
                     </Dialog>
                     <Dialog open={isCreateDetailOpen} onOpenChange={setIsCreateDetailOpen}>
@@ -312,7 +315,7 @@ const CTAForEmptyProfile = () => {
                                     <p className="text-muted-foreground text-xs">Tự điền thông tin vào biểu mẫu chi tiết.</p>
                                 </Card>
                             </div>
-                             <div className="mt-4 text-center">
+                            <div className="mt-4 text-center">
                                 <Button variant="link" onClick={() => { setIsCreateDetailOpen(false); setIsDialogOpen(true); }}>Quay lại</Button>
                             </div>
                         </DialogContent>
@@ -320,19 +323,19 @@ const CTAForEmptyProfile = () => {
                 </div>
             </Card>
             <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-             <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
+            <AlertDialog open={isConfirmLoginOpen} onOpenChange={setIsConfirmLoginOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                    <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Bạn cần có tài khoản để lưu các lựa chọn và xem việc làm phù hợp. Đi đến trang đăng ký/đăng nhập?
-                    </AlertDialogDescription>
+                        <AlertDialogTitle>Bạn chưa đăng nhập</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Bạn cần có tài khoản để lưu các lựa chọn và xem việc làm phù hợp. Đi đến trang đăng ký/đăng nhập?
+                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel>Từ chối</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleConfirmLogin}>
-                        Đồng ý
-                    </AlertDialogAction>
+                        <AlertDialogCancel>Từ chối</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmLogin}>
+                            Đồng ý
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -341,96 +344,90 @@ const CTAForEmptyProfile = () => {
 };
 
 export function CtaViecLamGoiY() {
-  const { role, isLoggedIn } = useAuth();
-  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [suggestions, setSuggestions] = useState<Job[]>([]);
+    const router = useRouter();
+    const { role, isLoggedIn, user } = useAuth();
+    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [suggestions, setSuggestions] = useState<Job[]>([]);
 
-//   const fetchSuggestions = useCallback(async () => {
-//     if (role === 'guest' || role === 'candidate-empty-profile') {
-//         setIsLoading(false);
-//         return;
-//     }
-    
-//     setIsLoading(true);
-//     try {
-//         const storedProfile = localStorage.getItem('generatedCandidateProfile');
-//         if (storedProfile) {
-//             const profile: Partial<CandidateProfile> = JSON.parse(storedProfile);
-//             const matchResults = await matchJobsToProfile(profile, 'related');
-//             setSuggestions(matchResults.map(r => r.job).slice(0, 4));
-//         } else {
-//             // Fallback for logged-in users without a profile somehow
-//             setSuggestions(jobData.slice(0, 4));
-//         }
-//     } catch (error) {
-//         console.error("Failed to fetch job suggestions for CTA:", error);
-//         setSuggestions(jobData.slice(0, 4)); // Fallback on error
-//     } finally {
-//         setIsLoading(false);
-//     }
-//   }, [role]);
+    const fetchSuggestions = useCallback(async () => {
+        if (role === 'guest' || role === 'candidate-empty-profile' || !user) {
+            setIsLoading(false);
+            return;
+        }
 
-//   useEffect(() => {
-//     fetchSuggestions();
-//      // Re-fetch when profile changes
-//     const handleStorageChange = (event: StorageEvent) => {
-//       if (event.key === 'generatedCandidateProfile' || event.key === null) {
-//         fetchSuggestions();
-//       }
-//     };
-//     window.addEventListener('storage', handleStorageChange);
-//     return () => {
-//       window.removeEventListener('storage', handleStorageChange);
-//     };
-//   }, [fetchSuggestions]);
-  
-  const handleLoginClick = () => {
-      setIsAuthDialogOpen(true);
-  }
+        try {
+            const aspirations = user.aspirations;
+            setIsLoading(true);
+            if (!!aspirations) {
+                const filters: SearchFilters = stringifyObject(aspirations);
+                if (filters.job) {
+                    const visaCode = japanJobTypes.find(v => v.name === filters.visa)?.code ?? '';
+                    const jobCode = JOBS.find(j => j.label === filters.job && j.value.startsWith(visaCode))?.value;
+                    filters.job = jobCode ?? '';
+                }
+                const { docs: jobs, total, totalPages } = await getJobs(filters, 1, 4);
+                setSuggestions([...jobs]);
+            }
+        } catch (error) {
 
-  const renderContent = () => {
-    if (!isLoggedIn) {
-        return <CTAForGuest onLoginClick={handleLoginClick} />;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [role]);
+
+    useEffect(() => {
+        fetchSuggestions();
+    }, [fetchSuggestions]);
+
+    const handleLoginClick = () => {
+        setIsAuthDialogOpen(true);
     }
-    if (role === 'candidate-empty-profile') {
-        return <CTAForEmptyProfile />;
-    }
-    if (isLoading) {
+
+    const renderContent = () => {
+        if (!isLoggedIn) {
+            return <CTAForGuest onLoginClick={handleLoginClick} />;
+        }
+        if (role === 'candidate-empty-profile') {
+            return <CTAForEmptyProfile />;
+        }
+        if (isLoading) {
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
+                </div>
+            );
+        }
+        if (suggestions.length === 0) {
+            return (
+                <div className="col-span-full">
+                    <CTAForEmptyProfile />
+                </div>
+            );
+        }
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
-          </div>
-        );
-    }
-    if (suggestions.length === 0) {
-        return (
-            <div className="col-span-full">
-                <CTAForEmptyProfile />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {suggestions.map((job) => (
+                    <JobCard key={job.id} job={job} />
+                ))}
             </div>
         );
-    }
+    };
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {suggestions.map((job) => (
-                <JobCard key={job.id} job={job} />
-            ))}
-        </div>
-    );
-  };
-  
-  return (
-    <section id="VIECLAMGOIY01" className="w-full">
-        <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-2xl font-headline font-bold text-left mb-8">
-                <Star className="inline-block mr-3 text-yellow-500 h-8 w-8" />
-                Gợi ý việc làm dành cho bạn
-            </h2>
-            {renderContent()}
-            <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-        </div>
-    </section>
-  )
+        <section id="VIECLAMGOIY01" className="w-full">
+            <div className="container mx-auto px-4 md:px-6">
+                <div className='flex'>
+                    <h2 className="text-2xl font-headline font-bold text-left mb-8">
+                        <Star className="inline-block mr-3 text-yellow-500 h-8 w-8" />
+                        Gợi ý việc làm dành cho bạn
+                    </h2>
+                    <Button variant={'link'} className='ml-auto' onClick={() => router.push('/viec-lam-cua-toi?highlight=suggested')}>Xem tất cả</Button>
+                </div>
+                {renderContent()}
+                <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
+            </div>
+        </section>
+    )
 }
 
-    
