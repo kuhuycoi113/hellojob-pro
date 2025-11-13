@@ -24,7 +24,7 @@ export default function BehavioralJobs({ }: any) {
     const fetchSuggestedJobs = useCallback(async () => {
         setIsLoadingBehavioral(true);
         const filters: SearchFilters = {};
-        const { docs: jobs, total, totalPages } = await getJobs(filters, 1, currentPage * 9);
+        const { docs: jobs, total, totalPages } = await getJobs(filters, 1, currentPage * 12);
         setBehavioralSuggestedJobs(jobs);
         setTotalJobs(total);
         setTotalPage(totalPages);
