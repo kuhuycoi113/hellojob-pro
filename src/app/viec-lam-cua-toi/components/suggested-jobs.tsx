@@ -48,25 +48,42 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
                 const jobCode = JOBS.find(j => j.label === filters.job && j.value.startsWith(visaCode))?.value;
                 filters.job = jobCode ?? '';
             }
-            const { docs: jobs, total, totalPages } = await getJobs(filters, currentPage, 12);
-            setSuggestedJobs(prev => [...prev, ...jobs]);
+            const { docs: jobs, total, totalPages } = await getJobs(filters, 1, 12);
+            setSuggestedJobs([...jobs]);
             setTotalJobs(total);
             setTotalPage(totalPages);
             setIsLoadingSuggestions(false);
             console.log('User aspirations:', filters);
             setFirstLoad(true);
         }
-    }, [user.aspirations, currentPage]);
+    }, [user.aspirations]);
+    // useEffect(() => {
+    //     setFirstLoad(false);
+    // }, [user.aspirations])
 
     useEffect(() => {
         fetchSuggestedJobs();
     }, [fetchSuggestedJobs])
 
-    const handleLoadMore = () => {
+    const handleLoadMore = async () => {
         setIsLoadingMore(true);
-        setCurrentPage(prev => prev + 1);
-        setIsLoadingMore(false);
-    };
+        setIsLoadingSuggestions(true);
+
+        const aspirations = user.aspirations;
+        if (!!aspirations) {
+            const filters: SearchFilters = stringifyObject(aspirations);
+            if (filters.job) {
+                const visaCode = japanJobTypes.find(v => v.name === filters.visa)?.code ?? '';
+                const jobCode = JOBS.find(j => j.label === filters.job && j.value.startsWith(visaCode))?.value;
+                filters.job = jobCode ?? '';
+            }
+            const { docs: jobs } = await getJobs(filters, currentPage + 1, 12);
+            setSuggestedJobs(prev => [...prev, ...jobs]);
+            setIsLoadingMore(false);
+            setIsLoadingSuggestions(false);
+            setCurrentPage(prev => prev + 1);
+        };
+    }
 
     return (<>
         <AccordionItem value="item-1" className={cn(

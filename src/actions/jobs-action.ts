@@ -23,22 +23,10 @@ function createSearchQuery(filter: SearchFilters): any {
             bool: {
                 filter: [
                     {
-                        bool: {
-                            should: [
-                                {
-                                    range: {
-                                        createdDate: {
-                                            gte: 1762502844446,
-                                        },
-                                    },
-                                },
-                                {
-                                    terms: {
-                                        "source.keyword": ["MANUAL", "PARTNER"],
-                                    },
-                                },
-                            ],
-                            minimum_should_match: 1,
+                        range: {
+                            createdDate: {
+                                gte: 1762502844446,
+                            },
                         },
                     },
                     {

@@ -273,7 +273,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                             <h1 className="text-2xl md:text-3xl font-bold font-headline">{job.title}</h1>
                                             <div id="IDVLCT01" className="flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-xs font-bold text-white w-fit my-3">
                                                 <Image src="/img/japanflag.png" alt="Japan flag" width={16} height={16} className="h-3 w-auto" />
-                                                <span>{job.id}</span>
+                                                <span>{job.code}</span>
                                             </div>
                                             {isClient && job.visa && (
                                                 <Badge
