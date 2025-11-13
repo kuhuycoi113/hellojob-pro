@@ -88,8 +88,10 @@ export const LoggedInView = () => {
             nextUrl.searchParams.delete('highlight');
             router.replace(nextUrl.toString(), { scroll: false });
             clearLastAction();
+        } else {
+            setOpenAccordion('item-1');
         }
-    }, [searchParams, router]);
+    }, []);
 
 
 

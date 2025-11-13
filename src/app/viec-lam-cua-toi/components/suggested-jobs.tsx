@@ -60,10 +60,8 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
-        setTimeout(() => {
-            setCurrentPage(prev => prev + 8);
-            setIsLoadingMore(false);
-        }, 500); // Simulate network delay
+        setCurrentPage(prev => prev + 8);
+        setIsLoadingMore(false);
     };
 
     return (<>

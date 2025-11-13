@@ -1,5 +1,7 @@
 "use client";
+import { getJobs } from "@/actions/jobs-action";
 import { JobCard } from "@/components/job-card";
+import { SearchFilters } from "@/components/job-search/search-results";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,11 +9,32 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BrainCircuit, Briefcase } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useCallback, useEffect, useState } from "react";
 
 export default function BehavioralJobs({ }: any) {
+    const router=useRouter();
     const [behavioralSuggestedJobs, setBehavioralSuggestedJobs] = useState<any[]>([]);
     const [isLoadingBehavioral, setIsLoadingBehavioral] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalJobs, setTotalJobs] = useState(0);
+    const [totalPage, setTotalPage] = useState(0);
+    const fetchSuggestedJobs = useCallback(async () => {
+        setIsLoadingBehavioral(true);
+        const filters: SearchFilters = {};
+        const { docs: jobs, total, totalPages } = await getJobs(filters, 1, currentPage * 9);
+        setBehavioralSuggestedJobs(jobs);
+        setTotalJobs(total);
+        setTotalPage(totalPages);
+        setIsLoadingBehavioral(false);
+        console.log('User aspirations:', filters);
+    }, [currentPage]);
+
+    useEffect(() => {
+        fetchSuggestedJobs();
+    }, [fetchSuggestedJobs])
 
     return (
         <AccordionItem value="item-4" id="behavioral-suggestions" className="border rounded-lg border-b-0">
@@ -19,7 +42,7 @@ export default function BehavioralJobs({ }: any) {
                 <div className="flex items-center gap-3">
                     <BrainCircuit className="h-5 w-5 text-purple-500" />
                     <span>Có thể bạn quan tâm</span>
-                    <Badge variant="secondary">{isLoadingBehavioral ? '...' : behavioralSuggestedJobs.length}</Badge>
+                    <Badge variant="secondary">{isLoadingBehavioral ? '...' : totalJobs}</Badge>
                 </div>
             </AccordionTrigger>
             <AccordionContent className="bg-background p-6 rounded-b-lg">
@@ -30,11 +53,19 @@ export default function BehavioralJobs({ }: any) {
                         ))}
                     </div>
                 ) : behavioralSuggestedJobs.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {behavioralSuggestedJobs.map((item) => (
-                            <JobCard key={item.job.id} job={item.job} showRecruiterName={false} showPostedTime={true} />
-                        ))}
-                    </div>
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {behavioralSuggestedJobs.map((item) => (
+                                <JobCard key={item.id} job={item} showRecruiterName={false} showPostedTime={true} />
+                            ))}
+                        </div>
+
+                        <div className="text-center mt-8">
+                            <Button onClick={()=>router.push('/tim-viec-lam')} variant={'link'}>
+                                Xem thêm
+                            </Button>
+                        </div>
+                    </>
                 ) : (
                     <div className="text-center py-8 text-muted-foreground">
                         <p>Hãy xem và lưu một vài công việc để chúng tôi có thể gợi ý tốt hơn cho bạn!</p>
