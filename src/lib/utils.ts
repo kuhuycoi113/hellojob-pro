@@ -104,7 +104,7 @@ export const generateBulletJobCrawl = (data: any) => {
     job ?? career,
     workLocation,
     languageLevel,
-    numberRecruits ? `${numberRecruits} ${getGenderLabel(gender)}` : null,
+    numberRecruits ? `${numberRecruits} ${getGenderLabel(gender)}` : gender ? getGenderLabel(gender) : null,
     basicSalary ? `LCB ${formatSalaryForDisplay(basicSalary, formatVisa(visa))}` : null,
     specialConditions ? specialConditions.join(",") : null,
   ]
