@@ -1,0 +1,137 @@
+[
+  {
+    "label": "JLPT N5",
+    "value": "N5",
+    "level": 0,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "JLPT"
+  },
+  {
+    "label": "JLPT N4",
+    "value": "N4",
+    "level": 1,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "JLPT"
+  },
+  {
+    "label": "JLPT N3",
+    "value": "N3",
+    "level": 2,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "JLPT"
+  },
+  {
+    "label": "JLPT N2",
+    "value": "N2",
+    "level": 3,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "JLPT"
+  },
+  {
+    "label": "JLPT N1",
+    "value": "N1",
+    "level": 4,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "JLPT"
+  },
+  {
+    "label": "Kaiwa N5",
+    "value": "KN5",
+    "level": 0,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Kaiwa"
+  },
+  {
+    "label": "Kaiwa N4",
+    "value": "KN4",
+    "level": 1,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Kaiwa"
+  },
+  {
+    "label": "Kaiwa N3",
+    "value": "KN3",
+    "level": 2,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Kaiwa"
+  },
+  {
+    "label": "Kaiwa N2",
+    "value": "KN2",
+    "level": 3,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Kaiwa"
+  },
+  {
+    "label": "Kaiwa N1",
+    "value": "KN1",
+    "level": 4,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Kaiwa"
+  },
+  {
+    "label": "Trình độ tương đương N5",
+    "value": "TDN5",
+    "level": 0,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Trình độ tương đương"
+  },
+  {
+    "label": "Trình độ tương đương N4",
+    "value": "TDN4",
+    "level": 1,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Trình độ tương đương"
+  },
+  {
+    "label": "Trình độ tương đương N3",
+    "value": "TDN3",
+    "level": 2,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Trình độ tương đương"
+  },
+  {
+    "label": "Trình độ tương đương N2",
+    "value": "TDN2",
+    "level": 3,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Trình độ tương đương"
+  },
+  {
+    "label": "Trình độ tương đương N1",
+    "value": "TDN1",
+    "level": 4,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Trình độ tương đương"
+  }
+]

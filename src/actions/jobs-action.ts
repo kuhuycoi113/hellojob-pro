@@ -5,6 +5,7 @@ import { countDocuments, searchDocuments } from "@/lib/elasticsearch";
 import { PaginatedResponse } from "@/lib/types";
 import { visaMapping } from "@/lib/visa-data";
 import JOBS from '@/lib/jobs.json';
+import LANGUAGE_LEVEL from "@/lib/language_level.json";
 const CANDIDATES_INDEX = 'hellojobv5-job-crawled';
 
 function createSearchQuery(filter: SearchFilters): any {
@@ -195,7 +196,6 @@ function createSearchQuery(filter: SearchFilters): any {
             },
         });
     }
-    console.log(gender)
     if (!!gender && gender.length > 0) {
         let genderValues: string[] = [];
         if (gender === "nam") {
@@ -257,11 +257,24 @@ function createSearchQuery(filter: SearchFilters): any {
             },
         });
     }
+    if (!!languageRequirement && languageRequirement.length > 0) {
+        const level = LANGUAGE_LEVEL.find(level => level.label === languageRequirement.replaceAll('-', ' ').toUpperCase());
+        console.log(level)
+        if (!!level) {
+            const levelType = level.type;
+            const levels = LANGUAGE_LEVEL.filter(lv => lv.type === levelType && lv.level <= level.level).map(lv => lv.label);
+            conditions.push({
+                terms: {
+                    "languageLevel.keyword": levels,
+                },
+            });
+        }
+    }
     Object.keys(filter).forEach((key) => {
         // Bỏ qua các trường đặc biệt đã xử lý ở trên
         if (['visa', 'visaDetail', 'workLocation', 'specialConditions', 'career', 'job', 'gender', 'age',
             'interviewDateType', 'q', 'height', 'realSalary', 'basicSalary', 'fee', 'interviewLocation', 'suggestionType',
-            'tattooRequirement', 'weight'].includes(key)) return;
+            'languageRequirement', 'tattooRequirement', 'weight'].includes(key)) return;
 
         const value = filter[key as keyof SearchFilters];
         if (value === undefined || value === null || value === '' || value === 'all' || (Array.isArray(value) && value.length === 0)) return;
@@ -285,6 +298,7 @@ function createSearchQuery(filter: SearchFilters): any {
     } else {
         searchQuery.query.bool.must = conditions;
     }
+    delete searchQuery.sort
     console.log(JSON.stringify(searchQuery));
     return searchQuery;
 }
