@@ -195,6 +195,7 @@ function createSearchQuery(filter: SearchFilters): any {
             },
         });
     }
+    console.log(gender)
     if (!!gender && gender.length > 0) {
         let genderValues: string[] = [];
         if (gender === "nam") {
@@ -206,9 +207,9 @@ function createSearchQuery(filter: SearchFilters): any {
         if (genderValues.length > 0) {
             shouldClauses.push({ terms: { "gender.keyword": genderValues } });
         }
-        shouldClauses.push({
-            bool: { must_not: { exists: { field: "gender" } } },
-        });
+        // shouldClauses.push({
+        //     bool: { must_not: { exists: { field: "gender" } } },
+        // });
         if (shouldClauses.length > 0) {
             conditions.push({
                 bool: {
@@ -284,6 +285,7 @@ function createSearchQuery(filter: SearchFilters): any {
     } else {
         searchQuery.query.bool.must = conditions;
     }
+    console.log(JSON.stringify(searchQuery));
     return searchQuery;
 }
 export async function getJobs(filter: SearchFilters, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {

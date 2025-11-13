@@ -339,7 +339,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         <RequirementItem icon={ChevronsRight} label="Chi tiết Visa" value={job.visa} />
                                         <RequirementItem icon={Briefcase} label="Ngành nghề" value={job.job ?? job.career ?? 'Liên hệ'} />
                                         <RequirementItem icon={MapPin} label="Nơi phỏng vấn" value={job.interviewLocation ?? 'Liên hệ'} />
-                                        <RequirementItem icon={User} label="Giới tính" value={job.gender ?? 'Liên hệ'} />
+                                        <RequirementItem icon={User} label="Giới tính" value={job.gender ? formatGender(job.gender) : 'Liên hệ'} />
                                         <RequirementItem icon={Users} label="Số lượng" value={job.numberRecruits ? `${job.numberRecruits} người` : null} />
                                         <RequirementItem icon={Cake} label="Yêu cầu tuổi" value={job.minAge && job.maxAge ? `${job.minAge} - ${job.maxAge}` : job.minAge ? `Từ ${job.minAge}` : job.maxAge ? `Đến ${job.maxAge}` : null} />
                                         <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageLevel ?? 'Không yêu cầu'} />
@@ -371,7 +371,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
 
                                 <JobDetailSection title="Mô tả công việc & Ghi chú" icon={FileText}>
                                     <div>
-                                        <p>Mô tả chi tiết cho công việc {(job.career || job.job) && <strong>{job.job ?? job.career}, {job.workLocation}{job.numberRecruits ? `, tuyển ${job.numberRecruits} ${formatGender(job.gender)} người` : ''}</strong>}
+                                        <p>Mô tả chi tiết cho công việc {(job.career || job.job) && <strong>{job.job ?? job.career}, {job.workLocation}{job.numberRecruits ? `, tuyển ${job.numberRecruits} ${job.gender ? formatGender(job.gender) : 'người'}` : ''}</strong>}
                                             . Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản
                                             . Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p>
                                         <ul>
