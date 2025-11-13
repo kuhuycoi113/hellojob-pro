@@ -92,9 +92,8 @@ const AuthContent: FC<{ children: React.ReactElement, onOpenChange: (open: boole
     })
   }
   return (
-
-    <div className='grid grid-cols-1 md:grid-cols-2 gap-0'>
-      <div className="p-8 md:p-12 flex flex-col justify-center">
+    <div className="w-full max-w-4xl overflow-hidden rounded-lg shadow-2xl md:grid md:grid-cols-2 relative">
+      <div className="bg-background p-8 md:p-12 flex flex-col justify-center">
         {children}
         <div className="space-y-3">
           <Button variant="outline" className="w-full justify-start h-12 text-base"
@@ -115,8 +114,8 @@ const AuthContent: FC<{ children: React.ReactElement, onOpenChange: (open: boole
           </Button>
         </div>
 
-        <div className="mt-auto pt-8 flex flex-col">
-          <p className="text-xs text-muted-foreground">
+        <div className="mt-auto flex flex-col">
+          <p className="mt-6 text-center text-xs text-muted-foreground">
             Bằng việc tiếp tục, bạn đồng ý với {' '}
             <a href="#" className="underline underline-offset-4 hover:text-primary">
               Điều khoản dịch vụ
