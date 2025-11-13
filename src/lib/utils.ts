@@ -7,6 +7,7 @@ import { japanJobTypes, visaDetailsByVisaType } from "./visa-data";
 import { SearchFilters } from "@/components/job-search/search-results";
 import { User } from "@/contexts/AuthContext";
 import { publicFeeLimits } from "./mock-data";
+import { formatDate } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -438,4 +439,23 @@ export function getVisaBadgeClassName(visa: string) {
     badgeClassName += "border-accent-orange/70 bg-orange-50 text-orange-500";
   }
   return badgeClassName;
+}
+
+export function stringifyObject(obj: Record<string, any>): Record<string, string | Array<string> | null> {
+  const result: Record<string, string | Array<string> | null> = {};
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key];
+      if (value === null) {
+        result[key] = null;
+      } else if (value instanceof Date) {
+        result[key] = formatDate(value, 'yyyy-MM-dd');
+      } else if (value instanceof Array) {
+        result[key] = value;
+      } else {
+        result[key] = String(value);
+      }
+    }
+  }
+  return result;
 }

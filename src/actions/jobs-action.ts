@@ -11,7 +11,7 @@ function createSearchQuery(filter: SearchFilters): any {
 
     const {
         q, visaDetail, career, workLocation, job, interviewLocation, numberRecruits, netFee, netFeeNoTicket, interviewRounds, interviewDate, interviewDateType,
-        basicSalary, netSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
+        basicSalary, realSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
         age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
         otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement
     } = filter;
@@ -98,14 +98,14 @@ function createSearchQuery(filter: SearchFilters): any {
     };
     if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== "") {
         console.log(visaDetail)
-        const visaLabel = visaMapping[visaDetail as keyof typeof visaMapping];
+        const visaLabel = visaMapping[visaDetail as keyof typeof visaMapping] ?? visaDetail;
         searchQuery.query.bool.must.push({
             term: {
                 "visa.keyword": visaLabel,
             },
         });
     }
-    if (["thực tập sinh 3 năm", "thực tập sinh 1 năm"].includes(visaDetail)) {
+    if (["thực tập sinh 3 năm", "thực tập sinh 1 năm"].includes(visaDetail ?? '')) {
         searchQuery.query.bool.must.push({
             bool: {
                 should: [
@@ -267,7 +267,9 @@ function createSearchQuery(filter: SearchFilters): any {
     }
     Object.keys(filter).forEach((key) => {
         // Bỏ qua các trường đặc biệt đã xử lý ở trên
-        if (['visa', 'visaDetail', 'workLocation', 'specialConditions', 'career', 'job', 'gender', 'age', 'interviewDateType', 'q', 'height', 'weight'].includes(key)) return;
+        if (['visa', 'visaDetail', 'workLocation', 'specialConditions', 'career', 'job', 'gender', 'age',
+            'interviewDateType', 'q', 'height', 'realSalary', 'basicSalary', 'fee', 'interviewLocation', 'suggestionType',
+            'tattooRequirement', 'weight'].includes(key)) return;
 
         const value = filter[key as keyof SearchFilters];
         if (value === undefined || value === null || value === '' || value === 'all' || (Array.isArray(value) && value.length === 0)) return;
@@ -285,6 +287,7 @@ function createSearchQuery(filter: SearchFilters): any {
             });
         }
     });
+    console.log(JSON.stringify(searchQuery));
     return searchQuery;
 }
 export async function getJobs(filter: SearchFilters, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {

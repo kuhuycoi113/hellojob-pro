@@ -10,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronDown, CalendarIcon, SlidersHorizontal, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CandidateProfile } from '@/ai/schemas';
-import { Industry, industriesByJobType, allIndustries } from '@/lib/industry-data';
+import { CAREERS, Industry, industriesByJobType } from '@/lib/industry-data';
 import { japanJobTypes, visaDetailsByVisaType, allSpecialConditions, experienceYears, languageLevels, educationLevels, tattooRequirements } from '@/lib/visa-data';
 import { locations, interviewLocations, japanRegions, allJapanLocations } from '@/lib/location-data';
 import { format } from 'date-fns';
@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { updateProfile } from '@/actions/user-action';
+import JOBS from '@/lib/jobs.json';
 
 const JPY_VND_RATE = 180;
 const USD_VND_RATE = 26300;
@@ -79,13 +80,13 @@ interface EditAspirationsDialogProps {
     onOpenChange: (open: boolean) => void;
 }
 //
-
+const allIndustries = Object.values(CAREERS).flat();
 export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
     isOpen,
     onOpenChange
 }) => {
     const { user } = useAuth();
-    const [availableIndustries, setAvailableIndustries] = useState<Industry[]>(allIndustries);
+    const [availableIndustries, setAvailableIndustries] = useState<string[]>(allIndustries);
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const isMobile = useIsMobile();
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -108,20 +109,24 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
             : Object.keys(visaDetailsByVisaType).find(key =>
                 (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === tempAspirations.visaDetail)
             );
-
-        const industries = parentVisaSlug ? (industriesByJobType[parentVisaSlug as keyof typeof industriesByJobType] || allIndustries) : allIndustries;
-        const uniqueIndustries = Array.from(new Map(industries.map(item => [item.name, item])).values());
-        setAvailableIndustries(uniqueIndustries);
-    }, [tempAspirations.visa, tempAspirations.visaDetail]);
+        const industries = CAREERS[parentVisaSlug as keyof typeof CAREERS] || allIndustries;
+        setAvailableIndustries(industries ?? []);
+    }, [tempAspirations.visaDetail]);
 
     useEffect(() => {
         // done
         if (tempAspirations.career) {
-            const selectedIndustryData = allIndustries.find(ind => ind.name === tempAspirations.career);
-            const jobs = selectedIndustryData?.keywords || [];
-            setAvailableJobDetails(jobs);
+            const parentVisaSlug = tempAspirations.visa
+                ? japanJobTypes.find(jt => jt.name === tempAspirations.visa)?.slug
+                : Object.keys(visaDetailsByVisaType).find(key =>
+                    (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === tempAspirations.visaDetail)
+                );
+            const visaCode = japanJobTypes.find(v => v.slug === parentVisaSlug)?.code;
+            const parentIndustry = tempAspirations.career;
+            const jobDetails = JOBS.filter(item => item.parent === parentIndustry && item.value.startsWith(visaCode || ''))?.map(j => j.label) || [];
+            setAvailableJobDetails(jobDetails);
             // Reset job detail if industry changes
-            if (!jobs.includes(tempAspirations.job as string)) {
+            if (!jobDetails.includes(tempAspirations.job as string)) {
                 setTempAspirations(prev => ({ ...prev, job: null }));
             }
         } else {
@@ -394,7 +399,7 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {availableIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                        {availableIndustries.map(ind => <SelectItem key={ind} value={ind}>{ind}</SelectItem>)}
                                     </SelectContent>
                                 </Select>
                             </div>

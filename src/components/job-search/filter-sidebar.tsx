@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Slider } from "@/components/ui/slider";
 import { CAREERS, industriesByJobType, type Industry } from "@/lib/industry-data";
 import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2 } from "lucide-react";
-import { japanRegions, allJapanLocations, interviewLocations } from '@/lib/location-data';
+import { interviewLocations } from '@/lib/location-data';
 import { type SearchFilters, experienceYears } from './search-results';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,7 +22,6 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format, parse } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { jobData } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
 import { japanJobTypes, visaDetailsByVisaType, workShifts, allSpecialConditions, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, visionRequirements, tattooRequirements } from '@/lib/visa-data';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
@@ -244,10 +243,10 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
                     id="net-salary-jpy"
                     type="text"
                     placeholder="VD: 160,000"
-                    onChange={(e) => handleSalaryInputChange(e, 'netSalary', 10000000, onFilterChange)}
-                    value={getDisplayValue(filters.netSalary)}
+                    onChange={(e) => handleSalaryInputChange(e, 'realSalary', 10000000, onFilterChange)}
+                    value={getDisplayValue(filters.realSalary)}
                 />
-                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.netSalary, 'VD: 160,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
+                <p className="text-xs text-muted-foreground">{getConvertedValue(filters.realSalary, 'VD: 160,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
             </div>
         </div>
     );
@@ -255,7 +254,7 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
 MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 const japanProvinces = PROVINCES.filter((item) => item.groupCode === "JP");
 
-export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply, onReset, resultCount }: FilterSidebarProps) => {
+export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply, onReset }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<any[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<String[]>(allIndustries);
     const isMobile = useIsMobile();
@@ -686,7 +685,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                 <div className="flex items-center gap-2 py-2 text-sm hover:no-underline" >
                                                     <Checkbox
                                                         id={`region-${region}`}
-                                                        checked={Array.isArray(filters.workLocation) && japanRegions[region].every(p => filters.workLocation.includes(p.label))}
+                                                        checked={Array.isArray(filters.workLocation) && japanRegions[region].every(p => (filters.workLocation??[]).includes(p.label))}
                                                         onCheckedChange={(checked) => {
                                                             const currentSelection = new Set(Array.isArray(filters.workLocation) ? filters.workLocation : []);
                                                             if (checked) {

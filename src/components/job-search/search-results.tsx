@@ -14,11 +14,11 @@ import { experienceYears } from "@/lib/visa-data";
 
 export type SearchFilters = {
     q?: string;
-    visa: string;
-    visaDetail: string;
-    career: string;
-    workLocation: string[];
-    interviewLocation: string;
+    visa?: string;
+    visaDetail?: string;
+    career?: string;
+    workLocation?: string[];
+    interviewLocation?: string;
     job?: string;
     experienceRequirement?: string;
     gender?: 'nam' | 'nu' | '';
@@ -26,7 +26,7 @@ export type SearchFilters = {
     weight?: [number, number];
     age?: [number, number];
     basicSalary?: string;
-    netSalary?: string;
+    realSalary?: string;
     hourlySalary?: string;
     annualIncome?: string;
     annualBonus?: string;

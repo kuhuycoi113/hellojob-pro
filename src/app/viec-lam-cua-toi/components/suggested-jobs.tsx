@@ -5,21 +5,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import { cn, stringifyObject } from '@/lib/utils';
 import { Loader2, Pencil, Star } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { EditAspirationsDialog } from './edit-aspirations-dialog';
-import { CandidateProfile } from '@/ai/schemas';
-import { toast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { EmptyProfileView } from "./empty-profile-view";
-import { visaDetailsByVisaType } from "@/lib/visa-data";
-import { industriesByJobType } from "@/lib/industry-data";
 import { useAuth } from '@/contexts/AuthContext';
 import { notFound } from 'next/navigation';
-import { updateProfile } from '@/actions/user-action';
+import { japanJobTypes } from '@/lib/visa-data';
+import JOBS from '@/lib/jobs.json';
+import { getJobs } from '@/actions/jobs-action';
+import { SearchFilters } from '@/components/job-search/search-results';
 
 export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highlight }) => {
     const { role, user } = useAuth();
@@ -27,25 +23,46 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
         return notFound();
     }
     const [suggestedJobs, setSuggestedJobs] = React.useState<any[]>([]);
-    const [visibleJobsCount, setVisibleJobsCount] = useState(8);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
-
+    const [currentPage, setCurrentPage] = useState(1);
     const [isAspirationsDialogOpen, setIsAspirationsDialogOpen] = useState(false);
+    const [totalJobs, setTotalJobs] = useState(0);
+    const [totalPage, setTotalPage] = useState(0);
 
     if (role === 'candidate-empty-profile') {
         return <EmptyProfileView />;
     }
 
-
     const openEditAspirationsDialog = () => {
         setIsAspirationsDialogOpen(true);
     };
+    const fetchSuggestedJobs = useCallback(async () => {
+        debugger
+        setIsLoadingSuggestions(true);
+        const aspirations = user.aspirations;
+        const filters: SearchFilters = stringifyObject(aspirations);
+        if (filters.job) {
+            const visaCode = japanJobTypes.find(v => v.name === filters.visa)?.code ?? '';
+            const jobCode = JOBS.find(j => j.label === filters.job && j.value.startsWith(visaCode))?.value;
+            filters.job = jobCode ?? '';
+        }
+        const { docs: jobs, total, totalPages } = await getJobs(filters, 1, currentPage * 9);
+        setSuggestedJobs(jobs);
+        setTotalJobs(total);
+        setTotalPage(totalPages);
+        setIsLoadingSuggestions(false);
+        console.log('User aspirations:', filters);
+    }, [user.aspirations, currentPage]);
+
+    useEffect(() => {
+        fetchSuggestedJobs();
+    }, [fetchSuggestedJobs])
 
     const handleLoadMore = () => {
         setIsLoadingMore(true);
         setTimeout(() => {
-            setVisibleJobsCount(prev => prev + 8);
+            setCurrentPage(prev => prev + 8);
             setIsLoadingMore(false);
         }, 500); // Simulate network delay
     };
@@ -91,9 +108,9 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
                 ) : suggestedJobs.length > 0 ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {suggestedJobs.slice(0, visibleJobsCount).map((job) => (<JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} />))}
+                            {suggestedJobs.map((job) => (<JobCard key={job.id} job={job} showRecruiterName={false} showPostedTime={true} />))}
                         </div>
-                        {visibleJobsCount < suggestedJobs.length && (
+                        {currentPage < totalPage && (
                             <div className="text-center mt-8">
                                 <Button onClick={handleLoadMore} disabled={isLoadingMore}>
                                     {isLoadingMore ? (
