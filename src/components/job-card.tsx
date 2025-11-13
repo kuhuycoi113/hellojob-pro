@@ -278,7 +278,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <div className="text-sm text-muted-foreground">
                                     <p className="flex items-center gap-1.5">
                                         <MapPin className="h-4 w-4 flex-shrink-0" />
-                                        <span>{job.workLocation || "Liên hệ"}</span>
+                                        <span>{job.workLocation?.length ? job.workLocation : "Liên hệ"}</span>
                                     </p>
                                 </div>
 
@@ -369,7 +369,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         </div>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
                             <MapPin className="h-3 w-3 flex-shrink-0" />
-                            {job.workLocation}
+                            {job.workLocation?.length ? job.workLocation : 'Liên hệ'}
                         </p>
                         <div className="text-xs font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1">
                             {job.realSalary > 0 && (
@@ -444,7 +444,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         </div>
                         <div className="my-2 flex items-center gap-1 text-xs text-muted-foreground">
                             <MapPin className="h-3 w-3 flex-shrink-0" />
-                            <span>{job.workLocation ?? 'Liên hệ'}</span>
+                            <span>{job.workLocation?.length ? job.workLocation : 'Liên hệ'}</span>
                         </div>
 
                         <div className="mt-auto">

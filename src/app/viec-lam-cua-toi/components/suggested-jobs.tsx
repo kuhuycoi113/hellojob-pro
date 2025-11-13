@@ -38,7 +38,6 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
         setIsAspirationsDialogOpen(true);
     };
     const fetchSuggestedJobs = useCallback(async () => {
-        debugger
         setIsLoadingSuggestions(true);
         const aspirations = user.aspirations;
         const filters: SearchFilters = stringifyObject(aspirations);
@@ -77,7 +76,7 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
                     <div className="flex items-center gap-3">
                         <Star className="h-5 w-5 text-yellow-500" />
                         <span>Gợi ý cho bạn</span>
-                        <Badge>{isLoadingSuggestions ? '...' : suggestedJobs?.length}</Badge>
+                        <Badge>{isLoadingSuggestions ? '...' : totalJobs}</Badge>
                     </div>
                 </AccordionTrigger>
                 <Button
