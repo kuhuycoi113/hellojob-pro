@@ -276,8 +276,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     </p>
                                 </div>
                                 <div className="text-sm text-muted-foreground">
-                                    <p className="flex items-center gap-1.5">
-                                        <MapPin className="h-4 w-4 flex-shrink-0" />
+                                    <p className="items-center gap-1.5 truncate">
+                                        <MapPin className="h-4 w-4 flex-shrink-0 inline mr-1" />
                                         <span>{job.workLocation?.length ? job.workLocation : "Liên hệ"}</span>
                                     </p>
                                 </div>
@@ -367,8 +367,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <span>{interviewDate || "N/A"}</span>
                             </p>
                         </div>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <MapPin className="h-3 w-3 flex-shrink-0" />
+                        <p className="text-xs text-muted-foreground items-center gap-1 truncate">
+                            <MapPin className="h-3 w-3 flex-shrink-0 inline mr-1" />
                             {job.workLocation?.length ? job.workLocation : 'Liên hệ'}
                         </p>
                         <div className="text-xs font-semibold flex flex-wrap gap-x-3 gap-y-1 pt-1">
@@ -442,8 +442,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <span>{interviewDate || "Liên hệ"}</span>
                             </p>
                         </div>
-                        <div className="my-2 flex items-center gap-1 text-xs text-muted-foreground">
-                            <MapPin className="h-3 w-3 flex-shrink-0" />
+                        <div className="my-2 items-center gap-1 text-xs text-muted-foreground truncate">
+                            <MapPin className="h-3 w-3 flex-shrink-0 inline mr-1" />
                             <span>{job.workLocation?.length ? job.workLocation : 'Liên hệ'}</span>
                         </div>
 
