@@ -209,7 +209,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             return;
         }
         logInteraction(job, 'view');
-        router.push(`/viec-lam/${job.code}`);
+        router.push(`/viec-lam/${job.id}`);
     };
 
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';

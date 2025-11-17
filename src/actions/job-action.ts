@@ -14,10 +14,14 @@ export async function getJobByCode(code: string): Promise<any> {
                 bool: {
                     filter: [
                         {
-                            term: {
-                                "code.keyword": code,
-                            },
-                        },
+                            bool: {
+                                should: [
+                                    { term: { "code.keyword": code } },
+                                    { term: { "id.keyword": code } }
+                                ],
+                                minimum_should_match: 1
+                            }
+                        }
                     ]
                 }
             }
