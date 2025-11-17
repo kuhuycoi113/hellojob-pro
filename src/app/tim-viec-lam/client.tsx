@@ -26,9 +26,8 @@ export default function JobSearchPageContent() {
     const [currentPage, setCurrentPage] = useState(1);
     const [firstLoad, setFirstLoad] = useState(false);
     const loadedPages = [1];
-    console.log('start')
     const runFilter = useCallback(async (filtersToApply: SearchFilters, sortOption: string, page: number) => {
-        const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, page, 20);
+        const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, sortOption, page, 20);
         setFilteredJobs(jobs);
         setTotalJobs(total);
         setTotalPage(totalPages);
@@ -105,8 +104,8 @@ export default function JobSearchPageContent() {
 
     const loadMoreJobs = useCallback(async () => {
         const nextPage = loadedPages[loadedPages.length - 1] + 1;
-        const { newFilters } = generateJobFilter(readOnlySearchParams);
-        const { docs: jobs } = await getJobs(newFilters, nextPage, 20);
+        const { newFilters, sortOption } = generateJobFilter(readOnlySearchParams);
+        const { docs: jobs } = await getJobs(newFilters, sortOption, nextPage, 20);
         setFilteredJobs(prevJobs => [...prevJobs, ...jobs]);
         setCurrentPage(nextPage);
         loadedPages.push(nextPage);

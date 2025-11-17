@@ -6,9 +6,10 @@ import { PaginatedResponse } from "@/lib/types";
 import { visaMapping } from "@/lib/visa-data";
 import JOBS from '@/lib/jobs.json';
 import LANGUAGE_LEVEL from "@/lib/language_level.json";
+import { SortOptions } from "@elastic/elasticsearch/api/types";
 const CANDIDATES_INDEX = 'hellojobv5-job-crawled';
 
-function createSearchQuery(filter: SearchFilters): any {
+function createSearchQuery(filter: SearchFilters, sortOption: string | null): any {
 
     const {
         q, visaDetail, career, workLocation, job, interviewLocation, numberRecruits, netFee, netFeeNoTicket, interviewRounds, interviewDate, interviewDateType,
@@ -64,27 +65,64 @@ function createSearchQuery(filter: SearchFilters): any {
                 must: [],
                 should: [],
             },
-        },
-        sort: [
-            {
-                "_script": {
-                    "type": "number",
-                    "order": "asc",
-                    "script": {
-                        "source": `
+        }
+    };
+    const sort: any[] = [{
+        "_script": {
+            "type": "number",
+            "order": "asc",
+            "script": {
+                "source": `
             def now = new Date().getTime();
             if (doc['expiredDate'].size() == 0) return 0;
             long exp = doc['expiredDate'].value;
             // Nếu đã hết hạn thì trả về 1, chưa hết hạn thì 0
             return now > exp ? 1 : 0;
           `
-                    }
-                }
-            },
-            { "_score": { "order": "desc" } },
-            { "createdDate": { "order": "desc" } }
-        ]
-    };
+            }
+        }
+    }];
+    switch (sortOption) {
+        case 'salary_desc': {
+            sort.push({ "basicSalary": { "order": "desc" } });
+            break;
+        }
+        case 'salary_asc': {
+            sort.push({ "basicSalary": { "order": "asc" } });
+            break;
+        }
+        case 'net_salary_desc': {
+            sort.push({ "realSalary": { "order": "desc" } });
+            break;
+        }
+        case 'net_salary_asc': {
+            sort.push({ "realSalary": { "order": "asc" } });
+            break;
+        }
+        case 'fee_asc': {
+            sort.push({ "fee": { "order": "asc" } });
+            break;
+        }
+        case 'fee_desc': {
+            sort.push({ "fee": { "order": "desc" } });
+            break;
+        }
+        case 'interview_date_asc': {
+            sort.push({ "interviewDay": { "order": "asc" } });
+            break;
+        }
+        case 'interview_date_desc': {
+            sort.push({ "interviewDay": { "order": "desc" } });
+            break;
+        }
+        case 'newest':
+        default: {
+            sort.push({ "_score": { "order": "desc" } });
+            sort.push({ "createdDate": { "order": "desc" } });
+            break;
+        }
+    }
+    searchQuery.sort = sort;
     const conditions = [];
     if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== "") {
         console.log(visaDetail)
@@ -259,7 +297,6 @@ function createSearchQuery(filter: SearchFilters): any {
     }
     if (!!languageRequirement && languageRequirement.length > 0) {
         const level = LANGUAGE_LEVEL.find(level => level.label === languageRequirement.replaceAll('-', ' ').toUpperCase());
-        console.log(level)
         if (!!level) {
             const levelType = level.type;
             const levels = LANGUAGE_LEVEL.filter(lv => lv.type === levelType && lv.level <= level.level).map(lv => lv.label);
@@ -302,10 +339,10 @@ function createSearchQuery(filter: SearchFilters): any {
     console.log(JSON.stringify(searchQuery));
     return searchQuery;
 }
-export async function getJobs(filter: SearchFilters, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {
+export async function getJobs(filter: SearchFilters, sortOption: string, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {
 
     try {
-        const query = createSearchQuery(filter);
+        const query = createSearchQuery(filter, sortOption);
         const results = await searchDocuments<any>(CANDIDATES_INDEX, query, page, limit);
         const mappedDocs: any[] = results.docs.map(doc => {
             const name = doc.fullName || doc.sender;
@@ -362,7 +399,7 @@ export async function getJobsByIDs(ids: string[]): Promise<PaginatedResponse<any
 }
 export async function countJobs(filter: SearchFilters): Promise<number> {
     try {
-        const query = createSearchQuery(filter);
+        const query = createSearchQuery(filter, null);
         delete query.sort;
         const total = await countDocuments(CANDIDATES_INDEX, query);
         console.log('counted')

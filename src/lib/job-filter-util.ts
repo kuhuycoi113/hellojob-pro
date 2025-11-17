@@ -16,7 +16,7 @@ export const initialSearchFilters: SearchFilters = {
     weight: [35, 120],
     age: [18, 70],
     basicSalary: '',
-    netSalary: '',
+    realSalary: '',
     hourlySalary: '',
     annualIncome: '',
     annualBonus: '',
@@ -88,10 +88,10 @@ export const sortOptionMap: { [key: string]: string } = {
     fee_desc: 'phi-cao-den-thap',
     interview_date_asc: 'phong-van-gan-nhat',
     interview_date_desc: 'phong-van-xa-nhat',
-    has_image: 'uu-tien-co-anh',
-    has_video: 'uu-tien-co-video',
-    hot: 'hot-nhat',
-    most_applicants: 'nhieu-nguoi-ung-tuyen',
+    // has_image: 'uu-tien-co-anh',
+    // has_video: 'uu-tien-co-video',
+    // hot: 'hot-nhat',
+    // most_applicants: 'nhieu-nguoi-ung-tuyen',
 };
 
 const reverseKeyMap: { [key: string]: string } = Object.fromEntries(
