@@ -8,16 +8,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Award, Briefcase, Handshake, MessageSquare, PieChart, Send, ShieldCheck, Sparkles, Star, Target, Users, Phone, ChevronRight, Bookmark, MapPin } from 'lucide-react';
+import { Award, Briefcase, Handshake, MessageSquare, PieChart, Send, ShieldCheck, Sparkles, Star, Target, Users, Phone, ChevronRight } from 'lucide-react';
 import { MessengerIcon, ZaloIcon } from '@/components/custom-icons';
 import { ContactButtons } from '@/components/contact-buttons';
 import { consultants as consultantData } from '@/lib/consultant-data';
 import { jobData, type Job } from '@/lib/mock-data';
+import { JobCard } from '@/components/job-card';
 import Link from 'next/link';
 import { industryGroups } from '@/lib/industry-data';
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
-import { JobCard } from '@/components/job-card';
 
 const companyValues = [
     {
@@ -76,9 +74,29 @@ const getJobsByGroupedExpertise = (expertise: string): Job[] | null => {
     return null;
 }
 
+
 export default function ConsultantDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const consultant = consultantData.find(c => c.id === resolvedParams.id);
+    const [managedJobsCount, setManagedJobsCount] = useState(0);
+
+    useEffect(() => {
+        if (consultant) {
+            const calculateManagedJobsCount = () => {
+                const directlyAssignedCount = jobData.filter(job => job.recruiter.id === consultant.id).length;
+                if (directlyAssignedCount > 0) {
+                    return directlyAssignedCount;
+                }
+                const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
+                if (jobsByGroup) {
+                    return jobsByGroup.length;
+                }
+                return 0;
+            };
+            setManagedJobsCount(calculateManagedJobsCount());
+        }
+    }, [consultant]);
+
 
     if (!consultant) {
         notFound();
@@ -87,54 +105,43 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
     // HIENTHIVIEC01 Algorithm
     const getConsultantJobs = (): Job[] => {
         // Helper to safely parse and get date for sorting
-        const getSortableDate = (job: Job) => {
-            if (!job.postedTime) return 0;
-            try {
-                return new Date(job.postedTime.split(' ')[1].split('/').reverse().join('-')).getTime();
-            } catch (e) {
-                return 0; // Return a default value if parsing fails
-            }
-        };
+        // const getSortableDate = (job: Job) => {
+        //     if (!job.postedTime) return 0;
+        //     try {
+        //         // The date format is DD/MM/YYYY, so we need to parse it correctly
+        //         const parts = job.postedTime.split(' ')[1].split('/');
+        //         if (parts.length === 3) {
+        //             // new Date(year, monthIndex, day)
+        //             return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])).getTime();
+        //         }
+        //         return 0;
+        //     } catch (e) {
+        //         return 0; // Return a default value if parsing fails
+        //     }
+        // };
 
-        const sortJobsByDate = (jobs: Job[]) => {
-            return jobs.sort((a, b) => getSortableDate(b) - getSortableDate(a));
-        };
+        // const sortJobsByDate = (jobs: Job[]) => {
+        //     return jobs.sort((a, b) => getSortableDate(b) - getSortableDate(a));
+        // };
 
-        // First, try to get jobs explicitly assigned to the consultant
-        const directlyAssignedJobs = jobData.filter(job => job.recruiter.id === consultant.id);
+        // // First, try to get jobs explicitly assigned to the consultant
+        // const directlyAssignedJobs = jobData.filter(job => job.recruiter.id === consultant.id);
         
-        if (directlyAssignedJobs.length > 0) {
-            return sortJobsByDate(directlyAssignedJobs).slice(0, 4);
-        }
+        // if (directlyAssignedJobs.length > 0) {
+        //     return sortJobsByDate(directlyAssignedJobs).slice(0, 4);
+        // }
         
-        // If no jobs are directly assigned, fall back to the grouped expertise logic (PHANLOAINHOMNGANH01)
-        const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
-        if (jobsByGroup) {
-            return sortJobsByDate(jobsByGroup).slice(0, 4);
-        }
+        // // If no jobs are directly assigned, fall back to the grouped expertise logic (PHANLOAINHOMNGANH01)
+        // const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
+        // if (jobsByGroup) {
+        //     return sortJobsByDate(jobsByGroup).slice(0, 4);
+        // }
         
         // If no jobs are found by either method, return an empty array.
         return [];
     };
 
     const consultantJobs = getConsultantJobs();
-    
-    const calculateManagedJobsCount = () => {
-       // Count directly assigned jobs first for accuracy
-       const directlyAssignedCount = jobData.filter(job => job.recruiter.id === consultant.id).length;
-       if (directlyAssignedCount > 0) {
-           return directlyAssignedCount;
-       }
-       
-       // If no jobs are directly assigned, count based on expertise
-       const jobsByGroup = getJobsByGroupedExpertise(consultant.mainExpertise || '');
-       if (jobsByGroup) {
-           return jobsByGroup.length;
-       }
-       return 0; // Default to 0 if no jobs are found
-    };
-    
-    const managedJobsCount = calculateManagedJobsCount();
 
 
   return (
@@ -151,7 +158,7 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                 <h1 className="text-2xl font-headline font-bold mt-4">{consultant.name}</h1>
                 <p className="text-primary font-semibold">Tư vấn viên</p>
                 <div className="flex flex-wrap justify-center gap-2 mt-4">
-                    {consultant.strengths.map(strength => (
+                    {consultant?.strengths?.map(strength => (
                         <Badge key={strength} variant="secondary" className="bg-green-100 text-green-800 border-green-200">{strength}</Badge>
                     ))}
                 </div>
@@ -222,25 +229,26 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                 ))}
               </CardContent>
             </Card>
-             <Card id="consultant-jobs-section" className="shadow-xl">
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl text-primary flex items-center justify-between">
-                        <span>Việc làm phụ trách</span>
-                        <Button variant="link" asChild><Link href="/viec-lam">Xem tất cả <ChevronRight className="h-4 w-4"/></Link></Button>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {consultantJobs.length > 0 ? (
-                        consultantJobs.map(job => (
-                            <JobCard key={job.id} job={job} variant="grid-item" showRecruiterName={false} showPostedTime={true} />
-                        ))
-                    ) : (
-                        <p className="text-muted-foreground col-span-2">Hiện tại tư vấn viên này chưa phụ trách công việc nào.</p>
-                    )}
-                </CardContent>
-            </Card>
           </div>
         </div>
+        
+        <Card id="consultant-jobs-section" className="shadow-xl mt-12">
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl text-primary flex items-center justify-between">
+                    <span>Việc làm phụ trách</span>
+                    <Button variant="link" asChild><Link href="/viec-lam">Xem tất cả <ChevronRight className="h-4 w-4"/></Link></Button>
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {consultantJobs.length > 0 ? (
+                    consultantJobs.map(job => (
+                        <JobCard key={job.id} job={job} variant="grid-item" showRecruiterName={false} />
+                    ))
+                ) : (
+                    <p className="text-muted-foreground col-span-full">Hiện tại tư vấn viên này chưa phụ trách công việc nào.</p>
+                )}
+            </CardContent>
+        </Card>
       </div>
     </div>
   );

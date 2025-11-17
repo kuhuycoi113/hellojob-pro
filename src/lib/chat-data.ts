@@ -15,6 +15,8 @@ export type User = {
   experience?: string;
   successfulCandidates?: number;
   strengths?: string[];
+  messengerId?: string;
+  zalo?: string;
   avatar?: string; // Add avatar for compatibility
 };
 

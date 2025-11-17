@@ -1,10 +1,32 @@
 
 import type { User } from './chat-data';
 
-// This file now only contains raw data and no component imports to prevent circular dependencies.
-
 export const consultants: User[] = [
-    {
+  {
+    id: 'nguyen-quoc-viet',
+    name: 'Nguyễn Quốc Việt',
+    avatarUrl: '/img/TVV009.JPG',
+    dataAiHint: 'professional man portrait',
+    experience: '12 năm',
+    mainExpertise: 'Tư vấn chiến lược việc làm tại Nhật',
+    successfulCandidates: 880,
+    strengths: ['Tầm nhìn', 'Chiến lược', 'Kết nối cấp cao', 'Định hướng sự nghiệp'],
+    messengerId: 'gu.en.beto.2025',
+    zalo: '84902045222',
+  },
+  {
+    id: 'phung-thi-tuyet-nhung',
+    name: 'Phùng Thị Tuyết Nhung',
+    avatarUrl: '/img/TVV008.png',
+    dataAiHint: 'professional woman portrait',
+    experience: '8 năm',
+    mainExpertise: 'Tư vấn Kỹ sư, Thực tập sinh, Đặc định & Phát triển sự nghiệp',
+    successfulCandidates: 420,
+    strengths: ['Tận tâm', 'Hỗ trợ toàn diện', 'Đào tạo kỹ năng'],
+    messengerId: '61577193914962',
+    zalo: '84916033799',
+  },
+  {
     id: 'le-xuan-long',
     name: 'Lê Xuân Long',
     avatarUrl: '/img/long.jpg',
@@ -31,8 +53,10 @@ export const consultants: User[] = [
     dataAiHint: 'professional woman portrait',
     experience: '5 năm',
     mainExpertise: 'Tư vấn Tokutei Vận tải, Xây dựng, Thực phẩm',
-    successfulCandidates: 450,
+    successfulCandidates: 380,
     strengths: ['Nhiều đơn gấp', 'Hỗ trợ nhiệt tình', 'Kinh nghiệm'],
+    messengerId: 'ngocoanhhj',
+    zalo: '84936199064',
   },
   {
     id: 'pham-thi-ha',

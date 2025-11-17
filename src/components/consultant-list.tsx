@@ -4,14 +4,18 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Star, PieChart } from 'lucide-react';
+import { Star, PieChart, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
-import { ContactButtons } from './contact-buttons';
-import { consultants } from '@/lib/consultant-data';
-import type { User as Consultant } from '@/lib/chat-data';
+import { Button } from '@/components/ui/button';
+import { useChat } from '@/contexts/ChatContext';
+import { ContactButtons } from '@/components/contact-buttons';
+import { consultants as consultantChatData } from '@/lib/consultant-data';
 
 
-const ConsultantCard = ({ consultant }: { consultant: Consultant }) => {
+const ConsultantCard = ({ consultant }: { consultant: typeof consultantChatData[0] }) => {
+    // Find the corresponding full consultant data for the chat context
+    const chatConsultant = consultantChatData.find(c => c.id === consultant.id);
+
     return (
         <Card className="shadow-xl text-center p-6 flex flex-col h-full transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
             <Link href={`/tu-van-vien/${consultant.id}`} className="block h-full flex flex-col flex-grow">
@@ -22,7 +26,7 @@ const ConsultantCard = ({ consultant }: { consultant: Consultant }) => {
                 <h2 className="text-xl font-headline font-bold mt-4">{consultant.name}</h2>
                 <p className="text-primary font-semibold text-sm flex-grow">{consultant.mainExpertise}</p>
                 <div className="flex flex-wrap justify-center gap-2 mt-3">
-                    {consultant.strengths?.map(strength => (
+                    {consultant?.strengths?.map(strength => (
                         <Badge key={strength} variant="secondary" className="bg-green-100 text-green-800 border-green-200">{strength}</Badge>
                     ))}
                 </div>
@@ -32,18 +36,41 @@ const ConsultantCard = ({ consultant }: { consultant: Consultant }) => {
                 </div>
             </Link>
             <div className="mt-4 pt-4 border-t">
-                <ContactButtons contact={consultant} />
+                {chatConsultant && <ContactButtons contact={chatConsultant} showChatText={true} />}
             </div>
         </Card>
     );
 };
 
-export function ConsultantList() {
+export default function ConsultantListPage() {
+  const hiddenConsultantIds = [
+    'le-xuan-long',
+    'nguyen-thi-phuong-loan',
+    'dao-quang-minh',
+    'nguyen-thi-thu-trang',
+    'pham-thi-ha'
+  ];
+
+  const visibleConsultants = consultantChatData.filter(
+    consultant => !hiddenConsultantIds.includes(consultant.id)
+  );
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
-        {consultants.map((consultant) => (
-            <ConsultantCard key={consultant.id} consultant={consultant} />
-        ))}
+    <div className="bg-secondary">
+      <div className="container mx-auto px-4 md:px-6 py-16">
+        <div className="text-center mb-12">
+            <h1 className="text-4xl font-headline font-bold text-accent">Đội ngũ tư vấn viên chuyên nghiệp</h1>
+            <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
+                Những chuyên gia tận tâm sẽ đồng hành cùng bạn trên con đường chinh phục sự nghiệp tại Nhật Bản.
+            </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch justify-center">
+            {visibleConsultants.map((consultant) => (
+                <ConsultantCard key={consultant.id} consultant={consultant} />
+            ))}
+        </div>
+      </div>
     </div>
   );
 }
+
