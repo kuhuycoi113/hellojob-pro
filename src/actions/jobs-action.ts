@@ -298,7 +298,7 @@ function createSearchQuery(filter: SearchFilters): any {
     } else {
         searchQuery.query.bool.must = conditions;
     }
-    delete searchQuery.sort
+    // delete searchQuery.sort
     console.log(JSON.stringify(searchQuery));
     return searchQuery;
 }
