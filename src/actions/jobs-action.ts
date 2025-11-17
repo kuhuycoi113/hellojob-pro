@@ -427,7 +427,7 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
     console.log(JSON.stringify(searchQuery));
     return searchQuery;
 }
-export async function getJobs(filter: SearchFilters, sortOption: string, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {
+export async function getJobs(filter: SearchFilters, sortOption: string | null, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {
 
     try {
         const query = createSearchQuery(filter, sortOption);

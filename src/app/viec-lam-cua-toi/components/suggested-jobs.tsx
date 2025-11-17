@@ -48,7 +48,7 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
                 const jobCode = JOBS.find(j => j.label === filters.job && j.value.startsWith(visaCode))?.value;
                 filters.job = jobCode ?? '';
             }
-            const { docs: jobs, total, totalPages } = await getJobs(filters, 1, 12);
+            const { docs: jobs, total, totalPages } = await getJobs(filters, null, 1, 12);
             setSuggestedJobs([...jobs]);
             setTotalJobs(total);
             setTotalPage(totalPages);
@@ -77,7 +77,7 @@ export const SuggestedJobs: React.FC<{ highlight: string | null }> = ({ highligh
                 const jobCode = JOBS.find(j => j.label === filters.job && j.value.startsWith(visaCode))?.value;
                 filters.job = jobCode ?? '';
             }
-            const { docs: jobs } = await getJobs(filters, currentPage + 1, 12);
+            const { docs: jobs } = await getJobs(filters, null, currentPage + 1, 12);
             setSuggestedJobs(prev => [...prev, ...jobs]);
             setIsLoadingMore(false);
             setIsLoadingSuggestions(false);
