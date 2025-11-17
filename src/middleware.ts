@@ -11,6 +11,8 @@ const PUBLIC_PATHS = [
   "/xac-thuc",
   "/xac-thuc-so-dien-thoai",
   "/tim-viec-lam",
+  "/ho-so-cua-toi",
+  "/viec-lam-cua-toi",
   "/",
   // "/danh-sach-viec-lam",
   // "/danh-sach-ung-vien",
