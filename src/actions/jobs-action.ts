@@ -84,35 +84,123 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
     }];
     switch (sortOption) {
         case 'salary_desc': {
-            sort.push({ "basicSalary": { "order": "desc" } });
+            sort.push({
+                "_script": {
+                    "type": "number",
+                    "order": "desc",
+                    "script": {
+                        "source": `
+        if (doc['basicSalary'].size() == 0 || doc['basicSalary'].value == 0) {
+          return -1;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+        }
+        return doc['basicSalary'].value; // còn lại thì trả về mức lương
+      `
+                    }
+                }
+            })
             break;
         }
         case 'salary_asc': {
-            sort.push({ "basicSalary": { "order": "asc" } });
+            sort.push({
+                "_script": {
+                    "type": "number",
+                    "order": "asc",
+                    "script": {
+                        "source": `
+        if (doc['basicSalary'].size() == 0 || doc['basicSalary'].value == 0) {
+          return 99999999;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+        }
+        return doc['basicSalary'].value; // còn lại thì trả về mức lương
+      `
+                    }
+                }
+            })
             break;
         }
         case 'net_salary_desc': {
-            sort.push({ "realSalary": { "order": "desc" } });
+            sort.push({
+                "_script": {
+                    "type": "number",
+                    "order": "desc",
+                    "script": {
+                        "source": `
+        if (doc['realSalary'].size() == 0 || doc['realSalary'].value == 0) {
+          return -1;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+        }
+        return doc['realSalary'].value; // còn lại thì trả về mức lương
+      `
+                    }
+                }
+            })
             break;
         }
         case 'net_salary_asc': {
-            sort.push({ "realSalary": { "order": "asc" } });
+            sort.push({
+                "_script": {
+                    "type": "number",
+                    "order": "asc",
+                    "script": {
+                        "source": `
+        if (doc['realSalary'].size() == 0 || doc['realSalary'].value == 0) {
+          return 99999999;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+        }
+        return doc['realSalary'].value; // còn lại thì trả về mức lương
+      `
+                    }
+                }
+            })
             break;
         }
         case 'fee_asc': {
-            sort.push({ "fee": { "order": "asc" } });
+            sort.push({
+                "_script": {
+                    "type": "number",
+                    "order": "asc",
+                    "script": {
+                        "source": `
+        if (doc['fee'].size() == 0 || doc['fee'].value == 0) {
+          return 99999999;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+        }
+        return doc['fee'].value; // còn lại thì trả về mức lương
+      `
+                    }
+                }
+            })
             break;
         }
         case 'fee_desc': {
-            sort.push({ "fee": { "order": "desc" } });
+            sort.push({
+                "_script": {
+                    "type": "number",
+                    "order": "asc",
+                    "script": {
+                        "source": `
+        if (doc['fee'].size() == 0 || doc['fee'].value == 0) {
+          return 99999999;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+        }
+        return doc['fee'].value; // còn lại thì trả về mức lương
+      `
+                    }
+                }
+            })
             break;
         }
         case 'interview_date_asc': {
-            sort.push({ "interviewDay": { "order": "asc" } });
+            sort.push({
+                "interviewDay": {
+                    "order": "asc",
+                    "missing": "_last"
+                }
+            });
             break;
         }
         case 'interview_date_desc': {
-            sort.push({ "interviewDay": { "order": "desc" } });
+            sort.push({
+                "interviewDay": {
+                    "order": "desc",
+                    "missing": "_last"
+                }
+            });
             break;
         }
         case 'newest':
