@@ -25,7 +25,6 @@ export default function JobSearchPageContent() {
     const [totalPage, setTotalPage] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [firstLoad, setFirstLoad] = useState(false);
-    const loadedPages = [1];
     const runFilter = useCallback(async (filtersToApply: SearchFilters, sortOption: string, page: number) => {
         const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, sortOption, page, 20);
         setFilteredJobs(jobs);
@@ -41,13 +40,12 @@ export default function JobSearchPageContent() {
     }, []);
 
     useEffect(() => {
-        const { newFilters, sortOption } = generateJobFilter(readOnlySearchParams);
-        setCurrentPage(1);
-        loadedPages.splice(0, loadedPages.length, 1);
+        const { newFilters, sortOption, page } = generateJobFilter(readOnlySearchParams);
+        setCurrentPage(page);
         setSortBy(sortOption);
         setAppliedFilters(newFilters);
         setStagedFilters(newFilters);
-        runFilter(newFilters, sortOption, 1);
+        runFilter(newFilters, sortOption, page);
         console.log('Filters from URL:', newFilters);
     }, [readOnlySearchParams]);
 
@@ -58,7 +56,6 @@ export default function JobSearchPageContent() {
     useEffect(() => {
         countStagedResults(stagedFilters);
     }, [stagedFilters]);
-
 
 
     const handleApplyFilters = useCallback(() => {
@@ -99,17 +96,14 @@ export default function JobSearchPageContent() {
         } else {
             query.set(keyMap['sortBy'], sortOptionMap[value]);
         }
+        query.delete('page');
         router.push(`/tim-viec-lam?${query.toString()}`);
     };
-
-    const loadMoreJobs = useCallback(async () => {
-        const nextPage = loadedPages[loadedPages.length - 1] + 1;
-        const { newFilters, sortOption } = generateJobFilter(readOnlySearchParams);
-        const { docs: jobs } = await getJobs(newFilters, sortOption, nextPage, 20);
-        setFilteredJobs(prevJobs => [...prevJobs, ...jobs]);
-        setCurrentPage(nextPage);
-        loadedPages.push(nextPage);
-    }, [appliedFilters]);
+    const onPageChange = (page: number) => {
+        const query = new URLSearchParams(readOnlySearchParams.toString());
+        query.set('page', page.toString());
+        router.push(`/tim-viec-lam?${query.toString()}`);
+    }
 
     const handleResetFilters = useCallback(() => {
     }, [router, runFilter, countStagedResults, readOnlySearchParams]);
@@ -147,7 +141,7 @@ export default function JobSearchPageContent() {
                 resultCount={stagedResultCount}
                 sortBy={sortBy}
                 onSortChange={handleSortChange}
-                loadMoreJobs={loadMoreJobs}
+                onPageChange={onPageChange}
                 totalPage={totalPage}
                 currentPage={currentPage}
                 firstLoad={firstLoad}

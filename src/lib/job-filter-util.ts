@@ -104,6 +104,7 @@ const reverseSortOptionMap: { [key: string]: string } = Object.fromEntries(
 export const generateJobFilter = (readOnlySearchParams: any) => {
     const newFilters: SearchFilters = { ...initialSearchFilters, workLocation: [], specialConditions: [], otherSkillRequirement: [] };
     let sortOption = 'newest';
+    let page = 1;
     for (const [key, value] of readOnlySearchParams.entries()) {
         const internalKey = reverseKeyMap[key] || key;
         if (internalKey === 'sortBy') {
@@ -122,6 +123,8 @@ export const generateJobFilter = (readOnlySearchParams: any) => {
             const values = Array.isArray(value) ? value : [value];
             const conditionNames = values.map(v => allSpecialConditions.find(c => c.slug === v)?.name).filter(Boolean) as string[];
             newFilters.specialConditions = [...(newFilters.specialConditions || []), ...conditionNames];
+        } else if (internalKey === 'page') {
+            page = parseInt(value, 10) || 1;
         } else {
             if (internalKey in newFilters) {
                 // @ts-ignore
@@ -129,5 +132,5 @@ export const generateJobFilter = (readOnlySearchParams: any) => {
             }
         }
     }
-    return { sortOption, newFilters };
+    return { sortOption, newFilters, page };
 }

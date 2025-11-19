@@ -12,6 +12,7 @@ import { JobCard } from "../job-card";
 import { experienceYears } from "@/lib/visa-data";
 import { Card, CardContent } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
+import { PaginationComponent } from "../pagination";
 
 export type SearchFilters = {
     q?: string;
@@ -64,35 +65,15 @@ type SearchResultsProps = {
     resultCount: number;
     sortBy: string;
     onSortChange: (value: string) => void;
-    loadMoreJobs: () => void;
+    onPageChange: (page: number) => void;
     totalPage: number;
     currentPage: number;
     firstLoad?: boolean;
 }
 
-export const SearchResults = ({ jobs, total, filters, appliedFilters, firstLoad = false, totalPage, currentPage, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange, loadMoreJobs }: SearchResultsProps) => {
+export const SearchResults = ({ jobs, total, filters, appliedFilters, firstLoad = false, totalPage, currentPage, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange, onPageChange }: SearchResultsProps) => {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
-    const observer = useRef<IntersectionObserver | null>(null);
-
-    const nextPage = useCallback(async () => {
-        setIsLoadingMore(true);
-        await loadMoreJobs();
-        setIsLoadingMore(false);
-    }, []);
-
-    const lastJobElementRef = useCallback((node: HTMLDivElement) => {
-        if (isLoadingMore) return;
-        if (observer.current) observer.current.disconnect();
-
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && currentPage < totalPage) {
-                nextPage();
-            }
-        });
-
-        if (node) observer.current.observe(node);
-    }, [isLoadingMore, currentPage, totalPage, nextPage]);
 
     const handleApply = () => {
         applyFilters();
@@ -162,18 +143,9 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, firstLoad 
                             <div className="grid grid-cols-1 gap-4">
                                 {jobs.map((job, index) => {
                                     const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} />;
-                                    if (index === jobs.length - 3) {
-                                        // return <div key={job.id} style={{ textAlign: 'center' }}>
-                                        //     <Button disabled={isLoadingMore} onClick={nextPage} asChild size="lg">
-                                        //         <span>Tải thêm việc làm</span>
-                                        //     </Button>
-                                        // </div>
-                                        // return <button disabled={isLoadingMore} key={job.id} onClick={nextPage}>Load more</button>
-                                        return <div ref={lastJobElementRef} key={job.id}>{card}</div>
-                                    }
                                     return <div key={job.id}>{card}</div>
                                 })}
-                                {(!firstLoad||isLoadingMore) && Array.from({ length: 4 }).map((_, i) => (
+                                {(!firstLoad || isLoadingMore) && Array.from({ length: 4 }).map((_, i) => (
                                     <Card key={i}>
                                         <CardContent className="p-3 flex flex-col items-stretch gap-4 md:flex-row">
                                             <Skeleton className="h-48 w-full flex-shrink-0 md:h-40 md:w-60" />
@@ -187,6 +159,15 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, firstLoad 
                             <div className="text-center py-16 bg-background rounded-lg">
                                 <p className="text-lg font-semibold text-muted-foreground">Không tìm thấy công việc nào phù hợp.</p>
                                 <p className="text-sm text-muted-foreground mt-2">Hãy thử thay đổi bộ lọc hoặc tìm kiếm lại.</p>
+                            </div>
+                        )}
+                        {totalPage > 1 && (
+                            <div className="mt-8">
+                                <PaginationComponent
+                                    currentPage={currentPage}
+                                    totalPages={totalPage}
+                                    onPageChange={onPageChange}
+                                />
                             </div>
                         )}
                         {/* {isLoadingMore && (
