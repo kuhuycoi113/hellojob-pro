@@ -3,10 +3,12 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import JobSearchPageContent from './client';
 import { type Metadata } from 'next';
-import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, tattooRequirements, visionRequirements, experienceYears } from '@/lib/visa-data';
+import { allSpecialConditions, visaDetailsByVisaType, workShifts, otherSkills, dominantHands, educationLevels, englishLevels, tattooRequirements, visionRequirements, experienceYears } from '@/lib/visa-data';
 import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/location-data';
 import { industriesByJobType } from '@/lib/industry-data';
 import { format, isValid, parse } from 'date-fns';
+import LANGUAGE_LEVEL from '@/lib/language_level.json';
+const languageLevels = LANGUAGE_LEVEL.filter(level => level.groupCode.includes('TN'));
 
 type SearchParams = {
   [key: string]: string | string[] | undefined;

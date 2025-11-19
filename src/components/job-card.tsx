@@ -280,7 +280,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                     </p>
                                 </div>
                                 <div className="text-sm text-muted-foreground">
-                                    <p className="items-center gap-1.5 truncate">
+                                    <p className="items-center gap-1.5 line-clamp-1">
                                         <MapPin className="h-4 w-4 flex-shrink-0 inline mr-1" />
                                         <span>{job.workLocation?.length ? job.workLocation : "Liên hệ"}</span>
                                     </p>
@@ -371,7 +371,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <span>{interviewDate || "N/A"}</span>
                             </p>
                         </div>
-                        <p className="text-xs text-muted-foreground items-center gap-1 truncate">
+                        <p className="text-xs text-muted-foreground items-center gap-1 line-clamp-1">
                             <MapPin className="h-3 w-3 flex-shrink-0 inline mr-1" />
                             {job.workLocation?.length ? job.workLocation : 'Liên hệ'}
                         </p>
@@ -446,7 +446,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <span>{interviewDate || "Liên hệ"}</span>
                             </p>
                         </div>
-                        <div className="my-2 items-center gap-1 text-xs text-muted-foreground truncate">
+                        <div className="my-2 items-center gap-1 text-xs text-muted-foreground line-clamp-1">
                             <MapPin className="h-3 w-3 flex-shrink-0 inline mr-1" />
                             <span>{job.workLocation?.length ? job.workLocation : 'Liên hệ'}</span>
                         </div>

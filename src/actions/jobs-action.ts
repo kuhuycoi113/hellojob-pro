@@ -6,7 +6,7 @@ import { PaginatedResponse } from "@/lib/types";
 import { visaMapping } from "@/lib/visa-data";
 import JOBS from '@/lib/jobs.json';
 import LANGUAGE_LEVEL from "@/lib/language_level.json";
-import { SortOptions } from "@elastic/elasticsearch/api/types";
+const languageLevels = LANGUAGE_LEVEL.filter(level => level.groupCode.includes('TN'));
 const CANDIDATES_INDEX = 'hellojobv5-job-crawled';
 
 function createSearchQuery(filter: SearchFilters, sortOption: string | null): any {
@@ -384,11 +384,10 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
         });
     }
     if (!!languageRequirement && languageRequirement.length > 0) {
-        console.log(languageRequirement.replaceAll('-', ' ').toUpperCase());
-        const level = LANGUAGE_LEVEL.find(level => level.label.toUpperCase() === languageRequirement.replaceAll('-', ' ').toUpperCase());
+        const level = LANGUAGE_LEVEL.find(level => level.slug === languageRequirement);
         if (!!level) {
             const levelType = level.type;
-            const levels = LANGUAGE_LEVEL.filter(lv => lv.type === levelType && lv.level <= level.level).map(lv => lv.label);
+            const levels = LANGUAGE_LEVEL.filter(lv => lv.type === levelType && lv.level <= level.level).map(lv => lv.name);
             conditions.push({
                 terms: {
                     "languageLevel.keyword": levels,

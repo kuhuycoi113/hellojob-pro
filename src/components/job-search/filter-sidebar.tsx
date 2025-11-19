@@ -23,12 +23,13 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format, parse } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { Badge } from '../ui/badge';
-import { japanJobTypes, visaDetailsByVisaType, workShifts, allSpecialConditions, otherSkills, dominantHands, educationLevels, languageLevels, englishLevels, visionRequirements, tattooRequirements } from '@/lib/visa-data';
+import { japanJobTypes, visaDetailsByVisaType, workShifts, allSpecialConditions, otherSkills, dominantHands, educationLevels, englishLevels, visionRequirements, tattooRequirements } from '@/lib/visa-data';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import JOBS from '@/lib/jobs.json';
 import PROVINCES from "@/lib/provinces.json";
+import LANGUAGE_LEVEL from '@/lib/language_level.json';
 
 const createSlug = (str: string) => {
     if (!str) return '';
@@ -40,6 +41,7 @@ const createSlug = (str: string) => {
         .replace(/\s+/g, '-')
         .replace(/[^\w\-.]+/g, '');
 };
+const languageLevels = LANGUAGE_LEVEL.filter(level => level.groupCode.includes('TN'));
 
 const conditionsByVisaDetail: { [key: string]: string[] } = {
     'thuc-tap-sinh-3-nam': ['Tuyển gấp', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Nợ phí', 'Phí mềm', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Bay nhanh', 'Trình cục sớm', 'Có bảng lương'],

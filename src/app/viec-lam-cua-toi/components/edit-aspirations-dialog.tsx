@@ -11,7 +11,7 @@ import { ChevronDown, CalendarIcon, SlidersHorizontal, Search } from 'lucide-rea
 import { cn } from '@/lib/utils';
 import type { CandidateProfile } from '@/ai/schemas';
 import { CAREERS, Industry, industriesByJobType } from '@/lib/industry-data';
-import { japanJobTypes, visaDetailsByVisaType, allSpecialConditions, experienceYears, languageLevels, educationLevels, tattooRequirements } from '@/lib/visa-data';
+import { japanJobTypes, visaDetailsByVisaType,educationLevels} from '@/lib/visa-data';
 import { locations, interviewLocations, japanRegions, allJapanLocations } from '@/lib/location-data';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -26,6 +26,8 @@ import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { updateProfile } from '@/actions/user-action';
 import JOBS from '@/lib/jobs.json';
+import LANGUAGE_LEVEL from '@/lib/language_level.json';
+const languageLevels = LANGUAGE_LEVEL.filter(level => level.groupCode.includes('TN'));
 
 const JPY_VND_RATE = 180;
 const USD_VND_RATE = 26300;

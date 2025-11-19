@@ -124,25 +124,6 @@ export const educationLevels = [
     { name: "Tốt nghiệp Senmon", slug: "tot-nghiep-senmon" },
 ];
 
-export const languageLevels = [
-    { name: 'JLPT N5', slug: 'jlpt-n5' },
-    { name: 'JLPT N4', slug: 'jlpt-n4' },
-    { name: 'JLPT N3', slug: 'jlpt-n3' },
-    { name: 'JLPT N2', slug: 'jlpt-n2' },
-    { name: 'JLPT N1', slug: 'jlpt-n1' },
-    { name: 'Kaiwa N5', slug: 'kaiwa-n5' },
-    { name: 'Kaiwa N4', slug: 'kaiwa-n4' },
-    { name: 'Kaiwa N3', slug: 'kaiwa-n3' },
-    { name: 'Kaiwa N2', slug: 'kaiwa-n2' },
-    { name: 'Kaiwa N1', slug: 'kaiwa-n1' },
-    { name: 'Trình độ tương đương N5', slug: 'trinh-do-tuong-duong-n5' },
-    { name: 'Trình độ tương đương N4', slug: 'trinh-do-tuong-duong-n4' },
-    { name: 'Trình độ tương đương N3', slug: 'trinh-do-tuong-duong-n3' },
-    { name: 'Trình độ tương đương N2', slug: 'trinh-do-tuong-duong-n2' },
-    { name: 'Trình độ tương đương N1', slug: 'trinh-do-tuong-duong-n1' },
-    { name: 'Không yêu cầu', slug: 'khong-yeu-cau' }
-];
-
 export const englishLevels = [
     { name: 'TOEIC 900+', slug: 'toeic-900' },
     { name: 'TOEIC 800+', slug: 'toeic-800' },

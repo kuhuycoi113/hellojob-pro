@@ -106,6 +106,7 @@ export default function JobSearchPageContent() {
     }
 
     const handleResetFilters = useCallback(() => {
+        router.push(`/tim-viec-lam`);
     }, [router, runFilter, countStagedResults, readOnlySearchParams]);
 
     const handleNewSearch = useCallback((filters: Partial<SearchFilters>) => {
