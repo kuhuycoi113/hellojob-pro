@@ -84,8 +84,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
     const [badgeClassName, setBadgeClassName] = useState<string>('opacity-0');
-    const [jobTitle, setJobTitle] = useState(generateBulletJobCrawl(job));
-    const recruiter = consultants[3];
+    const [jobTitle, _setJobTitle] = useState(generateBulletJobCrawl(job));
+    const [recruiter, _setRecruiter] = useState<any>(() => {
+        const salerID = job.salerID;
+        let rec = consultants.find(c => c.id === salerID) ?? consultants[0];
+        return rec;
+    });
 
     useEffect(() => {
         setIsClient(true);
