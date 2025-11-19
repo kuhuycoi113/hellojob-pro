@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
     },
     handleInvalidToken: async (reason) => {
       const publicPaths = Object.assign([], PUBLIC_PATHS);
-      if (pathname.startsWith("/api/public/")||pathname.startsWith("/viec-lam/")) {
+      if (pathname.startsWith("/api/public/")||pathname.startsWith("/viec-lam/")||pathname.startsWith("/tu-van-vien/")) {
         publicPaths.push(pathname);
       }
       return redirectToLogin(request, {
