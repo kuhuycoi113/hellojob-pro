@@ -10,7 +10,7 @@ import { allSpecialConditions } from '@/lib/visa-data';
 import { countJobs, getJobs } from '@/actions/jobs-action';
 import { generateJobFilter, initialSearchFilters, keyMap, sortOptionMap } from '@/lib/job-filter-util';
 
-
+const DISPLAYED_JOBS_PER_PAGE = 30;
 export default function JobSearchPageContent() {
     const router = useRouter();
     const readOnlySearchParams = useSearchParams();
@@ -26,7 +26,7 @@ export default function JobSearchPageContent() {
     const [currentPage, setCurrentPage] = useState(1);
     const [firstLoad, setFirstLoad] = useState(false);
     const runFilter = useCallback(async (filtersToApply: SearchFilters, sortOption: string, page: number) => {
-        const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, sortOption, page, 20);
+        const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, sortOption, page, DISPLAYED_JOBS_PER_PAGE);
         setFilteredJobs(jobs);
         setTotalJobs(total);
         setTotalPage(totalPages);
