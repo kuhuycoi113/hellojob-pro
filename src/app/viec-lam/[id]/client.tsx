@@ -236,7 +236,8 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
         </div>
     }
 
-    const assignedConsultant = consultants[3];
+    const salerID = job.salerID;
+    const assignedConsultant = consultants.find(c => c.id === salerID) ?? consultants[0];
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay';
 
     const feeWithTuitionDisplay = getFeeDisplay(job.fee, "Phí và vé và học phí");
