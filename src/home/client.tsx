@@ -29,7 +29,6 @@ export default function HomeClient() {
     q: '',
     visa: '',
     visaDetail: 'all',
-    workLocation: [],
     career: '',
   });
 
