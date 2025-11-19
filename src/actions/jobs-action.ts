@@ -384,7 +384,8 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
         });
     }
     if (!!languageRequirement && languageRequirement.length > 0) {
-        const level = LANGUAGE_LEVEL.find(level => level.label === languageRequirement.replaceAll('-', ' ').toUpperCase());
+        console.log(languageRequirement.replaceAll('-', ' ').toUpperCase());
+        const level = LANGUAGE_LEVEL.find(level => level.label.toUpperCase() === languageRequirement.replaceAll('-', ' ').toUpperCase());
         if (!!level) {
             const levelType = level.type;
             const levels = LANGUAGE_LEVEL.filter(lv => lv.type === levelType && lv.level <= level.level).map(lv => lv.label);
