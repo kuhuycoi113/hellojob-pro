@@ -620,7 +620,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                             <SelectValue placeholder="Tất cả loại hình" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all-details">Tất cả loại hình</SelectItem>
+                                            <SelectItem value="all">Tất cả loại hình</SelectItem>
                                             {japanJobTypes.map(type => (
                                                 <SelectGroup key={type.slug}>
                                                     <SelectLabel>{type.name}</SelectLabel>

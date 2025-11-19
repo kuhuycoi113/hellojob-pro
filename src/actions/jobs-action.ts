@@ -6,7 +6,6 @@ import { PaginatedResponse } from "@/lib/types";
 import { visaMapping } from "@/lib/visa-data";
 import JOBS from '@/lib/jobs.json';
 import LANGUAGE_LEVEL from "@/lib/language_level.json";
-const languageLevels = LANGUAGE_LEVEL.filter(level => level.groupCode.includes('TN'));
 const CANDIDATES_INDEX = 'hellojobv5-job-crawled';
 
 function createSearchQuery(filter: SearchFilters, sortOption: string | null): any {
@@ -212,7 +211,7 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
     }
     searchQuery.sort = sort;
     const conditions = [];
-    if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== "") {
+    if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== ""&& visaDetail !== "all") {
         console.log(visaDetail)
         const visaLabel = visaMapping[visaDetail as keyof typeof visaMapping] ?? visaDetail;
         conditions.push({

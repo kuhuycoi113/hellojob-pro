@@ -5,7 +5,7 @@ import { allSpecialConditions } from "./visa-data";
 export const initialSearchFilters: SearchFilters = {
     q: '',
     visa: '',
-    visaDetail: '',
+    visaDetail: 'all',
     career: '',
     workLocation: [],
     interviewLocation: '',
