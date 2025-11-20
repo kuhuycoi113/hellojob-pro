@@ -25,6 +25,8 @@ const PUBLIC_PATHS = [
   "/nang-cap-premium",
   "/gioi-thieu-ban-be",
   "/dieu-khoan-chinh-sach",
+  "/chinhh-sach-bao-mat",
+  "/giai-quyet-tranh-chap",
   "/",
   // "/danh-sach-viec-lam",
   // "/danh-sach-ung-vien",
