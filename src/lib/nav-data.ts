@@ -22,7 +22,7 @@ import {
 
 export const mainNavLinks = [
   { href: '/', label: 'Trang chủ', icon: Home, mobile: true },
-  { href: '/viec-lam', label: 'Việc làm' },
+  { href: '/tim-viec-lam', label: 'Việc làm' },
   { href: '/lo-trinh', label: 'Lộ trình' },
   {
     href: '/tao-ho-so-ai',

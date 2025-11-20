@@ -16,9 +16,6 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
         age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
         otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement, suggestionType
     } = filter;
-    const now = new Date();
-    const fifteenDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
-    const secondsTimestamp = Math.floor(fifteenDaysAgo.getTime() / 1000);
     const searchQuery: any = {
         query: {
             bool: {
@@ -211,7 +208,7 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
     }
     searchQuery.sort = sort;
     const conditions = [];
-    if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== ""&& visaDetail !== "all") {
+    if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== "" && visaDetail !== "all") {
         console.log(visaDetail)
         const visaLabel = visaMapping[visaDetail as keyof typeof visaMapping] ?? visaDetail;
         conditions.push({
@@ -461,11 +458,112 @@ export async function getJobsByIDs(ids: string[]): Promise<PaginatedResponse<any
                     ]
                 }
             },
-            sort: [
-                { createdDate: { order: 'desc' } }
+            sort: [{
+                "_script": {
+                    "type": "number",
+                    "order": "asc",
+                    "script": {
+                        "source": `
+            def now = new Date().getTime();
+            if (doc['expiredDate'].size() == 0) return 0;
+            long exp = doc['expiredDate'].value;
+            // Nếu đã hết hạn thì trả về 1, chưa hết hạn thì 0
+            return now > exp ? 1 : 0;
+          `
+                    }
+                }
+            },
+            { createdDate: { order: 'desc' } }
             ]
         };
         const results = await searchDocuments<any>(CANDIDATES_INDEX, query, 1, 10);
+        const mappedDocs: any[] = results.docs.map(doc => {
+            const name = doc.fullName || doc.sender;
+            return {
+                ...doc,
+                id: doc.id,
+                source: doc.source, // Fixed: Added back the source field
+            }
+        });
+
+        return { ...results, docs: mappedDocs };
+    } catch (error: any) {
+        console.error("Failed to fetch new candidates from Elasticsearch:", error);
+        if (error.meta?.body?.error?.type === 'index_not_found_exception') {
+            console.log(`Index ${CANDIDATES_INDEX} not found. Returning empty results.`);
+        }
+        return { docs: [], total: 0, page: 1, limit: 10, totalPages: 0 };
+    }
+}
+export async function getJobsBySalerID(id: string, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {
+    try {
+        const searchQuery: any = {
+            query: {
+                bool: {
+                    filter: [
+                        {
+                            range: {
+                                createdDate: {
+                                    gte: 1762502844446,
+                                },
+                            },
+                        },
+                        {
+                            exists: {
+                                field: "visa",
+                            },
+                        },
+                        {
+                            exists: {
+                                field: "aiContent",
+                            },
+                        },
+                        {
+                            exists: {
+                                field: "job",
+                            },
+                        },
+                        {
+                            exists: {
+                                field: "career",
+                            },
+                        },
+                        {
+                            term: {
+                                "country.keyword": "Nhật Bản",
+                            },
+                        },
+                        {
+                            exists: {
+                                field: "createdDate",
+                            },
+                        },
+                    ],
+                    must: [
+                        { term: { "salerID.keyword": id } }
+                    ],
+                },
+            },
+            sort: [
+                {
+                    "_script": {
+                        "type": "number",
+                        "order": "asc",
+                        "script": {
+                            "source": `
+            def now = new Date().getTime();
+            if (doc['expiredDate'].size() == 0) return 0;
+            long exp = doc['expiredDate'].value;
+            // Nếu đã hết hạn thì trả về 1, chưa hết hạn thì 0
+            return now > exp ? 1 : 0;
+          `
+                        }
+                    }
+                },
+                { createdDate: { order: 'desc' } }
+            ]
+        };
+        const results = await searchDocuments<any>(CANDIDATES_INDEX, searchQuery, page, limit);
         const mappedDocs: any[] = results.docs.map(doc => {
             const name = doc.fullName || doc.sender;
             return {
