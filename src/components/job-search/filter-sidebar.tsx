@@ -643,17 +643,21 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                 <div className="space-y-2">
                                     <Label>Ngành nghề</Label>
                                     <Select value={filters.career} onValueChange={(value) => onFilterChange({ career: value, job: '' })}>
-                                        <SelectTrigger className={cn(filters.career && filters.career !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn ngành nghề" /></SelectTrigger>
+                                        <SelectTrigger className={cn(filters.career && filters.career !== 'all' && 'text-primary')}>
+                                            <SelectValue placeholder="Chọn ngành nghề" />
+                                        </SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all">Tất cả ngành nghề</SelectItem>
-                                            {availableIndustries.map((ind: any, index: number) => <SelectItem key={`${ind}-${index}`} value={ind}>{ind}</SelectItem>)}
+                                            {[...new Set(availableIndustries)].map((ind: any, index: number) => <SelectItem key={`${ind}-${index}`} value={ind}>{ind}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Chi tiết công việc</Label>
                                     <Select value={filters.job} onValueChange={(value) => onFilterChange({ job: value })} disabled={!filters.career || filters.career === 'all'}>
-                                        <SelectTrigger className={cn(filters.job && 'text-primary')}><SelectValue placeholder="Chọn công việc" /></SelectTrigger>
+                                        <SelectTrigger className={cn(filters.job && 'text-primary')}>
+                                            <SelectValue placeholder="Chọn công việc" />
+                                        </SelectTrigger>
                                         <SelectContent className="max-h-60">
                                             <SelectItem value="all-details">Tất cả công việc</SelectItem>
                                             {availableJobDetails.map(detail => <SelectItem key={detail.value} value={detail.value}>{detail.label}</SelectItem>)}
@@ -687,7 +691,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                 <div className="flex items-center gap-2 py-2 text-sm hover:no-underline" >
                                                     <Checkbox
                                                         id={`region-${region}`}
-                                                        checked={Array.isArray(filters.workLocation) && japanRegions[region].every(p => (filters.workLocation??[]).includes(p.label))}
+                                                        checked={Array.isArray(filters.workLocation) && japanRegions[region].every(p => (filters.workLocation ?? []).includes(p.label))}
                                                         onCheckedChange={(checked) => {
                                                             const currentSelection = new Set(Array.isArray(filters.workLocation) ? filters.workLocation : []);
                                                             if (checked) {
