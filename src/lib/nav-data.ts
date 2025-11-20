@@ -44,6 +44,7 @@ export const quickAccessLinks = [
   { href: '/gop-y', label: 'Góp ý', icon: MessageSquareWarning },
   { href: '/nang-cap-premium', label: 'Nâng cấp Premium', icon: Gem },
   { href: '/gioi-thieu-ban-be', label: 'Giới thiệu bạn bè', icon: UserPlus },
+  { href: '/dieu-khoan-chinh-sach', label: 'Điều khoản người dùng', icon: FileText },
 ];
 
 // Re-ordered to a stable, logical order to fix hydration errors.
