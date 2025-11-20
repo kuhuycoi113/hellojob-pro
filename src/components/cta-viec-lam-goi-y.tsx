@@ -366,7 +366,7 @@ export function CtaViecLamGoiY() {
                     const jobCode = JOBS.find(j => j.label === filters.job && j.value.startsWith(visaCode))?.value;
                     filters.job = jobCode ?? '';
                 }
-                const { docs: jobs, total, totalPages } = await getJobs(filters, 1, 4);
+                const { docs: jobs, total, totalPages } = await getJobs(filters, null, 1, 4);
                 setSuggestions([...jobs]);
             }
         } catch (error) {
