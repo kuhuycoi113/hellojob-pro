@@ -354,7 +354,7 @@ export function CtaViecLamPhuHop() {
         setIsLoading(true);
         try {
             const filters = {};
-            const { docs: jobs, total, totalPages } = await getJobs(filters, 1, 1 * 4);
+            const { docs: jobs, total, totalPages } = await getJobs(filters, null, 1, 1 * 4);
             setSuggestions(jobs);
         } catch (error) {
             console.error("Failed to fetch behavioral suggestions for CTA:", error);
