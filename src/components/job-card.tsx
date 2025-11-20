@@ -453,7 +453,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
                         <div className="mt-auto">
                             <div className="flex flex-wrap items-center justify-between gap-2">
-                                <div className="flex items-center gap-1">
+                                {showRecruiterName && <div className="flex items-center gap-1">
                                     <Link href={`/tu-van-vien/${recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                                         <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
                                             <AvatarImage src={recruiter.avatarUrl} alt={recruiter.name} />
@@ -461,7 +461,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                         </Avatar>
                                     </Link>
                                     <ContactButtons contact={recruiter as any} job={job} />
-                                </div>
+                                </div>}
                                 {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied || isExpired || isApplying}>{applyButtonContent}</Button>}
                                 {hasApplied && showCancelApplication &&
                                     <AlertDialog>

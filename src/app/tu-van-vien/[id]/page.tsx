@@ -2,7 +2,7 @@
 
 'use client';
 
-import { use, useState, useEffect } from 'react';
+import { use, useState, useEffect, useCallback } from 'react';
 import { notFound } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,10 @@ import { jobData, type Job } from '@/lib/mock-data';
 import { JobCard } from '@/components/job-card';
 import Link from 'next/link';
 import { industryGroups } from '@/lib/industry-data';
+import { useLoadingCallback } from '@/lib/useLoadingCallback';
+import { id } from 'date-fns/locale';
+import { getJobsBySalerID } from '@/actions/jobs-action';
+import { PaginationComponent } from '@/components/pagination';
 
 const companyValues = [
     {
@@ -73,24 +77,29 @@ const getJobsByGroupedExpertise = (expertise: string): Job[] | null => {
     return null;
 }
 
-
+const DISPLAYED_JOBS_COUNT = 8;
 export default function ConsultantDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const consultant = consultantData.find(c => c.id === resolvedParams.id);
-    const [managedJobsCount, setManagedJobsCount] = useState(0);
-
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [managedJobsCount, setManagedJobsCount] = useState(null as number | null);
+    const [consultantJobs, setConsultantJobs] = useState<any[]>([]);
 
     if (!consultant) {
         notFound();
     }
 
     // HIENTHIVIEC01 Algorithm
-    const getConsultantJobs = (): any[] => {
-        return [];
-    };
-
-    const consultantJobs = getConsultantJobs();
-
+    const [getManagedJobs, isLoading, error] = useLoadingCallback(async (page) => {
+        const { docs, total, totalPages } = await getJobsBySalerID(resolvedParams.id, page, DISPLAYED_JOBS_COUNT);
+        setConsultantJobs(docs);
+        setTotalPages(totalPages);
+        setManagedJobsCount(total);
+    });
+    useEffect(() => {
+        getManagedJobs(page);
+    }, [page]);
 
     return (
         <div className="bg-secondary">
@@ -187,13 +196,24 @@ export default function ConsultantDetailPage({ params }: { params: Promise<{ id:
                             {/* <Button variant="link" asChild><Link href="/viec-lam">Xem tất cả <ChevronRight className="h-4 w-4" /></Link></Button> */}
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {consultantJobs.length > 0 ? (
-                            consultantJobs.map(job => (
-                                <JobCard key={job.id} job={job} variant="grid-item" showRecruiterName={false} />
-                            ))
-                        ) : (
-                            <p className="text-muted-foreground col-span-full">Hiện tại tư vấn viên này chưa phụ trách công việc nào.</p>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {consultantJobs.length > 0 ? (
+                                consultantJobs.map(job => (
+                                    <JobCard key={job.id} job={job} variant="grid-item" showRecruiterName={false} />
+                                ))
+                            ) : (
+                                <p className="text-muted-foreground col-span-full">Hiện tại tư vấn viên này chưa phụ trách công việc nào.</p>
+                            )}
+                        </div>
+                        {totalPages > 1 && (
+                            <div className="mt-8">
+                                <PaginationComponent
+                                    currentPage={page}
+                                    totalPages={totalPages}
+                                    onPageChange={setPage}
+                                />
+                            </div>
                         )}
                     </CardContent>
                 </Card>
