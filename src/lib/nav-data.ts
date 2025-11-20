@@ -18,6 +18,7 @@ import {
   Briefcase,
   UserSearch,
   Building,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const mainNavLinks = [
@@ -45,6 +46,8 @@ export const quickAccessLinks = [
   { href: '/nang-cap-premium', label: 'Nâng cấp Premium', icon: Gem },
   { href: '/gioi-thieu-ban-be', label: 'Giới thiệu bạn bè', icon: UserPlus },
   { href: '/dieu-khoan-chinh-sach', label: 'Điều khoản người dùng', icon: FileText },
+  { href: '/chinh-sach-bao-mat', label: 'Chính sách bảo mật', icon: ShieldCheck },
+  { href: '/giai-quyet-tranh-chap', label: 'Giải quyết tranh chấp', icon: Handshake },
 ];
 
 // Re-ordered to a stable, logical order to fix hydration errors.
