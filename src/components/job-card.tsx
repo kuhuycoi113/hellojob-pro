@@ -34,6 +34,7 @@ import { consultants } from '@/lib/consultant-data';
 import { applyJob, cancelAppliedJob, updateProfile } from '@/actions/user-action';
 import { validateProfileForApplication } from '@/lib/validators';
 import { useServerInfo } from './layout/root-provider';
+import { NameAvatar } from './ui/name-avatar';
 
 
 // CANHANHOA01: Function to log user interaction
@@ -217,17 +218,107 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     };
 
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
-
-
-
-
     const feeInfo = getFeeDisplayInfo(job, isSearchPage, role);
     const feeFilterIsActive = !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket || role === 'admin');
     let isExpired = false;
     if (job.expiredDate < serverTime) {
         isExpired = true;
     }
-
+    const renderConsultantComponent = () => {
+        switch (role) {
+            case 'admin': {
+                let secondColor = "#3B5998";
+                let titleLinkGroup = "#";
+                let contactLink = "#";
+                switch (job.source) {
+                    case "ZALO": {
+                        secondColor = "#0068FF";
+                        if (job.contact?.length) {
+                            contactLink = `https://zalo.me/${job.contact}`;
+                        } else {
+                            contactLink = job.senderLink;
+                        }
+                        titleLinkGroup = job.groupLink;
+                        break;
+                    }
+                    case "FACEBOOK": {
+                        secondColor = "#3B5998";
+                        // titleLinkGroup = candidate?.contact ?? candidate?.postLink ?? candidate?.groupLink;
+                        contactLink = job.contact;
+                        titleLinkGroup = job.postLink ?? job.contact ?? job.groupLink;
+                        break;
+                    }
+                    case "SUNRISE": {
+                        secondColor = "#AFC536";
+                        titleLinkGroup = job.contact;
+                        break;
+                    }
+                }
+                const poster = {
+                    groupName: job.groupName,
+                    groupLink: titleLinkGroup,
+                    zalo: contactLink
+                };
+                return <>
+                    <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
+                        <PopoverTrigger asChild>
+                            {/* <div onMouseEnter={() => setIsConsultantPopoverOpen(true)} onMouseLeave={() => setIsConsultantPopoverOpen(false)}> */}
+                            <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                                <NameAvatar fullName={job.sender} size={30} className='cursor-pointer transition-transform hover:scale-110' />
+                            </div>
+                            {/* </div> */}
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80" side="top" align="start">
+                            <div className="flex gap-4">
+                                <NameAvatar fullName={job.sender} size={16} />
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-semibold">{job.sender}</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        {job.groupName}
+                                    </p>
+                                    {(contactLink || titleLinkGroup) && <Button asChild size="sm" variant="link" className="h-auto p-0">
+                                        <Link href={contactLink ?? titleLinkGroup} target='_blank'>Thử truy cập</Link>
+                                    </Button>}
+                                </div>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                    <ContactButtons contact={poster} job={job} showChatText={true} />
+                </>;
+            } default: {
+                return <>
+                    <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
+                        <PopoverTrigger asChild>
+                            <Link href={`/tu-van-vien/${recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                                <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                                    <AvatarImage src={recruiter.avatarUrl} alt={recruiter.name} />
+                                    <AvatarFallback>{recruiter.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                            </Link>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80" side="top" align="start">
+                            <div className="flex gap-4">
+                                <Avatar className="h-16 w-16">
+                                    <AvatarImage src={recruiter.avatarUrl} alt={recruiter.name} />
+                                    <AvatarFallback>{recruiter.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-semibold">{recruiter.name}</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        {recruiter.mainExpertise}
+                                    </p>
+                                    <Button asChild size="sm" variant="link" className="h-auto p-0">
+                                        <Link href={`/tu-van-vien/${recruiter.id}`}>Xem hồ sơ</Link>
+                                    </Button>
+                                </div>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                    <ContactButtons contact={recruiter} job={job} showChatText={true} />
+                </>;
+            }
+        }
+    }
     if (variant === 'list-item') {
         return (
             <>
@@ -301,36 +392,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
                                 <div className="mt-auto flex flex-wrap items-end justify-between gap-y-2 pt-2">
                                     <div className="flex items-center gap-1">
-                                        <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
-                                            <PopoverTrigger asChild>
-                                                <div onMouseEnter={() => setIsConsultantPopoverOpen(true)} onMouseLeave={() => setIsConsultantPopoverOpen(false)}>
-                                                    <Link href={`/tu-van-vien/${recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                                                        <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
-                                                            <AvatarImage src={recruiter.avatarUrl} alt={recruiter.name} />
-                                                            <AvatarFallback>{recruiter.name.charAt(0)}</AvatarFallback>
-                                                        </Avatar>
-                                                    </Link>
-                                                </div>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-80" side="top" align="start">
-                                                <div className="flex gap-4">
-                                                    <Avatar className="h-16 w-16">
-                                                        <AvatarImage src={recruiter.avatarUrl} alt={recruiter.name} />
-                                                        <AvatarFallback>{recruiter.name.charAt(0)}</AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="space-y-1">
-                                                        <h4 className="text-sm font-semibold">{recruiter.name}</h4>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {recruiter.mainExpertise}
-                                                        </p>
-                                                        <Button asChild size="sm" variant="link" className="h-auto p-0">
-                                                            <Link href={`/tu-van-vien/${recruiter.id}`}>Xem hồ sơ</Link>
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
-                                        <ContactButtons contact={recruiter} job={job} showChatText={true} />
+                                        {renderConsultantComponent()}
                                     </div>
                                     {isClient && <div className="flex items-center gap-2">
                                         <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>

@@ -2,11 +2,13 @@
 
 import React from "react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { cn } from "@/lib/utils"
 
 type NameAvatarProps = {
   fullName: string
   src?: string
-  size?: number
+  size?: number,
+  className?: string
 }
 
 const letterColors: Record<string, string> = {
@@ -48,14 +50,14 @@ function getFirstLetterOfLastName(fullName: string): string {
   return lastName[0]?.toUpperCase() || "?"
 }
 
-export function NameAvatar({ fullName, src, size = 40 }: NameAvatarProps) {
+export function NameAvatar({ fullName, src, size = 40, className = '' }: NameAvatarProps) {
   const letter = getFirstLetterOfLastName(fullName)
   const color = letterColors[letter] || "#9E9E9E"
 
   return (
     <Avatar
       style={{ width: size, height: size }}
-      className="flex items-center justify-center"
+      className={cn("flex items-center justify-center", className)}
     >
       {src ? (
         <AvatarImage src={src} alt={fullName} />
