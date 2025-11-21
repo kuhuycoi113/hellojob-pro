@@ -11,17 +11,13 @@ import { useChat } from '@/contexts/ChatContext';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { Job } from '@/lib/mock-data';
+import { User } from '@/lib/chat-data';
 
 
 // Define a more generic type for the contact person
-type ContactPerson = {
-    id: string;
-    name: string;
-    avatarUrl: string;
-};
 
 interface ContactButtonsProps {
-    contact: ContactPerson;
+    contact: User;
     job?: Job; // Make job optional
     variant?: 'default' | 'compact';
     showChatText?: boolean;
@@ -71,17 +67,17 @@ export function ContactButtons({ contact, job, variant = 'default', showChatText
                 </span>
             </Button>
             <Button asChild variant="outline" size="icon" className="h-8 w-8 border-purple-500 text-purple-500 hover:bg-purple-50 hover:text-purple-600">
-                <Link href="https://m.me/your_user_id" target="_blank" onClick={handleLinkClick}>
+                <Link href={`https://m.me${contact.messengerId}`} target="_blank" onClick={handleLinkClick}>
                      <Image src="/img/Mess.svg" alt="Messenger" width={20} height={20} />
                 </Link>
             </Button>
             <Button asChild variant="outline" size="icon" className="h-8 w-8 border-blue-500 text-blue-500 hover:bg-blue-50 hover:text-blue-600">
-                <Link href="https://zalo.me/your_zalo_id" target="_blank" onClick={handleLinkClick}>
+                <Link href={`https://zalo.me/${contact.zalo}`} target="_blank" onClick={handleLinkClick}>
                    <Image src="/img/Zalo.svg" alt="Zalo" width={20} height={20} />
                 </Link>
             </Button>
              <Button asChild variant="outline" size="icon" className="h-8 w-8 border-green-500 text-green-500 hover:bg-green-50 hover:text-green-600">
-                 <Link href="tel:09012345678" onClick={handleLinkClick}>
+                 <Link href={`tel:${contact.phone}`} onClick={handleLinkClick}>
                     <Image src="/img/phone.svg" alt="Phone" width={20} height={20} />
                 </Link>
             </Button>
@@ -114,17 +110,17 @@ export function ContactButtons({ contact, job, variant = 'default', showChatText
                             <MessageSquare className="h-8 w-8"/>
                         </Button>
                         <Button asChild variant="outline" size="icon" className="h-16 w-16 border-purple-500 hover:bg-purple-50">
-                            <Link href="https://m.me/your_user_id" target="_blank" onClick={handleLinkClick}>
+                            <Link href={`https://m.me/${contact.messengerId}`} target="_blank" onClick={handleLinkClick}>
                                 <Image src="/img/Mess.svg" alt="Messenger" width={32} height={32} />
                             </Link>
                         </Button>
                         <Button asChild variant="outline" size="icon" className="h-16 w-16 border-blue-500 hover:bg-blue-50">
-                            <Link href="https://zalo.me/your_zalo_id" target="_blank" onClick={handleLinkClick}>
+                            <Link href={`https://zalo.me/${contact.zalo}`} target="_blank" onClick={handleLinkClick}>
                               <Image src="/img/Zalo.svg" alt="Zalo" width={32} height={32} />
                             </Link>
                         </Button>
                         <Button asChild variant="outline" size="icon" className="h-16 w-16 border-green-500 hover:bg-green-50">
-                             <Link href="tel:09012345678" onClick={handleLinkClick}>
+                             <Link href={`tel:${contact.phone}`} onClick={handleLinkClick}>
                                 <Image src="/img/phone.svg" alt="Phone" width={32} height={32} />
                             </Link>
                         </Button>

@@ -18,6 +18,7 @@ export type User = {
   messengerId?: string;
   zalo?: string;
   avatar?: string; // Add avatar for compatibility
+  phone?: string
 };
 
 export type Attachment = {

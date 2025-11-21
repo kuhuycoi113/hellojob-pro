@@ -12,7 +12,8 @@ export const consultants: User[] = [
     successfulCandidates: 880,
     strengths: ['Tầm nhìn', 'Chiến lược', 'Kết nối cấp cao', 'Định hướng sự nghiệp'],
     messengerId: 'gu.en.beto.2025',
-    zalo: '84902045222',
+    zalo: '0902045222',
+    phone: '+84902045222',
   },
   {
     id: 'phung-thi-tuyet-nhung',
@@ -24,7 +25,8 @@ export const consultants: User[] = [
     successfulCandidates: 420,
     strengths: ['Tận tâm', 'Hỗ trợ toàn diện', 'Đào tạo kỹ năng'],
     messengerId: '61577193914962',
-    zalo: '84916033799',
+    zalo: '0916033799',
+    phone: '+84916033799',
   },
   {
     id: 'le-xuan-long',
@@ -56,7 +58,8 @@ export const consultants: User[] = [
     successfulCandidates: 380,
     strengths: ['Nhiều đơn gấp', 'Hỗ trợ nhiệt tình', 'Kinh nghiệm'],
     messengerId: 'ngocoanhhj',
-    zalo: '84936199064',
+    zalo: '0936199064',
+    phone: '+84936199064',
   },
   {
     id: 'pham-thi-ha',

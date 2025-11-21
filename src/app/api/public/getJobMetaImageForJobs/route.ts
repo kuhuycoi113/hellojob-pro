@@ -6,8 +6,8 @@ import { getJobs } from "@/actions/jobs-action";
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const { newFilters } = generateJobFilter(searchParams);
-    const { docs: jobs, total: totalJob } = await getJobs(newFilters, 1, 4);
+    const { newFilters, sortOption } = generateJobFilter(searchParams);
+    const { docs: jobs, total: totalJob } = await getJobs(newFilters, sortOption, 1, 4);
     const { canvas } = await generateJobMetaDataJobsImage(jobs, totalJob);
     if (!canvas) {
       return new NextResponse("Image generation failed", { status: 500 });
