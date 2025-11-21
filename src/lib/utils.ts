@@ -158,18 +158,18 @@ const controlledFeeVisas = [
   'Đặc định đầu Việt'
 ];
 export const getFeeDisplayInfo = (job: any, isSearchPage?: boolean) => {
-  const { visaDetail, netFee, netFeeNoTicket, netFeeWithTuition } = job;
+  debugger
+  const { visa: visaDetail, fee, netFeeNoTicket, netFeeWithTuition } = job;
   const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
   const isControlled = controlledFeeVisas.includes(formatVisa(job.visa) || '');
 
   let feeValue: number | undefined;
   let feeLabel: string | undefined;
-
   if (netFeeWithTuition) {
     feeValue = parseInt(netFeeWithTuition);
     feeLabel = 'Phí và vé và học phí';
-  } else if (netFee) {
-    feeValue = parseInt(netFee);
+  } else if (fee) {
+    feeValue = parseInt(fee);
     feeLabel = (visaDetail?.includes('Thực tập sinh')) ? 'Phí và vé không học phí' : 'Phí có vé';
   } else if (netFeeNoTicket) {
     feeValue = parseInt(netFeeNoTicket);
@@ -181,7 +181,7 @@ export const getFeeDisplayInfo = (job: any, isSearchPage?: boolean) => {
   }
 
   if (isControlled && feeValue > feeLimit) {
-    return { shouldShow: true, text: `Phí: Không rõ` };
+    return { shouldShow: true, text: `Phí: Liên hệ` };
   }
 
   if (visaDetail && visasForVndDisplay.includes(visaDetail)) {

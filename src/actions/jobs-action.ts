@@ -391,10 +391,21 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
             });
         }
     }
+    if (!!netFee && netFee.length > 0) {
+        const feeNum = Number(netFee);
+        conditions.push({
+            range: {
+                fee: {
+                    lte: feeNum,
+                    gt: 0
+                },
+            },
+        });
+    }
     Object.keys(filter).forEach((key) => {
         // Bỏ qua các trường đặc biệt đã xử lý ở trên
         if (['visa', 'visaDetail', 'workLocation', 'specialConditions', 'career', 'job', 'gender', 'age',
-            'interviewDateType', 'q', 'height', 'realSalary', 'basicSalary', 'fee', 'interviewLocation', 'suggestionType',
+            'interviewDateType', 'q', 'height', 'realSalary', 'basicSalary', 'netFee', 'interviewLocation', 'suggestionType',
             'languageRequirement', 'tattooRequirement', 'weight'].includes(key)) return;
 
         const value = filter[key as keyof SearchFilters];

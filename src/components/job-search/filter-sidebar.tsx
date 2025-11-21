@@ -923,7 +923,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                     id="net-fee-with-tuition-usd"
                                                     type="text"
                                                     placeholder={getFeePlaceholder()}
-                                                    onChange={(e) => handleSalaryInputChange(e, 'netFee', 4200, onFilterChange)} // Assuming netFee maps to this for now
+                                                    onChange={(e) => handleSalaryInputChange(e, 'netFee', 10000, onFilterChange)} // Assuming netFee maps to this for now
                                                     value={getDisplayValue(filters.netFee)}
                                                 />
                                                 <p className="text-xs text-muted-foreground">{getConvertedFeeValue(filters.netFee, getFeePlaceholder())}</p>
@@ -934,7 +934,7 @@ export const FilterSidebar = ({ filters, appliedFilters, onFilterChange, onApply
                                                     id="net-fee-no-tuition-usd"
                                                     type="text"
                                                     placeholder="0 đến 3600$"
-                                                    onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 3600, onFilterChange)} // Assuming netFeeNoTicket maps to this
+                                                    onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 10000, onFilterChange)} // Assuming netFeeNoTicket maps to this
                                                     value={getDisplayValue(filters.netFeeNoTicket)}
                                                 />
                                                 <p className="text-xs text-muted-foreground">{getConvertedFeeValue(filters.netFeeNoTicket, '0 đến 3600$')}</p>
