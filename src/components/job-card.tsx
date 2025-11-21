@@ -74,7 +74,7 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
 export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, onCancelAppliedJob }:
     { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, onCancelAppliedJob?: any }) => {
     const { serverTime } = useServerInfo()
-    const { isLoggedIn, setPostLoginAction, user, setSavedJobCount, setApplicationCount, setLastAction, isApplying, setIsApplying, applyForJob } = useAuth();
+    const { user, setSavedJobCount, setLastAction, isApplying, applyForJob, role } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
     const [isClient, setIsClient] = useState(false);
@@ -221,8 +221,8 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
 
 
-    const feeInfo = getFeeDisplayInfo(job, isSearchPage);
-    const feeFilterIsActive = !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket);
+    const feeInfo = getFeeDisplayInfo(job, isSearchPage, role);
+    const feeFilterIsActive = !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket || role === 'admin');
     let isExpired = false;
     if (job.expiredDate < serverTime) {
         isExpired = true;
@@ -248,6 +248,19 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 {isClient && <Button variant="outline" size="icon" className="absolute right-1.5 top-1.5 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white md:hidden" onClick={handleSaveJob}>
                                     <Bookmark className={cn("h-4 w-4", isSaved ? "text-accent-orange fill-current" : "text-gray-400")} />
                                 </Button>}
+                                {
+                                    role === 'admin' &&
+                                    <div className='absolute left-0 bottom-0' style={{
+                                        overflow: 'auto',
+                                        fontSize: '11px',
+                                        padding: '5px',
+                                        borderRadius: '5px 5px 0 0',
+                                        maxHeight: 'calc(100% - 50px)',
+                                        backgroundColor: 'rgba(255,255,255,.9)'
+                                    }}>
+                                        {job.aiContent ?? job.baseContent}
+                                    </div>
+                                }
                             </div>
 
                             <div className="flex flex-grow flex-col">

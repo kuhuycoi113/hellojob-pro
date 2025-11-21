@@ -14,7 +14,7 @@ import { validateProfileForApplication } from '@/lib/validators';
 import { applyJob, updateProfile } from '@/actions/user-action';
 import { toast } from '@/hooks/use-toast';
 
-export type Role = 'candidate' | 'candidate-empty-profile' | 'guest';
+export type Role = 'candidate' | 'candidate-empty-profile' | 'guest' | 'admin';
 
 export type PostLoginAction = {
   type: 'APPLY_JOB';
@@ -110,6 +110,8 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
   if (serverUser) {
     if (validateProfileForApplication(serverUser)?.length > 0) {
       role = 'candidate-empty-profile';
+    } else if (serverUser.type === 'ADMIN') {
+      role = 'admin'
     } else {
       role = 'candidate';
     }

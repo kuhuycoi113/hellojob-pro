@@ -5,7 +5,7 @@ import MAPPING_IMAGES from "@/lib/mapping_images.json";
 import MAPPING_EXCLUDE_IMAGES from "@/lib/mapping_exclude_images.json";
 import { japanJobTypes, visaDetailsByVisaType } from "./visa-data";
 import { SearchFilters } from "@/components/job-search/search-results";
-import { User } from "@/contexts/AuthContext";
+import { Role, User } from "@/contexts/AuthContext";
 import { publicFeeLimits } from "./mock-data";
 import { formatDate } from "date-fns";
 
@@ -157,9 +157,15 @@ const controlledFeeVisas = [
   'Kỹ sư, tri thức đầu Việt',
   'Đặc định đầu Việt'
 ];
-export const getFeeDisplayInfo = (job: any, isSearchPage?: boolean) => {
-  debugger
+export const getFeeDisplayInfo = (job: any, isSearchPage?: boolean, role?: Role) => {
   const { visa: visaDetail, fee, netFeeNoTicket, netFeeWithTuition } = job;
+  if (role === 'admin') {
+    if (fee > 100) {
+      return { shouldShow: true, text: `Phí: $${formatCurrency(String(fee))}` };
+    } else {
+      return { shouldShow: false, text: `Phí: Liên hệ nguồn` };
+    }
+  }
   const feeLimit = publicFeeLimits[visaDetail as keyof typeof publicFeeLimits];
   const isControlled = controlledFeeVisas.includes(formatVisa(job.visa) || '');
 

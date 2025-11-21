@@ -72,7 +72,6 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
             def now = new Date().getTime();
             if (doc['expiredDate'].size() == 0) return 0;
             long exp = doc['expiredDate'].value;
-            // Nếu đã hết hạn thì trả về 1, chưa hết hạn thì 0
             return now > exp ? 1 : 0;
           `
             }
@@ -87,9 +86,9 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
                     "script": {
                         "source": `
         if (doc['basicSalary'].size() == 0 || doc['basicSalary'].value == 0) {
-          return -1;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+          return -1;
         }
-        return doc['basicSalary'].value; // còn lại thì trả về mức lương
+        return doc['basicSalary'].value;
       `
                     }
                 }
@@ -104,9 +103,9 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
                     "script": {
                         "source": `
         if (doc['basicSalary'].size() == 0 || doc['basicSalary'].value == 0) {
-          return 99999999;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+          return 99999999;
         }
-        return doc['basicSalary'].value; // còn lại thì trả về mức lương
+        return doc['basicSalary'].value;
       `
                     }
                 }
@@ -121,9 +120,9 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
                     "script": {
                         "source": `
         if (doc['realSalary'].size() == 0 || doc['realSalary'].value == 0) {
-          return -1;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+          return -1;
         }
-        return doc['realSalary'].value; // còn lại thì trả về mức lương
+        return doc['realSalary'].value;
       `
                     }
                 }
@@ -137,10 +136,27 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
                     "order": "asc",
                     "script": {
                         "source": `
-        if (doc['realSalary'].size() == 0 || doc['realSalary'].value == 0) {
-          return 99999999;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+        if (doc['realSalary'].size() == 0 || doc['realSalary'].value == 0 || doc['fee'].value >20000 || doc['fee'].value <100) {
+          return 99999999;
         }
-        return doc['realSalary'].value; // còn lại thì trả về mức lương
+        return doc['realSalary'].value;
+      `
+                    }
+                }
+            })
+            break;
+        }
+        case 'fee_desc': {
+            sort.push({
+                "_script": {
+                    "type": "number",
+                    "order": "desc",
+                    "script": {
+                        "source": `
+        if (doc['fee'].size() == 0 || doc['fee'].value == 0 || doc['fee'].value >20000 || doc['fee'].value <100) {
+          return -1;
+        }
+        return doc['fee'].value;
       `
                     }
                 }
@@ -155,26 +171,9 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
                     "script": {
                         "source": `
         if (doc['fee'].size() == 0 || doc['fee'].value == 0) {
-          return 99999999;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
+          return 99999999;
         }
-        return doc['fee'].value; // còn lại thì trả về mức lương
-      `
-                    }
-                }
-            })
-            break;
-        }
-        case 'fee_desc': {
-            sort.push({
-                "_script": {
-                    "type": "number",
-                    "order": "asc",
-                    "script": {
-                        "source": `
-        if (doc['fee'].size() == 0 || doc['fee'].value == 0) {
-          return 99999999;                     // gán giá trị cực thấp -> xuống cuối khi sort desc
-        }
-        return doc['fee'].value; // còn lại thì trả về mức lương
+        return doc['fee'].value;
       `
                     }
                 }
@@ -209,7 +208,6 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
     searchQuery.sort = sort;
     const conditions = [];
     if (!!visaDetail && visaDetail !== "all-details" && visaDetail !== "" && visaDetail !== "all") {
-        console.log(visaDetail)
         const visaLabel = visaMapping[visaDetail as keyof typeof visaMapping] ?? visaDetail;
         conditions.push({
             term: {
@@ -431,7 +429,6 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
         searchQuery.query.bool.must = conditions;
     }
     // delete searchQuery.sort
-    console.log(JSON.stringify(searchQuery));
     return searchQuery;
 }
 export async function getJobs(filter: SearchFilters, sortOption: string | null, page: number, limit: number = 10): Promise<PaginatedResponse<any>> {
@@ -448,7 +445,6 @@ export async function getJobs(filter: SearchFilters, sortOption: string | null, 
             }
         });
 
-        console.log('fetched')
         return { ...results, docs: mappedDocs };
     } catch (error: any) {
         console.error("Failed to fetch new candidates from Elasticsearch:", error);
@@ -478,7 +474,6 @@ export async function getJobsByIDs(ids: string[]): Promise<PaginatedResponse<any
             def now = new Date().getTime();
             if (doc['expiredDate'].size() == 0) return 0;
             long exp = doc['expiredDate'].value;
-            // Nếu đã hết hạn thì trả về 1, chưa hết hạn thì 0
             return now > exp ? 1 : 0;
           `
                     }
@@ -565,7 +560,6 @@ export async function getJobsBySalerID(id: string, page: number, limit: number =
             def now = new Date().getTime();
             if (doc['expiredDate'].size() == 0) return 0;
             long exp = doc['expiredDate'].value;
-            // Nếu đã hết hạn thì trả về 1, chưa hết hạn thì 0
             return now > exp ? 1 : 0;
           `
                         }
@@ -598,7 +592,6 @@ export async function countJobs(filter: SearchFilters): Promise<number> {
         const query = createSearchQuery(filter, null);
         delete query.sort;
         const total = await countDocuments(CANDIDATES_INDEX, query);
-        console.log('counted')
         return total;
     } catch (error: any) {
         console.error("Failed to fetch new candidates from Elasticsearch:", error);
