@@ -170,6 +170,9 @@ export const getFeeDisplayInfo = (job: any, isSearchPage?: boolean) => {
     feeLabel = 'Phí và vé và học phí';
   } else if (fee) {
     feeValue = parseInt(fee);
+    if (visaDetail?.includes('Thực tập sinh') && feeValue <= 500) {
+      return { shouldShow: true, text: `Phí: Liên hệ` };
+    }
     feeLabel = (visaDetail?.includes('Thực tập sinh')) ? 'Phí và vé không học phí' : 'Phí có vé';
   } else if (netFeeNoTicket) {
     feeValue = parseInt(netFeeNoTicket);
@@ -177,7 +180,7 @@ export const getFeeDisplayInfo = (job: any, isSearchPage?: boolean) => {
   }
 
   if (!feeLabel || feeValue === undefined) {
-    return { shouldShow: isControlled, text: `Phí: Không rõ` };
+    return { shouldShow: isControlled, text: `Phí: Liên hệ` };
   }
 
   if (isControlled && feeValue > feeLimit) {
