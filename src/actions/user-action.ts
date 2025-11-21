@@ -17,6 +17,17 @@ export async function updateProfile(userId: any, data: any) {
     }
 }
 
+export async function findByUID(uID: any) {
+    try {
+        const adminApp = getFirebaseAdminApp();
+        const db = adminApp.firestore();
+        const user = await db.collection('users').doc(uID).get();
+        return user.data();
+    } catch (error) {
+        return null;
+    }
+}
+
 export async function applyJob(userId: string, job: any) {
     try {
         const newObj = {

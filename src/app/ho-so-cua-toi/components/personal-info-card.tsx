@@ -8,7 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
 
-export const PersonalInfoCard = ({ candidate, setIsProfileEditDialogOpen, translation }: { candidate: any, setIsProfileEditDialogOpen: any, translation: any }) => {
+export const PersonalInfoCard = ({ candidate, setIsProfileEditDialogOpen, translation, showEditButton = true }: { candidate: any, setIsProfileEditDialogOpen: any, translation: any, showEditButton?: boolean }) => {
     const { phone, zalo, messenger, line } = candidate.personalInfo;
     const hasContactInfo = !!(phone || zalo || messenger || line);
     const missingFields = validateProfileForApplication(candidate);
@@ -33,9 +33,9 @@ export const PersonalInfoCard = ({ candidate, setIsProfileEditDialogOpen, transl
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="font-headline text-xl flex items-center"><UserCog className="mr-3 text-primary" /> {translation.personalInfo}</CardTitle>
-                <Button variant="ghost" size="icon" onClick={() => setIsProfileEditDialogOpen(true)}>
+                {showEditButton && <Button variant="ghost" size="icon" onClick={() => setIsProfileEditDialogOpen(true)}>
                     <Edit className="h-4 w-4" />
-                </Button>
+                </Button>}
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
                 <p><strong>{translation.dateOfBirth}:</strong> {candidate.personalInfo.dateOfBirth ? format(new Date(candidate.personalInfo.dateOfBirth), 'dd/MM/yyyy') : notUpdatedText}</p>
