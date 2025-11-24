@@ -87,8 +87,7 @@ export default function JobSearchPageContent() {
         }
         router.push(`/tim-viec-lam?${query.toString()}`);
     }, [stagedFilters, sortBy, router]);
-
-    const handleSortChange = (value: string) => {
+    const handleSortChange = useCallback((value: string) => {
         setSortBy(value);
         const query = new URLSearchParams(readOnlySearchParams.toString());
         if (value === 'newest') {
@@ -98,12 +97,13 @@ export default function JobSearchPageContent() {
         }
         query.delete('page');
         router.push(`/tim-viec-lam?${query.toString()}`);
-    };
-    const onPageChange = (page: number) => {
+    }, [readOnlySearchParams]);  // hoặc []
+    
+    const onPageChange = useCallback((page: number) => {
         const query = new URLSearchParams(readOnlySearchParams.toString());
         query.set('page', page.toString());
         router.push(`/tim-viec-lam?${query.toString()}`);
-    }
+    }, [readOnlySearchParams]);
 
     const handleResetFilters = useCallback(() => {
         router.push(`/tim-viec-lam`);

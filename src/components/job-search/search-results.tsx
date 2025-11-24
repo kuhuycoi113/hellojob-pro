@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useRef, useState, useEffect, memo } from "react";
 import { Button } from "../ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
@@ -71,7 +71,7 @@ type SearchResultsProps = {
     firstLoad?: boolean;
 }
 
-export const SearchResults = ({ jobs, total, filters, appliedFilters, firstLoad = false, totalPage, currentPage, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange, onPageChange }: SearchResultsProps) => {
+export const SearchResults = memo(({ jobs, total, filters, appliedFilters, firstLoad = false, totalPage, currentPage, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange, onPageChange }: SearchResultsProps) => {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -180,4 +180,4 @@ export const SearchResults = ({ jobs, total, filters, appliedFilters, firstLoad 
             </div>
         </div>
     )
-};
+});
