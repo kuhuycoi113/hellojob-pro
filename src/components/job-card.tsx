@@ -35,6 +35,7 @@ import { applyJob, cancelAppliedJob, updateProfile } from '@/actions/user-action
 import { validateProfileForApplication } from '@/lib/validators';
 import { useServerInfo } from './layout/root-provider';
 import { NameAvatar } from './ui/name-avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 
 // CANHANHOA01: Function to log user interaction
@@ -373,6 +374,27 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                 <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
                                                     {feeInfo.text}
                                                 </Badge>
+                                            )}
+                                            {!!job.formImage && (
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <div className="relative flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center rounded-sm border-2 border-muted bg-secondary">
+                                                                <FileText className="h-4 w-4 text-muted-foreground" />
+                                                                {job.formImage && (
+                                                                    <Star className="absolute -top-1.5 -right-1.5 h-3 w-3 text-yellow-400 fill-yellow-400" />
+                                                                )}
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            {!!job.formImage ? (
+                                                                <p>Việc làm này có form đơn hàng đẹp</p>
+                                                            ) : (
+                                                                <p>Việc làm này có ảnh form đơn hàng</p>
+                                                            )}
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
                                             )}
                                         </>
                                     )}

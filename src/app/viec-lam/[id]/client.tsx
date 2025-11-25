@@ -4,7 +4,7 @@ import { notFound, useRouter } from 'next/navigation';
 import { publicFeeLimits, controlledFeeVisas } from '@/lib/mock-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, CalendarDays, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle, MoreHorizontal, Copy } from 'lucide-react';
+import { Briefcase, CalendarDays, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle, MoreHorizontal, Copy, Eye } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -35,6 +35,7 @@ import { applyJob, updateProfile } from '@/actions/user-action';
 import { useServerInfo } from '@/components/layout/root-provider';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ImageViewer } from '@/lib/image-viewer';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -86,7 +87,7 @@ const visasForVndDisplay = [
 export default function JobDetailClientPage({ job, behavioralSuggestions }: { job: any, behavioralSuggestions: any[] }) {
     const { toast } = useToast();
     const { serverTime } = useServerInfo();
-    const { isLoggedIn, setPostLoginAction, user, setApplicationCount, setSavedJobCount, setLastAction } = useAuth();
+    const { isLoggedIn, setPostLoginAction, user, setApplicationCount, setSavedJobCount, setLastAction, role } = useAuth();
     const [isClient, setIsClient] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const [hasApplied, setHasApplied] = useState(false);
@@ -96,6 +97,8 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
+    const [isViewerOpen, setIsViewerOpen] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         setIsClient(true);
@@ -236,6 +239,11 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
         </div>
     }
 
+    const openImageViewer = (imageUrl: string) => {
+        setSelectedImage(imageUrl);
+        setIsViewerOpen(true);
+    };
+
     const salerID = job.salerID;
     const assignedConsultant = consultants.find(c => c.id === salerID) ?? consultants[0];
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay';
@@ -253,6 +261,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     if (job.basicSalary > 100000 && job.basicSalary < 900000) {
         annualIncome = job.basicSalary * 12;
     }
+
 
     if (!!job) {
         return (
@@ -387,24 +396,26 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                     {!job.benefits && <div><ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li><li>Thưởng 1-2 lần/năm tùy theo kết quả kinh doanh.</li></ul></div>}
                                 </JobDetailSection>
 
-                                {(job.videoUrl || job.avatar) &&
-                                    <JobDetailSection title="Hình ảnh & Video công việc" icon={ImageIcon}>
-                                        <div className={cn("space-y-6", isExpired && "grayscale")}>
-                                            {job.videoUrl && (
-                                                <div className="aspect-video">
-                                                    <iframe id="VIDEOVIECLAM01" className="w-full h-full rounded-lg" src={job.videoUrl} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                <JobDetailSection title="Hình ảnh công việc" icon={ImageIcon}>
+                                    <div className={cn("space-y-6", isExpired && "grayscale")}>
+                                        <div className={cn("grid grid-cols-1 gap-4", job.formImage && role === 'admin' ? 'md:grid-cols-2' : 'md:grid-cols-1')}>
+                                            <div onClick={() => openImageViewer(avatar)} className={cn("relative overflow-hidden rounded-lg border-2 border-[#9B999A] group cursor-pointer", job.formImage && role === 'admin' ? 'aspect-[2/3]' : 'aspect-[5/3]')}>
+                                                <Image id={job.code} src={avatar} alt={job.code} fill className="object-cover" quality={100} unoptimized />
+                                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <Eye className="h-10 w-10 text-white" />
                                                 </div>
-                                            )}
-                                            {!!avatar && (
-                                                <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                                                    <div className="relative aspect-[5/3] overflow-hidden rounded-lg border-2 border-[#9B999A]">
-                                                        <Image id={job.code} src={avatar} alt={job.code} fill className="object-cover" quality={100} unoptimized />
+                                            </div>
+                                            {job.formImage && role === 'admin' &&
+                                                <div onClick={() => openImageViewer(job.formImage)} className={cn("relative overflow-hidden rounded-lg border-2 border-[#9B999A] group cursor-pointer aspect-[2/3]")}>
+                                                    <Image id={job.code} src={job.formImage} alt={job.code} fill objectFit='contain' quality={100} unoptimized />
+                                                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <Eye className="h-10 w-10 text-white" />
                                                     </div>
                                                 </div>
-                                            )}
+                                            }
                                         </div>
-                                    </JobDetailSection>
-                                }
+                                    </div>
+                                </JobDetailSection>
 
                             </div>
 
@@ -522,6 +533,12 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                 <div className="space-t-20 md:space-t-28 pt-20 md:pt-28">
                     <CtaViecLamTuongTu isLoading={false} suggestions={behavioralSuggestions} />
                 </div>
+                <ImageViewer
+                    isOpen={isViewerOpen}
+                    onOpenChange={setIsViewerOpen}
+                    imageUrl={selectedImage}
+                    alt="Xem ảnh chi tiết"
+                />
             </>
         );
     }
