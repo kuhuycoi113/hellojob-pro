@@ -37,6 +37,8 @@ export const initialSearchFilters: SearchFilters = {
     otherSkillRequirement: [],
     companyArrivalTime: '',
     workShift: '',
+    showExpired: true,
+    sortExpiredToEnd: true
 };
 
 
@@ -76,6 +78,8 @@ export const keyMap: { [key: string]: string } = {
     companyArrivalTime: 'thoi-diem-ve-cong-ty',
     workShift: 'ca-lam-viec',
     sortBy: 'sap-xep',
+    showExpired: 'hien-thi-het-han',
+    sortExpiredToEnd: 'het-han-xuong-duoi'
 };
 
 export const sortOptionMap: { [key: string]: string } = {
@@ -105,8 +109,14 @@ export const generateJobFilter = (readOnlySearchParams: any) => {
     const newFilters: SearchFilters = { ...initialSearchFilters, workLocation: [], specialConditions: [], otherSkillRequirement: [] };
     let sortOption = 'newest';
     let page = 1;
-    for (const [key, value] of readOnlySearchParams.entries()) {
-        const internalKey = reverseKeyMap[key] || key;
+    let entries = null;
+    try {
+        entries = readOnlySearchParams.entries()
+    } catch (error) {
+        entries = Object.entries(readOnlySearchParams)
+    }
+    for (const [key, value] of entries) {
+        const internalKey: string = reverseKeyMap[key] || key;
         if (internalKey === 'sortBy') {
             sortOption = reverseSortOptionMap[value] || 'newest';
         } else if (internalKey === 'workLocation' || internalKey === 'otherSkillRequirement') {
@@ -125,6 +135,10 @@ export const generateJobFilter = (readOnlySearchParams: any) => {
             newFilters.specialConditions = [...(newFilters.specialConditions || []), ...conditionNames];
         } else if (internalKey === 'page') {
             page = parseInt(value, 10) || 1;
+        } else if (internalKey === 'showExpired' || internalKey === 'sortExpiredToEnd') {
+            if (internalKey in newFilters) {
+                newFilters[internalKey] = JSON.parse(value?.toLocaleLowerCase() ?? 'true');
+            }
         } else {
             if (internalKey in newFilters) {
                 // @ts-ignore

@@ -50,6 +50,10 @@ export type SearchFilters = {
     companyArrivalTime?: string;
     workShift?: string;
     suggestionType?: 'accurate' | 'related';
+    showExpired?: boolean;
+    hasForm?: boolean;
+    hasNiceForm?: boolean;
+    sortExpiredToEnd?: boolean;
 }
 
 export { experienceYears };

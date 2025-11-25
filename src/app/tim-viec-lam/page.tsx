@@ -8,6 +8,8 @@ import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/locat
 import { industriesByJobType } from '@/lib/industry-data';
 import { format, isValid, parse } from 'date-fns';
 import LANGUAGE_LEVEL from '@/lib/language_level.json';
+import { generateJobFilter } from '@/lib/job-filter-util';
+import { getJobs } from '@/actions/jobs-action';
 const languageLevels = LANGUAGE_LEVEL.filter(level => level.groupCode.includes('TN'));
 
 type SearchParams = {
@@ -346,17 +348,21 @@ export async function generateMetadata({ searchParams }: { searchParams: any }):
   };
 }
 
+const DISPLAYED_JOBS_PER_PAGE = 30;
 
-export default function JobSearchPage({ searchParams }: { searchParams: SearchParams }) {
+export default async function JobSearchPage({ searchParams }: { searchParams: SearchParams }) {
   // Pass searchParams to client component to avoid re-reading them,
   // this is important for structured data generation on the client.
+  const { newFilters, sortOption, page } = generateJobFilter(await searchParams);
+  const { docs: jobs, total, totalPages } = await getJobs(newFilters, sortOption, page, DISPLAYED_JOBS_PER_PAGE);
+  // const appliedFilters=
   return (
     <Suspense fallback={
       <div className="flex h-screen items-center justify-center bg-secondary">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
       </div>
     }>
-      <JobSearchPageContent />
+      <JobSearchPageContent filters={newFilters} jobs={jobs} total={total} totalPages={totalPages} page={page} sort={sortOption} />
     </Suspense>
   );
 }

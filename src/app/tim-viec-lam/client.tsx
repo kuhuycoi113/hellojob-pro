@@ -10,59 +10,57 @@ import { allSpecialConditions } from '@/lib/visa-data';
 import { countJobs, getJobs } from '@/actions/jobs-action';
 import { generateJobFilter, initialSearchFilters, keyMap, sortOptionMap } from '@/lib/job-filter-util';
 
-const DISPLAYED_JOBS_PER_PAGE = 30;
-export default function JobSearchPageContent() {
+export default function JobSearchPageContent({ jobs = [], filters, total, totalPages = 0, page = 1, sort = 'newest' }: { jobs?: Job[], filters: SearchFilters, total: number, totalPages?: number, page?: number, sort?: string }) {
     const router = useRouter();
     const readOnlySearchParams = useSearchParams();
 
-    const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(initialSearchFilters);
-    const [stagedFilters, setStagedFilters] = useState<SearchFilters>(initialSearchFilters);
-    const [sortBy, setSortBy] = useState('newest');
+    const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(filters);
+    const [stagedFilters, setStagedFilters] = useState<SearchFilters>(filters);
+    const [sortBy, setSortBy] = useState(sort);
 
-    const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-    const [stagedResultCount, setStagedResultCount] = useState<number>(0);
-    const [totalJobs, setTotalJobs] = useState<number | null>(null);
-    const [totalPage, setTotalPage] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [filteredJobs, setFilteredJobs] = useState<Job[]>(jobs);
+    const [stagedResultCount, setStagedResultCount] = useState<number>(total);
+    const [totalJobs, setTotalJobs] = useState<number | null>(total);
+    const [totalPage, setTotalPage] = useState(totalPages);
+    const [currentPage, setCurrentPage] = useState(page);
     const [firstLoad, setFirstLoad] = useState(false);
-    const runFilter = useCallback(async (filtersToApply: SearchFilters, sortOption: string, page: number) => {
-        const { docs: jobs, total, totalPages } = await getJobs(filtersToApply, sortOption, page, DISPLAYED_JOBS_PER_PAGE);
+    
+    useEffect(() => {
+        // Đồng bộ hóa tất cả các state được khởi tạo từ props
         setFilteredJobs(jobs);
         setTotalJobs(total);
         setTotalPage(totalPages);
+        setCurrentPage(page);
+        setSortBy(sort);
+        
+        // Cập nhật cả appliedFilters và stagedFilters theo props mới từ SC
+        setAppliedFilters(filters);
+        setStagedFilters(filters);
+        
+        // Bạn có thể giữ lại stagedResultCount để nó cập nhật theo total
+        setStagedResultCount(total);
+        
+        // Có thể loại bỏ setFirstLoad(true) ở đây nếu logic không cần
         setFirstLoad(true);
-    }, []);
+        
+        // Dependency Array: Chạy lại mỗi khi các props này thay đổi
+    }, [jobs, filters, total, totalPages, page, sort]);
 
-    const countStagedResults = useCallback(async (filtersToCount: SearchFilters) => {
-        const total = await countJobs(filtersToCount);
+    const handleStagedFilterChange = useCallback(async (updateFilters: Partial<SearchFilters>) => {
+        const newFilter: SearchFilters = { ...stagedFilters, ...updateFilters };
+        setStagedFilters(newFilter);
+        const total = await countJobs(newFilter);
+        console.log(newFilter)
         document.getElementById('filter-staged-count-badge')!.textContent = total.toString();
         setStagedResultCount(total);
-    }, []);
-
-    useEffect(() => {
-        const { newFilters, sortOption, page } = generateJobFilter(readOnlySearchParams);
-        setCurrentPage(page);
-        setSortBy(sortOption);
-        setAppliedFilters(newFilters);
-        setStagedFilters(newFilters);
-        runFilter(newFilters, sortOption, page);
-        console.log('Filters from URL:', newFilters);
-    }, [readOnlySearchParams]);
-
-    const handleStagedFilterChange = useCallback((newFilters: Partial<SearchFilters>) => {
-        setStagedFilters(prev => ({ ...prev, ...newFilters }));
-    }, []);
-
-    useEffect(() => {
-        countStagedResults(stagedFilters);
-    }, [stagedFilters]);
+    },[]);
 
 
     const handleApplyFilters = useCallback(() => {
         const query = new URLSearchParams();
         Object.entries(stagedFilters).forEach(([key, value]) => {
             const urlKey = keyMap[key] || key;
-            if (value && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
+            if ((value || typeof value === 'boolean') && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
                 if (key !== 'visa') {
                     if (Array.isArray(value)) {
                         if (key === 'specialConditions') {
@@ -86,7 +84,7 @@ export default function JobSearchPageContent() {
             query.set(keyMap['sortBy'], sortOptionMap[sortBy]);
         }
         router.push(`/tim-viec-lam?${query.toString()}`);
-    }, [stagedFilters, sortBy, router]);
+    }, [stagedFilters]);
     const handleSortChange = useCallback((value: string) => {
         setSortBy(value);
         const query = new URLSearchParams(readOnlySearchParams.toString());
@@ -97,17 +95,17 @@ export default function JobSearchPageContent() {
         }
         query.delete('page');
         router.push(`/tim-viec-lam?${query.toString()}`);
-    }, [readOnlySearchParams]);  // hoặc []
-    
+    }, []);  // hoặc []
+
     const onPageChange = useCallback((page: number) => {
         const query = new URLSearchParams(readOnlySearchParams.toString());
         query.set('page', page.toString());
         router.push(`/tim-viec-lam?${query.toString()}`);
-    }, [readOnlySearchParams]);
+    }, []);
 
     const handleResetFilters = useCallback(() => {
         router.push(`/tim-viec-lam`);
-    }, [router, runFilter, countStagedResults, readOnlySearchParams]);
+    }, []);
 
     const handleNewSearch = useCallback((filters: Partial<SearchFilters>) => {
         const query = new URLSearchParams();

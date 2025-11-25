@@ -14,7 +14,7 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
         q, visaDetail, career, workLocation, job, interviewLocation, numberRecruits, netFee, netFeeNoTicket, interviewRounds, interviewDate, interviewDateType,
         basicSalary, realSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
         age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-        otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement, suggestionType
+        otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement, suggestionType, showExpired, sortExpiredToEnd
     } = filter;
     const searchQuery: any = {
         query: {
@@ -93,20 +93,33 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
             },
         });
     }
-    const sort: any[] = [{
-        "_script": {
-            "type": "number",
-            "order": "asc",
-            "script": {
-                "source": `
+    const sort: any[] = [];
+    if (showExpired) {
+        if (sortExpiredToEnd) {
+            sort.push({
+                "_script": {
+                    "type": "number",
+                    "order": "asc",
+                    "script": {
+                        "source": `
             def now = new Date().getTime();
             if (doc['expiredDate'].size() == 0) return 0;
             long exp = doc['expiredDate'].value;
             return now > exp ? 1 : 0;
           `
-            }
+                    }
+                }
+            });
         }
-    }];
+    } else {
+        searchQuery.query.bool.filter.push({
+            "range": {
+                "expiredDate": {
+                    "gte": Date.now(),
+                }
+            }
+        });
+    }
     switch (sortOption) {
         case 'salary_desc': {
             sort.push({
@@ -474,7 +487,6 @@ export async function getJobs(filter: SearchFilters, sortOption: string | null, 
                 source: doc.source, // Fixed: Added back the source field
             }
         });
-
         return { ...results, docs: mappedDocs };
     } catch (error: any) {
         console.error("Failed to fetch new candidates from Elasticsearch:", error);

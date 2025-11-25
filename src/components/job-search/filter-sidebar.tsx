@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { CAREERS, industriesByJobType, type Industry } from "@/lib/industry-data";
-import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2, Search } from "lucide-react";
+import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2, Search, ListFilter } from "lucide-react";
 import { interviewLocations } from '@/lib/location-data';
 import { type SearchFilters, experienceYears } from './search-results';
 import { cn } from '@/lib/utils';
@@ -31,6 +31,7 @@ import JOBS from '@/lib/jobs.json';
 import PROVINCES from "@/lib/provinces.json";
 import LANGUAGE_LEVEL from '@/lib/language_level.json';
 import { useDebounce } from '@/lib/useDebounce';
+import { Switch } from '../ui/switch';
 
 const createSlug = (str: string) => {
     if (!str) return '';
@@ -257,7 +258,7 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
 MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 const japanProvinces = PROVINCES.filter((item) => item.groupCode === "JP");
 
-export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, onApply, onReset }: FilterSidebarProps) => {
+export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, onApply, onReset, resultCount }: FilterSidebarProps) => {
     const [availableJobDetails, setAvailableJobDetails] = useState<any[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<String[]>(allIndustries);
     const isMobile = useIsMobile();
@@ -481,7 +482,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                             onDebouncedChange={handleKeywordDebounced}
                         />
                     </div>
-                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'experience', 'requirements', 'interviewLocation', 'process', 'salary', 'netSalary', 'specialConditions', 'netFee']} className="w-full">
+                    <Accordion type="multiple" defaultValue={['jobType', 'location', 'industry', 'experience', 'requirements', 'interviewLocation', 'process', 'salary', 'netSalary', 'specialConditions', 'netFee', 'conditions']} className="w-full">
                         <AccordionItem value="jobType">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><Briefcase className="h-5 w-5" />Loại hình công việc</span>
@@ -1098,6 +1099,56 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                 ))}
                             </AccordionContent>
                         </AccordionItem>
+                        <AccordionItem value="conditions" className="border-b-0">
+                            <AccordionTrigger className="text-base font-semibold">
+                                <span className="flex items-center gap-2"><ListFilter className="h-5 w-5" />Điều kiện hiển thị</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-4 pt-4">
+                                <div className="flex items-center justify-between space-x-2">
+                                    <Label htmlFor="show-expired" className="cursor-pointer text-muted-foreground">Hiển thị đơn hết hạn</Label>
+                                    <Switch
+                                        id="show-expired"
+                                        checked={filters.showExpired}
+                                        onCheckedChange={(checked) => onFilterChange({ showExpired: checked })}
+                                    />
+                                </div>
+                                {filters.showExpired && (
+                                    <div className="pl-6 border-l-2 ml-2 space-y-4 pt-4">
+                                        <div className="flex items-center justify-between space-x-2">
+                                            <Label htmlFor="sort-expired" className="cursor-pointer text-muted-foreground">Hết hạn xuống dưới</Label>
+                                            <Switch
+                                                id="sort-expired"
+                                                checked={filters.sortExpiredToEnd}
+                                                onCheckedChange={(checked) => onFilterChange({ sortExpiredToEnd: checked })}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                                {/* <div className="space-y-4">
+                                    <div className="flex items-center justify-between space-x-2">
+                                        <Label htmlFor="has-form" className="font-normal cursor-pointer flex-grow text-muted-foreground">Có form đơn</Label>
+                                        <Switch
+                                            id="has-form"
+                                            checked={filters.hasForm}
+                                            onCheckedChange={(checked) => onFilterChange({ hasForm: !!checked, hasNiceForm: checked ? filters.hasNiceForm : false })}
+                                        />
+                                    </div>
+                                    <div className="pl-6 border-l-2 ml-2 space-y-4">
+                                        <div className="flex items-center justify-between space-x-2">
+                                            <Label htmlFor="has-nice-form" className={cn("font-normal cursor-pointer flex-grow text-muted-foreground", !filters.hasForm && "opacity-50")}>
+                                                Form đơn đẹp
+                                            </Label>
+                                            <Switch
+                                                id="has-nice-form"
+                                                checked={filters.hasNiceForm}
+                                                onCheckedChange={(checked) => onFilterChange({ hasNiceForm: !!checked })}
+                                                disabled={!filters.hasForm}
+                                            />
+                                        </div>
+                                    </div>
+                                </div> */}
+                            </AccordionContent>
+                        </AccordionItem>
                     </Accordion>
                 </CardContent>
             </Card>
@@ -1105,7 +1156,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                 <div className="grid grid-cols-3 gap-2 w-full">
                     <Button variant="outline" onClick={onReset} className="col-span-1">Xóa</Button>
                     <Button className="w-full bg-primary text-white col-span-2" onClick={onApply}>
-                        Áp dụng <Badge variant="secondary" className="ml-2" id='filter-staged-count-badge'>0</Badge>
+                        Áp dụng <Badge variant="secondary" className="ml-2" id='filter-staged-count-badge'>{resultCount}</Badge>
                     </Button>
                 </div>
             </div>
