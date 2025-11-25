@@ -50,10 +50,9 @@ export default function JobSearchPageContent({ jobs = [], filters, total, totalP
         const newFilter: SearchFilters = { ...stagedFilters, ...updateFilters };
         setStagedFilters(newFilter);
         const total = await countJobs(newFilter);
-        console.log(newFilter)
         document.getElementById('filter-staged-count-badge')!.textContent = total.toString();
         setStagedResultCount(total);
-    },[]);
+    },[stagedFilters]);
 
 
     const handleApplyFilters = useCallback(() => {
