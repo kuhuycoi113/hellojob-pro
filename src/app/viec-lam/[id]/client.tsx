@@ -254,7 +254,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     const avatar = job.avatar || getJobImage(job.job, job.career);
     const badgeClassName = getVisaBadgeClassName(job.visa);
     let isExpired = false;
-    if (job.expiredDate < serverTime) {
+    if (job?.expiredDate < serverTime) {
         isExpired = true;
     }
     let annualIncome = null;

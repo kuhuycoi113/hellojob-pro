@@ -202,7 +202,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     const badgeClassName = useMemo(() => getVisaBadgeClasses(jobVisa as any), [jobVisa]);
     const postedTime = useMemo(() => convertTime(job?.time || job?.postedDate || job?.createdDate), [job]);
     const interviewDate = useMemo(() => job.interviewDay, [job.interviewDay]);
-    const isExpired = useMemo(() => job.expiredDate < serverTime, [job.expiredDate, serverTime]);
+    const isExpired = useMemo(() => job?.expiredDate < serverTime, [job?.expiredDate, serverTime]);
     const feeInfo = useMemo(() => getFeeDisplayInfo(job, isSearchPage, role), [job, isSearchPage, role]);
     const feeFilterIsActive = useMemo(() => !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket || role === 'admin'), [appliedFilters, role]);
     

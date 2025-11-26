@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
               ${data?.numberRecruits ? ` ${data?.numberRecruits} người` : ""}
               ${data?.specialConditions?.length > 0 ? ` (${formatSpecialCondition(data?.specialConditions).join(", ")})` : ""}`;
     let isExpired = false;
-    if (data.expiredDate < Date.now()) {
+    if (data?.expiredDate < Date.now()) {
         isExpired = true;
     }
     if (isExpired) {
