@@ -31,6 +31,7 @@ import LANGUAGE_LEVEL from '@/lib/language_level.json';
 import { useDebounce } from '@/lib/useDebounce';
 import { Switch } from '../ui/switch';
 import { CheckedState } from '@radix-ui/react-checkbox';
+import { useAuth } from '@/contexts/AuthContext';
 
 const createSlug = (str: string) => {
     if (!str) return '';
@@ -267,6 +268,7 @@ MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 const japanProvinces = PROVINCES.filter((item) => item.groupCode === "JP");
 
 export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, onApply, onReset, resultCount }: FilterSidebarProps) => {
+    const { role } = useAuth();
     const [availableJobDetails, setAvailableJobDetails] = useState<any[]>([]);
     const [availableIndustries, setAvailableIndustries] = useState<String[]>(allIndustries);
     const isMobile = useIsMobile();
@@ -294,11 +296,10 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                 const provinces = japanRegions[region];
                 return provinces.find((province: { label: string, [key: string]: any }) => filters.workLocation?.includes(province.label))
             });
-            console.log(regions)
             return regions;
         }
     })
-    
+
     // Tối ưu hóa: Bọc hàm xử lý input từ khóa bằng useCallback
     const handleKeywordDebounced = useCallback((q: string) => {
         if ((filters.q ?? '') === (q ?? '')) return; // avoid no-op updates
@@ -334,7 +335,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
         [activeFilters.visaDetail]);
 
     const availableConditions = useMemo(() => {
-        if (!activeFilters.visaDetail) {
+        if (!activeFilters.visaDetail || activeFilters.visaDetail === 'all') {
             return allSpecialConditions;
         }
         const conditions = conditionsByVisaDetail[activeFilters.visaDetail as keyof typeof conditionsByVisaDetail] || [];
@@ -362,7 +363,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
 
         return isEngineerVisa || isTokuteiServiceIndustry;
     }, [activeFilters.visa, activeFilters.visaDetail, activeFilters.career]);
-    
+
     // Tối ưu hóa: Tạo callback ổn định cho việc thay đổi input lương/phí
     const handleSalaryChangeCallback = useCallback((
         e: React.ChangeEvent<HTMLInputElement>,
@@ -403,7 +404,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
             onFilterChange({ interviewDate: '' });
         }
     }, [onFilterChange]);
-    
+
     const handleRegionSelect = useCallback((checked: CheckedState, regionLabel: any) => {
         const currentSelection = new Set(Array.isArray(filters.workLocation) ? filters.workLocation : []);
         if (checked) {
@@ -413,7 +414,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
         }
         onFilterChange({ workLocation: Array.from(currentSelection) });
     }, [filters.workLocation, japanRegions, onFilterChange]);
-    
+
     const handleProvinceSelect = useCallback((checked: CheckedState, provinceLabel: any) => {
         const currentSelection = new Set(Array.isArray(filters.workLocation) ? filters.workLocation : []);
         if (checked) {
@@ -1163,7 +1164,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                         </div>
                                     </div>
                                 )}
-                                {/* <div className="space-y-4">
+                                {role === 'admin' && <div className="space-y-4">
                                     <div className="flex items-center justify-between space-x-2">
                                         <Label htmlFor="has-form" className="font-normal cursor-pointer flex-grow text-muted-foreground">Có form đơn</Label>
                                         <Switch
@@ -1172,7 +1173,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                             onCheckedChange={(checked) => onFilterChange({ hasForm: !!checked, hasNiceForm: checked ? filters.hasNiceForm : false })}
                                         />
                                     </div>
-                                    <div className="pl-6 border-l-2 ml-2 space-y-4">
+                                    {/* <div className="pl-6 border-l-2 ml-2 space-y-4">
                                         <div className="flex items-center justify-between space-x-2">
                                             <Label htmlFor="has-nice-form" className={cn("font-normal cursor-pointer flex-grow text-muted-foreground", !filters.hasForm && "opacity-50")}>
                                                 Form đơn đẹp
@@ -1184,8 +1185,8 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                 disabled={!filters.hasForm}
                                             />
                                         </div>
-                                    </div>
-                                </div> */}
+                                    </div> */}
+                                </div>}
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>

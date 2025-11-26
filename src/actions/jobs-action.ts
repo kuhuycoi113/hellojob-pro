@@ -14,7 +14,8 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
         q, visaDetail, career, workLocation, job, interviewLocation, numberRecruits, netFee, netFeeNoTicket, interviewRounds, interviewDate, interviewDateType,
         basicSalary, realSalary, hourlySalary, annualIncome, annualBonus, gender, experienceRequirement, yearsOfExperience,
         age, height, weight, visionRequirement, tattooRequirement, languageRequirement, educationRequirement, dominantHand,
-        otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement, suggestionType, showExpired, sortExpiredToEnd
+        otherSkillRequirement, specialConditions, companyArrivalTime, workShift, englishRequirement, suggestionType, showExpired, sortExpiredToEnd,
+        hasForm, hasNiceForm
     } = filter;
     const searchQuery: any = {
         query: {
@@ -119,6 +120,15 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
                 }
             }
         });
+    }
+    if (hasForm) {
+        searchQuery.query.bool.filter.push(
+            {
+                exists: {
+                    field: "formImage.keyword",
+                },
+            }
+        );
     }
     switch (sortOption) {
         case 'salary_desc': {

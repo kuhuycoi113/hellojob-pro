@@ -100,7 +100,7 @@ export default function JobSearchPageContent({ jobs = [], filters, total, totalP
         const query = new URLSearchParams(readOnlySearchParams.toString());
         query.set('page', page.toString());
         router.push(`/tim-viec-lam?${query.toString()}`);
-    }, []);
+    }, [stagedFilters]);
 
     const handleResetFilters = useCallback(() => {
         router.push(`/tim-viec-lam`);

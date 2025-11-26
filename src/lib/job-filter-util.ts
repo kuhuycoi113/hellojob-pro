@@ -38,7 +38,8 @@ export const initialSearchFilters: SearchFilters = {
     companyArrivalTime: '',
     workShift: '',
     showExpired: true,
-    sortExpiredToEnd: true
+    sortExpiredToEnd: true,
+    hasForm: false
 };
 
 
@@ -79,7 +80,9 @@ export const keyMap: { [key: string]: string } = {
     workShift: 'ca-lam-viec',
     sortBy: 'sap-xep',
     showExpired: 'hien-thi-het-han',
-    sortExpiredToEnd: 'het-han-xuong-duoi'
+    sortExpiredToEnd: 'het-han-xuong-duoi',
+    hasForm: 'co-form-don',
+    hasNiceForm: 'form-don-dep'
 };
 
 export const sortOptionMap: { [key: string]: string } = {
@@ -122,7 +125,11 @@ export const generateJobFilter = (readOnlySearchParams: any) => {
         } else if (internalKey === 'workLocation' || internalKey === 'otherSkillRequirement') {
             const currentValues = newFilters[internalKey as 'workLocation' | 'otherSkillRequirement'] || [];
             // @ts-ignore
-            newFilters[internalKey as 'workLocation' | 'otherSkillRequirement'] = [...currentValues, ...value];
+            if (Array.isArray(value)) {
+                newFilters[internalKey as 'workLocation' | 'otherSkillRequirement'] = [...currentValues, ...value];
+            } else {
+                newFilters[internalKey as 'workLocation' | 'otherSkillRequirement'] = [...currentValues, value];
+            }
         } else if (internalKey === 'age' || internalKey === 'height' || internalKey === 'weight') {
             const values = readOnlySearchParams.getAll(key);
             if (values.length === 2) {
@@ -135,7 +142,7 @@ export const generateJobFilter = (readOnlySearchParams: any) => {
             newFilters.specialConditions = [...(newFilters.specialConditions || []), ...conditionNames];
         } else if (internalKey === 'page') {
             page = parseInt(value, 10) || 1;
-        } else if (internalKey === 'showExpired' || internalKey === 'sortExpiredToEnd') {
+        } else if (internalKey === 'showExpired' || internalKey === 'sortExpiredToEnd' || internalKey === 'hasForm' || internalKey === 'hasNiceForm') {
             if (internalKey in newFilters) {
                 newFilters[internalKey] = JSON.parse(value?.toLocaleLowerCase() ?? 'true');
             }
