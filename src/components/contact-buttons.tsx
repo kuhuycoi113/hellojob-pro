@@ -76,7 +76,7 @@ export function ContactButtons({ contact, job, variant = 'default', showChatText
                         onClick={handleChatClick}
                     >
                         <MessageSquare className="h-4 w-4" />
-                        <span className={cn('ml-2', (variant === 'compact') ? 'hidden' : 'inline','max-w-[150px] truncate')}>
+                        <span className={cn('ml-2', (variant === 'compact'||!showChatText) ? 'hidden' : 'inline max-w-[190px] truncate')}>
                             {contact.groupName}
                         </span>
                     </Button>

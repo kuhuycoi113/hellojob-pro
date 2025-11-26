@@ -40,7 +40,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 // CANHANHOA01: Function to log user interaction
 const logInteraction = (job: Job, type: 'view' | 'save') => {
     try {
-        const MAX_SIGNALS = 50; 
+        const MAX_SIGNALS = 50;
         let signals: Partial<Job>[] = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
         const signal: Partial<Job> = {
             id: job.id,
@@ -92,7 +92,8 @@ const getVisaBadgeClasses = (visa: string): string => {
 // SUB-COMPONENT (Tách biệt logic hiển thị Recruiter/Admin)
 // ====================================================================
 
-const JobRecruiterInfo = ({ job, recruiter, role, isConsultantPopoverOpen, setIsConsultantPopoverOpen }: { job: any, recruiter: any, role: string, isConsultantPopoverOpen: boolean, setIsConsultantPopoverOpen: (open: boolean) => void }) => {
+const JobRecruiterInfo = ({ job, recruiter, role, isConsultantPopoverOpen, setIsConsultantPopoverOpen, showChatText = true }:
+    { job: any, recruiter: any, role: string, isConsultantPopoverOpen: boolean, showChatText?: boolean, setIsConsultantPopoverOpen: (open: boolean) => void }) => {
     // Logic cho vai trò Admin
     if (role === 'admin') {
         let titleLinkGroup = "#";
@@ -141,7 +142,7 @@ const JobRecruiterInfo = ({ job, recruiter, role, isConsultantPopoverOpen, setIs
                     </div>
                 </PopoverContent>
             </Popover>
-            <ContactButtons contact={poster} job={job} showChatText={true} />
+            <ContactButtons contact={poster} job={job} showChatText={showChatText} />
         </>;
     }
 
@@ -205,7 +206,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     const isExpired = useMemo(() => job?.expiredDate < serverTime, [job?.expiredDate, serverTime]);
     const feeInfo = useMemo(() => getFeeDisplayInfo(job, isSearchPage, role), [job, isSearchPage, role]);
     const feeFilterIsActive = useMemo(() => !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket || role === 'admin'), [appliedFilters, role]);
-    
+
     // Tính toán Recruiter/Consultant (chỉ chạy khi salerID thay đổi)
     const recruiter = useMemo(() => {
         const salerID = job.salerID;
@@ -214,7 +215,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
 
     // 3. Logic Side Effect (Tách biệt khỏi logic tính toán)
-    
+
     // Effect: Khởi tạo trạng thái client và Saved Job từ localStorage (chỉ chạy 1 lần)
     useEffect(() => {
         setIsClient(true);
@@ -245,7 +246,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             savedJobs.push(job.id);
             localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
             setIsSaved(true);
-            logInteraction(job, 'save'); 
+            logInteraction(job, 'save');
             setSavedJobCount(prev => prev + 1);
             setLastAction('saved');
         }
@@ -387,12 +388,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                 <div className="mt-auto flex flex-wrap items-end justify-between gap-y-2 pt-2">
                                     <div className="flex items-center gap-1">
                                         {/* Tối ưu: Thay thế renderConsultantComponent bằng Sub-Component */}
-                                        <JobRecruiterInfo 
-                                            job={job} 
-                                            recruiter={recruiter} 
-                                            role={role} 
-                                            isConsultantPopoverOpen={isConsultantPopoverOpen} 
-                                            setIsConsultantPopoverOpen={setIsConsultantPopoverOpen} 
+                                        <JobRecruiterInfo
+                                            job={job}
+                                            recruiter={recruiter}
+                                            role={role}
+                                            isConsultantPopoverOpen={isConsultantPopoverOpen}
+                                            setIsConsultantPopoverOpen={setIsConsultantPopoverOpen}
                                         />
                                     </div>
                                     {isClient && <div className="flex items-center gap-2">
@@ -531,12 +532,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <div className="flex flex-wrap items-center justify-between gap-2">
                                 {showRecruiterName && <div className="flex items-center gap-1">
                                     {/* Tối ưu: Thay thế renderConsultantComponent bằng Sub-Component */}
-                                    <JobRecruiterInfo 
-                                        job={job} 
-                                        recruiter={recruiter} 
-                                        role={role} 
-                                        isConsultantPopoverOpen={isConsultantPopoverOpen} 
-                                        setIsConsultantPopoverOpen={setIsConsultantPopoverOpen} 
+                                    <JobRecruiterInfo
+                                        job={job}
+                                        recruiter={recruiter}
+                                        role={role}
+                                        isConsultantPopoverOpen={isConsultantPopoverOpen}
+                                        setIsConsultantPopoverOpen={setIsConsultantPopoverOpen}
+                                        showChatText={false}
                                     />
                                 </div>}
                                 {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied || isExpired || isApplying}>{applyButtonContent}</Button>}
