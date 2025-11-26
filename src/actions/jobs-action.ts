@@ -319,7 +319,6 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
     }
 
     if (!!workLocation && workLocation.length > 0) {
-        const matchingLocations = Object.assign([], workLocation);
         // workLocation.forEach((location: string) => {
         //     const locationLower = location.toLowerCase();
         //     const province = PROVINCES.find((item) => item.label.toLowerCase() === locationLower && item.level > 0);
@@ -340,7 +339,7 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
                 },
             },
         ];
-        matchingLocations.forEach((location: string) => {
+        workLocation.forEach((location: string) => {
             if (!!location && location.trim() !== "empty") {
                 shouldLocation.push({ match: { workLocation: location.trim() } });
             }

@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
@@ -32,6 +30,7 @@ import PROVINCES from "@/lib/provinces.json";
 import LANGUAGE_LEVEL from '@/lib/language_level.json';
 import { useDebounce } from '@/lib/useDebounce';
 import { Switch } from '../ui/switch';
+import { CheckedState } from '@radix-ui/react-checkbox';
 
 const createSlug = (str: string) => {
     if (!str) return '';
@@ -223,8 +222,15 @@ const getDisplayValue = (value?: string) => {
     return num.toLocaleString('ja-JP');
 };
 
+// Định nghĩa lại type cho callback xử lý input lương/phí để dùng cho prop
+type SalaryChangeCallback = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: keyof SearchFilters,
+    limit: number | null
+) => void;
 
-const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<FilterSidebarProps, 'filters' | 'onFilterChange'>) => {
+// Cập nhật props của MonthlySalaryContent
+const MonthlySalaryContent = React.memo(({ filters, onSalaryChange }: { filters: Pick<FilterSidebarProps, 'filters'>['filters'], onSalaryChange: SalaryChangeCallback }) => {
 
     const placeholderText = "VD: 200,000";
 
@@ -236,7 +242,8 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
                     id="basic-salary-jpy"
                     type="text"
                     placeholder={placeholderText}
-                    onChange={(e) => handleSalaryInputChange(e, 'basicSalary', 10000000, onFilterChange)}
+                    // Sử dụng onSalaryChange đã được tối ưu
+                    onChange={(e) => onSalaryChange(e, 'basicSalary', 10000000)}
                     value={getDisplayValue(filters.basicSalary)}
                 />
                 <p className="text-xs text-muted-foreground">{getConvertedValue(filters.basicSalary, placeholderText, JPY_VND_RATE, 'triệu VNĐ')}</p>
@@ -247,7 +254,8 @@ const MonthlySalaryContent = React.memo(({ filters, onFilterChange }: Pick<Filte
                     id="net-salary-jpy"
                     type="text"
                     placeholder="VD: 160,000"
-                    onChange={(e) => handleSalaryInputChange(e, 'realSalary', 10000000, onFilterChange)}
+                    // Sử dụng onSalaryChange đã được tối ưu
+                    onChange={(e) => onSalaryChange(e, 'realSalary', 10000000)}
                     value={getDisplayValue(filters.realSalary)}
                 />
                 <p className="text-xs text-muted-foreground">{getConvertedValue(filters.realSalary, 'VD: 160,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
@@ -263,7 +271,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
     const [availableIndustries, setAvailableIndustries] = useState<String[]>(allIndustries);
     const isMobile = useIsMobile();
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-    const [japanRegions, setJapanRegions] = useState(() => {
+    const [japanRegions, setJapanRegions] = useState<{ [key: string]: { label: string, [key: string]: any } }[] | any>(() => {
         const regions: { [key: string]: any[] } = {};
         japanProvinces.filter(item => item.groupCode === 'JP').forEach((region: any) => {
             if (!region.parentCode) {
@@ -277,6 +285,21 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
         });
         return regions;
     });
+    const [selectedParentRegion, _] = useState<string[]>(() => {
+        if (!filters?.workLocation?.length) {
+            return [];
+        } else {
+            let regions = [];
+            regions = Object.keys(japanRegions).filter((region, index) => {
+                const provinces = japanRegions[region];
+                return provinces.find((province: { label: string, [key: string]: any }) => filters.workLocation?.includes(province.label))
+            });
+            console.log(regions)
+            return regions;
+        }
+    })
+    
+    // Tối ưu hóa: Bọc hàm xử lý input từ khóa bằng useCallback
     const handleKeywordDebounced = useCallback((q: string) => {
         if ((filters.q ?? '') === (q ?? '')) return; // avoid no-op updates
         onFilterChange({ q });
@@ -339,6 +362,15 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
 
         return isEngineerVisa || isTokuteiServiceIndustry;
     }, [activeFilters.visa, activeFilters.visaDetail, activeFilters.career]);
+    
+    // Tối ưu hóa: Tạo callback ổn định cho việc thay đổi input lương/phí
+    const handleSalaryChangeCallback = useCallback((
+        e: React.ChangeEvent<HTMLInputElement>,
+        field: keyof SearchFilters,
+        limit: number | null
+    ) => {
+        handleSalaryInputChange(e, field, limit, onFilterChange);
+    }, [onFilterChange]);
 
     useEffect(() => {
         const parentVisaSlug = filters.visa || Object.keys(visaDetailsByVisaType).find(key =>
@@ -358,19 +390,41 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
         setAvailableJobDetails(jobDetails);
     }, [filters.career]);
 
-    const handleDateSelect = (date: Date | undefined) => {
+    // Tối ưu hóa: Bọc các hàm xử lý sự kiện bằng useCallback
+    const handleDateSelect = useCallback((date: Date | undefined) => {
         onFilterChange({ interviewDate: date ? format(date, 'yyyy-MM-dd') : '' });
-    };
+        setIsDatePickerOpen(false); // Thêm logic đóng popover/sheet vào đây
+    }, [onFilterChange]);
 
-    const handleFlexibleDateChange = (checked: boolean | string) => {
+    const handleFlexibleDateChange = useCallback((checked: boolean | string) => {
         if (checked) {
             onFilterChange({ interviewDate: 'flexible' });
         } else {
             onFilterChange({ interviewDate: '' });
         }
-    };
+    }, [onFilterChange]);
+    
+    const handleRegionSelect = useCallback((checked: CheckedState, regionLabel: any) => {
+        const currentSelection = new Set(Array.isArray(filters.workLocation) ? filters.workLocation : []);
+        if (checked) {
+            japanRegions[regionLabel].forEach((p: any) => currentSelection.add(p.label));
+        } else {
+            japanRegions[regionLabel].forEach((p: any) => currentSelection.delete(p.label));
+        }
+        onFilterChange({ workLocation: Array.from(currentSelection) });
+    }, [filters.workLocation, japanRegions, onFilterChange]);
+    
+    const handleProvinceSelect = useCallback((checked: CheckedState, provinceLabel: any) => {
+        const currentSelection = new Set(Array.isArray(filters.workLocation) ? filters.workLocation : []);
+        if (checked) {
+            currentSelection.add(provinceLabel);
+        } else {
+            currentSelection.delete(provinceLabel);
+        }
+        onFilterChange({ workLocation: Array.from(currentSelection) });
+    }, [filters.workLocation, onFilterChange]);
 
-    const handleVisaDetailChange = (value: string) => {
+    const handleVisaDetailChange = useCallback((value: string) => {
         const newFilters: Partial<SearchFilters> = { visaDetail: value };
         const parentTypeSlug = Object.keys(visaDetailsByVisaType).find(key =>
             (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.slug === value)
@@ -395,9 +449,9 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
         }
 
         onFilterChange(newFilters);
-    };
+    }, [filters.visa, filters.interviewLocation, onFilterChange]);
 
-    const renderInterviewLocations = () => {
+    const renderInterviewLocations = useCallback(() => {
         const vietnamVisas = ["thuc-tap-sinh-3-nam", "thuc-tap-sinh-1-nam", "dac-dinh-dau-viet", "dac-dinh-di-moi", "ky-su-tri-thuc-dau-viet"];
         const japanVisas = ["thuc-tap-sinh-3-go", "dac-dinh-dau-nhat", "ky-su-tri-thuc-dau-nhat"];
 
@@ -432,7 +486,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                 </SelectGroup>
             </>
         )
-    }
+    }, [filters.visaDetail]);
 
     const showTtsFeeFilter = useMemo(() => {
         const visasToShowFee = ['thuc-tap-sinh-3-nam', 'thuc-tap-sinh-1-nam'];
@@ -553,30 +607,22 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                         {Array.isArray(filters.workLocation) && filters.workLocation.length > 0 && (
                                             <div className='flex flex-wrap gap-1 mt-2 text-xs'>
                                                 {filters.workLocation.map(loc => (
-                                                    <Badge key={loc} variant="secondary" className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded'>
+                                                    <Badge onClick={() => handleProvinceSelect(false, loc)} key={loc} variant="secondary" className='bg-primary/20 text-primary-dark font-medium px-2 py-0.5 rounded cursor-pointer'>
                                                         {loc}
                                                     </Badge>
                                                 ))}
                                             </div>
                                         )}
                                     </div>
-                                    <Accordion type="multiple" className="w-full">
+                                    <Accordion type="multiple" className="w-full" defaultValue={selectedParentRegion}>
                                         {Object.keys(japanRegions).map((region) => (
                                             <AccordionItem key={region} value={region}>
                                                 <div className="flex items-center gap-2 py-2 text-sm hover:no-underline" >
                                                     <Checkbox
                                                         id={`region-${region}`}
-                                                        checked={Array.isArray(filters.workLocation) && japanRegions[region].every(p => (filters.workLocation ?? []).includes(p.label))}
-                                                        onCheckedChange={(checked) => {
-                                                            const currentSelection = new Set(Array.isArray(filters.workLocation) ? filters.workLocation : []);
-                                                            if (checked) {
-                                                                japanRegions[region].forEach(p => currentSelection.add(p.label));
-                                                                [].every
-                                                            } else {
-                                                                japanRegions[region].forEach(p => currentSelection.delete(p.label));
-                                                            }
-                                                            onFilterChange({ workLocation: Array.from(currentSelection) });
-                                                        }}
+                                                        checked={Array.isArray(filters.workLocation) && japanRegions[region].every((p: any) => (filters.workLocation ?? []).includes(p.label))}
+                                                        onCheckedChange={(checked) => handleRegionSelect(checked, region)}
+                                                        value={region}
                                                     />
                                                     <AccordionTrigger className="flex-1 p-0 hover:no-underline">
                                                         <Label htmlFor={`region-${region}`} className="flex-grow text-left font-semibold cursor-pointer flex justify-between w-full">
@@ -586,20 +632,12 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                     </AccordionTrigger>
                                                 </div>
                                                 <AccordionContent className="pl-6 space-y-2">
-                                                    {japanRegions[region].map((province) => (
+                                                    {japanRegions[region].map((province: any) => (
                                                         <div key={province.label} className="flex items-center gap-2">
                                                             <Checkbox
                                                                 id={`pref-${province.label}`}
                                                                 checked={Array.isArray(filters.workLocation) && filters.workLocation.includes(province.label)}
-                                                                onCheckedChange={(checked) => {
-                                                                    const currentSelection = new Set(Array.isArray(filters.workLocation) ? filters.workLocation : []);
-                                                                    if (checked) {
-                                                                        currentSelection.add(province.label);
-                                                                    } else {
-                                                                        currentSelection.delete(province.label);
-                                                                    }
-                                                                    onFilterChange({ workLocation: Array.from(currentSelection) });
-                                                                }}
+                                                                onCheckedChange={(checked) => handleProvinceSelect(checked, province.label)}
                                                             />
                                                             <Label htmlFor={`pref-${province.label}`} className="flex w-full items-center justify-between font-normal cursor-pointer">
                                                                 <span>{province.label}</span>
@@ -673,10 +711,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                     <CalendarComponent
                                                         mode="single"
                                                         selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? parse(filters.interviewDate, 'yyyy-MM-dd', new Date()) : undefined}
-                                                        onSelect={(date) => {
-                                                            handleDateSelect(date);
-                                                            setIsDatePickerOpen(false);
-                                                        }}
+                                                        onSelect={handleDateSelect} // Sử dụng hàm đã bọc useCallback
                                                         fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
                                                         toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
                                                         locale={vi}
@@ -700,7 +735,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                     <CalendarComponent
                                                         mode="single"
                                                         selected={filters.interviewDate && filters.interviewDate !== 'flexible' ? parse(filters.interviewDate, 'yyyy-MM-dd', new Date()) : undefined}
-                                                        onSelect={handleDateSelect}
+                                                        onSelect={handleDateSelect} // Sử dụng hàm đã bọc useCallback
                                                         fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
                                                         toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
                                                         locale={vi}
@@ -736,7 +771,8 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                             {shouldShowLươngNăm && <TabsTrigger value="yearly" className={cn("text-xs py-1 h-auto data-[state=active]:bg-accent-yellow")}>Lương năm</TabsTrigger>}
                                         </TabsList>
                                         <TabsContent value="basic" className="pt-4">
-                                            <MonthlySalaryContent filters={filters} onFilterChange={onFilterChange} />
+                                            {/* Truyền hàm callback đã tối ưu */}
+                                            <MonthlySalaryContent filters={filters} onSalaryChange={handleSalaryChangeCallback} />
                                         </TabsContent>
                                         <TabsContent value="hourly" className="pt-4">
                                             <div className="space-y-2">
@@ -745,7 +781,8 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                     id="hourly-salary-jpy"
                                                     type="text"
                                                     placeholder="VD: 1,000"
-                                                    onChange={(e) => handleSalaryInputChange(e, 'hourlySalary', 15000, onFilterChange)}
+                                                    // Sử dụng hàm callback đã tối ưu
+                                                    onChange={(e) => handleSalaryChangeCallback(e, 'hourlySalary', 15000)}
                                                     value={getDisplayValue(filters.hourlySalary || '')}
                                                 />
                                                 <p className="text-xs text-muted-foreground">{getConvertedValue(filters.hourlySalary, 'VD: 1,000', JPY_VND_RATE, 'trăm nghìn VNĐ')}</p>
@@ -759,7 +796,8 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                         id="annual-income-jpy"
                                                         type="text"
                                                         placeholder="VD: 3,000,000"
-                                                        onChange={(e) => handleSalaryInputChange(e, 'annualIncome', 30000000, onFilterChange)}
+                                                        // Sử dụng hàm callback đã tối ưu
+                                                        onChange={(e) => handleSalaryChangeCallback(e, 'annualIncome', 30000000)}
                                                         value={getDisplayValue(filters.annualIncome || '')}
                                                     />
                                                     <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualIncome, 'VD: 3,000,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
@@ -770,7 +808,8 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                         id="annual-bonus-jpy"
                                                         type="text"
                                                         placeholder="VD: 500,000"
-                                                        onChange={(e) => handleSalaryInputChange(e, 'annualBonus', 5000000, onFilterChange)}
+                                                        // Sử dụng hàm callback đã tối ưu
+                                                        onChange={(e) => handleSalaryChangeCallback(e, 'annualBonus', 5000000)}
                                                         value={getDisplayValue(filters.annualBonus || '')}
                                                     />
                                                     <p className="text-xs text-muted-foreground">{getConvertedValue(filters.annualBonus, 'VD: 500,000', JPY_VND_RATE, 'triệu VNĐ')}</p>
@@ -779,7 +818,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                         </TabsContent>
                                     </Tabs>
                                 ) : (
-                                    <MonthlySalaryContent filters={filters} onFilterChange={onFilterChange} />
+                                    <MonthlySalaryContent filters={filters} onSalaryChange={handleSalaryChangeCallback} />
                                 )}
                             </AccordionContent>
                         </AccordionItem>
@@ -798,7 +837,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                     id="net-fee-with-tuition-usd"
                                                     type="text"
                                                     placeholder={getFeePlaceholder()}
-                                                    onChange={(e) => handleSalaryInputChange(e, 'netFee', 10000, onFilterChange)} // Assuming netFee maps to this for now
+                                                    onChange={(e) => handleSalaryChangeCallback(e, 'netFee', 10000)} // Sử dụng hàm callback đã tối ưu
                                                     value={getDisplayValue(filters.netFee)}
                                                 />
                                                 <p className="text-xs text-muted-foreground">{getConvertedFeeValue(filters.netFee, getFeePlaceholder())}</p>
@@ -809,7 +848,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                     id="net-fee-no-tuition-usd"
                                                     type="text"
                                                     placeholder="0 đến 3600$"
-                                                    onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 10000, onFilterChange)} // Assuming netFeeNoTicket maps to this
+                                                    onChange={(e) => handleSalaryChangeCallback(e, 'netFeeNoTicket', 10000)} // Sử dụng hàm callback đã tối ưu
                                                     value={getDisplayValue(filters.netFeeNoTicket)}
                                                 />
                                                 <p className="text-xs text-muted-foreground">{getConvertedFeeValue(filters.netFeeNoTicket, '0 đến 3600$')}</p>
@@ -824,7 +863,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                     id="net-fee-with-ticket-usd"
                                                     type="text"
                                                     placeholder={getFeePlaceholder()}
-                                                    onChange={(e) => handleSalaryInputChange(e, 'netFee', 4200, onFilterChange)}
+                                                    onChange={(e) => handleSalaryChangeCallback(e, 'netFee', 4200)} // Sử dụng hàm callback đã tối ưu
                                                     value={getDisplayValue(filters.netFee)}
                                                 />
                                                 <p className="text-xs text-muted-foreground">{getConvertedFeeValue(filters.netFee, getFeePlaceholder())}</p>
@@ -835,7 +874,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                     id="net-fee-no-ticket-usd"
                                                     type="text"
                                                     placeholder={getFeePlaceholder()}
-                                                    onChange={(e) => handleSalaryInputChange(e, 'netFeeNoTicket', 4200, onFilterChange)}
+                                                    onChange={(e) => handleSalaryChangeCallback(e, 'netFeeNoTicket', 4200)} // Sử dụng hàm callback đã tối ưu
                                                     value={getDisplayValue(filters.netFeeNoTicket)}
                                                 />
                                                 <p className="text-xs text-muted-foreground">{getConvertedFeeValue(filters.netFeeNoTicket, getFeePlaceholder())}</p>

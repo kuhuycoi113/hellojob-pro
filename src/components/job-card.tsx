@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,120 +22,217 @@ import {
 import { cn, convertTime, formatSalaryForDisplay, formatVisa, generateBulletJobCrawl, getFeeDisplayInfo, getJobImage } from '@/lib/utils';
 import Link from 'next/link';
 import { useAuth, User } from '@/contexts/AuthContext';
-import { AuthDialog } from './auth-dialog';
 import { ContactButtons } from './contact-buttons';
-import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { EditProfileDialog } from '../app/ho-so-cua-toi/components/candidate-edit-dialog';
 import type { SearchFilters } from './job-search/search-results';
 import { consultants } from '@/lib/consultant-data';
-import { applyJob, cancelAppliedJob, updateProfile } from '@/actions/user-action';
-import { validateProfileForApplication } from '@/lib/validators';
+import { cancelAppliedJob, updateProfile } from '@/actions/user-action';
 import { useServerInfo } from './layout/root-provider';
 import { NameAvatar } from './ui/name-avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
+// ====================================================================
+// PURE UTILITIES (Trích xuất logic tính toán không cần state)
+// ====================================================================
 
 // CANHANHOA01: Function to log user interaction
 const logInteraction = (job: Job, type: 'view' | 'save') => {
     try {
-        const MAX_SIGNALS = 50; // Limit the number of signals to keep it manageable
+        const MAX_SIGNALS = 50; 
         let signals: Partial<Job>[] = JSON.parse(localStorage.getItem('behavioralSignals') || '[]');
-
-        // Create a signal object with only relevant properties
         const signal: Partial<Job> = {
             id: job.id,
             industry: job.industry,
             workLocation: job.workLocation,
             visa: formatVisa(job?.visa),
             title: generateBulletJobCrawl(job),
-            // We can add salary later if needed for more complex logic
         };
-
-        // Add the new signal to the front and remove duplicates by job id
         signals = [signal, ...signals.filter(s => s.id !== job.id)];
-
-        // Trim the array to the max limit
         if (signals.length > MAX_SIGNALS) {
             signals = signals.slice(0, MAX_SIGNALS);
         }
-
         localStorage.setItem('behavioralSignals', JSON.stringify(signals));
-        // Trigger a storage event to update other components like the "My Jobs" page
         window.dispatchEvent(new Event('storage'));
     } catch (error) {
         console.error("Error logging user interaction:", error);
     }
 };
 
-// List of visa details that have special fee handling
+// Pure function to calculate badge class
+const getVisaBadgeClasses = (visa: string): string => {
+    let classes = 'transition-opacity opacity-100 ';
+    // Logic tương tự trong file gốc, chỉ được trích xuất ra hàm thuần túy
+    if (visa === 'Thực tập sinh 1 năm') {
+        classes += 'border-accent-green/70 bg-green-50 text-[#BDCF58]';
+    } else if (visa === 'Thực tập sinh 3 Go') {
+        classes += 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
+    } else if (visa === 'Đặc định đầu Nhật') {
+        classes += 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
+    } else if (visa === 'Đặc định đầu Việt') {
+        classes += 'border-accent-blue/60 bg-blue-40 text-[#19A6DF]';
+    } else if (visa === 'Đặc định đi mới') {
+        classes += 'text-[#40B5E4]';
+    } else if (visa === 'Kỹ sư, tri thức đầu Việt') {
+        classes += 'border-accent-orange/70 bg-orange-50 text-[#F2B92A]';
+    } else if (visa === 'Kỹ sư, tri thức đầu Nhật') {
+        classes += 'border-accent-orange/70 bg-orange-50 text-[#F7B102]';
+    } else if (visa?.includes("Thực tập sinh")) {
+        classes += "border-accent-green/70 bg-green-50 text-accent-green";
+    } else if (visa?.includes("Kỹ năng đặc định")) {
+        classes += "border-accent-blue/70 bg-blue-50 text-accent-blue";
+    } else if (visa?.includes("Kỹ sư, tri thức")) {
+        classes += "border-accent-orange/70 bg-orange-50 text-orange-500";
+    }
+    return classes;
+};
 
+// ====================================================================
+// SUB-COMPONENT (Tách biệt logic hiển thị Recruiter/Admin)
+// ====================================================================
 
-export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showLikes = true, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, onCancelAppliedJob }:
+const JobRecruiterInfo = ({ job, recruiter, role, isConsultantPopoverOpen, setIsConsultantPopoverOpen }: { job: any, recruiter: any, role: string, isConsultantPopoverOpen: boolean, setIsConsultantPopoverOpen: (open: boolean) => void }) => {
+    // Logic cho vai trò Admin
+    if (role === 'admin') {
+        let titleLinkGroup = "#";
+        let contactLink = "#";
+        switch (job.source) {
+            case "ZALO": {
+                contactLink = job.contact?.length ? `https://zalo.me/${job.contact}` : job.senderLink;
+                titleLinkGroup = job.groupLink;
+                break;
+            }
+            case "FACEBOOK": {
+                contactLink = job.contact;
+                titleLinkGroup = job.postLink ?? job.contact ?? job.groupLink;
+                break;
+            }
+            case "SUNRISE": {
+                titleLinkGroup = job.contact;
+                break;
+            }
+        }
+        const poster = {
+            groupName: job.groupName,
+            groupLink: titleLinkGroup,
+            zalo: contactLink
+        };
+
+        return <>
+            <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
+                <PopoverTrigger asChild>
+                    <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                        <NameAvatar fullName={job.sender} size={30} className='cursor-pointer transition-transform hover:scale-110' />
+                    </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-100" side="top" align="start">
+                    <div className="flex gap-2">
+                        <NameAvatar fullName={job.sender} size={30} />
+                        <div className="space-y-0.5">
+                            <h4 className="text-sm font-semibold">{job.sender}</h4>
+                            <p className="text-sm text-muted-foreground">
+                                {job.groupName}
+                            </p>
+                            {(contactLink || titleLinkGroup) && <Button asChild size="sm" variant="link" className="h-auto p-0">
+                                <Link href={contactLink ?? titleLinkGroup} target='_blank'>Thử truy cập</Link>
+                            </Button>}
+                        </div>
+                    </div>
+                </PopoverContent>
+            </Popover>
+            <ContactButtons contact={poster} job={job} showChatText={true} />
+        </>;
+    }
+
+    // Logic cho vai trò mặc định (Consultant)
+    return <>
+        <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
+            <PopoverTrigger asChild>
+                <Link href={`/tu-van-vien/${recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
+                        <AvatarImage src={recruiter.avatarUrl} alt={recruiter.name} />
+                        <AvatarFallback>{recruiter.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                </Link>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" side="top" align="start">
+                <div className="flex gap-4">
+                    <Avatar className="h-16 w-16">
+                        <AvatarImage src={recruiter.avatarUrl} alt={recruiter.name} />
+                        <AvatarFallback>{recruiter.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-1">
+                        <h4 className="text-sm font-semibold">{recruiter.name}</h4>
+                        <p className="text-sm text-muted-foreground">
+                            {recruiter.mainExpertise}
+                        </p>
+                        <Button asChild size="sm" variant="link" className="h-auto p-0">
+                            <Link href={`/tu-van-vien/${recruiter.id}`}>Xem hồ sơ</Link>
+                        </Button>
+                    </div>
+                </div>
+            </PopoverContent>
+        </Popover>
+        <ContactButtons contact={recruiter} job={job} showChatText={true} />
+    </>;
+};
+
+// ====================================================================
+// MAIN COMPONENT (Tối ưu hóa hooks và logic)
+// ====================================================================
+
+export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, onCancelAppliedJob }:
     { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, onCancelAppliedJob?: any }) => {
-    const { serverTime } = useServerInfo()
+
+    const { serverTime } = useServerInfo();
     const { user, setSavedJobCount, setLastAction, isApplying, applyForJob, role } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
+
+    // 1. Trạng thái component đơn giản
     const [isClient, setIsClient] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const [hasApplied, setHasApplied] = useState(false);
     const [isConsultantPopoverOpen, setIsConsultantPopoverOpen] = useState(false);
-    const [postedTime, setPostedTime] = useState<string | null>(null);
-    const [interviewDate, setInterviewDate] = useState<string | null>(null);
-    const [badgeClassName, setBadgeClassName] = useState<string>('opacity-0');
-    const [jobTitle, _setJobTitle] = useState(generateBulletJobCrawl(job));
-    const [recruiter, _setRecruiter] = useState<any>(() => {
-        const salerID = job.salerID;
-        let rec = consultants.find(c => c.id === salerID) ?? consultants[0];
-        return rec;
-    });
 
+    // 2. Các giá trị dẫn xuất (Derived Values) - Dùng useMemo
+    const jobTitle = useMemo(() => generateBulletJobCrawl(job), [job]);
+    const jobVisa = useMemo(() => formatVisa(job.visa), [job.visa]);
+    const badgeClassName = useMemo(() => getVisaBadgeClasses(jobVisa as any), [jobVisa]);
+    const postedTime = useMemo(() => convertTime(job?.time || job?.postedDate || job?.createdDate), [job]);
+    const interviewDate = useMemo(() => job.interviewDay, [job.interviewDay]);
+    const isExpired = useMemo(() => job.expiredDate < serverTime, [job.expiredDate, serverTime]);
+    const feeInfo = useMemo(() => getFeeDisplayInfo(job, isSearchPage, role), [job, isSearchPage, role]);
+    const feeFilterIsActive = useMemo(() => !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket || role === 'admin'), [appliedFilters, role]);
+    
+    // Tính toán Recruiter/Consultant (chỉ chạy khi salerID thay đổi)
+    const recruiter = useMemo(() => {
+        const salerID = job.salerID;
+        return consultants.find(c => c.id === salerID) ?? consultants[0];
+    }, [job.salerID]);
+
+
+    // 3. Logic Side Effect (Tách biệt khỏi logic tính toán)
+    
+    // Effect: Khởi tạo trạng thái client và Saved Job từ localStorage (chỉ chạy 1 lần)
     useEffect(() => {
         setIsClient(true);
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
         setIsSaved(savedJobs.includes(job.id));
+    }, [job.id]);
 
-        // Safely calculate dates on the client to avoid hydration mismatch
-        setPostedTime(convertTime(job?.time || job?.postedDate || job?.createdDate));
-        setInterviewDate(job.interviewDay);
-
-        // Safely calculate badge class names on client
-        let classes = 'transition-opacity opacity-100 ';
-        const visa = formatVisa(job.visa);
-        if (visa === 'Thực tập sinh 1 năm') {
-            classes += 'border-accent-green/70 bg-green-50 text-[#BDCF58]';
-        } else if (visa === 'Thực tập sinh 3 Go') {
-            classes += 'border-accent-green/70 bg-green-50 text-[#AFCC11]';
-        } else if (visa === 'Đặc định đầu Nhật') {
-            classes += 'border-accent-blue/70 bg-blue-50 text-[#009BDA]';
-        } else if (visa === 'Đặc định đầu Việt') {
-            classes += 'border-accent-blue/60 bg-blue-40 text-[#19A6DF]';
-        } else if (visa === 'Đặc định đi mới') {
-            classes += 'text-[#40B5E4]';
-        } else if (visa === 'Kỹ sư, tri thức đầu Việt') {
-            classes += 'border-accent-orange/70 bg-orange-50 text-[#F2B92A]';
-        } else if (visa === 'Kỹ sư, tri thức đầu Nhật') {
-            classes += 'border-accent-orange/70 bg-orange-50 text-[#F7B102]';
-        } else if (visa?.includes("Thực tập sinh")) {
-            classes += "border-accent-green/70 bg-green-50 text-accent-green";
-        } else if (visa?.includes("Kỹ năng đặc định")) {
-            classes += "border-accent-blue/70 bg-blue-50 text-accent-blue";
-        } else if (visa?.includes("Kỹ sư, tri thức")) {
-            classes += "border-accent-orange/70 bg-orange-50 text-orange-500";
-        }
-        setBadgeClassName(classes);
-
-    }, [job.id, job.postedDate, job.interviewDate, formatVisa(job.visa)]);
+    // Effect: Kiểm tra trạng thái ứng tuyển (chạy khi user hoặc job thay đổi)
     useEffect(() => {
         if (!!user && !!job?.id) {
             const appliedJobs = user.appliedJobs || [];
             setHasApplied(appliedJobs.includes(job.id));
         }
-    }, [job?.id, user?.appliedJobs]);
+    }, [job?.id, user?.appliedJobs, user]);
 
-    const handleSaveJob = (e: React.MouseEvent) => {
+
+    // 4. Handlers (Sử dụng useCallback nếu cần truyền xuống component con)
+    const handleSaveJob = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -149,21 +245,20 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             savedJobs.push(job.id);
             localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
             setIsSaved(true);
-            logInteraction(job, 'save'); // CANHANHOA01: Log save interaction
+            logInteraction(job, 'save'); 
             setSavedJobCount(prev => prev + 1);
             setLastAction('saved');
         }
-        // Trigger a storage event to update other components like the "My Jobs" page
         window.dispatchEvent(new Event('storage'));
-    };
+    }, [job, isSaved, setSavedJobCount, setLastAction]);
 
-    const handleApplyClick = async (e: React.MouseEvent) => {
+    const handleApplyClick = useCallback(async (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
         await applyForJob(job, jobTitle);
-    };
+    }, [job, jobTitle, applyForJob]);
 
-    const handleCancelApplicationClick = async (e: React.MouseEvent) => {
+    const handleCancelApplicationClick = useCallback(async (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
         if (!!user) {
@@ -181,145 +276,22 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
             toast({
                 title: 'Hủy ứng tuyển thành công!',
                 description: `Lịch sử ứng tuyển của bạn cho công việc "${jobTitle}" đã được thu hồi.`
-                // className: 'bg-green-500 text-white'
             });
         }
-        // if (!isLoggedIn) {
-        //     setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: jobTitle, job } });
-        //     setIsConfirmLoginOpen(true);
-        // } else {
-        //     const missingFields = validateProfileForApplication(user);
-        //     if (missingFields?.length === 0 && !!user) {
-        //         const appliedJobs = user.appliedJobs || [];
-        //         appliedJobs.push(job.id);
-        //         await applyJob(user.uid, job);
-        //         await updateProfile(user.uid, { appliedJobs });
-        //         user.appliedJobs = Object.assign([], appliedJobs);
-        //         setHasApplied(true);
-        //         setApplicationCount(prev => prev + 1);
-        //         setLastAction('applied');
-        //         toast({
-        //             title: 'Ứng tuyển thành công!',
-        //             description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
-        //             className: 'bg-green-500 text-white'
-        //         });
-        //     } else {
-        //         setIsProfileIncompleteAlertOpen(true);
-        //     }
-        // }
-    };
+    }, [job.id, jobTitle, user, onCancelAppliedJob, toast]);
 
-    const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        // Only navigate if the click target is not an interactive element
+    const handleCardClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         if ((e.target as HTMLElement).closest('a, button')) {
             return;
         }
+        if (isExpired) return; // Ngăn chặn điều hướng khi hết hạn
         logInteraction(job, 'view');
         router.push(`/viec-lam/${job.id}`);
-    };
+    }, [job, router, isExpired]);
 
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển';
-    const feeInfo = getFeeDisplayInfo(job, isSearchPage, role);
-    const feeFilterIsActive = !!(appliedFilters?.netFee || appliedFilters?.netFeeNoTicket || role === 'admin');
-    let isExpired = false;
-    if (job.expiredDate < serverTime) {
-        isExpired = true;
-    }
-    const renderConsultantComponent = () => {
-        switch (role) {
-            case 'admin': {
-                let secondColor = "#3B5998";
-                let titleLinkGroup = "#";
-                let contactLink = "#";
-                switch (job.source) {
-                    case "ZALO": {
-                        secondColor = "#0068FF";
-                        if (job.contact?.length) {
-                            contactLink = `https://zalo.me/${job.contact}`;
-                        } else {
-                            contactLink = job.senderLink;
-                        }
-                        titleLinkGroup = job.groupLink;
-                        break;
-                    }
-                    case "FACEBOOK": {
-                        secondColor = "#3B5998";
-                        // titleLinkGroup = candidate?.contact ?? candidate?.postLink ?? candidate?.groupLink;
-                        contactLink = job.contact;
-                        titleLinkGroup = job.postLink ?? job.contact ?? job.groupLink;
-                        break;
-                    }
-                    case "SUNRISE": {
-                        secondColor = "#AFC536";
-                        titleLinkGroup = job.contact;
-                        break;
-                    }
-                }
-                const poster = {
-                    groupName: job.groupName,
-                    groupLink: titleLinkGroup,
-                    zalo: contactLink
-                };
-                return <>
-                    <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
-                        <PopoverTrigger asChild>
-                            {/* <div onMouseEnter={() => setIsConsultantPopoverOpen(true)} onMouseLeave={() => setIsConsultantPopoverOpen(false)}> */}
-                            <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                                <NameAvatar fullName={job.sender} size={30} className='cursor-pointer transition-transform hover:scale-110' />
-                            </div>
-                            {/* </div> */}
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80" side="top" align="start">
-                            <div className="flex gap-4">
-                                <NameAvatar fullName={job.sender} size={16} />
-                                <div className="space-y-1">
-                                    <h4 className="text-sm font-semibold">{job.sender}</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                        {job.groupName}
-                                    </p>
-                                    {(contactLink || titleLinkGroup) && <Button asChild size="sm" variant="link" className="h-auto p-0">
-                                        <Link href={contactLink ?? titleLinkGroup} target='_blank'>Thử truy cập</Link>
-                                    </Button>}
-                                </div>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-                    <ContactButtons contact={poster} job={job} showChatText={true} />
-                </>;
-            } default: {
-                return <>
-                    <Popover open={isConsultantPopoverOpen} onOpenChange={setIsConsultantPopoverOpen}>
-                        <PopoverTrigger asChild>
-                            <Link href={`/tu-van-vien/${recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                                <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
-                                    <AvatarImage src={recruiter.avatarUrl} alt={recruiter.name} />
-                                    <AvatarFallback>{recruiter.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                            </Link>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80" side="top" align="start">
-                            <div className="flex gap-4">
-                                <Avatar className="h-16 w-16">
-                                    <AvatarImage src={recruiter.avatarUrl} alt={recruiter.name} />
-                                    <AvatarFallback>{recruiter.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div className="space-y-1">
-                                    <h4 className="text-sm font-semibold">{recruiter.name}</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                        {recruiter.mainExpertise}
-                                    </p>
-                                    <Button asChild size="sm" variant="link" className="h-auto p-0">
-                                        <Link href={`/tu-van-vien/${recruiter.id}`}>Xem hồ sơ</Link>
-                                    </Button>
-                                </div>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-                    <ContactButtons contact={recruiter} job={job} showChatText={true} />
-                </>;
-            }
-        }
-    }
+
+    // 5. Render theo variant
     if (variant === 'list-item') {
         return (
             <>
@@ -365,11 +337,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                     variant="outline"
                                                     className={badgeClassName}
                                                 >
-                                                    {formatVisa(job.visa)}
+                                                    {jobVisa}
                                                 </Badge>
                                             )}
-                                            {job.realSalary > 0 && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, formatVisa(job.visa))}</Badge>}
-                                            {job.basicSalary > 0 && <Badge variant="secondary" className="text-xs">Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, formatVisa(job.visa))}</Badge>}
+                                            {job.realSalary > 0 && <Badge variant="secondary" className="border-green-200 bg-green-100 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, jobVisa)}</Badge>}
+                                            {job.basicSalary > 0 && <Badge variant="secondary" className="text-xs">Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, jobVisa)}</Badge>}
                                             {feeFilterIsActive && feeInfo.shouldShow && (
                                                 <Badge variant="destructive" className="text-xs bg-red-100 text-red-800 border-red-200">
                                                     {feeInfo.text}
@@ -387,7 +359,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                             </div>
                                                         </TooltipTrigger>
                                                         <TooltipContent>
-                                                            {!!job.formImage ? (
+                                                            {!!job.formImage && role === 'admin' ? (
                                                                 <p>Việc làm này có form đơn hàng đẹp</p>
                                                             ) : (
                                                                 <p>Việc làm này có ảnh form đơn hàng</p>
@@ -414,7 +386,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
                                 <div className="mt-auto flex flex-wrap items-end justify-between gap-y-2 pt-2">
                                     <div className="flex items-center gap-1">
-                                        {renderConsultantComponent()}
+                                        {/* Tối ưu: Thay thế renderConsultantComponent bằng Sub-Component */}
+                                        <JobRecruiterInfo 
+                                            job={job} 
+                                            recruiter={recruiter} 
+                                            role={role} 
+                                            isConsultantPopoverOpen={isConsultantPopoverOpen} 
+                                            setIsConsultantPopoverOpen={setIsConsultantPopoverOpen} 
+                                        />
                                     </div>
                                     {isClient && <div className="flex items-center gap-2">
                                         <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
@@ -442,7 +421,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
 
     if (variant === 'chat') {
         return (
-            <div id="HIENTHIVIEC03" onClick={!isExpired ? () => router.push(`/viec-lam/${job.id}`) : undefined} className={cn("block w-full relative", isExpired ? "cursor-not-allowed" : "cursor-pointer")}>
+            <div id="HIENTHIVIEC03" onClick={!isExpired ? handleCardClick : undefined} className={cn("block w-full relative", isExpired ? "cursor-not-allowed" : "cursor-pointer")}>
                 <Card className={cn(
                     "flex items-start p-3 gap-3 transition-colors",
                     !isExpired && "hover:bg-secondary/50" // Only apply hover effect when not expired
@@ -456,10 +435,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <FileText className="h-3 w-3 flex-shrink-0" />
                             Mã: {job.code}
                         </p>
-                        {isClient && formatVisa(job.visa) && (
+                        {isClient && jobVisa && (
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
                                 <Star className="h-3 w-3 flex-shrink-0" />
-                                Visa: {formatVisa(job.visa)}
+                                Visa: {jobVisa}
                             </p>
                         )}
                         <div className="text-xs text-muted-foreground">
@@ -476,12 +455,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             {job.realSalary > 0 && (
                                 <span className={cn("flex items-center gap-1", !isExpired && "text-green-600")}>
                                     <DollarSign className="h-3 w-3 flex-shrink-0" />
-                                    Thực lĩnh: {formatSalaryForDisplay(job.realSalary, formatVisa(job.visa))}
+                                    Thực lĩnh: {formatSalaryForDisplay(job.realSalary, jobVisa)}
                                 </span>
                             )}
                             {job.basicSalary > 0 && <span className="flex items-center gap-1 text-muted-foreground">
                                 <DollarSign className="h-3 w-3 flex-shrink-0" />
-                                Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, formatVisa(job.visa))}
+                                Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, jobVisa)}
                             </span>}
                         </div>
                         <p className="text-right text-[11px] mt-1">
@@ -529,11 +508,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             variant="outline"
                                             className={badgeClassName}
                                         >
-                                            {formatVisa(job.visa)}
+                                            {jobVisa}
                                         </Badge>
                                     )}
-                                    {job.realSalary > 0 && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, formatVisa(job.visa))}</Badge>}
-                                    {job.basicSalary > 0 && <Badge variant="secondary" className="px-1.5 py-0 text-xs">Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, formatVisa(job.visa))}</Badge>}
+                                    {job.realSalary > 0 && <Badge variant="secondary" className="border-green-200 bg-green-100 px-1.5 py-0 text-xs text-green-800">Thực lĩnh: {formatSalaryForDisplay(job.realSalary, jobVisa)}</Badge>}
+                                    {job.basicSalary > 0 && <Badge variant="secondary" className="px-1.5 py-0 text-xs">Lương cơ bản: {formatSalaryForDisplay(job.basicSalary, jobVisa)}</Badge>}
                                 </>
                             )}
                         </div>
@@ -551,13 +530,14 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         <div className="mt-auto">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                                 {showRecruiterName && <div className="flex items-center gap-1">
-                                    <Link href={`/tu-van-vien/${recruiter.id}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                                        <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-110">
-                                            <AvatarImage src={recruiter.avatarUrl} alt={recruiter.name} />
-                                            <AvatarFallback>{recruiter.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                    </Link>
-                                    <ContactButtons contact={recruiter as any} job={job} />
+                                    {/* Tối ưu: Thay thế renderConsultantComponent bằng Sub-Component */}
+                                    <JobRecruiterInfo 
+                                        job={job} 
+                                        recruiter={recruiter} 
+                                        role={role} 
+                                        isConsultantPopoverOpen={isConsultantPopoverOpen} 
+                                        setIsConsultantPopoverOpen={setIsConsultantPopoverOpen} 
+                                    />
                                 </div>}
                                 {isClient && showApplyButtons && <Button size="sm" className="bg-accent-orange text-white" onClick={handleApplyClick} disabled={hasApplied || isExpired || isApplying}>{applyButtonContent}</Button>}
                                 {hasApplied && showCancelApplication &&
@@ -579,7 +559,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>Xác nhận huỷ ứng tuyển?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{job.title}" không? Hành động này sẽ được ghi nhận ngay lập tức.
+                                                    Bạn có chắc chắn muốn huỷ ứng tuyển công việc "{jobTitle}" không? Hành động này sẽ được ghi nhận ngay lập tức.
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>

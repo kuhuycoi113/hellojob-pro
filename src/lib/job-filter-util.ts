@@ -122,7 +122,7 @@ export const generateJobFilter = (readOnlySearchParams: any) => {
         } else if (internalKey === 'workLocation' || internalKey === 'otherSkillRequirement') {
             const currentValues = newFilters[internalKey as 'workLocation' | 'otherSkillRequirement'] || [];
             // @ts-ignore
-            newFilters[internalKey as 'workLocation' | 'otherSkillRequirement'] = [...currentValues, value];
+            newFilters[internalKey as 'workLocation' | 'otherSkillRequirement'] = [...currentValues, ...value];
         } else if (internalKey === 'age' || internalKey === 'height' || internalKey === 'weight') {
             const values = readOnlySearchParams.getAll(key);
             if (values.length === 2) {
