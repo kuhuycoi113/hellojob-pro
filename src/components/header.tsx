@@ -18,6 +18,7 @@ import { MainMenu } from '@/components/header/main-menu';
 import { LoggedInContent } from '@/components/header/loggedin-content';
 import { LoggedOutContent } from '@/components/header/loggedout-content';
 import { NavLink } from '@/components/header/nav-link';
+import { MobileSecondaryHeader } from './mobile-secondary-header';
 
 
 export const Logo = ({ className }: { className?: string }) => (
@@ -125,6 +126,7 @@ export function Header() {
             )}
           </div>
         </header>
+        {isClient && isMobile && <MobileSecondaryHeader />}
       </div>
       <AuthDialog isOpen={isAuthDialogOpen} onOpenChange={(open: any) => {
         setIsAuthDialogOpen(open);

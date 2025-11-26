@@ -52,7 +52,7 @@ export const quickAccessLinks = [
 
 // Re-ordered to a stable, logical order to fix hydration errors.
 export const mobileFooterLinks = [
-  { href: '/viec-lam', label: 'Việc làm', icon: Briefcase },
+  { href: '/tim-viec-lam', label: 'Việc làm', icon: Briefcase },
   { href: '/lo-trinh', label: 'Lộ trình', icon: Compass },
   { href: '/tao-ho-so-ai', label: 'Hồ sơ AI', icon: Sparkles },
   { href: '/cam-nang', label: 'Cẩm nang', icon: LifeBuoy },
