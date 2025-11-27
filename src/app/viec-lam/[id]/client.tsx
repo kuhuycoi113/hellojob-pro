@@ -352,7 +352,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         <RequirementItem icon={User} label="Giới tính" value={job.gender ? formatGender(job.gender) : 'Liên hệ'} />
                                         <RequirementItem icon={Users} label="Số lượng" value={job.numberRecruits ? `${job.numberRecruits} người` : null} />
                                         <RequirementItem icon={Cake} label="Yêu cầu tuổi" value={job.minAge && job.maxAge ? `${job.minAge} - ${job.maxAge}` : job.minAge ? `Từ ${job.minAge}` : job.maxAge ? `Đến ${job.maxAge}` : null} />
-                                        <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageLevel ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageLevel ?? 'Không rõ'} />
                                         <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={interviewDate ? interviewDate : 'Linh hoạt'} />
                                         <RequirementItem icon={ClipboardCheck} label="Số vòng" value={job.interviewRounds ? `${job.interviewRounds} vòng` : null} />
                                         <RequirementItem icon={Wallet} label="Phí và vé và học phí" value={feeWithTuitionDisplay ?? 'Liên hệ'} />
@@ -367,20 +367,20 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         <CardTitle className="flex items-center gap-3 font-headline text-xl"><UserCheck className="text-primary h-6 w-6" />Yêu cầu chi tiết</CardTitle>
                                     </CardHeader>
                                     <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                        <RequirementItem icon={GraduationCap} label="Yêu cầu học vấn" value={job.educationLevel ?? 'Không yêu cầu'} />
-                                        <RequirementItem icon={Briefcase} label="Kinh nghiệm" value={job.experience ?? 'Không yêu cầu'} />
-                                        <RequirementItem icon={CalendarDays} label="Số năm kinh nghiệm" value={job.experienceYear ?? 'Không yêu cầu'} />
-                                        <RequirementItem icon={Ruler} label="Chiều cao" value={job.height ?? 'Không yêu cầu'} />
-                                        <RequirementItem icon={Weight} label="Cân nặng" value={job.weight ?? 'Không yêu cầu'} />
-                                        <RequirementItem icon={Dna} label="Viêm gan B" value={job.vgb ?? 'Không yêu cầu'} />
-                                        <RequirementItem icon={User} label="Hình xăm" value={job.haveTattoo ?? 'Không yêu cầu'} />
-                                        <RequirementItem icon={ImageIcon} label="Yêu cầu thị lực" value={job.vision ?? 'Không yêu cầu'} />
-                                        <RequirementItem icon={ClipboardCheck} label="Hình thức phỏng vấn" value={job.interviewFormat ?? 'Không yêu cầu'} />
+                                        <RequirementItem icon={GraduationCap} label="Yêu cầu học vấn" value={job.educationLevel ?? 'Không rõ'} />
+                                        <RequirementItem icon={Briefcase} label="Kinh nghiệm" value={job.experience ?? 'Không rõ'} />
+                                        <RequirementItem icon={CalendarDays} label="Số năm kinh nghiệm" value={job.experienceYear ?? 'Không rõ'} />
+                                        <RequirementItem icon={Ruler} label="Chiều cao" value={job.height ?? 'Không rõ'} />
+                                        <RequirementItem icon={Weight} label="Cân nặng" value={job.weight ?? 'Không rõ'} />
+                                        <RequirementItem icon={Dna} label="Viêm gan B" value={job.vgb ?? 'Không rõ'} />
+                                        <RequirementItem icon={User} label="Hình xăm" value={job.haveTattoo ?? 'Không rõ'} />
+                                        <RequirementItem icon={ImageIcon} label="Yêu cầu thị lực" value={job.vision ?? 'Không rõ'} />
+                                        <RequirementItem icon={ClipboardCheck} label="Hình thức phỏng vấn" value={job.interviewFormat ?? 'Không rõ'} />
                                     </CardContent>
                                 </Card>
 
                                 <JobDetailSection title="Mô tả công việc & Ghi chú" icon={FileText}>
-                                    <div>
+                                    {/* <div>
                                         <p>Mô tả chi tiết cho công việc {(job.career || job.job) && <strong>{job.job ?? job.career}, {job.workLocation}{job.numberRecruits ? `, tuyển ${job.numberRecruits} ${job.gender ? formatGender(job.gender) : 'người'}` : ''}</strong>}
                                             . Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản
                                             . Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p>
@@ -388,6 +388,11 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                             {(job.career || job.job) && <li>Chi tiết công việc: {job.job ?? job.career}.</li>}
                                             <li>Môi trường làm việc sạch sẽ, hiện đại.</li>
                                         </ul>
+                                    </div> */}
+                                    <div>
+                                        <p>{job.aiContent}</p>
+                                        <p>-----------------</p>
+                                        <p>{job.baseContent}</p>
                                     </div>
                                 </JobDetailSection>
 
