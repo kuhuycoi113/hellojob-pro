@@ -264,7 +264,7 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
         const visaLabel = visaMapping[visaDetail as keyof typeof visaMapping] ?? visaDetail;
         conditions.push({
             term: {
-                "visa.keyword": visaLabel,
+                "visa.keyword": visaLabel?.replace(', tri thức', ''),
             },
         });
     }

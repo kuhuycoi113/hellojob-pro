@@ -5,14 +5,17 @@ import { useCallback, useRef, useState, useEffect, memo } from "react";
 import { Button } from "../ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
-import { FilterSidebar } from "./filter-sidebar";
+import { FilterSidebar, RECENT_FILTERS_KEY } from "./filter-sidebar";
 import { Job } from "@/lib/mock-data";
-import { ListFilter, Loader2 } from "lucide-react";
+import { Bookmark, ListFilter, Loader2 } from "lucide-react";
 import { JobCard } from "../job-card";
 import { experienceYears } from "@/lib/visa-data";
 import { Card, CardContent } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import { PaginationComponent } from "../pagination";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
 export type SearchFilters = {
     q?: string;
@@ -88,7 +91,15 @@ export const SearchResults = memo(({ jobs, total, filters, appliedFilters, first
         resetFilters();
         setIsSheetOpen(false); // Close sheet on reset
     }
-
+    const [isShowSaveFilter, setIsShowSaveFilter] = useState(false);
+    const [filterTitle, setFilterTitle] = useState('');
+    const saveFilter = () => {
+        const obj = { filters: appliedFilters, sortBy, id: '' + Date.now(), label: filterTitle }
+        const raw = localStorage.getItem(RECENT_FILTERS_KEY);
+        const savedFilters: any[] = raw ? JSON.parse(raw) : [];
+        savedFilters.unshift(obj);
+        localStorage.setItem(RECENT_FILTERS_KEY, JSON.stringify(savedFilters));
+    }
     return (
         <div className="w-full bg-secondary">
             <div className="container mx-auto px-4 md:px-6 py-6">
@@ -96,10 +107,31 @@ export const SearchResults = memo(({ jobs, total, filters, appliedFilters, first
                     <div className="hidden md:block">
                         <FilterSidebar filters={filters} appliedFilters={appliedFilters} onFilterChange={onFilterChange} onApply={applyFilters} onReset={resetFilters} resultCount={resultCount} />
                     </div>
-
                     <div className="md:col-span-3 lg:col-span-3">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-bold">Kết quả {total === null ? '' : `(${total})`}</h2>
+                            <Popover open={isShowSaveFilter} onOpenChange={setIsShowSaveFilter}>
+                                <PopoverTrigger asChild>
+                                    <Bookmark className={"h-5 w-5 text-primary mr-auto ml-1 cursor-pointer hover:fill-current transition-all duration-300"} />
+                                </PopoverTrigger>
+                                <PopoverContent className="w-270" side="top" align="start">
+                                    <div className="flex items-center">
+                                        <Input
+                                            id="title"
+                                            placeholder="Đặt một tên dễ nhớ cho bộ lọc này"
+                                            autoFocus
+                                            tabIndex={1}
+                                            className="w-[270px]"
+                                            value={filterTitle}
+                                            onChange={(e) => setFilterTitle(e.target.value)}
+                                        />
+                                        <Button variant="outline" onClick={saveFilter}
+                                            className={"ml-2 bg-white flex border-gray-300 border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange"}>
+                                            Lưu
+                                        </Button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
                             <div className="flex items-center gap-2">
                                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                                     <SheetTrigger asChild>

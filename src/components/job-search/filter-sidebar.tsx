@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { CAREERS, industriesByJobType, type Industry } from "@/lib/industry-data";
-import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2, Search, ListFilter } from "lucide-react";
+import { Briefcase, Check, DollarSign, Dna, MapPin, SlidersHorizontal, Star, UserSearch, Weight, Building, FileText, Calendar, Camera, Ruler, Languages, Clock, ListChecks, Trash2, Search, ListFilter, X } from "lucide-react";
 import { interviewLocations } from '@/lib/location-data';
 import { type SearchFilters, experienceYears } from './search-results';
 import { cn } from '@/lib/utils';
@@ -32,6 +32,8 @@ import { useDebounce } from '@/lib/useDebounce';
 import { Switch } from '../ui/switch';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { useAuth } from '@/contexts/AuthContext';
+import { initialSearchFilters, keyMap, sortOptionMap } from '@/lib/job-filter-util';
+import { useRouter } from 'next/navigation';
 
 const createSlug = (str: string) => {
     if (!str) return '';
@@ -52,8 +54,8 @@ const conditionsByVisaDetail: { [key: string]: string[] } = {
     'dac-dinh-dau-nhat': ['Tuyển gấp', 'Nhóm ngành 1', 'Nhóm ngành 2', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Hỗ trợ Ginou 2', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Muốn về công ty trước khi ra visa', 'Muốn về công ty sau khi ra visa', 'Nhận visa katsudo', 'Không nhận visa katsudo', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại', 'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Yêu cầu mặc Kimono', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Trình cục sớm', 'Có bảng lương'],
     'dac-dinh-dau-viet': ['Tuyển gấp', 'Nhóm ngành 1', 'Nhóm ngành 2', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Hỗ trợ Ginou 2', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Nhận visa katsudo', 'Không nhận visa katsudo', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại', 'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Yêu cầu mặc Kimono', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Nợ phí', 'Phí mềm', 'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Bay nhanh', 'Trình cục sớm', 'Có bảng lương'],
     'dac-dinh-di-moi': ['Tuyển gấp', 'Nhóm ngành 1', 'Nhóm ngành 2', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Hỗ trợ Ginou 2', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Nhận visa katsudo', 'Không nhận visa katsudo', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại', 'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Yêu cầu mặc Kimono', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Nợ phí', 'Phí mềm', 'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Bay nhanh', 'Trình cục sớm', 'Có bảng lương'],
-    'ky-su-tri-thuc-dau-nhat': ['Tuyển gấp', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Muốn về công ty trước khi ra visa', 'Muốn về công ty sau khi ra visa', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại', 'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Nhận nhiều loại bằng', 'Nhận bằng Senmon', 'Yêu cầu mặc Kimono', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Trình cục sớm', 'Có bảng lương'],
-    'ky-su-tri-thuc-dau-viet': ['Tuyển gấp', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại', 'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Nhận nhiều loại bằng', 'Nhận bằng Senmon', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Nợ phí', 'Phí mềm', 'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Bay nhanh', 'Trình cục sớm', 'Có bảng lương'],
+    'ky-su-dau-nhat': ['Tuyển gấp', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Muốn về công ty trước khi ra visa', 'Muốn về công ty sau khi ra visa', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại', 'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Nhận nhiều loại bằng', 'Nhận bằng Senmon', 'Yêu cầu mặc Kimono', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Trình cục sớm', 'Có bảng lương'],
+    'ky-su-dau-viet': ['Tuyển gấp', 'Nhà xưởng', 'Ngoài trời', 'Làm trên cao', 'Cặp đôi', 'Yêu cầu bằng lái', 'Nhận tuổi cao', 'Việc nhẹ', 'Việc nặng', 'Nghỉ T7, CN', 'Không yêu cầu kinh nghiệm', 'Nhân viên chính thức', 'Haken', 'Nhận visa gia đình', 'Nhận quay lại', 'Nhận tiếng yếu', 'Nhận trái ngành', 'Nhận thiếu giấy', 'Nhận nhiều loại bằng', 'Nhận bằng Senmon', 'Lương tốt', 'Tăng ca', 'Tăng lương định kỳ', 'Dễ cày tiền', 'Có thưởng', 'Nợ phí', 'Phí mềm', 'Hỗ trợ chỗ ở', 'Hỗ trợ về công ty', 'Chưa vé', 'Có vé', 'Công ty uy tín', 'Có người Việt', 'Đơn truyền thống', 'Bay nhanh', 'Trình cục sớm', 'Có bảng lương'],
 };
 
 const interviewRoundsOptions = [
@@ -264,6 +266,177 @@ const MonthlySalaryContent = React.memo(({ filters, onSalaryChange }: { filters:
         </div>
     );
 });
+const makeLabelFromFilters = (f: SearchFilters) => {
+    const parts: string[] = [];
+    if (f.q) parts.push(f.q);
+    if (f.visaDetail && f.visaDetail !== 'all') parts.push(f.visaDetail);
+    if ((f.career && f.career !== 'all') || (f.job && f.job !== 'all')) {
+        parts.push(f.job ?? f.career ?? '')
+    };
+    if (Array.isArray(f.workLocation) && f.workLocation.length) parts.push(`${f.workLocation.length} địa điểm`);
+    return parts.slice(0, 3).join(' • ') || 'Bộ lọc mới';
+};
+
+function loadRecentFilters(): RecentFilterItem[] {
+    try {
+        const raw = localStorage.getItem(RECENT_FILTERS_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveRecentFilters(items: RecentFilterItem[]) {
+    try {
+        localStorage.setItem(RECENT_FILTERS_KEY, JSON.stringify(items));
+    } catch { }
+}
+export type RecentFilterItem = {
+    id: string;
+    label: string;
+    filters: any;
+    sortBy: any;
+    createdAt: number;
+};
+
+export const RECENT_FILTERS_KEY = 'hj_recent_filters_v1';
+export const RecentFiltersCard = ({
+    onApply,
+    autoHideDelay = 50000
+}: {
+    onApply: (filters: any) => void;
+    autoHideDelay?: number;
+}) => {
+    const router = useRouter();
+    const [isVisible, setIsVisible] = useState(true);
+    const [isClosing, setIsClosing] = useState(false);
+    const [recentList, setRecentList] = useState<RecentFilterItem[]>([]);
+
+    useEffect(() => {
+        setRecentList(loadRecentFilters());
+    }, []);
+
+    useEffect(() => {
+        if (!isVisible) return;
+
+        const timer = setTimeout(() => {
+            handleClose();
+        }, autoHideDelay);
+
+        return () => clearTimeout(timer);
+    }, [isVisible, autoHideDelay]);
+
+    const handleClose = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setIsVisible(false);
+        }, 300); // match animation duration
+    };
+
+    const handleOpen = () => {
+        setIsVisible(true);
+        setIsClosing(false);
+    }
+
+    const handleApply = (stagedFilters: any, sortBy: any) => {
+
+        const query = new URLSearchParams();
+        Object.entries(stagedFilters).forEach(([key, value]) => {
+            const urlKey = keyMap[key] || key;
+            if ((value || typeof value === 'boolean') && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
+                if (key !== 'visa') {
+                    if (Array.isArray(value)) {
+                        if (key === 'specialConditions') {
+                            value.forEach(item => {
+                                const conditionSlug = allSpecialConditions.find(c => c.name === item)?.slug;
+                                if (conditionSlug) {
+                                    query.append(urlKey, conditionSlug);
+                                }
+                            });
+                        } else {
+                            value.forEach(item => query.append(urlKey, String(item)));
+                        }
+                    } else {
+                        query.set(urlKey, String(value));
+                    }
+                }
+            }
+        });
+
+        if (sortBy !== 'newest') {
+            query.set(keyMap['sortBy'], sortOptionMap[sortBy]);
+        }
+        router.push(`/tim-viec-lam?${query.toString()}`);
+        // onApply(filters);
+        // handleClose();
+    };
+
+    const handleRemove = (id: string) => {
+        const next = recentList.filter(i => i.id !== id);
+        setRecentList(next);
+        saveRecentFilters(next);
+    };
+
+    return (
+        <div
+            className={cn(
+                'fixed bottom-24 right-4 z-40 transition-all duration-300',
+                isClosing && 'translate-x-full right-0'
+            )}
+        >
+            {!isVisible && <div onClick={handleOpen} className={
+                cn('bg-white px-3 cursor-pointer transition-all z-39 duration-300 shadow w-[46px] h-[50px] opacity-[0.5] hover:w-[160px] hover:opacity-[1] absolute right-[100%] top-0 flex items-center justify-start text-primary')
+            }>
+                <div>
+                    <Clock className='mr-3' />
+                </div>
+                <span className='whitespace-nowrap'>Bộ lọc đã lưu</span>
+            </div>}
+            <Card className="shadow-2xl w-full max-w-sm z-41">
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-bold flex items-center justify-between">
+                        <span>Bộ lọc đã lưu</span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={handleClose}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2">
+                    {recentList.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">Chưa có bộ lọc đã lưu</p>
+                    ) : (
+                        recentList.map(item => (
+                            <div
+                                key={item.id}
+                                className="flex items-center justify-between gap-2 bg-muted p-2 rounded group"
+                            >
+                                <button
+                                    className="text-sm text-left truncate flex-1"
+                                    title={item.label}
+                                    onClick={() => handleApply(item.filters, item.sortBy)}
+                                >
+                                    {item.label}
+                                </button>
+                                <button
+                                    className="text-xs opacity-0 group-hover:opacity-100 px-1 transition-opacity"
+                                    onClick={() => handleRemove(item.id)}
+                                    aria-label="Xóa"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))
+                    )}
+                </CardContent>
+            </Card>
+        </div>
+    );
+};
 MonthlySalaryContent.displayName = 'MonthlySalaryContent';
 const japanProvinces = PROVINCES.filter((item) => item.groupCode === "JP");
 
@@ -358,7 +531,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
 
         const isEngineerVisa = parentVisaSlug === 'ky-su-tri-thuc';
         const isTokuteiServiceIndustry =
-            parentVisaSlug === 'ky-nang-dac-dinh' &&
+            parentVisaSlug === 'dac-dinh' &&
             ['nha-hang-tokutei', 'hang-khong-tokutei', 've-sinh-toa-nha-tokutei', 'luu-tru-khach-san-tokutei'].includes(activeFilters.career || '');
 
         return isEngineerVisa || isTokuteiServiceIndustry;
@@ -519,9 +692,19 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
 
     const isFlexibleDateChecked = filters.interviewDate === 'flexible';
 
+    const [showRecentCard, setShowRecentCard] = useState(true);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
 
     return (
         <div className="md:col-span-1 lg:col-span-1 h-full flex flex-col">
+            {isMounted && showRecentCard && role === 'admin' && (
+                <RecentFiltersCard onApply={onApply} autoHideDelay={50000} />
+            )}
             <Card className="flex-grow flex flex-col">
                 <CardHeader>
                     <CardTitle className="text-xl flex items-center gap-2"><SlidersHorizontal /> Bộ lọc tìm kiếm</CardTitle>

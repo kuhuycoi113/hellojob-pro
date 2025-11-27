@@ -74,15 +74,15 @@ const getVisaBadgeClasses = (visa: string): string => {
         classes += 'border-accent-blue/60 bg-blue-40 text-[#19A6DF]';
     } else if (visa === 'Đặc định đi mới') {
         classes += 'text-[#40B5E4]';
-    } else if (visa === 'Kỹ sư, tri thức đầu Việt') {
+    } else if (visa === 'Kỹ sư đầu Việt') {
         classes += 'border-accent-orange/70 bg-orange-50 text-[#F2B92A]';
-    } else if (visa === 'Kỹ sư, tri thức đầu Nhật') {
+    } else if (visa === 'Kỹ sư đầu Nhật') {
         classes += 'border-accent-orange/70 bg-orange-50 text-[#F7B102]';
     } else if (visa?.includes("Thực tập sinh")) {
         classes += "border-accent-green/70 bg-green-50 text-accent-green";
-    } else if (visa?.includes("Kỹ năng đặc định")) {
+    } else if (visa?.includes("Đặc định")) {
         classes += "border-accent-blue/70 bg-blue-50 text-accent-blue";
-    } else if (visa?.includes("Kỹ sư, tri thức")) {
+    } else if (visa?.includes("Kỹ sư")) {
         classes += "border-accent-orange/70 bg-orange-50 text-orange-500";
     }
     return classes;
@@ -396,7 +396,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             setIsConsultantPopoverOpen={setIsConsultantPopoverOpen}
                                         />
                                     </div>
-                                    {isClient && <div className="flex items-center gap-2">
+                                    {isClient && role === 'admin' && <div className="flex items-center gap-2">
                                         <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                                             <Bookmark className={cn("mr-2 h-5 w-5", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                                             Lưu
