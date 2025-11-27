@@ -410,7 +410,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <div className="w-full px-3 pb-1">
                                 <p className="flex items-center justify-end gap-1.5 text-right w-full" style={{ fontSize: '11px', color: '#9B999A' }}>
                                     <span className='text-primary'>Đăng lúc:</span>
-                                    <span>{postedTime ? postedTime.split(' ')[1] : '...'}</span>
+                                    <span>{postedTime ?? '...'}</span>
                                 </p>
                             </div>
                         )}
@@ -466,7 +466,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         </div>
                         <p className="text-right text-[11px] mt-1">
                             <span className={cn(!isExpired && "text-primary")}>Đăng lúc:</span>
-                            <span> {postedTime ? postedTime.split(' ')[1] : '...'}</span>
+                            <span> {postedTime??'...'}</span>
                         </p>
                     </div>
                 </Card>
@@ -575,7 +575,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             {showPostedTime && (
                                 <p className="mt-1 text-right text-xs">
                                     <span className='text-primary'>Đăng lúc:</span>
-                                    <span className='text-muted-foreground'> {postedTime ? postedTime.split(' ')[1] : '...'}</span>
+                                    <span className='text-muted-foreground'> {postedTime??'...'}</span>
                                 </p>
                             )}
                         </div>
