@@ -703,7 +703,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
     return (
         <div className="md:col-span-1 lg:col-span-1 h-full flex flex-col">
             {isMounted && showRecentCard && role === 'admin' && (
-                <RecentFiltersCard onApply={onApply} autoHideDelay={50000} />
+                <RecentFiltersCard onApply={onApply} autoHideDelay={5000} />
             )}
             <Card className="flex-grow flex flex-col">
                 <CardHeader>

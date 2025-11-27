@@ -16,6 +16,9 @@ import { PaginationComponent } from "../pagination";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 export type SearchFilters = {
     q?: string;
@@ -79,8 +82,10 @@ type SearchResultsProps = {
 }
 
 export const SearchResults = memo(({ jobs, total, filters, appliedFilters, firstLoad = false, totalPage, currentPage, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange, onPageChange }: SearchResultsProps) => {
+    const { role } = useAuth();
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const router = useRouter();
 
     const handleApply = () => {
         applyFilters();
@@ -99,6 +104,13 @@ export const SearchResults = memo(({ jobs, total, filters, appliedFilters, first
         const savedFilters: any[] = raw ? JSON.parse(raw) : [];
         savedFilters.unshift(obj);
         localStorage.setItem(RECENT_FILTERS_KEY, JSON.stringify(savedFilters));
+        toast({
+            title: "Lưu bộ lọc thành công!",
+            duration: 1000,
+        });
+        setFilterTitle('');
+        setIsShowSaveFilter(false);
+        router.refresh();
     }
     return (
         <div className="w-full bg-secondary">
@@ -110,7 +122,7 @@ export const SearchResults = memo(({ jobs, total, filters, appliedFilters, first
                     <div className="md:col-span-3 lg:col-span-3">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-bold">Kết quả {total === null ? '' : `(${total})`}</h2>
-                            <Popover open={isShowSaveFilter} onOpenChange={setIsShowSaveFilter}>
+                            {role === 'admin' && <Popover open={isShowSaveFilter} onOpenChange={setIsShowSaveFilter}>
                                 <PopoverTrigger asChild>
                                     <Bookmark className={"h-5 w-5 text-primary mr-auto ml-1 cursor-pointer hover:fill-current transition-all duration-300"} />
                                 </PopoverTrigger>
@@ -131,7 +143,7 @@ export const SearchResults = memo(({ jobs, total, filters, appliedFilters, first
                                         </Button>
                                     </div>
                                 </PopoverContent>
-                            </Popover>
+                            </Popover>}
                             <div className="flex items-center gap-2">
                                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                                     <SheetTrigger asChild>
