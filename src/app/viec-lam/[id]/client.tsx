@@ -391,8 +391,11 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                     </div> */}
                                     <div>
                                         <p>{job.aiContent}</p>
-                                        <p>-----------------</p>
-                                        <p>{job.baseContent}</p>
+                                        {role === 'admin' && <>
+                                            <p>-----------------</p>
+                                            <p>{job.baseContent}</p>
+                                        </>
+                                        }
                                     </div>
                                 </JobDetailSection>
 
