@@ -25,7 +25,7 @@ export const phoneAuth = (submitButtonId: string, phoneNumber: string) => {
 export const verifyOtp = (confirmationResult: ConfirmationResult, otp: string) => {
     return confirmationResult.confirm(otp);
 }
-export const setUserData = async (user: any, refCode: any) => {
+export const setUserData = async (user: any, refCode: any, createdDate: number) => {
     const userRef = doc(db, `users`, user.uid);
     const userData = (await getDoc(userRef))?.data();
     let isNewUser = false;
@@ -42,7 +42,7 @@ export const setUserData = async (user: any, refCode: any) => {
             auth: {
                 providerId
             },
-            createdDate: Timestamp.now(),
+            createdDate,
             status: 0,
             isPublish: true,
             type: 'AGENT'
@@ -120,28 +120,28 @@ export const signOut = async () => {
 
 
 export const toUser = ({ decodedToken }: Tokens): User => {
-  const {
-    uid,
-    email,
-    picture: photoURL,
-    email_verified: emailVerified,
-    phone_number: phoneNumber,
-    name: displayName,
-    auth_time: authTime,
-    source_sign_in_provider: signInProvider
-  } = decodedToken;
+    const {
+        uid,
+        email,
+        picture: photoURL,
+        email_verified: emailVerified,
+        phone_number: phoneNumber,
+        name: displayName,
+        auth_time: authTime,
+        source_sign_in_provider: signInProvider
+    } = decodedToken;
 
-  const customClaims = filterStandardClaims(decodedToken);
+    const customClaims = filterStandardClaims(decodedToken);
 
-  return {
-    uid,
-    email: email ?? null,
-    displayName: displayName ?? null,
-    photoURL: photoURL ?? null,
-    phoneNumber: phoneNumber ?? null,
-    emailVerified: emailVerified ?? false,
-    providerId: signInProvider,
-    customClaims,
-    authTime
-  };
+    return {
+        uid,
+        email: email ?? null,
+        displayName: displayName ?? null,
+        photoURL: photoURL ?? null,
+        phoneNumber: phoneNumber ?? null,
+        emailVerified: emailVerified ?? false,
+        providerId: signInProvider,
+        customClaims,
+        authTime
+    };
 };

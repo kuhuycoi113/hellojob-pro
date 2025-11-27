@@ -92,7 +92,7 @@ export function RootProvider({
         }
         let decodedUser = toUser(firebaseUser, idTokenResult);
         await login(idTokenResult.token);
-        const res = await setUserData(decodedUser, null);
+        const res = await setUserData(decodedUser, null, serverTime);
         decodedUser = { ...decodedUser, ...res.userInfo };
         // console.log(decodedUser)
         // if(!res.isNewUser){
@@ -103,7 +103,7 @@ export function RootProvider({
         setUser(decodedUser);
     };
     return (
-        <ServerInfoContext.Provider value={{serverTime}}>
+        <ServerInfoContext.Provider value={{ serverTime }}>
             <AuthProvider serverUser={user}>
                 <ChatProvider>
                     {children}
@@ -114,7 +114,7 @@ export function RootProvider({
 }
 
 export function useServerInfo() {
-  const context = useContext(ServerInfoContext);
-  if (!context) throw new Error("ServerInfo must be init");
-  return context;
+    const context = useContext(ServerInfoContext);
+    if (!context) throw new Error("ServerInfo must be init");
+    return context;
 }

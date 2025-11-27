@@ -114,6 +114,9 @@ export default async function RootLayout({
         fetchedUser.dateOfFirstIssue = fetchedUser.dateOfFirstIssue.seconds * 1000;
       }
       user = { ...user, ...fetchedUser };
+      if (typeof user.createdDate !== 'number') {
+        delete user.createdDate;
+      }
     }
   } catch (error) {
     console.log(error);
