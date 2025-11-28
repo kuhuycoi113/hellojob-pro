@@ -52,7 +52,7 @@ export default function QuickEditJob({
     isQuickEditOpen,
     setIsQuickEditOpen
 }: QuickEditJobProps) {
-    const { postLoginAction, clearPostLoginAction } = useAuth()
+    const { postLoginAction, clearPostLoginAction, setPostLoginAction } = useAuth()
     const [editableJob, setEditableJob] = useState<Job>({});
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [availableIndustries, setAvailableIndustries] = useState<string[]>([]);
@@ -165,6 +165,7 @@ export default function QuickEditJob({
                 className: 'bg-green-500 text-white',
             });
             clearPostLoginAction();
+            setPostLoginAction({ type: 'EDITED_JOB', data: editableJob });
             setIsQuickEditOpen(false);
         } else {
             toast({

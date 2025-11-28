@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function JobSearchPageContent({ jobs = [], filters, total, totalPages = 0, page = 1, sort = 'newest' }: { jobs?: Job[], filters: SearchFilters, total: number, totalPages?: number, page?: number, sort?: string }) {
     const router = useRouter();
     const readOnlySearchParams = useSearchParams();
-    const { role } = useAuth();
+    const { role, postLoginAction, clearPostLoginAction } = useAuth();
     if (role === 'admin') {
         initialSearchFilters.hasForm = true;
     }
@@ -121,7 +121,17 @@ export default function JobSearchPageContent({ jobs = [], filters, total, totalP
         // Thực hiện logic tìm kiếm ở đây
     }, []);
 
-
+    useEffect(() => {
+        if (postLoginAction?.type === 'EDITED_JOB') {
+            const editedJob = postLoginAction.data;
+            const jobID = editedJob.id;
+            const jobIndex = jobs.findIndex(job => job.id === jobID);
+            if (jobIndex > -1) {
+                jobs[jobIndex] = { ...jobs[jobIndex], ...editedJob };
+            }
+            clearPostLoginAction();
+        }
+    }, [postLoginAction])
     return (
         <div className="flex flex-col">
             {/* <JsonLdScript
