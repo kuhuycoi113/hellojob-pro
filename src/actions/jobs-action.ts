@@ -121,7 +121,6 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
             }
         });
     }
-    console.log(typeof hasForm)
     if (hasForm) {
         searchQuery.query.bool.filter.push(
             {
