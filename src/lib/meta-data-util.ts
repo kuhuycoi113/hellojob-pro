@@ -41,7 +41,10 @@ export const generateJobMetaDataImage = async (job: any) => {
         const { canvas, ctx, width, height, fontSize, font400, font700, maxTextWidth } = props;
         const startX = props.startX + 15;
         // Load ảnh nền
-        const avatarUrl = job.avatar?.url ?? job.avatar ?? '/img/metadata/opengraph-image.jpg';
+        let avatarUrl = job.avatar?.url ?? job.avatar ?? '/img/metadata/opengraph-image.jpg';
+        if (avatarUrl.endsWith('undefined')) {
+            avatarUrl = getJobImage(job.job, job.career) ?? '/img/metadata/opengraph-image.jpg';
+        }
         await drawBackgroundImage(ctx, avatarUrl, width, height);
 
         let startY = 50;
@@ -384,9 +387,12 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             }
             let avatarUrl;
             if (!!job) {
-                avatarUrl = job.avatar ?? getJobImage(job.job, job.career) ?? `${process.env.NEXT_PUBLIC_URL}/img/job-default.png`;
+                avatarUrl = job.avatar ?? `${process.env.NEXT_PUBLIC_URL}/img/metadata/opengraph-image.jpg`;
+                if (avatarUrl.endsWith('undefined')) {
+                    avatarUrl = getJobImage(job.job, job.career) ?? `${process.env.NEXT_PUBLIC_URL}/img/metadata/opengraph-image.jpg`;
+                }
             } else {
-                avatarUrl = `${process.env.NEXT_PUBLIC_URL}/img/nojob.png?v=121`;
+                avatarUrl = `${process.env.NEXT_PUBLIC_URL}/img/no-image.jpg?v=121`;
             }
             let img;
             try {
