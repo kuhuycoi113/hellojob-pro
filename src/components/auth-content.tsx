@@ -12,7 +12,7 @@ import { onIdTokenChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 const AuthContent: FC<{ children: React.ReactElement, onOpenChange: (open: boolean) => void }> = ({ children, onOpenChange }) => {
 
-  const { setRole, postLoginAction } = useAuth();
+  const { setRole } = useAuth();
   const { toast } = useToast();
   const [hasLogged, setHasLogged] = useState(false);
   const searchParams = useSearchParams();

@@ -1,92 +1,177 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import Image from "next/image";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
-import { allIndustries } from "@/lib/industry-data";
+import { CAREERS } from "@/lib/industry-data";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { CalendarIcon, Check, ChevronsUpDown, EyeOff, MapPin } from "lucide-react";
+import { CalendarIcon, Check, ChevronsUpDown, EyeOff, MapPin, Search } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./ui/command";
 import { Calendar } from "./ui/calendar";
 import { ScrollArea } from "./ui/scroll-area";
-import { visaDetailsByVisaType } from "@/lib/visa-data";
+import { japanJobTypes, visaDetailsByVisaType } from "@/lib/visa-data";
 import { cn } from "@/lib/utils";
-import { parse } from "date-fns";
+import { format, formatDate, parse } from "date-fns";
 import { vi } from "date-fns/locale";
-import { allJapanLocations } from "@/lib/location-data";
+import { allJapanLocations, japanRegions } from "@/lib/location-data";
+import { useAuth } from "@/contexts/AuthContext";
+import { Checkbox } from "./ui/checkbox";
+import { Badge } from "./ui/badge";
+import JOBS from '@/lib/jobs.json';
+import { Textarea } from "./ui/textarea";
+import { updateJob } from "@/actions/job-action";
 import { toast } from "@/hooks/use-toast";
-
-type Job = {
-    title: string;
-    company?: string;
-    location?: string;
-};
-
+interface Job {
+    id?: string;
+    visa?: string;
+    job?: string;
+    career?: string;
+    basicSalary?: number; realSalary?: number; interviewDay?: string; workLocation?: string; avatar?: string; filter?: any;
+    aiContent?: string;
+    formImage?: string
+}
 interface QuickEditJobProps {
-    job: any;
     isQuickEditOpen: boolean;
     setIsQuickEditOpen: (open: boolean) => void;
 }
-const formatSalaryInput = (value: string | undefined): string => {
-    if (!value) return '';
-    const num = parseInt(value.replace(/[^0-9]/g, ''), 10);
+const formatSalaryInput = (number: number | undefined): string => {
+    const value = number ? '' + number : '';
+    if (!value || !value?.length) return '';
+    const num = Number(value.replace(/[^0-9]/g, ''));
     if (isNaN(num)) return '';
     return num.toLocaleString('en-US');
 };
 
-const parseSalaryInput = (value: string): string => {
-    return value.replace(/[^0-9]/g, '');
+const parseSalaryInput = (value: string): number => {
+    return Number(value.replace(/[^0-9]/g, ''));
 };
+const allIndustries = Object.values(CAREERS).flat();
 export default function QuickEditJob({
-    job,
     isQuickEditOpen,
     setIsQuickEditOpen
 }: QuickEditJobProps) {
-    const [editableJob, setEditableJob] = useState<any>(job);
+    const { postLoginAction, clearPostLoginAction } = useAuth()
+    const [editableJob, setEditableJob] = useState<Job>({});
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [isJobDetailPopoverOpen, setIsJobDetailPopoverOpen] = useState(false);
+    const [availableIndustries, setAvailableIndustries] = useState<string[]>([]);
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
-    const [interviewDate, setInterviewDate] = useState<string | null>(null);
-    const [isLocationPopoverOpen, setIsLocationPopoverOpen] = useState(false);
+    const [isLocationDialogOpen, setIsLocationDialogOpen] = useState(false);
     const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
     const [locationSearch, setLocationSearch] = useState('');
     const [isClosed, setIsClosed] = useState(false);
     const [newImageFile, setNewImageFile] = useState<File | null>(null);
+    const [newFormImageFile, setNewFormImageFile] = useState<File | null>(null);
+    const [formImagePreview, setFormImagePreview] = useState<string | null>(null);
+    const [locationSearchTerm, setLocationSearchTerm] = useState('');
 
-    const handleImageFileChange = (e: any) => {
 
-    }
-    const handleQuickEditIndustryChange = () => {
-
-    }
-    const handleQuickEditJobDetailChange = (newDescription: string) => {
-        setEditableJob((prev: any) => ({
-            ...prev,
-            details: { ...prev.details, description: newDescription }
-        }));
+    const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setNewImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
     };
-    const handleApplyLocations = () => {
-        const locationNames = selectedLocations.map(slug => allJapanLocations.find(l => l.slug === slug)?.name).filter(Boolean).join(', ');
-        setEditableJob((prev: any) => ({ ...prev, workLocation: locationNames }));
-        setIsLocationPopoverOpen(false);
+    const handleFormImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setNewFormImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
     };
+
+
+    useEffect(() => {
+        if (!!editableJob?.visa) {
+            const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key =>
+                (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === editableJob.visa)
+            )
+            const industries = CAREERS[parentVisaSlug as keyof typeof CAREERS];
+            setAvailableIndustries(industries ?? []);
+        } else {
+            setAvailableIndustries([]);
+        }
+    }, [editableJob?.visa]);
+
+    useEffect(() => {
+        // done
+        if (editableJob?.career) {
+            const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key =>
+                (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === editableJob.visa)
+            )
+            const visaCode = japanJobTypes.find(v => v.slug === parentVisaSlug)?.code;
+            const parentIndustry = editableJob.career;
+            const jobDetails = JOBS.filter(item => item.parent === parentIndustry && item.value.startsWith(visaCode || ''))?.map(j => j.label) || [];
+            setAvailableJobDetails(jobDetails);
+            // Reset job detail if industry changes
+            if (!jobDetails.includes(editableJob.job as string)) {
+                delete editableJob.job;
+            }
+        } else {
+            setAvailableJobDetails([]);
+        }
+    }, [editableJob.career, setEditableJob]);
+    // const handleApplyLocations = () => {
+    //     const locationNames = selectedLocations.map(slug => allJapanLocations.find(l => l.slug === slug)?.name).filter(Boolean).join(', ');
+    //     setEditableJob((prev: any) => ({ ...prev, workLocation: locationNames }));
+    //     setIsLocationPopoverOpen(false);
+    // };
 
     const handleCloseJob = (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-        const closedJobs = JSON.parse(localStorage.getItem('closedJobs') || '[]');
-        if (!closedJobs.includes(job.id)) {
-            closedJobs.push(job.id);
-            localStorage.setItem('closedJobs', JSON.stringify(closedJobs));
-            setIsClosed(true);
+        // const closedJobs = JSON.parse(localStorage.getItem('closedJobs') || '[]');
+        // if (!closedJobs.includes(job.id)) {
+        //     closedJobs.push(job.id);
+        //     localStorage.setItem('closedJobs', JSON.stringify(closedJobs));
+        //     setIsClosed(true);
+        //     toast({
+        //         title: "Đã đóng đơn",
+        //         description: "Việc làm này sẽ được ẩn đi.",
+        //     });
+        // }
+    };
+    useEffect(() => {
+        if (postLoginAction?.type === 'QUICK_EDIT_JOB') {
+            const { id, visa, job, career, basicSalary, realSalary, interviewDay, workLocation, avatar, aiContent, filter, formImage } = { ...postLoginAction.data };
+            const editJob: any = {
+                id, visa, job, career, basicSalary, realSalary, interviewDay, workLocation, avatar, aiContent, formImage
+            }
+            if (!!filter) {
+                editJob.filter = filter
+            }
+            setEditableJob(editJob);
+        }
+    }, [postLoginAction])
+    if (!editableJob) {
+        return;
+    }
+    const handleSave = async () => {
+        const success = await updateJob(editableJob, newImageFile, newFormImageFile);
+        if (success) {
             toast({
-                title: "Đã đóng đơn",
-                description: "Việc làm này sẽ được ẩn đi.",
+                title: 'Cập nhật nhanh việc làm thành công!',
+                className: 'bg-green-500 text-white',
+            });
+            clearPostLoginAction();
+            setIsQuickEditOpen(false);
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Cập nhật nhanh việc làm không thành công!',
             });
         }
-    };
+    }
     return (
 
         <Dialog open={isQuickEditOpen} onOpenChange={setIsQuickEditOpen}>
@@ -100,13 +185,13 @@ export default function QuickEditJob({
                 <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label className="text-right">Hình ảnh</Label>
-                        <div className="col-span-3">
+                        <div className="col-span-1">
                             <Label
                                 htmlFor="image-upload-input-list"
                                 className="relative flex items-center justify-center w-24 h-24 border-2 border-dashed rounded-md cursor-pointer border-border hover:border-primary transition-colors bg-secondary/50"
                             >
                                 <Image
-                                    src={imagePreview || editableJob.image.src}
+                                    src={imagePreview || editableJob.avatar || '/img/no-image.jpg'}
                                     alt="Ảnh xem trước"
                                     fill
                                     className="object-contain rounded-md p-1"
@@ -120,14 +205,31 @@ export default function QuickEditJob({
                                 />
                             </Label>
                         </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="title-edit" className="text-right">Tiêu đề</Label>
-                        <Input id="title-edit" value={editableJob.title} onChange={(e) => setEditableJob({ ...editableJob, title: e.target.value })} className="col-span-3" />
+                        <Label className="text-right">Form đơn</Label>
+                        <div className="col-span-1">
+                            <Label
+                                htmlFor="image-upload-input-form"
+                                className="relative flex items-center justify-center w-24 h-24 border-2 border-dashed rounded-md cursor-pointer border-border hover:border-primary transition-colors bg-secondary/50"
+                            >
+                                <Image
+                                    src={formImagePreview || editableJob.formImage || '/img/no-image.jpg'}
+                                    alt="Ảnh form Đơn"
+                                    fill
+                                    className="object-contain rounded-md p-1"
+                                />
+                                <Input
+                                    id="image-upload-input-form"
+                                    type="file"
+                                    className="sr-only"
+                                    accept="image/*"
+                                    onChange={handleFormImageFileChange}
+                                />
+                            </Label>
+                        </div>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="visa-edit" className="text-right">Loại Visa</Label>
-                        <Select onValueChange={(value) => setEditableJob({ ...editableJob, visaDetail: value })} value={editableJob.visaDetail}>
+                        <Select onValueChange={(value) => setEditableJob(prev => ({ ...prev, visa: value }))} value={editableJob.visa}>
                             <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
                             <SelectContent>
                                 {Object.entries(visaDetailsByVisaType).map(([group, details]) => (
@@ -141,68 +243,52 @@ export default function QuickEditJob({
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="industry-edit" className="text-right">Ngành nghề</Label>
-                        <Select onValueChange={handleQuickEditIndustryChange} value={editableJob.industry}>
-                            <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
+                        <Select
+                            value={editableJob.career || ''}
+                            onValueChange={(value) => {
+                                setEditableJob(prev => ({ ...prev, career: value }));
+                            }}
+                            disabled={!editableJob.visa}
+                        >
+                            <SelectTrigger className="col-span-3" id="industry-modal">
+                                <SelectValue placeholder="Chọn ngành nghề" >
+                                    {editableJob.career || "Chọn ngành nghề"}
+                                </SelectValue>
+                            </SelectTrigger>
                             <SelectContent>
-                                {allIndustries.map(ind => <SelectItem key={ind.slug} value={ind.name}>{ind.name}</SelectItem>)}
+                                {availableIndustries.map((ind, index) => <SelectItem key={`${ind}-${index}`} value={ind}>{ind}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label className="text-right">Chi tiết công việc</Label>
-                        <Popover open={isJobDetailPopoverOpen} onOpenChange={setIsJobDetailPopoverOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    aria-expanded={isJobDetailPopoverOpen}
-                                    className="col-span-3 justify-between font-normal"
-                                    disabled={availableJobDetails.length === 0}
-                                >
-                                    <span className="truncate">
-                                        {editableJob.details.description.match(/Chi tiết công việc: ([^.]*)/)?.[1]?.trim() || "Chọn công việc chi tiết"}
-                                    </span>
-                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
-                                <Command>
-                                    <CommandInput placeholder="Tìm công việc..." />
-                                    <CommandList>
-                                        <CommandEmpty>Không tìm thấy.</CommandEmpty>
-                                        <CommandGroup>
-                                            {availableJobDetails.map((detail) => (
-                                                <CommandItem
-                                                    key={detail}
-                                                    value={detail}
-                                                    onSelect={(currentValue) => {
-                                                        const newDescription = `Chi tiết công việc: ${currentValue}. ${editableJob.details.description.replace(/Chi tiết công việc: [^.]*\.?/, '').trim()}`;
-                                                        handleQuickEditJobDetailChange(newDescription);
-                                                        setIsJobDetailPopoverOpen(false);
-                                                    }}
-                                                >
-                                                    <Check
-                                                        className={cn(
-                                                            "mr-2 h-4 w-4",
-                                                            editableJob.details.description.includes(`Chi tiết công việc: ${detail}`) ? "opacity-100" : "opacity-0"
-                                                        )}
-                                                    />
-                                                    {detail}
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                        <Select
+                            value={editableJob.job || undefined}
+                            onValueChange={value => setEditableJob(prev => ({ ...prev, job: value }))}
+                            disabled={!editableJob.career || availableJobDetails.length === 0}
+                        >
+                            <SelectTrigger
+                                id="job-detail-modal"
+                                className={cn("col-span-3", !editableJob.job && !editableJob.career && "text-xs italic text-muted-foreground")}
+                            >
+                                <SelectValue
+                                    placeholder={editableJob.job ?? (!editableJob.career ? "Hãy chọn Ngành nghề mong muốn" : "Chọn công việc chi tiết")}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {availableJobDetails.map(job => (
+                                    <SelectItem key={job} value={job}>{job}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="salary-edit" className="text-right">Lương cơ bản</Label>
                         <div className="col-span-3 flex items-center rounded-md border border-input focus-within:ring-2 focus-within:ring-ring">
                             <Input
                                 id="salary-edit"
-                                value={formatSalaryInput(editableJob.salary.basic)}
-                                onChange={(e) => setEditableJob({ ...editableJob, salary: { ...editableJob.salary, basic: parseSalaryInput(e.target.value) } })}
+                                value={formatSalaryInput(editableJob.basicSalary)}
+                                onChange={(e) => setEditableJob({ ...editableJob, basicSalary: parseSalaryInput(e.target.value) })}
                                 className="border-0 focus-visible:ring-0"
                             />
                             <span className="bg-secondary px-3 py-2 text-sm text-muted-foreground rounded-r-md">JPY</span>
@@ -213,8 +299,8 @@ export default function QuickEditJob({
                         <div className="col-span-3 flex items-center rounded-md border border-input focus-within:ring-2 focus-within:ring-ring">
                             <Input
                                 id="net-salary-edit"
-                                value={formatSalaryInput(editableJob.salary.actual || '')}
-                                onChange={(e) => setEditableJob({ ...editableJob, salary: { ...editableJob.salary, actual: parseSalaryInput(e.target.value) } })}
+                                value={formatSalaryInput(editableJob.realSalary)}
+                                onChange={(e) => setEditableJob({ ...editableJob, realSalary: parseSalaryInput(e.target.value) })}
                                 className="border-0 focus-visible:ring-0"
                             />
                             <span className="bg-secondary px-3 py-2 text-sm text-muted-foreground rounded-r-md">JPY</span>
@@ -226,21 +312,19 @@ export default function QuickEditJob({
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className="col-span-3 justify-start text-left font-normal">
                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {interviewDate ? interviewDate : <span>Chọn ngày</span>}
+                                    {editableJob.interviewDay ? editableJob.interviewDay : <span>Chọn ngày</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
                                 <Calendar
                                     mode="single"
-                                    selected={interviewDate ? parse(interviewDate, 'dd/MM/yyyy', new Date()) : undefined}
+                                    selected={editableJob.interviewDay ? parse(editableJob.interviewDay, 'dd-MM-yyyy', new Date()) : undefined}
                                     onSelect={(date) => {
                                         if (date) {
-                                            const today = new Date();
-                                            today.setHours(0, 0, 0, 0);
-                                            const newOffset = Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                                            setEditableJob((prev: any) => ({ ...prev, interviewDateOffset: newOffset }));
+                                            setEditableJob((prev: any) => ({ ...prev, interviewDay: formatDate(date, 'dd-MM-yyyy') }));
                                         }
                                     }}
+                                    today={undefined}
                                     initialFocus
                                     locale={vi}
                                 />
@@ -249,55 +333,98 @@ export default function QuickEditJob({
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label className="text-right">Địa điểm</Label>
-                        <Popover open={isLocationPopoverOpen} onOpenChange={setIsLocationPopoverOpen}>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" className="col-span-3 justify-start">
-                                    <MapPin className="mr-2 h-4 w-4" />
-                                    <span className="truncate">
-                                        {selectedLocations.length > 0 ? selectedLocations.map(slug => allJapanLocations.find(l => l.slug === slug)?.name).filter(Boolean).join(', ') : 'Chọn địa điểm'}
-                                    </span>
-                                    <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[400px] p-2" align="start">
-                                <Input
-                                    placeholder="Tìm tỉnh thành..."
-                                    className="mb-2"
-                                    value={locationSearch}
-                                    onChange={(e) => setLocationSearch(e.target.value)}
-                                />
-                                <ScrollArea className="h-[250px]">
-                                    <div className="flex flex-wrap gap-2 p-2">
-                                        {allJapanLocations
-                                            .filter(prefecture => prefecture.name.toLowerCase().includes(locationSearch.toLowerCase()))
-                                            .map(prefecture => {
-                                                const isSelected = selectedLocations.includes(prefecture.slug);
-                                                return (
-                                                    <Button
-                                                        key={prefecture.slug}
-                                                        variant={isSelected ? "default" : "outline"}
-                                                        size="sm"
-                                                        className="h-auto px-2 py-1"
-                                                        onClick={() => {
-                                                            const newSelection = isSelected
-                                                                ? selectedLocations.filter(s => s !== prefecture.slug)
-                                                                : [...selectedLocations, prefecture.slug];
-                                                            setSelectedLocations(newSelection);
-                                                        }}
-                                                    >
-                                                        {prefecture.name}
-                                                    </Button>
-                                                );
-                                            })}
+                        <Dialog open={isLocationDialogOpen} onOpenChange={setIsLocationDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" className=" col-span-3 justify-start text-left font-normal h-auto min-h-10">
+                                    <div className="truncate">
+                                        {!!editableJob.workLocation?.length ? (
+                                            editableJob.workLocation.split(', ').map(locName => (
+                                                <Badge key={locName} variant="secondary" className='mr-1'>
+                                                    {locName}
+                                                </Badge>
+                                            ))
+                                        ) : "Chọn địa điểm"}
                                     </div>
-                                </ScrollArea>
-                                <div className="p-2 border-t mt-2">
-                                    <Button onClick={handleApplyLocations} size="sm" className="w-full">
-                                        Áp dụng điền vào
-                                    </Button>
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-3xl">
+                                <DialogHeader>
+                                    <DialogTitle>Chọn địa điểm làm việc</DialogTitle>
+                                    <DialogDescription>Bạn có thể chọn nhiều tỉnh hoặc cả vùng.</DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4 space-y-4">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                        <Input
+                                            placeholder="Tìm tỉnh/thành phố..."
+                                            className="pl-10"
+                                            value={locationSearchTerm}
+                                            onChange={(e) => setLocationSearchTerm(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="mt-4 max-h-[50vh] overflow-y-auto pr-2 space-y-4">
+                                        {japanRegions
+                                            .filter(region => region.prefectures.some(p => p.name.toLowerCase().includes(locationSearchTerm.toLowerCase())))
+                                            .map((region) => (
+                                                <div key={region.slug}>
+                                                    <div className="flex items-center gap-2 mb-2 pb-2 border-b">
+                                                        <Checkbox
+                                                            id={`region-${region.slug}`}
+                                                            checked={region.prefectures.every(p => editableJob.workLocation?.includes(p.name))}
+                                                            onCheckedChange={(checked) => {
+                                                                const locations = editableJob.workLocation?.split(', ')
+                                                                const currentSelection = new Set(locations || []);
+                                                                region.prefectures.forEach(p => {
+                                                                    if (checked) {
+                                                                        currentSelection.add(p.name);
+                                                                    } else {
+                                                                        currentSelection.delete(p.name);
+                                                                    }
+                                                                });
+                                                                setEditableJob(prev => ({ ...prev, workLocation: Array.from(currentSelection).join(', ') }));
+                                                            }}
+                                                        />
+                                                        <Label htmlFor={`region-${region.slug}`} className="flex-grow text-left font-semibold cursor-pointer">
+                                                            Vùng {region.name}
+                                                        </Label>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 pl-6">
+                                                        {region.prefectures
+                                                            .filter(p => p.name.toLowerCase().includes(locationSearchTerm.toLowerCase()))
+                                                            .map(p => (
+                                                                <div key={p.slug} className="flex items-center gap-2">
+                                                                    <Checkbox
+                                                                        id={`pref-${p.slug}`}
+                                                                        checked={editableJob.workLocation?.includes(p.name)}
+                                                                        onCheckedChange={(checked) => {
+                                                                            const locations = editableJob.workLocation?.split(', ')
+                                                                            const currentSelection = new Set(locations || []);
+                                                                            if (checked) {
+                                                                                currentSelection.add(p.name);
+                                                                            } else {
+                                                                                currentSelection.delete(p.name);
+                                                                            }
+                                                                            setEditableJob(prev => ({ ...prev, workLocation: Array.from(currentSelection).join(', ') }));
+                                                                        }}
+                                                                    />
+                                                                    <Label htmlFor={`pref-${p.slug}`} className="font-normal cursor-pointer">{p.name}</Label>
+                                                                </div>
+                                                            ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                    </div>
                                 </div>
-                            </PopoverContent>
-                        </Popover>
+                                <DialogFooter>
+                                    <Button onClick={() => setIsLocationDialogOpen(false)}>Xác nhận</Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label className="text-right">Nội dung AI</Label>
+                        <Textarea className="col-span-3" defaultValue={editableJob.aiContent} rows={5}
+                            onChange={(e) => setEditableJob({ ...editableJob, aiContent: e.target.value })} />
                     </div>
                 </div>
                 <DialogFooter className="sm:justify-between flex-col-reverse sm:flex-row gap-2">
@@ -305,20 +432,7 @@ export default function QuickEditJob({
                         <EyeOff className="mr-2 h-4 w-4" /> Đóng đơn
                     </Button>
                     <Button variant="outline" onClick={() => setIsQuickEditOpen(false)}>Hủy</Button>
-                    <Button onClick={() => {
-                        let finalJobState = { ...editableJob };
-                        if (imagePreview) {
-                            finalJobState.image = { ...finalJobState.image, src: imagePreview };
-                        }
-                        const updatedJobs = JSON.parse(localStorage.getItem('updatedJobs') || '{}');
-                        updatedJobs[job.id] = { ...updatedJobs[job.id], ...finalJobState };
-                        localStorage.setItem('updatedJobs', JSON.stringify(updatedJobs));
-                        setEditableJob(finalJobState);
-                        toast({ title: "Đã lưu thay đổi!" });
-                        setIsQuickEditOpen(false);
-                        setImagePreview(null);
-                        setNewImageFile(null);
-                    }}>Lưu thay đổi</Button>
+                    <Button onClick={handleSave}>Lưu thay đổi</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

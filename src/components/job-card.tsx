@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { MapPin, DollarSign, Star, FileText, Bookmark, X } from 'lucide-react';
+import { MapPin, DollarSign, Star, FileText, Bookmark, X, Pencil } from 'lucide-react';
 import { Job } from '@/lib/mock-data';
 import {
     AlertDialog,
@@ -187,7 +187,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, onCancelAppliedJob?: any }) => {
 
     const { serverTime } = useServerInfo();
-    const { user, setSavedJobCount, setLastAction, isApplying, applyForJob, role } = useAuth();
+    const { user, setSavedJobCount, setLastAction, isApplying, applyForJob, role, setPostLoginAction } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
 
@@ -329,7 +329,12 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             </div>
 
                             <div className="flex flex-grow flex-col">
-                                <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{jobTitle}</h3>
+                                <div className="flex items-start justify-between gap-2">
+                                    <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{jobTitle}</h3>
+                                    <Button id="SUADON01" variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" onClick={() => setPostLoginAction({ type: 'QUICK_EDIT_JOB', data: job })}>
+                                        <Pencil className="h-4 w-4 text-muted-foreground" />
+                                    </Button>
+                                </div>
                                 <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
                                     {isClient && (
                                         <>

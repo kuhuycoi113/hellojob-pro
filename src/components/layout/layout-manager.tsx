@@ -15,6 +15,7 @@ import { CtaNhaTuyenDung } from '../cta-nha-tuyen-dung';
 import { CtaViecLamPhuHop } from '../cta-viec-lam-phu-hop';
 import { Badge } from '../ui/badge';
 import { AuthDialog } from '../auth-dialog';
+import QuickEditJob from '../quick-edit-job';
 
 const FloatingChatWidget = dynamic(() => import('@/components/chat/floating-chat-widget').then(mod => mod.FloatingChatWidget), { ssr: false });
 
@@ -28,6 +29,7 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
         isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen, setIsConfirmLoginOpen, isConfirmLoginOpen,
         isAuthDialogOpen, setIsAuthDialogOpen, isProfileEditDialogOpen, setIsProfileEditDialogOpen, lastDataApplied } = useAuth();
     const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = useState(false);
+    const [isQuickEditOpen, setIsQuickEditOpen] = useState(false);
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
@@ -50,6 +52,9 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (isLoggedIn && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
             setIsPostLoginApplyDialogOpen(true);
+        }
+        if (isLoggedIn && postLoginAction && postLoginAction.type === 'QUICK_EDIT_JOB') {
+            setIsQuickEditOpen(true);
         }
     }, [isLoggedIn, postLoginAction]);
     useEffect(() => {
@@ -179,6 +184,7 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <QuickEditJob isQuickEditOpen={isQuickEditOpen} setIsQuickEditOpen={setIsQuickEditOpen} />
         </>
     );
 }

@@ -17,12 +17,8 @@ import { toast } from '@/hooks/use-toast';
 export type Role = 'candidate' | 'candidate-empty-profile' | 'guest' | 'admin';
 
 export type PostLoginAction = {
-  type: 'APPLY_JOB';
-  data: {
-    jobId: string;
-    jobTitle: string;
-    job?: any;
-  };
+  type: 'APPLY_JOB'|'QUICK_EDIT_JOB';
+  data: any;
 } | null;
 
 

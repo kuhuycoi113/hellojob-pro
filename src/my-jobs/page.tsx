@@ -637,7 +637,7 @@ const LoggedInView = () => {
         'Kỹ sư, tri thức': ['Kỹ sư, tri thức đầu Việt', 'Kỹ sư, tri thức đầu Nhật'],
     };
     const visaTypes = Object.keys(visaDetailsOptions);
-    const availableIndustries = tempAspirations.desiredVisaType ? (industriesByJobType[tempAspirations.desiredVisaType as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
+    const availableIndustries = tempAspirations.visa ? (industriesByJobType[tempAspirations.visa as keyof typeof industriesByJobType] || []) : Object.values(industriesByJobType).flat();
 
     const educationLevels = ["Không yêu cầu", "Tốt nghiệp THPT", "Tốt nghiệp Trung cấp", "Tốt nghiệp Cao đẳng", "Tốt nghiệp Đại học", "Tốt nghiệp Senmon"];
     const languageLevels = ["Không yêu cầu", "N5", "N4", "N3", "N2", "N1"];

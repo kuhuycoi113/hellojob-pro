@@ -1,10 +1,11 @@
 'use server';
 
-import { searchDocuments } from "@/lib/elasticsearch";
+import { searchDocuments, updateDocument } from "@/lib/elasticsearch";
 import { PaginatedResponse } from "@/lib/types";
 const CANDIDATES_INDEX = 'hellojobv5-job-crawled';
 import JOBS from '@/lib/jobs.json';
-
+import * as AWS from "aws-sdk";
+import { FileMimeType } from "@/lib/file-mime-type";
 
 export async function getJobByCode(code: string): Promise<any> {
 
@@ -264,4 +265,77 @@ export const findSuggestedJobs = async (job: any): Promise<PaginatedResponse<any
         }
         return { docs: [], total: 0, page: 1, limit: 4, totalPages: 0 };
     }
+}
+export const updateJob = async (job: any, avatarFile: File | null, formImageFile: File | null) => {
+    let avatarRelativePath,formImagePath;
+    const s3 = new AWS.S3({ endpoint: process.env.AWS_MEDIA_END_POINT });
+    try {
+        if (!!avatarFile || !!formImageFile) {
+            AWS.config.update({
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                signatureVersion: "v4",
+            });
+        }
+        if (!!avatarFile) {
+            const buffer = Buffer.from(await avatarFile.arrayBuffer());
+            const folderUploadPrefix = `upload/hellojobv5/job-avatar/`;
+            let mimeType = avatarFile.type;
+            if (!FileMimeType[mimeType]) {
+                mimeType = "image/png";
+            }
+            const filename = job.id + "_" + Date.now() + "." + FileMimeType[mimeType];
+            const params: any = {
+                Bucket: process.env.AWS_MEDIA_BUCKET_NAME,
+                Key: folderUploadPrefix + filename,
+                Body: buffer,
+                ContentType: avatarFile.type,
+                ContentDisposition: "inline",
+            };
+            await s3.putObject(params).promise();
+            avatarRelativePath = folderUploadPrefix + filename;
+            const avatarUrl = `https://cdn.hellojob.jp/${folderUploadPrefix + filename}`;
+            job.avatar = avatarUrl;
+        }
+        if (!!formImageFile) {
+            const buffer = Buffer.from(await formImageFile.arrayBuffer());
+            const folderUploadPrefix = `upload/hellojobv5/job-form/`;
+            let mimeType = formImageFile.type;
+            if (!FileMimeType[mimeType]) {
+                mimeType = "image/png";
+            }
+            const filename = job.id + "_" + Date.now() + "." + FileMimeType[mimeType];
+            const params: any = {
+                Bucket: process.env.AWS_MEDIA_BUCKET_NAME,
+                Key: folderUploadPrefix + filename,
+                Body: buffer,
+                ContentType: formImageFile.type,
+                ContentDisposition: "inline",
+            };
+            await s3.putObject(params).promise();
+            formImagePath = folderUploadPrefix + filename;
+            const avatarUrl = `https://cdn.hellojob.jp/${folderUploadPrefix + filename}`;
+            job.formImage = avatarUrl;
+        }
+        await updateDocument(CANDIDATES_INDEX, job.id, job);
+        return true;
+    } catch (e) {
+        if (!!avatarRelativePath) {
+            await s3
+                .deleteObject({
+                    Key: avatarRelativePath,
+                    Bucket: process.env.AWS_MEDIA_BUCKET_NAME ?? "",
+                })
+                .promise();
+        }
+        if (!!formImagePath) {
+            await s3
+                .deleteObject({
+                    Key: formImagePath,
+                    Bucket: process.env.AWS_MEDIA_BUCKET_NAME ?? "",
+                })
+                .promise();
+        }
+    }
+    return false;
 }
