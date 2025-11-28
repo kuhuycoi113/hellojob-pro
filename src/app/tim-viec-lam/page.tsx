@@ -8,8 +8,13 @@ import { allJapanLocations, japanRegions, interviewLocations } from '@/lib/locat
 import { industriesByJobType } from '@/lib/industry-data';
 import { format, isValid, parse } from 'date-fns';
 import LANGUAGE_LEVEL from '@/lib/language_level.json';
-import { generateJobFilter } from '@/lib/job-filter-util';
+import { generateJobFilter, initialSearchFilters } from '@/lib/job-filter-util';
 import { getJobs } from '@/actions/jobs-action';
+import { cookies } from 'next/headers';
+import { authConfig } from '@/lib/firebase-server';
+import { getTokens } from 'next-firebase-auth-edge';
+import { toUser } from '@/lib/auth.util';
+import { findCachedUser } from '@/actions/user-action';
 const languageLevels = LANGUAGE_LEVEL.filter(level => level.groupCode.includes('TN'));
 
 type SearchParams = {
@@ -353,7 +358,15 @@ const DISPLAYED_JOBS_PER_PAGE = 30;
 export default async function JobSearchPage({ searchParams }: { searchParams: SearchParams }) {
   // Pass searchParams to client component to avoid re-reading them,
   // this is important for structured data generation on the client.
-  const { newFilters, sortOption, page } = generateJobFilter(await searchParams);
+  const tokens = await getTokens(await cookies(), authConfig);
+  let firebaseUser = tokens ? toUser(tokens) : null;
+  let user = await findCachedUser(firebaseUser?.uid);
+  const _initialSearchFilters = JSON.parse(JSON.stringify(initialSearchFilters));
+  if (user?.role === 'admin') {
+    _initialSearchFilters.hasForm = true;
+    // initialSearchFilters.hasNiceForm = true;
+  }
+  const { newFilters, sortOption, page } = generateJobFilter(await searchParams, _initialSearchFilters);
   const { docs: jobs, total, totalPages } = await getJobs(newFilters, sortOption, page, DISPLAYED_JOBS_PER_PAGE);
   // const appliedFilters=
   return (

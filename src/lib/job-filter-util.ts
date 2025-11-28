@@ -82,7 +82,7 @@ export const keyMap: { [key: string]: string } = {
     showExpired: 'hien-thi-het-han',
     sortExpiredToEnd: 'het-han-xuong-duoi',
     hasForm: 'co-form-don',
-    hasNiceForm: 'form-don-dep'
+    // hasNiceForm: 'form-don-dep'
 };
 
 export const sortOptionMap: { [key: string]: string } = {
@@ -108,8 +108,8 @@ const reverseSortOptionMap: { [key: string]: string } = Object.fromEntries(
     Object.entries(sortOptionMap).map(([key, value]) => [value, key])
 );
 
-export const generateJobFilter = (readOnlySearchParams: any) => {
-    const newFilters: SearchFilters = { ...initialSearchFilters, workLocation: [], specialConditions: [], otherSkillRequirement: [] };
+export const generateJobFilter = (readOnlySearchParams: any,_initialSearchFilters:any=initialSearchFilters) => {
+    const newFilters: SearchFilters = { ..._initialSearchFilters, workLocation: [], specialConditions: [], otherSkillRequirement: [] };
     let sortOption = 'newest';
     let page = 1;
     let entries = null;
@@ -142,7 +142,7 @@ export const generateJobFilter = (readOnlySearchParams: any) => {
             newFilters.specialConditions = [...(newFilters.specialConditions || []), ...conditionNames];
         } else if (internalKey === 'page') {
             page = parseInt(value, 10) || 1;
-        } else if (internalKey === 'showExpired' || internalKey === 'sortExpiredToEnd' || internalKey === 'hasForm' || internalKey === 'hasNiceForm') {
+        } else if (internalKey === 'showExpired' || internalKey === 'sortExpiredToEnd'||internalKey==='hasForm') {
             if (internalKey in newFilters) {
                 newFilters[internalKey] = JSON.parse(value?.toLocaleLowerCase() ?? 'true');
             }

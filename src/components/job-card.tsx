@@ -348,7 +348,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                     {feeInfo.text}
                                                 </Badge>
                                             )}
-                                            {!!job.formImage && (
+                                            {!!job.formImage && role === 'admin' && (
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
@@ -466,7 +466,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                         </div>
                         <p className="text-right text-[11px] mt-1">
                             <span className={cn(!isExpired && "text-primary")}>Đăng lúc:</span>
-                            <span> {postedTime??'...'}</span>
+                            <span> {postedTime ?? '...'}</span>
                         </p>
                     </div>
                 </Card>
@@ -575,7 +575,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             {showPostedTime && (
                                 <p className="mt-1 text-right text-xs">
                                     <span className='text-primary'>Đăng lúc:</span>
-                                    <span className='text-muted-foreground'> {postedTime??'...'}</span>
+                                    <span className='text-muted-foreground'> {postedTime ?? '...'}</span>
                                 </p>
                             )}
                         </div>

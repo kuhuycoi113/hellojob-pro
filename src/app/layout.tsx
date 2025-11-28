@@ -9,8 +9,8 @@ import { getTokens } from 'next-firebase-auth-edge';
 import { cookies } from 'next/headers';
 import { authConfig } from '@/lib/firebase-server';
 import { toUser } from '@/lib/auth.util';
-import { getFirestore } from "firebase-admin/firestore";
-import { getFirebaseAdminApp } from '@/lib/firebase-admin';
+import { findCachedUser } from '@/actions/user-action';
+import { initialSearchFilters } from '@/lib/job-filter-util';
 
 const siteConfig = {
   name: "HelloJob",
@@ -98,25 +98,18 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const tokens = await getTokens(await cookies(), authConfig);
-  let user = tokens ? toUser(tokens) : null;
+  let firebaseUser = tokens ? toUser(tokens) : null;
+  let user = null;
   try {
-    if (!!user?.uid) {
-      const adminApp = getFirebaseAdminApp();
-      const db = adminApp.firestore();
-      const fetchedUser = (await db.doc(`/users/${user.uid}`).get())?.data();
-      if (!!fetchedUser?.createdDate?.seconds) {
-        fetchedUser.createdDate = fetchedUser.createdDate.seconds * 1000;
-      }
-      if (!!fetchedUser?.dateOfBirth?.seconds) {
-        fetchedUser.dateOfBirth = fetchedUser.dateOfBirth.seconds * 1000;
-      }
-      if (!!fetchedUser?.dateOfFirstIssue?.seconds) {
-        fetchedUser.dateOfFirstIssue = fetchedUser.dateOfFirstIssue.seconds * 1000;
-      }
-      user = { ...user, ...fetchedUser };
-      if (typeof user.createdDate !== 'number') {
-        delete user.createdDate;
-      }
+    if (!!firebaseUser?.uid) {
+      user = await findCachedUser(firebaseUser.uid);
+      user = { ...firebaseUser, ...user };
+      delete user.stsTokenManager;
+      delete user.reloadUserInfo;
+      delete user.tenantId;
+      delete user.reloadListener;
+      delete user.proactiveRefresh;
+      // console.log(user)
     }
   } catch (error) {
     console.log(error);

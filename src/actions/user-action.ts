@@ -5,6 +5,9 @@ import { randomUUID } from "crypto";
 const APPLIED_JOBS_COLLECTION = 'hellojobv5-applied-jobs';
 import * as AWS from "aws-sdk";
 import { FileMimeType } from "@/lib/file-mime-type";
+import { validateProfileForApplication } from "@/lib/validators";
+import { Role, User } from "@/contexts/AuthContext";
+import { cache } from "react";
 
 export async function updateProfile(userId: any, data: any) {
     try {
@@ -17,16 +20,45 @@ export async function updateProfile(userId: any, data: any) {
     }
 }
 
-export async function findByUID(uID: any) {
+async function findByUID(uID: any): Promise<any | null> {
     try {
+        if (!uID) {
+            throw 'Chưa đăng nhập';
+        }
         const adminApp = getFirebaseAdminApp();
         const db = adminApp.firestore();
-        const user = await db.collection('users').doc(uID).get();
-        return user.data();
+        let user = (await db.collection('users').doc(uID).get())?.data() ?? null;
+        let role: Role = 'guest';
+        if (user) {
+            if (validateProfileForApplication(user)?.length > 0) {
+                role = 'candidate-empty-profile';
+            } else if (user.type === 'ADMIN') {
+                role = 'admin'
+            } else {
+                role = 'candidate';
+            }
+            user.role = role;
+
+            if (!!user?.createdDate?.seconds) {
+                user.createdDate = user.createdDate.seconds * 1000;
+            }
+            if (!!user?.dateOfBirth?.seconds) {
+                user.dateOfBirth = user.dateOfBirth.seconds * 1000;
+            }
+            if (!!user?.dateOfFirstIssue?.seconds) {
+                user.dateOfFirstIssue = user.dateOfFirstIssue.seconds * 1000;
+            }
+            user = { ...user, ...user };
+            if (typeof user.createdDate !== 'number') {
+                delete user.createdDate;
+            }
+        }
+        return user;
     } catch (error) {
         return null;
     }
 }
+export const findCachedUser = cache(findByUID);
 
 export async function applyJob(userId: string, job: any) {
     try {

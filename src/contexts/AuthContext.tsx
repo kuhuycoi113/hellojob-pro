@@ -106,16 +106,7 @@ export const AuthProvider = ({ serverUser, children }: AuthProviderProps) => {
   const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [lastDataApplied, setLastDataApplied] = useState<{ job: any, jobTitle: string } | null>(null);
-  let role: Role = 'guest';
-  if (serverUser) {
-    if (validateProfileForApplication(serverUser)?.length > 0) {
-      role = 'candidate-empty-profile';
-    } else if (serverUser.type === 'ADMIN') {
-      role = 'admin'
-    } else {
-      role = 'candidate';
-    }
-  }
+  let role: Role = serverUser?.role ?? 'guest';
 
   const [postLoginAction, setPostLoginAction] = useState<PostLoginAction>(null);
   const isLoggedIn = role !== 'guest';

@@ -1353,7 +1353,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                         <Switch
                                             id="has-form"
                                             checked={filters.hasForm}
-                                            onCheckedChange={(checked) => onFilterChange({ hasForm: !!checked, hasNiceForm: checked ? filters.hasNiceForm : false })}
+                                            onCheckedChange={(checked) => onFilterChange({ hasForm: !!checked })}
                                         />
                                     </div>
                                     {/* <div className="pl-6 border-l-2 ml-2 space-y-4">

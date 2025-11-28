@@ -58,7 +58,7 @@ export type SearchFilters = {
     suggestionType?: 'accurate' | 'related';
     showExpired?: boolean;
     hasForm?: boolean;
-    hasNiceForm?: boolean;
+    // hasNiceForm?: boolean;
     sortExpiredToEnd?: boolean;
 }
 

@@ -7,13 +7,17 @@ import { SearchResults, type SearchFilters } from '@/components/job-search/searc
 import { Job } from '@/lib/mock-data';
 import { SearchModule } from '@/components/job-search/search-module';
 import { allSpecialConditions } from '@/lib/visa-data';
-import { countJobs, getJobs } from '@/actions/jobs-action';
-import { generateJobFilter, initialSearchFilters, keyMap, sortOptionMap } from '@/lib/job-filter-util';
+import { countJobs } from '@/actions/jobs-action';
+import { initialSearchFilters, keyMap, sortOptionMap } from '@/lib/job-filter-util';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function JobSearchPageContent({ jobs = [], filters, total, totalPages = 0, page = 1, sort = 'newest' }: { jobs?: Job[], filters: SearchFilters, total: number, totalPages?: number, page?: number, sort?: string }) {
     const router = useRouter();
     const readOnlySearchParams = useSearchParams();
-
+    const { role } = useAuth();
+    if (role === 'admin') {
+        initialSearchFilters.hasForm = true;
+    }
     const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(filters);
     const [stagedFilters, setStagedFilters] = useState<SearchFilters>(filters);
     const [sortBy, setSortBy] = useState(sort);
@@ -24,7 +28,7 @@ export default function JobSearchPageContent({ jobs = [], filters, total, totalP
     const [totalPage, setTotalPage] = useState(totalPages);
     const [currentPage, setCurrentPage] = useState(page);
     const [firstLoad, setFirstLoad] = useState(false);
-    
+
     useEffect(() => {
         // Đồng bộ hóa tất cả các state được khởi tạo từ props
         setFilteredJobs(jobs);
@@ -32,17 +36,17 @@ export default function JobSearchPageContent({ jobs = [], filters, total, totalP
         setTotalPage(totalPages);
         setCurrentPage(page);
         setSortBy(sort);
-        
+
         // Cập nhật cả appliedFilters và stagedFilters theo props mới từ SC
         setAppliedFilters(filters);
         setStagedFilters(filters);
-        
+
         // Bạn có thể giữ lại stagedResultCount để nó cập nhật theo total
         setStagedResultCount(total);
-        
+
         // Có thể loại bỏ setFirstLoad(true) ở đây nếu logic không cần
         setFirstLoad(true);
-        
+
         // Dependency Array: Chạy lại mỗi khi các props này thay đổi
     }, [jobs, filters, total, totalPages, page, sort]);
 
@@ -52,13 +56,16 @@ export default function JobSearchPageContent({ jobs = [], filters, total, totalP
         const total = await countJobs(newFilter);
         document.getElementById('filter-staged-count-badge')!.textContent = total.toString();
         setStagedResultCount(total);
-    },[stagedFilters]);
+    }, [stagedFilters]);
 
 
     const handleApplyFilters = useCallback(() => {
         const query = new URLSearchParams();
         Object.entries(stagedFilters).forEach(([key, value]) => {
             const urlKey = keyMap[key] || key;
+            if (key === 'hasForm') {
+                debugger;
+            }
             if ((value || typeof value === 'boolean') && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
                 if (key !== 'visa') {
                     if (Array.isArray(value)) {
@@ -78,7 +85,6 @@ export default function JobSearchPageContent({ jobs = [], filters, total, totalP
                 }
             }
         });
-
         if (sortBy !== 'newest') {
             query.set(keyMap['sortBy'], sortOptionMap[sortBy]);
         }

@@ -92,15 +92,11 @@ export function RootProvider({
         }
         let decodedUser = toUser(firebaseUser, idTokenResult);
         await login(idTokenResult.token);
-        const res = await setUserData(decodedUser, null, serverTime);
-        decodedUser = { ...decodedUser, ...res.userInfo };
-        // console.log(decodedUser)
-        // if(!res.isNewUser){
-
-        // }else{
-        //   decodedUser.
-        // }
-        setUser(decodedUser);
+        if (!user) {
+            const res = await setUserData(decodedUser, null, serverTime);
+            decodedUser = { ...decodedUser, ...res.userInfo };
+            setUser(decodedUser);
+        }
     };
     return (
         <ServerInfoContext.Provider value={{ serverTime }}>
