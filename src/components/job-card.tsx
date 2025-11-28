@@ -331,9 +331,9 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                             <div className="flex flex-grow flex-col">
                                 <div className="flex items-start justify-between gap-2">
                                     <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{jobTitle}</h3>
-                                    <Button id="SUADON01" variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" onClick={() => setPostLoginAction({ type: 'QUICK_EDIT_JOB', data: job })}>
+                                    {role === 'admin' && <Button id="SUADON01" variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" onClick={() => setPostLoginAction({ type: 'QUICK_EDIT_JOB', data: job })}>
                                         <Pencil className="h-4 w-4 text-muted-foreground" />
-                                    </Button>
+                                    </Button>}
                                 </div>
                                 <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
                                     {isClient && (
