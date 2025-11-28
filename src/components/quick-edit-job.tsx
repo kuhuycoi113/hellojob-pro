@@ -65,7 +65,7 @@ export default function QuickEditJob({
     const [newFormImageFile, setNewFormImageFile] = useState<File | null>(null);
     const [formImagePreview, setFormImagePreview] = useState<string | null>(null);
     const [locationSearchTerm, setLocationSearchTerm] = useState('');
-
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -157,6 +157,7 @@ export default function QuickEditJob({
         return;
     }
     const handleSave = async () => {
+        setIsSaving(true);
         const success = await updateJob(editableJob, newImageFile, newFormImageFile);
         if (success) {
             toast({
@@ -171,6 +172,7 @@ export default function QuickEditJob({
                 title: 'Cập nhật nhanh việc làm không thành công!',
             });
         }
+        setIsSaving(false);
     }
     return (
 
@@ -416,7 +418,7 @@ export default function QuickEditJob({
                                     </div>
                                 </div>
                                 <DialogFooter>
-                                    <Button onClick={() => setIsLocationDialogOpen(false)}>Xác nhận</Button>
+                                    <Button onClick={() => setIsLocationDialogOpen(false)} disabled={isSaving}>Xác nhận</Button>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
