@@ -431,9 +431,6 @@ export default function QuickEditJob({
                     </div>
                 </div>
                 <DialogFooter className="sm:justify-between flex-col-reverse sm:flex-row gap-2">
-                    <Button variant="destructive" onClick={(e) => { handleCloseJob(e); setIsQuickEditOpen(false); }} className="sm:mr-auto">
-                        <EyeOff className="mr-2 h-4 w-4" /> Đóng đơn
-                    </Button>
                     <Button variant="outline" onClick={() => setIsQuickEditOpen(false)}>Hủy</Button>
                     <Button onClick={handleSave}>Lưu thay đổi</Button>
                 </DialogFooter>

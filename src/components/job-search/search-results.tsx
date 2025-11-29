@@ -190,7 +190,7 @@ export const SearchResults = memo(({ jobs, total, filters, appliedFilters, first
                         {(totalPage > 0 || !firstLoad) ? (
                             <div className="grid grid-cols-1 gap-4">
                                 {jobs.map((job, index) => {
-                                    const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={true} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} />;
+                                    const card = <JobCard job={job} showPostedTime={true} showLikes={false} showApplyButtons={role !== 'admin'} variant="list-item" appliedFilters={appliedFilters} isSearchPage={true} />;
                                     return <div key={job.id}>{card}</div>
                                 })}
                                 {(!firstLoad || isLoadingMore) && Array.from({ length: 4 }).map((_, i) => (

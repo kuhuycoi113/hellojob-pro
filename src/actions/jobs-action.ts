@@ -58,6 +58,13 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
                             field: "createdDate",
                         },
                     },
+                    {
+                        bool: {
+                            "must_not": [
+                                { "term": { "isClosed": true } }
+                            ]
+                        }
+                    }
                 ],
                 must: [],
                 should: [],

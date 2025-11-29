@@ -16,6 +16,7 @@ import { CtaViecLamPhuHop } from '../cta-viec-lam-phu-hop';
 import { Badge } from '../ui/badge';
 import { AuthDialog } from '../auth-dialog';
 import QuickEditJob from '../quick-edit-job';
+import { closeJob } from '@/actions/job-action';
 
 const FloatingChatWidget = dynamic(() => import('@/components/chat/floating-chat-widget').then(mod => mod.FloatingChatWidget), { ssr: false });
 
@@ -24,13 +25,14 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
     const { toast } = useToast();
-    const { isLoggedIn, postLoginAction, clearPostLoginAction, user,
+    const { isLoggedIn, postLoginAction, clearPostLoginAction, role, setPostLoginAction,
         isLimitApplyDialogOpen, setIsLimitApplyDialogOpen, applyForJob,
         isProfileIncompleteAlertOpen, setIsProfileIncompleteAlertOpen, setIsConfirmLoginOpen, isConfirmLoginOpen,
         isAuthDialogOpen, setIsAuthDialogOpen, isProfileEditDialogOpen, setIsProfileEditDialogOpen, lastDataApplied } = useAuth();
     const [isPostLoginApplyDialogOpen, setIsPostLoginApplyDialogOpen] = useState(false);
     const [isQuickEditOpen, setIsQuickEditOpen] = useState(false);
     const [isClient, setIsClient] = useState(false);
+    const [isConfirmCloseOpen, setIsConfirmCloseOpen] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
@@ -50,11 +52,21 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
 
 
     useEffect(() => {
-        if (isLoggedIn && postLoginAction && postLoginAction.type === 'APPLY_JOB') {
-            setIsPostLoginApplyDialogOpen(true);
-        }
-        if (isLoggedIn && postLoginAction && postLoginAction.type === 'QUICK_EDIT_JOB') {
-            setIsQuickEditOpen(true);
+        if (isLoggedIn && !!postLoginAction) {
+            switch (postLoginAction.type) {
+                case 'APPLY_JOB': {
+                    setIsPostLoginApplyDialogOpen(true);
+                    break;
+                }
+                case 'QUICK_EDIT_JOB': {
+                    setIsQuickEditOpen(true);
+                    break;
+                }
+                case 'REQUEST_CLOSE_JOB': {
+                    setIsConfirmCloseOpen(true);
+                    break;
+                }
+            }
         }
     }, [isLoggedIn, postLoginAction]);
     useEffect(() => {
@@ -73,6 +85,27 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
             }
         }
     };
+    const handleCloseJob = async () => {
+        const { id } = { ...postLoginAction?.data };
+        if (!!id) {
+            const success = await closeJob(id);
+            if (success) {
+                toast({
+                    title: 'Đóng việc làm thành công!',
+                    className: 'bg-green-500 text-white',
+                });
+                clearPostLoginAction();
+                setPostLoginAction({ type: 'CLOSED_JOB', data: {id} });
+                setIsConfirmCloseOpen(false);
+            }
+        }
+        else {
+            toast({
+                variant: 'destructive',
+                title: 'Đóng việc làm không thành công!',
+            });
+        }
+    }
 
     const handleConfirmUpdateProfile = () => {
         setIsProfileIncompleteAlertOpen(false);
@@ -184,7 +217,24 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <QuickEditJob isQuickEditOpen={isQuickEditOpen} setIsQuickEditOpen={setIsQuickEditOpen} />
+            {role === 'admin' && <>
+                <QuickEditJob isQuickEditOpen={isQuickEditOpen} setIsQuickEditOpen={setIsQuickEditOpen} />
+
+                <AlertDialog open={isConfirmCloseOpen} onOpenChange={setIsConfirmCloseOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Đóng việc làm?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Bạn có chắc chắn muốn đóng việc làm này? Sau khi đóng, việc làm này sẽ không thể truy cập lại được nữa!
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleCloseJob}>Vẫn đóng</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            </>}
         </>
     );
 }

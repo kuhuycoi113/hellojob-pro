@@ -267,7 +267,7 @@ export const findSuggestedJobs = async (job: any): Promise<PaginatedResponse<any
     }
 }
 export const updateJob = async (job: any, avatarFile: File | null, formImageFile: File | null) => {
-    let avatarRelativePath,formImagePath;
+    let avatarRelativePath, formImagePath;
     const s3 = new AWS.S3({ endpoint: process.env.AWS_MEDIA_END_POINT });
     try {
         if (!!avatarFile || !!formImageFile) {
@@ -336,6 +336,17 @@ export const updateJob = async (job: any, avatarFile: File | null, formImageFile
                 })
                 .promise();
         }
+    }
+    return false;
+}
+export const closeJob = async (jobID: string) => {
+    try {
+        await updateDocument(CANDIDATES_INDEX, jobID, {
+            isClosed: true
+        });
+        return true;
+    } catch (error) {
+        console.log(error);
     }
     return false;
 }

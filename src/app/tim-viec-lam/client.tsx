@@ -122,14 +122,27 @@ export default function JobSearchPageContent({ jobs = [], filters, total, totalP
     }, []);
 
     useEffect(() => {
-        if (postLoginAction?.type === 'EDITED_JOB') {
-            const editedJob = postLoginAction.data;
-            const jobID = editedJob.id;
-            const jobIndex = jobs.findIndex(job => job.id === jobID);
-            if (jobIndex > -1) {
-                jobs[jobIndex] = { ...jobs[jobIndex], ...editedJob };
+        switch (postLoginAction?.type) {
+            case 'EDITED_JOB': {
+                const editedJob = postLoginAction.data;
+                const jobID = editedJob.id;
+                const jobIndex = jobs.findIndex(job => job.id === jobID);
+                if (jobIndex > -1) {
+                    jobs[jobIndex] = { ...jobs[jobIndex], ...editedJob };
+                }
+                clearPostLoginAction();
+                break;
             }
-            clearPostLoginAction();
+            case 'CLOSED_JOB': {
+                const { id: jobID } = postLoginAction.data;
+                const jobIndex = jobs.findIndex(job => job.id === jobID);
+                if (jobIndex > -1) {
+                    jobs = jobs.splice(jobIndex, 1);
+                    // jobs = [...jobs.filter(item => item.id !== jobID)];
+                }
+                clearPostLoginAction();
+                break;
+            }
         }
     }, [postLoginAction])
     return (
