@@ -402,11 +402,13 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                             setIsConsultantPopoverOpen={setIsConsultantPopoverOpen}
                                         />
                                     </div>
-                                    {isClient && role === 'admin' && <div className="flex items-center gap-2">
-                                        {role === 'admin' && <Button variant="outline" size="sm" className="hidden bg-white md:flex text-destructive border-destructive/50 hover:bg-destructive/5 hover:text-destructive" onClick={() => setPostLoginAction({ type: 'REQUEST_CLOSE_JOB', data: { id: job.id } })} >
-                                            <EyeOff className="mr-2 h-5 w-5" />
-                                            Đóng
-                                        </Button>}
+                                    {isClient && <div className="flex items-center gap-2">
+                                        {
+                                            role === 'admin' && <Button variant="outline" size="sm" className="hidden bg-white md:flex text-destructive border-destructive/50 hover:bg-destructive/5 hover:text-destructive" onClick={() => setPostLoginAction({ type: 'REQUEST_CLOSE_JOB', data: { id: job.id } })} >
+                                                <EyeOff className="mr-2 h-5 w-5" />
+                                                Đóng
+                                            </Button>
+                                        }
                                         <Button variant="outline" size="sm" className={cn("hidden bg-white md:flex border-gray-300", isSaved && "border border-accent-orange bg-background text-accent-orange hover:bg-accent-orange/5 hover:text-accent-orange")} onClick={handleSaveJob}>
                                             <Bookmark className={cn("mr-2 h-5 w-5", isSaved ? "fill-current text-accent-orange" : "text-gray-400")} />
                                             Lưu
