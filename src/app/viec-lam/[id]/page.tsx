@@ -59,7 +59,6 @@ const JobPage = async ({ params }: PageProps) => {
     } catch (error) {
 
     }
-    job.title = generateBulletJobCrawl(job);
     // You can fetch job data here using params.id if needed
     return (
         <JobDetailClientPage job={job} behavioralSuggestions={behavioralSuggestions} />

@@ -27,15 +27,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 import { EditProfileDialog } from '@/app/ho-so-cua-toi/components/candidate-edit-dialog';
-import type { SearchFilters } from '@/components/job-search/search-results';
 import { validateProfileForApplication } from '@/lib/validators';
 import { CtaViecLamTuongTu } from '@/components/cta-viec-lam-tuong-tu';
-import { findSuggestedJobs, getJobByCode } from '@/actions/job-action';
 import { applyJob, updateProfile } from '@/actions/user-action';
 import { useServerInfo } from '@/components/layout/root-provider';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ImageViewer } from '@/lib/image-viewer';
+import { useImagePreview } from '@/contexts/ImagePreviewContext';
+import { JobDetailConsultant } from './components/consultant';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -87,6 +86,7 @@ const visasForVndDisplay = [
 export default function JobDetailClientPage({ job, behavioralSuggestions }: { job: any, behavioralSuggestions: any[] }) {
     const { toast } = useToast();
     const { serverTime } = useServerInfo();
+    const { setImagePreview } = useImagePreview();
     const { isLoggedIn, setPostLoginAction, user, setApplicationCount, setSavedJobCount, setLastAction, role } = useAuth();
     const [isClient, setIsClient] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
@@ -97,9 +97,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
-    const [isViewerOpen, setIsViewerOpen] = useState(false);
-    const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
-
+    const jobTitle=generateBulletJobCrawl(job);
     useEffect(() => {
         setIsClient(true);
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -143,7 +141,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
         e.stopPropagation();
         e.preventDefault();
         if (!isLoggedIn) {
-            setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: job.title } });
+            setPostLoginAction({ type: 'APPLY_JOB', data: { jobId: job.id, jobTitle: jobTitle } });
             setIsConfirmLoginOpen(true);
         } else {
             if (validateProfileForApplication(user) && !!user) {
@@ -157,7 +155,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                 setLastAction('applied');
                 toast({
                     title: 'Ứng tuyển thành công!',
-                    description: `Hồ sơ của bạn đã được gửi cho công việc "${job.title}".`,
+                    description: `Hồ sơ của bạn đã được gửi cho công việc "${jobTitle}".`,
                     className: 'bg-green-500 text-white'
                 });
             } else {
@@ -174,36 +172,6 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     const handleConfirmUpdateProfile = () => {
         setIsProfileIncompleteAlertOpen(false);
         setIsProfileEditDialogOpen(true);
-    };
-
-    const handleShare = async () => {
-        const shareUrl = `https://vi.hellojob.jp/viec-lam/${job.id}`;
-        const shareData = {
-            title: job.title,
-            text: `Hãy xem công việc này trên HelloJob: ${job.title}`,
-            url: shareUrl,
-        };
-        const copyLink = () => {
-            navigator.clipboard.writeText(shareUrl);
-            toast({
-                title: "Đã sao chép liên kết!",
-                description: "Bạn có thể dán và chia sẽ liên kết việc làm này.",
-            });
-        }
-        if (navigator.share) {
-            try {
-                await navigator.share(shareData);
-            } catch (err: any) {
-                if (err.name === 'AbortError') {
-                    console.log('Share cancelled by user.');
-                } else {
-                    console.error("Error sharing:", err);
-                    copyLink();
-                }
-            }
-        } else {
-            copyLink();
-        }
     };
 
     const getFeeDisplay = (feeValue: any | undefined, feeLabel: string) => {
@@ -240,12 +208,8 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     }
 
     const openImageViewer = (imageUrl: string) => {
-        setSelectedImage(imageUrl);
-        setIsViewerOpen(true);
+        setImagePreview(imageUrl);
     };
-
-    const salerID = job.salerID;
-    const assignedConsultant = consultants.find(c => c.id === salerID) ?? consultants[0];
     const applyButtonContent = hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay';
 
     const feeWithTuitionDisplay = getFeeDisplay(job.fee, "Phí và vé và học phí");
@@ -280,7 +244,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                 <Card id="VLCT-HEADER" className="shadow-lg overflow-hidden">
                                     <div className="p-6">
                                         <div>
-                                            <h1 className="text-2xl md:text-3xl font-bold font-headline">{job.title}</h1>
+                                            <h1 className="text-2xl md:text-3xl font-bold font-headline">{jobTitle}</h1>
                                             <div id="IDVLCT01" className="flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-xs font-bold text-white w-fit my-3">
                                                 <Image src="/img/japanflag.png" alt="Japan flag" width={16} height={16} className="h-3 w-auto" />
                                                 <span>{job.code}</span>
@@ -452,47 +416,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         </div>
                                     </CardContent>
                                 </Card>
-                                <Card
-                                    id="MDTVV01"
-                                    className="shadow-lg group hover:shadow-xl hover:border-primary transition-all"
-                                >
-                                    <CardHeader>
-                                        <CardTitle className="text-lg font-bold flex items-center gap-2 group-hover:text-primary transition-colors"><UserRound />Tư vấn viên</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        <div className="flex items-center gap-3">
-                                            <Link href={`/tu-van-vien/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
-                                                <Avatar className="h-12 w-12 cursor-pointer transition-transform hover:scale-110">
-                                                    <AvatarImage src={assignedConsultant.avatarUrl} alt={assignedConsultant.name} />
-                                                    <AvatarFallback>{assignedConsultant.name.charAt(0)}</AvatarFallback>
-                                                </Avatar>
-                                            </Link>
-                                            <div>
-                                                <Link href={`/tu-van-vien/${assignedConsultant.id}`} onClick={(e) => e.stopPropagation()}>
-                                                    <p className="font-semibold text-primary hover:underline">{assignedConsultant.name}</p>
-                                                </Link>
-                                                <p className="text-sm text-muted-foreground">{assignedConsultant.mainExpertise}</p>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <ContactButtons contact={assignedConsultant as any} job={job} showChatText={true} />
-                                        </div>
-                                    </CardContent>
-                                    <div className="border-t p-4 grid grid-cols-2 gap-2">
-                                        <Button variant="ghost" className="text-muted-foreground text-sm" onClick={handleShare}>
-                                            <Copy className="mr-2 h-4 w-4" />Giới thiệu việc làm
-                                        </Button>
-                                        <Button variant="ghost" className="text-muted-foreground text-sm">
-                                            <Share2 className="mr-2 h-4 w-4" />Giới thiệu tư vấn viên
-                                        </Button>
-                                        <Button asChild variant="ghost" className="text-muted-foreground text-sm">
-                                            <Link href="/tu-van-vien"><Users className="mr-2 h-4 w-4" />Tư vấn viên khác</Link>
-                                        </Button>
-                                        <Button asChild variant="ghost" className="text-muted-foreground text-sm">
-                                            <Link href={`/tu-van-vien/${assignedConsultant.id}`}><User className="mr-2 h-4 w-4" />Xem hồ sơ chi tiết</Link>
-                                        </Button>
-                                    </div>
-                                </Card>
+                                <JobDetailConsultant job={job} />
                             </aside>
                         </div>
                     </div>
@@ -541,12 +465,6 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                 <div className="space-t-20 md:space-t-28 pt-20 md:pt-28">
                     <CtaViecLamTuongTu isLoading={false} suggestions={behavioralSuggestions} />
                 </div>
-                <ImageViewer
-                    isOpen={isViewerOpen}
-                    onOpenChange={setIsViewerOpen}
-                    imageUrl={selectedImage}
-                    alt="Xem ảnh chi tiết"
-                />
             </>
         );
     }

@@ -8,6 +8,7 @@ import { login, logout } from '../../../api';
 import { useSearchParams } from 'next/navigation';
 import { setUserData } from '@/lib/auth.util';
 import { app, auth, db } from "@/lib/firebase";
+import { ImagePreviewProvider } from '@/contexts/ImagePreviewContext';
 export const toUser = (user: FirebaseUser, idTokenResult: IdTokenResult): User => {
 
     // return {
@@ -101,9 +102,11 @@ export function RootProvider({
     return (
         <ServerInfoContext.Provider value={{ serverTime }}>
             <AuthProvider serverUser={user}>
-                <ChatProvider>
-                    {children}
-                </ChatProvider>
+                <ImagePreviewProvider>
+                    <ChatProvider>
+                        {children}
+                    </ChatProvider>
+                </ImagePreviewProvider>
             </AuthProvider>
         </ServerInfoContext.Provider>
     );

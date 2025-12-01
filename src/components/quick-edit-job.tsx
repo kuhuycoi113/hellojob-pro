@@ -12,7 +12,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Calendar } from "./ui/calendar";
 import { ScrollArea } from "./ui/scroll-area";
 import { japanJobTypes, visaDetailsByVisaType } from "@/lib/visa-data";
-import { cn } from "@/lib/utils";
+import { cn, formatVisa } from "@/lib/utils";
 import { format, formatDate, parse } from "date-fns";
 import { vi } from "date-fns/locale";
 import { allJapanLocations, japanRegions } from "@/lib/location-data";
@@ -47,7 +47,9 @@ const formatSalaryInput = (number: number | undefined): string => {
 const parseSalaryInput = (value: string): number => {
     return Number(value.replace(/[^0-9]/g, ''));
 };
-const allIndustries = Object.values(CAREERS).flat();
+const allProvinces = japanRegions.flatMap(region =>
+    region.prefectures.map(p => p.name)
+);
 export default function QuickEditJob({
     isQuickEditOpen,
     setIsQuickEditOpen
@@ -93,8 +95,9 @@ export default function QuickEditJob({
 
     useEffect(() => {
         if (!!editableJob?.visa) {
+            const visa = formatVisa(editableJob.visa);
             const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key =>
-                (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === editableJob.visa)
+                (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === visa)
             )
             const industries = CAREERS[parentVisaSlug as keyof typeof CAREERS];
             setAvailableIndustries(industries ?? []);
@@ -105,9 +108,10 @@ export default function QuickEditJob({
 
     useEffect(() => {
         // done
-        if (editableJob?.career) {
+        if (!!editableJob?.career && !!editableJob?.visa) {
+            const visa = formatVisa(editableJob.visa);
             const parentVisaSlug = Object.keys(visaDetailsByVisaType).find(key =>
-                (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === editableJob.visa)
+                (visaDetailsByVisaType[key as keyof typeof visaDetailsByVisaType] || []).some(detail => detail.name === visa)
             )
             const visaCode = japanJobTypes.find(v => v.slug === parentVisaSlug)?.code;
             const parentIndustry = editableJob.career;
@@ -121,26 +125,6 @@ export default function QuickEditJob({
             setAvailableJobDetails([]);
         }
     }, [editableJob.career, setEditableJob]);
-    // const handleApplyLocations = () => {
-    //     const locationNames = selectedLocations.map(slug => allJapanLocations.find(l => l.slug === slug)?.name).filter(Boolean).join(', ');
-    //     setEditableJob((prev: any) => ({ ...prev, workLocation: locationNames }));
-    //     setIsLocationPopoverOpen(false);
-    // };
-
-    const handleCloseJob = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        // const closedJobs = JSON.parse(localStorage.getItem('closedJobs') || '[]');
-        // if (!closedJobs.includes(job.id)) {
-        //     closedJobs.push(job.id);
-        //     localStorage.setItem('closedJobs', JSON.stringify(closedJobs));
-        //     setIsClosed(true);
-        //     toast({
-        //         title: "Đã đóng đơn",
-        //         description: "Việc làm này sẽ được ẩn đi.",
-        //     });
-        // }
-    };
     useEffect(() => {
         if (postLoginAction?.type === 'QUICK_EDIT_JOB') {
             const { id, visa, job, career, basicSalary, realSalary, interviewDay, workLocation, avatar, aiContent, filter, formImage } = { ...postLoginAction.data };
@@ -232,7 +216,7 @@ export default function QuickEditJob({
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="visa-edit" className="text-right">Loại Visa</Label>
-                        <Select onValueChange={(value) => setEditableJob(prev => ({ ...prev, visa: value }))} value={editableJob.visa}>
+                        <Select onValueChange={(value) => setEditableJob(prev => ({ ...prev, visa: value?.replace('Đặc định', 'Tokutei') ?? null }))} value={formatVisa(editableJob?.visa ?? '') ?? ''}>
                             <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
                             <SelectContent>
                                 {Object.entries(visaDetailsByVisaType).map(([group, details]) => (
@@ -341,11 +325,13 @@ export default function QuickEditJob({
                                 <Button variant="outline" className=" col-span-3 justify-start text-left font-normal h-auto min-h-10">
                                     <div className="truncate">
                                         {!!editableJob.workLocation?.length ? (
-                                            editableJob.workLocation.split(', ').map(locName => (
-                                                <Badge key={locName} variant="secondary" className='mr-1'>
-                                                    {locName}
-                                                </Badge>
-                                            ))
+                                            editableJob.workLocation.split(', ').map(locName => {
+                                                if (allProvinces.includes(locName)) {
+                                                    return <Badge key={locName} variant="secondary" className='mr-1'>
+                                                        {locName}
+                                                    </Badge>
+                                                }
+                                            })
                                         ) : "Chọn địa điểm"}
                                     </div>
                                 </Button>
@@ -375,7 +361,7 @@ export default function QuickEditJob({
                                                             id={`region-${region.slug}`}
                                                             checked={region.prefectures.every(p => editableJob.workLocation?.includes(p.name))}
                                                             onCheckedChange={(checked) => {
-                                                                const locations = editableJob.workLocation?.split(', ')
+                                                                const locations = editableJob.workLocation?.split(', ').filter(item => allProvinces.includes(item));
                                                                 const currentSelection = new Set(locations || []);
                                                                 region.prefectures.forEach(p => {
                                                                     if (checked) {
@@ -400,7 +386,7 @@ export default function QuickEditJob({
                                                                         id={`pref-${p.slug}`}
                                                                         checked={editableJob.workLocation?.includes(p.name)}
                                                                         onCheckedChange={(checked) => {
-                                                                            const locations = editableJob.workLocation?.split(', ')
+                                                                            const locations = editableJob.workLocation?.split(', ').filter(item => allProvinces.includes(item));
                                                                             const currentSelection = new Set(locations || []);
                                                                             if (checked) {
                                                                                 currentSelection.add(p.name);

@@ -33,6 +33,7 @@ import { useServerInfo } from './layout/root-provider';
 import { NameAvatar } from './ui/name-avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { closeJob } from '@/actions/job-action';
+import { useImagePreview } from '@/contexts/ImagePreviewContext';
 
 // ====================================================================
 // PURE UTILITIES (Trích xuất logic tính toán không cần state)
@@ -186,7 +187,7 @@ const JobRecruiterInfo = ({ job, recruiter, role, isConsultantPopoverOpen, setIs
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, onCancelAppliedJob }:
     { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, onCancelAppliedJob?: any }) => {
-
+    const { setImagePreview } = useImagePreview();
     const { serverTime } = useServerInfo();
     const { user, setSavedJobCount, setLastAction, isApplying, applyForJob, role, setPostLoginAction } = useAuth();
     const router = useRouter();
@@ -285,8 +286,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     const handleCardClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         if ((e.target as HTMLElement).closest('a, button')) {
             return;
-        }
-        if (isExpired) return; // Ngăn chặn điều hướng khi hết hạn
+        } // Ngăn chặn điều hướng khi hết hạn
         logInteraction(job, 'view');
         router.push(`/viec-lam/${job.id}`);
     }, [job, router, isExpired]);
@@ -358,7 +358,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
-                                                            <div className="relative flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center rounded-sm border-2 border-muted bg-secondary">
+                                                            <div onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                e.preventDefault();
+                                                                setImagePreview(job.formImage)
+                                                            }} className="relative flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center rounded-sm border-2 border-muted bg-secondary">
                                                                 <FileText className="h-4 w-4 text-muted-foreground" />
                                                                 {job.formImage && (
                                                                     <Star className="absolute -top-1.5 -right-1.5 h-3 w-3 text-yellow-400 fill-yellow-400" />
@@ -495,7 +499,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     return (
         <>
             <Card id="HIENTHIVIEC02" className={cn("flex h-full flex-col overflow-hidden rounded-lg border border-border shadow-sm transition-shadow duration-300", isExpired && "grayscale")}>
-                <div className={cn("group cursor-pointer", isExpired && "cursor-not-allowed")} onClick={handleCardClick}>
+                <div className={cn("group cursor-pointer")} onClick={handleCardClick}>
                     <div className="relative aspect-video w-full">
                         <Image src={job.avatar || getJobImage(job.job, job.career)} unoptimized alt={jobTitle} fill className="object-cover transition-transform group-hover:scale-105" />
                         {isExpired && (

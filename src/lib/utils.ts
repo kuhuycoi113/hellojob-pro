@@ -254,7 +254,7 @@ export const getJobImage = (job: string, career: string) => {
   }
   return mappingImage.images[randomInt];
 };
-export const formatVisa = (visa: string | null | undefined) => {
+export const formatVisa = (visa: string | null) => {
   return visa?.replace('Tokutei', 'Đặc định') ?? null;
 };
 export const findVisaByVisaDetail = (visaDetail: string) => {

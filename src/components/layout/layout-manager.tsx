@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Header } from '@/components/header';
@@ -17,8 +17,10 @@ import { Badge } from '../ui/badge';
 import { AuthDialog } from '../auth-dialog';
 import QuickEditJob from '../quick-edit-job';
 import { closeJob } from '@/actions/job-action';
+import { ImageViewer } from '@/lib/image-viewer';
 
 const FloatingChatWidget = dynamic(() => import('@/components/chat/floating-chat-widget').then(mod => mod.FloatingChatWidget), { ssr: false });
+
 
 
 export function LayoutManager({ children }: { children: React.ReactNode }) {
@@ -95,7 +97,7 @@ export function LayoutManager({ children }: { children: React.ReactNode }) {
                     className: 'bg-green-500 text-white',
                 });
                 clearPostLoginAction();
-                setPostLoginAction({ type: 'CLOSED_JOB', data: {id} });
+                setPostLoginAction({ type: 'CLOSED_JOB', data: { id } });
                 setIsConfirmCloseOpen(false);
             }
         }

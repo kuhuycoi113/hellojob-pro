@@ -10,13 +10,12 @@ import {
 import { ZoomIn, ZoomOut, Download, X } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 interface ImageViewerProps {
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  imageUrl?: string;
+  onOpenChange: (open: any) => void;
+  imageUrl?: string | null;
   alt?: string;
 }
 
@@ -39,9 +38,9 @@ export function ImageViewer({ isOpen, onOpenChange, imageUrl, alt }: ImageViewer
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
-      onOpenChange(open);
       if (!open) {
         setTimeout(() => setScale(1), 300); // Reset scale after closing
+        onOpenChange(null);
       }
     }}>
       <DialogContent className="max-w-4xl max-h-[100vh] h-[80vh]  p-0 bg-background flex flex-col border-0">
