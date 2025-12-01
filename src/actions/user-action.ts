@@ -58,7 +58,7 @@ async function findByUID(uID: any): Promise<any | null> {
         return null;
     }
 }
-export const findCachedUser = cache(findByUID);
+export const findCachedUser = findByUID;
 
 export async function applyJob(userId: string, job: any) {
     try {
