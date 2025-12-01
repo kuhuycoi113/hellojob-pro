@@ -48,7 +48,7 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
             id: job.id,
             industry: job.industry,
             workLocation: job.workLocation,
-            visa: formatVisa(job?.visa),
+            visa: formatVisa(job?.visa??null),
             title: generateBulletJobCrawl(job),
         };
         signals = [signal, ...signals.filter(s => s.id !== job.id)];
@@ -297,10 +297,10 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     if (variant === 'list-item') {
         return (
             <>
-                <div id="HIENTHIVIEC01" className={cn("w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground", isExpired && "opacity-60 grayscale cursor-not-allowed")} onClick={handleCardClick}>
+                <div id="HIENTHIVIEC01" className={cn("w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground", isExpired && "opacity-60 grayscale cursor-not-allowed")}>
                     <div className="p-3 hover:bg-secondary/30">
                         <div className="flex flex-col items-stretch gap-4 md:flex-row">
-                            <div className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
+                            <Link href={`/viec-lam/${job.id}`} className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
                                 <Image src={job.avatar || getJobImage(job.job, job.career)} unoptimized alt={jobTitle} fill sizes='100%' className="rounded-lg object-cover" />
                                 {isExpired && (
                                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
@@ -327,11 +327,11 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                         {job.aiContent ?? job.baseContent}
                                     </div>
                                 }
-                            </div>
+                            </Link>
 
                             <div className="flex flex-grow flex-col">
                                 <div className="flex items-start justify-between gap-2">
-                                    <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary">{jobTitle}</h3>
+                                    <h3 className="mb-2 text-lg font-bold leading-tight line-clamp-2 hover:text-primary"><Link href={`/viec-lam/${job.id}`}>{jobTitle}</Link></h3>
                                     {role === 'admin' && <Button id="SUADON01" variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" onClick={() => setPostLoginAction({ type: 'QUICK_EDIT_JOB', data: job })}>
                                         <Pencil className="h-4 w-4 text-muted-foreground" />
                                     </Button>}
