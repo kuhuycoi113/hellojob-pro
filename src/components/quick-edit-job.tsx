@@ -140,6 +140,18 @@ export default function QuickEditJob({
     }
     const handleSave = async () => {
         setIsSaving(true);
+        if (!!editableJob?.job && editableJob?.visa) {
+            const visa = formatVisa(editableJob.visa);
+            const allVisa = Object.values(visaDetailsByVisaType)
+                .flatMap(list => list);
+            const visaCode = allVisa.find(item => item.name === visa)?.code;
+            if (!!visaCode) {
+                const filterJob = JOBS.find(item => item.label === editableJob.job && item.value.startsWith(visaCode));
+                if (filterJob?.value != editableJob.filter?.job.value) {
+                    editableJob.filter = { ...(editableJob.filter ?? {}), job: filterJob }
+                }
+            }
+        }
         const success = await updateJob(editableJob, newImageFile, newFormImageFile);
         if (success) {
             toast({
