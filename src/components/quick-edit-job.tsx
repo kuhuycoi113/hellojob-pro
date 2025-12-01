@@ -30,7 +30,8 @@ interface Job {
     career?: string;
     basicSalary?: number; realSalary?: number; interviewDay?: string; workLocation?: string; avatar?: string; filter?: any;
     aiContent?: string;
-    formImage?: string
+    formImage?: string;
+    expiredDate?: number
 }
 interface QuickEditJobProps {
     isQuickEditOpen: boolean;
@@ -60,9 +61,6 @@ export default function QuickEditJob({
     const [availableIndustries, setAvailableIndustries] = useState<string[]>([]);
     const [availableJobDetails, setAvailableJobDetails] = useState<string[]>([]);
     const [isLocationDialogOpen, setIsLocationDialogOpen] = useState(false);
-    const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-    const [locationSearch, setLocationSearch] = useState('');
-    const [isClosed, setIsClosed] = useState(false);
     const [newImageFile, setNewImageFile] = useState<File | null>(null);
     const [newFormImageFile, setNewFormImageFile] = useState<File | null>(null);
     const [formImagePreview, setFormImagePreview] = useState<string | null>(null);
@@ -127,9 +125,9 @@ export default function QuickEditJob({
     }, [editableJob.career, setEditableJob]);
     useEffect(() => {
         if (postLoginAction?.type === 'QUICK_EDIT_JOB') {
-            const { id, visa, job, career, basicSalary, realSalary, interviewDay, workLocation, avatar, aiContent, filter, formImage } = { ...postLoginAction.data };
+            const { id, visa, job, career, basicSalary, realSalary, interviewDay, workLocation, avatar, aiContent, filter, formImage, expiredDate } = { ...postLoginAction.data };
             const editJob: any = {
-                id, visa, job, career, basicSalary, realSalary, interviewDay, workLocation, avatar, aiContent, formImage
+                id, visa, job, career, basicSalary, realSalary, interviewDay, workLocation, avatar, aiContent, formImage, expiredDate
             }
             if (!!filter) {
                 editJob.filter = filter
@@ -308,7 +306,7 @@ export default function QuickEditJob({
                                     selected={editableJob.interviewDay ? parse(editableJob.interviewDay, 'dd-MM-yyyy', new Date()) : undefined}
                                     onSelect={(date) => {
                                         if (date) {
-                                            setEditableJob((prev: any) => ({ ...prev, interviewDay: formatDate(date, 'dd-MM-yyyy') }));
+                                            setEditableJob((prev: any) => ({ ...prev, interviewDay: formatDate(date, 'dd-MM-yyyy'), expiredDate: date.getTime() }));
                                         }
                                     }}
                                     today={undefined}
