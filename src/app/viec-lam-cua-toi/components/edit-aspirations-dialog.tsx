@@ -684,7 +684,7 @@ export const EditAspirationsDialog: React.FC<EditAspirationsDialogProps> = ({
                                                         selected={tempAspirations.interviewDate && tempAspirations.interviewDateType !== 'flexible' ? new Date(tempAspirations.interviewDate) : undefined}
                                                         onSelect={handleDateSelect}
                                                         locale={vi}
-                                                        initialFocus
+                                                        // initialFocus
                                                     />
                                                 </PopoverContent>
                                             </Popover>

@@ -312,7 +312,6 @@ export default function QuickEditJob({
                                         }
                                     }}
                                     today={undefined}
-                                    initialFocus
                                     locale={vi}
                                 />
                             </PopoverContent>

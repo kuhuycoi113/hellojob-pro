@@ -899,7 +899,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                         fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
                                                         toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
                                                         locale={vi}
-                                                        initialFocus
+                                                        // initialFocus
                                                     />
                                                 </SheetContent>
                                             </Sheet>
@@ -923,7 +923,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                                         fromDate={new Date(new Date().setDate(new Date().getDate() + 1))}
                                                         toDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
                                                         locale={vi}
-                                                        initialFocus
+                                                        // initialFocus
                                                     />
                                                 </PopoverContent>
                                             </Popover>

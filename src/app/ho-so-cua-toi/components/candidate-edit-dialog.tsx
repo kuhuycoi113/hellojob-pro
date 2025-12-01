@@ -120,7 +120,7 @@ const renderLevel1Edit = (
                 handleDateSelect(date);
                 if (isMobile) setIsDatePickerOpen(false); // Close sheet on select
             }}
-            initialFocus
+            // initialFocus
             captionLayout="dropdown-buttons"
             fromYear={1950}
             toYear={new Date().getFullYear() - 16}
