@@ -181,8 +181,9 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                             </div>
                             <div className="space-y-2 lg:col-span-1">
                                 <Label htmlFor="search-location" className="text-foreground text-sm">Địa điểm làm việc</Label>
-                                <Select onValueChange={(value) => handleFilterChange('workLocation', value === 'all' ? [] : value.split(','))} value={filters.workLocation?.join(',') ?? 'all'}>
-                                    <SelectTrigger id="search-location">
+                                <Select onValueChange={(value) => handleFilterChange('workLocation', value === 'all' ? [] : value.split(', '))} 
+                                value={!!filters.workLocation?.length?filters.workLocation.join(', ') :'all'}>
+                                    <SelectTrigger id="search-location" className='text-left'>
                                         <SelectValue placeholder="Tất cả Nhật Bản" />
                                     </SelectTrigger>
                                     <SelectContent className="max-h-[300px]">
@@ -191,7 +192,7 @@ export const SearchModule = ({ onSearch, showHero = false, filters: initialFilte
                                             return  <SelectGroup key={region}>
                                                 <SelectLabel>{region}</SelectLabel>
                                                 {region !== 'hokkaido' && region !== 'okinawa' && (
-                                                    <SelectItem value={japanRegions[region].map(item=>item.label).join(',')}>Toàn bộ vùng {region}</SelectItem>
+                                                    <SelectItem value={japanRegions[region].map(item=>item.label).join(', ')}>Toàn bộ vùng {region}</SelectItem>
                                                 )}
                                                 {japanRegions[region].map(p => <SelectItem key={p.label} value={p.label}>{p.label}</SelectItem>)}
                                             </SelectGroup>

@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { SearchResults, type SearchFilters } from '@/components/job-search/search-results';
 import { Job } from '@/lib/mock-data';
 import { SearchModule } from '@/components/job-search/search-module';
-import { allSpecialConditions } from '@/lib/visa-data';
+import { allSpecialConditions, japanJobTypes } from '@/lib/visa-data';
 import { countJobs } from '@/actions/jobs-action';
 import { initialSearchFilters, keyMap, sortOptionMap } from '@/lib/job-filter-util';
 import { useAuth } from '@/contexts/AuthContext';
@@ -114,9 +114,19 @@ export default function JobSearchPageContent({ jobs = [], filters, total, totalP
 
     const handleNewSearch = useCallback((filters: Partial<SearchFilters>) => {
         const query = new URLSearchParams();
-        query.set('chi-tiet-loai-hinh-visa', filters.visaDetail || '');
-        query.set('nganh-nghe', filters.career || '');
-        query.set('dia-diem', filters.workLocation?.join(',') || '');
+        if (!!filters.visaDetail && filters.visaDetail != '' && filters.visaDetail != 'all') {
+            query.set('chi-tiet-loai-hinh-visa', filters.visaDetail || '');
+        }
+        if (!!filters.career && filters.career != '' && filters.career != 'all') {
+            query.set('nganh-nghe', filters.career || '');
+        }
+        if (!!filters.workLocation && !!filters.workLocation?.length) {
+            filters.workLocation.forEach(loc => {
+                if (!!loc?.length) {
+                    query.append('dia-diem', loc || '');
+                }
+            })
+        }
         router.push(`/tim-viec-lam?${query.toString()}`);
         // Thực hiện logic tìm kiếm ở đây
     }, []);
