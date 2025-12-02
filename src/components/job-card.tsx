@@ -297,7 +297,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     if (variant === 'list-item') {
         return (
             <>
-                <div id="HIENTHIVIEC01" className={cn("w-full transition-shadow duration-300 hover:shadow-lg rounded-lg cursor-pointer border bg-card text-card-foreground", isExpired && "opacity-60 grayscale cursor-not-allowed")}>
+                <div id="HIENTHIVIEC01" className={cn("w-full transition-shadow duration-300 hover:shadow-lg rounded-lg border bg-card text-card-foreground", isExpired && "opacity-60 grayscale")}>
                     <div className="p-3 hover:bg-secondary/30">
                         <div className="flex flex-col items-stretch gap-4 md:flex-row">
                             <Link href={`/viec-lam/${job.id}`} className="relative h-48 w-full flex-shrink-0 md:h-40 md:w-60">
