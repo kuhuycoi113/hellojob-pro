@@ -37,8 +37,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
             images: [
                 {
                     url: `${process.env.DOMAIN}/api/public/getJobMetaImage?jobCode=${id}`,
-                    width: 1200,
-                    height: 630,
+                    width: 2400,
+                    height: 1200,
                     alt: "HelloJob",
                 },
             ],
