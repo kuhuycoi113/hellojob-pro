@@ -334,6 +334,7 @@ export async function generateMetadata({ searchParams }: { searchParams: any }):
       description,
       url,
       siteName,
+      type:'website',
       images: [
         {
           url: avatarUrl,

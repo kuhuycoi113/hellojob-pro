@@ -30,10 +30,14 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     if (isExpired) {
         title = "[HẾT HẠN] " + title;
     }
+    const description = generateBulletJobCrawl(data);
     return {
         title,
+        description,
         openGraph: {
             title,
+            type: 'website',
+            description,
             images: [
                 {
                     url: `${process.env.DOMAIN}/api/public/getJobMetaImage?jobCode=${id}`,
