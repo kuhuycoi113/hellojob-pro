@@ -337,8 +337,8 @@ export async function generateMetadata({ searchParams }: { searchParams: any }):
       images: [
         {
           url: avatarUrl,
-          width: 1200,
-          height: 630,
+          width: 2400,
+          height: 1200,
           alt: "HelloJob",
         }
       ]
