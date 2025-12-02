@@ -334,7 +334,7 @@ export async function generateMetadata({ searchParams }: { searchParams: any }):
       description,
       url,
       siteName,
-      type:'website',
+      type: 'website',
       images: [
         {
           url: avatarUrl,
@@ -350,6 +350,9 @@ export async function generateMetadata({ searchParams }: { searchParams: any }):
     },
     alternates: {
       canonical: url,
+    },
+    other: {
+      "fb:app_id": "160733669562957",   // thay app id của bạn vào
     }
   };
 }

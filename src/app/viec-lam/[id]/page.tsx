@@ -48,6 +48,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
             ],
             url: `${process.env.DOMAIN}/viec-lam/${id}`,
         },
+        other: {
+            "fb:app_id": "160733669562957",   // thay app id của bạn vào
+        }
     };
 }
 const JobPage = async ({ params }: PageProps) => {
