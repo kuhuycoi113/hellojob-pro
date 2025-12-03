@@ -497,7 +497,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         </div>
                                     </div>
                                 </JobDetailSection>
-                                {htmlForm &&
+                                {!!htmlForm &&
                                     <JobDetailSection title="Thông Báo Đơn Hàng" icon={ImageIcon}>
                                         <div className={cn("space-y-6", isExpired && "grayscale")}>
                                             <>
