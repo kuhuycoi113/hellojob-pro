@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { AutoHeightIframe } from '@/components/ui/auto-height-iframe';
 import { toast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ImageViewerProps {
   isOpen: boolean;
@@ -24,11 +25,12 @@ interface ImageViewerProps {
 }
 
 export function ImageViewer({ isOpen, onOpenChange, imageUrl, alt, previewType = 'image', previewData }: ImageViewerProps) {
+  const isMobile = useIsMobile();
   const [scale, setScale] = useState(1);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  useEffect(()=>{
+  useEffect(() => {
     console.log(previewType)
-  },[previewType])
+  }, [previewType])
   const handleDownload = () => {
     if (imageUrl) {
       const link = document.createElement('a');
@@ -183,6 +185,7 @@ export function ImageViewer({ isOpen, onOpenChange, imageUrl, alt, previewType =
                     style={{ transform: `scale(${scale})` }}
                   />
                 </div>
+                {isMobile && <p className='text-center text-muted-foreground'><i>Nhấn và giữ vào ảnh để tải ảnh vào Photos</i></p>}
                 <div className="flex items-center justify-center gap-2 p-4 bg-background/80 backdrop-blur-sm border-t">
                   <Button variant="outline" size="icon" onClick={() => setScale(s => Math.max(0.5, s - 0.2))}>
                     <ZoomOut />
