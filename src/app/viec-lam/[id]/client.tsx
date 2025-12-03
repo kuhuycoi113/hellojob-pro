@@ -536,7 +536,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                             </div>
 
                             {/* Sidebar */}
-                            <aside className={cn("lg:col-span-1 space-y-6 lg:sticky lg:top-24", isExpired && "grayscale pointer-events-none")}>
+                            <aside className={cn("lg:col-span-1 space-y-6 lg:sticky lg:top-24", isExpired && "grayscale")}>
                                 <Card className="shadow-lg">
                                     <CardHeader>
                                         <CardTitle className="text-lg">Mức lương</CardTitle>
