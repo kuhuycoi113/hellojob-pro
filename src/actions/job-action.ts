@@ -6,6 +6,7 @@ const CANDIDATES_INDEX = 'hellojobv5-job-crawled';
 import JOBS from '@/lib/jobs.json';
 import * as AWS from "aws-sdk";
 import { FileMimeType } from "@/lib/file-mime-type";
+import puppeteer from 'puppeteer';
 
 export async function getJobByCode(code: string): Promise<any> {
 
@@ -349,4 +350,51 @@ export const closeJob = async (jobID: string) => {
         console.log(error);
     }
     return false;
+}
+
+export const convertToPDF = async (htmlContent: string) => {
+    try {
+        console.log(0)
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                // The following args are recommended for running in Docker/containerized environments
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--no-first-run',
+                '--no-zygote',
+                '--single-process', // This is not recommended for general use, but can help in resource-constrained environments
+                '--disable-gpu'
+            ]
+        });
+        console.log(1)
+        const page = await browser.newPage();
+        console.log(2)
+        await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+        console.log(3)
+
+        // Generate the PDF
+        const pdfBuffer = await page.pdf({
+            format: 'A4',
+            printBackground: true, // Crucial for including CSS background colors
+            margin: {
+                top: '20px',
+                right: '20px',
+                bottom: '20px',
+                left: '20px'
+            }
+        });
+        console.log(4)
+
+        // Close the browser
+        await browser.close();
+        console.log(5)
+
+        // Return the PDF as a Base64 string
+        return pdfBuffer.toString();
+    } catch (error:any) {
+        // console.log(error)
+    }
 }

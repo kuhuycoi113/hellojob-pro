@@ -4,12 +4,12 @@ import { notFound, useRouter } from 'next/navigation';
 import { publicFeeLimits, controlledFeeVisas } from '@/lib/mock-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, CalendarDays, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle, MoreHorizontal, Copy, Eye } from 'lucide-react';
+import { Briefcase, CalendarDays, MapPin, Sparkles, UserCheck, FileText, Share2, Users, ClipboardCheck, Wallet, UserRound, ArrowLeft, Image as ImageIcon, Milestone, Languages, Cake, ChevronsRight, Info, Star, GraduationCap, Weight, Ruler, Dna, User, Bookmark, BrainCircuit, Loader2, LogIn, UserPlus, Pencil, FastForward, ListChecks, HardHat, PlusCircle, MoreHorizontal, Copy, Eye, FileIcon, FileImageIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
 import { use, useState, useEffect } from 'react';
-import { cn, convertTime, findVisaByVisaDetail, formatGender, formatSalaryForDisplay, formatVisa, generateBulletJobCrawl, getJobImage, getVisaBadgeClassName } from '@/lib/utils';
+import { cn, convertTime, findVisaByVisaDetail, formatGender, formatSalaryForDisplay, formatVisa, generateBulletJobCrawl, generateHtmlFromMarkdown, getJobImage, getVisaBadgeClassName } from '@/lib/utils';
 import { consultants } from '@/lib/consultant-data';
 import { ContactButtons } from '@/components/contact-buttons';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -35,6 +35,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useImagePreview } from '@/contexts/ImagePreviewContext';
 import { JobDetailConsultant } from './components/consultant';
+import { AutoHeightIframe } from '@/components/ui/auto-height-iframe';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -98,6 +99,8 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
     const jobTitle = generateBulletJobCrawl(job);
+    const htmlForm = generateHtmlFromMarkdown(job.visa, job.formMarkdownArray);
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
     useEffect(() => {
         setIsClient(true);
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
@@ -226,6 +229,120 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
         annualIncome = job.basicSalary * 12;
     }
 
+    const handleConvertToPDF = async () => {
+        if (!htmlForm) {
+            toast({
+                variant: "destructive",
+                title: "Không có dữ liệu HTML"
+            });
+            return;
+        }
+
+        try {
+            setIsGeneratingPdf(true);
+            const response = await fetch('/api/public/getJobPDF', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ htmlContent: htmlForm, responseType: 'application/pdf' }),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Lỗi từ server: ${response.status} ${errorText}`);
+            }
+
+            const pdfBlob = await response.blob();
+
+            // Create a link to download the PDF
+            const url = window.URL.createObjectURL(pdfBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${jobTitle} | ${job.id} | ${job.code}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            toast({
+                title: "Tạo PDF thành công",
+                description: "File PDF đã được tải xuống.",
+                className: 'bg-green-500 text-white'
+            });
+
+        } catch (e) {
+            console.error("PDF Generation Error:", e);
+            let errorMessage = "Không thể tạo file PDF. Vui lòng thử lại.";
+            if (e instanceof Error) {
+                errorMessage = e.message;
+            }
+            toast({
+                variant: "destructive",
+                title: "Lỗi khi tải PDF về.",
+                description: errorMessage
+            });
+        } finally {
+            setIsGeneratingPdf(false);
+        }
+    }
+    const handleConvertToImage = async () => {
+        if (!htmlForm) {
+            toast({
+                variant: "destructive",
+                title: "Không có dữ liệu HTML."
+            });
+            return;
+        }
+
+        try {
+            setIsGeneratingPdf(true);
+            const response = await fetch('/api/public/getJobPDF', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ htmlContent: htmlForm, responseType: 'image/jpeg' }),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Lỗi từ server: ${response.status} ${errorText}`);
+            }
+
+            const pdfBlob = await response.blob();
+
+            // Create a link to download the PDF
+            const url = window.URL.createObjectURL(pdfBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${jobTitle} | ${job.id} | ${job.code}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            toast({
+                title: "Tạo Ảnh thành công",
+                description: "File Ảnh đã được tải xuống.",
+                className: 'bg-green-500 text-white'
+            });
+
+        } catch (e) {
+            console.error("Image Generation Error:", e);
+            let errorMessage = "Không thể tạo file Ảnh. Vui lòng thử lại.";
+            if (e instanceof Error) {
+                errorMessage = e.message;
+            }
+            toast({
+                variant: "destructive",
+                title: "Lỗi khi tải Ảnh về.",
+                description: errorMessage
+            });
+        } finally {
+            setIsGeneratingPdf(false);
+        }
+    }
 
     if (!!job) {
         return (
@@ -370,24 +487,43 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
 
                                 <JobDetailSection title="Hình ảnh công việc" icon={ImageIcon}>
                                     <div className={cn("space-y-6", isExpired && "grayscale")}>
-                                        <div className={cn("grid grid-cols-1 gap-4", job.formImage && role === 'admin' ? 'md:grid-cols-2' : 'md:grid-cols-1')}>
-                                            <div onClick={() => openImageViewer(avatar)} className={cn("relative overflow-hidden rounded-lg border-2 border-[#9B999A] group cursor-pointer", job.formImage && role === 'admin' ? 'aspect-[2/3]' : 'aspect-[5/3]')}>
-                                                <Image id={job.code} src={avatar} alt={job.code} fill className="object-cover" quality={100} unoptimized />
+                                        <div className={cn("grid grid-cols-1 gap-4", job.formImage && role === 'admin' ? 'md:grid-cols-1' : 'md:grid-cols-1')}>
+                                            <div onClick={() => openImageViewer(avatar)} className={cn("relative w-full max-h-[500px] overflow-hidden rounded-lg border-2 border-[#9B999A] group cursor-pointer aspect-[5/3]")}>
+                                                <Image id={job.code} src={avatar} alt={job.code} fill objectFit='cover' className="object-cover" quality={100} unoptimized />
                                                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                     <Eye className="h-10 w-10 text-white" />
                                                 </div>
                                             </div>
-                                            {job.formImage && role === 'admin' &&
-                                                <div onClick={() => openImageViewer(job.formImage)} className={cn("relative overflow-hidden rounded-lg border-2 border-[#9B999A] group cursor-pointer aspect-[2/3]")}>
-                                                    <Image id={job.code} src={job.formImage} alt={job.code} fill objectFit='contain' quality={100} unoptimized />
-                                                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                        <Eye className="h-10 w-10 text-white" />
-                                                    </div>
-                                                </div>
-                                            }
                                         </div>
                                     </div>
                                 </JobDetailSection>
+                                {htmlForm &&
+                                    <JobDetailSection title="Thông Báo Đơn Hàng" icon={ImageIcon}>
+                                        <div className={cn("space-y-6", isExpired && "grayscale")}>
+                                            <>
+                                                <div>
+                                                    <AutoHeightIframe htmlContent={htmlForm} title={jobTitle} />
+                                                    <div className='flex justify-between items-center mt-2'>
+                                                        <Button onClick={handleConvertToImage} disabled={isGeneratingPdf} className="bg-accent-orange text-white hover:bg-accent-orange/90">
+                                                            <>
+                                                                <FileImageIcon className="mr-2 h-4 w-4" />
+                                                                Tải xuống ảnh
+                                                            </>
+                                                        </Button>
+                                                        <Button onClick={handleConvertToPDF} disabled={isGeneratingPdf}>
+                                                            {isGeneratingPdf ? 'Đang tạo PDF...' : (
+                                                                <>
+                                                                    <FileIcon className="mr-2 h-4 w-4" />
+                                                                    Tải xuống PDF
+                                                                </>
+                                                            )}
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        </div>
+                                    </JobDetailSection>
+                                }
 
                             </div>
 

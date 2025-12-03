@@ -468,3 +468,69 @@ export function stringifyObject(obj: Record<string, any>): Record<string, string
   }
   return result;
 }
+
+export const generateHtmlFromMarkdown = (visaDetail: string, details: { stt: string, hangMuc: string, noiDung: string }[] | null): string | null => {
+  if (!details?.length || !visaDetail) return null;
+  const visa = formatVisa(visaDetail);
+
+  // Convert Markdown table to HTML table
+
+  let tableHtml = '';
+  const sttStyle = 'padding: 8px 6px; border: 1px solid #e5e7eb; text-align: center; background-color: #AFC536;';
+  const cellStyle = 'padding: 8px 6px; border: 1px solid #e5e7eb;';
+  details.forEach(({ stt, hangMuc, noiDung }, index) => {
+    tableHtml +=
+      `<tr>
+      <td style="${sttStyle}">${stt}</td>
+      <td style="${cellStyle}">${hangMuc}</td>
+      <td style="${cellStyle}">${noiDung}</td>
+    </tr>`;
+  });
+
+  const fullHtml = `
+      <!DOCTYPE html>
+      <html lang="vi">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Thông Báo Đơn Hàng: ${visa}</title>
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+          <style>
+              body { font-family: 'Montserrat', 'Arial', sans-serif; margin: 0; padding: 0; background-color: #fff; color: #111827; }
+              .container { width: 100%; max-width: 794px; margin: auto; background-color: white; padding: 0; box-sizing: border-box; }
+              h1, h2 { text-align: center; color: #111827; }
+              h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;margin-top:0 }
+              h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+              table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+              th, td { padding: 8px; border: 1px solid #e5e7eb; text-align: left; word-break: break-word; color: #111827; }
+              th { background-color: #19A6DF; color: white; text-align: center; }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <h1></h1>
+              <h2>${visa}</h2>
+              <table>
+                  <thead>
+                      <tr>
+                          <th style="width:25px">STT</th>
+                          <th style="width:100px">Hạng mục</th>
+                          <th>Nội dung</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      ${tableHtml}
+                      <tr>
+                        <td colspan="3" style="background-color: #F2B92A; text-align: center; font-weight: bold;">MỌI THÔNG TIN KHÔNG CÓ TRONG ĐƠN HÀNG SẼ HỎI KHI PHỎNG VẤN</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+      </body>
+      </html>
+    `;
+
+  return fullHtml;
+};
