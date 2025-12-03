@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
     const page = await browser.newPage();
 
     // Set the HTML content of the page
-    const html = htmlContent.replace('<h1></h1>', '<h1 style="margin-top:10px">THÔNG BÁO ĐƠN HÀNG</h1>')
+    const html = htmlContent.replace('<h1></h1>', '<h1 style="margin-top:30px">THÔNG BÁO ĐƠN HÀNG</h1>')
+    .replace('<body>', '<body style="padding-bottom:30px">')
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
     // Generate the PDF

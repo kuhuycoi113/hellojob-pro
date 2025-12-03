@@ -479,11 +479,12 @@ export const generateHtmlFromMarkdown = (visaDetail: string, details: { stt: str
   const sttStyle = 'padding: 8px 6px; border: 1px solid #e5e7eb; text-align: center; background-color: #AFC536;';
   const cellStyle = 'padding: 8px 6px; border: 1px solid #e5e7eb;';
   details.forEach(({ stt, hangMuc, noiDung }, index) => {
+    const desc = noiDung.replace(/(\*\*|__)(.*?)\1/g, "<b>$2</b>").replace(/\*(.*?)\*/g, "<i>$1</i>");
     tableHtml +=
       `<tr>
       <td style="${sttStyle}">${stt}</td>
       <td style="${cellStyle}">${hangMuc}</td>
-      <td style="${cellStyle}">${noiDung}</td>
+      <td style="${cellStyle}">${desc}</td>
     </tr>`;
   });
 
@@ -503,7 +504,7 @@ export const generateHtmlFromMarkdown = (visaDetail: string, details: { stt: str
               h1, h2 { text-align: center; color: #111827; }
               h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;margin-top:0 }
               h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
-              table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+              table { width: 100%; border-collapse: collapse; font-size: 12pt;line-height:1.3rem }
               th, td { padding: 8px; border: 1px solid #e5e7eb; text-align: left; word-break: break-word; color: #111827; }
               th { background-color: #19A6DF; color: white; text-align: center; }
           </style>

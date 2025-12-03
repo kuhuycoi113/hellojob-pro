@@ -314,19 +314,20 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
 
             // Create a link to download the PDF
             const url = window.URL.createObjectURL(pdfBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${jobTitle} | ${job.id} | ${job.code}.jpg`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            setImagePreview(url);
+            // const link = document.createElement('a');
+            // link.href = url;
+            // link.download = `${jobTitle} | ${job.id} | ${job.code}.jpg`;
+            // document.body.appendChild(link);
+            // link.click();
+            // document.body.removeChild(link);
+            // window.URL.revokeObjectURL(url);
 
-            toast({
-                title: "Tạo Ảnh thành công",
-                description: "File Ảnh đã được tải xuống.",
-                className: 'bg-green-500 text-white'
-            });
+            // toast({
+            //     title: "Tạo Ảnh thành công",
+            //     description: "File Ảnh đã được tải xuống.",
+            //     className: 'bg-green-500 text-white'
+            // });
 
         } catch (e) {
             console.error("Image Generation Error:", e);
@@ -511,18 +512,18 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                             <>
                                                 <div>
                                                     <AutoHeightIframe htmlContent={htmlForm} title={jobTitle} />
-                                                    <div className='flex justify-between items-center mt-2'>
-                                                        <Button onClick={handleConvertToImage} disabled={isGeneratingPdf} className="bg-accent-orange text-white hover:bg-accent-orange/90">
+                                                    <div className='flex justify-end items-center mt-2'>
+                                                        <Button onClick={handleConvertToImage} disabled={isGeneratingPdf} className="bg-accent-orange text-white hover:bg-accent-orange/90 mr-2">
                                                             <>
                                                                 <FileImageIcon className="mr-2 h-4 w-4" />
-                                                                Tải xuống ảnh
+                                                                Xem/Tải ảnh
                                                             </>
                                                         </Button>
                                                         <Button onClick={handleConvertToPDF} disabled={isGeneratingPdf}>
                                                             {isGeneratingPdf ? 'Đang tạo PDF...' : (
                                                                 <>
                                                                     <FileIcon className="mr-2 h-4 w-4" />
-                                                                    Tải xuống PDF
+                                                                    Xem/Tải PDF
                                                                 </>
                                                             )}
                                                         </Button>
