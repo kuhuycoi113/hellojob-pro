@@ -48,7 +48,7 @@ const logInteraction = (job: Job, type: 'view' | 'save') => {
             id: job.id,
             industry: job.industry,
             workLocation: job.workLocation,
-            visa: formatVisa(job?.visa??null),
+            visa: formatVisa(job?.visa ?? null),
             title: generateBulletJobCrawl(job),
         };
         signals = [signal, ...signals.filter(s => s.id !== job.id)];
@@ -203,7 +203,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
     const jobTitle = useMemo(() => generateBulletJobCrawl(job), [job]);
     const jobVisa = useMemo(() => formatVisa(job.visa), [job.visa]);
     const badgeClassName = useMemo(() => getVisaBadgeClasses(jobVisa as any), [jobVisa]);
-    const postedTime = useMemo(() => convertTime(job?.time || job?.postedDate || job?.createdDate), [job]);
+    const postedTime = useMemo(() => convertTime(job?.postedDate || job?.time || job?.createdDate), [job]);
     const interviewDate = useMemo(() => job.interviewDay, [job.interviewDay]);
     const isExpired = useMemo(() => job?.expiredDate < serverTime, [job?.expiredDate, serverTime]);
     const feeInfo = useMemo(() => getFeeDisplayInfo(job, isSearchPage, role), [job, isSearchPage, role]);

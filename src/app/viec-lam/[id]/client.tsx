@@ -97,14 +97,14 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
     const [isProfileEditDialogOpen, setIsProfileEditDialogOpen] = useState(false);
     const [postedTime, setPostedTime] = useState<string | null>(null);
     const [interviewDate, setInterviewDate] = useState<string | null>(null);
-    const jobTitle=generateBulletJobCrawl(job);
+    const jobTitle = generateBulletJobCrawl(job);
     useEffect(() => {
         setIsClient(true);
         const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
         setIsSaved(savedJobs.includes(job.id));
         console.log(job)
         // Safely calculate dates on the client to avoid hydration mismatch
-        setPostedTime(convertTime(job?.time || job?.postedDate || job?.createdDate));
+        setPostedTime(convertTime(job?.postedDate || job?.time || job?.createdDate));
 
         if (!!job.interviewDay) {
             setInterviewDate(job.interviewDay);
