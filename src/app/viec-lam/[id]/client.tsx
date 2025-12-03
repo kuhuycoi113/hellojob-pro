@@ -487,13 +487,21 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
 
                                 <JobDetailSection title="Hình ảnh công việc" icon={ImageIcon}>
                                     <div className={cn("space-y-6", isExpired && "grayscale")}>
-                                        <div className={cn("grid grid-cols-1 gap-4", job.formImage && role === 'admin' ? 'md:grid-cols-1' : 'md:grid-cols-1')}>
-                                            <div onClick={() => openImageViewer(avatar)} className={cn("relative w-full max-h-[500px] overflow-hidden rounded-lg border-2 border-[#9B999A] group cursor-pointer aspect-[5/3]")}>
-                                                <Image id={job.code} src={avatar} alt={job.code} fill objectFit='cover' className="object-cover" quality={100} unoptimized />
+                                        <div className={cn("grid grid-cols-1 gap-4", job.formImage && role === 'admin' ? 'md:grid-cols-2' : 'md:grid-cols-1')}>
+                                            <div onClick={() => openImageViewer(avatar)} className={cn("relative overflow-hidden rounded-lg border-2 border-[#9B999A] group cursor-pointer", job.formImage && role === 'admin' ? 'aspect-[2/3]' : 'aspect-[5/3]')}>
+                                                <Image id={job.code} src={avatar} alt={job.code} fill objectFit='contain' className="object-cover" quality={100} unoptimized />
                                                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                     <Eye className="h-10 w-10 text-white" />
                                                 </div>
                                             </div>
+                                            {job.formImage && role === 'admin' &&
+                                                <div onClick={() => openImageViewer(job.formImage)} className={cn("relative overflow-hidden rounded-lg border-2 border-[#9B999A] group cursor-pointer aspect-[2/3]")}>
+                                                    <Image id={job.code} src={job.formImage} alt={job.code} fill objectFit='contain' quality={100} unoptimized />
+                                                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <Eye className="h-10 w-10 text-white" />
+                                                    </div>
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </JobDetailSection>
