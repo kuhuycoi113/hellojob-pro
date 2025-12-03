@@ -30,11 +30,15 @@ export function AutoHeightIframe({
 
     // Reset height when content changes to avoid showing stale height
     React.useEffect(() => {
-        const iframe = iframeRef.current;
-        if (iframe && iframe.contentWindow) {
-            const contentHeight = iframe.contentWindow.document.body.scrollHeight;
-            setHeight(`${contentHeight + 20}px`); // Add a small buffer
-            setIsLoading(false);
+        if (!!fakeRef?.current) {
+            setTimeout(() => {
+                const iframe = iframeRef.current;
+                if (iframe && iframe.contentWindow) {
+                    const contentHeight = iframe.contentWindow.document.body.scrollHeight;
+                    setHeight(`${contentHeight + 20}px`); // Add a small buffer
+                    setIsLoading(false);
+                }
+            }, 1000)
         }
     }, [fakeRef]);
 
