@@ -19,7 +19,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { cn, convertTime, formatSalaryForDisplay, formatVisa, generateBulletJobCrawl, getFeeDisplayInfo, getJobImage } from '@/lib/utils';
+import { cn, convertTime, formatSalaryForDisplay, formatVisa, generateBulletJobCrawl, generateHtmlFromMarkdown, getFeeDisplayInfo, getJobImage } from '@/lib/utils';
 import Link from 'next/link';
 import { useAuth, User } from '@/contexts/AuthContext';
 import { ContactButtons } from './contact-buttons';
@@ -187,7 +187,7 @@ const JobRecruiterInfo = ({ job, recruiter, role, isConsultantPopoverOpen, setIs
 
 export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', showPostedTime = false, showApplyButtons = true, appliedFilters, isSearchPage = false, showCancelApplication = false, onCancelAppliedJob }:
     { job: any, showRecruiterName?: boolean, variant?: 'list-item' | 'grid-item' | 'chat', showPostedTime?: boolean, showLikes?: boolean, showApplyButtons?: boolean, appliedFilters?: SearchFilters, isSearchPage?: boolean, showCancelApplication?: boolean, onCancelAppliedJob?: any }) => {
-    const { setImagePreview } = useImagePreview();
+    const { setPreviewData, setPreviewType } = useImagePreview();
     const { serverTime } = useServerInfo();
     const { user, setSavedJobCount, setLastAction, isApplying, applyForJob, role, setPostLoginAction } = useAuth();
     const router = useRouter();
@@ -214,6 +214,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
         const salerID = job.salerID;
         return consultants.find(c => c.id === salerID) ?? consultants[0];
     }, [job.salerID]);
+    const htmlForm = generateHtmlFromMarkdown(job.visa, job.formMarkdownArray);
 
 
     // 3. Logic Side Effect (Tách biệt khỏi logic tính toán)
@@ -354,27 +355,22 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                     {feeInfo.text}
                                                 </Badge>
                                             )}
-                                            {!!job.formImage && role === 'admin' && (
+                                            {!!htmlForm && (
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
                                                             <div onClick={(e) => {
-                                                                e.stopPropagation();
                                                                 e.preventDefault();
-                                                                setImagePreview(job.formImage)
+                                                                e.stopPropagation();
+                                                                setPreviewType('iframe');
+                                                                setPreviewData({ html: htmlForm, fileName: `${jobTitle} | ${job.id} | ${job.code}` });
                                                             }} className="relative flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center rounded-sm border-2 border-muted bg-secondary">
                                                                 <FileText className="h-4 w-4 text-muted-foreground" />
-                                                                {job.formImage && (
-                                                                    <Star className="absolute -top-1.5 -right-1.5 h-3 w-3 text-yellow-400 fill-yellow-400" />
-                                                                )}
+                                                                <Star className="absolute -top-1.5 -right-1.5 h-3 w-3 text-yellow-400 fill-yellow-400" />
                                                             </div>
                                                         </TooltipTrigger>
                                                         <TooltipContent>
-                                                            {!!job.formImage && role === 'admin' ? (
-                                                                <p>Việc làm này có form đơn hàng đẹp</p>
-                                                            ) : (
-                                                                <p>Việc làm này có ảnh form đơn hàng</p>
-                                                            )}
+                                                            <p>Việc làm này có form đơn hàng đẹp</p>
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
