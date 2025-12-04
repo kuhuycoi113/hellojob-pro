@@ -14,11 +14,11 @@ import { Card, CardContent } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import { PaginationComponent } from "../pagination";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export type SearchFilters = {
     q?: string;
@@ -83,6 +83,7 @@ type SearchResultsProps = {
 
 export const SearchResults = memo(({ jobs, total, filters, appliedFilters, firstLoad = false, totalPage, currentPage, onFilterChange, applyFilters, resetFilters, resultCount, sortBy, onSortChange, onPageChange }: SearchResultsProps) => {
     const { role } = useAuth();
+    const isMobile = useIsMobile();
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const router = useRouter();
@@ -215,6 +216,7 @@ export const SearchResults = memo(({ jobs, total, filters, appliedFilters, first
                                     currentPage={currentPage}
                                     totalPages={totalPage}
                                     onPageChange={onPageChange}
+                                    isMobile={isMobile}
                                 />
                             </div>
                         )}

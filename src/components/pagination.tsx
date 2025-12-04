@@ -1,6 +1,6 @@
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "./ui/pagination";
 
-export const PaginationComponent = ({ currentPage, totalPages, onPageChange }: { currentPage: number, totalPages: number, onPageChange: (page: number) => void }) => {
+export const PaginationComponent = ({ currentPage, totalPages, isMobile = false, onPageChange }: { currentPage: number, totalPages: number, isMobile?: boolean, onPageChange: (page: number) => void }) => {
     if (totalPages <= 1) return null;
 
     const handlePrevious = () => {
@@ -12,7 +12,7 @@ export const PaginationComponent = ({ currentPage, totalPages, onPageChange }: {
 
     const pageNumbers = [];
     // Logic to show a few pages around the current one
-    const maxPagesToShow = 5;
+    const maxPagesToShow = isMobile ? 3 : 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
     let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
 
@@ -29,7 +29,7 @@ export const PaginationComponent = ({ currentPage, totalPages, onPageChange }: {
         <Pagination>
             <PaginationContent>
                 <PaginationItem>
-                    <PaginationPrevious onClick={handlePrevious} className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''} />
+                    <PaginationPrevious onClick={handlePrevious} isMobile={isMobile} className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''} />
                 </PaginationItem>
                 {startPage > 1 && (
                     <PaginationItem>
@@ -53,7 +53,7 @@ export const PaginationComponent = ({ currentPage, totalPages, onPageChange }: {
                     </PaginationItem>
                 )}
                 <PaginationItem>
-                    <PaginationNext onClick={handleNext} className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''} />
+                    <PaginationNext onClick={handleNext} isMobile={isMobile} className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''} />
                 </PaginationItem>
             </PaginationContent>
         </Pagination>
