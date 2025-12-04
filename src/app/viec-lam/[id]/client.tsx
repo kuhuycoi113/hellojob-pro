@@ -36,6 +36,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useImagePreview } from '@/contexts/ImagePreviewContext';
 import { JobDetailConsultant } from './components/consultant';
 import { AutoHeightIframe } from '@/components/ui/auto-height-iframe';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const JobDetailSection = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
     <Card>
@@ -85,6 +86,7 @@ const visasForVndDisplay = [
 ];
 
 export default function JobDetailClientPage({ job, behavioralSuggestions }: { job: any, behavioralSuggestions: any[] }) {
+    const isMobile=useIsMobile();
     const { toast } = useToast();
     const { serverTime } = useServerInfo();
     const { setImagePreview } = useImagePreview();
@@ -253,23 +255,36 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                 throw new Error(`Lỗi từ server: ${response.status} ${errorText}`);
             }
 
-            const pdfBlob = await response.blob();
+            const blob = await response.blob();
+            const fileName=`${jobTitle} | ${job.id} | ${job.code}`;
 
             // Create a link to download the PDF
-            const url = window.URL.createObjectURL(pdfBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${jobTitle} | ${job.id} | ${job.code}.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            if (isMobile &&
+                navigator.canShare &&
+                navigator.canShare({ files: [new File([], "")] })) {
+                const file = new File([blob], `${fileName}.pdf`, {
+                    type: "application/pdf",
+                });
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: fileName,
+                        text: `Lưu hoặc tải về PDF đơn hàng: ${fileName}`
+                    });
+                } catch (error) {
+                    console.error("Error sharing image:", error);
+                }
+            } else {
+                const url = URL.createObjectURL(blob);
 
-            toast({
-                title: "Tạo PDF thành công",
-                description: "File PDF đã được tải xuống.",
-                className: 'bg-green-500 text-white'
-            });
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${fileName}.pdf`;
+                a.click();
+
+                URL.revokeObjectURL(url);
+                toast({ title: "Tải PDF thành công", className: "bg-green-500 text-white" });
+            }
 
         } catch (e) {
             console.error("PDF Generation Error:", e);
