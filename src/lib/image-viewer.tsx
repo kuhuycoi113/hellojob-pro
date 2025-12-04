@@ -45,20 +45,20 @@ export function ImageViewer({
     try {
       setIsGeneratingPdf(true);
 
-      if (isMobile &&
+      if (!isMobile &&
         navigator.canShare &&
         navigator.canShare({ files: [new File([], "")] })) {
         try {
           const res = await fetch(imageUrl);
           const blob = await res.blob();
           const ext = FileMimeType[blob.type] ?? 'jpg';
-          const file = new File([blob], `${previewData.fileName}.${ext}`, {
+          const file = new File([blob], `Đơn hàng.${ext}`, {
             type: blob.type,
           });
           await navigator.share({
             files: [file],
-            title: previewData.fileName,
-            text: `Lưu hoặc tải về PDF đơn hàng: ${previewData.fileName}`
+            title: 'Lưu hoặc tải về ảnh đơn hàng',
+            text: `Lưu hoặc tải về ảnh đơn hàng`
           });
         } catch (error) {
           console.error("Error sharing image:", error);
@@ -67,7 +67,6 @@ export function ImageViewer({
         const a = document.createElement("a");
         a.href = imageUrl;
         const paths = imageUrl.split('.');
-        console.log(paths)
         a.download = `download.jpg`;
         a.click();
         toast({ title: "Tải Ảnh thành công", className: "bg-green-500 text-white" });
