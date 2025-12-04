@@ -208,6 +208,7 @@ export function ImageViewer({
       open={isOpen}
       close={() => onOpenChange(false)}
       slides={slides as any}
+      carousel={{finite:false,preload:0}}
       plugins={previewType === 'image' ? [Zoom, Captions, Download, Fullscreen] : [Download, Fullscreen]}
       download={{
         download({ slide, saveAs }) {
