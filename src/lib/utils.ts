@@ -497,9 +497,9 @@ export const generateHtmlFromMarkdown = (visaDetail: string, details: { stt: str
           <title>Thông Báo Đơn Hàng: ${visa}</title>
           <link rel="preconnect" href="https://fonts.googleapis.com">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+          <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
           <style>
-              body { font-family: 'Montserrat', 'Arial', sans-serif; margin: 0; padding: 0; background-color: #fff; color: #111827; }
+              body { font-family: 'Montserrat','Noto Sans JP', 'Arial', sans-serif; margin: 0; padding: 0; background-color: #fff; color: #111827; }
               .container { width: 100%; max-width: 794px; margin: auto; background-color: white; padding: 0; box-sizing: border-box; }
               h1, h2 { text-align: center; color: #111827; }
               h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;margin-top:0 }

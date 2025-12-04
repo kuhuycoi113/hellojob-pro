@@ -132,7 +132,7 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
         searchQuery.query.bool.filter.push(
             {
                 exists: {
-                    field: "formImage.keyword",
+                    field: "formMarkdownArray",
                 },
             }
         );

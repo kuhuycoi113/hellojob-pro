@@ -355,8 +355,36 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                     {feeInfo.text}
                                                 </Badge>
                                             )}
-
-                                            {!!job.formImage && role === 'admin' && (
+                                            {
+                                                !!htmlForm&&(
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <div onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                e.preventDefault();
+                                                                setPreviewType('iframe');
+                                                                setPreviewData({html:htmlForm,fileName:`${jobTitle} | ${job.id} |${job.code}`})
+                                                                setImagePreview(job.formImage)
+                                                            }} className="relative flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center rounded-sm border-2 border-muted bg-secondary">
+                                                                <FileText className="h-4 w-4 text-muted-foreground" />
+                                                                {job.formImage && (
+                                                                    <Star className="absolute -top-1.5 -right-1.5 h-3 w-3 text-yellow-400 fill-yellow-400" />
+                                                                )}
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            {!!job.formImage && role === 'admin' ? (
+                                                                <p>Việc làm này có form đơn hàng đẹp</p>
+                                                            ) : (
+                                                                <p>Việc làm này có ảnh form đơn hàng</p>
+                                                            )}
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                                )
+                                            }
+                                            {/* {!!job.formImage && role === 'admin' && (
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
@@ -380,7 +408,7 @@ export const JobCard = ({ job, showRecruiterName = true, variant = 'grid-item', 
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
-                                            )}
+                                            )} */}
                                         </>
                                     )}
                                 </div>
