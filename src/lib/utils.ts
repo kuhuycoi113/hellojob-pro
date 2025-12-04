@@ -499,11 +499,11 @@ export const generateHtmlFromMarkdown = (visaDetail: string, details: { stt: str
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
           <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
           <style>
-              body { font-family: 'Montserrat','Noto Sans JP', 'Arial', sans-serif; margin: 0; padding: 0; background-color: #fff; color: #111827; }
-              .container { width: 100%; max-width: 794px; margin: auto; background-color: white; padding: 0; box-sizing: border-box; }
+              body { font-family: 'Montserrat','Noto Sans JP', 'Arial', sans-serif; margin: 0; padding: 0; color: #111827; }
+              .container { width: 100%; max-width: 794px; margin: auto; background-color: white; padding: 1rem 0 0; box-sizing: border-box; }
               h1, h2 { text-align: center; color: #111827; }
-              h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;margin-top:0 }
-              h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+              h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 0;margin-top:0 }
+              h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; margin-top:0 }
               table { width: 100%; border-collapse: collapse; font-size: 12pt;line-height:1.3rem }
               th, td { padding: 8px; border: 1px solid #e5e7eb; text-align: left; word-break: break-word; color: #111827; }
               th { background-color: #19A6DF; color: white; text-align: center; }

@@ -1,6 +1,8 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
+
+// If you want you can use SCSS instead of css
 import { RootProvider } from '@/components/layout/root-provider';
 import { LayoutManager } from '@/components/layout/layout-manager';
 import { Montserrat } from 'next/font/google';

@@ -96,6 +96,13 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
                             "slop": 2
                         }
                     }
+                }, {
+                    match_phrase: {
+                        "formMarkdownArray.noiDung": {
+                            "query": q,
+                            "slop": 2
+                        }
+                    }
                 }],
                 minimum_should_match: 1,
             },

@@ -3,6 +3,7 @@
 import { waitForDebugger } from 'node:inspector/promises';
 import React, { useState, useRef, useCallback } from 'react';
 import { Skeleton } from './skeleton';
+import { Loader2 } from 'lucide-react';
 
 interface AutoHeightIframeProps {
     htmlContent: string;
@@ -46,8 +47,9 @@ export function AutoHeightIframe({
         <>
             <div className="relative min-h-[200px]">
                 {isLoading && (
-                    <div className="absolute inset-0">
-                        <Skeleton className="w-full h-full" />
+                    <div className="flex h-screen w-full flex-col bg-white text-primary items-center justify-center">
+                        <Loader2 className="h-12 w-12 animate-spin" />
+                        <p className="mt-4">Đang tải...</p>
                     </div>
                 )}
                 <iframe
