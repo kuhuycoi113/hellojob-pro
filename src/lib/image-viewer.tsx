@@ -9,7 +9,6 @@ import Download from "yet-another-react-lightbox/plugins/download";
 import "yet-another-react-lightbox/styles.css";
 
 import { useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
