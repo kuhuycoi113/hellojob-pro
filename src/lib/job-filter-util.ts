@@ -39,7 +39,7 @@ export const initialSearchFilters: SearchFilters = {
     workShift: '',
     showExpired: true,
     sortExpiredToEnd: true,
-    hasForm: false
+    hasForm: true
 };
 
 

@@ -63,9 +63,6 @@ export default function JobSearchPageContent({ jobs = [], filters, total, totalP
         const query = new URLSearchParams();
         Object.entries(stagedFilters).forEach(([key, value]) => {
             const urlKey = keyMap[key] || key;
-            if (key === 'hasForm') {
-                debugger;
-            }
             if ((value || typeof value === 'boolean') && (!Array.isArray(value) || value.length > 0) && JSON.stringify(value) !== JSON.stringify(initialSearchFilters[key as keyof SearchFilters])) {
                 if (key !== 'visa') {
                     if (Array.isArray(value)) {
