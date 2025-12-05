@@ -37,6 +37,7 @@ export function ImageViewer({
 
 
   const handleDownloadImage = async () => {
+    debugger
     if (isGeneratingPdf) {
       return;
     }
@@ -44,7 +45,7 @@ export function ImageViewer({
     try {
       setIsGeneratingPdf(true);
 
-      if (!isMobile &&
+      if (isMobile &&
         navigator.canShare &&
         navigator.canShare({ files: [new File([], "")] })) {
         try {
