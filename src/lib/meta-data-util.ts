@@ -47,6 +47,8 @@ export const generateJobMetaDataImage = async (job: any) => {
         }
         await drawBackgroundImage(ctx, avatarUrl, width, height);
 
+        return canvas.toBuffer('image/jpeg');
+
         let startY = 50;
         for (const { key, backgroundColor, color } of JOB_KEYS) {
             const keys = key.split(',');

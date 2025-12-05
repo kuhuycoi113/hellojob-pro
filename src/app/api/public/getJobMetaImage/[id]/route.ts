@@ -22,6 +22,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       headers: {
         "Content-Type": "image/jpeg", // hoặc webp tùy bạn
         "Content-Length": buffer.length.toString(),
+        "Content-Disposition": "inline"
       },
     });
   } catch (error) {
