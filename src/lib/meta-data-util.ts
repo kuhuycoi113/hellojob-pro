@@ -41,9 +41,9 @@ export const generateJobMetaDataImage = async (job: any) => {
         const { canvas, ctx, width, height, fontSize, font400, font700, maxTextWidth } = props;
         const startX = props.startX + 15;
         // Load ảnh nền
-        let avatarUrl = job.avatar?.url ?? job.avatar ?? '/img/metadata/opengraph-image.jpg';
+        let avatarUrl = job.avatar?.url ?? job.avatar ?? '/img/no-image.jpg';
         if (avatarUrl.endsWith('undefined')) {
-            avatarUrl = getJobImage(job.job, job.career) ?? '/img/metadata/opengraph-image.jpg';
+            avatarUrl = getJobImage(job.job, job.career) ?? '/img/no-image.jpg';
         }
         await drawBackgroundImage(ctx, avatarUrl, width, height);
 
@@ -269,75 +269,13 @@ const drawRoundedRect = (ctx: any, x: number, y: number, w: number, h: number, r
 const drawImage = async (ctx: any, img: any, x: number, y: number, w: number, h: number) => {
     await ctx.drawImage(img, x, y, w, h);
 };
-const drawCircleImage = async (
-    ctx: any,
-    imgSource: any,
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    borderWidth: number = 2,
-    borderColor: string = '#E4E4E4'
-) => {
-    const radius = Math.min(w, h) / 2;
-    const centerX = x + w / 2;
-    const centerY = y + h / 2;
-
-    ctx.save();
-
-    // Nền trắng hình tròn
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.fillStyle = '#FFFFFF'; // Nền trắng
-    ctx.fill();
-
-    // Viền ngoài hình tròn
-    ctx.lineWidth = borderWidth;
-    ctx.strokeStyle = borderColor;
-    ctx.stroke();
-
-    // Tạo clipping path để chỉ vẽ hình tròn
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius - borderWidth / 2, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.clip();
-
-    // Vẽ ảnh trong phần bị cắt
-
-    const imgUrl: string = imgSource ?? `${process.env.NEXT_PUBLIC_URL}/metadata/opengraph-image.jpg`;
-
-    let img;
-    try {
-        const response = await fetch(imgUrl);
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        // const buffer = await sharp(avatarUrl)
-        //     .toFormat('jpeg')
-        //     .toBuffer();
-        const output = await sharp(buffer)
-            .resize(Math.round(w), Math.round(h), {
-                fit: 'cover', // crop ảnh cho đúng khung
-                position: 'center' // có thể là 'top', 'left', 'right', 'bottom', 'entropy', v.v.
-            })
-            .toFormat('png') // hoặc .resize(), .crop(), etc
-            .toBuffer();
-        img = await loadImage(output);
-    } catch (e) {
-        console.log(e)
-        img = await loadImage(`${process.env.NEXT_PUBLIC_URL}/metadata/opengraph-image.jpg`);
-    }
-    await ctx.drawImage(img, x, y, w, h);
-
-    ctx.restore();
-};
 
 const drawBackgroundImage = async (ctx: any, url: string, w: number, h: number) => {
     let img;
     try {
         img = await loadImage(url);
     } catch (e) {
-        img = await loadImage(`${process.env.NEXT_PUBLIC_URL}/metadata/opengraph-image.jpg`);
+        img = await loadImage(`${process.env.NEXT_PUBLIC_URL}/img/no-image.jpg`);
     }
     const dim = getScaledDimension(img.width, img.height, w, h);
     drawImage(ctx, img, (w - dim.width) / 2, (h - dim.height) / 2, dim.width, dim.height);
@@ -387,9 +325,9 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
             }
             let avatarUrl;
             if (!!job) {
-                avatarUrl = job.avatar ?? `${process.env.NEXT_PUBLIC_URL}/img/metadata/opengraph-image.jpg`;
+                avatarUrl = job.avatar ?? `${process.env.NEXT_PUBLIC_URL}/img/no-image.jpg`;
                 if (avatarUrl.endsWith('undefined')) {
-                    avatarUrl = getJobImage(job.job, job.career) ?? `${process.env.NEXT_PUBLIC_URL}/img/metadata/opengraph-image.jpg`;
+                    avatarUrl = getJobImage(job.job, job.career) ?? `${process.env.NEXT_PUBLIC_URL}/img/no-image.jpg`;
                 }
             } else {
                 avatarUrl = `${process.env.NEXT_PUBLIC_URL}/img/no-image.jpg?v=121`;
@@ -514,39 +452,3 @@ export const generateJobMetaDataJobsImage = async (jobs: any[], total: number): 
         return null;
     }
 };
-
-export const generateWarehouseMetaDataImage = async (user: any, jobs: any[], total: number) => {
-    try {
-        const {
-            canvas,
-            ctx,
-            width,
-            height,
-        } = await generateJobMetaDataJobsImage(jobs, total);
-        const warehouseNameCardWidth = width * 0.5869
-        const warehouseNameCardHeight = height * 0.4038
-        let x = (width - warehouseNameCardWidth) / 2
-        let y = (height - warehouseNameCardHeight) / 2
-        drawRoundedRect(ctx, 0, 0, width, height, 0, 'rgba(0, 0, 0, 0.5)');
-        drawRoundedRect(ctx, x, y, warehouseNameCardWidth, warehouseNameCardHeight, 5, '#fff');
-        const diameter = warehouseNameCardWidth * 0.2746;
-        const leftPadding = 0.0429 * warehouseNameCardWidth;
-        x = x + leftPadding;
-        y = y + (warehouseNameCardHeight - diameter) / 2;
-        await drawCircleImage(ctx, user?.avatarUrl ?? `${process.env.NEXT_PUBLIC_URL}/img/loading-ani.png`, x, y, diameter, diameter, 2, "#e4e4e4");
-        const font = `700 60px Montserrat`;
-        x += diameter + leftPadding;
-        y += 70;
-        ctx.font = font;
-        ctx.fillStyle = '#0d8dc8';
-        ctx.fillText('Kho đơn', x, y);
-        y += 80;
-        const maxTextWidth = warehouseNameCardWidth - (diameter + leftPadding * 2) - 48
-        const fullName = breakLine(ctx, user?.fullName ?? '<Chưa rõ>', maxTextWidth);
-
-        ctx.fillText(fullName, x, y);
-        return canvas;
-    } catch (error) {
-        return null
-    }
-}
