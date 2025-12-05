@@ -459,23 +459,6 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                     </CardContent>
                                 </Card>
 
-                                {(job.educationLevel || job.experience || job.experienceYear || job.height || job.weight || job.vgb || job.haveTattoo || job.vision || job.interviewFormat) && <Card>
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-3 font-headline text-xl"><UserCheck className="text-primary h-6 w-6" />Yêu cầu chi tiết</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                        {job.educationLevel && <RequirementItem icon={GraduationCap} label="Yêu cầu học vấn" value={job.educationLevel ?? 'Không rõ'} />}
-                                        {job.experience && <RequirementItem icon={Briefcase} label="Kinh nghiệm" value={job.experience ?? 'Không rõ'} />}
-                                        {job.experienceYear && <RequirementItem icon={CalendarDays} label="Số năm kinh nghiệm" value={job.experienceYear ?? 'Không rõ'} />}
-                                        {job.height && <RequirementItem icon={Ruler} label="Chiều cao" value={job.height ?? 'Không rõ'} />}
-                                        {job.weight && <RequirementItem icon={Weight} label="Cân nặng" value={job.weight ?? 'Không rõ'} />}
-                                        {job.vgb && <RequirementItem icon={Dna} label="Viêm gan B" value={job.vgb ?? 'Không rõ'} />}
-                                        {job.haveTattoo && <RequirementItem icon={User} label="Hình xăm" value={job.haveTattoo ?? 'Không rõ'} />}
-                                        {job.vision && <RequirementItem icon={ImageIcon} label="Yêu cầu thị lực" value={job.vision ?? 'Không rõ'} />}
-                                        {job.interviewFormat && <RequirementItem icon={ClipboardCheck} label="Hình thức phỏng vấn" value={job.interviewFormat ?? 'Không rõ'} />}
-                                    </CardContent>
-                                </Card>}
-
                                 {!!htmlForm &&
                                     <JobDetailSection title="Thông Báo Đơn Hàng" icon={ImageIcon}>
                                         <div className={cn("space-y-6", isExpired && "grayscale")}>
@@ -505,6 +488,23 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         </div>
                                     </JobDetailSection>
                                 }
+
+                                {(job.educationLevel || job.experience || job.experienceYear || job.height || job.weight || job.vgb || job.haveTattoo || job.vision || job.interviewFormat) && <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-3 font-headline text-xl"><UserCheck className="text-primary h-6 w-6" />Yêu cầu chi tiết</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                        {job.educationLevel && <RequirementItem icon={GraduationCap} label="Yêu cầu học vấn" value={job.educationLevel ?? 'Không rõ'} />}
+                                        {job.experience && <RequirementItem icon={Briefcase} label="Kinh nghiệm" value={job.experience ?? 'Không rõ'} />}
+                                        {job.experienceYear && <RequirementItem icon={CalendarDays} label="Số năm kinh nghiệm" value={job.experienceYear ?? 'Không rõ'} />}
+                                        {job.height && <RequirementItem icon={Ruler} label="Chiều cao" value={job.height ?? 'Không rõ'} />}
+                                        {job.weight && <RequirementItem icon={Weight} label="Cân nặng" value={job.weight ?? 'Không rõ'} />}
+                                        {job.vgb && <RequirementItem icon={Dna} label="Viêm gan B" value={job.vgb ?? 'Không rõ'} />}
+                                        {job.haveTattoo && <RequirementItem icon={User} label="Hình xăm" value={job.haveTattoo ?? 'Không rõ'} />}
+                                        {job.vision && <RequirementItem icon={ImageIcon} label="Yêu cầu thị lực" value={job.vision ?? 'Không rõ'} />}
+                                        {job.interviewFormat && <RequirementItem icon={ClipboardCheck} label="Hình thức phỏng vấn" value={job.interviewFormat ?? 'Không rõ'} />}
+                                    </CardContent>
+                                </Card>}
 
                                 <JobDetailSection title="Mô tả công việc & Ghi chú" icon={FileText}>
                                     {/* <div>
