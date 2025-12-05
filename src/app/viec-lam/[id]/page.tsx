@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import React, { cache } from 'react';
 import JobDetailClientPage from './client';
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 
 interface PageProps {
     params: { id: string };
@@ -14,13 +15,17 @@ export const getJobByCodeCached = cache(async (id: string) => {
     return job ? JSON.parse(JSON.stringify(job)) : null;
 });
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+    const _header = await headers();
+    const host = _header.get("host");
+    const protocol = _header.get("x-forwarded-proto") ?? "https";
+    const domain = `${protocol}://${host}`;
     const { id } = (await params) as { id: string };
     const data = await getJobByCodeCached(id);
     let avatar: any = "/img/sample/no-image.jpg";
     if (!!data?.avatar?.length) {
         avatar = data?.avatar;
     }
-    const jobTitle=generateBulletJobCrawl(data);
+    const jobTitle = generateBulletJobCrawl(data);
     let title = `HelloJob - ${jobTitle}`;
     let isExpired = false;
     if (data?.expiredDate < Date.now()) {
@@ -39,13 +44,13 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
             description,
             images: [
                 {
-                    url: `${process.env.DOMAIN}/api/public/getJobMetaImage?jobCode=${id}`,
+                    url: `${domain}/api/public/getJobMetaImage?jobCode=${id}`,
                     width: 2400,
                     height: 1200,
                     alt: "HelloJob",
                 },
             ],
-            url: `${process.env.DOMAIN}/viec-lam/${id}`,
+            url: `${domain}/viec-lam/${id}`,
         },
         other: {
             "fb:app_id": "160733669562957",   // thay app id của bạn vào
