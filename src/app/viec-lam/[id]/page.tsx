@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
         title = "[HẾT HẠN] " + title;
     }
     const description = generateBulletJobCrawl(data);
-    
+
     return {
         title,
         description,
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
             description,
             images: [
                 {
-                    url: `${process.env.DOMAIN}/api/public/getJobMetaImage/${id}`,
+                    url: data.avatar,
                     width: 2400,
                     height: 1200,
                     alt: "HelloJob",
