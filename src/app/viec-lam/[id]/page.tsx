@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
         title = "[HẾT HẠN] " + title;
     }
     const description = generateBulletJobCrawl(data);
+    
     return {
         title,
         description,
