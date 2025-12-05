@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateJobMetaDataImage } from "@/lib/meta-data-util";
 import { getJobByCode } from "@/actions/job-action";
 import { makeTestImageBuffer } from "@/lib/testcanvas";
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const jobCode = searchParams.get("jobCode") ?? null;
+    const { id } = params;
+    const jobCode = id ?? null;
     if (!jobCode) {
       throw new Error("Missing jobCode parameter");
     }
