@@ -476,30 +476,6 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                     </CardContent>
                                 </Card>}
 
-                                <JobDetailSection title="Mô tả công việc & Ghi chú" icon={FileText}>
-                                    {/* <div>
-                                        <p>Mô tả chi tiết cho công việc {(job.career || job.job) && <strong>{job.job ?? job.career}, {job.workLocation}{job.numberRecruits ? `, tuyển ${job.numberRecruits} ${job.gender ? formatGender(job.gender) : 'người'}` : ''}</strong>}
-                                            . Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản
-                                            . Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p>
-                                        <ul>
-                                            {(job.career || job.job) && <li>Chi tiết công việc: {job.job ?? job.career}.</li>}
-                                            <li>Môi trường làm việc sạch sẽ, hiện đại.</li>
-                                        </ul>
-                                    </div> */}
-                                    <div>
-                                        <p>{job.aiContent}</p>
-                                        {role === 'admin' && <>
-                                            <p>-----------------</p>
-                                            <p>{job.baseContent}</p>
-                                        </>
-                                        }
-                                    </div>
-                                </JobDetailSection>
-
-                                <JobDetailSection title="Quyền lợi & Chế độ" icon={Sparkles}>
-                                    {job.benefits && <div dangerouslySetInnerHTML={{ __html: job.benefits }} />}
-                                    {!job.benefits && <div><ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li><li>Thưởng 1-2 lần/năm tùy theo kết quả kinh doanh.</li></ul></div>}
-                                </JobDetailSection>
                                 {!!htmlForm &&
                                     <JobDetailSection title="Thông Báo Đơn Hàng" icon={ImageIcon}>
                                         <div className={cn("space-y-6", isExpired && "grayscale")}>
@@ -529,6 +505,31 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         </div>
                                     </JobDetailSection>
                                 }
+
+                                <JobDetailSection title="Mô tả công việc & Ghi chú" icon={FileText}>
+                                    {/* <div>
+                                        <p>Mô tả chi tiết cho công việc {(job.career || job.job) && <strong>{job.job ?? job.career}, {job.workLocation}{job.numberRecruits ? `, tuyển ${job.numberRecruits} ${job.gender ? formatGender(job.gender) : 'người'}` : ''}</strong>}
+                                            . Đây là cơ hội tuyệt vời để làm việc trong một môi trường chuyên nghiệp tại Nhật Bản
+                                            . Công việc đòi hỏi sự cẩn thận, tỉ mỉ và trách nhiệm cao để đảm bảo chất lượng sản phẩm tốt nhất.</p>
+                                        <ul>
+                                            {(job.career || job.job) && <li>Chi tiết công việc: {job.job ?? job.career}.</li>}
+                                            <li>Môi trường làm việc sạch sẽ, hiện đại.</li>
+                                        </ul>
+                                    </div> */}
+                                    <div>
+                                        <p>{job.aiContent}</p>
+                                        {role === 'admin' && <>
+                                            <p>-----------------</p>
+                                            <p>{job.baseContent}</p>
+                                        </>
+                                        }
+                                    </div>
+                                </JobDetailSection>
+
+                                <JobDetailSection title="Quyền lợi & Chế độ" icon={Sparkles}>
+                                    {job.benefits && <div dangerouslySetInnerHTML={{ __html: job.benefits }} />}
+                                    {!job.benefits && <div><ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li><li>Thưởng 1-2 lần/năm tùy theo kết quả kinh doanh.</li></ul></div>}
+                                </JobDetailSection>
                                 <JobDetailSection title="Hình ảnh công việc" icon={ImageIcon}>
                                     <div className={cn("space-y-6", isExpired && "grayscale")}>
                                         <div className={cn("grid grid-cols-1 gap-4", job.formImage && role === 'admin' ? 'md:grid-cols-2' : 'md:grid-cols-1')}>
