@@ -169,3 +169,9 @@
 .leading-tight{
   line-height: 1.25rem;
 }
+.yarl__slide img {
+  -webkit-touch-callout: default !important; /* Cho phép gọi context menu */
+  -webkit-user-select: auto !important;
+  user-select: auto !important;
+  pointer-events: auto !important;
+}

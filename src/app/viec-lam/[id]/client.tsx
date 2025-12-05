@@ -86,7 +86,7 @@ const visasForVndDisplay = [
 ];
 
 export default function JobDetailClientPage({ job, behavioralSuggestions }: { job: any, behavioralSuggestions: any[] }) {
-    const isMobile=useIsMobile();
+    const isMobile = useIsMobile();
     const { toast } = useToast();
     const { serverTime } = useServerInfo();
     const { setImagePreview } = useImagePreview();
@@ -256,7 +256,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
             }
 
             const blob = await response.blob();
-            const fileName=`${jobTitle} | ${job.id} | ${job.code}`;
+            const fileName = `${jobTitle} | ${job.id} | ${job.code}`;
 
             // Create a link to download the PDF
             if (isMobile &&
@@ -442,39 +442,39 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         <CardTitle className="flex items-center gap-3 font-headline text-xl"><Info className="text-primary h-6 w-6" />Thông tin cơ bản</CardTitle>
                                     </CardHeader>
                                     <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                        <RequirementItem icon={Milestone} label="Loại Visa" value={findVisaByVisaDetail(job.visa)} />
-                                        <RequirementItem icon={ChevronsRight} label="Chi tiết Visa" value={job.visa} />
-                                        <RequirementItem icon={Briefcase} label="Ngành nghề" value={job.job ?? job.career ?? 'Liên hệ'} />
-                                        <RequirementItem icon={MapPin} label="Nơi phỏng vấn" value={job.interviewLocation ?? 'Liên hệ'} />
-                                        <RequirementItem icon={User} label="Giới tính" value={job.gender ? formatGender(job.gender) : 'Liên hệ'} />
-                                        <RequirementItem icon={Users} label="Số lượng" value={job.numberRecruits ? `${job.numberRecruits} người` : null} />
-                                        <RequirementItem icon={Cake} label="Yêu cầu tuổi" value={job.minAge && job.maxAge ? `${job.minAge} - ${job.maxAge}` : job.minAge ? `Từ ${job.minAge}` : job.maxAge ? `Đến ${job.maxAge}` : null} />
-                                        <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageLevel ?? 'Không rõ'} />
+                                        {job.visa && <RequirementItem icon={Milestone} label="Loại Visa" value={findVisaByVisaDetail(job.visa)} />}
+                                        {job.visa && <RequirementItem icon={ChevronsRight} label="Chi tiết Visa" value={job.visa} />}
+                                        {job.job && <RequirementItem icon={Briefcase} label="Ngành nghề" value={job.job ?? job.career ?? 'Liên hệ'} />}
+                                        {job.interviewLocation && <RequirementItem icon={MapPin} label="Nơi phỏng vấn" value={job.interviewLocation ?? 'Liên hệ'} />}
+                                        {job.gender && <RequirementItem icon={User} label="Giới tính" value={job.gender ? formatGender(job.gender) : 'Liên hệ'} />}
+                                        {job.numberRecruits && <RequirementItem icon={Users} label="Số lượng" value={job.numberRecruits ? `${job.numberRecruits} người` : null} />}
+                                        {(job.minAge || job.maxAge) && <RequirementItem icon={Cake} label="Yêu cầu tuổi" value={job.minAge && job.maxAge ? `${job.minAge} - ${job.maxAge}` : job.minAge ? `Từ ${job.minAge}` : job.maxAge ? `Đến ${job.maxAge}` : null} />}
+                                        {job.languageLevel && <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageLevel ?? 'Không rõ'} />}
                                         <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={interviewDate ? interviewDate : 'Linh hoạt'} />
-                                        <RequirementItem icon={ClipboardCheck} label="Số vòng" value={job.interviewRounds ? `${job.interviewRounds} vòng` : null} />
-                                        <RequirementItem icon={Wallet} label="Phí và vé và học phí" value={feeWithTuitionDisplay ?? 'Liên hệ'} />
-                                        <RequirementItem icon={Wallet} label={job.visa?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé"} value={feeDisplay} />
-                                        <RequirementItem icon={Wallet} label="Phí không vé" value={feeNoTicketDisplay ?? 'Liên hệ'} />
-                                        <RequirementItem icon={Star} label="Điều kiện đặc biệt" value={job.specialConditions} />
+                                        {job.interviewRounds && <RequirementItem icon={ClipboardCheck} label="Số vòng" value={job.interviewRounds ? `${job.interviewRounds} vòng` : null} />}
+                                        {feeWithTuitionDisplay && <RequirementItem icon={Wallet} label="Phí và vé và học phí" value={feeWithTuitionDisplay ?? 'Liên hệ'} />}
+                                        {feeDisplay && <RequirementItem icon={Wallet} label={job.visa?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé"} value={feeDisplay} />}
+                                        {feeNoTicketDisplay && <RequirementItem icon={Wallet} label="Phí không vé" value={feeNoTicketDisplay ?? 'Liên hệ'} />}
+                                        {(job.specialConditions) && <RequirementItem icon={Star} label="Điều kiện đặc biệt" value={job.specialConditions} />}
                                     </CardContent>
                                 </Card>
 
-                                <Card>
+                                {(job.educationLevel || job.experience || job.experienceYear || job.height || job.weight || job.vgb || job.haveTattoo || job.vision || job.interviewFormat) && <Card>
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-3 font-headline text-xl"><UserCheck className="text-primary h-6 w-6" />Yêu cầu chi tiết</CardTitle>
                                     </CardHeader>
                                     <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                        <RequirementItem icon={GraduationCap} label="Yêu cầu học vấn" value={job.educationLevel ?? 'Không rõ'} />
-                                        <RequirementItem icon={Briefcase} label="Kinh nghiệm" value={job.experience ?? 'Không rõ'} />
-                                        <RequirementItem icon={CalendarDays} label="Số năm kinh nghiệm" value={job.experienceYear ?? 'Không rõ'} />
-                                        <RequirementItem icon={Ruler} label="Chiều cao" value={job.height ?? 'Không rõ'} />
-                                        <RequirementItem icon={Weight} label="Cân nặng" value={job.weight ?? 'Không rõ'} />
-                                        <RequirementItem icon={Dna} label="Viêm gan B" value={job.vgb ?? 'Không rõ'} />
-                                        <RequirementItem icon={User} label="Hình xăm" value={job.haveTattoo ?? 'Không rõ'} />
-                                        <RequirementItem icon={ImageIcon} label="Yêu cầu thị lực" value={job.vision ?? 'Không rõ'} />
-                                        <RequirementItem icon={ClipboardCheck} label="Hình thức phỏng vấn" value={job.interviewFormat ?? 'Không rõ'} />
+                                        {job.educationLevel && <RequirementItem icon={GraduationCap} label="Yêu cầu học vấn" value={job.educationLevel ?? 'Không rõ'} />}
+                                        {job.experience && <RequirementItem icon={Briefcase} label="Kinh nghiệm" value={job.experience ?? 'Không rõ'} />}
+                                        {job.experienceYear && <RequirementItem icon={CalendarDays} label="Số năm kinh nghiệm" value={job.experienceYear ?? 'Không rõ'} />}
+                                        {job.height && <RequirementItem icon={Ruler} label="Chiều cao" value={job.height ?? 'Không rõ'} />}
+                                        {job.weight && <RequirementItem icon={Weight} label="Cân nặng" value={job.weight ?? 'Không rõ'} />}
+                                        {job.vgb && <RequirementItem icon={Dna} label="Viêm gan B" value={job.vgb ?? 'Không rõ'} />}
+                                        {job.haveTattoo && <RequirementItem icon={User} label="Hình xăm" value={job.haveTattoo ?? 'Không rõ'} />}
+                                        {job.vision && <RequirementItem icon={ImageIcon} label="Yêu cầu thị lực" value={job.vision ?? 'Không rõ'} />}
+                                        {job.interviewFormat && <RequirementItem icon={ClipboardCheck} label="Hình thức phỏng vấn" value={job.interviewFormat ?? 'Không rõ'} />}
                                     </CardContent>
-                                </Card>
+                                </Card>}
 
                                 <JobDetailSection title="Mô tả công việc & Ghi chú" icon={FileText}>
                                     {/* <div>
@@ -529,16 +529,18 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                                     <AutoHeightIframe htmlContent={htmlForm} title={jobTitle} />
                                                     <div className='flex justify-end items-center mt-2'>
                                                         <Button onClick={handleConvertToImage} disabled={isGeneratingPdf} className="bg-accent-orange text-white hover:bg-accent-orange/90 mr-2">
-                                                            <>
-                                                                <FileImageIcon className="mr-2 h-4 w-4" />
-                                                                Xem/Tải ảnh
-                                                            </>
+                                                            {isGeneratingPdf ? 'Đang tạo ảnh...' : (
+                                                                <>
+                                                                    <FileImageIcon className="mr-2 h-4 w-4" />
+                                                                    Xem và tải ảnh Form đơn hàng
+                                                                </>
+                                                            )}
                                                         </Button>
                                                         <Button onClick={handleConvertToPDF} disabled={isGeneratingPdf}>
                                                             {isGeneratingPdf ? 'Đang tạo PDF...' : (
                                                                 <>
                                                                     <FileIcon className="mr-2 h-4 w-4" />
-                                                                    Xem/Tải PDF
+                                                                    Xem và tải PDF Form đơn hàng
                                                                 </>
                                                             )}
                                                         </Button>
