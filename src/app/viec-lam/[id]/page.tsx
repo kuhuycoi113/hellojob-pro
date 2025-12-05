@@ -20,9 +20,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     if (!!data?.avatar?.length) {
         avatar = data?.avatar;
     }
-    let title = `HelloJob - ${data?.visa},${data?.job}
-              ${data?.numberRecruits ? ` ${data?.numberRecruits} người` : ""}
-              ${data?.specialConditions?.length > 0 ? ` (${formatSpecialCondition(data?.specialConditions).join(", ")})` : ""}`;
+    const jobTitle=generateBulletJobCrawl(data);
+    let title = `HelloJob - ${jobTitle}`;
     let isExpired = false;
     if (data?.expiredDate < Date.now()) {
         isExpired = true;
@@ -40,9 +39,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
             description,
             images: [
                 {
-                    url: `${process.env.DOMAIN}/api/public/getJobMetaImage?jobCode=${id}`,
-                    width: 2400,
-                    height: 1200,
+                    url: data.avatar??getJobImage(data.job,data.career),
+                    width: 1200,
+                    height: 600,
                     alt: "HelloJob",
                 },
             ],
