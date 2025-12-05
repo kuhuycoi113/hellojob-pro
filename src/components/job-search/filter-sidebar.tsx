@@ -1347,7 +1347,7 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                         </div>
                                     </div>
                                 )}
-                                {role === 'admin' && <div className="space-y-4">
+                                {<div className="space-y-4">
                                     <div className="flex items-center justify-between space-x-2">
                                         <Label htmlFor="has-form" className="font-normal cursor-pointer flex-grow text-muted-foreground">Có form đơn</Label>
                                         <Switch
