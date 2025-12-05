@@ -16,9 +16,9 @@ import { initialSearchFilters } from '@/lib/job-filter-util';
 
 const siteConfig = {
   name: "HelloJob",
-  url: "https://vi.hellojob.jp", // Replace with your actual domain
+  url: `${process.env.NEXT_PUBLIC_URL}`, // Replace with your actual domain
   description: "Nền tảng việc làm và phát triển sự nghiệp tại Nhật Bản. Tìm kiếm việc làm Kỹ năng đặc định (Tokutei Ginou), Thực tập sinh, Kỹ sư. Xây dựng lộ trình sự nghiệp (SWR) bền vững.",
-  ogImage: "/metadata/opengraph-image.jpg",
+  // ogImage: "/metadata/opengraph-image.jpg",
 };
 
 const montserrat = Montserrat({
@@ -30,7 +30,7 @@ const montserrat = Montserrat({
 
 
 export const metadata: Metadata = {
-  // metadataBase: new URL(siteConfig.url),
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`,
@@ -65,13 +65,13 @@ export const metadata: Metadata = {
   //     },
   //   ],
   // },
-  twitter: {
-    card: "summary_large_image",
-    title: siteConfig.name,
-    description: siteConfig.description,
-    images: [siteConfig.ogImage],
-    creator: "@hellojob", // Replace with your Twitter handle
-  },
+  // twitter: {
+  //   card: "summary_large_image",
+  //   title: siteConfig.name,
+  //   description: siteConfig.description,
+  //   images: [siteConfig.ogImage],
+  //   creator: "@hellojob", // Replace with your Twitter handle
+  // },
   icons: {
     icon: [
       { url: '/metadata/favicon-32x32.png' },
