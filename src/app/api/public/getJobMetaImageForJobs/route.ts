@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
       headers: {
         "Content-Type": "image/jpeg", // hoặc webp tùy bạn
         "Content-Length": buffer.length.toString(),
+        "Content-Disposition": "inline"
       },
     });
   } catch (error) {
