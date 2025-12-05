@@ -527,8 +527,8 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                             <>
                                                 <div>
                                                     <AutoHeightIframe htmlContent={htmlForm} title={jobTitle} />
-                                                    <div className='flex justify-end items-center mt-2'>
-                                                        <Button onClick={handleConvertToImage} disabled={isGeneratingPdf} className="bg-accent-orange text-white hover:bg-accent-orange/90 mr-2">
+                                                    <div className='flex justify-end items-center mt-2 flex-wrap gap-2'>
+                                                        <Button onClick={handleConvertToImage} disabled={isGeneratingPdf} className="w-full md:w-[40%] flex bg-accent-orange text-white hover:bg-accent-orange/90">
                                                             {isGeneratingPdf ? 'Đang tạo ảnh...' : (
                                                                 <>
                                                                     <FileImageIcon className="mr-2 h-4 w-4" />
@@ -536,7 +536,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                                                 </>
                                                             )}
                                                         </Button>
-                                                        <Button onClick={handleConvertToPDF} disabled={isGeneratingPdf}>
+                                                        <Button onClick={handleConvertToPDF} disabled={isGeneratingPdf} className='w-full md:w-[40%] flex'>
                                                             {isGeneratingPdf ? 'Đang tạo PDF...' : (
                                                                 <>
                                                                     <FileIcon className="mr-2 h-4 w-4" />
