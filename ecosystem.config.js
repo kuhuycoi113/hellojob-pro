@@ -1,6 +1,6 @@
 module.exports = {
   apps : [{
-    name   : "nextjs-app",
+    name   : "hellojob-pro",
     script : "npm", // Chạy tiến trình npm
     args: "start", // Chạy script "start" trong package.json
     watch  : false, // Không giám sát file (chỉ giám sát khi phát triển)
