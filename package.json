@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npx next dev --turbopack",
     "build": "next build",
-    "start": "next start -p 9997",
+    "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
