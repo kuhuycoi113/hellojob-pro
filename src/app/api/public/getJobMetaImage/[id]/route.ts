@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateJobMetaDataImage } from "@/lib/meta-data-util";
 import { getJobByCode } from "@/actions/job-action";
-import { makeTestImageBuffer } from "@/lib/testcanvas";
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = params;

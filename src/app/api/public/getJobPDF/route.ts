@@ -1,14 +1,30 @@
 import puppeteer from 'puppeteer';
 import { NextRequest, NextResponse } from 'next/server';
-
+import { Cache } from "@/lib/server-cache";
+const TTL = 1000 * 60 * 60 * 12; // 30 phút
 export async function POST(req: NextRequest) {
   let browser;
   try {
-    const { htmlContent, responseType }: {
+    const { id, htmlContent, responseType }: {
+      id: string,
       htmlContent: string | null,
       responseType: 'application/pdf' | 'image/jpeg' | 'image/png'
     } = await req.json();
-
+    const now = Date.now();
+    for (const [key, value] of Cache.entries()) {
+      if (value.expireAt < now) Cache.delete(key);
+    }
+    const cachedKey = `${id}-${responseType}`;
+    const cached = Cache.get(cachedKey);
+    if (cached) {
+      console.log('HIT');
+      return new NextResponse(cached.buffer as any, {
+        status: 200,
+        headers: {
+          'Content-Type': responseType,
+        },
+      })
+    }
     if (!htmlContent) {
       return new NextResponse('Thiếu nội dung HTML', { status: 400 });
     }
@@ -25,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     // Set the HTML content of the page
     const html = htmlContent.replace('<h1></h1>', '<h1 style="margin-top:30px">THÔNG BÁO ĐƠN HÀNG</h1>')
-    .replace('<body>', '<body style="padding-bottom:30px">')
+      .replace('<body>', '<body style="padding-bottom:30px">')
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
     // Generate the PDF
@@ -49,10 +65,11 @@ export async function POST(req: NextRequest) {
           console.log(error);
         }
         // Return the PDF as a blob
+        Cache.set(cachedKey, pdfBuffer, now + TTL);
         return new NextResponse(pdfBuffer as any, {
           status: 200,
           headers: {
-            'Content-Type': 'application/pdf',
+            'Content-Type': responseType,
           },
         });
       }
@@ -71,6 +88,7 @@ export async function POST(req: NextRequest) {
         } catch (error) {
           console.log(error);
         }
+        Cache.set(cachedKey, imageBuffer, now + TTL);
         return new NextResponse(imageBuffer as any, {
           status: 200,
           headers: {

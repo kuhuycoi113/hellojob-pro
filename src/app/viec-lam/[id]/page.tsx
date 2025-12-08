@@ -16,7 +16,7 @@ export const getJobByCodeCached = cache(async (id: string) => {
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
     const { id } = (await params) as { id: string };
     const data = await getJobByCodeCached(id);
-    let avatar: any = "/img/sample/no-image.jpg";
+    let avatar: any = "/img/no-image.jpg";
     if (!!data?.avatar?.length) {
         avatar = data?.avatar;
     }

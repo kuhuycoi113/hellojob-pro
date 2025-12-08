@@ -442,20 +442,20 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         <CardTitle className="flex items-center gap-3 font-headline text-xl"><Info className="text-primary h-6 w-6" />Thông tin cơ bản</CardTitle>
                                     </CardHeader>
                                     <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                        {job.visa && <RequirementItem icon={Milestone} label="Loại Visa" value={findVisaByVisaDetail(job.visa)} />}
-                                        {job.visa && <RequirementItem icon={ChevronsRight} label="Chi tiết Visa" value={job.visa} />}
-                                        {job.job && <RequirementItem icon={Briefcase} label="Ngành nghề" value={job.job ?? job.career ?? 'Liên hệ'} />}
-                                        {job.interviewLocation && <RequirementItem icon={MapPin} label="Nơi phỏng vấn" value={job.interviewLocation ?? 'Liên hệ'} />}
-                                        {job.gender && <RequirementItem icon={User} label="Giới tính" value={job.gender ? formatGender(job.gender) : 'Liên hệ'} />}
-                                        {job.numberRecruits && <RequirementItem icon={Users} label="Số lượng" value={job.numberRecruits ? `${job.numberRecruits} người` : null} />}
-                                        {(job.minAge || job.maxAge) && <RequirementItem icon={Cake} label="Yêu cầu tuổi" value={job.minAge && job.maxAge ? `${job.minAge} - ${job.maxAge}` : job.minAge ? `Từ ${job.minAge}` : job.maxAge ? `Đến ${job.maxAge}` : null} />}
-                                        {job.languageLevel && <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageLevel ?? 'Không rõ'} />}
+                                        {!!job.visa && <RequirementItem icon={Milestone} label="Loại Visa" value={findVisaByVisaDetail(job.visa)} />}
+                                        {!!job.visa && <RequirementItem icon={ChevronsRight} label="Chi tiết Visa" value={job.visa} />}
+                                        {!!job.job && <RequirementItem icon={Briefcase} label="Ngành nghề" value={job.job ?? job.career ?? 'Liên hệ'} />}
+                                        {!!job.interviewLocation && <RequirementItem icon={MapPin} label="Nơi phỏng vấn" value={job.interviewLocation ?? 'Liên hệ'} />}
+                                        {!!job.gender && <RequirementItem icon={User} label="Giới tính" value={job.gender ? formatGender(job.gender) : 'Liên hệ'} />}
+                                        {!!job.numberRecruits && <RequirementItem icon={Users} label="Số lượng" value={job.numberRecruits ? `${job.numberRecruits} người` : null} />}
+                                        {!!(job.minAge || job.maxAge) && <RequirementItem icon={Cake} label="Yêu cầu tuổi" value={job.minAge && job.maxAge ? `${job.minAge} - ${job.maxAge}` : job.minAge ? `Từ ${job.minAge}` : job.maxAge ? `Đến ${job.maxAge}` : null} />}
+                                        {!!job.languageLevel && <RequirementItem icon={Languages} label="Yêu cầu ngoại ngữ" value={job.languageLevel ?? 'Không rõ'} />}
                                         <RequirementItem icon={CalendarDays} label="Ngày phỏng vấn" value={interviewDate ? interviewDate : 'Linh hoạt'} />
-                                        {job.interviewRounds && <RequirementItem icon={ClipboardCheck} label="Số vòng" value={job.interviewRounds ? `${job.interviewRounds} vòng` : null} />}
-                                        {feeWithTuitionDisplay && <RequirementItem icon={Wallet} label="Phí và vé và học phí" value={feeWithTuitionDisplay ?? 'Liên hệ'} />}
-                                        {feeDisplay && <RequirementItem icon={Wallet} label={job.visa?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé"} value={feeDisplay} />}
-                                        {feeNoTicketDisplay && <RequirementItem icon={Wallet} label="Phí không vé" value={feeNoTicketDisplay ?? 'Liên hệ'} />}
-                                        {(job.specialConditions) && <RequirementItem icon={Star} label="Điều kiện đặc biệt" value={job.specialConditions} />}
+                                        {!!job.interviewRounds && <RequirementItem icon={ClipboardCheck} label="Số vòng" value={job.interviewRounds ? `${job.interviewRounds} vòng` : null} />}
+                                        {!!feeWithTuitionDisplay && <RequirementItem icon={Wallet} label="Phí và vé và học phí" value={feeWithTuitionDisplay ?? 'Liên hệ'} />}
+                                        {!!feeDisplay && <RequirementItem icon={Wallet} label={job.visa?.includes('Thực tập sinh') ? "Phí và vé không học phí" : "Phí có vé"} value={feeDisplay} />}
+                                        {!!feeNoTicketDisplay && <RequirementItem icon={Wallet} label="Phí không vé" value={feeNoTicketDisplay ?? 'Liên hệ'} />}
+                                        {!!(job.specialConditions) && <RequirementItem icon={Star} label="Điều kiện đặc biệt" value={job.specialConditions} />}
                                     </CardContent>
                                 </Card>
 

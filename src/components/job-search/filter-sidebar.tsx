@@ -837,6 +837,158 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                             </AccordionContent>
                         </AccordionItem>
 
+
+                        <AccordionItem value="requirements">
+                            <AccordionTrigger className="text-base font-semibold">
+                                <span className="flex items-center gap-2"><UserSearch className="h-5 w-5" />Yêu cầu ứng viên</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-4 pt-4">
+                                <div>
+                                    <Label className="font-semibold">Giới tính</Label>
+                                    <RadioGroup value={filters.gender} onValueChange={(value) => onFilterChange({ gender: value as any })} className="flex items-center space-x-4 pt-2">
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="" id="gender-all" />
+                                            <Label htmlFor="gender-all" className='font-normal'>Tất cả</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="nam" id="gender-male" />
+                                            <Label htmlFor="gender-male" className='font-normal'>Nam</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="nu" id="gender-female" />
+                                            <Label htmlFor="gender-female" className='font-normal'>Nữ</Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="font-semibold">Trình độ tiếng Nhật</Label>
+                                    <Select value={filters.languageRequirement} onValueChange={(value) => onFilterChange({ languageRequirement: value })}>
+                                        <SelectTrigger className={cn(filters.languageRequirement && filters.languageRequirement !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Tất cả</SelectItem>
+                                            {languageLevels.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                {showEnglishLevelFilter && (
+                                    <div className="space-y-2">
+                                        <Label className="font-semibold">Trình độ tiếng Anh</Label>
+                                        <Select value={filters.englishRequirement} onValueChange={(value) => onFilterChange({ englishRequirement: value })}>
+                                            <SelectTrigger className={cn(filters.englishRequirement && filters.englishRequirement !== 'all' && "text-primary")}><SelectValue placeholder="Chọn trình độ" /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">Tất cả</SelectItem>
+                                                {englishLevels.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )}
+                                <div className="space-y-2">
+                                    <Label>Tuổi</Label>
+                                    <Slider
+                                        defaultValue={[18, 36]}
+                                        min={18}
+                                        max={60}
+                                        step={1}
+                                        onValueChange={(value) => onFilterChange({ age: value as [number, number] })}
+                                    />
+                                    <div className="flex justify-between text-xs text-muted-foreground">
+                                        <span>{filters.age?.[0] || 18} tuổi</span>
+                                        <span>{filters.age?.[1] || 60} tuổi</span>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Chiều cao (cm)</Label>
+                                    <Slider
+                                        defaultValue={[145, 180]}
+                                        min={135}
+                                        max={210}
+                                        step={1}
+                                        onValueChange={(value) => onFilterChange({ height: value as [number, number] })}
+                                    />
+                                    <div className="flex justify-between text-xs text-muted-foreground">
+                                        <span>{filters.height?.[0] || 135} cm</span>
+                                        <span>{filters.height?.[1] || 210} cm</span>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Cân nặng (kg)</Label>
+                                    <Slider
+                                        defaultValue={[40, 90]}
+                                        min={35}
+                                        max={120}
+                                        step={1}
+                                        onValueChange={(value) => onFilterChange({ weight: value as [number, number] })}
+                                    />
+                                    <div className="flex justify-between text-xs text-muted-foreground">
+                                        <span>{filters.weight?.[0] || 35} kg</span>
+                                        <span>{filters.weight?.[1] || 120} kg</span>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="font-semibold">Yêu cầu thị lực</Label>
+                                    <Select value={filters.visionRequirement || 'all'} onValueChange={(value) => onFilterChange({ visionRequirement: value })}>
+                                        <SelectTrigger className="mt-2" id="vision-requirement"><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
+                                        <SelectContent>
+                                            {visionRequirements.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                {showTattooFilter && (
+                                    <div className="space-y-2">
+                                        <Label className="font-semibold">Yêu cầu hình xăm</Label>
+                                        <Select value={filters.tattooRequirement || 'all'} onValueChange={(value) => onFilterChange({ tattooRequirement: value })}>
+                                            <SelectTrigger className={cn(filters.tattooRequirement && filters.tattooRequirement !== 'all' && "text-primary")}><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
+                                            <SelectContent>
+                                                {tattooRequirements.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )}
+                                {showEducationFilter && (
+                                    <div className="space-y-2">
+                                        <Label className="font-semibold">Học vấn</Label>
+                                        <Select value={filters.educationRequirement} onValueChange={(value) => onFilterChange({ educationRequirement: value })}>
+                                            <SelectTrigger className={cn(filters.educationRequirement && filters.educationRequirement !== 'all' && "text-primary")}><SelectValue placeholder="Chọn học vấn" /></SelectTrigger>
+                                            <SelectContent>
+                                                {educationLevels.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )}
+                                <div className="space-y-2">
+                                    <Label className="font-semibold">Tay thuận</Label>
+                                    <Select value={filters.dominantHand} onValueChange={(value) => onFilterChange({ dominantHand: value })}>
+                                        <SelectTrigger className={cn(filters.dominantHand && filters.dominantHand !== 'all' && "text-primary")}>
+                                            <SelectValue placeholder="Chọn tay thuận" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {dominantHands.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-4">
+                                    <Label className="font-semibold pt-2">Yêu cầu năng lực khác</Label>
+                                    <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-2">
+                                        {otherSkills.map(skill => (
+                                            <div key={skill.slug} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`skill-${skill.slug}`}
+                                                    checked={filters.otherSkillRequirement?.includes(skill.slug)}
+                                                    onCheckedChange={(checked) => {
+                                                        const currentSkills = filters.otherSkillRequirement || [];
+                                                        const newSkills = checked
+                                                            ? [...currentSkills, skill.slug]
+                                                            : currentSkills.filter((s) => s !== skill.slug);
+                                                        onFilterChange({ otherSkillRequirement: newSkills });
+                                                    }}
+                                                />
+                                                <Label htmlFor={`skill-${skill.slug}`} className="font-normal text-sm cursor-pointer">{skill.name}</Label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
                         <AccordionItem value="interviewLocation">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><FileText className="h-5 w-5" />Quy trình tuyển dụng</span>
@@ -1096,158 +1248,6 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                             </AccordionContent>
                         </AccordionItem>
 
-                        <AccordionItem value="requirements">
-                            <AccordionTrigger className="text-base font-semibold">
-                                <span className="flex items-center gap-2"><UserSearch className="h-5 w-5" />Yêu cầu ứng viên</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-4 pt-4">
-                                <div>
-                                    <Label className="font-semibold">Giới tính</Label>
-                                    <RadioGroup value={filters.gender} onValueChange={(value) => onFilterChange({ gender: value as any })} className="flex items-center space-x-4 pt-2">
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="" id="gender-all" />
-                                            <Label htmlFor="gender-all" className='font-normal'>Tất cả</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="nam" id="gender-male" />
-                                            <Label htmlFor="gender-male" className='font-normal'>Nam</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="nu" id="gender-female" />
-                                            <Label htmlFor="gender-female" className='font-normal'>Nữ</Label>
-                                        </div>
-                                    </RadioGroup>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Tuổi</Label>
-                                    <Slider
-                                        defaultValue={[18, 36]}
-                                        min={18}
-                                        max={60}
-                                        step={1}
-                                        onValueChange={(value) => onFilterChange({ age: value as [number, number] })}
-                                    />
-                                    <div className="flex justify-between text-xs text-muted-foreground">
-                                        <span>{filters.age?.[0] || 18} tuổi</span>
-                                        <span>{filters.age?.[1] || 60} tuổi</span>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Chiều cao (cm)</Label>
-                                    <Slider
-                                        defaultValue={[145, 180]}
-                                        min={135}
-                                        max={210}
-                                        step={1}
-                                        onValueChange={(value) => onFilterChange({ height: value as [number, number] })}
-                                    />
-                                    <div className="flex justify-between text-xs text-muted-foreground">
-                                        <span>{filters.height?.[0] || 135} cm</span>
-                                        <span>{filters.height?.[1] || 210} cm</span>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Cân nặng (kg)</Label>
-                                    <Slider
-                                        defaultValue={[40, 90]}
-                                        min={35}
-                                        max={120}
-                                        step={1}
-                                        onValueChange={(value) => onFilterChange({ weight: value as [number, number] })}
-                                    />
-                                    <div className="flex justify-between text-xs text-muted-foreground">
-                                        <span>{filters.weight?.[0] || 35} kg</span>
-                                        <span>{filters.weight?.[1] || 120} kg</span>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="font-semibold">Yêu cầu thị lực</Label>
-                                    <Select value={filters.visionRequirement || 'all'} onValueChange={(value) => onFilterChange({ visionRequirement: value })}>
-                                        <SelectTrigger className="mt-2" id="vision-requirement"><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
-                                        <SelectContent>
-                                            {visionRequirements.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                {showTattooFilter && (
-                                    <div className="space-y-2">
-                                        <Label className="font-semibold">Yêu cầu hình xăm</Label>
-                                        <Select value={filters.tattooRequirement || 'all'} onValueChange={(value) => onFilterChange({ tattooRequirement: value })}>
-                                            <SelectTrigger className={cn(filters.tattooRequirement && filters.tattooRequirement !== 'all' && "text-primary")}><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
-                                            <SelectContent>
-                                                {tattooRequirements.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                )}
-                                <div className="space-y-2">
-                                    <Label className="font-semibold">Trình độ tiếng Nhật</Label>
-                                    <Select value={filters.languageRequirement} onValueChange={(value) => onFilterChange({ languageRequirement: value })}>
-                                        <SelectTrigger className={cn(filters.languageRequirement && filters.languageRequirement !== 'all' && 'text-primary')}><SelectValue placeholder="Chọn yêu cầu" /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">Tất cả</SelectItem>
-                                            {languageLevels.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                {showEnglishLevelFilter && (
-                                    <div className="space-y-2">
-                                        <Label className="font-semibold">Trình độ tiếng Anh</Label>
-                                        <Select value={filters.englishRequirement} onValueChange={(value) => onFilterChange({ englishRequirement: value })}>
-                                            <SelectTrigger className={cn(filters.englishRequirement && filters.englishRequirement !== 'all' && "text-primary")}><SelectValue placeholder="Chọn trình độ" /></SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">Tất cả</SelectItem>
-                                                {englishLevels.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                )}
-                                {showEducationFilter && (
-                                    <div className="space-y-2">
-                                        <Label className="font-semibold">Học vấn</Label>
-                                        <Select value={filters.educationRequirement} onValueChange={(value) => onFilterChange({ educationRequirement: value })}>
-                                            <SelectTrigger className={cn(filters.educationRequirement && filters.educationRequirement !== 'all' && "text-primary")}><SelectValue placeholder="Chọn học vấn" /></SelectTrigger>
-                                            <SelectContent>
-                                                {educationLevels.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                )}
-                                <div className="space-y-2">
-                                    <Label className="font-semibold">Tay thuận</Label>
-                                    <Select value={filters.dominantHand} onValueChange={(value) => onFilterChange({ dominantHand: value })}>
-                                        <SelectTrigger className={cn(filters.dominantHand && filters.dominantHand !== 'all' && "text-primary")}>
-                                            <SelectValue placeholder="Chọn tay thuận" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {dominantHands.map(item => <SelectItem key={item.slug} value={item.slug}>{item.name}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-4">
-                                    <Label className="font-semibold pt-2">Yêu cầu năng lực khác</Label>
-                                    <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-2">
-                                        {otherSkills.map(skill => (
-                                            <div key={skill.slug} className="flex items-center space-x-2">
-                                                <Checkbox
-                                                    id={`skill-${skill.slug}`}
-                                                    checked={filters.otherSkillRequirement?.includes(skill.slug)}
-                                                    onCheckedChange={(checked) => {
-                                                        const currentSkills = filters.otherSkillRequirement || [];
-                                                        const newSkills = checked
-                                                            ? [...currentSkills, skill.slug]
-                                                            : currentSkills.filter((s) => s !== skill.slug);
-                                                        onFilterChange({ otherSkillRequirement: newSkills });
-                                                    }}
-                                                />
-                                                <Label htmlFor={`skill-${skill.slug}`} className="font-normal text-sm cursor-pointer">{skill.name}</Label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-
                         <AccordionItem value="process">
                             <AccordionTrigger className="text-base font-semibold">
                                 <span className="flex items-center gap-2"><ListChecks className="h-5 w-5" />Quy trình tuyển dụng</span>
@@ -1356,19 +1356,6 @@ export const FilterSidebar = memo(({ filters, appliedFilters, onFilterChange, on
                                             onCheckedChange={(checked) => onFilterChange({ hasForm: !!checked })}
                                         />
                                     </div>
-                                    {/* <div className="pl-6 border-l-2 ml-2 space-y-4">
-                                        <div className="flex items-center justify-between space-x-2">
-                                            <Label htmlFor="has-nice-form" className={cn("font-normal cursor-pointer flex-grow text-muted-foreground", !filters.hasForm && "opacity-50")}>
-                                                Form đơn đẹp
-                                            </Label>
-                                            <Switch
-                                                id="has-nice-form"
-                                                checked={filters.hasNiceForm}
-                                                onCheckedChange={(checked) => onFilterChange({ hasNiceForm: !!checked })}
-                                                disabled={!filters.hasForm}
-                                            />
-                                        </div>
-                                    </div> */}
                                 </div>}
                             </AccordionContent>
                         </AccordionItem>
