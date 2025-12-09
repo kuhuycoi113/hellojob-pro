@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
       if (value.expireAt < now) Cache.delete(key);
     }
     const cachedKey = `${id}-${responseType}`;
+    console.log(cachedKey)
     const cached = Cache.get(cachedKey);
     if (cached) {
       console.log('HIT');

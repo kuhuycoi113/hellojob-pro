@@ -247,7 +247,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ htmlContent: htmlForm, responseType: 'application/pdf' }),
+                body: JSON.stringify({ id: job.id, htmlContent: htmlForm, responseType: 'application/pdf' }),
             });
 
             if (!response.ok) {
@@ -317,7 +317,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ htmlContent: htmlForm, responseType: 'image/jpeg' }),
+                body: JSON.stringify({ id: job.id, htmlContent: htmlForm, responseType: 'image/jpeg' }),
             });
 
             if (!response.ok) {
@@ -500,7 +500,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                     {job.benefits && <div dangerouslySetInnerHTML={{ __html: job.benefits }} />}
                                     {!job.benefits && <div><ul><li>Hưởng đầy đủ chế độ bảo hiểm (y tế, hưu trí, thất nghiệp) theo quy định của pháp luật Nhật Bản.</li><li>Hỗ trợ chi phí nhà ở và đi lại.</li><li>Có nhiều cơ hội làm thêm giờ để tăng thu nhập.</li><li>Được đào tạo bài bản và có cơ hội phát triển, gia hạn hợp đồng lâu dài.</li><li>Thưởng 1-2 lần/năm tùy theo kết quả kinh doanh.</li></ul></div>}
                                 </JobDetailSection>
-                                
+
 
                                 {!!htmlForm &&
                                     <JobDetailSection title="Thông Báo Đơn Hàng" icon={ImageIcon}>
@@ -509,7 +509,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                                 <div>
                                                     <AutoHeightIframe htmlContent={htmlForm} title={jobTitle} />
                                                     <div className='flex justify-end items-center mt-2 flex-wrap gap-2'>
-                                                        <Button onClick={handleConvertToImage} disabled={isGeneratingPdf} className="w-full md:w-[40%] flex bg-accent-orange text-white hover:bg-accent-orange/90" style={{fontSize:'15px'}}>
+                                                        <Button onClick={handleConvertToImage} disabled={isGeneratingPdf} className="w-full md:w-[40%] flex bg-accent-orange text-white hover:bg-accent-orange/90" style={{ fontSize: '15px' }}>
                                                             {isGeneratingPdf ? 'Đang tạo ảnh...' : (
                                                                 <>
                                                                     <FileImageIcon className="mr-2 h-4 w-4" />
@@ -517,7 +517,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                                                 </>
                                                             )}
                                                         </Button>
-                                                        <Button onClick={handleConvertToPDF} disabled={isGeneratingPdf} className='w-full md:w-[40%] flex' style={{fontSize:'15px'}}>
+                                                        <Button onClick={handleConvertToPDF} disabled={isGeneratingPdf} className='w-full md:w-[40%] flex' style={{ fontSize: '15px' }}>
                                                             {isGeneratingPdf ? 'Đang tạo PDF...' : (
                                                                 <>
                                                                     <FileIcon className="mr-2 h-4 w-4" />
@@ -531,7 +531,7 @@ export default function JobDetailClientPage({ job, behavioralSuggestions }: { jo
                                         </div>
                                     </JobDetailSection>
                                 }
-                                
+
                                 <JobDetailSection title="Hình ảnh công việc" icon={ImageIcon}>
                                     <div className={cn("space-y-6", isExpired && "grayscale")}>
                                         <div className={cn("grid grid-cols-1 gap-4", job.formImage && role === 'admin' ? 'md:grid-cols-2' : 'md:grid-cols-1')}>
