@@ -73,40 +73,42 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
     };
 
     if (!!q && q.length > 0) {
-        searchQuery.query.bool.filter.push({
-            bool: {
-                should: [{
-                    match_phrase: {
-                        "aiContent": {
-                            "query": q,
-                            "slop": 2
+        q.split(';').forEach(keyword => {
+            searchQuery.query.bool.filter.push({
+                bool: {
+                    should: [{
+                        match_phrase: {
+                            "aiContent": {
+                                "query": keyword.trim(),
+                                "slop": 2
+                            }
                         }
-                    }
-                }, {
-                    match_phrase: {
-                        "baseContent": {
-                            "query": q,
-                            "slop": 2
+                    }, {
+                        match_phrase: {
+                            "baseContent": {
+                                "query": keyword.trim(),
+                                "slop": 2
+                            }
                         }
-                    }
-                }, {
-                    match_phrase: {
-                        "matchingContent": {
-                            "query": q,
-                            "slop": 2
+                    }, {
+                        match_phrase: {
+                            "matchingContent": {
+                                "query": keyword.trim(),
+                                "slop": 2
+                            }
                         }
-                    }
-                }, {
-                    match_phrase: {
-                        "formMarkdownArray.noiDung": {
-                            "query": q,
-                            "slop": 2
+                    }, {
+                        match_phrase: {
+                            "formMarkdownArray.noiDung": {
+                                "query": keyword.trim(),
+                                "slop": 2
+                            }
                         }
-                    }
-                }],
-                minimum_should_match: 1,
-            },
-        });
+                    }],
+                    minimum_should_match: 1,
+                },
+            });
+        })
     }
     const sort: any[] = [];
     if (showExpired) {
