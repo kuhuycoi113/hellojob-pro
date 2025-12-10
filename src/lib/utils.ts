@@ -479,7 +479,7 @@ export const generateHtmlFromMarkdown = (visaDetail: string, details: { stt: str
   const sttStyle = 'padding: 8px 6px; border: 1px solid #e5e7eb; text-align: center; background-color: #AFC536;';
   const cellStyle = 'padding: 8px 6px; border: 1px solid #e5e7eb;';
   details.forEach(({ stt, hangMuc, noiDung }, index) => {
-    const desc = noiDung.replace(/(\*\*|__)(.*?)\1/g, "<b>$2</b>").replace(/\*(.*?)\*/g, "<i>$1</i>");
+    const desc = noiDung?.replace(/(\*\*|__)(.*?)\1/g, "<b>$2</b>")?.replace(/\*(.*?)\*/g, "<i>$1</i>");
     tableHtml +=
       `<tr>
       <td style="${sttStyle}">${stt}</td>
