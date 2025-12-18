@@ -269,8 +269,8 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
         }
         case 'newest':
         default: {
-            sort.push({ "_score": { "order": "desc" } });
-            sort.push({ "createdDate": { "order": "desc" } });
+            // sort.push({ "_score": { "order": "desc" } });
+            sort.push({ "postedDate": { "order": "desc" } });
             break;
         }
     }
