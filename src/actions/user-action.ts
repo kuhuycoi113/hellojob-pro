@@ -1,5 +1,5 @@
 'use server';
-import { createDocument, deleteDocument, searchDocuments, updateDocument } from "@/lib/elasticsearch";
+import { createDocument, searchDocuments, updateDocument } from "@/lib/elasticsearch";
 import { getFirebaseAdminApp } from "@/lib/firebase-admin";
 import { randomUUID } from "crypto";
 const APPLIED_JOBS_COLLECTION = 'hellojobv5-applied-jobs';
@@ -7,7 +7,6 @@ import * as AWS from "aws-sdk";
 import { FileMimeType } from "@/lib/file-mime-type";
 import { validateProfileForApplication } from "@/lib/validators";
 import { Role, User } from "@/contexts/AuthContext";
-import { cache } from "react";
 
 export async function updateProfile(userId: any, data: any) {
     try {

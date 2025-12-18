@@ -1,7 +1,6 @@
-import { Client } from '@elastic/elasticsearch';
-import type { RequestBody, TransportRequestPromise } from '@elastic/elasticsearch/lib/Transport';
-import type { SearchHit } from '@elastic/elasticsearch/api/types';
+import { Client } from '@opensearch-project/opensearch';
 import { PaginatedResponse } from './types';
+import { RequestBody, TransportRequestPromise } from '@opensearch-project/opensearch/lib/Transport.js';
 
 const elasticsearchHost = process.env.ELASTICSEARCH_HOST;
 const elasticsearchUsername = process.env.ELASTICSEARCH_USERNAME;
@@ -23,7 +22,9 @@ export const client = new Client({
   auth: {
     username: elasticsearchUsername,
     password: elasticsearchPassword,
-  },
+  }, ssl: {
+    rejectUnauthorized: process.env.ELASTICSEARCH_REJECT_UNAUTHORIZED === 'true' // Bỏ qua kiểm tra chứng chỉ SSL khi dev local qua tunnel
+  }
 });
 
 /**
@@ -33,7 +34,7 @@ export const client = new Client({
  * @param body - The content of the document.
  * @returns Promise containing the result from Elasticsearch.
  */
-export const createDocument = <T extends RequestBody>(
+export const createDocument = <T extends Record<string, any>>(
   index: string,
   id: string,
   body: T
@@ -117,7 +118,7 @@ export const deleteDocument = (
  */
 export const searchDocuments = async <T = any>(
   index: string,
-  query: RequestBody,
+  query: any,
   page: number = 1,
   limit: number = 10,
 ): Promise<PaginatedResponse<T>> => {
@@ -131,7 +132,7 @@ export const searchDocuments = async <T = any>(
     track_total_hits: true,
   });
 
-  const hits = response.body.hits.hits as SearchHit<T>[];
+  const hits = response.body.hits.hits as any[];
   const total = (response.body.hits.total as any).value ?? 0;
 
   return {
@@ -144,7 +145,7 @@ export const searchDocuments = async <T = any>(
 };
 export const countDocuments = async (
   index: string,
-  query: RequestBody
+  query: any
 ): Promise<number> => {
   const response = await client.count({
     index,
