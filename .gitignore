@@ -20,6 +20,8 @@
 *.tsbuildinfo
 next-env.d.ts
 /.idx
+/.modified
+/package-lock.json
 
 # Misc
 .DS_Store
