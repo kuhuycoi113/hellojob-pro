@@ -19,6 +19,7 @@
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+/.idx
 
 # Misc
 .DS_Store
