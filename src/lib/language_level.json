@@ -98,5 +98,15 @@
       "TN"
     ],
     "type": "Kaiwa"
+  },
+  {
+    "name": "Không yêu cầu tiếng",
+    "value": "TDN1",
+    "slug": "khong-yeu-cau-tieng",
+    "level": 10,
+    "groupCode": [
+      "TN"
+    ],
+    "type": "Không yêu cầu tiếng"
   }
 ]
