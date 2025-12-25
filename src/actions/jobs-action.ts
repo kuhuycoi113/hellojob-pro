@@ -483,9 +483,10 @@ function createSearchQuery(filter: SearchFilters, sortOption: string | null): an
     }
     if (!!languageRequirement && languageRequirement.length > 0) {
         const level = LANGUAGE_LEVEL.find(level => level.slug === languageRequirement);
+        console.log(level)
         if (!!level) {
             const levelType = level.type;
-            const levels = LANGUAGE_LEVEL.filter(lv => lv.type === levelType && lv.level <= level.level).map(lv => lv.name);
+            const levels = LANGUAGE_LEVEL.filter(lv => lv.level <= level.level).map(lv => lv.name);
             conditionMust.push({
                 terms: {
                     "languageLevel.keyword": levels,

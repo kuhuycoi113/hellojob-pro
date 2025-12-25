@@ -2,7 +2,7 @@
   {
     "name": "JLPT N5",
     "value": "N5",
-    "level": 0,
+    "level": 5,
     "slug": "jlpt-n5",
     "groupCode": [
       "TN"
@@ -12,7 +12,7 @@
   {
     "name": "JLPT N4",
     "value": "N4",
-    "level": 1,
+    "level": 6,
     "slug": "jlpt-n4",
     "groupCode": [
       "TN"
@@ -23,7 +23,7 @@
     "name": "JLPT N3",
     "value": "N3",
     "slug": "jlpt-n3",
-    "level": 2,
+    "level": 7,
     "groupCode": [
       "TN"
     ],
@@ -33,7 +33,7 @@
     "name": "JLPT N2",
     "value": "N2",
     "slug": "jlpt-n2",
-    "level": 3,
+    "level": 8,
     "groupCode": [
       "TN"
     ],
@@ -43,7 +43,7 @@
     "name": "JLPT N1",
     "value": "N1",
     "slug": "jlpt-n1",
-    "level": 4,
+    "level": 9,
     "groupCode": [
       "TN"
     ],
